@@ -55,6 +55,7 @@ describe("buildInboxItems", () => {
     });
     expect(items.map((i) => i.kind)).toEqual(["live_proof", "other_tabs_unsaved_keys"]);
     expect(items[0].count).toBe(2);
+    expect(items[0].title).toBe("2 live proofs waiting — tap to sign");
     expect(items[1].title).toBe("Managing in 2 other tabs");
     expect(items[1].subtitle).toBe("@alice · def…");
   });
@@ -466,6 +467,7 @@ describe("buildInboxSheetRows", () => {
     });
     expect(rows).toHaveLength(2);
     expect(rows[0].title).toBe("Card A");
+    expect(rows[0].subtitle).toContain("tap to sign");
     expect(rows[0].subtitle).toContain("5m left");
     expect(rows[1].title).toBe("@bob");
   });

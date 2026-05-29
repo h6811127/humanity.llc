@@ -10,12 +10,28 @@ import {
   incrementUsage,
   profileLinkedAccount,
   resolveEffectiveEntitlements,
-  stewardSchemaReady,
+  stewardPushSchemaReady,
 } from "./db";
 import { utcDayKey } from "./plans";
 
 export const LIVE_PROOF_PENDING_TYPE = "live_proof.pending";
 export const STEWARD_PUSH_DELIVERED_EVENT = "notify.push.delivered";
+export const STEWARD_PUSH_NOTIFY_FAILED_EVENT = "notify.push.live_proof_notify_failed";
+
+let pushNotifyFailuresSinceBoot = 0;
+
+export function stewardPushNotifyFailuresSinceBoot(): number {
+  return pushNotifyFailuresSinceBoot;
+}
+
+/** @internal test helper */
+export function clearStewardPushNotifyFailuresForTests(): void {
+  pushNotifyFailuresSinceBoot = 0;
+}
+
+function recordStewardPushNotifyFailure(): void {
+  pushNotifyFailuresSinceBoot += 1;
+}
 
 /** Per-account concurrent SSE streams (M3). */
 export const STEWARD_PUSH_MAX_CONNECTIONS_PER_ACCOUNT = 5;
@@ -162,6 +178,7 @@ export function registerStewardPushIp(clientIp: string): () => void {
 export function clearStewardPushConnectionsForTests(): void {
   connectionsByAccount.clear();
   connectionCountByIp.clear();
+  clearStewardPushNotifyFailuresForTests();
 }
 
 export function formatSsePingComment(): string {
@@ -323,74 +340,80 @@ export async function notifyLiveProofPending(
   db: D1Database,
   input: LiveProofPendingNotifyInput
 ): Promise<{ delivered: number; account_id: string | null }> {
-  if (!hostedStewardEnabled(env) || !(await stewardSchemaReady(db))) {
-    return { delivered: 0, account_id: null };
-  }
-
-  const accountId = await profileLinkedAccount(db, input.profile_id);
-  if (!accountId) {
-    return { delivered: 0, account_id: null };
-  }
-
-  const resolved = await resolveEffectiveEntitlements(db, accountId);
-  if (!resolved) {
-    return { delivered: 0, account_id: accountId };
-  }
-
-  const { account, entitlements } = resolved;
-  if (account.status !== "active" && account.status !== "trialing") {
-    return { delivered: 0, account_id: accountId };
-  }
-  if (entitlements["steward.hosted"] !== true) {
-    return { delivered: 0, account_id: accountId };
-  }
-  if (entitlements["notify.push.live_proof"] !== true) {
-    return { delivered: 0, account_id: accountId };
-  }
-
-  const event: LiveProofPendingPushEvent = {
-    type: LIVE_PROOF_PENDING_TYPE,
-    version: 1,
-    operator_id: OPERATOR_ID,
-    account_id: accountId,
-    profile_id: input.profile_id,
-    qr_id: input.qr_id,
-    challenge_id: input.challenge_id,
-    issued_at: input.issued_at,
-    expires_at: input.expires_at,
-  };
-
-  const chunk = formatLiveProofPendingSse(event);
-  const sinks = connectionsByAccount.get(accountId);
-  if (!sinks || sinks.size === 0) {
-    return { delivered: 0, account_id: accountId };
-  }
-
-  const dayKey = utcDayKey();
-  let delivered = 0;
-  for (const sink of sinks) {
-    try {
-      sink.write(chunk);
-      delivered += 1;
-      try {
-        await incrementUsage(
-          db,
-          accountId,
-          sink.deviceId || "",
-          STEWARD_PUSH_DELIVERED_EVENT,
-          dayKey
-        );
-      } catch {
-        /* metering must not break fan-out */
-      }
-    } catch (err) {
-      console.error("steward_push_sink_write_failed", {
-        account_id: accountId,
-        connection_id: sink.connectionId,
-        err,
-      });
+  try {
+    if (!hostedStewardEnabled(env) || !(await stewardPushSchemaReady(db))) {
+      return { delivered: 0, account_id: null };
     }
-  }
 
-  return { delivered, account_id: accountId };
+    const accountId = await profileLinkedAccount(db, input.profile_id);
+    if (!accountId) {
+      return { delivered: 0, account_id: null };
+    }
+
+    const resolved = await resolveEffectiveEntitlements(db, accountId);
+    if (!resolved) {
+      return { delivered: 0, account_id: accountId };
+    }
+
+    const { account, entitlements } = resolved;
+    if (account.status !== "active" && account.status !== "trialing") {
+      return { delivered: 0, account_id: accountId };
+    }
+    if (entitlements["steward.hosted"] !== true) {
+      return { delivered: 0, account_id: accountId };
+    }
+    if (entitlements["notify.push.live_proof"] !== true) {
+      return { delivered: 0, account_id: accountId };
+    }
+
+    const event: LiveProofPendingPushEvent = {
+      type: LIVE_PROOF_PENDING_TYPE,
+      version: 1,
+      operator_id: OPERATOR_ID,
+      account_id: accountId,
+      profile_id: input.profile_id,
+      qr_id: input.qr_id,
+      challenge_id: input.challenge_id,
+      issued_at: input.issued_at,
+      expires_at: input.expires_at,
+    };
+
+    const chunk = formatLiveProofPendingSse(event);
+    const sinks = connectionsByAccount.get(accountId);
+    if (!sinks || sinks.size === 0) {
+      return { delivered: 0, account_id: accountId };
+    }
+
+    const dayKey = utcDayKey();
+    let delivered = 0;
+    for (const sink of sinks) {
+      try {
+        sink.write(chunk);
+        delivered += 1;
+        try {
+          await incrementUsage(
+            db,
+            accountId,
+            sink.deviceId || "",
+            STEWARD_PUSH_DELIVERED_EVENT,
+            dayKey
+          );
+        } catch {
+          /* metering must not break fan-out */
+        }
+      } catch (err) {
+        console.error("steward_push_sink_write_failed", {
+          account_id: accountId,
+          connection_id: sink.connectionId,
+          err,
+        });
+      }
+    }
+
+    return { delivered, account_id: accountId };
+  } catch (err) {
+    recordStewardPushNotifyFailure();
+    console.error("steward_push_notify_failed", err);
+    return { delivered: 0, account_id: null };
+  }
 }

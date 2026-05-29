@@ -10,6 +10,7 @@ import {
   StewardPushConnectionLimitError,
   STEWARD_PUSH_MAX_CONNECTIONS_PER_ACCOUNT,
   stewardPushConnectionCount,
+  stewardPushNotifyFailuresSinceBoot,
 } from "../src/steward/push";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
@@ -183,5 +184,24 @@ describe("notifyLiveProofPending", () => {
       expires_at: "2026-05-26T12:02:00.000Z",
     });
     expect(result.delivered).toBe(0);
+  });
+
+  it("records notify_failures_since_boot when fan-out throws", async () => {
+    const db = {
+      prepare: () => {
+        throw new Error("db_unavailable");
+      },
+    } as unknown as D1Database;
+    const env: Env = { DB: db, HOSTED_STEWARD_ENABLED: "1" };
+    const before = stewardPushNotifyFailuresSinceBoot();
+    const result = await notifyLiveProofPending(env, db, {
+      profile_id: PROFILE,
+      qr_id: QR_ID,
+      challenge_id: CHALLENGE,
+      issued_at: "2026-05-26T12:00:00.000Z",
+      expires_at: "2026-05-26T12:02:00.000Z",
+    });
+    expect(result.delivered).toBe(0);
+    expect(stewardPushNotifyFailuresSinceBoot()).toBe(before + 1);
   });
 });

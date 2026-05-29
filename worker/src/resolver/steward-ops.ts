@@ -6,6 +6,7 @@ import {
   STEWARD_PUSH_MAX_CONNECTIONS_PER_ACCOUNT,
   STEWARD_PUSH_MAX_CONNECTIONS_PER_IP,
   stewardPushConnectionSummary,
+  stewardPushNotifyFailuresSinceBoot,
 } from "../steward/push";
 import { utcDayKey } from "../steward/plans";
 import type { Env } from "../env";
@@ -140,6 +141,7 @@ export async function handleGetStewardOpsSnapshot(
       usage,
       push: {
         ...push,
+        notify_failures_since_boot: stewardPushNotifyFailuresSinceBoot(),
         max_connections_per_account: STEWARD_PUSH_MAX_CONNECTIONS_PER_ACCOUNT,
         max_connections_per_ip: STEWARD_PUSH_MAX_CONNECTIONS_PER_IP,
       },

@@ -173,6 +173,26 @@ export function liveControlInboxChanged(prev, next) {
   return liveControlPendingSignature(prev) !== liveControlPendingSignature(next);
 }
 
+/** @see docs/LIVE_CONTROL_USABILITY_HARDENING.md H-07 */
+export const LIVE_PROOF_INBOX_ACTION_COPY = "Live proof waiting — tap to sign";
+
+/**
+ * @param {number} count
+ */
+export function liveProofInboxAggregateTitle(count) {
+  if (count === 1) return LIVE_PROOF_INBOX_ACTION_COPY;
+  return `${count} live proofs waiting — tap to sign`;
+}
+
+/**
+ * @param {string} [expiryLabel]
+ */
+export function liveProofInboxRowSubtitle(expiryLabel = "") {
+  const trimmed = String(expiryLabel || "").trim();
+  if (!trimmed) return LIVE_PROOF_INBOX_ACTION_COPY;
+  return `${LIVE_PROOF_INBOX_ACTION_COPY} · ${trimmed}`;
+}
+
 /**
  * @param {string} iso
  * @param {number} [now]

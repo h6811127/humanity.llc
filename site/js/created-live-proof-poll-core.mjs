@@ -45,11 +45,15 @@ export function liveProofPanelMostlyVisible(rect) {
 
 /**
  * @param {{
- *   reason: 'poll_discovered' | 'deeplink',
+ *   reason: 'poll_discovered' | 'deeplink' | 'visibility_resume',
  *   panelMostlyVisible: boolean,
  * }} input
  */
 export function shouldScrollLiveProofPanelIntoView(input) {
   if (input.panelMostlyVisible) return false;
-  return input.reason === "poll_discovered" || input.reason === "deeplink";
+  return (
+    input.reason === "poll_discovered" ||
+    input.reason === "deeplink" ||
+    input.reason === "visibility_resume"
+  );
 }

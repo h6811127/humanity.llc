@@ -75,6 +75,12 @@ describe("shouldScrollLiveProofPanelIntoView", () => {
         panelMostlyVisible: false,
       })
     ).toBe(true);
+    expect(
+      shouldScrollLiveProofPanelIntoView({
+        reason: "visibility_resume",
+        panelMostlyVisible: false,
+      })
+    ).toBe(true);
   });
 
   it("does not scroll when panel is already salient", () => {

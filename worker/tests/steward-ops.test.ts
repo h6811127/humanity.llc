@@ -219,6 +219,7 @@ describe("operator steward ops snapshot", () => {
       push: {
         active_connections: number;
         active_client_ips: number;
+        notify_failures_since_boot: number;
         max_connections_per_account: number;
       };
       controls: { sla: { live_proof_push_p95_target_seconds: number } };
@@ -238,6 +239,7 @@ describe("operator steward ops snapshot", () => {
     });
     expect(body.push.active_connections).toBe(1);
     expect(body.push.active_client_ips).toBe(1);
+    expect(body.push.notify_failures_since_boot).toBe(0);
     expect(body.push.max_connections_per_account).toBe(5);
     expect(body.controls.sla.live_proof_push_p95_target_seconds).toBe(5);
   });

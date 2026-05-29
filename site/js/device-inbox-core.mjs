@@ -16,6 +16,7 @@ import {
   crossTabPresenceLabel,
 } from "./device-cross-tab-copy-core.mjs";
 import { dotOverlayFromCounts } from "./device-dot-state-core.mjs?v=58";
+import { liveProofInboxAggregateTitle, liveProofInboxRowSubtitle } from "./device-live-control-inbox-core.mjs";
 
 /** @typedef {'live_proof' | 'tab_keys_unsaved' | 'cross_tab_keys' | 'other_tabs_unsaved_keys' | 'orphan_keys_removed' | 'card_disabled_since_visit'} InboxKind */
 
@@ -82,7 +83,7 @@ export function buildInboxItems(input) {
       kind: "live_proof",
       urgency: "high",
       count: n,
-      title: n === 1 ? "1 live proof waiting" : `${n} live proof waiting`,
+      title: liveProofInboxAggregateTitle(n),
       hubScrollTarget: "device-hub-live-control-group",
     });
   }
@@ -590,7 +591,7 @@ export function buildInboxSheetRows(items, ctx = {}) {
         rows.push({
           kind: "live_proof",
           title: label,
-          subtitle: expiry ? `Someone is waiting · ${expiry}` : "Someone is waiting",
+          subtitle: liveProofInboxRowSubtitle(expiry),
           tone: "gold",
           proofItem: proof,
         });

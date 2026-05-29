@@ -430,7 +430,13 @@ function initLiveControlProof() {
         stopPolling();
         return;
       }
-      refresh();
+      void (async () => {
+        await pollPendingChallenge();
+        refresh();
+        if (activeChallengeId) {
+          scheduleScrollPanelIntoView("visibility_resume");
+        }
+      })();
     });
     window.addEventListener("pagehide", () => {
       stopPolling();

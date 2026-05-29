@@ -15,7 +15,7 @@ import {
   handleGetStewardEntitlements,
   handlePostStewardSession,
 } from "../src/resolver/steward-hosted";
-import { stewardSchemaReady } from "../src/steward/db";
+import { stewardSchemaReady, stewardPushSchemaReady } from "../src/steward/db";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const ACCOUNT = "acc_TestHostedSteward1";
@@ -235,6 +235,7 @@ describe("steward hosted E1", () => {
     const db = stewardDb("pk");
     const env: Env = { DB: db, HOSTED_STEWARD_ENABLED: "1" };
     expect(await stewardSchemaReady(db)).toBe(true);
+    expect(await stewardPushSchemaReady(db)).toBe(true);
     const res = await handleGetOperatorCapabilities(
       new Request("https://humanity.llc/.well-known/hc/v1/operator/capabilities"),
       env

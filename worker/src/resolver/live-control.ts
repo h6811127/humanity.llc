@@ -169,8 +169,6 @@ export async function handlePostLiveControlChallenge(
         challenge_id: challengeId,
         issued_at: issuedAtIso,
         expires_at: expiresAtIso,
-      }).catch((err) => {
-        console.error("steward_push_notify_failed", err);
       })
     );
   }

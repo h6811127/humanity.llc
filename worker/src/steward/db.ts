@@ -14,6 +14,12 @@ import { closeStewardPushConnectionsForAccount } from "./push";
 
 const STEWARD_TABLE = "steward_accounts";
 
+const STEWARD_PUSH_TABLES = [
+  STEWARD_TABLE,
+  "steward_account_profiles",
+  "steward_usage_counters",
+] as const;
+
 export async function stewardSchemaReady(db: D1Database): Promise<boolean> {
   const row = await db
     .prepare(
@@ -22,6 +28,20 @@ export async function stewardSchemaReady(db: D1Database): Promise<boolean> {
     .bind(STEWARD_TABLE)
     .first();
   return !!row;
+}
+
+/** Push fan-out needs profiles linkage + usage metering tables (migration 0012). */
+export async function stewardPushSchemaReady(db: D1Database): Promise<boolean> {
+  for (const name of STEWARD_PUSH_TABLES) {
+    const row = await db
+      .prepare(
+        `SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?`
+      )
+      .bind(name)
+      .first();
+    if (!row) return false;
+  }
+  return true;
 }
 
 export async function getPlanEntitlements(

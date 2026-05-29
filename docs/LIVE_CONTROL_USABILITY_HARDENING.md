@@ -1,6 +1,6 @@
 # Live control usability hardening
 
-**Status:** In progress — Slice A shipped (H-01–H-03); Slice B shipped (H-04–H-06)  
+**Status:** In progress — Slice A shipped (H-01–H-03); Slice B shipped (H-04–H-06); Slice C shipped (H-07–H-08)  
 **Gate:** `docs/M7_LIVE_CONTROL_ALPHA.md` Step 2 · post–production FK repair (`docs/LIVE_PROOF_FAILURE_INVESTIGATION.md`)  
 **Related:** [`M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md`](M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md) · [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md) · [`SCAN_PAGE_TRUST_UI.md`](SCAN_PAGE_TRUST_UI.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) · [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) (plain-language errors)
 
@@ -188,6 +188,8 @@ This document is the **implementation backlog** for hardening live control **usa
 
 ### H-07 — Push-primary, poll-fallback for stewards
 
+**Status:** Shipped (2026-05-29)
+
 **Problem:** `notifyLiveProofPending` runs in `waitUntil` on challenge create; failures only log `steward_push_notify_failed`. Owners with wallet keys depend on poll intervals or manually opening `/created/`.
 
 **Proposed behavior:**
@@ -202,14 +204,17 @@ This document is the **implementation backlog** for hardening live control **usa
 **Acceptance:**
 
 - [ ] Push-enabled steward receives notification within N seconds of stranger ask (manual QA).
-- [ ] Inbox row opens correct `/created/?live_challenge=…` without re-asking on scanner.
-- [ ] Push disabled: poll path still discovers pending challenge within poll budget.
+- [x] Inbox row opens correct `/created/?live_challenge=…` without re-asking on scanner.
+- [x] Push disabled: poll path still discovers pending challenge within poll budget.
+- [x] Steward-ops exposes `push.notify_failures_since_boot` for operator triage.
 
 ---
 
 ## P1 — Recovery and continuity
 
 ### H-08 — Tab backgrounding recovery (owner)
+
+**Status:** Shipped (2026-05-29)
 
 **Problem:** `/created/` stops live-proof poll when `document.visibilityState === "hidden"` (battery). Owner switching to Messages/Camera may return after missing visual cue.
 
@@ -224,7 +229,8 @@ This document is the **implementation backlog** for hardening live control **usa
 **Acceptance:**
 
 - [ ] iOS Safari: background `/created/` 30s while stranger asks; return shows **Prove control now** without manual refresh.
-- [ ] No poll storm when tab hidden.
+- [x] `visibilitychange` → visible triggers immediate `pollPendingChallenge()` + scroll when pending.
+- [x] No poll storm when tab hidden.
 
 ---
 
@@ -421,3 +427,4 @@ flowchart TD
 | 2026-05-29 | Initial backlog from production FK incident + Step 2 usability review (H-01–H-15) |
 | 2026-05-29 | Slice A shipped: H-01 scan client helpers, H-02 insert error mapping, H-03 poll retry |
 | 2026-05-29 | Slice B shipped: H-04 handoff copy, H-05 same-device banner, H-06 owner QR in challenge JSON |
+| 2026-05-29 | Slice C shipped: H-07 inbox tap-to-sign copy + push schema/ops observability; H-08 owner visibility resume poll |

@@ -64,11 +64,11 @@ registerGlanceTarget("device-hub-glance-popover", "device-hub-glance-list", "dev
 function glanceCopy(wallet) {
   return wallet
     ? {
-        liveProofSub: "Tap to view waiting proofs",
+        liveProofSub: "Tap to sign",
         moreSub: "Tap to view all saved",
       }
     : {
-        liveProofSub: "Tap to open inbox",
+        liveProofSub: "Tap to sign",
         moreSub: "Tap to open hub",
       };
 }

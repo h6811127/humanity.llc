@@ -165,7 +165,7 @@ test.describe("device inbox - live proof", () => {
     const row = page.locator(".device-inbox-sheet-row--live_proof");
     await expect(row).toBeVisible();
     await expect(row.getByText("E2E Test Card")).toBeVisible();
-    await expect(row.getByText(/Someone is waiting/)).toBeVisible();
+    await expect(row.getByText(/tap to sign/i)).toBeVisible();
     await row.locator("button").click();
     await expect(page).toHaveURL(new RegExp(`live_challenge=${CHALLENGE_ID}`));
     await expect(page).toHaveURL(/profile_id=7Xk9mP2nQ4rT6vW8yZ1aB3cD5/);

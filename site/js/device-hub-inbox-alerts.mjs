@@ -13,6 +13,7 @@ import { openSaveKeysForThisTab } from "./device-notice-nav.mjs";
 import {
   formatLiveControlExpiry,
   getLiveControlPending,
+  liveProofInboxRowSubtitle,
   openLiveControlProof,
 } from "./device-live-control-inbox.mjs";
 
@@ -195,7 +196,7 @@ function renderLiveProofHubGroup(liveControlGroup, liveControlList, show) {
   if (summaryEl instanceof HTMLElement) {
     summaryEl.textContent =
       n === 1
-        ? "Someone nearby asked for live proof. Tap the card below to sign."
+        ? "Someone nearby asked for live proof. Tap a card below to sign."
         : `${n} cards need your signature. Tap one below.`;
     summaryEl.hidden = false;
   }
@@ -203,7 +204,7 @@ function renderLiveProofHubGroup(liveControlGroup, liveControlList, show) {
   for (const item of pending) {
     const label = inboxWalletEntryLabel(item.entry);
     const expiry = item.expires_at ? formatLiveControlExpiry(item.expires_at) : "";
-    const sub = expiry ? `Someone is waiting · ${expiry}` : "Someone is waiting";
+    const sub = liveProofInboxRowSubtitle(expiry);
 
     const li = document.createElement("li");
     li.className = "list-row list-action device-live-control-row";

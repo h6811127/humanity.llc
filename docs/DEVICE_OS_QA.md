@@ -278,6 +278,16 @@ See [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md).
 | 2 | Tap **Ask for live proof** on same device | Owner handoff pane + QR/copy link appear; scanner flow not replaced by owner-only view |
 | 3 | Second phone scans same URL (no keys) | No same-device banner; normal stranger scanner flow |
 
+### P1-LC-VR · Live control owner tab resume (H-08)
+
+**Ref:** [`LIVE_CONTROL_USABILITY_HARDENING.md`](LIVE_CONTROL_USABILITY_HARDENING.md) H-08.
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Open `/created/` with signing keys; leave tab on listening state | Live-proof panel visible |
+| 2 | Switch to another app for ~30s while stranger asks on scan page | No poll while hidden |
+| 3 | Return to `/created/` tab | **Prove control now** appears without manual refresh; panel scrolls into view if off-screen |
+
 ### P1-LCP · Live control printed QR camera QA (M7 Step 2)
 
 **Runbook:** [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md) · desk check: `npm run worker:test -- worker/tests/scan.test.ts worker/tests/live-control.test.ts`.
@@ -358,6 +368,29 @@ Automated: `e2e/device-status-dot.spec.ts` § hub sheet header chrome (steps 6�
 **Fail signals:** Install prompt on scan; install card with zero saved cards; install card over orphan inbox; dead status dot after adding PWA module to status graph.
 
 Automated (Phase 0+): `npm run worker:test:pwa-install` · Phase 3–4: `npm run e2e:pwa-install` (steps 2, 8–11 + no-SW policy in CI). **Manual HTTPS sign-off:** iOS Safari 2026-05-28 ✅ (steps 1–2, 5–6, 9–10, P0-W, standalone wallet). Re-verify icon after Phase 4.1 deploy (`site:generate-pwa-icons` + Pages).
+
+### P1-PWA-R · PWA standalone refresh (Phases 6–8)
+
+**Spec:** [`PWA_INSTALL.md`](PWA_INSTALL.md) § Standalone refresh & resume · **Implementation:** [`PWA_INSTALL_IMPLEMENTATION.md`](PWA_INSTALL_IMPLEMENTATION.md) Phases 6–8
+
+**Prerequisites:** Installed PWA (standalone) with ≥1 saved card. Phase 6+ refresh modules shipped.
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Open installed PWA · switch to another app · return within ~30s | Hub dot, inbox badge, and network chips update without manual browser reload (soft refresh on resume) |
+| 2 | Revoke or disable a card in Safari tab · switch back to installed PWA | Saved-row chip / alert reflects change after resume (wallet re-read from `localStorage`) |
+| 3 | Background PWA · restore from app switcher (bfcache path if applicable) | No stuck “card disabled since visit” from previous visit; chrome refreshes |
+| 4 | With hub collapsed on `/` | Resume does **not** fan out parallel status GET for every saved card (debounce / scope gates) |
+| 5 | Pull down on `/` landing content (Phase 7) | Brief in-progress indicator → “Updated” (or equivalent); dot and hub glance refresh |
+| 6 | Pull down on `/wallet/` | Same as step 5; saved-row chips refresh when debounce allows |
+| 7 | Hub or inbox sheet **open** · attempt pull | No gesture fight; PTR disabled or scoped (no stuck spinner) |
+| 8 | **Watch for live proof** off · pull to refresh | Chrome + chips still update; live-control poll does not run |
+| 9 | Deploy newer Pages build · open old standalone session (Phase 8) | Stale shell banner appears; tap reload loads new shell; dot healthy (**P0-3**) |
+| 10 | `/create/` or scan URL in standalone (if navigated there) | **No** PTR chrome |
+
+**Fail signals:** Standalone user must kill app to see card status change; pull triggers 10+ unscoped status GETs; PTR fires during hub sheet drag; auto `location.reload()` on every resume; refresh module on status graph breaks dot (**P0-3**).
+
+Automated (when shipped): `npm run worker:test -- worker/tests/pwa-standalone-refresh-core.test.ts` · extend `npm run e2e:pwa-install`.
 
 ### P1-8 · Hosted tier budget (Phase 10 — E2 staging)
 

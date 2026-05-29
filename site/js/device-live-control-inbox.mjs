@@ -84,6 +84,12 @@ import {
 
 export { getLiveControlPollHealth } from "./device-live-control-inbox-core.mjs";
 export {
+  formatLiveControlExpiry,
+  LIVE_PROOF_INBOX_ACTION_COPY,
+  liveProofInboxAggregateTitle,
+  liveProofInboxRowSubtitle,
+} from "./device-live-control-inbox-core.mjs";
+export {
   LIVE_CONTROL_POLL_MS_ACTIVE,
   LIVE_CONTROL_POLL_MS_IDLE,
   liveControlPollIntervalMs,
@@ -159,8 +165,6 @@ export const LIVE_CONTROL_BUDGET_CHANGED = "hc-live-control-poll-budget-changed"
  *   at: number,
  *   tabId?: string,
  * }} LiveControlLeaderSnapshot */
-
-export { formatLiveControlExpiry };
 
 export function getLastLiveProofCheckAt() {
   return lastLiveProofCheckAt;
