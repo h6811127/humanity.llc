@@ -7,7 +7,7 @@ import "./device-help-fab.mjs";
 initDeviceHub({
   noticeMode: "keys-strip",
   showLiveControlInbox: false,
-  savedLabel: "My cards",
+  savedLabel: "My objects",
 });
 
 document.getElementById("created-hub-manage-tab")?.addEventListener("click", () => {

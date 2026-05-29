@@ -57,7 +57,7 @@ test.describe("production sad-path — /created/ route gate", () => {
   test("bare /created/ redirects to wallet when no session", async ({ page }) => {
     await page.goto("/created/", { waitUntil: "commit" });
     await page.waitForURL(/\/wallet\/?$/, { timeout: 15_000 });
-    await expect(page.getByRole("heading", { name: "My cards on this device" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "My objects on this device" })).toBeVisible();
   });
 
   test("S6: #revoke without keys shows view-only notice, not live revoke controls", async ({

@@ -654,12 +654,12 @@ function appendHubSavedMoreRow(hiddenCount) {
     <div class="hub-card-head">
       <span class="list-content">
         <span class="list-title">${hiddenCount} more saved on this device</span>
-        <span class="list-sub">Open My cards for the full list and controls</span>
+        <span class="list-sub">Open My objects for the full list and controls</span>
       </span>
     </div>
     <div class="hub-card-actions">
       <div class="hub-card-actions-primary">
-        <a class="hub-card-action" href="/wallet/">Open My cards</a>
+        <a class="hub-card-action" href="/wallet/">Open My objects</a>
       </div>
     </div>`;
   }

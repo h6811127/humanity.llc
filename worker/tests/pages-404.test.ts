@@ -15,6 +15,12 @@ describe("Pages 404 shell", () => {
     expect(redirects).toMatch(/404\.html/i);
   });
 
+  it("aliases /objects to /wallet for bookmarks", () => {
+    const redirects = readFileSync(join(process.cwd(), "site/_redirects"), "utf8");
+    expect(redirects).toMatch(/\/objects\s+\/wallet\/\s+301/);
+    expect(redirects).toMatch(/\/objects\/\s+\/wallet\/\s+301/);
+  });
+
   it("rewrites /shop/products/* to a shell outside the splat (avoids Pages .html strip loop)", () => {
     const redirects = readFileSync(join(process.cwd(), "site/_redirects"), "utf8");
     expect(redirects).toMatch(/\/shop\/products\/\*\s+\/shop\/product-detail\/\s+200/);

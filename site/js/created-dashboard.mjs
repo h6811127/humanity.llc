@@ -152,7 +152,7 @@ export function initCreatedDashboard({
 
       if (!runSave) {
         showFeedback(
-          "Ownership not loaded in this tab. Finish create in this tab, or tap Open controls on My cards.",
+          "Ownership not loaded in this tab. Finish create in this tab, or tap Open controls on My objects.",
           true
         );
         return;
@@ -163,7 +163,7 @@ export function initCreatedDashboard({
 
       if (saved === null) {
         showFeedback(
-          "Ownership not loaded in this tab. Finish create in this tab, or tap Open controls on My cards.",
+          "Ownership not loaded in this tab. Finish create in this tab, or tap Open controls on My objects.",
           true
         );
         return;

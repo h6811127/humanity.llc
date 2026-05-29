@@ -119,4 +119,4 @@ export const CREATED_INCOMPLETE_LINK_MESSAGE =
   "Missing profile or QR in this link. Create a new card, or open the full URL from your create confirmation.";
 
 export const CREATED_SESSION_MISMATCH_HTML =
-  'This link is for a different card than the keys in this tab. Open <a href="/wallet/">My cards</a> and tap <strong>Open controls</strong> on the card you want.';
+  'This link is for a different card than the control loaded in this tab. Open <a href="/wallet/">My objects</a> and tap <strong>Open controls</strong> on the card you want.';

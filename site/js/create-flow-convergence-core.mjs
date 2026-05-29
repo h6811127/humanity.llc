@@ -121,8 +121,8 @@ export function createConvergenceNudgeCopy(template, ctx) {
       title: `${addVerb} under your existing card`,
       body:
         ctx.rootCount > 1
-          ? `Recommended: use ${rootLabel} on Live — one root key, no second card. Objects appear nested under your root in My cards.`
-          : `Recommended: use ${rootLabel} on Live — one root key, no second card. Objects appear nested under your root in My cards.`,
+          ? `Recommended: use ${rootLabel} on Live — one root key, no second card. Objects appear nested under your root in My objects.`
+          : `Recommended: use ${rootLabel} on Live — one root key, no second card. Objects appear nested under your root in My objects.`,
       primaryLabel: `${addVerb} on Live`,
       primaryHref: null,
       showGeneralSwitch: true,

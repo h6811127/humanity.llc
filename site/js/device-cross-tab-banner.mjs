@@ -89,7 +89,7 @@ function renderPageCrossTabBanner() {
       emphasisCardCtaSecondary("Open controls here", "data-cross-tab-use-keys")
     );
   }
-  actions.push(emphasisCardCtaLinkSecondary("My cards", "/wallet/"));
+  actions.push(emphasisCardCtaLinkSecondary("My objects", "/wallet/"));
 
   banner.hidden = false;
   banner.className = "hc-emphasis-card hc-emphasis-card--info device-cross-tab-banner";
@@ -181,7 +181,7 @@ function bindUseKeysHere(root, profileId, opts = {}) {
 function vouchCrossTabSubtext() {
   return getDefaultVouchProfileId()
     ? " — open that tab to vouch, or take control here"
-    : " — open that tab to sign, or open controls from My cards";
+    : " — open that tab to sign, or open controls from My objects";
 }
 
 function walletEntryForVouchHere(primaryProfileId) {

@@ -3,6 +3,8 @@
 # Unknown paths: site/404.html (HTTP 404). Disable SPA fallback in Pages project settings.
 
 /create  /create/  301
+/objects  /wallet/  301
+/objects/  /wallet/  301
 # Product detail SPA — rewrite outside /shop/products/* (Pages 308-strips .html; a target like
 # /shop/products/detail.html becomes /shop/products/detail, which re-matches the splat and loops).
 /shop/products/*  /shop/product-detail/  200

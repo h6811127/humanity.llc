@@ -32,10 +32,10 @@
   ],
   "shortcuts": [
     {
-      "name": "My cards",
-      "short_name": "Cards",
+      "name": "My objects",
+      "short_name": "Objects",
       "url": "/wallet/",
-      "description": "Open saved Humanity cards on this device."
+      "description": "Open saved objects you own on this device."
     },
     {
       "name": "Create a live card",

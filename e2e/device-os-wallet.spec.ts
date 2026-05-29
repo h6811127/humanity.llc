@@ -84,11 +84,11 @@ test.describe("device OS wallet flow", () => {
     }, SAMPLE_WALLET_ENTRY);
   });
 
-  test("shows My cards home and Open controls opens /created/ with session keys", async ({
+  test("shows My objects home and Open controls opens /created/ with session keys", async ({
     page,
   }) => {
     await page.goto("/wallet/");
-    await expect(page.getByRole("heading", { name: "My cards on this device" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "My objects on this device" })).toBeVisible();
     await expect(page.getByText("E2E Test Card")).toBeVisible();
     await clickOpenControlsOnSavedCard(page);
     await expect(page).toHaveURL(/\/created\/\?.*profile_id=7Xk9mP2nQ4rT6vW8yZ1aB3cD5/);
@@ -653,10 +653,10 @@ test.describe("device OS wallet flow", () => {
     await expect(page.locator(".hub-card-status-alert:not([hidden])")).toHaveCount(0);
   });
 
-  test("contextless /created/ redirects to My cards home", async ({ page }) => {
+  test("contextless /created/ redirects to My objects home", async ({ page }) => {
     await page.goto("/created/");
     await expect(page).toHaveURL(/\/wallet\/$/);
-    await expect(page.getByRole("heading", { name: "My cards on this device" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "My objects on this device" })).toBeVisible();
   });
 
   test("keys custody wallet notice uses compact stacked layout", async ({ page }) => {

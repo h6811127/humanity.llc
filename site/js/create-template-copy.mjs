@@ -15,7 +15,7 @@ export const CREATE_TEMPLATE_HERO = {
   status_plate: {
     title: "Add a status plate",
     lead:
-      "Recommended: add under an existing general card on Live — one root key, nested in My cards. Standalone plate cards below stay available for legacy pilots.",
+      "Recommended: add under an existing general card on Live — one root key, nested in My objects. Standalone plate cards below stay available for legacy pilots.",
   },
   lost_item_relay: {
     title: "Add a lost-item relay",

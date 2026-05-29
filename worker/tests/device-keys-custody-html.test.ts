@@ -48,6 +48,12 @@ describe("device-keys-custody-html", () => {
     expect(html).not.toContain("hc-notice--warning");
   });
 
+  it("wallet page uses My objects nav label (D3)", () => {
+    const html = readFileSync(join(root, "site/wallet/index.html"), "utf8");
+    expect(html).toContain("My objects on this device");
+    expect(html).not.toContain("My cards on this device");
+  });
+
   it("help page leads with ownership and demotes signing keys to advanced", () => {
     const html = readFileSync(join(root, "site/help/index.html"), "utf8");
     expect(html).toContain('id="ownership"');

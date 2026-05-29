@@ -54,7 +54,7 @@ Pages serves `404.html` with HTTP **404** for paths that do not match a file whe
 |------|---------|
 | `index.html` | Landing (hero, **How it works**, device hub; status plate pilot — no pass demo) |
 | `created/index.html` | Post-create owner UI + shared device hub |
-| `wallet/index.html` | My cards on this device (`/wallet/`, `hc_wallet` in localStorage) |
+| `wallet/index.html` | My objects on this device (`/wallet/`, alias `/objects/`) |
 | `shop/index.html` | Tier 0 drop  -  config-driven Shopify checkout handoff |
 | `data/shop-config.json` | Set `checkout_url` + `checkout_open` to enable Buy |
 | `shop/thanks/index.html` | Post-checkout guidance (Tier 0 email copy) |

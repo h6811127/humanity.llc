@@ -100,7 +100,7 @@ Use this table when rewriting copy or adding UI. **Engineering identifiers stay*
 | No signing keys in this tab | **Ownership not loaded in this tab** | Explain what to do, not why crypto |
 | Keys open in another tab | **Another tab is managing this** | Cross-tab custody |
 | Steward-capable signing keys | **You can attest as steward** | Network + device both required |
-| My cards (wallet) | **My objects** / **What I own** (TBD) | “Cards” is protocol jargon; objects is Layer 3 |
+| My cards (wallet) | **My objects** | URL stays `/wallet/`; alias `/objects/` → `/wallet/` |
 
 **Keep “key” in:** data policy, technical standards, threat models, engineer docs, optional Advanced panel, and API/error codes (`INVALID_SIGNATURE` → user message without “key” where possible).
 
@@ -355,7 +355,7 @@ Hosted steward accounts ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMP
 | **D0** | This doc + terminology map | None |
 | **D1** | Copy pass: create, created save strip, hub custody, wallet CTAs | Low — no behavior change | **Shipped** (2026-05-29) |
 | **D2** | Demote crypto detail to Help Advanced; landing + trust chips | Low | **Shipped** (2026-05-29) |
-| **D3** | Rename nav labels (“My cards” → “My objects”) with redirects/aliases | Medium — bookmarks, tests |
+| **D3** | Rename nav labels (“My cards” → “My objects”) with redirects/aliases | Medium — bookmarks, tests | **Shipped** (2026-05-29) |
 | **D4** | Session-only warnings only when auto-save fails or user opted out | Medium — test matrix |
 | **D5** | Stronger recovery gates before merch checkout / Nth child object | Product policy |
 | **D6** | Optional WebAuthn wrap around control activation (extends vouch-ready option E) | Engineering |
@@ -412,4 +412,4 @@ Hosted steward accounts ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMP
 |------|----------|
 | 2026-05-29 | Adopt three-layer ownership model; default UI targets Layer 2; Layer 1 docs remain canonical for engineering |
 | 2026-05-29 | Protocol and storage unchanged in D0–D2; copy and information architecture only |
-| 2026-05-29 | **D2 shipped** — landing trust chips, help ownership-first + Advanced section, card-creation keys demoted |
+| 2026-05-29 | **D3 shipped** — “My objects” nav label; `/objects` → `/wallet/` alias; URL `/wallet/` unchanged |

@@ -1095,7 +1095,7 @@ function renderScanActorBand(vm: ScanViewModel, origin: string): string {
   <p class="scan-actor-band-lead">You can vouch or open your cards from here.</p>
   <div class="scan-actor-band-actions">
     <button type="button" class="scan-actor-band-primary" id="scan-actor-band-vouch">Go to vouch</button>
-    <a class="scan-actor-band-secondary" href="${walletUrl}">My cards</a>
+    <a class="scan-actor-band-secondary" href="${walletUrl}">My objects</a>
   </div>
 </section>`;
 }
