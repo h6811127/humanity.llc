@@ -15,6 +15,10 @@ import {
 } from "./device-wallet.mjs";
 import { isKeysCustodyNoticeDismissed, dismissKeysCustodyNotice } from "./device-keys-custody-core.mjs";
 import { keysCustodyHtml } from "./device-keys-custody.mjs";
+import { isHubStrangerEmptyState } from "./device-hub-stranger-empty-core.mjs";
+import { getWalletCount } from "./device-wallet.mjs";
+import { loadPins } from "./device-pins.mjs";
+import { notificationCount } from "./device-inbox.mjs";
 import { actOnOtherTabKeys, openSaveKeysForThisTab, walletEntryForProfile } from "./device-notice-nav.mjs";
 import {
   actOnOrphanRemovedTabKeys,
@@ -128,7 +132,7 @@ function rowActionsHtml(row) {
   if (row.kind === "vouch_default") {
     return `
       <button type="button" class="device-hub-keys-custody-action device-hub-keys-custody-action--secondary" data-hub-custody-clear-default>Clear default</button>
-      <button type="button" class="device-hub-keys-custody-action" data-hub-custody-saved-cards>Saved cards</button>`;
+      <button type="button" class="device-hub-keys-custody-action" data-hub-custody-saved-cards>Saved objects</button>`;
   }
   if (row.kind === "vouch_nudge") {
     return `<button type="button" class="device-hub-keys-custody-action" data-hub-custody-saved-cards>Choose on saved cards</button>`;
@@ -136,7 +140,7 @@ function rowActionsHtml(row) {
   if (row.kind === "wallet_scale") {
     return `
       <button type="button" class="device-hub-keys-custody-action device-hub-keys-custody-action--secondary" data-hub-custody-import-backup>Import backup</button>
-      <button type="button" class="device-hub-keys-custody-action" data-hub-custody-saved-cards>Saved cards</button>`;
+      <button type="button" class="device-hub-keys-custody-action" data-hub-custody-saved-cards>Saved objects</button>`;
   }
   if (row.kind === "cross_tab" && row.entry) {
     const parts = [`<button type="button" class="device-hub-keys-custody-action" data-hub-custody-focus>Open tab</button>`];
@@ -267,6 +271,19 @@ function bindPanelActions(panel, state) {
 export function renderHubKeysCustodyPanel() {
   const panel = document.getElementById("device-hub-keys-custody");
   if (!panel) return false;
+
+  if (
+    isHubStrangerEmptyState({
+      walletCount: getWalletCount(),
+      pinCount: loadPins().length,
+      inboxActionCount: notificationCount(),
+    })
+  ) {
+    panel.hidden = true;
+    panel.innerHTML = "";
+    panel.classList.remove("device-hub-section");
+    return true;
+  }
 
   const inbox = gatherInboxInput();
   const session = getTabSession();

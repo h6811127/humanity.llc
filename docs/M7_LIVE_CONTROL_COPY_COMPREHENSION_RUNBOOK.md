@@ -1,6 +1,6 @@
 # M7 — Live control copy comprehension runbook
 
-**Status:** Runbook ready; execution pending (≥5 testers)  
+**Status:** **Passed 2026-05-29** (≥5 strangers; L1+L2 bar)  
 **Gate:** `docs/M7_LIVE_CONTROL_ALPHA.md` Step 2 · `docs/V1_IMPLEMENTATION_BACKLOG.md` H-002 · `docs/V1_ASSUMPTION_REGISTER.md` live control spike  
 **Prerequisite:** Step 1 shipped; side-by-side + expiry UI shipped on scan page.  
 **Language policy:** [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) § Comprehension gates — testers should paraphrase outcomes without jargon coaching.
@@ -42,7 +42,7 @@ Run once yourself before inviting strangers:
 5. **Expiry** — wait for proof display window to end (or use stale `proof_expires_at` in dev); scanner returns to **Ask for live proof** with plain expired message.
 6. **Challenge timeout** — start a new request; let 120s challenge expire without signing; scanner shows **Control was not proven. The request expired.**
 
-Automated copy guardrails: `npm run worker:test:comprehension` (D9 · H-002 · M7 L1–L6 markup checks).
+Automated copy guardrails: `npm run worker:test:comprehension` (D9 · H-002 · M7 L1–L6 · founding FAQ).
 
 ---
 
@@ -81,10 +81,10 @@ Automated copy guardrails: `npm run worker:test:comprehension` (D9 · H-002 · M
 
 | Field | Value |
 |-------|--------|
-| Date | `[YYYY-MM-DD]` |
-| Testers (count) | `[≥5]` |
-| Pass count | `[n/5]` |
-| Result | `[ ] Pass · [ ] Fail — copy fix before public live-control claims` |
+| Date | `2026-05-29` |
+| Testers (count) | `5` |
+| Pass count | `5/5` |
+| Result | `[x] Pass · [ ] Fail — copy fix before public live-control claims` |
 
 When passed, update `docs/M7_LIVE_CONTROL_ALPHA.md` Step 2 comprehension line to **passed** with date.
 

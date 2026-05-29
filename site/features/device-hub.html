@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>On this device hub · Features · humanity.llc</title>
-    <meta name="description" content="Returning users manage keys, pins, and shortcuts without accounts." />
+    <meta name="description" content="Returning stewards manage ownership, pins, and shortcuts—no accounts." />
     <meta name="theme-color" content="#ffffff" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
     <link rel="stylesheet" href="/styles.css?v=69" />
@@ -24,7 +24,7 @@
           <h1>On this device hub</h1>
         </section>
         <div class="feature">
-          <p class="feature-lead">Returning users manage keys, pins, and shortcuts without accounts.</p>
+          <p class="feature-lead">Returning stewards manage ownership, pins, and shortcuts—no accounts.</p>
           <p class="feature-sub"><span class="ship-badge ship-badge-live">Live</span> status dot + hub sheet on <a href="/">/</a>, <a href="/wallet/">/wallet/</a>, <a href="/created/">/created/</a></p>
         </div>
         <section class="group feature-aspects">
@@ -38,7 +38,7 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead">Create puts keys in one tab; strangers need the story, returners need a control center. The hub names the two storage layers and surfaces the next action (save, notice, revoke, vouch).</p>
+    <p class="settings-panel-lead">After create, stewards need a control center for what they own on this device—not a lecture on key storage. The hub surfaces the next action (save ownership, attest, revoke, live proof).</p>
   </div>
 </details>
 <details class="settings-disclosure settings-disclosure-info feature-aspect">
@@ -50,7 +50,7 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead"><strong>Status dot</strong>  -  floating trust indicator; tap opens <strong>On this device</strong> hub sheet. <strong>Inbox</strong>  -  action rows, badge, live-proof overlays when the tab is visible. <strong>Saved cards</strong>  -  Open controls, Open scan, relabel/remove. <strong>Pinned scans</strong>  -  public bookmarks only (<code>hc_device_pins</code>). <strong>Search</strong>  -  inline in hub; filters local rows only. <strong>Backup import</strong>  -  decrypt <code>.hcbackup.json</code> into <code>hc_wallet</code>. <strong>Focus mode</strong>  -  hide intro sections.<br><br><strong>Shell micro-features</strong> (compact list on <a href="/features-available-now.html">features hub</a>): cross-tab keys banner, resolver tab sync toggle, opt-in browser alerts + <code>sw-live-proof.mjs</code> (live proof only), PWA install on steward pages, keys custody notices, child-object backup gate on <a href="/created/">/created/</a>, ephemeral manifesto update at <code>#update-status</code>. User guides: <a href="/help/#device-shell">/help/#device-shell</a>.</p>
+    <p class="settings-panel-lead"><strong>Status dot</strong>  -  floating trust indicator; tap opens <strong>On this device</strong> hub sheet. <strong>Inbox</strong>  -  action rows, badge, live-proof overlays when the tab is visible. <strong>Saved objects</strong>  -  Open controls, Open scan, relabel/remove. <strong>Pinned scans</strong>  -  public bookmarks only (<code>hc_device_pins</code>). <strong>Search</strong>  -  inline in hub; filters local rows only. <strong>Backup import</strong>  -  decrypt <code>.hcbackup.json</code> into <code>hc_wallet</code>. <strong>Focus mode</strong>  -  hide intro sections.<br><br><strong>Shell micro-features</strong> (compact list on <a href="/features-available-now.html">features hub</a>): cross-tab managing banner, resolver tab sync toggle, opt-in browser alerts + <code>sw-live-proof.mjs</code> (live proof only), PWA install on steward pages, ownership custody notices, child-object backup gate on <a href="/created/">/created/</a>, ephemeral manifesto update at <code>#update-status</code>. User guides: <a href="/help/#device-shell">/help/#device-shell</a>.</p>
   </div>
 </details>
 <details class="settings-disclosure settings-disclosure-info feature-aspect">
@@ -62,7 +62,7 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead">Private keys stay in browser storage; pins never hold signing material. Search is client-side over data you already saved. Cross-tab keys and card-disabled alerts use <strong>resolver-confirmed</strong> polls — never wallet cache alone. Browser alerts and OS push (hosted tier) are <strong>live proof only</strong> — never for cross-tab keys or custody nudges.</p>
+    <p class="settings-panel-lead">Control stays in browser storage; pins never hold signing material. Search is client-side over data you already saved. Cross-tab managing and card-disabled alerts use <strong>resolver-confirmed</strong> polls — never wallet cache alone. Browser alerts and OS push (hosted tier) are <strong>live proof only</strong> — never for cross-tab custody nudges.</p>
   </div>
 </details>
 <details class="settings-disclosure settings-disclosure-info feature-aspect">
@@ -74,7 +74,19 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead">Not cloud sync or multi-device accounts. Browser profile sync (Safari/Chrome) may copy <code>localStorage</code> incompletely  -  prefer explicit save per machine. No directory search for other people’s cards. Status dot is shell chrome, not the live-control protocol — see <a href="/features/live-control.html">live control</a> for in-person key proof.</p>
+    <p class="settings-panel-lead">Not cloud sync or multi-device accounts. Browser profile sync (Safari/Chrome) may copy saved ownership incompletely  -  prefer explicit save per machine. No directory search for other people’s cards. Status dot is shell chrome, not the live-control protocol — see <a href="/features/live-control.html">live control</a> for in-person control proof.</p>
+  </div>
+</details>
+<details class="settings-disclosure settings-disclosure-info feature-aspect">
+  <summary class="settings-summary">
+    <span class="list-icon list-icon-tone-slate" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span>
+    <span class="settings-summary-text">
+      <span class="settings-summary-title">Advanced: signing keys & browser storage</span>
+    </span>
+    <span class="list-chevron" aria-hidden="true">›</span>
+  </summary>
+  <div class="settings-panel settings-panel-info-body">
+    <p class="settings-panel-lead">Signing material per tab lives in <code>sessionStorage</code> (<code>hc_created</code>). <strong>Save ownership on this device</strong> copies control to <code>localStorage</code> (<code>hc_wallet</code>). Cross-tab presence stores public metadata only—never private keys.</p>
   </div>
 </details>
 <details class="settings-disclosure settings-disclosure-info feature-aspect">
@@ -86,7 +98,7 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead">Optional activity log on device, clearer multi-tab key handoff, federated read  -  still no operator custody of owner keys.</p>
+    <p class="settings-panel-lead">Optional activity log on device, clearer multi-tab control handoff, federated read  -  still no operator custody of owner keys.</p>
   </div>
 </details></div>
         </section>

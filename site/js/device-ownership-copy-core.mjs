@@ -124,3 +124,6 @@ export function otherTabSwitchConfirmMessage(hereSnippet, thereSnippet) {
     `Bring the other tab forward for ${thereSnippet}…? Control here stays until you close this tab.`
   );
 }
+
+/** Hub / wallet empty state — Layer 2 (D9). @see docs/HUB_STRANGER_ONBOARDING.md */
+export const HUB_PINS_BOOKMARKS_ONLY = "Bookmarks only — cannot manage objects";

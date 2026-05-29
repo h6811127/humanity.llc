@@ -361,9 +361,10 @@ Hosted steward accounts ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMP
 | **D6** | Optional WebAuthn wrap around control activation (extends vouch-ready option E) | Engineering | **Shipped** (2026-05-29) |
 | **D7** | Gap close-out: vouch explainer, status dot, hub segment copy | Low — copy only | **Shipped** (2026-05-29) |
 | **D8** | Collapse `/created/` developer export (backup download, raw recovery import, pubkey preview) under **Export for developers** | Low — IA only | **Shipped** (2026-05-29) |
-| **D9** | Comprehension gates — M7 live control, M5 stranger path, founding copy (human runbooks; see [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) § Comprehension gates) | Process | **Next** (human QA) |
+| **D9** | Comprehension gates — M7 live control, M5 stranger path, founding copy (human runbooks; see [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) § Comprehension gates) | Process | **In progress** — M7 + M5 passed; founding copy pending |
 | **D9e** | Engineering prep: scan SSR + inbox aria Layer 2; device-hub feature advanced panel | Low — copy only | **Shipped** (2026-05-29) |
 | **D9g** | Comprehension copy guards — live-control strings in `device-ownership-copy-core.mjs`; `npm run worker:test:comprehension` | Low — tests only | **Shipped** (2026-05-29) |
+| **D9f** | Founding + steward surface copy — shop FAQ calendar expiry, wallet attestation help, feature pages, hub custody | Low — copy only | **Shipped** (2026-05-29) |
 
 **Do not migrate:** resolver APIs, document types, storage key names, or test fixture terminology without a dedicated protocol PR.
 
@@ -426,3 +427,5 @@ Hosted steward accounts ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMP
 | 2026-05-29 | **D9e shipped** — scan vouch/live-control SSR Layer 2; inbox badge aria; activity log; device-hub feature advanced panel |
 | 2026-05-29 | Gap table marked complete for D1–D2 default UI surfaces |
 | 2026-05-29 | **D9 engineering** — `device-ownership-copy-core.mjs` live-control comprehension strings; `worker:test:comprehension` copy guards |
+| 2026-05-29 | **D9f shipped** — founding sticker FAQ (no calendar expiry); wallet attestation help; device-hub feature Layer 2 + advanced panel |
+| 2026-05-29 | **M7 comprehension passed** — 5/5 strangers per [`M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md`](M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md) |

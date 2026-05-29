@@ -18,6 +18,8 @@ import {
   LIVE_CONTROL_SCANNER_LEAD,
   LIVE_CONTROL_SUCCESS_COPY,
   LIVE_CONTROL_SUCCESS_TITLE,
+  FOUNDING_BUY_DOES_NOT_VERIFY,
+  FOUNDING_STICKER_NO_CALENDAR_EXPIRY,
   SCAN_LIMITS_DISCLOSURE_TITLE,
 } from "../../site/js/device-ownership-copy-core.mjs";
 import { renderScanPage } from "../src/resolver/scan-html";
@@ -198,5 +200,30 @@ describe("D9 V1 launch gate copy (static surfaces)", () => {
     const html = await activeScanHtml();
     expect(html).toContain("Legal identity, government ID, KYC");
     expect(html).toContain("Employment eligibility");
+  });
+});
+
+describe("D9 founding copy guards (FOUNDING_DROP_BRIEF)", () => {
+  it("Tier 0 founding sticker states buy ≠ verify and no calendar expiry", () => {
+    const html = readFileSync(join(root, "site/shop/founding/index.html"), "utf8");
+    expect(html).toContain(FOUNDING_BUY_DOES_NOT_VERIFY);
+    expect(html).toContain(FOUNDING_STICKER_NO_CALENDAR_EXPIRY);
+    expect(html).toMatch(/holding the sticker does not prove/i);
+    expect(html).toContain("Does buying this verify me?");
+    expect(html).toContain("Will my sticker stop working after a year?");
+  });
+
+  it("wallet help uses attestation default wording (D7)", () => {
+    const html = readFileSync(join(root, "site/wallet/index.html"), "utf8");
+    expect(html).toContain("Default for attestation");
+    expect(html).not.toContain("Default for vouching");
+  });
+
+  it("device-hub feature page leads with ownership not keys (D9e)", () => {
+    const html = readFileSync(join(root, "site/features/device-hub.html"), "utf8");
+    expect(html).toContain("manage ownership");
+    expect(html).toContain("Saved objects");
+    expect(html).toContain("Advanced: signing keys");
+    expect(html).not.toMatch(/feature-lead">[^<]*\bkeys\b[^<]*manage keys/i);
   });
 });

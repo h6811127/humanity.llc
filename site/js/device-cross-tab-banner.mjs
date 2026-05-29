@@ -1,5 +1,5 @@
 /**
- * Banner when signing keys are active in another tab on this device.
+ * Banner when control is active in another tab on this device.
  */
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
 import { activateWalletEntryGated } from "./device-control-activation.mjs";
@@ -188,8 +188,8 @@ function bindUseKeysHere(root, profileId, opts = {}) {
 
 function vouchCrossTabSubtext() {
   return getDefaultVouchProfileId()
-    ? " — open that tab to vouch, or take control here"
-    : " — open that tab to sign, or open controls from My objects";
+    ? " — open that tab to attest, or take control here"
+    : " — open that tab to take control, or open controls from My objects";
 }
 
 function walletEntryForVouchHere(primaryProfileId) {
@@ -337,7 +337,7 @@ function renderScanCrossTabNotice() {
   const subtext = vouchCrossTabSubtext().replace(/^\s*-\s*/, "").trim();
   const detail = subtext
     ? `${subtext.charAt(0).toUpperCase()}${subtext.slice(1)}`
-    : "Open that tab to vouch.";
+    : "Open that tab to attest.";
 
   const actions = [emphasisCardCtaButton("Open that tab", "data-cross-tab-action")];
   if (walletEntry) {

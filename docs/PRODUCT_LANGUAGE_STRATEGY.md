@@ -195,3 +195,5 @@ Copy changes that affect trust claims should be validated with strangers **witho
 | 2026-05-29 | D7 shipped: `device-ownership-copy-core.mjs` + tests (`device-ownership-copy-core.test.ts`) |
 | 2026-05-29 | D8 shipped: `/created/` **Export for developers** disclosure; primary restore path stays Layer 2 |
 | 2026-05-29 | D9 engineering: centralized live-control comprehension copy + `npm run worker:test:comprehension` |
+| 2026-05-29 | D9f: founding shop FAQ + steward help surfaces aligned to comprehension gates |
+| 2026-05-29 | M7 live-control comprehension passed (5/5 strangers) |

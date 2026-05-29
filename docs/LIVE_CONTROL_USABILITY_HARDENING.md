@@ -1,6 +1,6 @@
 # Live control usability hardening
 
-**Status:** In progress — Slice A shipped (H-01–H-03); Slice B shipped (H-04–H-06); Slice C shipped (H-07–H-08); Slice D shipped (H-09–H-10); Slice E engineering shipped (H-13–H-15); H-11–H-12 human QA pending  
+**Status:** In progress — Slice A shipped (H-01–H-03); Slice B shipped (H-04–H-06); Slice C shipped (H-07–H-08); Slice D shipped (H-09–H-10); Slice E engineering shipped (H-13–H-15); **H-11 passed** (2026-05-29); H-12 human QA pending  
 **Gate:** `docs/M7_LIVE_CONTROL_ALPHA.md` Step 2 · post–production FK repair (`docs/LIVE_PROOF_FAILURE_INVESTIGATION.md`)  
 **Related:** [`M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md`](M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md) · [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md) · [`SCAN_PAGE_TRUST_UI.md`](SCAN_PAGE_TRUST_UI.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) · [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) (plain-language errors)
 
@@ -291,8 +291,8 @@ This document is the **implementation backlog** for hardening live control **usa
 
 **Acceptance:**
 
-- [ ] Runbook sign-off completed.
-- [ ] Any copy failures filed as H-04 / scan-html tickets before marking M7 Step 2 comprehension done.
+- [x] Runbook sign-off completed (2026-05-29 · 5/5).
+- [x] Any copy failures filed as H-04 / scan-html tickets before marking M7 Step 2 comprehension done.
 
 ---
 

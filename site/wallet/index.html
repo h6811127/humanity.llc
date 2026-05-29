@@ -22,7 +22,7 @@
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=4" />
     <link rel="stylesheet" href="/styles.css?v=129" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=62" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=63" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=29" />
   </head>
   <body class="page-wallet has-shell-chrome">
@@ -304,7 +304,7 @@
           </details>
         </div>
 
-        <div class="device-hub-group" data-hub-group="import">
+        <div class="device-hub-group" data-hub-group="import" data-hub-stranger-empty-hide>
           <p class="device-hub-subgroup-label">Backup</p>
           <details
             class="device-hub-import device-hub-import-block"
@@ -345,6 +345,7 @@
           class="device-hub-section device-hub-section--secondary"
           id="device-hub-actions-section"
           aria-labelledby="device-hub-actions-title"
+          data-hub-stranger-empty-hide
         >
           <h3 class="device-hub-section-title" id="device-hub-actions-title">Recent device actions</h3>
           <p class="device-hub-section-lead">
@@ -383,7 +384,7 @@
             <ul class="wallet-help-list">
               <li><strong>Saved here</strong> means ownership stays in this browser until you clear site data. Not tied to an account or the network.</li>
               <li><strong>Open controls</strong> and <strong>Open card</strong> (⋯ menu) both load saved ownership when available, then open your card page. <strong>Open scan</strong> opens the public scan link only.</li>
-              <li><strong>Default for vouching</strong> (⋯ on a saved card) auto-loads that card’s control when you open someone’s scan in this browser — you stay on the scan page to submit the attestation.</li>
+              <li><strong>Default for attestation</strong> (⋯ on a saved card) auto-loads that card’s control when you open someone’s scan in this browser — you stay on the scan page to submit the attestation.</li>
               <li><strong>Network</strong> chip is live from the resolver (<strong>Card disabled</strong> vs <strong>QR revoked</strong> vs active). <strong>Card disabled since last visit</strong> compares to your last session — whole card off the network, not QR-only revoke.</li>
               <li><strong>Pin</strong> is a scan bookmark only (↗), no ownership.</li>
             </ul>
