@@ -257,6 +257,7 @@ export function initCreatedDashboard({
 
   initCreatedLiveSetupMemory({
     getProfileId: profileId,
+    getSession: opts.getSession,
     setupComplete: () => {
       const pid = profileId();
       return pid ? isSetupDone(pid) : true;

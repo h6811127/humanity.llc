@@ -56,7 +56,11 @@ export function initCreatedLiveSetupMemory(opts) {
     for (const item of items) {
       const step = item.getAttribute("data-memory-step");
       const isDone =
-        step === "save" || step === "print" || step === "test" || step === "live"
+        step === "save" ||
+        step === "print" ||
+        step === "test" ||
+        step === "protect" ||
+        step === "live"
           ? memory[step]
           : false;
       item.classList.toggle("is-done", isDone);

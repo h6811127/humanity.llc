@@ -8,6 +8,10 @@ import {
   VIEW_ONLY_MANAGE_TAB_LEAD,
   VIEW_ONLY_RESTORE_LEAD,
 } from "./device-ownership-copy-core.mjs";
+import {
+  applyCreatedViewLiveReadonlyUi,
+  clearCreatedViewLiveReadonlyUi,
+} from "./created-view-live-readonly.mjs";
 
 /**
  * Show restore panel and hide signing-only controls.
@@ -47,6 +51,8 @@ export function applyCreatedViewModeUi() {
     const backupDetails = document.getElementById("backup-details");
     if (backupDetails instanceof HTMLDetailsElement) backupDetails.open = true;
   }
+
+  applyCreatedViewLiveReadonlyUi();
 }
 
 /** Restore signing UI after keys load into this tab. */
@@ -64,6 +70,8 @@ export function clearCreatedViewModeUi() {
   for (const el of document.querySelectorAll("[data-created-signing-only]")) {
     el.hidden = false;
   }
+
+  clearCreatedViewLiveReadonlyUi();
 }
 
 /**

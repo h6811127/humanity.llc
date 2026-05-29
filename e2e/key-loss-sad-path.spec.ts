@@ -90,6 +90,8 @@ test.describe("key-loss sad paths", () => {
     await expect(page.locator("#created-view-restore-panel")).toBeVisible();
     await expect(page.locator("#import-recovery-form")).toBeVisible();
     await expect(page.locator("#no-session")).toBeHidden();
+    await expect(page.locator("#created-view-live-qr-tasks")).toBeVisible();
+    await expect(page.locator("#created-live-scanners-see")).toBeHidden();
   });
 
   test("K5: wallet label without signing keys still view-only on /created/", async ({ page }) => {

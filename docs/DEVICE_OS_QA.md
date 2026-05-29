@@ -221,7 +221,22 @@ Spec: [`HC_EMPHASIS_CARD_IMPORT_REGRESSION.md`](HC_EMPHASIS_CARD_IMPORT_REGRESSI
 
 **Fail signals:** Emphasis cards render as plain text (no shadow/dot/pill); `@import` or `<link>` for `hc-emphasis-card.css` missing on shell pages.
 
-### P1-KC · Keys custody emphasis card (compact layout)
+#
+## P1-RESTORE — View-only restore and Live QR tasks
+
+**When:** After deploy touching `/created/` view mode or setup **Protect** step.
+
+| Step | Action | Pass |
+|------|--------|------|
+| 1 | Open `/created/?profile_id=&qr_id=` in a tab **without** `hc_created` keys | Hero **View this card**; **Live · Manage** tabs visible |
+| 2 | **Live** tab | **QR and signage** section visible; **What scanners see** publish form hidden |
+| 3 | Open scan / copy link | Works when scan URL resolves (no signing) |
+| 4 | **Manage** tab | **Restore ownership** at top; recovery import + backup link |
+| 5 | Restore with valid recovery or `.hcbackup` | Enters control mode; signing UI returns |
+
+Automated: `npm run e2e:key-loss-sad-path` (K1/K5) · `npm run worker:test -- worker/tests/created-view-live-readonly-core.test.ts worker/tests/created-view-mode-core.test.ts`
+
+## P1-KC · Keys custody emphasis card (compact layout)
 
 Spec: [`KEYS_CUSTODY_EMPHASIS_CARD_SPACING_INVESTIGATION.md`](KEYS_CUSTODY_EMPHASIS_CARD_SPACING_INVESTIGATION.md) · [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md) § Compact density.
 

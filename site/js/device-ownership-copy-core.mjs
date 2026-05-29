@@ -35,6 +35,9 @@ export const VIEW_ONLY_NO_SESSION_DETAIL =
 export const VIEW_ONLY_MANAGE_TAB_LEAD =
   "Read-only network snapshot and restore paths. Signing controls appear after you restore ownership in this tab.";
 
+export const VIEW_ONLY_LIVE_QR_TASKS_LEAD =
+  "Preview or share this QR without signing. To change what scanners see, restore ownership under Manage.";
+
 export const VIEW_ONLY_RESTORE_LEAD =
   "Paste the recovery code you saved at create, or import an encrypted backup file. humanity.llc cannot restore your object for you.";
 
