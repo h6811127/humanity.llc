@@ -41,7 +41,7 @@ export function dotOverlayFromCounts({
 /** @param {DotInboxOverlay} overlay */
 export function overlayAriaText(overlay) {
   if (overlay === "proof_waiting") return "live proof waiting";
-  if (overlay === "cross_tab_keys") return "keys active in another tab";
+  if (overlay === "cross_tab_keys") return "managing in another tab";
   if (overlay === "card_disabled_since_visit") return "card disabled since last visit";
   return "";
 }
@@ -96,12 +96,12 @@ export function statusAriaLabel(network, device, overlay, opts = {}) {
         : "resolver offline";
   const deviceText =
     device === "unsaved"
-      ? "tab keys not saved"
+      ? "ownership not saved on device"
       : device === "steward"
-        ? "steward keys ready"
+        ? "steward control ready"
         : device === "keys"
-          ? "saved keys on device"
-          : "no saved keys on device";
+          ? "ownership saved on device"
+          : "no ownership saved on device";
   const overlayText = overlayAriaText(overlay);
   const base = overlayText
     ? `Status: ${networkText}, ${deviceText}, ${overlayText}.`
@@ -112,12 +112,12 @@ export function statusAriaLabel(network, device, overlay, opts = {}) {
   if (pageKind === "scan") {
     const scanDeviceText =
       device === "unsaved"
-        ? "signing keys in this tab are not saved"
+        ? "ownership in this tab is not saved on device"
         : device === "steward"
-          ? "steward keys ready in this tab"
+          ? "steward control ready in this tab"
           : device === "keys"
-            ? "signing keys saved on this device"
-            : "no signing keys in this tab";
+            ? "ownership saved on this device"
+            : "ownership not loaded in this tab";
     const scanBase = overlayText
       ? `Your device: ${networkText}, ${scanDeviceText}, ${overlayText}.`
       : `Your device: ${networkText}, ${scanDeviceText}.`;
@@ -132,7 +132,7 @@ export function statusAriaLabel(network, device, overlay, opts = {}) {
 function stewardNextLine({ overlayText, queueUrl, pageKind }) {
   if (overlayText) return overlayText;
   if (pageKind === "wallet") {
-    return "Steward keys are ready on this device; open a saved card when you need to sign.";
+    return "Steward control is ready on this device; open a saved card when you need to attest.";
   }
   if (queueUrl) return "Open steward review queue.";
   return "Open controls for steward actions.";
@@ -174,7 +174,7 @@ export function describeDotState(network, device, overlay, opts = {}) {
     overlay === "proof_waiting"
       ? "Live proof requests are waiting."
       : overlay === "cross_tab_keys"
-        ? "Keys are active in another tab."
+        ? "Another tab is managing ownership."
         : overlay === "card_disabled_since_visit"
           ? "A saved card was disabled on the network since your last visit."
           : "";
@@ -184,8 +184,8 @@ export function describeDotState(network, device, overlay, opts = {}) {
       id: "offline",
       now: "Resolver offline.",
       why: stewardReady
-        ? "Steward keys are ready locally, but network is unreachable."
-        : "Health check failed and signing actions need a connection.",
+        ? "Steward control is ready locally, but network is unreachable."
+        : "Health check failed and attestation needs a connection.",
       next:
         overlayText ||
         (pageKind === "scan"
@@ -202,12 +202,12 @@ export function describeDotState(network, device, overlay, opts = {}) {
       id: "degraded",
       now: "Resolver limited.",
       why: stewardReady
-        ? "Steward keys are ready locally; network responses are currently limited."
+        ? "Steward control is ready locally; network responses are currently limited."
         : "Resolver reported degraded health.",
       next:
         overlayText ||
         (pageKind === "scan"
-          ? "Wait for resolver recovery before signing on this scan."
+          ? "Wait for resolver recovery before attesting on this scan."
           : "Retry status check or wait for recovery."),
       action: overlayQuickActionForPage(overlay, pageKind) ?? {
         kind: "retry",
@@ -218,13 +218,13 @@ export function describeDotState(network, device, overlay, opts = {}) {
   if (device === "unsaved") {
     return {
       id: "unsaved",
-      now: "Tab keys not saved.",
-      why: "This tab has signing keys that are not yet saved to this device.",
+      now: "Ownership not saved.",
+      why: "This tab has control that is not yet saved to this device.",
       next:
         overlayText ||
         (pageKind === "scan"
-          ? "Save keys on this device or scroll to vouch on this scan."
-          : "Open controls and save keys."),
+          ? "Save ownership on this device or scroll to attest on this scan."
+          : "Open controls and save ownership."),
       action: overlayQuickActionForPage(overlay, pageKind) ?? {
         kind: "open_controls",
         label: "Open controls",
@@ -235,7 +235,7 @@ export function describeDotState(network, device, overlay, opts = {}) {
     return {
       id: "steward",
       now: "Steward ready, resolver online.",
-      why: "Steward-capable signing keys are available in this browser context.",
+      why: "Steward-capable control is available in this browser.",
       next:
         pageKind === "scan"
           ? overlayText || "Scroll to vouch on this scan."
@@ -250,12 +250,12 @@ export function describeDotState(network, device, overlay, opts = {}) {
   if (device === "keys") {
     return {
       id: "keys",
-      now: "Saved keys ready.",
-      why: "Signing keys are saved on this device and resolver is online.",
+      now: "Ownership saved.",
+      why: "Ownership is saved on this device and resolver is online.",
       next:
         overlayText ||
         (pageKind === "scan"
-          ? "Scroll to vouch or use keys here on this scan."
+          ? "Scroll to attest or take control here on this scan."
           : singleSavedCardWithKeys && pageKind !== "wallet"
             ? "Open your saved card to update or revoke."
             : "Open controls to manage a saved card."),
@@ -264,13 +264,13 @@ export function describeDotState(network, device, overlay, opts = {}) {
   }
   return {
     id: "none",
-    now: "No saved keys on this device.",
-    why: "Resolver is online, but this browser has no saved signing keys.",
+    now: "No ownership saved on this device.",
+    why: "Resolver is online, but this browser has no saved ownership.",
     next:
       overlayText ||
       (pageKind === "scan"
-        ? "Use keys here to vouch, or create a card."
-        : "Create a card or save keys from this tab."),
+        ? "Take control here to attest, or create a card."
+        : "Create a card or save ownership from this tab."),
     action: overlayQuickActionForPage(overlay, pageKind) ?? {
       kind: "create_card",
       label: "Create a card",

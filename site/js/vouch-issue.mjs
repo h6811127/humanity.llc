@@ -55,7 +55,7 @@ function rememberVouchReturnUrl() {
 
 function loadKeysHelpHtml(walletUrl) {
   const defaultHint = getDefaultVouchProfileId()
-    ? ` Change default on <a href="${walletUrl}">My objects</a> (⋯ → <strong>Default for vouching</strong>).`
+    ? ` Change default on <a href="${walletUrl}">My objects</a> (⋯ → <strong>Default for attestation</strong>).`
     : "";
   return (
     ` Or open <a href="${walletUrl}">My objects</a>, tap <strong>Open controls</strong> (` +
@@ -153,7 +153,7 @@ function mountVouchSignLockUi(profileId) {
   if (isSignUnlocked(profileId)) {
     const ok = document.createElement("p");
     ok.className = "vouch-lead";
-    ok.textContent = "Signing unlocked for this tab.";
+    ok.textContent = "Control unlocked for this tab.";
     box.appendChild(ok);
   } else if (lock?.mode === "pin") {
     const label = document.createElement("label");
@@ -176,17 +176,17 @@ function mountVouchSignLockUi(profileId) {
     unlockBtn.addEventListener("click", async () => {
       const pin = input.value;
       if (!pin.trim()) {
-        setStatus("Enter your PIN to unlock signing.", "error");
+        setStatus("Enter your PIN to take control.", "error");
         return;
       }
       unlockBtn.disabled = true;
       const result = await verifyPinSignLock(profileId, pin);
       if (!result.ok) {
-        setStatus(result.error || "Could not unlock signing.", "error");
+        setStatus(result.error || "Could not unlock control in this tab.", "error");
         unlockBtn.disabled = false;
         return;
       }
-      setStatus("Signing unlocked for this tab.", "neutral");
+      setStatus("Control unlocked for this tab.", "neutral");
       mountVouchSignLockUi(profileId);
     });
 
@@ -204,11 +204,11 @@ function mountVouchSignLockUi(profileId) {
       unlockBtn.disabled = true;
       const result = await unlockSignLock(profileId);
       if (!result.ok) {
-        setStatus(result.error || "Could not unlock signing.", "error");
+        setStatus(result.error || "Could not unlock control in this tab.", "error");
         unlockBtn.disabled = false;
         return;
       }
-      setStatus("Signing unlocked for this tab.", "neutral");
+      setStatus("Control unlocked for this tab.", "neutral");
       mountVouchSignLockUi(profileId);
     });
     box.appendChild(unlockBtn);
@@ -234,7 +234,7 @@ function mountVouchStopButton(voucherLabel) {
     stop.type = "button";
     stop.id = "vouch-stop-keys";
     stop.className = "vouch-stop-keys";
-    stop.textContent = "Clear keys from this tab";
+    stop.textContent = "Stop managing in this tab";
     stop.addEventListener("click", () => {
       const active = loadSession();
       try {
@@ -252,7 +252,7 @@ function mountVouchStopButton(voucherLabel) {
   }
 
   const hint = voucherLabel ? ` · ${voucherLabel}` : "";
-  setStatus(`Signing key loaded${hint}. Confirm in-person contact before signing.`);
+  setStatus(`Control loaded${hint}. Confirm in-person contact before attesting.`);
 }
 
 function plainVouchError(code, fallback) {
@@ -275,7 +275,7 @@ function plainVouchError(code, fallback) {
     REPLAYED_NONCE: "Nonce already used. Sign again.",
     INVALID_SIGNATURE: "Signature invalid. Reload keys from your create session.",
     CARD_INVALID_SIGNATURE:
-      "Signature invalid. Load steward keys via My objects → Sign as…",
+      "Signature invalid. Load steward control via My objects → Attest as…",
     SIGNATURE_MISMATCH: "Signature does not match your card keys.",
   };
   const plain = map[code] || stripResolverUrlsFromMessage(fallback);
@@ -390,7 +390,7 @@ function mountUseKeysHereButtons(eligible) {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "hc-emphasis-card__cta vouch-use-keys-here";
-    btn.textContent = `Sign as ${item.label} · ${item.verificationLabel}`;
+    btn.textContent = `Attest as ${item.label} · ${item.verificationLabel}`;
     btn.addEventListener("click", async () => {
       btn.disabled = true;
       setStatus("Loading ownership…", "waiting");
@@ -530,9 +530,9 @@ async function showNoKeysExplainer(voucheeProfileId) {
 
   if (wallet.length === 0) {
     showExplainerHtml(
-      `Vouching requires your card’s Ed25519 signing key in <strong>this tab</strong>-network Steward status alone is not enough. ` +
-        `Create a card or open ${walletLinksHtml()}, then tap <strong>Sign as…</strong> on this scan. ` +
-        `Only the signed document is transmitted; the private key stays on device.`
+      `Attesting requires control of your identity in <strong>this tab</strong>—network Steward status alone is not enough. ` +
+        `Create a card or open ${walletLinksHtml()}, then tap <strong>Attest as…</strong> on this scan. ` +
+        `Only the signed statement is transmitted; your ownership stays on device.`
     );
     return;
   }
@@ -566,19 +566,19 @@ async function showNoKeysExplainer(voucheeProfileId) {
   let lead;
   if (multiple) {
     lead =
-      `<strong>Select a signing card.</strong> No signing key is active in this tab. ` +
+      `<strong>Choose which identity attests.</strong> Ownership is not loaded in this tab. ` +
       (hasActivatable
-        ? `Tap <strong>Sign as…</strong> below. `
-        : `Re-save a card with keys on <a href="${walletUrl}">My objects</a>, then return. `) +
+        ? `Tap <strong>Attest as…</strong> below. `
+        : `Re-save a card with control on <a href="${walletUrl}">My objects</a>, then return. `) +
       (!defaultSet
-        ? `<a href="${walletUrl}">Set a default for vouching</a> to auto-load one card on future scans. `
+        ? `<a href="${walletUrl}">Set a default for attestation</a> to auto-load one card on future scans. `
         : "");
   } else {
     lead =
-      `${lines}${more} - <strong>signing key not loaded in this tab</strong>. ` +
+      `${lines}${more} — <strong>ownership not loaded in this tab</strong>. ` +
       (hasActivatable
-        ? `Tap <strong>Sign as…</strong> below to load the key and sign. `
-        : `Re-save your card with keys on <a href="${walletUrl}">My objects</a>, then return. `);
+        ? `Tap <strong>Attest as…</strong> below to take control and attest. `
+        : `Re-save your card with control on <a href="${walletUrl}">My objects</a>, then return. `);
   }
 
   showExplainerHtml(
@@ -629,8 +629,8 @@ async function mountVouchSwitchDefault(session) {
   const defaultLabel = cardLabel(defaultEntry);
 
   const detail =
-    `Active signing key: <strong>${currentLabel}</strong>. ` +
-    `Default for vouching: <strong>${defaultLabel}</strong>.`;
+    `Active control: <strong>${currentLabel}</strong>. ` +
+    `Default for attestation: <strong>${defaultLabel}</strong>.`;
 
   const tpl = document.createElement("template");
   tpl.innerHTML = emphasisCardShellHtml({
@@ -640,7 +640,7 @@ async function mountVouchSwitchDefault(session) {
     role: "note",
     dot: "info",
     eyebrow: "Default card",
-    title: "Different key active",
+    title: "Different identity active",
     detail,
     actionsHtml: emphasisCardActionsHtml([
       emphasisCardCtaButton(`Switch to ${defaultLabel}`, "data-vouch-switch-default"),
@@ -657,7 +657,7 @@ async function mountVouchSwitchDefault(session) {
     }
     const result = await activateVouchKeysGated(defaultEntry);
     if (!result.ok) {
-      setStatus(result.error || "Could not switch signing card.", "error");
+      setStatus(result.error || "Could not switch attestation identity.", "error");
       return;
     }
     runVouchFlow({ autoActivateAttempted: true });
@@ -677,7 +677,7 @@ function bindSubmitHandler(voucheeProfileId) {
       !session.owner_private_key_b58 ||
       !session.owner_public_key_b58
     ) {
-      setStatus("No signing key in this tab.", "error");
+      setStatus("Ownership not loaded in this tab.", "error");
       return;
     }
     const voucherProfileId = session.profile_id;
@@ -688,17 +688,17 @@ function bindSubmitHandler(voucheeProfileId) {
       return;
     }
     if (!confirmEl.checked) {
-      setStatus("Confirm in-person attestation before signing.", "error");
+      setStatus("Confirm in-person attestation before submitting.", "error");
       return;
     }
     if (isSignLockEnabled(voucherProfileId) && !isSignUnlocked(voucherProfileId)) {
-      setStatus("Unlock signing before you submit this vouch.", "error");
+      setStatus("Unlock control before you submit this vouch.", "error");
       mountVouchSignLockUi(voucherProfileId);
       return;
     }
 
     submitBtn.disabled = true;
-    setStatus("Signing vouch…", "waiting");
+    setStatus("Attesting…", "waiting");
 
     try {
       const signed = await signVouch({
@@ -779,7 +779,7 @@ async function runVouchFlow(opts = {}) {
   const voucherProfileId = session.profile_id;
   if (voucherProfileId === voucheeProfileId) {
     showExplainerHtml(
-      "Cannot vouch for your own profile. Open another person’s scan while <strong>your</strong> signing key is loaded in this tab."
+      "Cannot vouch for your own profile. Open another person’s scan while <strong>your</strong> identity is loaded in this tab."
     );
     return;
   }
@@ -832,8 +832,8 @@ async function runVouchFlow(opts = {}) {
     session.handle ? `@${session.handle}` : session.wallet_label || toneHint;
   mountVouchStopButton(
     autoLoaded
-      ? `Signing as ${voucherDisplay} (default, auto-loaded)`
-      : `Signing as ${voucherDisplay} · ${toneHint}`
+      ? `Attesting as ${voucherDisplay} (default, auto-loaded)`
+      : `Attesting as ${voucherDisplay} · ${toneHint}`
   );
   mountVouchSignLockUi(voucherProfileId);
 

@@ -33,7 +33,7 @@ describe("scanGlancePrimaryAction", () => {
     ).toEqual({ kind: "scan_go_vouch", label: "Go to vouch" });
     expect(
       scanGlancePrimaryAction({ kind: "create_card", label: "Create a card", href: "/create/" }, "none")
-    ).toEqual({ kind: "scan_use_keys_here", label: "Use keys here" });
+    ).toEqual({ kind: "scan_use_keys_here", label: "Take control here" });
   });
 });
 
@@ -76,6 +76,6 @@ describe("scanPageDotAriaLabel", () => {
         device: "steward",
         overlay: "none",
       })
-    ).toBe("Your device: steward keys ready in this tab. Tap for details.");
+    ).toBe("Your device: steward control ready in this tab. Tap for details.");
   });
 });

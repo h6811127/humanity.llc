@@ -212,7 +212,7 @@ Priority surfaces to migrate to Layer 2 copy:
 | `/created/` save strip | “Save control key”, “root signing key” | “Save ownership on this device” |
 | Hub custody panel | “Keys active”, “Keys in this tab” | “Managing here”, “Save ownership” |
 | `/wallet/` actions | “Use keys” | “Open controls” (align with hub) |
-| Scan vouch explainer | “Ed25519 signing key in this tab” | “You need control of your identity in this tab to attest” |
+| Scan vouch explainer | “Ed25519 signing key in this tab” | “You need control of your identity in this tab to attest” | **D7** |
 | Inbox / cross-tab | “Keys open in N tabs” | “Managing in N other tabs” |
 | Help / features | Deep `sessionStorage` exposition | Move to Advanced; lead with ownership |
 | `device-keys-custody.mjs` | “Your browser holds the private key” | “Your browser holds control — the network never does” |
@@ -359,6 +359,7 @@ Hosted steward accounts ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMP
 | **D4** | Session-only warnings only when auto-save fails or user opted out | Medium — test matrix | **Shipped** (2026-05-29) |
 | **D5** | Stronger recovery gates before merch checkout / Nth child object | Product policy | **Shipped** (2026-05-29) |
 | **D6** | Optional WebAuthn wrap around control activation (extends vouch-ready option E) | Engineering | **Shipped** (2026-05-29) |
+| **D7** | Gap close-out: vouch explainer, status dot, hub segment copy | Low — copy only | **Shipped** (2026-05-29) |
 
 **Do not migrate:** resolver APIs, document types, storage key names, or test fixture terminology without a dedicated protocol PR.
 

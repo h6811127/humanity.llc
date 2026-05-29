@@ -1,6 +1,7 @@
 /**
  * M6 Step 3  -  revoke vouches the viewer issued from this browser session.
  */
+import { UNLOCK_CONTROL_FIRST } from "./device-ownership-copy-core.mjs";
 import { stripResolverUrlsFromMessage } from "./resolver-user-error-core.mjs";
 import { postVouchRevokeUrl, signVouchRevocation } from "./hc-sign.mjs";
 
@@ -82,7 +83,7 @@ export function initVoucherRevoke(ctx) {
   async function revokeEntry(entry, button) {
     const k = keys();
     if (!k) {
-      setStatus("Unlock your signing key above first.", true);
+      setStatus(UNLOCK_CONTROL_FIRST, true);
       return;
     }
 

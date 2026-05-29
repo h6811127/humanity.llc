@@ -38,7 +38,7 @@ export function scanGlancePrimaryAction(descriptorAction, overlay) {
     return { kind: "scan_scroll_live_proof", label: "Go to live proof" };
   }
   if (descriptorAction.kind === "create_card") {
-    return { kind: "scan_use_keys_here", label: "Use keys here" };
+    return { kind: "scan_use_keys_here", label: "Take control here" };
   }
   return descriptorAction;
 }
@@ -91,9 +91,9 @@ function scanDeviceAriaPhrase(network, device, overlay) {
   if (network === "offline") return "offline";
   if (network === "degraded") return "resolver limited";
   if (overlay === "proof_waiting") return "live proof waiting";
-  if (overlay === "cross_tab_keys") return "keys in another tab";
-  if (device === "steward") return "steward keys ready in this tab";
-  if (device === "unsaved") return "tab keys not saved";
-  if (device === "keys") return "keys saved on this device";
-  return "no signing keys in this tab";
+  if (overlay === "cross_tab_keys") return "managing in another tab";
+  if (device === "steward") return "steward control ready in this tab";
+  if (device === "unsaved") return "ownership not saved on device";
+  if (device === "keys") return "ownership saved on this device";
+  return "ownership not loaded in this tab";
 }

@@ -98,16 +98,16 @@ describe("dotOverlayFromCounts", () => {
 describe("statusAriaLabel", () => {
   it("includes overlay text when present", () => {
     expect(statusAriaLabel("ok", "steward", "proof_waiting")).toBe(
-      "Status: resolver online, steward keys ready, live proof waiting."
+      "Status: resolver online, steward control ready, live proof waiting."
     );
     expect(statusAriaLabel("ok", "keys", "none")).toBe(
-      "Status: resolver online, saved keys on device."
+      "Status: resolver online, ownership saved on device."
     );
   });
 
   it("uses Your device prefix on scan pages", () => {
     expect(statusAriaLabel("ok", "none", "cross_tab_keys", { pageKind: "scan" })).toBe(
-      "Your device: resolver online, no signing keys in this tab, keys active in another tab."
+      "Your device: resolver online, ownership not loaded in this tab, managing in another tab."
     );
   });
 });
@@ -115,7 +115,7 @@ describe("statusAriaLabel", () => {
 describe("overlayAriaText", () => {
   it("maps overlay ids to phrases", () => {
     expect(overlayAriaText("proof_waiting")).toBe("live proof waiting");
-    expect(overlayAriaText("cross_tab_keys")).toBe("keys active in another tab");
+    expect(overlayAriaText("cross_tab_keys")).toBe("managing in another tab");
     expect(overlayAriaText("card_disabled_since_visit")).toBe(
       "card disabled since last visit"
     );
@@ -129,7 +129,7 @@ describe("describeDotState", () => {
       stewardReady: true,
     });
     expect(degraded.id).toBe("degraded");
-    expect(degraded.why).toContain("Steward keys are ready locally");
+    expect(degraded.why).toContain("Steward control is ready locally");
 
     const offline = describeDotState("offline", "steward", "none", {
       stewardReady: true,
@@ -221,7 +221,7 @@ describe("describeDotState", () => {
 
   it("uses scan-specific next copy for eligible viewers", () => {
     const none = describeDotState("ok", "none", "none", { pageKind: "scan" });
-    expect(none.next).toContain("Use keys here");
+    expect(none.next).toContain("Take control here");
     const steward = describeDotState("ok", "steward", "none", {
       pageKind: "scan",
       stewardReady: true,
@@ -243,7 +243,7 @@ describe("statusAriaLabel wallet", () => {
   it("appends scroll hint on wallet page", () => {
     const label = statusAriaLabel("ok", "steward", "none", { pageKind: "wallet" });
     expect(label).toMatch(/tap to scroll to saved cards/i);
-    expect(label).toMatch(/steward keys ready/i);
+    expect(label).toMatch(/steward control ready/i);
   });
 
   it("does not append scroll hint on landing", () => {
@@ -414,8 +414,8 @@ describe("shell S4 neutral dot and chrome status line", () => {
       },
       {
         id: "notices",
-        chipLabel: "Tab keys",
-        label: "Tab Keys Active",
+        chipLabel: "Not saved",
+        label: "Control active in tab",
         detail: "",
         zero: false,
         highlight: true,
@@ -427,7 +427,7 @@ describe("shell S4 neutral dot and chrome status line", () => {
       "Network reachable",
       "0 cards",
       "0 pinned",
-      "Tab keys",
+      "Not saved",
     ]);
     expect(items.find((item) => item.id === "network")?.emphasis).toBe("primary");
     expect(items.find((item) => item.id === "pinned")?.emphasis).toBe("meta");

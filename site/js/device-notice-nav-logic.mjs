@@ -1,5 +1,9 @@
 /**
  * Pure navigation plan for "keys in another tab" actions.
+ */
+import { otherTabSwitchConfirmMessage as ownershipOtherTabSwitchMessage } from "./device-ownership-copy-core.mjs";
+
+/**
  * @param {{
  *   session: { profile_id?: string, owner_private_key_b58?: string } | null,
  *   entry: { profile_id: string },
@@ -30,8 +34,5 @@ export function resolveOtherTabKeysAction(input) {
 export function otherTabSwitchConfirmMessage(session, entry) {
   const here = session?.profile_id?.slice(0, 12) ?? "this tab";
   const there = entry.profile_id.slice(0, 12);
-  return (
-    `This tab already has signing keys (${here}…). ` +
-    `Bring the other tab forward for ${there}…? Keys here stay until you close this tab.`
-  );
+  return ownershipOtherTabSwitchMessage(here, there);
 }

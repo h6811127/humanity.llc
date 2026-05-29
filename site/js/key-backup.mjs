@@ -3,6 +3,7 @@
  * Crypto parity: worker/src/crypto/key-backup.ts (tests).
  * @see docs/M5_5_OWNER_KEY_PORTABILITY.md
  */
+import { BACKUP_INVALID_OWNERSHIP } from "./device-ownership-copy-core.mjs";
 import * as ed from "https://esm.sh/@noble/ed25519@2.3.0";
 import { decodeBase58, encodeBase58 } from "./hc-sign.mjs";
 import {
@@ -42,9 +43,7 @@ function assertPassphrase(passphrase) {
 async function verifyDecryptedKey(privateKeyBase58, expectedPublicKeyBase58) {
   const privateKey = b58ToBytes(privateKeyBase58);
   if (privateKey.length !== 32) {
-    throw new Error(
-      "This backup file does not contain a valid signing key. Re-download from /created/ after create."
-    );
+    throw new Error(BACKUP_INVALID_OWNERSHIP);
   }
   const derivedPub = encodeBase58(await ed.getPublicKeyAsync(privateKey));
   if (derivedPub !== expectedPublicKeyBase58) {

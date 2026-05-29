@@ -477,8 +477,8 @@ describe("buildStatusSegmentsFromCounts", () => {
       liveProof: 0,
     });
     const notices = segments.find((s) => s.id === "notices");
-    expect(notices?.label).toBe("Tab Keys Active");
-    expect(notices?.chipLabel).toBe("Tab keys");
+    expect(notices?.label).toBe("Control active in tab");
+    expect(notices?.chipLabel).toBe("Not saved");
     expect(notices?.highlight).toBe(true);
   });
 

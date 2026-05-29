@@ -67,7 +67,7 @@ export function buildStatusSegmentsFromCounts(input) {
       chipLabel: saved === 0 ? "0 cards" : `${saved} card${saved === 1 ? "" : "s"}`,
       detail:
         saved === 0
-          ? "No signing keys saved on this device"
+          ? "No ownership saved on this device"
           : `${saved} card${saved === 1 ? "" : "s"} stored on this device`,
       zero: saved === 0,
       highlight: false,
@@ -85,9 +85,9 @@ export function buildStatusSegmentsFromCounts(input) {
   if (notices > 0) {
     segments.push({
       id: "notices",
-      label: "Tab Keys Active",
-      chipLabel: "Tab keys",
-      detail: "Signing keys in this tab  -  not saved on device",
+      label: "Control active in tab",
+      chipLabel: "Not saved",
+      detail: "Ownership in this tab is not saved on device",
       zero: false,
       highlight: true,
       chipTone: "highlight",
