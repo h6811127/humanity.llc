@@ -36,3 +36,20 @@ export function pwaInstallCardBodyHtml(opts) {
     actionsHtml: emphasisCardActionsHtml(actions),
   });
 }
+
+/**
+ * Shown instead of install card until first setup wizard completes (P4).
+ */
+export function pwaInstallDeferralCardBodyHtml() {
+  return emphasisCardBodyHtml({
+    eyebrow: escapeEmphasisHtml("Home screen app"),
+    title: escapeEmphasisHtml("Finish your first object in Safari"),
+    detail: escapeEmphasisHtml(
+      "Complete setup on your new card, then add this site to your Home Screen for quick return."
+    ),
+    dot: "info",
+    actionsHtml: emphasisCardActionsHtml([
+      emphasisCardCtaSecondary("Not now", "data-pwa-install-dismiss"),
+    ]),
+  });
+}

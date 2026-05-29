@@ -16,6 +16,9 @@ export const PWA_INSTALL_DISMISS_COOLDOWN_MS = 7 * 24 * 60 * 60 * 1000;
 /** Minimum saved cards before proactive install hint on landing (returning steward). */
 export const PWA_INSTALL_MIN_SAVED_CARDS = 1;
 
+/** localStorage map key — profile_id → true when setup wizard finished (`created-mode.mjs`). */
+export const PWA_INSTALL_SETUP_DONE_KEY = "hc_setup_done";
+
 /** Do not show install card while inbox has urgent cross-tab/orphan items. */
 export const PWA_INSTALL_BLOCKED_INBOX_KINDS = [
   "orphan_keys_removed",
@@ -34,6 +37,32 @@ export function isStandaloneDisplayMode(mediaQuery) {
  * @param {string | null | undefined} dismissedAtIso
  * @param {number} [nowMs]
  */
+/**
+ * @param {Record<string, unknown> | null | undefined} setupDoneMap
+ * @param {string[]} walletProfileIds
+ */
+export function hasAnyWalletSetupDone(setupDoneMap, walletProfileIds) {
+  if (!walletProfileIds?.length) return false;
+  const map = setupDoneMap && typeof setupDoneMap === "object" ? setupDoneMap : {};
+  return walletProfileIds.some((profileId) => {
+    if (!profileId) return false;
+    return Boolean(map[profileId]);
+  });
+}
+
+/**
+ * @param {string | null | undefined} rawJson
+ */
+export function parseSetupDoneMap(rawJson) {
+  if (!rawJson) return {};
+  try {
+    const parsed = JSON.parse(rawJson);
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
 export function isInstallDismissSnoozed(dismissedAtIso, nowMs = Date.now()) {
   if (!dismissedAtIso) return false;
   const dismissedAt = Date.parse(dismissedAtIso);
@@ -49,6 +78,7 @@ export function isInstallDismissSnoozed(dismissedAtIso, nowMs = Date.now()) {
  *   isIosSafari: boolean;
  *   dismissedAtIso?: string | null;
  *   savedCardCount?: number;
+ *   anyWalletSetupDone?: boolean;
  *   inboxKinds?: string[];
  *   deviceStatusLoadError?: boolean;
  *   nowMs?: number;
@@ -62,6 +92,7 @@ export function shouldShowPwaInstallSurface(input) {
     isIosSafari,
     dismissedAtIso = null,
     savedCardCount = 0,
+    anyWalletSetupDone = false,
     inboxKinds = [],
     deviceStatusLoadError = false,
     nowMs = Date.now(),
@@ -73,6 +104,7 @@ export function shouldShowPwaInstallSurface(input) {
   if (isPwaExcludedPath(pathname)) return false;
   if (isInstallDismissSnoozed(dismissedAtIso, nowMs)) return false;
   if (savedCardCount < PWA_INSTALL_MIN_SAVED_CARDS) return false;
+  if (!anyWalletSetupDone) return false;
 
   const blockedInbox = inboxKinds.some((kind) =>
     PWA_INSTALL_BLOCKED_INBOX_KINDS.includes(kind)
@@ -82,6 +114,47 @@ export function shouldShowPwaInstallSurface(input) {
   if (deferredPromptAvailable) return true;
   if (isIosSafari) return true;
   return false;
+}
+
+/**
+ * Informational card while setup wizard is still in progress (P4).
+ * @param {{
+ *   pathname: string;
+ *   standalone: boolean;
+ *   dismissedAtIso?: string | null;
+ *   savedCardCount?: number;
+ *   anyWalletSetupDone?: boolean;
+ *   inboxKinds?: string[];
+ *   deviceStatusLoadError?: boolean;
+ *   nowMs?: number;
+ * }} input
+ */
+export function shouldShowPwaInstallDeferralHint(input) {
+  const {
+    pathname,
+    standalone,
+    dismissedAtIso = null,
+    savedCardCount = 0,
+    anyWalletSetupDone = false,
+    inboxKinds = [],
+    deviceStatusLoadError = false,
+    nowMs = Date.now(),
+  } = input;
+
+  if (standalone) return false;
+  if (deviceStatusLoadError) return false;
+  if (!isPwaShellPagePath(pathname)) return false;
+  if (isPwaExcludedPath(pathname)) return false;
+  if (isInstallDismissSnoozed(dismissedAtIso, nowMs)) return false;
+  if (savedCardCount < PWA_INSTALL_MIN_SAVED_CARDS) return false;
+  if (anyWalletSetupDone) return false;
+
+  const blockedInbox = inboxKinds.some((kind) =>
+    PWA_INSTALL_BLOCKED_INBOX_KINDS.includes(kind)
+  );
+  if (blockedInbox) return false;
+
+  return true;
 }
 
 /**

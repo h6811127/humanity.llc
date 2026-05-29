@@ -23,6 +23,31 @@ export function deviceStateFromContext({ unsavedTabKeys, stewardReady, savedWall
 }
 
 /**
+ * Scan page device axis: tab signing state only (not wallet row count).
+ * Wallet-only keys map to `none` (hollow ring) — see docs/SAFARI_KEYS_WIPE_INVESTIGATION.md P0-5.
+ *
+ * @param {{ unsavedTabKeys: boolean, stewardReady: boolean, hasTabSigningKeys: boolean }}
+ */
+export function scanDeviceStateFromContext({
+  unsavedTabKeys,
+  stewardReady,
+  hasTabSigningKeys,
+}) {
+  if (unsavedTabKeys) return "unsaved";
+  if (stewardReady && hasTabSigningKeys) return "steward";
+  if (hasTabSigningKeys) return "keys";
+  return "none";
+}
+
+/**
+ * @param {number} walletSigningKeyCount
+ * @param {boolean} hasTabSigningKeys
+ */
+export function scanWalletKeysNotInTab(walletSigningKeyCount, hasTabSigningKeys) {
+  return walletSigningKeyCount > 0 && !hasTabSigningKeys;
+}
+
+/**
  * @param {{ liveProofPending: number, crossTabNotice: number, cardDisabledSinceVisit?: number }}
  */
 export function dotOverlayFromCounts({
@@ -159,6 +184,7 @@ export function dotExplainerKicker(descriptor, compact) {
  *   queueUrl?: string | null,
  *   pageKind?: string,
  *   singleSavedCardWithKeys?: boolean,
+ *   walletKeysNotInTab?: boolean,
  * }} [opts]
  */
 export function describeDotState(network, device, overlay, opts = {}) {
@@ -166,6 +192,7 @@ export function describeDotState(network, device, overlay, opts = {}) {
   const queueUrl = opts.queueUrl || null;
   const pageKind = opts.pageKind || "landing";
   const singleSavedCardWithKeys = opts.singleSavedCardWithKeys === true;
+  const walletKeysNotInTab = opts.walletKeysNotInTab === true;
   const openControlsAction =
     singleSavedCardWithKeys && pageKind !== "wallet"
       ? { kind: "open_card_controls", label: "Open controls" }
@@ -260,6 +287,18 @@ export function describeDotState(network, device, overlay, opts = {}) {
             ? "Open your saved card to update or revoke."
             : "Open controls to manage a saved card."),
       action: overlayQuickActionForPage(overlay, pageKind) ?? openControlsAction,
+    };
+  }
+  if (device === "none" && pageKind === "scan" && walletKeysNotInTab) {
+    return {
+      id: "none",
+      now: "Ownership not in this tab.",
+      why: "Your ownership is saved on this device, but this tab cannot sign yet.",
+      next: overlayText || "Restore control here to attest on this scan.",
+      action: overlayQuickActionForPage(overlay, pageKind) ?? {
+        kind: "scan_use_keys_here",
+        label: "Restore control here",
+      },
     };
   }
   return {

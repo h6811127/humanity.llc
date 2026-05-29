@@ -1456,6 +1456,35 @@ a {
   display: none;
 }
 
+.scan-steward-preview-return {
+  margin: 0 var(--pad) 12px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: var(--surface-popover-bg);
+  border: 1px solid var(--surface-popover-border);
+  box-shadow: var(--hc-emphasis-card-shadow, 0 1px 3px rgba(0, 0, 0, 0.06));
+}
+
+.scan-steward-preview-return[hidden] {
+  display: none;
+}
+
+.scan-steward-preview-return-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--surface-popover-accent, var(--red));
+  text-decoration: none;
+}
+
+.scan-steward-preview-return-link:hover,
+.scan-steward-preview-return-link:focus-visible {
+  text-decoration: underline;
+}
+
 /* Scanner safety header (docs/SCANNER_EXPERIENCE.md Phase B) */
 .scan-safety-header {
   margin: 0 var(--pad) 14px;
@@ -3466,6 +3495,9 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
   </div>
 </div>
     <div class="scan-cross-tab-banner" id="scan-cross-tab-banner" role="status" hidden></div>
+    <div class="scan-steward-preview-return" id="scan-steward-preview-return" hidden>
+      <a id="scan-steward-preview-return-link" class="scan-steward-preview-return-link" href="#">Back</a>
+    </div>
     <p class="scan-offline-banner" id="scan-offline-banner" role="status" hidden>Offline - status may be stale; refresh when connected.</p>
     <main class="screen scan-screen">
       <div class="scan-pass-layer">
@@ -3634,5 +3666,6 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
   
   
   <script type="module" src="http://127.0.0.1:8788/js/scan-merch-funnel.mjs?v=2"></script>
+  <script type="module" src="http://127.0.0.1:8788/js/scan-steward-preview-return.mjs?v=1"></script>
 </body>
 </html>
