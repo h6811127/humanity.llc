@@ -1,10 +1,18 @@
+import { tabNoticeCountFromOwnershipState } from "./device-ownership-notice-core.mjs";
+
 /**
  * @param {{ profile_id?: string, owner_private_key_b58?: string } | null | undefined} session
  * @param {boolean} isSavedOnDevice
+ * @param {{ autoSaveEnabled?: boolean, autoSaveFailed?: boolean }} [opts]
  */
-export function tabNoticeCountFromState(session, isSavedOnDevice) {
+export function tabNoticeCountFromState(session, isSavedOnDevice, opts = {}) {
   if (!session?.profile_id || !session?.owner_private_key_b58) return 0;
-  return isSavedOnDevice ? 0 : 1;
+  return tabNoticeCountFromOwnershipState({
+    hasTabControl: true,
+    savedOnDevice: isSavedOnDevice,
+    autoSaveEnabled: opts.autoSaveEnabled ?? true,
+    autoSaveFailed: opts.autoSaveFailed ?? false,
+  });
 }
 
 /**

@@ -4,6 +4,8 @@
  */
 
 import { mountKeysCustody } from "./device-keys-custody.mjs";
+import { isAutoSaveEnabled, isAutoSaveFailed } from "./device-auto-save.mjs";
+import { shouldShowSessionOnlyOwnershipWarning } from "./device-ownership-notice-core.mjs";
 import { isWalletSaved } from "./device-wallet.mjs";
 import { clearFreshUrlParam } from "./created-workspace.mjs";
 import { markSetupDone } from "./created-mode.mjs";
@@ -60,6 +62,16 @@ export function initCreatedSetup(opts) {
     const saved = isWalletSaved(profileId);
     const card = custodyMount.querySelector(".device-keys-custody--created");
     if (saved) {
+      card?.remove();
+      return;
+    }
+    const showWarn = shouldShowSessionOnlyOwnershipWarning({
+      hasTabControl: true,
+      savedOnDevice: saved,
+      autoSaveEnabled: isAutoSaveEnabled(),
+      autoSaveFailed: isAutoSaveFailed(profileId),
+    });
+    if (!showWarn) {
       card?.remove();
       return;
     }

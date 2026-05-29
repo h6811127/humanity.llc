@@ -377,11 +377,26 @@ describe("shouldUseCachedNetworkStatus", () => {
 });
 
 describe("tabNoticeCountFromState", () => {
-  it("counts unsaved tab keys only", () => {
+  it("counts unsaved tab keys only when auto-save is off or failed", () => {
     expect(
       tabNoticeCountFromState(
         { profile_id: "p1", owner_private_key_b58: "k" },
-        false
+        false,
+        { autoSaveEnabled: false }
+      )
+    ).toBe(1);
+    expect(
+      tabNoticeCountFromState(
+        { profile_id: "p1", owner_private_key_b58: "k" },
+        false,
+        { autoSaveEnabled: true, autoSaveFailed: false }
+      )
+    ).toBe(0);
+    expect(
+      tabNoticeCountFromState(
+        { profile_id: "p1", owner_private_key_b58: "k" },
+        false,
+        { autoSaveEnabled: true, autoSaveFailed: true }
       )
     ).toBe(1);
     expect(

@@ -4,6 +4,51 @@
  * @see docs/CARD_WORKSPACE_PHASE0.md
  */
 export const AUTO_SAVE_KEY = "hc_auto_save_device";
+export const AUTO_SAVE_FAILED_KEY = "hc_auto_save_failed";
+
+/** @param {string} profileId */
+export function markAutoSaveFailed(profileId) {
+  if (!profileId) return;
+  try {
+    const raw = sessionStorage.getItem(AUTO_SAVE_FAILED_KEY);
+    const map = raw ? JSON.parse(raw) : {};
+    map[profileId] = Date.now();
+    sessionStorage.setItem(AUTO_SAVE_FAILED_KEY, JSON.stringify(map));
+  } catch {
+    /* ignore */
+  }
+}
+
+/** @param {string} profileId */
+export function clearAutoSaveFailed(profileId) {
+  if (!profileId) return;
+  try {
+    const raw = sessionStorage.getItem(AUTO_SAVE_FAILED_KEY);
+    if (!raw) return;
+    const map = JSON.parse(raw);
+    delete map[profileId];
+    if (!Object.keys(map).length) {
+      sessionStorage.removeItem(AUTO_SAVE_FAILED_KEY);
+    } else {
+      sessionStorage.setItem(AUTO_SAVE_FAILED_KEY, JSON.stringify(map));
+    }
+  } catch {
+    /* ignore */
+  }
+}
+
+/** @param {string | null | undefined} profileId */
+export function isAutoSaveFailed(profileId) {
+  if (!profileId) return false;
+  try {
+    const raw = sessionStorage.getItem(AUTO_SAVE_FAILED_KEY);
+    if (!raw) return false;
+    const map = JSON.parse(raw);
+    return Object.prototype.hasOwnProperty.call(map, profileId);
+  } catch {
+    return false;
+  }
+}
 
 /**
  * @param {string | null} stored `localStorage` value for {@link AUTO_SAVE_KEY}

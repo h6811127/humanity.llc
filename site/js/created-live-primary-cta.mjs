@@ -3,6 +3,7 @@
  */
 
 import { isWalletSaved } from "./device-wallet.mjs";
+import { isAutoSaveEnabled, isAutoSaveFailed } from "./device-auto-save.mjs";
 import { resolveCreatedLivePrimaryCta } from "./created-live-primary-cta-core.mjs";
 
 const DONE_STORAGE_KEY = "hc_created_task_done";
@@ -55,6 +56,8 @@ export function initCreatedLivePrimaryCta(opts) {
       resolverReachable: opts.resolverReachable?.() ?? true,
       testScanDone: testScanDone(profileId),
       scanUrlReady,
+      autoSaveEnabled: isAutoSaveEnabled(),
+      autoSaveFailed: !!(profileId && isAutoSaveFailed(profileId)),
     };
   }
 
@@ -82,6 +85,7 @@ export function initCreatedLivePrimaryCta(opts) {
 
   window.addEventListener("hc-created-live-cta-sync", sync);
   window.addEventListener("hc-device-hub-changed", sync);
+  window.addEventListener("hc-auto-save-changed", sync);
 
   sync();
   return { sync };

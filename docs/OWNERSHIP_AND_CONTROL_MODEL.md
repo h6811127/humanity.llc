@@ -356,7 +356,7 @@ Hosted steward accounts ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMP
 | **D1** | Copy pass: create, created save strip, hub custody, wallet CTAs | Low — no behavior change | **Shipped** (2026-05-29) |
 | **D2** | Demote crypto detail to Help Advanced; landing + trust chips | Low | **Shipped** (2026-05-29) |
 | **D3** | Rename nav labels (“My cards” → “My objects”) with redirects/aliases | Medium — bookmarks, tests | **Shipped** (2026-05-29) |
-| **D4** | Session-only warnings only when auto-save fails or user opted out | Medium — test matrix |
+| **D4** | Session-only warnings only when auto-save fails or user opted out | Medium — test matrix | **Shipped** (2026-05-29) |
 | **D5** | Stronger recovery gates before merch checkout / Nth child object | Product policy |
 | **D6** | Optional WebAuthn wrap around control activation (extends vouch-ready option E) | Engineering |
 

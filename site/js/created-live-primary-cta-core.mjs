@@ -13,6 +13,8 @@
  *   resolverReachable: boolean,
  *   testScanDone: boolean,
  *   scanUrlReady: boolean,
+ *   autoSaveEnabled?: boolean,
+ *   autoSaveFailed?: boolean,
  * }} input
  * @returns {{ mode: CreatedLivePrimaryMode, label: string, subtitle: string }}
  */
@@ -25,11 +27,15 @@ export function resolveCreatedLivePrimaryCta(input) {
     };
   }
   if (input.hasSigningKeys && !input.walletSaved) {
-    return {
-      mode: "save-keys",
-      label: "Save ownership on this device",
-      subtitle: "Required to manage and revoke later",
-    };
+    const autoSaveEnabled = input.autoSaveEnabled !== false;
+    const suppressSaveNudge = autoSaveEnabled && !input.autoSaveFailed;
+    if (!suppressSaveNudge) {
+      return {
+        mode: "save-keys",
+        label: "Save ownership on this device",
+        subtitle: "Required to manage and revoke later",
+      };
+    }
   }
   if (!input.resolverReachable) {
     return {

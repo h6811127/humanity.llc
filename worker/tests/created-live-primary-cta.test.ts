@@ -18,9 +18,36 @@ describe("resolveCreatedLivePrimaryCta", () => {
     ).toBe("prove-live");
   });
 
-  it("prompts save when keys are in tab but not on device", () => {
+  it("prompts save when keys are in tab but not on device and auto-save is off", () => {
     expect(
-      resolveCreatedLivePrimaryCta({ ...base, walletSaved: false }).mode
+      resolveCreatedLivePrimaryCta({
+        ...base,
+        walletSaved: false,
+        autoSaveEnabled: false,
+      }).mode
+    ).toBe("save-keys");
+  });
+
+  it("skips save nudge during quiet auto-save happy path", () => {
+    expect(
+      resolveCreatedLivePrimaryCta({
+        ...base,
+        walletSaved: false,
+        autoSaveEnabled: true,
+        autoSaveFailed: false,
+        testScanDone: false,
+      }).mode
+    ).toBe("test-scan");
+  });
+
+  it("prompts save when auto-save failed", () => {
+    expect(
+      resolveCreatedLivePrimaryCta({
+        ...base,
+        walletSaved: false,
+        autoSaveEnabled: true,
+        autoSaveFailed: true,
+      }).mode
     ).toBe("save-keys");
   });
 

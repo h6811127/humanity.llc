@@ -1,6 +1,12 @@
 import { markSetupDone } from "./created-mode.mjs";
-import { isAutoSaveEnabled } from "./device-auto-save.mjs";
+import {
+  clearAutoSaveFailed,
+  isAutoSaveEnabled,
+  isAutoSaveFailed,
+  markAutoSaveFailed,
+} from "./device-auto-save.mjs";
 import { logDeviceActivity } from "./device-activity.mjs";
+import { shouldShowCreatedOwnershipSaveUi } from "./device-ownership-notice-core.mjs";
 import {
   defaultWalletLabel,
   isWalletSaved,
@@ -33,6 +39,19 @@ export function initCreatedDeviceSave(getSession) {
       card.hidden = true;
       return;
     }
+    const saved = isWalletSaved(session.profile_id);
+    const showUi = shouldShowCreatedOwnershipSaveUi({
+      savedOnDevice: saved,
+      autoSaveEnabled: isAutoSaveEnabled(),
+      autoSaveFailed: isAutoSaveFailed(session.profile_id),
+    });
+    if (!showUi) {
+      card.hidden = true;
+      if (!saved && isAutoSaveEnabled()) {
+        queueMicrotask(() => runSave({ quiet: true }));
+      }
+      return;
+    }
     card.hidden = false;
     if (labelInput) {
       labelInput.placeholder = "Label";
@@ -40,7 +59,6 @@ export function initCreatedDeviceSave(getSession) {
         labelInput.value = defaultWalletLabel(session);
       }
     }
-    const saved = isWalletSaved(session.profile_id);
     if (saved) {
       const sync = saveSessionToWallet(session, labelInput?.value ?? "");
       if (sync.ok && sync.updated) {
@@ -54,31 +72,43 @@ export function initCreatedDeviceSave(getSession) {
       form.hidden = false;
       doneEl.hidden = true;
       if (isAutoSaveEnabled()) {
-        queueMicrotask(() => runSave());
+        queueMicrotask(() => runSave({ quiet: true }));
       }
     }
   }
 
-  function runSave() {
+  /**
+   * @param {{ quiet?: boolean }} [opts]
+   */
+  function runSave(opts = {}) {
     const session = getSession();
     if (!session?.profile_id || !session?.owner_private_key_b58) {
-      setStatus("No signing keys in this tab.", true);
+      if (!opts.quiet) {
+        setStatus("Ownership not loaded in this tab.", true);
+      }
       return false;
     }
     const result = saveSessionToWallet(session, labelInput?.value ?? "");
     if ("error" in result) {
-      setStatus(result.error, true);
+      markAutoSaveFailed(session.profile_id);
+      if (!opts.quiet) {
+        setStatus(result.error, true);
+      }
       refresh();
+      window.dispatchEvent(new Event("hc-device-hub-changed"));
       return false;
     }
-    setStatus(
-      result.already
-        ? "Already saved on this device."
-        : result.updated
-          ? "Updated saved keys on this device."
-          : "Saved on this device.",
-      false
-    );
+    clearAutoSaveFailed(session.profile_id);
+    if (!opts.quiet) {
+      setStatus(
+        result.already
+          ? "Already saved on this device."
+          : result.updated
+            ? "Updated saved keys on this device."
+            : "Saved on this device.",
+        false
+      );
+    }
     if (!result.already) {
       const label =
         labelInput?.value?.trim() || defaultWalletLabel(session);

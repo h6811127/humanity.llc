@@ -181,6 +181,7 @@ export function startDeviceChromeRefresh() {
 
   window.addEventListener("hc-tab-presence-changed", onPresenceChanged);
   window.addEventListener("hc-device-hub-changed", onImmediateChromeEvent);
+  window.addEventListener("hc-auto-save-changed", onImmediateChromeEvent);
   // Live-proof / inbox updates change `getInboxItems()`; invalidate gather cache so
   // the shell badge and inbox sheet reflect the new pending set immediately.
   window.addEventListener("hc-live-control-inbox-changed", () => {

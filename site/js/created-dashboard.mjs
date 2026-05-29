@@ -4,6 +4,7 @@
  */
 
 import { isWalletSaved } from "./device-wallet.mjs";
+import { isAutoSaveEnabled, isAutoSaveFailed } from "./device-auto-save.mjs";
 import { syncUpdateStatusTaskGate } from "./created-first-revoke-gate.mjs?v=2";
 import { initCreatedLivePrimaryCta } from "./created-live-primary-cta.mjs";
 import { initCreatedLiveSetupMemory } from "./created-live-setup-memory.mjs";
@@ -121,9 +122,14 @@ export function initCreatedDashboard({
 
   function syncCustodySummary(saved) {
     if (!custodySummarySub) return;
+    const pid = profileId();
+    const quietAutoSave =
+      !saved && pid && isAutoSaveEnabled() && !isAutoSaveFailed(pid);
     custodySummarySub.textContent = saved
       ? "Saved on this device"
-      : "Save to update and revoke later";
+      : quietAutoSave
+        ? "Saving on this device…"
+        : "Save to update and revoke later";
     if (custodyDisclosure) {
       custodyDisclosure.classList.toggle("created-custody-disclosure--saved", saved);
     }

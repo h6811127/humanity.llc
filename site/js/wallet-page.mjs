@@ -2,9 +2,10 @@
  * /wallet/ - dedicated saved-cards page (not the hub bottom sheet).
  */
 import { logDeviceActivity } from "./device-activity.mjs";
-import { isAutoSaveEnabled, initAutoSaveToggle } from "./device-auto-save.mjs";
+import { isAutoSaveEnabled, initAutoSaveToggle, isAutoSaveFailed } from "./device-auto-save.mjs";
 import { initDeviceHub, refreshDeviceHub } from "./device-hub-ui.mjs";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
+import { shouldShowSessionOnlyOwnershipWarning } from "./device-ownership-notice-core.mjs";
 import { refreshWalletContextFromChrome, walletEntryForSession } from "./wallet-page-chrome.mjs";
 import { createPinEntry, loadPins, savePins } from "./device-pins.mjs";
 import { mountKeysCustody } from "./device-keys-custody.mjs";
@@ -12,6 +13,7 @@ import "./device-help-fab.mjs";
 import {
   defaultWalletLabel,
   getWalletCount,
+  isWalletSaved,
   loadWallet,
   saveSessionToWallet,
 } from "./device-wallet.mjs";
@@ -65,7 +67,7 @@ function updateContextBanners() {
   refreshWalletContextFromChrome();
 }
 
-function initTabSave() {
+function refreshTabSaveGroup() {
   const session = getTabSession();
   if (!saveForm || !saveGroup) return;
 
@@ -74,12 +76,24 @@ function initTabSave() {
     return;
   }
 
-  saveGroup.hidden = false;
+  const show = shouldShowSessionOnlyOwnershipWarning({
+    hasTabControl: true,
+    savedOnDevice: isWalletSaved(session.profile_id),
+    autoSaveEnabled: isAutoSaveEnabled(),
+    autoSaveFailed: isAutoSaveFailed(session.profile_id),
+  });
+  saveGroup.hidden = !show;
+  if (!show) return;
+
   if (saveLabel && !saveLabel.value.trim()) {
     saveLabel.value = defaultWalletLabel(session);
   }
+}
 
-  saveForm.addEventListener("submit", (e) => {
+function initTabSave() {
+  refreshTabSaveGroup();
+
+  saveForm?.addEventListener("submit", (e) => {
     e.preventDefault();
     const current = getTabSession();
     if (!current?.profile_id || !current?.owner_private_key_b58) {
@@ -157,6 +171,7 @@ window.addEventListener("hc-device-hub-changed", () => {
   refreshHelpVisibility();
   updateContextBanners();
   refreshAutoSaveLine();
+  refreshTabSaveGroup();
 });
 
 window.addEventListener("storage", (e) => {
@@ -166,4 +181,7 @@ window.addEventListener("storage", (e) => {
 
 // Phase 2: device-chrome-refresh owns cross-tab refresh scheduling.
 
-window.addEventListener("hc-auto-save-changed", refreshAutoSaveLine);
+window.addEventListener("hc-auto-save-changed", () => {
+  refreshAutoSaveLine();
+  refreshTabSaveGroup();
+});
