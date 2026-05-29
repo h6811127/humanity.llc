@@ -667,6 +667,16 @@ See [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md).
 
 Vitest: `worker/tests/device-inbox-sheet-core.test.ts`, `worker/tests/device-inbox.test.ts` (`inboxDotOverlayFromItems`). Playwright: `e2e/device-inbox.spec.ts` § card disabled since visit; § sheet reconcile (P5e — opens sheet via `setInboxSheetOpen`, phase 16).
 
+## P5f — Stuck inbox backdrop vs Check network (Step 1 extension)
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | `/wallet/` with saved card; open inbox from badge; close via backdrop | **Check network** still tappable; status line updates on tap |
+| 2 | Leave tab ~6 min (network cache stale) or refocus tab | **Check network** still tappable; stale “checked X ago” OK |
+| 3 | Simulate stuck `#device-inbox-backdrop.is-visible` with inbox closed (devtools) | Taps pass through to wallet/hub controls; reconcile clears backdrop on tab focus |
+
+Vitest: `worker/tests/device-sheet-backdrop-sync.test.ts`, `worker/tests/device-safe-rebuild-tripwires.test.ts`. Playwright: `e2e/device-hub-check-network-backdrop.spec.ts`.
+
 ## P5 — Inbox diagnostics (dev — phase 7)
 
 | Step | Action | Expected |

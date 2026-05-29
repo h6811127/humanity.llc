@@ -16,27 +16,25 @@ export function syncSheetBackdropClosed(backdrop) {
 }
 
 /**
- * Inbox backdrop (z-index 56) sits above the hub sheet (55). When the hub is open
- * but the inbox is closed, a stuck inbox backdrop swallows taps — including Check network.
+ * Inbox backdrop (z-index 56) sits above the hub sheet (55) and wallet chrome.
+ * When the inbox is closed, a stuck inbox backdrop swallows taps — including Check network.
  * Safe to call synchronously before lazy inbox module load finishes closing the sheet.
  *
  * @param {Pick<Document, "getElementById"> & { body?: { classList?: { contains: (c: string) => boolean } } }} [doc]
  */
 export function syncInboxBackdropForOpenHub(doc = document) {
   if (!doc?.getElementById) return;
-  const hub = doc.getElementById("device-hub");
   const inboxBackdrop = doc.getElementById("device-inbox-backdrop");
   if (!inboxBackdrop) return;
 
-  const hubOpen =
-    hub &&
-    typeof hub.classList?.contains === "function" &&
-    hub.classList.contains("device-hub--sheet") &&
-    !hub.classList.contains("device-hub-collapsed");
-  if (!hubOpen) return;
+  if (doc.body?.classList?.contains("device-inbox-sheet-open") === true) return;
 
-  const inboxOpen = doc.body?.classList?.contains("device-inbox-sheet-open") === true;
-  if (inboxOpen) return;
+  const sheet = doc.getElementById("device-inbox-sheet");
+  const sheetExpanded =
+    sheet &&
+    typeof sheet.classList?.contains === "function" &&
+    !sheet.classList.contains("device-inbox-sheet--collapsed");
+  if (sheetExpanded) return;
 
   syncSheetBackdropClosed(inboxBackdrop);
 }

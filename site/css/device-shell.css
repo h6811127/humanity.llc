@@ -2247,6 +2247,11 @@ body.device-hub-sheet-open {
   pointer-events: none;
 }
 
+/* Stuck .is-visible after inbox close must not swallow taps (Check network, wallet chrome). */
+body:not(.device-inbox-sheet-open) .device-inbox-backdrop.is-visible {
+  pointer-events: none;
+}
+
 @media (pointer: coarse) {
   .device-hub-backdrop,
   .device-inbox-backdrop {
