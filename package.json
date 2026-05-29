@@ -17,6 +17,7 @@
     "worker:migrate:local": "wrangler d1 migrations apply humanity-resolver --local --config worker/wrangler.toml",
     "worker:migrate:remote": "wrangler d1 migrations apply humanity-resolver --remote --config worker/wrangler.toml",
     "worker:apply-child-object-qr-schema": "node worker/scripts/apply-child-object-qr-schema.mjs",
+    "worker:repair-live-control-challenges-fk": "node worker/scripts/apply-repair-live-control-challenges-fk.mjs",
     "worker:fixtures": "tsx worker/scripts/generate-fixtures.ts",
     "worker:test": "vitest run",
     "worker:test:device": "vitest run worker/tests/device",

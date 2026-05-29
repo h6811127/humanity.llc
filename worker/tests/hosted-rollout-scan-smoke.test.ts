@@ -1,8 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
+  liveControlChallengeSmokeFailure,
+  resolveLiveControlSmokeIds,
   resolveScanSmokeUrl,
   scanPageSmokeFailure,
+  smokeProductionLiveControlChallenge,
   smokeProductionScanPage,
 } from "../scripts/hosted-rollout-scan-smoke.mjs";
 
@@ -45,6 +48,35 @@ describe("hosted-rollout-scan-smoke", () => {
     );
 
     await expect(smokeProductionScanPage("https://api.test")).rejects.toThrow("exit:1");
+
+    exit.mockRestore();
+  });
+
+  it("resolveLiveControlSmokeIds reads showcase status plate", () => {
+    const { profileId, qrId } = resolveLiveControlSmokeIds("https://humanity.llc");
+    expect(profileId).toBe("r4YyNEWJvVwWNMETzXfGjFyL");
+    expect(qrId).toBe("qr_8w7zHCPHisXvTnar");
+  });
+
+  it("liveControlChallengeSmokeFailure detects 500 and Error 1101 bodies", () => {
+    expect(liveControlChallengeSmokeFailure(201, '{"challenge_id":"lc_x"}')).toBe(false);
+    expect(liveControlChallengeSmokeFailure(500, "error code: 1101")).toBe(true);
+  });
+
+  it("smokeProductionLiveControlChallenge exits on POST failure", async () => {
+    const exit = vi.spyOn(process, "exit").mockImplementation((code) => {
+      throw new Error(`exit:${code}`);
+    });
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => ({
+        status: 500,
+        text: async () => "error code: 1101",
+      }))
+    );
+
+    await expect(smokeProductionLiveControlChallenge("https://api.test")).rejects.toThrow("exit:1");
 
     exit.mockRestore();
   });
