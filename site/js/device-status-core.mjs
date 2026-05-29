@@ -49,7 +49,7 @@ let networkStatus = "offline";
 /** @type {Promise<typeof import("./device-hub-sheet.mjs")> | null} */
 let hubSheetModulePromise = null;
 
-/** @type {(() => void) | null} */
+/** @type {((open: boolean) => void) | null} */
 let onHubExpandedHook = null;
 
 function loadHubSheetModule() {
@@ -68,7 +68,7 @@ export function setNetworkStatus(status) {
   networkStatus = status;
 }
 
-/** @param {() => void} fn */
+/** @param {(open: boolean) => void} fn */
 export function setHubExpandedHook(fn) {
   onHubExpandedHook = fn;
 }
@@ -180,7 +180,7 @@ export function setHubExpanded(open, { persist = true, haptic = false } = {}) {
         hubCollapsed: hub?.classList.contains("device-hub-collapsed") ?? null,
       });
     }
-    onHubExpandedHook?.();
+    onHubExpandedHook?.(open);
   });
 }
 

@@ -36,7 +36,9 @@ import {
 } from "./lost-item-relay-loop-scorecard.mjs";
 import { syncCreatedPilotStewardCopy } from "./pilot-steward-copy.mjs";
 import { initCreatedDeviceSave } from "./created-device-save.mjs";
-import { markSetupDone, modeFromPage } from "./created-mode.mjs";
+import { markSetupDone, modeFromPage, isSetupDone } from "./created-mode.mjs";
+import { ownershipBackupSeatbeltSatisfied } from "./created-first-session-gate-core.mjs";
+import { findWalletEntryByProfileId } from "./device-wallet.mjs";
 import { initCreatedMerchFunnel } from "./created-merch-funnel.mjs";
 import { initCreatedChildObject } from "./created-child-object.mjs";
 import { initCreatedLostItemRelay } from "./created-child-object-lost-item.mjs";
@@ -378,7 +380,15 @@ function getWorkspaceMode() {
 
 function enterControlWorkspace() {
   workspaceMode = "control";
-  if (profileId) markSetupDone(profileId);
+  if (profileId) {
+    const walletEntry = findWalletEntryByProfileId(profileId);
+    if (
+      isSetupDone(profileId) ||
+      ownershipBackupSeatbeltSatisfied(loadSession(), walletEntry)
+    ) {
+      markSetupDone(profileId);
+    }
+  }
   clearFreshUrlParam();
   clearCreatedViewModeUi();
   applyCreatedWorkspaceMode("control");

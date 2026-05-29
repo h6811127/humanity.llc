@@ -51,9 +51,10 @@ Central strings: `site/js/device-ownership-copy-core.mjs`
 | `VIEW_ONLY_NO_SESSION_WALLET_EMPTY` | `#no-session-detail` when wallet has no signing rows (Flow C) |
 | `VIEW_ONLY_NO_SESSION_WALLET_SAVED` | `#no-session-detail` when wallet has keys but tab does not |
 | `viewOnlyNoSessionDetailHtml(signingKeyCount)` | Runtime branch for `#no-session-detail` (P0-7) |
-| `BACKUP_WRONG_PASSPHRASE` | `.hcbackup` decrypt failure |
+| `WALLET_SAVE_STORAGE_FULL` / `WALLET_SAVE_FAILED` | Quota or generic wallet save failure (P0-3) |
 | `BACKUP_INVALID_OWNERSHIP` | Invalid backup payload |
 | `IMPORT_OWNERSHIP_LOADED_TAB` | Successful hub import |
+| `HUB_RESTORE_IMPORT_HINT` / `HUB_RESTORE_IMPORT_SUMMARY` | Hub backup import form (Phase 4) |
 
 Automated guards: `npm run worker:test:key-loss-copy`
 

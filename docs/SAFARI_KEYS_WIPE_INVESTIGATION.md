@@ -408,7 +408,7 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 | **P0-1** | **Wire `maybeQuietTabRehydrate()` on scan pages** before vouch/live-proof UI | R1 Camera QR path | **Shipped** — `scan-tab-keys.mjs?v=8` awaits rehydrate; script loads before `vouch-issue` |
 | **P0-2** | **Synchronous save** before leaving create success path | R3 race (less common on prod than assumed) | **Shipped** — `create-card.mjs` sync `saveSessionToWallet` before navigate; `created-device-save.mjs` no microtask |
 | **P0-3** | **try/catch on `saveWallet` / `saveSessionToWallet`** — visible error, `hc_auto_save_failed` | R3 quota | **Shipped** — `device-wallet-save-core.mjs`; `saveWallet` returns `{ error }`; save UI surfaces copy |
-| **P0-4** | **First-session backup gate** before “done” | R4 true wipe | N/A |
+| **P0-4** | **First-session backup gate** before “done” | R4 true wipe | **Shipped** — `created-first-session-gate-core.mjs`; setup required until seatbelt or `hc_setup_done` |
 | **P0-5** | **Scan dot / “Keys on this device” = tab signing state**, not wallet count; **Restore control here** CTA | R9 — **prod** | Flow B — **Shipped** (`scan-page-dot.mjs?v=8`, actor band lead sync) |
 | **P0-6** | **Never persist `hc_created` without `owner_private_key_b58`**; strip keyless session on view-only | R11 — **prod** | Flow C — **Shipped** (`device-keys.mjs` `setTabSession`, `created.mjs`) |
 | **P0-7** | **View-only copy** branches on wallet: empty → backup/import; saved → restore in this tab | R13 — **prod** | Flow C — **Shipped** |
@@ -486,7 +486,7 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 | 4 | P0-7 View-only copy branches | **Shipped** | `created-view-only-copy-core.mjs`; wallet-empty vs wallet-saved copy on `#no-session-detail` + view restore panel |
 | 5 | P0-2 Sync save on create | **Shipped** | `created-device-save-core.mjs`; sync save in `create-card.mjs` before `location.replace`; `/created/` auto-save runs inline |
 | 6 | P0-3 saveWallet try/catch | **Shipped** | `device-wallet-save-core.mjs`; quota-safe `saveWallet`; `hc_auto_save_failed` + visible save errors |
-| 7 | P0-4 Backup gate | Pending | R4 |
+| 7 | P0-4 Backup gate | **Shipped** | `created-first-session-gate-core.mjs`; setup required until seatbelt; wallet persists recovery markers; steward `#revoke` bypass gated |
 | 8 | P0b-1 Card disabled FP | Pending | R10 |
 | 9 | P0b-2 Setup wizard scan tab | Pending | R12 |
 | 10 | P0b-3 Scan single-row auto-activate (stranger vouch) | Pending | Overlaps P1-1 |

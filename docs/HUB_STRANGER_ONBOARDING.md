@@ -60,6 +60,7 @@ The collapsed hub does not consume layout on `/` (hero stays above the fold). Op
 | Saved items | Section header + **+ New**; empty row copy |
 | Pinned scans | Subgroup label + **Bookmarks only — cannot manage objects** + empty row |
 | Search | Kept (wallet parity) |
+| Backup import | `[data-hub-group="import"]` with **`data-hub-restore-always`** — full form stays visible; empty hint links to `#hub-import-form` |
 
 ### Hidden until first save (`data-hub-stranger-empty-hide`)
 
@@ -67,7 +68,6 @@ The collapsed hub does not consume layout on `/` (hero stays above the fold). Op
 |---------|--------|
 | `#device-hub-network-tools` | Monitoring eyebrow, check buttons, watch toggle |
 | `#device-hub-keys-custody` | Education + proactive rows (empty hint carries custody for strangers) |
-| `[data-hub-group="import"]` | Full backup form; import linked from empty hint `#hub-import-form` |
 | `[data-hub-group="shortcuts"]` | Landing hub only — settings remain on page **Shortcuts & settings** section |
 | `#device-hub-actions-section` | Recent device actions |
 | `#device-hub-status-key` | Status dot color legend |
@@ -80,6 +80,7 @@ Shared strings in `site/js/device-ownership-copy-core.mjs`:
 
 - `HUB_EMPTY_NO_CARDS_HINT` — lead + link targets (create, import anchor)
 - `HUB_PINS_BOOKMARKS_ONLY` — *Bookmarks only — cannot manage objects*
+- `HUB_RESTORE_IMPORT_HINT` / `HUB_RESTORE_IMPORT_SUMMARY` — converged backup import copy (Phase 4 step 2; hydrated in `device-hub-import.mjs`)
 
 ### Files
 
@@ -87,13 +88,14 @@ Shared strings in `site/js/device-ownership-copy-core.mjs`:
 |------|--------|
 | Core | `site/js/device-hub-stranger-empty-core.mjs` |
 | Apply | `site/js/device-hub-ui.mjs` (`applyHubStrangerEmptyChrome` on each `refreshDeviceHub`) |
-| HTML | `site/index.html`, `site/create/index.html` (empty hint + pins hint + `data-hub-stranger-empty-hide`) |
-| CSS | `site/css/device-shell.css` — hide `[data-hub-stranger-empty-hide]` under `.device-hub--stranger-empty` |
-| Tests | `worker/tests/device-hub-stranger-empty-core.test.ts` · HTML guard in `device-hub-header-html.test.ts` |
+| HTML | `site/index.html`, `site/create/index.html`, `site/wallet/index.html` (empty hint + pins hint + `data-hub-stranger-empty-hide` + import `data-hub-restore-always`) |
+| CSS | `site/css/device-shell.css` — hide `[data-hub-stranger-empty-hide]` under `.device-hub--stranger-empty`; **`[data-hub-restore-always]` exempt** |
+| Tests | `worker/tests/device-hub-stranger-empty-core.test.ts` · `worker/tests/device-hub-restore-always.test.ts` · HTML guard in `device-hub-header-html.test.ts` |
 
 ### Regression
 
 ```bash
+npm run worker:test:hub-restore-always
 npm run worker:test -- worker/tests/device-hub-stranger-empty-core.test.ts worker/tests/device-hub-header-html.test.ts
 ```
 

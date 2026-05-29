@@ -10,7 +10,14 @@ import {
   readBackupFile,
 } from "./key-backup.mjs";
 import { logDeviceActivity } from "./device-activity.mjs";
-import { IMPORT_OWNERSHIP_LOADED_TAB } from "./device-ownership-copy-core.mjs";
+import {
+  HUB_RESTORE_IMPORT_HINT,
+  HUB_RESTORE_IMPORT_SUMMARY,
+  IMPORT_OWNERSHIP_LOADED_TAB,
+} from "./device-ownership-copy-core.mjs";
+
+const HUB_IMPORT_FORM_HINT_ID = "hub-import-form-hint";
+const HUB_IMPORT_SUMMARY_CLASS = "hub-import-list-sub";
 import { activateWalletEntry, openCardNowPage } from "./device-keys.mjs";
 import { mergeBackupIntoWallet } from "./device-hub-import-core.mjs";
 import { loadWallet, saveWallet, walletEntryFromSession } from "./device-wallet.mjs";
@@ -43,11 +50,28 @@ function showImportOpenControlsCta(statusEl, entry) {
 }
 
 /**
+ * Apply converged hub import copy (Phase 4 step 2).
+ * @param {HTMLFormElement | null} form
+ */
+export function applyHubRestoreImportCopy(form) {
+  if (!form) return;
+  const hintEl = document.getElementById(HUB_IMPORT_FORM_HINT_ID);
+  if (hintEl) hintEl.textContent = HUB_RESTORE_IMPORT_HINT;
+  const summaryEls = form.closest(".device-hub-import")?.querySelectorAll(
+    `.${HUB_IMPORT_SUMMARY_CLASS}`
+  );
+  summaryEls?.forEach((el) => {
+    el.textContent = HUB_RESTORE_IMPORT_SUMMARY;
+  });
+}
+
+/**
  * @param {HTMLFormElement | null} form
  * @param {HTMLElement | null} statusEl
  */
 export function initHubBackupImport(form, statusEl) {
   if (!form) return;
+  applyHubRestoreImportCopy(form);
 
   function setStatus(msg, isError = false) {
     if (!statusEl) return;

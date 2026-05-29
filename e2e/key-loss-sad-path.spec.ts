@@ -131,17 +131,25 @@ test.describe("key-loss sad paths", () => {
     await expect(page.getByRole("heading", { name: "View this card" })).toBeVisible({
       timeout: 15_000,
     });
-    await expect(page.locator("#created-view-ownership-hint")).toBeVisible();
+    await expect(page.locator("#created-view-live-banner")).toBeVisible();
     await expect(page.locator("#revoke-qr-btn")).toBeHidden();
+
+    await page.getByRole("tab", { name: "Manage" }).click();
+    await expect(page.locator("#created-view-ownership-hint")).toBeVisible();
   });
 
   test("K2: wrong backup passphrase shows plain error on wallet import", async ({ page }) => {
     await page.goto("/wallet/");
 
+    await expect(page.locator('[data-hub-group="import"]')).toBeVisible();
+    await expect(page.locator("#wallet-page")).toHaveClass(/device-hub--stranger-empty/);
+
     await page.locator("#hub-import-form").evaluate((el) => {
       const details = el.closest("details");
       if (details instanceof HTMLDetailsElement) details.open = true;
     });
+
+    await expect(page.locator("#hub-import-passphrase")).toBeVisible();
 
     await page.locator("#hub-import-passphrase").fill("wrong-passphrase-here");
     await page.locator("#hub-import-form input[type='file']").setInputFiles(BACKUP_FIXTURE);

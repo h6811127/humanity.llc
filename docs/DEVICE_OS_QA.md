@@ -413,12 +413,12 @@ Automated: `e2e/device-status-dot.spec.ts` § hub sheet header chrome (steps 4�
 
 | Step | Action | Expected |
 |------|--------|----------|
-| 1 | Fresh browser (no `hc_wallet` / pins) → `/` → open hub | Empty hint: **No cards saved yet** + Create + import backup links; **no** Monitoring block, backup form, shortcuts, activity log, or status-dot legend |
+| 1 | Fresh browser (no `hc_wallet` / pins) → `/` → open hub | Empty hint: **No cards saved yet** + Create + import backup links; **Backup import** form visible (`data-hub-restore-always`); **no** Monitoring block, shortcuts, activity log, or status-dot legend |
 | 2 | Pinned scans subgroup | **Bookmarks only — cannot manage objects** |
 | 3 | Create + save a card (or import backup) | Hub shows full steward chrome; `device-hub--stranger-empty` removed |
 | 4 | Repeat on `/wallet/` empty | Same hide rules; wallet page hint matches landing |
 
-Automated: `npm run worker:test -- worker/tests/device-hub-stranger-empty-core.test.ts`
+Automated: `npm run worker:test:hub-restore-always` · `npm run worker:test -- worker/tests/device-hub-stranger-empty-core.test.ts`
 
 ### P2-SLC · Hub stranger landing chrome
 

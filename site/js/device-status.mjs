@@ -99,13 +99,11 @@ import {
 export { DOT_STATE_CHANGED };
 
 export function setHubExpanded(open, opts) {
-  if (open) {
-    onHubOpenedFromIntro();
-  }
   setHubExpandedCore(open, opts);
 }
 
-setHubExpandedHook(() => {
+setHubExpandedHook((open) => {
+  if (open) onHubOpenedFromIntro();
   refreshDeviceChrome({ immediate: true });
 });
 

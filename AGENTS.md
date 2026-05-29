@@ -61,7 +61,7 @@ The floating **status dot** (`#brand-status-dot-btn`) is the hub opener on `/`, 
 
 When you touch any of these, run the regression suite before finishing:
 
-- `site/js/device-status.mjs`, `device-status-bootstrap.mjs`, `device-status-load-error.mjs`, `device-dot-state-core.mjs`
+- `site/js/device-status.mjs`, `device-status-core.mjs`, `device-status-bootstrap.mjs`, `device-status-load-error.mjs`, `device-dot-state-core.mjs`
 - `site/js/device-hub-sheet.mjs`, `device-inbox-sheet.mjs`, `device-hub-glance.mjs`, `device-shell-chrome.mjs`, `device-hub-glance-popover.mjs`
 - `site/css/device-shell.css` (especially `pointer-events` on `.top-chrome--float` / `.shell-status-cluster`)
 

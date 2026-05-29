@@ -9,6 +9,7 @@ import { reconcileRemovedProfilesAfterWalletSave } from "./device-wallet-removed
 import { setLastActiveProfileId } from "./device-quiet-tab-rehydrate-prefs.mjs";
 import { scheduleStoragePersistRequest } from "./device-storage-persist.mjs";
 import { walletSaveErrorMessage } from "./device-wallet-save-core.mjs";
+import { mergeOwnershipSeatbeltFields } from "./created-first-session-gate-core.mjs";
 
 export const WALLET_STORAGE_KEY = "hc_wallet";
 export const WALLET_SUMMARY_STORAGE_KEY = "hc_wallet_summary";
@@ -426,7 +427,7 @@ export function walletSome(predicate) {
 }
 
 export function walletEntryFromSession(session, label) {
-  return {
+  const entry = {
     id: `${session.profile_id}_${Date.now()}`,
     label: label.trim() || `@${session.handle || session.profile_id.slice(0, 8)}`,
     saved_at: new Date().toISOString(),
@@ -449,6 +450,7 @@ export function walletEntryFromSession(session, label) {
       ) ?? session.verification,
     issued_vouches: session.issued_vouches,
   };
+  return mergeOwnershipSeatbeltFields(entry, session);
 }
 
 export function isWalletSaved(profileId) {
@@ -540,7 +542,7 @@ function walletEntrySyncSignature(entry) {
 export function mergeWalletEntryFromSession(existing, session, label = "") {
   const trimmed = label.trim();
   const qrId = session.qr_id ?? walletEntryQrId(session) ?? existing.qr_id;
-  return {
+  const merged = {
     ...existing,
     label: trimmed || existing.label,
     handle: session.handle ?? existing.handle,
@@ -566,6 +568,7 @@ export function mergeWalletEntryFromSession(existing, session, label = "") {
     issued_vouches: session.issued_vouches ?? existing.issued_vouches,
     saved_at: new Date().toISOString(),
   };
+  return mergeOwnershipSeatbeltFields(merged, session);
 }
 
 /**

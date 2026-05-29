@@ -269,7 +269,7 @@ test.describe("status dot accessibility", () => {
     await page.goto("/");
     const dotBtn = page.locator("#brand-status-dot-btn");
     await waitForStatusDotReady(page);
-    await expect(dotBtn).toHaveAttribute("aria-label", /steward keys ready/i);
+    await expect(dotBtn).toHaveAttribute("aria-label", /steward control ready/i);
     await expect(dotBtn).toHaveAttribute("aria-label", /resolver online/i);
 
     await dotBtn.click();
@@ -348,7 +348,7 @@ test.describe("hub intro coachmark", () => {
     const intro = page.locator("#device-hub-intro-coachmark");
     await expect(intro).toBeVisible({ timeout: 5000 });
     await expect(intro).toContainText(/meet your device hub/i);
-    await expect(intro).toContainText(/status dot/i);
+    await expect(intro).toContainText(/tap the dot/i);
     await expect(page.locator(".shell-status-cluster--hub-intro")).toBeVisible();
   });
 

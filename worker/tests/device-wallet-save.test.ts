@@ -78,6 +78,23 @@ describe("mergeWalletEntryFromSession", () => {
     const merged = mergeWalletEntryFromSession(existing, session);
     expect(merged.verification).toEqual({ state: "steward", label: "Steward" });
   });
+
+  it("persists ownership seatbelt markers from session (P0-4)", () => {
+    const existing = {
+      profile_id: "p1",
+      label: "Card",
+      owner_private_key_b58: "priv",
+    };
+    const session = {
+      profile_id: "p1",
+      owner_private_key_b58: "priv",
+      recovery_key_acknowledged: true,
+      key_backup_exported_at: "2026-05-28T12:00:00.000Z",
+    };
+    const merged = mergeWalletEntryFromSession(existing, session);
+    expect(merged.recovery_key_acknowledged).toBe(true);
+    expect(merged.key_backup_exported_at).toBe("2026-05-28T12:00:00.000Z");
+  });
 });
 
 describe("loadWalletSummary", () => {
