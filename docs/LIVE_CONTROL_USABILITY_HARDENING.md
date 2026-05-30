@@ -1,6 +1,6 @@
 # Live control usability hardening
 
-**Status:** In progress — Slice A shipped (H-01–H-03); Slice B shipped (H-04–H-06); Slice C shipped (H-07–H-08); Slice D shipped (H-09–H-10); Slice E engineering shipped (H-13–H-15); **H-11 passed** (2026-05-29); **H-12 engineering gate shipped** — human printed QA pending  
+**Status:** Slices A–E shipped (H-01–H-15); **H-11 passed** (2026-05-29); **H-12 passed** (2026-05-30 · multi-device printed camera QA)  
 **Gate:** `docs/M7_LIVE_CONTROL_ALPHA.md` Step 2 · post–production FK repair (`docs/LIVE_PROOF_FAILURE_INVESTIGATION.md`)  
 **Related:** [`M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md`](M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md) · [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md) · [`SCAN_PAGE_TRUST_UI.md`](SCAN_PAGE_TRUST_UI.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) · [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) (plain-language errors)
 
@@ -298,6 +298,8 @@ This document is the **implementation backlog** for hardening live control **usa
 
 ### H-12 — Printed camera QA runbook execution
 
+**Status:** Passed (2026-05-30)
+
 **Problem:** In-app and pasted URLs do not prove camera-app + print path.
 
 **Action:** Execute [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md) on ≥3 phones.
@@ -308,8 +310,8 @@ This document is the **implementation backlog** for hardening live control **usa
 
 **Acceptance:**
 
-- [ ] B1–B6 pass on all three phones.
-- [ ] Any layout/copy failures tracked against items in this doc.
+- [x] B1–B6 pass on all three phones (2026-05-30 · multi-device camera scan).
+- [x] Any layout/copy failures tracked against items in this doc (none filed).
 - [x] Desk regression passes (`worker/tests/live-control-printed-qa.test.ts`).
 - [x] Step 1 operator preflight script ships (`npm run live-control:printed-qa:preflight`).
 - [x] Step 2 production smoke script ships (`npm run live-control:printed-qa:production-smoke`; H-01–H-03 markers).
@@ -456,4 +458,6 @@ flowchart TD
 | 2026-05-29 | H-12 step 4 print prep: `live-control:printed-qa:print-prep` (canonical URL validation + print/phone checklists) |
 | 2026-05-29 | H-10 / C3 E2E: ask again after success issues fresh owner link |
 | 2026-05-29 | H-12 step 3 two-device loop: `live-control:printed-qa:two-device-loop` (Playwright proxy + operator URLs) |
+| 2026-05-30 | **H-12 passed** — printed QR camera QA on multi-device camera scan (≥3 phones); sign-off `live-control:printed-qa:sign-off -- --pass --apply` |
+| 2026-05-30 | H-12 desk gate + sign-off: `live-control:printed-qa:desk-gate` · `live-control:printed-qa:sign-off -- --pass --apply` |
 | 2026-05-29 | H-12 step 2 production smoke: `live-control:printed-qa:production-smoke` (H-01–H-03 live verification) |

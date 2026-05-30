@@ -76,6 +76,7 @@
     "card-disabled-since-visit:sign-off": "node worker/scripts/card-disabled-since-visit-sign-off.mjs",
     "e2e:created-control": "playwright test e2e/created-control.spec.ts",
     "e2e:create-flow-convergence": "playwright test e2e/create-flow-convergence.spec.ts",
+    "worker:test:create-flow-convergence": "vitest run worker/tests/create-flow-convergence-core.test.ts worker/tests/device-emphasis-card-html.test.ts -t \"convergence|hidden emphasis|Pilot|GeneralRoots|createdAddObject\"",
     "e2e:live-control-loop": "playwright test e2e/live-control-loop.spec.ts",
     "live-control:printed-qa:preflight": "node worker/scripts/live-control-printed-qa-preflight.mjs",
     "live-control:printed-qa:production-smoke": "node worker/scripts/live-control-printed-qa-production-smoke.mjs",

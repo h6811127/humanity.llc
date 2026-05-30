@@ -27,7 +27,7 @@ Use it when prioritizing hardening before launch surfaces (live proof in person,
 | Automated matrix S1–S9 | **Wired** (e2e + vitest) | Same doc § Recommended test matrix |
 | Generic create → scan → revoke (strangers) | **Passed** 2026-05-27 | [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) |
 | Live proof infra errors (1101, poll retry) | **Shipped** H-01–H-03 | [`LIVE_CONTROL_USABILITY_HARDENING.md`](LIVE_CONTROL_USABILITY_HARDENING.md) |
-| Live proof in-person handoff | **H-04–H-10 shipped** (scanner recovery H-09/H-10: 2026-05-29); **H-13–H-15 engineering shipped** (2026-05-29); **H-11 passed** (2026-05-29); **H-12 desk gate shipped** — human printed QA pending | [`LIVE_CONTROL_USABILITY_HARDENING.md`](LIVE_CONTROL_USABILITY_HARDENING.md) |
+| Live proof in-person handoff | **H-04–H-12 shipped** (H-09/H-10: 2026-05-29; H-11 comprehension: 2026-05-29; **H-12 printed camera QA: 2026-05-30**) | [`LIVE_CONTROL_USABILITY_HARDENING.md`](LIVE_CONTROL_USABILITY_HARDENING.md) |
 | Merch checkout sad paths | **Matrix + automated M1–M8** (2026-05-29); live payment + physical QA open | [`MERCH_CHECKOUT_SAD_PATH_MATRIX.md`](MERCH_CHECKOUT_SAD_PATH_MATRIX.md) |
 | Large wallet / power user | **Guardrails shipped** (comfort + large hints; E2E W1–W3) | [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Open issues |
 | Social / trust misunderstanding | **Copy exists**; comprehension not fully re-run | [`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md) |
@@ -71,10 +71,10 @@ Agents are strong at **systematic enumeration** against docs and code. Humans an
 | **H-09** | **Scan refresh mid-wait** | Scanner refreshes during wait | Must re-ask even if challenge pending |
 | **H-10** | **Expiry retry affordance** | Challenge window ends | Stranger does not notice they can ask again |
 | H-11 | Comprehension runbook | Unscripted strangers | **Passed** 2026-05-29 |
-| H-12 | Printed camera QA | ≥3 phones, camera scan | Pre-flight steps 1–3: `live-control:printed-qa:*` scripts |
+| H-12 | Printed camera QA | **Passed** 2026-05-30 · multi-device camera scan | `live-control:printed-qa:sign-off -- --pass --apply` |
 | H-13 | Full-loop Playwright E2E | **Shipped** — `npm run e2e:live-control-loop` | Poll→proven + refresh resume + expiry retry |
 
-**Human next step (Slice E):** H-12 § A–C on ≥3 phones after pre-flight steps 1–3 — see [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md).
+**Human next step (Slice E):** ~~H-12 § A–C on ≥3 phones~~ **closed 2026-05-30** — see [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md) · [`M7_LIVE_CONTROL_ALPHA.md`](M7_LIVE_CONTROL_ALPHA.md).
 
 ### 2. Key custody and continuity (by design, still sad)
 
@@ -169,7 +169,7 @@ Canonical matrix: [`HOSTED_OPS_SAD_PATH_MATRIX.md`](HOSTED_OPS_SAD_PATH_MATRIX.m
 | Priority | Area | Next action | Owner |
 |----------|------|-------------|-------|
 | **P0** | Live proof scanner recovery | **H-09 + H-10** — sessionStorage resume + expiry retry UX | **Shipped** 2026-05-29 |
-| **P0** | Live proof comprehension | Execute H-11 / H-12 runbooks with ≥5 strangers | Product / QA |
+| **P0** | Live proof comprehension | **H-11 + H-12 passed** (2026-05-29 / 2026-05-30) | Product / QA |
 | **P1** | Key-loss paths | **K1/K2/K5 + P0-4 + Phase 3–4 shipped** — P0b-1 step 2 prod WebKit sign-off (`card-disabled-since-visit:desk-gate` → **P1-P0b-1** → sign-off); manual P1-RESTORE / P1-HE | Product + QA |
 | **P1** | Merch checkout | **Matrix shipped** — operator physical QA + live payment before `checkout_open: true` | Engineering + Ops |
 | **P2** | Large wallet guardrails | **Shipped** — `e2e/wallet-scale-guardrail.spec.ts` (W1–W3) | Shell |
@@ -218,7 +218,7 @@ Canonical matrix: [`HOSTED_OPS_SAD_PATH_MATRIX.md`](HOSTED_OPS_SAD_PATH_MATRIX.m
 | **S32** | **Scan sole signing row vouch auto-activate (P0b-3)** | `npm run worker:test:vouch-scan-sole-activate` · `npm run e2e:vouch-scan-sole-signing` |
 | **S33** | **Corrupt `hc_wallet` urgent tab hint on `/wallet/` (P1-4 / R7)** | `npm run worker:test:wallet-corrupt` · `e2e/key-loss-sad-path.spec.ts` (R7) |
 | **S34** | **Safari S2 scan rehydrate + S3 PWA/browser mismatch (P2-3)** | `npm run e2e:safari-keys-persistence` (wallet + standalone scan actor band) |
-| **S35** | **Create flow convergence nudge (step 14)** | `e2e/create-flow-convergence.spec.ts` · `worker/tests/device-emphasis-card-html.test.ts` |
+| **S35** | **Create flow convergence nudge (step 14)** | `npm run e2e:create-flow-convergence` · `npm run worker:test:create-flow-convergence` |
 
 Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH_QA_2026-05-26.md) § Recommended test matrix.
 
@@ -268,4 +268,4 @@ Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH
 | 2026-05-29 | P2 wallet scale guardrails E2E (W1–W3); scan URL hints marked shipped |
 | 2026-05-29 | Merch sad-path matrix + M1–M2 E2E (`MERCH_CHECKOUT_SAD_PATH_MATRIX.md`) |
 | 2026-05-29 | Slice E shipped: H-13 `e2e/live-control-loop.spec.ts` |
-| 2026-05-29 | Initial inventory from sad-path review; Slice D (H-09, H-10) shipped |
+| 2026-05-30 | **H-12 passed** — printed QR camera QA (multi-device); M7 Step 2 printed QA closed |

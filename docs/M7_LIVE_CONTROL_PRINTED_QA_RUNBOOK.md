@@ -1,6 +1,6 @@
 # M7 — Live control printed QR camera QA
 
-**Status:** Runbook ready; pre-flight steps 1–4 shipped — human § A–C camera QA pending (≥3 phones)  
+**Status:** Runbook ready; pre-flight steps 1–4 shipped — **human § A–C passed** (2026-05-30 · multi-device camera scan)  
 **Gate:** `docs/M7_LIVE_CONTROL_ALPHA.md` Step 2 · `docs/V1_IMPLEMENTATION_BACKLOG.md` H-003 · `docs/V1_ASSUMPTION_REGISTER.md` A-005  
 **Prerequisite:** Step 1 shipped; in-person layout + expiry UI shipped; comprehension runbook ready.
 

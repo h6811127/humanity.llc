@@ -7883,6 +7883,7 @@ button.btn-danger {
 
 /* Created workspace column emphasis — compact F3 stacked (KEYS_CUSTODY_EMPHASIS_CARD_SPACING_INVESTIGATION.md § step 9) */
 #create-public-card-notice.hc-emphasis-card,
+#create-add-object-nudge.hc-emphasis-card,
 #no-session.hc-emphasis-card,
 #created-error.hc-emphasis-card,
 #live-control-proof.hc-emphasis-card,
@@ -7898,6 +7899,7 @@ button.btn-danger {
 }
 
 #create-public-card-notice.hc-emphasis-card .hc-emphasis-card__main,
+#create-add-object-nudge.hc-emphasis-card .hc-emphasis-card__main,
 #no-session.hc-emphasis-card .hc-emphasis-card__main,
 #created-error.hc-emphasis-card .hc-emphasis-card__main,
 #live-control-proof.hc-emphasis-card .hc-emphasis-card__main,
@@ -7906,6 +7908,11 @@ button.btn-danger {
 .revoke-id-warning.hc-emphasis-card .hc-emphasis-card__main {
   flex: none;
   width: 100%;
+}
+
+#create-add-object-nudge.hc-emphasis-card .hc-emphasis-card__actions {
+  width: 100%;
+  justify-content: flex-start;
 }
 
 #no-session .hc-emphasis-card__actions {

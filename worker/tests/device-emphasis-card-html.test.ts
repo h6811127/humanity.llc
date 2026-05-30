@@ -197,6 +197,14 @@ describe("device-emphasis-card-html", () => {
     );
     expect(html).not.toContain("hc-notice--info create-add-object-nudge");
     expect(html).not.toMatch(/create-add-object-nudge-general[\s\S]*hc-notice-ack/);
+
+    const styles = readFileSync(join(root, "site/styles.css"), "utf8");
+    expect(styles).toMatch(
+      /#create-add-object-nudge\.hc-emphasis-card[\s\S]*flex-direction:\s*column/
+    );
+    expect(styles).toMatch(
+      /#create-add-object-nudge\.hc-emphasis-card \.hc-emphasis-card__main[\s\S]*flex:\s*none/
+    );
   });
 
   it("scan bundle propagates compact emphasis spacing tokens", () => {
@@ -222,7 +230,7 @@ describe("device-emphasis-card-html", () => {
   it("shell pages bust styles and theme-dark for emphasis alignment", () => {
     const stylesBust = {
       "site/wallet/index.html": "129",
-      "site/create/index.html": "129",
+      "site/create/index.html": "130",
       "site/created/index.html": "129",
     };
     for (const [page, v] of Object.entries(stylesBust)) {

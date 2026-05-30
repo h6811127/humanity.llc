@@ -1,6 +1,6 @@
 # M7  -  Live control alpha
 
-**Status:** Step 1 shipped (verify on production); Step 2 comprehension **passed** (2026-05-29); printed QA pending  
+**Status:** Step 1 shipped (verify on production); Step 2 comprehension **passed** (2026-05-29); printed QA **passed** (2026-05-30)  
 **Canonical refs:** `docs/Technical Standards v1.0.md` §8.6, `docs/V1_PRODUCT_TRUST_MODEL.md` § Live Control Proof Flow  
 **Product thesis:** Revocation proves the object is mutable. Live control proves the object is actively possessed.
 
@@ -81,5 +81,5 @@ Those become meaningful only after the base interaction is legible.
 - Visible countdown for challenge expiry — **shipped (2026-05-28):** challenge wait shows **Expires in M:SS**; proven success shows **Proof display expires in M:SS** until `proof_expires_at` (`scan-html.ts`, `scan-pass.css`).
 - Clear expired/failed state on the scanner page — **shipped (2026-05-28):** SSR stale-proof gate (`scan.ts`), client `showProofExpired` / `showRequestExpired` (`scan-html.ts`), regression tests in `worker/tests/scan.test.ts` and `worker/tests/live-control.test.ts`.
 - Copy comprehension test with the question: “What did live control prove?” — **passed (2026-05-29):** [`M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md`](M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md); 5/5 strangers; automated guards: `npm run worker:test:comprehension`.
-- Manual iPhone/Android camera scan of a printed QR — **runbook shipped (2026-05-28):** [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md); step 1 preflight: `npm run live-control:printed-qa:preflight`; ≥3 phones; camera-app entry + full live proof loop on print.
+- Manual iPhone/Android camera scan of a printed QR — **passed (2026-05-30)** · runbook shipped (2026-05-28): [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md); step 1 preflight: `npm run live-control:printed-qa:preflight`; ≥3 phones; camera-app entry + full live proof loop on print.
 - Usability hardening backlog (errors, handoff, recovery, gates) — **doc shipped (2026-05-29):** [`LIVE_CONTROL_USABILITY_HARDENING.md`](LIVE_CONTROL_USABILITY_HARDENING.md) (H-01–H-15).

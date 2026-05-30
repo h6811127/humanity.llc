@@ -16,4 +16,5 @@ export const DEVICE_SHELL_E2E_SPECS = [
   "e2e/shop-product-detail.spec.ts",
   "e2e/device-hub-large-wallet-summary.spec.ts",
   "e2e/device-hub-check-network-backdrop.spec.ts",
+  "e2e/create-flow-convergence.spec.ts",
 ];
