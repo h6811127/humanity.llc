@@ -198,6 +198,14 @@
 
           <div class="device-hub-group" data-hub-group="import" data-hub-restore-always>
             <p class="device-hub-subgroup-label">Backup</p>
+            <button
+              type="button"
+              class="btn-primary device-hub-scan-qr-btn"
+              id="hub-scan-qr-btn"
+              hidden
+            >
+              Scan QR to vouch
+            </button>
             <details
               class="device-hub-import device-hub-import-block"
               data-hub-searchable="import backup file keys"
@@ -228,6 +236,86 @@
                   Import to this device
                 </button>
                 <p class="form-status" id="hub-import-status" hidden role="status"></p>
+              </form>
+            </details>
+            <details
+              class="device-hub-import device-hub-import-block"
+              data-hub-searchable="import recovery code paste"
+            >
+              <summary class="device-hub-import-summary">
+                <span class="list-icon list-icon-tone-trust" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Import recovery code</span>
+                  <span class="list-sub hub-recovery-import-list-sub"></span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </summary>
+              <form class="device-hub-import-form" id="hub-recovery-import-form">
+                <p class="form-hint" id="hub-recovery-import-form-hint"></p>
+                <label class="form-label" for="hub-recovery-card-ref">Scan link or profile ID</label>
+                <input
+                  type="text"
+                  id="hub-recovery-card-ref"
+                  name="card_ref"
+                  class="form-input"
+                  autocomplete="off"
+                  placeholder="https://humanity.llc/c/… or profile ID"
+                  required
+                />
+                <label class="form-label" for="hub-recovery-code">Recovery code</label>
+                <textarea
+                  id="hub-recovery-code"
+                  name="recovery_code"
+                  class="form-input"
+                  rows="3"
+                  autocomplete="off"
+                  spellcheck="false"
+                  required
+                ></textarea>
+                <button type="submit" class="btn-secondary device-hub-import-btn">
+                  Import to this device
+                </button>
+                <p class="form-status" id="hub-recovery-import-status" hidden role="status"></p>
+              </form>
+            </details>
+            <details
+              class="device-hub-import device-hub-import-block"
+              data-hub-searchable="open scan link paste camera"
+            >
+              <summary class="device-hub-import-summary">
+                <span class="list-icon list-icon-tone-trust" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Open scan link</span>
+                  <span class="list-sub hub-open-scan-list-sub"></span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </summary>
+              <form class="device-hub-import-form" id="hub-open-scan-form">
+                <p class="form-hint" id="hub-open-scan-form-hint"></p>
+                <label class="form-label" for="hub-open-scan-url">Scan link</label>
+                <input
+                  type="url"
+                  id="hub-open-scan-url"
+                  name="scan_url"
+                  class="form-input"
+                  autocomplete="off"
+                  inputmode="url"
+                  placeholder="https://humanity.llc/c/…"
+                  required
+                />
+                <div class="device-hub-import-form-actions">
+                  <button type="button" class="btn-ghost" data-hub-open-scan-paste>
+                    Paste from clipboard
+                  </button>
+                  <button type="submit" class="btn-secondary device-hub-import-btn">
+                    Open in this app
+                  </button>
+                </div>
+                <p class="form-status" id="hub-open-scan-status" hidden role="status"></p>
               </form>
             </details>
           </div>
@@ -579,6 +667,30 @@
         </form>
       </main>
     </div>
+    <dialog
+      id="device-hub-qr-scanner"
+      class="device-hub-qr-scanner"
+      aria-labelledby="device-hub-qr-scanner-title"
+    >
+      <div class="device-hub-qr-scanner-inner">
+        <header class="device-hub-qr-scanner-head">
+          <h2 id="device-hub-qr-scanner-title">Scan a Humanity QR</h2>
+          <button
+            type="button"
+            class="device-hub-qr-scanner-close"
+            data-hub-qr-scanner-close
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </header>
+        <p class="device-hub-qr-scanner-lead" id="device-hub-qr-scanner-lead"></p>
+        <div class="device-hub-qr-scanner-video-wrap">
+          <video id="device-hub-qr-scanner-video" playsinline muted></video>
+        </div>
+        <p class="form-status" id="device-hub-qr-scanner-status" role="status" hidden></p>
+      </div>
+    </dialog>
     <script src="/js/device-status-bootstrap.mjs?v=71" type="module"></script>
     <script src="/js/create-hub.mjs?v=1" type="module"></script>
     <script type="module" src="/js/create-card.mjs?v=19"></script>

@@ -2,7 +2,7 @@
 
 **Purpose:** Single reference for parallel agents and humans working **Safari keys**, **ownership restore**, and **H-12 live-control** without duplicating effort or leaving merge conflicts.
 
-**Last updated:** 2026-05-29
+**Last updated:** 2026-05-30
 
 ---
 
@@ -10,6 +10,7 @@
 
 | Stream | Canonical doc | Engineering tracker | Primary surfaces |
 |--------|---------------|---------------------|------------------|
+| **Steward scan handoff / PWA vouch** | [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) | S1–S2 shipped · **S3 in progress** | `device-hub-qr-scanner*`, `device-hub-open-scan*`, `vouch-issue.mjs` |
 | **Safari keys / ITP** | [`SAFARI_KEYS_WIPE_INVESTIGATION.md`](SAFARI_KEYS_WIPE_INVESTIGATION.md) | Rollout steps 1–22 (**shipped** on `main`) | `device-quiet-tab-rehydrate*`, `scan-tab-keys`, shell copy, `safari-itp-storage-notice*`, `safari-storage-persist-denied-notice*` (RC-2) |
 | **Ownership restore UX** | [`OWNERSHIP_RESTORE_UX_PLAN.md`](OWNERSHIP_RESTORE_UX_PLAN.md) | Phases 1–4 + Safari cross-refs | `/created/` view mode, hub import, `device-ownership-*` |
 | **H-12 printed live-control QA** | [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md) | H-09–H-13 · sad-path S10–S12 | Scan live proof, `e2e/live-control-loop.spec.ts`, operator scripts |
@@ -35,6 +36,7 @@ Update this table when new PRs open.
 | P0b-1 step 2 sign-off | Card disabled since visit — **prod WebKit** re-verify on humanity.llc after deploy | Human QA | Desk gate: `npm run card-disabled-since-visit:desk-gate` · manual **P1-P0b-1** · sign-off: `card-disabled-since-visit:sign-off` |
 | H-12 human § A–C | ~~Printed QR camera QA on ≥3 phones~~ **Passed 2026-05-30** | Human QA | Sign-off: `live-control:printed-qa:sign-off -- --pass --apply` |
 | P3-1 / P3-2 | WebAuthn / optional encrypted persistence | Architecture | Not scheduled |
+| **S3** | In-app hub QR scanner (PWA vouch from print) | **Shipped** | [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) · `npm run worker:test:steward-scan-handoff` · **P1-PWA-V** |
 
 ---
 
@@ -70,7 +72,7 @@ npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts
 | Area | Likely owner stream | Files |
 |------|---------------------|-------|
 | View-only `/created/` | Ownership restore | `created-view-mode.mjs`, `created-view-live-readonly*.mjs`, `site/created/index.html` |
-| Hub restore / import | Ownership restore | `device-hub-import.mjs`, `device-hub-stranger-empty*` |
+| Hub restore / import | Ownership restore · steward handoff | `device-hub-import.mjs`, `device-hub-import-recovery.mjs`, `device-hub-open-scan.mjs`, `device-hub-qr-scanner.mjs`, `device-hub-stranger-empty*` |
 | Wallet summary / corrupt | Safari P3-3 / P1-4 | `device-wallet-summary-core.mjs`, `device-wallet-parse-core.mjs` |
 | Scan quiet rehydrate | Safari P0-1 | `scan-tab-keys.mjs`, `worker/src/resolver/scan-html.ts` |
 | Live proof UX | H-12 | `scan-live-control*`, `e2e/live-control-loop.spec.ts`, `worker/scripts/live-control-printed-qa-*` |
@@ -81,6 +83,8 @@ npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts
 
 | Date | Event |
 |------|--------|
+| 2026-05-30 | **Steward scan handoff S1–S3** — canonical doc + hub QR scanner + clipboard handoff · [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) |
+| 2026-05-30 | **PWA camera handoff** — hub recovery import + Open scan link + vouch Safari explainer |
 | 2026-05-30 | **H-12 passed** — printed QR camera QA (multi-device); M7 Step 2 printed QA closed |
 | 2026-05-30 | Create flow convergence — emphasis nudge UX + E2E regression (`e2e/create-flow-convergence.spec.ts`) |
 | 2026-05-30 | Hub card disappeared Safari — **P2-RC-MON E2E** + CI verify gate |

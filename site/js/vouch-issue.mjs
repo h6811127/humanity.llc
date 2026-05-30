@@ -34,6 +34,13 @@ import {
 } from "./vouch-ready-keys.mjs";
 import { soleSigningVouchActivateEntry } from "./vouch-scan-sole-signing-activate-core.mjs";
 import {
+  VOUCH_PWA_CAMERA_HANDOFF_LEAD,
+  VOUCH_PWA_CAMERA_HANDOFF_STEPS,
+} from "./device-ownership-copy-core.mjs";
+import { shouldShowScanPwaCameraHandoff } from "./scan-pwa-camera-handoff-core.mjs";
+import { isIosWebKitUserAgent } from "./safari-itp-storage-notice-core.mjs";
+import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
+import {
   clearSignUnlock,
   getSignLock,
   isSignLockEnabled,
@@ -576,12 +583,55 @@ function inferSoleSigningAutoLoad(voucherProfileId, voucheeProfileId, opts) {
   return vouchLoadedFromSoleSigningRow(voucherProfileId, voucheeProfileId);
 }
 
+function mountPwaCameraHandoffActions() {
+  if (!explainerActions) return;
+  clearExplainerActions();
+  explainerActions.hidden = false;
+
+  const copyBtn = document.createElement("button");
+  copyBtn.type = "button";
+  copyBtn.className = "hc-emphasis-card__cta vouch-copy-scan-link";
+  copyBtn.textContent = "Copy scan link";
+  copyBtn.addEventListener("click", async () => {
+    copyBtn.disabled = true;
+    try {
+      await navigator.clipboard.writeText(location.href);
+      copyBtn.textContent = "Link copied";
+      setStatus("Copied. Open your Home Screen app and paste under Open scan link.", "neutral");
+    } catch {
+      copyBtn.textContent = "Copy failed — select URL bar";
+      setStatus("Copy the URL from Safari’s address bar, then paste in your Home Screen app.", "error");
+    } finally {
+      setTimeout(() => {
+        copyBtn.disabled = false;
+        copyBtn.textContent = "Copy scan link";
+      }, 2500);
+    }
+  });
+  explainerActions.appendChild(copyBtn);
+}
+
 /**
  * No signing keys in this tab - explain network vs device and detect saved eligible cards.
  */
 async function showNoKeysExplainer(voucheeProfileId) {
   const wallet = loadWallet();
   const walletUrl = `${location.origin}/wallet/`;
+
+  if (
+    shouldShowScanPwaCameraHandoff({
+      isIosWebKit: isIosWebKitUserAgent(navigator.userAgent, navigator),
+      standalone: readStandaloneModeFromWindow(window),
+      walletCount: wallet.length,
+    })
+  ) {
+    showExplainerHtml(
+      `${VOUCH_PWA_CAMERA_HANDOFF_LEAD} ${VOUCH_PWA_CAMERA_HANDOFF_STEPS} ` +
+        `<a href="${location.origin}/features/vouching.html">How vouching works</a>.`
+    );
+    mountPwaCameraHandoffActions();
+    return;
+  }
 
   if (wallet.length === 0) {
     showExplainerHtml(

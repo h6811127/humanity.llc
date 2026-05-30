@@ -36,6 +36,7 @@ Use it when prioritizing hardening before launch surfaces (live proof in person,
 | Key-loss setup protect gate (K7) | **Shipped** — recovery ack or backup before Live | [`OWNERSHIP_RESTORE_UX_PLAN.md`](OWNERSHIP_RESTORE_UX_PLAN.md) Phase 2 |
 | Key-loss view-only Live tab (Phase 3) | **Shipped** — read-only QR/deploy; restore banner | Same doc Phase 3 |
 | Hub card disappeared Safari (RC-1–RC-16) | **Closed — monitoring** — `hub-card-disappeared:verify` · P2-RC-MON E2E | [`HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md`](HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md) |
+| Steward camera → Safari vouch (K9) | **S1–S3 shipped** | [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) |
 
 ---
 
@@ -219,6 +220,7 @@ Canonical matrix: [`HOSTED_OPS_SAD_PATH_MATRIX.md`](HOSTED_OPS_SAD_PATH_MATRIX.m
 | **S33** | **Corrupt `hc_wallet` urgent tab hint on `/wallet/` (P1-4 / R7)** | `npm run worker:test:wallet-corrupt` · `e2e/key-loss-sad-path.spec.ts` (R7) |
 | **S34** | **Safari S2 scan rehydrate + S3 PWA/browser mismatch (P2-3)** | `npm run e2e:safari-keys-persistence` (wallet + standalone scan actor band) |
 | **S35** | **Create flow convergence nudge (step 14)** | `npm run e2e:create-flow-convergence` · `npm run worker:test:create-flow-convergence` |
+| **S36** | **Hub recovery import + PWA scan link handoff** | `npm run worker:test:hub-restore-always` · `e2e/device-pwa-scan-handoff.spec.ts` |
 
 Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH_QA_2026-05-26.md) § Recommended test matrix.
 

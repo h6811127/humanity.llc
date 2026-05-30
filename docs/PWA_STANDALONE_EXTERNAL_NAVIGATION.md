@@ -2,7 +2,7 @@
 
 **Status:** **P1–P4 + P1b shipped** (2026-05-29) — standalone scan handoff, return banner, install deferral, setup **Continue** decoupled from scan preview; P3 deferred  
 **Audience:** Product, frontend, QA  
-**Related:** [`PWA_INSTALL.md`](PWA_INSTALL.md) · [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) · [`shop-checkout-handoff.mjs`](../site/js/shop-checkout-handoff.mjs) · [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md)
+**Related:** [`PWA_INSTALL.md`](PWA_INSTALL.md) · [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) · [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) · [`shop-checkout-handoff.mjs`](../site/js/shop-checkout-handoff.mjs) · [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md)
 
 ---
 
@@ -21,6 +21,10 @@ On iOS and Android standalone WebKit/Chromium:
 **Reported failure mode:** During the create → setup loop, tapping **Test scan** (setup step 3) “opens a new tab” and the steward **cannot easily return** to the wizard screen. The flow feels broken because there is no visible way back to the PWA context.
 
 This is distinct from the **cross-tab keys** product (multiple browser tabs on the same origin). A PWA window and a Safari window are separate **top-level browsing contexts** even when they share `localStorage`.
+
+### Camera → Safari vs PWA (vouch gap)
+
+**Inbound** from the iPhone Camera app is **not** covered by P1 same-tab handoff. Camera opens **Safari**; steward keys in the Home Screen PWA are unavailable for vouch. See [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) for the full roadmap (S1 clipboard handoff shipped · S3 in-app scanner in progress).
 
 ---
 
@@ -245,6 +249,7 @@ openStewardScanPreview(url, { navigation, standalone })
 
 | Date | Change |
 |------|--------|
+| 2026-05-30 | **S3 shipped** — in-app hub QR scanner; **S1–S2** handoff + recovery import |
 | 2026-05-29 | Initial investigation — inventory, impact matrix, proposals P1–P5 |
 | 2026-05-29 | **P1 shipped** — `pwa-scan-handoff-core.mjs` wired at setup, dashboard, hub, wallet pins, child-object scan links |
 | 2026-05-29 | **P2 shipped** — `hc_return` param, sessionStorage fallback, scan return banner + `scan-steward-preview-return.mjs` |

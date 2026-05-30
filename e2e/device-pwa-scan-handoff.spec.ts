@@ -300,4 +300,23 @@ test.describe("device PWA scan handoff (P1-PWA-N)", () => {
     await expect(page).not.toHaveURL(/scan-active/);
     await popup.close();
   });
+
+  test("standalone hub Open scan link form navigates pasted scan URL (camera handoff)", async ({
+    page,
+  }) => {
+    await seedShellHandoffWallet(page, true);
+    await stubCreatedResolver(page);
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await waitForShellReady(page);
+    await openHubSheet(page);
+
+    const scanUrl = `${PAGES_ORIGIN}/c/${HANDOFF_ENTRY.profile_id}?q=${HANDOFF_ENTRY.qr_id}`;
+    await page.locator('summary:has-text("Open scan link")').click();
+    await page.fill("#hub-open-scan-url", scanUrl);
+    await page.locator("#hub-open-scan-form button[type=submit]").click();
+    await expect(page).toHaveURL(
+      new RegExp(`/c/${HANDOFF_ENTRY.profile_id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`),
+      { timeout: 10_000 }
+    );
+  });
 });

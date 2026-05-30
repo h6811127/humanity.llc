@@ -1,6 +1,6 @@
 # Ownership restore and view-mode UX plan
 
-**Status:** Phase 4 step 3 shipped (CI regression gate + landing/create stranger-empty import E2E); Phase 4 step 2 shipped (hub import copy convergence); Phase 4 step 1 shipped (hub restore always visible); **Phase 3 shipped** (view Live read-only QR tasks + banner); Phase 2 shipped (setup wizard hard gate); Phase 1 shipped (restore panel wiring)  
+**Status:** Phase 4 step 4 shipped (hub recovery import + PWA scan link handoff); Phase 4 step 3 shipped (CI regression gate + landing/create stranger-empty import E2E); Phase 4 step 2 shipped (hub import copy convergence); Phase 4 step 1 shipped (hub restore always visible); **Phase 3 shipped** (view Live read-only QR tasks + banner); Phase 2 shipped (setup wizard hard gate); Phase 1 shipped (restore panel wiring)  
 **Audience:** Product, design, engineering, QA  
 **Related:** [`OWNERSHIP_AND_CONTROL_MODEL.md`](OWNERSHIP_AND_CONTROL_MODEL.md) · [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) · [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) · [`KEY_LOSS_SAD_PATH_MATRIX.md`](KEY_LOSS_SAD_PATH_MATRIX.md) · [`PRODUCT_WORKSTREAM_COORDINATION.md`](PRODUCT_WORKSTREAM_COORDINATION.md)
 
@@ -60,11 +60,26 @@ Setup wizard **hard gate** before step **You're live**:
 - E2E fix: K1 asserts **QR and signage** on **Live** tab before switching to Manage (tab pane hides `#created-view-live-qr-tasks`)
 - Manual: [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) **P1-HE** step 1 on `/` and `/create/` (import group visible when empty)
 
+## Phase 4 (step 4 shipped)
+
+- Hub **Import recovery code** — paste scan link + recovery code without `.hcbackup` file transfer; works across Safari and Home Screen PWA (`device-hub-import-recovery*.mjs`)
+- Hub **Open scan link** — paste camera-opened Safari scan URL to open in PWA (`device-hub-open-scan*.mjs`)
+- Scan vouch **camera handoff** explainer when iOS Safari lands from Camera with empty wallet (`scan-pwa-camera-handoff-core.mjs` · `vouch-issue.mjs`)
+- Copy: `HUB_RESTORE_RECOVERY_*`, `HUB_OPEN_SCAN_*`, `VOUCH_PWA_CAMERA_HANDOFF_*` in `device-ownership-copy-core.mjs`
+- Always visible under `data-hub-restore-always` import group on `/`, `/create/`, `/wallet/`
+- Tests: `npm run worker:test:hub-restore-always` · `e2e/device-pwa-scan-handoff.spec.ts` (Open scan link form)
+
 ## Phase 4 (step 2 shipped)
 
 - Hub import **form hint** and **summary** converge on `HUB_RESTORE_IMPORT_HINT` / `HUB_RESTORE_IMPORT_SUMMARY` — hydrated by `applyHubRestoreImportCopy()` in `device-hub-import.mjs` (no divergent inline HTML on `/`, `/create/`, `/wallet/`)
 - Placeholders: `#hub-import-form-hint`, `.hub-import-list-sub`
 - Tests: `npm run worker:test:hub-restore-always`
+
+## Steward scan handoff (S1–S3)
+
+- **S1 shipped:** Safari iOS vouch explainer + hub **Open scan link** — [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md)
+- **S2 shipped:** Hub **Import recovery code** (scan link + recovery code)
+- **S3 shipped:** Hub **Scan QR to vouch** (in-app camera · `device-hub-qr-scanner.mjs`)
 
 ## P0-4 first-session backup gate (shipped)
 

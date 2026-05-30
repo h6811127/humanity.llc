@@ -43,10 +43,27 @@ describe("hub restore always visible (Phase 4)", () => {
   });
 
   it("exports converged hub restore import hint copy", () => {
-    expect(HUB_RESTORE_IMPORT_HINT).toContain("Encrypted backup");
     expect(HUB_RESTORE_IMPORT_HINT).toContain(".hcbackup.json");
     expect(HUB_RESTORE_IMPORT_HINT.toLowerCase()).not.toContain("signing key");
-    expect(HUB_RESTORE_IMPORT_SUMMARY).toContain("Restore root card");
+    expect(HUB_RESTORE_IMPORT_SUMMARY).toContain("Encrypted backup");
+  });
+
+  it("includes hub recovery import on shell hub pages", () => {
+    for (const path of hubPages) {
+      const html = readPage(path);
+      expect(html, path).toContain('id="hub-recovery-import-form"');
+      expect(html, path).toContain("Import recovery code");
+      expect(html, path).toContain('id="hub-open-scan-form"');
+      expect(html, path).toContain("Open scan link");
+      expect(html, path).toContain('id="hub-scan-qr-btn"');
+      expect(html, path).toContain('id="device-hub-qr-scanner"');
+    }
+    const recoverySrc = readPage("site/js/device-hub-import-recovery.mjs");
+    expect(recoverySrc).toContain("initHubRecoveryImport");
+    const openScanSrc = readPage("site/js/device-hub-open-scan.mjs");
+    expect(openScanSrc).toContain("initHubOpenScanLink");
+    const qrScannerSrc = readPage("site/js/device-hub-qr-scanner.mjs");
+    expect(qrScannerSrc).toContain("initHubQrScanner");
   });
 
   it("uses empty hub import hint placeholders hydrated by device-hub-import (Phase 4 step 2)", () => {

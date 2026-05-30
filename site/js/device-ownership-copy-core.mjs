@@ -301,11 +301,45 @@ export const EPHEMERAL_BROWSING_SAVE_BLOCKED =
 export const HUB_PINS_BOOKMARKS_ONLY = "Bookmarks only — cannot manage objects";
 
 /** Hub backup import summary line (Phase 4). */
-export const HUB_RESTORE_IMPORT_SUMMARY = "Restore root card and object controls";
+export const HUB_RESTORE_IMPORT_SUMMARY = "Encrypted backup file";
 
 /** Hub backup import hint — aligns with view-only restore copy (Phase 4). */
 export const HUB_RESTORE_IMPORT_HINT =
-  "Encrypted backup (.hcbackup.json) restores root card and object controls in this tab. humanity.llc cannot restore without a file you saved at create. Never uploaded.";
+  "Choose the .hcbackup.json file and passphrase you saved at create. Restores full control in this app.";
+
+/** Hub recovery import summary (cross-context · iOS PWA handoff). */
+export const HUB_RESTORE_RECOVERY_SUMMARY = "Recovery code (no file)";
+
+/** Hub recovery import hint — primary cross-device path without file transfer. */
+export const HUB_RESTORE_RECOVERY_HINT =
+  "Paste your scan link (or profile ID) and the recovery code you saved at create. Works across Safari and your Home Screen app — no file transfer.";
+
+/** Hub open scan link — after iPhone camera opens Safari (PWA handoff). */
+export const HUB_OPEN_SCAN_SUMMARY = "Open a scan in this app";
+
+export const HUB_OPEN_SCAN_HINT =
+  "After your camera opens Safari, copy the scan link there, then paste it here to open the same scan in your Home Screen app — where your steward card lives.";
+
+/** Vouch / attest when iPhone camera landed in Safari with empty wallet. */
+export const VOUCH_PWA_CAMERA_HANDOFF_LEAD =
+  "Your camera opened Safari, but your steward card is in your Home Screen app. iPhone keeps them separate — you cannot attest from Safari alone.";
+
+export const VOUCH_PWA_CAMERA_HANDOFF_STEPS =
+  "Copy this scan link → open humanity.llc from your Home Screen → tap the status dot → Open scan link → paste → attest.";
+
+/** Hub in-app QR scanner (S3). */
+export const HUB_SCAN_QR_BTN = "Scan QR to vouch";
+
+export const HUB_SCAN_QR_DIALOG_TITLE = "Scan a Humanity QR";
+
+export const HUB_SCAN_QR_DIALOG_LEAD =
+  "Point at a printed or on-screen scan QR. The scan page opens in this app with your saved card.";
+
+export const HUB_SCAN_QR_UNSUPPORTED =
+  "Camera scan is not available here. Use Open scan link below and paste the URL from Safari.";
+
+export const HUB_SCAN_QR_PERMISSION_DENIED =
+  "Camera access was denied. Allow camera in Settings, or use Open scan link below.";
 
 /** Hub intro coachmark — strangers with nothing saved yet (P2). */
 export const HUB_INTRO_BODY_STRANGER =

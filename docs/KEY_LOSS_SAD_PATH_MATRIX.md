@@ -37,6 +37,7 @@ This matrix inventories unhappy custody paths, expected UX, and automated regres
 | **K6** | Revoke / live proof without keys | Deep link `#revoke` or `live_challenge` | View-only; disabled prove; unlock copy | `e2e/production-sad-path-created.spec.ts` (S6–S7) | — |
 | **K7** | Setup protect skipped | `fresh=1` without recovery ack or backup export | Step **Protect** hard gate; block Live / **Open card controls** | `npm run worker:test:setup-protect` | P1 create QA |
 | **K8** | PWA vs Safari tab | Standalone vs browser session | [`PWA_INSTALL.md`](PWA_INSTALL.md) semantics | `e2e/device-pwa-install.spec.ts` | P1-PWA |
+| **K9** | Camera → Safari, keys in PWA | Steward scans print with Camera app | S1 handoff copy + hub Open scan link; **S3** in-app scanner | `npm run worker:test:steward-scan-handoff` | **P1-PWA-V** in [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) |
 
 ---
 
@@ -57,7 +58,8 @@ Central strings: `site/js/device-ownership-copy-core.mjs`
 | `SETUP_WALLET_SAVE_REQUIRED` / `SETUP_WALLET_SAVED_*` | Setup wizard wallet save gate (RC-4 · K7) |
 | `BACKUP_INVALID_OWNERSHIP` | Invalid backup payload |
 | `IMPORT_OWNERSHIP_LOADED_TAB` | Successful hub import |
-| `HUB_RESTORE_IMPORT_HINT` / `HUB_RESTORE_IMPORT_SUMMARY` | Hub backup import form (Phase 4) |
+| `HUB_RESTORE_RECOVERY_*` / `HUB_OPEN_SCAN_*` / `VOUCH_PWA_CAMERA_HANDOFF_*` | Steward scan handoff S1–S2 · [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) |
+| `HUB_SCAN_QR_*` | In-app hub QR scanner S3 |
 | `WALLET_CORRUPT_*` | Corrupt `hc_wallet` hub + `/wallet/` tab hint (P1-4 · R7) |
 | `PWA_MISMATCH_*` / `RESTORE_CONTROL_IN_THIS_APP` | PWA vs Safari session split (P2-2 · R5) |
 

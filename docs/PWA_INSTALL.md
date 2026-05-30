@@ -232,7 +232,8 @@ An installed PWA is a **separate browsing context** (same profile storage, separ
 | Scenario | Expected behavior |
 |----------|-------------------|
 | Browser tab + PWA both open with keys | Cross-tab inbox / custody panel applies ([`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md)) |
-| Keys in PWA, user opens `/` in Safari | Same as two tabs — `cross_tab_keys` inbox kind |
+| Keys in PWA, user opens `/` in Safari | **iPhone:** separate wallet buckets — not the same as two browser tabs. Use [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) handoff or in-app scanner |
+| Camera QR → Safari while card is in PWA | **Cannot vouch in Safari.** S1 copy+paste handoff or S3 in-app scanner in PWA |
 | PWA scan preview (`window.open` / `target="_blank"`) | **P1 shipped:** same-tab in standalone via [`pwa-scan-handoff-core.mjs`](../site/js/pwa-scan-handoff-core.mjs) — [`PWA_STANDALONE_EXTERNAL_NAVIGATION.md`](PWA_STANDALONE_EXTERNAL_NAVIGATION.md) |
 | User installs from `/wallet/` | `start_url` still `/`; opening icon lands on hub-first landing |
 | Orphan flash after card delete | Old PWA window may heartbeat until closed — documented in [`CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md`](CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md) |
