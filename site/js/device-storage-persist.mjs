@@ -4,6 +4,7 @@
  */
 import {
   STORAGE_PERSIST_REQUESTED_KEY,
+  STORAGE_PERSIST_SETTLED_EVENT,
   isStoragePersistApiAvailable,
   shouldRequestStoragePersist,
   storagePersistAlreadyRequested,
@@ -24,8 +25,17 @@ function markPersistRequested(local, flagValue) {
   }
 }
 
+function notifyStoragePersistSettled(granted) {
+  if (typeof window === "undefined" || typeof window.dispatchEvent !== "function") return;
+  window.dispatchEvent(
+    new CustomEvent(STORAGE_PERSIST_SETTLED_EVENT, {
+      detail: { granted: granted === true },
+    })
+  );
+}
+
 /**
- * Fire-and-forget persist request (no user-visible UI).
+ * Fire-and-forget persist request; surfaces denial via RC-2 notice module.
  * @param {{ reason?: "ownership_save" | "shell_bootstrap" }} [opts]
  */
 export function scheduleStoragePersistRequest(opts = {}) {
@@ -59,9 +69,11 @@ export function scheduleStoragePersistRequest(opts = {}) {
   void storage.persist().then(
     (granted) => {
       markPersistRequested(local, storagePersistRequestedFlagValue(granted));
+      notifyStoragePersistSettled(granted);
     },
     () => {
       markPersistRequested(local, "0");
+      notifyStoragePersistSettled(false);
     }
   );
 }

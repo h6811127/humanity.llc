@@ -1,7 +1,7 @@
 # Investigation: Saved card disappeared from hub (iPhone Safari)
 
 **Date:** 2026-05-29 (opened from steward report — card saved, hub empty ~20 min later)  
-**Status:** Active — root-cause catalog + prioritized fix backlog  
+**Status:** Active — RC-1/RC-2 shipped; RC-4+ backlog open  
 **Reporter:** Steward on iPhone Safari after create + explicit save  
 **Related:** [`SAFARI_KEYS_WIPE_INVESTIGATION.md`](SAFARI_KEYS_WIPE_INVESTIGATION.md) · [`KEY_LOSS_SAD_PATH_MATRIX.md`](KEY_LOSS_SAD_PATH_MATRIX.md) · [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md) · [`PWA_INSTALL.md`](PWA_INSTALL.md)
 
@@ -36,7 +36,7 @@ The **~20 minute** delay does **not** match any client-side interval. It usually
 
 ## Root-cause catalog (prioritized)
 
-Fix backlog order matches this list. **Only RC-1 is implemented in this pass.**
+Fix backlog order matches this list. **RC-1 and RC-2 are implemented.**
 
 ### RC-1 — No post-save read-back verification **(product gap · fix shipped)**
 
@@ -51,15 +51,16 @@ Fix backlog order matches this list. **Only RC-1 is implemented in this pass.**
 
 ---
 
-### RC-2 — `navigator.storage.persist()` denied; no steward warning
+### RC-2 — `navigator.storage.persist()` denied; no steward warning **(fix shipped)**
 
 | Field | Detail |
 |-------|--------|
-| **Layer** | Client — `device-storage-persist.mjs` |
+| **Layer** | Client — `device-storage-persist.mjs` · `safari-storage-persist-denied-notice.mjs` |
 | **Mechanism** | After save we call `storage.persist()` once. If Safari returns `false`, we set `hc_storage_persist_requested_v1 = "0"` silently. Non-persistent origin storage is **more likely** evicted under iOS storage pressure (minutes to hours — explains ~20 min reports). |
 | **User pattern** | Save appeared successful; card vanished after backgrounding phone or low storage. |
-| **Still possible?** | **Yes** |
-| **Fix backlog** | Surface persist-denied emphasis card on iOS when `persist()` returns false and wallet has signing keys. |
+| **Still possible?** | **Eviction yes** — notice warns; **silent denial no** |
+| **Fix** | **Shipped** — warn emphasis card on iOS shell when flag is `"0"` and wallet has signing keys; `hc-storage-persist-settled` event refreshes chrome. |
+| **Tests** | `worker/tests/safari-storage-persist-denied-notice-core.test.ts` · `worker/tests/device-storage-persist-core.test.ts` |
 
 ---
 
@@ -388,7 +389,7 @@ Run on the **tab where the hub looks empty** (Safari → Develop → device → 
 | Priority | RC | Work | Status |
 |----------|-----|------|--------|
 | **1** | RC-1 | Post-save read-back in `saveWallet` | **Shipped** |
-| 2 | RC-2 | Persist-denied iOS warning card | Open |
+| **2** | RC-2 | Persist-denied iOS warning card | **Shipped** |
 | 3 | RC-4 | Setup cannot complete until `isWalletSaved` | Partial (P0-4 seatbelt ≠ wallet) |
 | 4 | RC-3 | Reinforce backup-before-live + Home Screen guidance | Partial (P0-4, P2-1) |
 | 5 | RC-6 | Private mode detection | Open |
@@ -403,6 +404,7 @@ Run on the **tab where the hub looks empty** (Safari → Develop → device → 
 | RC | Command |
 |----|---------|
 | RC-1, RC-5 | `npm run worker:test -- worker/tests/device-wallet-save-core.test.ts` |
+| RC-2 | `npm run worker:test:safari-persist-denied-notice` |
 | RC-7 | `npm run worker:test:wallet-corrupt` · `npm run e2e:key-loss-sad-path` |
 | RC-8, RC-9 | `npm run e2e:safari-keys-persistence` |
 | Copy | `npm run worker:test:key-loss-copy` |
@@ -413,4 +415,5 @@ Run on the **tab where the hub looks empty** (Safari → Develop → device → 
 
 | Date | Event |
 |------|--------|
+| 2026-05-29 | **RC-2** persist-denied iOS warn card shipped |
 | 2026-05-29 | Initial catalog from steward report; **RC-1** read-back gate shipped |

@@ -242,6 +242,17 @@ export const SAFARI_ITP_NOTICE_DETAIL_BROWSER =
 export const SAFARI_ITP_NOTICE_DETAIL_STANDALONE =
   "If you do not open this app for about seven days of normal browser use, iOS may delete saved cards and keys on this device. Open humanity.llc from the home screen regularly — each visit resets that timer. Keep an encrypted backup if you rely on this phone.";
 
+/** iOS Safari persist() denied — saved ownership may be evicted (RC-2). */
+export const STORAGE_PERSIST_DENIED_EYEBROW = "iPhone storage";
+
+export const STORAGE_PERSIST_DENIED_TITLE = "Saved ownership may not stay on this iPhone";
+
+export const STORAGE_PERSIST_DENIED_DETAIL_BROWSER =
+  "Safari would not keep this site's storage durable. iOS may delete saved cards after you background the browser or when storage is low. Add humanity.llc to your Home Screen, open the app after each save, and export an encrypted backup before relying on this phone.";
+
+export const STORAGE_PERSIST_DENIED_DETAIL_STANDALONE =
+  "This app could not mark its storage as durable. iOS may delete saved cards when storage is low or after long background time. Open humanity.llc from your Home Screen after each save and keep an encrypted backup if you rely on this phone.";
+
 /** Hub / wallet empty state — Layer 2 (D9). @see docs/HUB_STRANGER_ONBOARDING.md */
 export const HUB_PINS_BOOKMARKS_ONLY = "Bookmarks only — cannot manage objects";
 

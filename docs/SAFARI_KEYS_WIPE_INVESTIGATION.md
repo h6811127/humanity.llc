@@ -501,6 +501,7 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 | 19 | R9 scan dot behavior E2E (Flow B) | **Shipped** | `e2e/scan-page-dot.spec.ts` · `ok:none` + restore glance when wallet saved, tab empty |
 | 20 | P0b-1 step 2 WebKit R10 desk proxy | **Shipped** | `e2e/card-disabled-fresh-create-webkit.spec.ts` · `e2e:card-disabled-since-visit:webkit` |
 | 21 | P0-1 scan quiet rehydrate runtime E2E | **Shipped** | `e2e/safari-keys-persistence.spec.ts` — sole-row S2/P0-1 positive · multi-card toggle-off negative |
+| 22 | RC-2 persist-denied iOS warn card | **Shipped** | [`HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md`](HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md) RC-2 · `safari-storage-persist-denied-notice*` · `npm run worker:test:safari-persist-denied-notice` |
 
 **P0-1 spec (reference for reviewers):**
 

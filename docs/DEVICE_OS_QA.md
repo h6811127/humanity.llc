@@ -576,6 +576,26 @@ Automated: `npm run worker:test:pwa-install` (includes `pwa-scan-handoff-core.te
 
 Automated: `npm run worker:test:pwa-install` · `npm run e2e:pwa-install` (P4 deferral case).
 
+### P2-RC2 · Safari persist-denied storage notice (RC-2 shipped)
+
+**Spec:** [`HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md`](HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md) RC-2 · **Modules:** `safari-storage-persist-denied-notice.mjs` · `device-storage-persist.mjs`
+
+**Prerequisites:** Real iPhone Safari or WebKit with ≥1 saved card (`hc_wallet` signing row). Card slot `#device-safari-persist-denied-notice-card` on `/`, `/wallet/`, `/created/` only.
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Save a card on iOS Safari | `localStorage.hc_storage_persist_requested_v1` becomes `"1"` or `"0"` after first persist attempt |
+| 2 | Web Inspector: set `hc_storage_persist_requested_v1` to `"0"` · reload `/` | Warn emphasis card: eyebrow **iPhone storage**, title **Saved ownership may not stay on this iPhone** |
+| 3 | Tap **Got it** | Card hides; `hc_storage_persist_denied_notice_dismissed_at` set |
+| 4 | Reload within 7 days | Card stays hidden (snooze, shared with ITP notice cooldown) |
+| 5 | Clear dismiss key · set flag `"1"` | Card does **not** show |
+| 6 | Open `/create/` with flag `"0"` | **No** persist-denied card (shell pages only) |
+| 7 | `data-device-status-error` on `#top-chrome` | **No** card (status graph broken) |
+
+**Fail signals:** Card on scan/create; no card when flag `"0"` and wallet has keys; dismiss does not snooze; card blocks hub open (**P0-3**).
+
+Automated: `npm run worker:test:safari-persist-denied-notice`.
+
 ### P1-8 · Hosted tier budget (Phase 10 — E2 staging)
 
 **Status:** E2 client probe staging; production enablement still waits on M4 sign-off and rollout gates. Spec: [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Phase 10 — hosted tier rows (M7) · build order: [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md).

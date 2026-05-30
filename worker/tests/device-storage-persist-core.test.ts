@@ -5,6 +5,7 @@ import {
   isStoragePersistApiAvailable,
   shouldRequestStoragePersist,
   storagePersistAlreadyRequested,
+  storagePersistWasDenied,
   storagePersistRequestedFlagValue,
 } from "../../site/js/device-storage-persist-core.mjs";
 
@@ -59,5 +60,10 @@ describe("device-storage-persist-core", () => {
   it("records granted vs denied flag values", () => {
     expect(storagePersistRequestedFlagValue(true)).toBe("1");
     expect(storagePersistRequestedFlagValue(false)).toBe("0");
+  });
+
+  it("detects denied persist flag (RC-2)", () => {
+    expect(storagePersistWasDenied("0")).toBe(true);
+    expect(storagePersistWasDenied("1")).toBe(false);
   });
 });
