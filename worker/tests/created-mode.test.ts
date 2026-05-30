@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   isSetupDone,
+  markSetupDone,
   modeFromPage,
   resolveCreatedMode,
   SETUP_DONE_KEY,
@@ -105,6 +106,11 @@ describe("resolveCreatedMode", () => {
     );
     syncSetupDoneForSavedProfile(profileId);
     expect(isSetupDone(profileId)).toBe(false);
+  });
+
+  it("markSetupDone no-ops without wallet row (RC-4)", () => {
+    expect(markSetupDone("missing-profile")).toBe(false);
+    expect(isSetupDone("missing-profile")).toBe(false);
   });
 
   it("modeFromPage skips setup backfill during fresh post-create flow (P4)", () => {

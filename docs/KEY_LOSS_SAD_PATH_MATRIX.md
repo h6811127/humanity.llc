@@ -54,6 +54,7 @@ Central strings: `site/js/device-ownership-copy-core.mjs`
 | `WALLET_SAVE_STORAGE_FULL` / `WALLET_SAVE_FAILED` | Quota or generic wallet save failure (P0-3) |
 | `WALLET_SAVE_VERIFY_FAILED` | Save write did not round-trip on read-back (RC-1) |
 | `STORAGE_PERSIST_DENIED_*` | iOS warn card when durable storage denied (RC-2) |
+| `SETUP_WALLET_SAVE_REQUIRED` / `SETUP_WALLET_SAVED_*` | Setup wizard wallet save gate (RC-4 · K7) |
 | `BACKUP_INVALID_OWNERSHIP` | Invalid backup payload |
 | `IMPORT_OWNERSHIP_LOADED_TAB` | Successful hub import |
 | `HUB_RESTORE_IMPORT_HINT` / `HUB_RESTORE_IMPORT_SUMMARY` | Hub backup import form (Phase 4) |

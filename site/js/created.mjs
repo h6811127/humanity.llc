@@ -383,10 +383,9 @@ function enterControlWorkspace() {
   workspaceMode = "control";
   if (profileId) {
     const walletEntry = findWalletEntryByProfileId(profileId);
-    if (
-      isSetupDone(profileId) ||
-      ownershipBackupSeatbeltSatisfied(loadSession(), walletEntry)
-    ) {
+    const walletSaved = isWalletSaved(profileId);
+    const seatbelt = ownershipBackupSeatbeltSatisfied(loadSession(), walletEntry);
+    if (walletSaved && (isSetupDone(profileId) || seatbelt)) {
       markSetupDone(profileId);
     }
   }

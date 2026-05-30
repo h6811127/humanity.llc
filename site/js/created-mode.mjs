@@ -69,9 +69,11 @@ export function isSetupDone(profileId) {
 
 /** @param {string} profileId */
 export function markSetupDone(profileId) {
+  if (!profileId || !isWalletSaved(profileId)) return false;
   const map = loadSetupDoneMap();
   map[profileId] = true;
   localStorage.setItem(SETUP_DONE_KEY, JSON.stringify(map));
+  return true;
 }
 
 /** Backfill hc_setup_done when wallet row already has a recovery seatbelt (legacy). */

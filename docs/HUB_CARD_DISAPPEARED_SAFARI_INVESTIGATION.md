@@ -36,7 +36,7 @@ The **~20 minute** delay does **not** match any client-side interval. It usually
 
 ## Root-cause catalog (prioritized)
 
-Fix backlog order matches this list. **RC-1 and RC-2 are implemented.**
+Fix backlog order matches this list. **RC-1, RC-2, and RC-4 are implemented.**
 
 ### RC-1 — No post-save read-back verification **(product gap · fix shipped)**
 
@@ -76,15 +76,16 @@ Fix backlog order matches this list. **RC-1 and RC-2 are implemented.**
 
 ---
 
-### RC-4 — Save never completed (steward believed they saved)
+### RC-4 — Save never completed (steward believed they saved) **(fix shipped)**
 
 | Field | Detail |
 |-------|--------|
 | **Layer** | Client — create / setup flow |
 | **Mechanism** | Auto-save off (`hc_auto_save_device = "0"`) and manual save skipped; **Protect** step (recovery ack / backup export) satisfies setup seatbelt but is **not** the same as `saveSessionToWallet`; left `/created/` before save microtask on **pre-P0-2 bundles**. |
 | **User pattern** | “I finished setup” but wallet empty from the start — disappearance noticed later. |
-| **Still possible?** | **Yes** if auto-save off + no manual save |
-| **Fix backlog** | Block setup finish until `isWalletSaved(profile_id)`; show explicit “Saved on this device” confirmation. |
+| **Still possible?** | **Bypass without wallet row no** — finish gated on `isWalletSaved` |
+| **Fix** | **Shipped** — `canCompleteSetupWizard` + `markSetupDone` wallet guard; done-step confirmation copy; finish button disabled until wallet + seatbelt. |
+| **Tests** | `worker/tests/created-setup-core.test.ts` · `worker/tests/created-mode.test.ts` · `npm run worker:test:setup-protect` |
 
 ---
 
@@ -390,7 +391,7 @@ Run on the **tab where the hub looks empty** (Safari → Develop → device → 
 |----------|-----|------|--------|
 | **1** | RC-1 | Post-save read-back in `saveWallet` | **Shipped** |
 | **2** | RC-2 | Persist-denied iOS warning card | **Shipped** |
-| 3 | RC-4 | Setup cannot complete until `isWalletSaved` | Partial (P0-4 seatbelt ≠ wallet) |
+| **3** | RC-4 | Setup cannot complete until `isWalletSaved` | **Shipped** |
 | 4 | RC-3 | Reinforce backup-before-live + Home Screen guidance | Partial (P0-4, P2-1) |
 | 5 | RC-6 | Private mode detection | Open |
 | 6 | RC-13 | Canonical origin enforcement | Open |
@@ -405,6 +406,7 @@ Run on the **tab where the hub looks empty** (Safari → Develop → device → 
 |----|---------|
 | RC-1, RC-5 | `npm run worker:test -- worker/tests/device-wallet-save-core.test.ts` |
 | RC-2 | `npm run worker:test:safari-persist-denied-notice` |
+| RC-4 | `npm run worker:test:setup-protect` · `worker/tests/created-setup-core.test.ts` |
 | RC-7 | `npm run worker:test:wallet-corrupt` · `npm run e2e:key-loss-sad-path` |
 | RC-8, RC-9 | `npm run e2e:safari-keys-persistence` |
 | Copy | `npm run worker:test:key-loss-copy` |
@@ -415,5 +417,6 @@ Run on the **tab where the hub looks empty** (Safari → Develop → device → 
 
 | Date | Event |
 |------|--------|
+| 2026-05-29 | **RC-4** setup finish gated on wallet save + done-step confirmation |
 | 2026-05-29 | **RC-2** persist-denied iOS warn card shipped |
 | 2026-05-29 | Initial catalog from steward report; **RC-1** read-back gate shipped |

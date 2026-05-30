@@ -253,6 +253,15 @@ export const STORAGE_PERSIST_DENIED_DETAIL_BROWSER =
 export const STORAGE_PERSIST_DENIED_DETAIL_STANDALONE =
   "This app could not mark its storage as durable. iOS may delete saved cards when storage is low or after long background time. Open humanity.llc from your Home Screen after each save and keep an encrypted backup if you rely on this phone.";
 
+/** Setup wizard — wallet save gate (RC-4 · K7). */
+export const SETUP_WALLET_SAVE_REQUIRED =
+  "Save your control key on this device before continuing.";
+
+export const SETUP_WALLET_SAVED_CONFIRMATION = "Saved on this device.";
+
+export const SETUP_WALLET_SAVED_DONE_DETAIL =
+  "Your control key is saved on this device. Open card controls when you are ready.";
+
 /** Hub / wallet empty state — Layer 2 (D9). @see docs/HUB_STRANGER_ONBOARDING.md */
 export const HUB_PINS_BOOKMARKS_ONLY = "Bookmarks only — cannot manage objects";
 

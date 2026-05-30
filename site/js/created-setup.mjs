@@ -13,6 +13,8 @@ import {
   setupMinStepIndex,
   setupProgressKicker,
   shouldOmitSetupSaveStep,
+  canCompleteSetupWizard,
+  setupCompletionBlockedMessage,
 } from "./created-setup-core.mjs";
 import { clearFreshUrlParam } from "./created-workspace.mjs";
 import { markSetupDone } from "./created-mode.mjs";
@@ -20,7 +22,12 @@ import { stewardFocusKeyFromHash } from "./created-tabs.mjs";
 import { SETUP_STEP_IDS, setupStepIndexFromHash } from "./created-setup-hash.mjs";
 import {
   initCreatedSetupSeatbelt,
+  setupOwnershipSeatbeltSatisfied,
 } from "./created-setup-seatbelt.mjs";
+import {
+  SETUP_WALLET_SAVED_CONFIRMATION,
+  SETUP_WALLET_SAVED_DONE_DETAIL,
+} from "./device-ownership-copy-core.mjs";
 import { stewardScanOpenedFeedback } from "./pwa-scan-handoff-core.mjs";
 import { openStewardScanPreviewFromWindow } from "./pwa-scan-handoff.mjs";
 import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
@@ -79,6 +86,7 @@ export function initCreatedSetup(opts) {
   const qrPreviewWrap = document.getElementById("created-setup-qr-preview");
   const setupQrImg = document.getElementById("created-setup-qr-img");
   const doneBtn = document.getElementById("created-setup-finish");
+  const walletSavedConfirmEl = document.getElementById("created-setup-wallet-saved-confirm");
   const progressKicker = root.querySelector(".created-setup-kicker");
   const saveProgressItem = root.querySelector('[data-setup-step="save"]');
 
@@ -120,6 +128,7 @@ export function initCreatedSetup(opts) {
     setSession,
     onSeatbeltChange: () => {
       syncSeatbeltContinue();
+      syncSetupFinishButton();
       refreshSave?.();
     },
   });
@@ -207,6 +216,26 @@ export function initCreatedSetup(opts) {
     }
   }
 
+  function syncSetupWalletSavedConfirm() {
+    if (!walletSavedConfirmEl) return;
+    const show =
+      currentStep() === "done" && isWalletSaved(profileId);
+    walletSavedConfirmEl.hidden = !show;
+    if (show) {
+      walletSavedConfirmEl.textContent = SETUP_WALLET_SAVED_DONE_DETAIL;
+    }
+  }
+
+  function syncSetupFinishButton() {
+    if (!doneBtn || currentStep() !== "done") return;
+    const canFinish = canCompleteSetupWizard({
+      walletSaved: isWalletSaved(profileId),
+      seatbeltSatisfied: seatbeltSatisfiedNow(),
+    });
+    doneBtn.disabled = !canFinish;
+    doneBtn.setAttribute("aria-disabled", canFinish ? "false" : "true");
+  }
+
   function syncIndicators() {
     const step = currentStep();
     indicators.forEach((el) => {
@@ -232,6 +261,8 @@ export function initCreatedSetup(opts) {
     }
     if (doneBtn) doneBtn.hidden = step !== "done";
     if (step === "protect") seatbeltCtl?.refresh?.();
+    syncSetupWalletSavedConfirm();
+    syncSetupFinishButton();
   }
 
   function canLeaveSaveStep() {
@@ -241,6 +272,9 @@ export function initCreatedSetup(opts) {
   function goToStep(index, { pushHistory = false } = {}) {
     const prevStep = currentStep();
     stepIndex = Math.max(minStepIndexNow(), Math.min(index, STEPS.length - 1));
+    if (currentStep() !== "save" && !canLeaveSaveStep()) {
+      stepIndex = STEPS.indexOf("save");
+    }
     syncIndicators();
     if (currentStep() === "save" && keysStrip) {
       keysStrip.hidden = false;
@@ -277,15 +311,12 @@ export function initCreatedSetup(opts) {
           const saved = runSave();
           refreshSave?.();
           if (saved) {
-            showFeedback("Saved on this device.");
+            showFeedback(SETUP_WALLET_SAVED_CONFIRMATION);
             goToStep(stepIndex + 1, { pushHistory: true });
             return;
           }
         }
-        showFeedback(
-          "Save your control key on this device before continuing.",
-          true
-        );
+        showFeedback(setupCompletionBlockedMessage({ walletSaved: false }), true);
         return;
       }
       goToStep(stepIndex + 1, { pushHistory: true });
@@ -310,13 +341,26 @@ export function initCreatedSetup(opts) {
   }
 
   function complete() {
-    if (!seatbeltSatisfiedNow()) {
-      showFeedback(seatbeltCtl?.blockMessage?.() ?? "Save a recovery path first.", true);
+    const blocked = setupCompletionBlockedMessage({
+      walletSaved: isWalletSaved(profileId),
+      seatbeltSatisfied: seatbeltSatisfiedNow(),
+      seatbeltBlockMessage: seatbeltCtl?.blockMessage?.(),
+    });
+    if (blocked) {
+      showFeedback(blocked, true);
+      if (!isWalletSaved(profileId)) {
+        goToStep(STEPS.indexOf("save"));
+        return;
+      }
       const protectIdx = STEPS.indexOf("protect");
       if (protectIdx >= 0) goToStep(protectIdx);
       return;
     }
-    markSetupDone(profileId);
+    if (!markSetupDone(profileId)) {
+      showFeedback(setupCompletionBlockedMessage({ walletSaved: false }), true);
+      goToStep(STEPS.indexOf("save"));
+      return;
+    }
     clearFreshUrlParam();
     onComplete();
   }
@@ -338,6 +382,9 @@ export function initCreatedSetup(opts) {
     const nextStep = event.state?.setupStep;
     if (typeof nextStep === "number" && event.state?.setup) {
       let idx = Math.max(minStepIndexNow(), Math.min(nextStep, STEPS.length - 1));
+      if (idx > STEPS.indexOf("save") && !canLeaveSaveStep()) {
+        idx = STEPS.indexOf("save");
+      }
       if (idx > STEPS.indexOf("protect") && !seatbeltSatisfiedNow()) {
         idx = STEPS.indexOf("protect");
       }
@@ -362,7 +409,7 @@ export function initCreatedSetup(opts) {
     const saved = runSave();
     refreshSave?.();
     if (saved) {
-      showFeedback("Saved on this device.");
+      showFeedback(SETUP_WALLET_SAVED_CONFIRMATION);
       syncIndicators();
     } else {
       showFeedback("Could not save yet. Check the form above.", true);
@@ -395,6 +442,8 @@ export function initCreatedSetup(opts) {
   window.addEventListener("hc-device-hub-changed", () => {
     syncSetupKeysCustody();
     syncSetupProgressChrome();
+    syncSetupWalletSavedConfirm();
+    syncSetupFinishButton();
     if (currentStep() === "save") syncIndicators();
     if (omitSaveStepNow() && stepIndex < minStepIndexNow()) {
       goToStep(minStepIndexNow());
@@ -404,7 +453,10 @@ export function initCreatedSetup(opts) {
 
   const hashStep = setupStepIndexFromHash(location.hash);
   if (hashStep != null) {
-    let idx = hashStep > 0 && !canLeaveSaveStep() ? 0 : hashStep;
+    let idx = hashStep > 0 && !canLeaveSaveStep() ? STEPS.indexOf("save") : hashStep;
+    if (idx > STEPS.indexOf("save") && !canLeaveSaveStep()) {
+      idx = STEPS.indexOf("save");
+    }
     if (idx > STEPS.indexOf("protect") && !setupOwnershipSeatbeltSatisfied(getSession())) {
       idx = STEPS.indexOf("protect");
     }
