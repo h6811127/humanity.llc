@@ -36,8 +36,11 @@ describe("landing messaging (Step 3)", () => {
   it("landing title and founder note bridge mission and what ships today", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
     expect(html).toContain("humanity.llc · Live objects on physical tags");
+    expect(html).toContain("Built for commons, not platforms");
     expect(html).toContain("The name is the mission");
     expect(html).toContain("I built this because");
+    expect(html).toContain("See what's live");
+    expect(html).toContain("Notes on the build");
     expect(html).toContain("Humanity Commons");
     expect(html).toContain("/features-available-now.html");
     expect(html).toContain("/studio/");

@@ -1805,6 +1805,16 @@ a.hub-card-menu-item {
   flex: 1 1 100%;
 }
 
+.landing-founder-note.hc-emphasis-card .landing-framing-more-actions {
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+}
+
+.landing-founder-note.hc-emphasis-card .landing-framing-more-actions > * {
+  margin: 0;
+}
+
 .hc-emphasis-card__cta.landing-framing-more-link {
   display: flex;
   align-items: center;
