@@ -41,11 +41,13 @@ describe("landing messaging (Step 3)", () => {
     expect(html).toContain("webpages that are difficult to edit");
     expect(html).toContain("One primitive, many uses");
     expect(html).toContain("hoodie displaying today's mood");
-    expect(html).toContain("trust you can inspect at scan time");
-    expect(html).toContain("humanity.llc is where I'm running that today");
-    expect(html).toContain("Humanity Commons is what I call the bigger build");
-    expect(html).not.toContain("Built for commons, not platforms");
-    expect(html).not.toContain("surveillance platform");
+    expect(html).toContain("trust you can check (what the scan shows right now)");
+    expect(html).toContain("shared trust layer for the internet");
+    expect(html).toContain("portable belonging and vouching at internet scale");
+    expect(html).toContain("rules they can inspect");
+    expect(html).toContain("one network, many networks, or both");
+    expect(html).not.toContain("online social democracy");
+    expect(html).not.toContain("one company's feed");
     expect(html).toContain("See what's live");
     expect(html).toContain("Notes on the build");
     expect(html).toContain("Humanity Commons");
