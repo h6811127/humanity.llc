@@ -49,6 +49,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run worker:test
+      # @see docs/OWNERSHIP_RESTORE_UX_PLAN.md Phase 4 step 3
       - name: Ownership restore Vitest (view-only + hub import)
         run: |
           npm run worker:test:view-only-restore

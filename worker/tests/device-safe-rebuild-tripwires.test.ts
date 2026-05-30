@@ -40,7 +40,7 @@ describe("UI/UX safe rebuild tripwires (post-plan)", () => {
       "device-hub-sheet.mjs",
       "device-inbox-sheet.mjs",
       "device-hub-ui.mjs",
-      "device-status.mjs",
+      "device-status-core.mjs",
     ]) {
       const src = readSiteJs(file);
       expect(src, file).toMatch(/import[\s\S]*syncInboxBackdropForOpenHub/);

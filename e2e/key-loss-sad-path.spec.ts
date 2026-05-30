@@ -36,6 +36,27 @@ async function openHubStrangerEmpty(page: import("@playwright/test").Page) {
   await expect(page.locator("#device-hub")).toHaveClass(/device-hub--stranger-empty/);
 }
 
+function mockHealth(route: Route) {
+  return route.fulfill({
+    status: 200,
+    contentType: "application/json",
+    body: JSON.stringify({ status: "ok", database: "ok" }),
+  });
+}
+
+async function waitForStatusDotReady(page: import("@playwright/test").Page) {
+  await expect(page.locator("#brand-status-dot")).toHaveAttribute("data-dot-state", /.+/, {
+    timeout: 15_000,
+  });
+}
+
+async function openHubStrangerEmpty(page: import("@playwright/test").Page) {
+  await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route));
+  await page.locator("#brand-status-dot-btn").click();
+  await expect(page.locator("body")).toHaveClass(/device-hub-sheet-open/, { timeout: 15_000 });
+  await expect(page.locator("#device-hub")).toHaveClass(/device-hub--stranger-empty/);
+}
+
 async function stubCardRoutes(page: import("@playwright/test").Page) {
   await page.route("**/.well-known/hc/v1/health**", (route) =>
     route.fulfill({
@@ -120,7 +141,41 @@ test.describe("key-loss sad paths", () => {
     await expect(page.locator("#created-view-restore-panel")).toBeVisible();
     await expect(page.locator("#import-recovery-form")).toBeVisible();
     await expect(page.locator("#no-session")).toBeHidden();
-    await expect(page.locator("#created-live-scanners-see")).toBeHidden();
+    await expect(page.locator("#created-view-restore-lead")).toContainText(
+      /recovery code|encrypted backup/i
+    );
+    await expectNoKeylessHcCreated(page);
+  });
+
+  test("K1b: wallet saved but tab empty shows restore-from-device copy", async ({ page }) => {
+    await page.addInitScript(
+      ({ profileId, qrId }) => {
+        localStorage.setItem(
+          "hc_wallet",
+          JSON.stringify([
+            {
+              id: "e2e_other_saved_signing",
+              profile_id: "otherProfileNotThisCard123",
+              qr_id: "qr_other_card",
+              label: "Other saved card",
+              handle: "other_card",
+              owner_private_key_b58: "e2eOwnerPrivKeyForViewOnlyCopyBranch",
+              owner_public_key_b58: "e2eOwnerPubKeyForViewOnlyCopyBranch",
+              saved_at: "2026-05-29T12:00:00.000Z",
+            },
+          ])
+        );
+      },
+      { profileId: PROFILE_ID, qrId: QR_ID }
+    );
+
+    await page.goto(`/created/?profile_id=${PROFILE_ID}&qr_id=${QR_ID}`);
+
+    await expect(page.getByRole("heading", { name: "View this card" })).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(page.locator("#created-view-restore-lead")).toContainText(/Open controls/i);
+    await expectNoKeylessHcCreated(page);
   });
 
   test("K5: wallet label without signing keys still view-only on /created/", async ({ page }) => {
