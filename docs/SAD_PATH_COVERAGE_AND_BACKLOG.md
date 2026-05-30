@@ -211,7 +211,7 @@ Canonical matrix: [`HOSTED_OPS_SAD_PATH_MATRIX.md`](HOSTED_OPS_SAD_PATH_MATRIX.m
 | **S26** | **Check network after stuck inbox backdrop (P5f)** | `e2e/device-hub-check-network-backdrop.spec.ts` |
 | **S27** | **Setup protect gate before Live (K7)** | `worker/tests/created-setup-seatbelt.test.ts` · `worker/tests/key-loss-copy-guards.test.ts` |
 | **S28** | **View-only Live tab read-only signage (Phase 3)** | `worker/tests/created-view-live-core.test.ts` · `e2e/key-loss-sad-path.spec.ts` (K1) |
-| **S29** | **Hub import visible in stranger-empty (Phase 4)** | `worker/tests/device-hub-restore-always.test.ts` · `e2e/key-loss-sad-path.spec.ts` (K2) |
+| **S29** | **Hub import visible in stranger-empty (Phase 4)** | `worker/tests/device-hub-restore-always.test.ts` · `e2e:key-loss-sad-path` (K2 wallet · K2-landing · K2-create) |
 | **S30** | **Fresh create hub row no since-visit FP (P0b-1 / R10)** | `e2e/device-os-wallet.spec.ts` · `worker/tests/card-disabled-since-visit-regression.test.ts` |
 | **S31** | **Setup wizard test scan no auto-advance in browser (P0b-2 / R12)** | `e2e/device-pwa-scan-handoff.spec.ts` · `worker/tests/pwa-scan-handoff-core.test.ts` |
 | **S32** | **Scan sole signing row vouch auto-activate (P0b-3)** | `npm run worker:test:vouch-scan-sole-activate` · `npm run e2e:vouch-scan-sole-signing` |
@@ -239,7 +239,7 @@ Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH
 | **P5f · Stuck inbox backdrop vs Check network** | `npm run e2e:device-hub-check-network-backdrop` · [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) § P5f |
 | **P1-SETUP-PROTECT · Setup protect gate (K7)** | `npm run worker:test:setup-protect` |
 | **P1-RESTORE · View-only Live + restore paths (K1 Phase 3)** | `npm run worker:test:view-only-restore` · `npm run e2e:key-loss-sad-path` |
-| **P1-HE · Hub stranger-empty import always visible (Phase 4)** | `npm run worker:test:hub-restore-always` · `npm run e2e:key-loss-sad-path` (K2) |
+| **P1-HE · Hub stranger-empty import always visible (Phase 4)** | `npm run ownership-restore:verify` · `npm run e2e:key-loss-sad-path` (K2-landing · K2-create · K2 wallet) |
 | **P1-VOUCH-SOLE · Scan sole-row vouch without default (P0b-3)** | `npm run e2e:vouch-scan-sole-signing` |
 | **P1-WALLET-CORRUPT · Corrupt wallet tab hint (P1-4 / R7)** | `npm run worker:test:wallet-corrupt` · `npm run e2e:key-loss-sad-path` (R7) |
 | **P2-SAFARI-KEYS · WebKit keys persistence (P2-3 / S2–S3)** | `npm run e2e:safari-keys-persistence` |

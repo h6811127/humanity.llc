@@ -49,6 +49,10 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run worker:test
+      - name: Ownership restore Vitest (view-only + hub import)
+        run: |
+          npm run worker:test:view-only-restore
+          npm run worker:test:hub-restore-always
       - name: Merch funnel rollout preflight (step 1 + step 6 Vitest)
         run: |
           npm run merch-funnel:rollout:step1

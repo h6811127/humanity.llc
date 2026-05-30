@@ -128,6 +128,7 @@
     "merch-funnel:rollout:post-deploy": "node worker/scripts/merch-funnel-rollout-post-deploy.mjs",
     "e2e:generate-key-loss-fixture": "tsx worker/scripts/generate-key-loss-e2e-fixture.ts",
     "e2e:key-loss-sad-path": "playwright test e2e/key-loss-sad-path.spec.ts",
+    "ownership-restore:verify": "npm run worker:test:view-only-restore && npm run worker:test:hub-restore-always && npm run e2e:key-loss-sad-path",
     "e2e:wallet-scale-guardrail": "playwright test e2e/wallet-scale-guardrail.spec.ts",
     "e2e:merch-checkout-sad-path": "playwright test e2e/merch-checkout-sad-path.spec.ts",
     "e2e:merch-funnel": "playwright test e2e/merch-funnel-customize.spec.ts e2e/merch-funnel-checkout.spec.ts e2e/merch-checkout-sad-path.spec.ts e2e/shop-product-detail.spec.ts"

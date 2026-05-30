@@ -233,7 +233,7 @@ Spec: [`HC_EMPHASIS_CARD_IMPORT_REGRESSION.md`](HC_EMPHASIS_CARD_IMPORT_REGRESSI
 | 4 | **Manage** tab | **Restore ownership** at top; recovery import + backup link |
 | 5 | Restore with valid recovery or `.hcbackup` | Enters control mode; signing UI returns |
 
-Automated: `npm run e2e:key-loss-sad-path` (K1/K5) · `npm run worker:test -- worker/tests/created-view-live-readonly-core.test.ts worker/tests/created-view-mode-core.test.ts`
+Automated: `npm run ownership-restore:verify` · `npm run e2e:key-loss-sad-path` (K1/K5/K2) · `npm run worker:test:view-only-restore`
 
 ## P1-KC · Keys custody emphasis card (compact layout)
 
@@ -391,7 +391,7 @@ Automated: `npm run e2e:key-loss-sad-path` · `npm run worker:test:key-loss-copy
 | 3 | Tap **Restore ownership** on Live banner | **Manage** tab; restore panel + import visible |
 | 4 | Deep link `#recovery` or `#backup` | Lands **Manage** with restore panel in view |
 
-Automated: `npm run e2e:key-loss-sad-path` (K1) · `npm run worker:test -- worker/tests/created-view-live-core.test.ts`
+Automated: `npm run ownership-restore:verify` · `npm run e2e:key-loss-sad-path` (K1) · `npm run worker:test:view-only-restore`
 
 ### P1-HOSTED-BR · Billing checkout return (O1–O2)
 
@@ -432,7 +432,7 @@ Automated: `e2e/device-status-dot.spec.ts` § hub sheet header chrome (steps 4�
 | 3 | Create + save a card (or import backup) | Hub shows full steward chrome; `device-hub--stranger-empty` removed |
 | 4 | Repeat on `/wallet/` empty | Same hide rules; wallet page hint matches landing |
 
-Automated: `npm run worker:test:hub-restore-always` · `npm run worker:test -- worker/tests/device-hub-stranger-empty-core.test.ts`
+Automated: `npm run worker:test:hub-restore-always` · `npm run e2e:key-loss-sad-path` (K2-landing · K2-create · K2 wallet)
 
 ### P2-SLC · Hub stranger landing chrome
 
