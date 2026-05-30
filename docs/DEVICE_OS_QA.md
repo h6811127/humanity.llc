@@ -613,6 +613,21 @@ Automated: `npm run worker:test:safari-persist-denied-notice`.
 
 Automated: `npm run worker:test:setup-ios-custody`.
 
+### P2-RC14 · Hub search false-empty (RC-14 shipped)
+
+**Spec:** [`HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md`](HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md) RC-14 · **Modules:** `device-hub-search-core.mjs` · `device-hub-ui.mjs`
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Save a card · open hub · type search with no matches | Saved section shows **No saved cards match your search** — not stranger-empty onboarding |
+| 2 | Clear search | Saved row returns |
+| 3 | With active search filter · remove last saved card (or clear wallet in devtools) | Search input clears when hub enters stranger-empty |
+| 4 | Stranger-empty → save first card | Stale search cleared; new row visible without manual clear |
+
+**Fail signals:** Stranger-empty copy while wallet has rows; stale search hides first save after stranger-empty.
+
+Automated: `npm run worker:test:hub-search-rc14`.
+
 ### P1-8 · Hosted tier budget (Phase 10 — E2 staging)
 
 **Status:** E2 client probe staging; production enablement still waits on M4 sign-off and rollout gates. Spec: [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Phase 10 — hosted tier rows (M7) · build order: [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md).
