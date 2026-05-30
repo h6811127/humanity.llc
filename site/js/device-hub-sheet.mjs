@@ -57,6 +57,9 @@ export function setHubSheetOpen(open) {
   hub.setAttribute("aria-hidden", open ? "false" : "true");
   if (open) {
     hub.removeAttribute("inert");
+    void import("./device-hub-wallet-integrity.mjs").then((mod) => {
+      mod.runHubOpenWalletIntegrityHeartbeat();
+    });
   } else {
     hub.setAttribute("inert", "");
     reconcileHubSheetState();

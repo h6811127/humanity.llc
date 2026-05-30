@@ -165,6 +165,11 @@ export function setHubExpanded(open, { persist = true, haptic = false } = {}) {
       mod.setHubSheetOpen(open);
     } else {
       hub.classList.toggle("device-hub-collapsed", !open);
+      if (open) {
+        void import("./device-hub-wallet-integrity.mjs").then((mod) => {
+          mod.runHubOpenWalletIntegrityHeartbeat();
+        });
+      }
       window.dispatchEvent(new Event("hc-live-control-poll-scope-changed"));
     }
     if (dotBtn) dotBtn.setAttribute("aria-expanded", open ? "true" : "false");

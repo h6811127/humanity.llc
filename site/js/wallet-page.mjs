@@ -17,6 +17,7 @@ import {
   isWalletSaved,
   isWalletStorageCorrupt,
   loadWallet,
+  reconcileWalletSummaryIntegrity,
   saveSessionToWallet,
 } from "./device-wallet.mjs";
 
@@ -158,6 +159,8 @@ if (pinForm) {
     refreshDeviceHub();
   });
 }
+
+reconcileWalletSummaryIntegrity();
 
 initDeviceHub({
   hubRoot: "#wallet-page",

@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { walletStorageFingerprint } from "../../site/js/device-wallet-summary-integrity-core.mjs";
 import {
   findWalletEntryById,
   findWalletEntryByProfileId,
@@ -13,9 +14,11 @@ import {
   listWalletDisplayEntries,
   loadWallet,
   loadWalletSummary,
+  reconcileWalletSummaryIntegrity,
   resetWalletCachesForTests,
   saveWallet,
   WALLET_STORAGE_KEY,
+  WALLET_SUMMARY_STORAGE_KEY,
 } from "../../site/js/device-wallet.mjs";
 
 const QR_A = "qr_xBZTq7M27tueCzBY";
@@ -188,5 +191,29 @@ describe("device wallet metadata hot paths", () => {
       { profile_id: "profile-print", qr_scope: "print_artifact" },
     ]);
     expect(summary.rows[0]).not.toHaveProperty("owner_private_key_b58");
+  });
+
+  it("reconcileWalletSummaryIntegrity rebuilds desynced hc_wallet_summary (RC-15)", () => {
+    const wallet = JSON.stringify([entry("a", "profile-meta-a", QR_A, true)]);
+    const fp = walletStorageFingerprint(wallet);
+    localStore.set(WALLET_STORAGE_KEY, wallet);
+    localStore.set(
+      WALLET_SUMMARY_STORAGE_KEY,
+      JSON.stringify({
+        version: 3,
+        walletFingerprint: fp,
+        count: 0,
+        profileIds: [],
+        signingKeyCount: 0,
+        pollableCount: 0,
+        stewardReady: false,
+        rows: [],
+      })
+    );
+    resetWalletCachesForTests();
+
+    expect(reconcileWalletSummaryIntegrity()).toEqual({ repaired: true });
+    expect(getWalletCount()).toBe(1);
+    expect(reconcileWalletSummaryIntegrity()).toEqual({ repaired: false });
   });
 });

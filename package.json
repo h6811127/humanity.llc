@@ -22,6 +22,7 @@
     "worker:fixtures": "tsx worker/scripts/generate-fixtures.ts",
     "worker:test": "vitest run",
     "worker:test:device": "vitest run worker/tests/device",
+    "worker:test:wallet-summary-integrity": "vitest run worker/tests/device-wallet-summary-integrity-core.test.ts worker/tests/device-wallet-meta.test.ts -t \"RC-15|walletSummaryIntegrity|reconcileWalletSummaryIntegrity\"",
     "worker:test:hub-search-rc14": "vitest run worker/tests/device-hub-search-core.test.ts worker/tests/device-hub-wallet-summary.test.ts -t \"RC-14|shouldClearHubSearch|shouldShowSavedSearch|stranger-empty chrome\"",
     "worker:test:card-disabled-since-visit": "vitest run worker/tests/wallet-network.test.ts worker/tests/device-wallet-network-confirmed.test.ts worker/tests/device-wallet-network-truth.test.ts worker/tests/card-disabled-since-visit-regression.test.ts worker/tests/card-disabled-since-visit-approaches.test.ts worker/tests/card-disabled-fresh-create.test.ts worker/tests/device-hub-frontend-pipeline.test.ts worker/tests/device-hub-search-core.test.ts",
     "worker:test:steward-billing": "vitest run worker/tests/billing-lifecycle.test.ts worker/tests/billing-webhook.test.ts worker/tests/stripe-webhook-verify.test.ts worker/tests/steward-hosted.test.ts",

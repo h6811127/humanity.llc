@@ -1,7 +1,7 @@
 # Investigation: Saved card disappeared from hub (iPhone Safari)
 
 **Date:** 2026-05-29 (opened from steward report — card saved, hub empty ~20 min later)  
-**Status:** Active — RC-1/RC-2/RC-4/RC-6/RC-13/RC-14 shipped; RC-3 partial; RC-15+ open  
+**Status:** Active — RC-1–RC-6/RC-13–RC-15 shipped; RC-3 partial  
 **Reporter:** Steward on iPhone Safari after create + explicit save  
 **Related:** [`SAFARI_KEYS_WIPE_INVESTIGATION.md`](SAFARI_KEYS_WIPE_INVESTIGATION.md) · [`KEY_LOSS_SAD_PATH_MATRIX.md`](KEY_LOSS_SAD_PATH_MATRIX.md) · [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md) · [`PWA_INSTALL.md`](PWA_INSTALL.md)
 
@@ -210,15 +210,16 @@ Fix backlog order matches this list. **RC-1, RC-2, RC-4, and RC-6 are implemente
 
 ---
 
-### RC-15 — `hc_wallet_summary` fingerprint desync
+### RC-15 — `hc_wallet_summary` fingerprint desync **(fix shipped)**
 
 | Field | Detail |
 |-------|--------|
 | **Layer** | Client — `loadWalletSummary()` |
 | **Mechanism** | Summary cached with matching fingerprint; if wallet manually edited outside app, summary rebuilds from wallet on mismatch. **Should not** show zero when wallet has rows. |
 | **User pattern** | Theoretical only. |
-| **Still possible?** | **Very unlikely** |
-| **Fix backlog** | Integrity heartbeat on hub open |
+| **Still possible?** | **Very unlikely** after hub-open heartbeat |
+| **Fix** | **Shipped** — `reconcileWalletSummaryIntegrity()` on hub open; integrity gate before accepting persisted summary + in-memory cache fingerprint check |
+| **Tests** | `npm run worker:test:wallet-summary-integrity` |
 
 ---
 
@@ -399,7 +400,7 @@ Run on the **tab where the hub looks empty** (Safari → Develop → device → 
 | 5 | RC-6 | Private mode detection | **Shipped** |
 | 6 | RC-13 | Canonical origin enforcement | **Shipped** |
 | 7 | RC-14 | Search/cap UX audit | **Shipped** (search clear + no-match copy) |
-| 8 | RC-15 | Hub open integrity heartbeat | Open |
+| 8 | RC-15 | Hub open integrity heartbeat | **Shipped** |
 
 ---
 
@@ -414,6 +415,7 @@ Run on the **tab where the hub looks empty** (Safari → Develop → device → 
 | RC-6 | `npm run worker:test:private-browsing` |
 | RC-13 | `npm run worker:test:canonical-origin` |
 | RC-14 | `npm run worker:test:hub-search-rc14` |
+| RC-15 | `npm run worker:test:wallet-summary-integrity` |
 | RC-7 | `npm run worker:test:wallet-corrupt` · `npm run e2e:key-loss-sad-path` |
 | RC-8, RC-9 | `npm run e2e:safari-keys-persistence` |
 | Copy | `npm run worker:test:key-loss-copy` |
@@ -425,6 +427,7 @@ Run on the **tab where the hub looks empty** (Safari → Develop → device → 
 | Date | Event |
 |------|--------|
 | 2026-05-29 | **RC-4** setup finish gated on wallet save + done-step confirmation |
+| 2026-05-30 | **RC-15** hub-open wallet summary integrity heartbeat |
 | 2026-05-30 | **RC-14** hub search clear on stranger transition + saved no-match copy |
 | 2026-05-30 | **RC-13** canonical `www` → apex redirect + debug hub origin line |
 | 2026-05-29 | **RC-2** persist-denied iOS warn card shipped |

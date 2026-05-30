@@ -22,6 +22,7 @@ import {
   buildWalletSummary,
   serializeWalletSummaryForStorage,
 } from "./device-wallet-summary-core.mjs";
+import { walletSummaryIntegrityNeedsRepair } from "./device-wallet-summary-integrity-core.mjs";
 
 export const WALLET_STORAGE_KEY = "hc_wallet";
 export const WALLET_SUMMARY_STORAGE_KEY = "hc_wallet_summary";
@@ -212,7 +213,9 @@ export function loadWalletSummary() {
   try {
     const raw = localStorage.getItem(WALLET_STORAGE_KEY);
     if (raw === walletSummaryCacheRaw && walletSummaryCache) {
-      return cloneWalletSummary(walletSummaryCache);
+      if (walletSummaryCache.walletFingerprint === walletRawFingerprint(raw)) {
+        return cloneWalletSummary(walletSummaryCache);
+      }
     }
 
     const fingerprint = walletRawFingerprint(raw);
@@ -220,7 +223,11 @@ export function loadWalletSummary() {
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
-        if (isWalletSummary(parsed) && parsed.walletFingerprint === fingerprint) {
+        if (
+          isWalletSummary(parsed) &&
+          parsed.walletFingerprint === fingerprint &&
+          !walletSummaryIntegrityNeedsRepair({ walletRaw: raw, storedSummary: parsed })
+        ) {
           walletSummaryCacheRaw = raw;
           walletSummaryCache = parsed;
           return cloneWalletSummary(parsed);
@@ -456,6 +463,43 @@ export function isWalletSaved(profileId) {
 /** Drop memo when `hc_wallet` changes in another tab (tests may call directly). */
 export function invalidateWalletCache() {
   resetWalletCachesForTests();
+}
+
+/**
+ * Re-read hc_wallet vs hc_wallet_summary and rebuild summary when desynced (RC-15).
+ * @returns {{ repaired: boolean }}
+ */
+export function reconcileWalletSummaryIntegrity() {
+  if (typeof localStorage === "undefined") {
+    return { repaired: false };
+  }
+  try {
+    const walletRaw = localStorage.getItem(WALLET_STORAGE_KEY);
+    const summaryRaw = localStorage.getItem(WALLET_SUMMARY_STORAGE_KEY);
+    /** @type {unknown} */
+    let storedSummary = null;
+    if (summaryRaw) {
+      try {
+        storedSummary = JSON.parse(summaryRaw);
+      } catch {
+        storedSummary = null;
+      }
+    }
+
+    const needsRepair = walletSummaryIntegrityNeedsRepair({
+      walletRaw,
+      storedSummary,
+    });
+    if (!needsRepair) {
+      return { repaired: false };
+    }
+
+    invalidateWalletCache();
+    loadWalletSummary();
+    return { repaired: true };
+  } catch {
+    return { repaired: false };
+  }
 }
 
 export function resetWalletCachesForTests() {

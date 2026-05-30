@@ -628,6 +628,19 @@ Automated: `npm run worker:test:setup-ios-custody`.
 
 Automated: `npm run worker:test:hub-search-rc14`.
 
+### P2-RC15 · Wallet summary integrity heartbeat (RC-15 shipped)
+
+**Spec:** [`HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md`](HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md) RC-15 · **Modules:** `device-wallet-summary-integrity-core.mjs` · `device-hub-wallet-integrity.mjs`
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | DevTools: set `hc_wallet` with one row · set `hc_wallet_summary.count` to `0` (matching fingerprint) | Opening hub sheet restores saved row without reload |
+| 2 | `/wallet/` load with desynced summary | Row visible after page init |
+
+**Fail signals:** Hub shows stranger-empty while `hc_wallet` has rows and summary is stale only.
+
+Automated: `npm run worker:test:wallet-summary-integrity`.
+
 ### P1-8 · Hosted tier budget (Phase 10 — E2 staging)
 
 **Status:** E2 client probe staging; production enablement still waits on M4 sign-off and rollout gates. Spec: [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Phase 10 — hosted tier rows (M7) · build order: [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md).
