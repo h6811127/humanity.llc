@@ -71,7 +71,7 @@ describe("/created/ dual-QR HTML guards (S7)", () => {
     expect(html).toContain('id="download-steward-qr"');
     expect(html).toContain('id="copy-steward-handoff"');
     expect(html).toContain('id="created-steward-qr-col"');
-    expect(html).toContain('id="created-setup-steward-qr-img"');
+    expect(html).not.toContain('id="created-setup-steward-qr-img"');
     expect(html).toContain('id="created-print-steward-discovery"');
     expect(html).toContain('id="created-print-steward-cta"');
     expect(html).toContain("Download public QR");

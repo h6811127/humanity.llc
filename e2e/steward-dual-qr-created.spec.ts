@@ -183,13 +183,13 @@ test.describe("/created/ steward dual-QR (S7)", () => {
   });
 });
 
-test.describe("/created/ setup wizard steward dual-QR (S7 · fresh=1)", () => {
+test.describe("/created/ setup wizard Get your QR (fresh=1)", () => {
   test.beforeEach(async ({ page }) => {
     await seedCreatedSetupFreshSession(page);
     await stubResolver(page);
   });
 
-  test("Get your QR step renders steward handoff preview img with data URL", async ({ page }) => {
+  test("Get your QR step shows public scan preview only", async ({ page }) => {
     const url = `/created/?profile_id=${SAMPLE.profile_id}&qr_id=${SAMPLE.qr_id}&fresh=1#setup-qr`;
     await page.goto(url);
 
@@ -202,17 +202,10 @@ test.describe("/created/ setup wizard steward dual-QR (S7 · fresh=1)", () => {
     await expect(page.getByRole("heading", { name: "Get your QR" })).toBeVisible();
 
     const publicPreview = page.locator("#created-setup-qr-preview");
-    const stewardPreview = page.locator("#created-setup-steward-qr-preview");
     const publicImg = page.locator("#created-setup-qr-img");
-    const stewardImg = page.locator("#created-setup-steward-qr-img");
 
     await expect(publicImg).toHaveAttribute("src", /^data:image\//, { timeout: 15_000 });
     await expect(publicPreview).toBeVisible();
-    await expect(stewardImg).toHaveAttribute("src", /^data:image\//, { timeout: 15_000 });
-    await expect(stewardImg).not.toHaveAttribute("alt", /Could not generate/i);
-    await expect(stewardPreview).toBeVisible();
-    await expect(stewardPreview.locator(".created-setup-steward-qr-hint")).toContainText(
-      /Steward handoff/i
-    );
+    await expect(page.locator("#created-setup-steward-qr-preview")).toHaveCount(0);
   });
 });

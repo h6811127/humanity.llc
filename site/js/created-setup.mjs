@@ -37,12 +37,6 @@ import { isIosWebKitUserAgent } from "./safari-itp-storage-notice-core.mjs";
 import { stewardScanOpenedFeedback } from "./pwa-scan-handoff-core.mjs";
 import { openStewardScanPreviewFromWindow } from "./pwa-scan-handoff.mjs";
 import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
-import {
-  buildStewardDualQrMaterials,
-  dualQrHandoffOrigin,
-  resolveDualQrScanUrl,
-} from "./steward-dual-qr-core.mjs";
-
 const STEPS = SETUP_STEP_IDS;
 
 /**
@@ -96,8 +90,6 @@ export function initCreatedSetup(opts) {
   const custodyMount = document.getElementById("device-keys-custody-created-setup");
   const qrPreviewWrap = document.getElementById("created-setup-qr-preview");
   const setupQrImg = document.getElementById("created-setup-qr-img");
-  const stewardQrPreviewWrap = document.getElementById("created-setup-steward-qr-preview");
-  const setupStewardQrImg = document.getElementById("created-setup-steward-qr-img");
   const doneBtn = document.getElementById("created-setup-finish");
   const walletSavedConfirmEl = document.getElementById("created-setup-wallet-saved-confirm");
   const iosSafariHintEl = document.getElementById("created-setup-ios-safari-hint");
@@ -196,38 +188,6 @@ export function initCreatedSetup(opts) {
     setupQrImg.src = src;
     setupQrImg.alt = "Your scan QR";
     qrPreviewWrap.hidden = false;
-    void syncSetupStewardQrPreview();
-  }
-
-  async function syncSetupStewardQrPreview() {
-    const scanUrl = getScanUrl?.();
-    if (!scanUrl || !stewardQrPreviewWrap || !setupStewardQrImg) {
-      if (stewardQrPreviewWrap) stewardQrPreviewWrap.hidden = true;
-      return;
-    }
-    const qrFromUrl = new URLSearchParams(location.search).get("qr_id")?.trim() || null;
-    const resolved = resolveDualQrScanUrl(scanUrl, profileId, qrFromUrl, location.origin);
-    if (!resolved) {
-      stewardQrPreviewWrap.hidden = true;
-      return;
-    }
-    const handoffOrigin = dualQrHandoffOrigin(resolved, location.origin);
-    const materials = buildStewardDualQrMaterials(resolved, handoffOrigin);
-    if (!materials.hasStewardHandoff || !materials.stewardHandoffUrl) {
-      stewardQrPreviewWrap.hidden = true;
-      return;
-    }
-    try {
-      const { renderBrandedQrToImage } = await import("./qr-render.mjs");
-      await renderBrandedQrToImage(setupStewardQrImg, materials.stewardHandoffUrl, {
-        alt: "Steward handoff QR code",
-      });
-      stewardQrPreviewWrap.hidden = false;
-    } catch {
-      setupStewardQrImg.removeAttribute("src");
-      setupStewardQrImg.alt = "Could not generate steward handoff QR";
-      stewardQrPreviewWrap.hidden = false;
-    }
   }
 
   let stepIndex = 0;
