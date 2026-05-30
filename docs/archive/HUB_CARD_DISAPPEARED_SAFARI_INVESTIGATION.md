@@ -3,7 +3,7 @@
 **Date:** 2026-05-29 (opened from steward report — card saved, hub empty ~20 min later)  
 **Status:** **Closed — monitoring only** (May 2026) — RC-1–RC-16 engineering backlog shipped; use diagnostic checklist for new reports  
 **Reporter:** Steward on iPhone Safari after create + explicit save  
-**Related:** [`SAFARI_KEYS_WIPE_INVESTIGATION.md`](SAFARI_KEYS_WIPE_INVESTIGATION.md) · [`KEY_LOSS_SAD_PATH_MATRIX.md`](KEY_LOSS_SAD_PATH_MATRIX.md) · [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md) · [`PWA_INSTALL.md`](PWA_INSTALL.md)
+**Related:** [`SAFARI_KEYS_CUSTODY.md`](SAFARI_KEYS_CUSTODY.md) · [`KEY_LOSS_SAD_PATH_MATRIX.md`](KEY_LOSS_SAD_PATH_MATRIX.md) · [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md) · [`PWA_INSTALL.md`](PWA_INSTALL.md)
 
 ---
 
@@ -69,7 +69,7 @@ Fix backlog order matches this list. **RC-1–RC-6 and RC-13–RC-16 are shipped
 | Field | Detail |
 |-------|--------|
 | **Layer** | Platform — WebKit ITP + storage pressure |
-| **Mechanism** | See R4 in [`SAFARI_KEYS_WIPE_INVESTIGATION.md`](SAFARI_KEYS_WIPE_INVESTIGATION.md): 7-day no-interaction rule, iOS cache cleanup, Settings → Clear Website Data, Home Screen PWA vs in-browser **separate ITP timers**. |
+| **Mechanism** | See R4 in [`SAFARI_KEYS_CUSTODY.md`](../SAFARI_KEYS_CUSTODY.md): 7-day no-interaction rule, iOS cache cleanup, Settings → Clear Website Data, Home Screen PWA vs in-browser **separate ITP timers**. |
 | **User pattern** | Hub stranger-empty; status dot also shows no saved ownership; no backup. |
 | **Still possible?** | **Yes** — by design without backup |
 | **Fix backlog** | RC-2 notice; P2-1 ITP notice (shipped); mandatory backup export before “You're live” (P0-4 shipped); setup wizard iOS Safari custody + Home Screen guidance on Protect/Done (RC-3 slice 1 shipped); Done → PWA install card handoff after `markSetupDone` (RC-3 slice 2 shipped). |

@@ -1,0 +1,138 @@
+# System invariants (engineering)
+
+**Status:** Canonical — do not break without updating tests and this doc  
+**Audience:** Humans and agents changing shell, wallet, scan, or resolver client code  
+**Indexes:** [`STEWARD_DEVICE_ROADMAP.md`](STEWARD_DEVICE_ROADMAP.md) · [`PRODUCT_WORKSTREAM_COORDINATION.md`](PRODUCT_WORKSTREAM_COORDINATION.md) · [`DOC_MAINTENANCE.md`](DOC_MAINTENANCE.md)
+
+This doc holds **rules that must stay true** after closed investigations are archived. For narrative history, see `docs/archive/`.
+
+---
+
+## Device shell — status dot and hub
+
+The floating **status dot** (`#brand-status-dot-btn`) opens the hub on `/`, `/create/`, and `/created/`. On `/wallet/` it only scrolls to saved cards. Do not wire glance-first on dot tap.
+
+| Invariant | Detail |
+|-----------|--------|
+| Module graph | `device-status-bootstrap.mjs` → inner loads `device-status-core.mjs` then `device-status.mjs`. New `./device-*.mjs` imports on the status graph must ship in the same PR, appear in `DEVICE_STATUS_SHELL_JS_FILES` (`device-status-shell-modules.mjs`), and bump `DEVICE_SHELL_ASSET_VERSION`. |
+| Partial vs total load | Partial failure (core OK, status failed): `data-device-status-partial`, hub opens, no coach hijack. Total failure: `data-device-status-error` + load-error coach; dot tap toggles coach, not hub. |
+| Lazy subgraphs | Do not static-import full inbox/hub-sheet/notifications from `device-status.mjs` or `device-chrome-refresh.mjs`. Use `device-inbox-sheet-loader.mjs`, `device-hub-sheet-loader.mjs`, `device-inbox-loader.mjs`, `device-browser-notifications-loader.mjs`. |
+| Hub open state | Open/close only through `setHubSheetOpen()` / `setHubExpanded()`. `hubSheetOpen()` treats a collapsed `#device-hub` as closed even if `body.device-hub-sheet-open` is stuck. |
+| Clickability CSS | `.top-chrome--float { pointer-events: none }` with `.shell-status-cluster` (and dot/badge) at `pointer-events: auto` when `top-chrome--edge-hidden` or hub/inbox locked. |
+| Boot gate | Shell bodies use `data-boot="pending"` until `markDeviceBootReady()`. Personalized rows stay hidden via `.device-boot-gated` until boot ready. |
+| Dot boot | Dot hidden until first settled `applyDot()` after health fetch + quiet rehydrate — no flash of wrong steward/offline state from core-only boot. |
+| Hub network chips | Per-profile chips show **checking** until `isResolverConfirmedProfile(profileId)`; cache ignored for identity/icon/scan-kind until poll confirms. |
+
+**Regression (status graph):**
+
+```bash
+npm run worker:test -- worker/tests/device-status-shell-modules.test.ts worker/tests/device-status-lazy-inbox.test.ts worker/tests/device-status-load-error.test.ts worker/tests/device-shell-boot.test.ts
+npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts e2e/device-cross-tab-keys.spec.ts e2e/scan-page-dot.spec.ts
+```
+
+Canonical UX spec: [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md). Load failure postmortem: [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md). Open boot follow-ups: [`SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md`](SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md) (RC-5–RC-14, including wallet-summary reconcile and cross-tab boot suppress).
+
+---
+
+## Wallet and hub card rows
+
+| Invariant | Detail |
+|-----------|--------|
+| Hub rows source | Hub saved-card rows always reflect `localStorage.hc_wallet`. Server orphan purge (90 days) does not touch browser storage. |
+| Post-save verify | `saveWallet()` must round-trip `localStorage` via `verifyWalletStorageWrite()`; failure returns `WALLET_SAVE_VERIFY_FAILED`. |
+| Corrupt wallet | Bad JSON → hub **urgent corrupt card** row, not stranger-empty. |
+| Session vs hub loss | Hub row visible + empty tab session = session loss (RC-8), not hub disappearance. |
+| Summary integrity | Allowlisted `hc_wallet_summary` rows + persist tripwire in `device-wallet-summary-core.mjs`. |
+| Private browsing | Create/save blocked when private browsing detected (`private-browsing-detect-core`). |
+| Canonical origin | `www.humanity.llc` → apex redirect on shell pages + Worker 301. |
+
+**Regression:** `npm run hub-card-disappeared:verify:fast` · `npm run worker:test -- worker/tests/device-wallet-summary-core.test.ts worker/tests/device-wallet-meta.test.ts worker/tests/device-wallet-save-core.test.ts`
+
+Reliability guide: [`HUB_CARD_SAFARI_RELIABILITY.md`](HUB_CARD_SAFARI_RELIABILITY.md).
+
+---
+
+## Card disabled since visit (inbox + hub banner)
+
+Banner, hub `#device-hub-card-disabled-group`, inbox badge, and dot overlay for **card disabled since visit** must use **resolver-confirmed** poll maps only — never `sessionStorage.hc_wallet_network_cache` alone.
+
+All of the following are required to show the banner:
+
+1. `resolverConfirmedMap[pid] === true` (network status fetch this visit)
+2. `scan.kind === "card_revoked"` from that poll
+3. Since-visit gate open (resolver health ok + live-proof poll health ok)
+4. Baseline `hc_wallet_last_seen_network[pid]` was not already `card_revoked`
+
+**Regression:** `npm run worker:test:card-disabled-since-visit` · `npm run e2e:card-disabled-since-visit`
+
+Canonical inbox taxonomy: [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
+
+---
+
+## Cross-tab keys and chrome refresh
+
+| Invariant | Detail |
+|-----------|--------|
+| Not OS push | Cross-tab keys use in-app chrome (`cross_tab_keys` / `orphan_keys_removed` inbox kinds), never browser `Notification`. |
+| Coordinator | `device-chrome-refresh.mjs` + fingerprint snapshot; avoid duplicate refresh paths that flash wrong labels. |
+| Presence churn | Laggy scroll on landing often traces to cross-tab presence heartbeats fanning `applyDot()` / `refreshSummary()` — see [`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md). |
+| Banner layout | Scan + landing `#device-cross-tab-banner` and `#wallet-tab-hint` use stacked F3 layout in `site/styles.css`. |
+
+**Regression:** `npm run worker:test -- worker/tests/device-cross-tab-state.test.ts worker/tests/device-cross-tab.test.ts` · `npm run e2e -- e2e/device-cross-tab-keys.spec.ts`
+
+---
+
+## Safari / PWA custody
+
+| Invariant | Detail |
+|-----------|--------|
+| Two stores | Signing needs `sessionStorage.hc_created` with private key; `localStorage.hc_wallet` survives tabs but does not sign until copied into session. |
+| Quiet rehydrate | `maybeQuietTabRehydrate()` on shell boot (`device-status.mjs`) and scan (`scan-tab-keys.mjs`) **before** vouch/live-control scripts. |
+| Scan script order | `scan-tab-keys.mjs` must load and finish (top-level await) **before** `vouch-issue.mjs` and live-control in `scan-html.ts`. |
+| Tab session writes | Never persist `hc_created` without `owner_private_key_b58` or recovery private key (`setTabSession` / P0-6). |
+| Scan dot honesty | Dot / actor band reflect **tab signing state**, not wallet count alone (P0-5). |
+| Save errors | `saveWallet()` try/catch + read-back verify; quota failures surface visibly. |
+| ITP notice | Lazy-load `safari-itp-storage-notice.mjs` after status bootstrap (~7-day eviction + Home Screen timer reset). |
+| Persist denied | When `navigator.storage.persist()` returns false, set `hc_storage_persist_requested_v1 = "0"` and show `safari-storage-persist-denied-notice.mjs`. |
+| PWA session mismatch | `device-pwa-session-mismatch-core.mjs` tracks `hc_last_signing_shell_mode` when tab gains keys. |
+| PWA shortcuts | Tab-native homepage shortcuts hidden in standalone via `pwa-browser-tab-shortcuts.mjs`. |
+| Steward handoff encode | QR encode for steward handoff URLs must use shared `qr-encode-url-core.mjs` — both `qr-render.mjs` and `qr-branding.mjs` must agree. |
+| Corrupt wallet | `loadWallet()` parse failure → corrupt coach card, not stranger-empty hub (P1-4). |
+
+**Regression:** `npm run e2e:safari-keys-persistence` · `npm run e2e:scan-page-dot` · `npm run e2e:key-loss-sad-path` · `npm run worker:test:safari-itp-notice` · `npm run worker:test:safari-persist-denied-notice` · `npm run worker:test:pwa-session-mismatch` · `npm run steward-scan-handoff:verify:fast`
+
+Canonical: [`SAFARI_KEYS_CUSTODY.md`](SAFARI_KEYS_CUSTODY.md) · [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) · [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) · [`PWA_INSTALL.md`](PWA_INSTALL.md)
+
+---
+
+## Network and polling
+
+Read [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) before adding shell network I/O.
+
+**North star:** *The stranger's browser pays for urgency. The steward's browser pays for intent.*
+
+Resolver tab sync: `hc-resolver-sync` BroadcastChannel (network 60s, health 30s); opt out via homepage **Share network checks** or `hc_resolver_sync_tabs=0`.
+
+---
+
+## Product language
+
+Default UI uses Layer 2 outcome copy; protocol terms stay in Advanced, Help, and engineer docs. Before changing user-visible strings: [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) · [`OWNERSHIP_AND_CONTROL_MODEL.md`](OWNERSHIP_AND_CONTROL_MODEL.md) · `site/js/device-ownership-copy-core.mjs`. Run `npm run worker:test:comprehension` when copy changes.
+
+---
+
+## UI tokens
+
+New floating UI must use `--surface-popover-*` per [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md). Keys custody cards use compact F3 stacked layout per [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md).
+
+**Regression:** `npm run worker:test:ui-color-scheme` · `npm run worker:test:keys-custody` · `npm run e2e:keys-custody`
+
+---
+
+## Cards, keys, verification
+
+- Steward status is on the resolver; vouch signing needs root `hc_created` keys on the same browser tab.
+- Cross-device restore: **recovery code** (primary) or encrypted backup (advanced).
+- Large wallets (~10+ saved root cards): poll budget and shell perf limits in [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) still apply.
+
+Canonical: [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md)
