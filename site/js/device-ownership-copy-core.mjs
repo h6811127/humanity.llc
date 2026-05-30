@@ -203,6 +203,17 @@ export const WALLET_CORRUPT_HUB_TITLE =
 export const WALLET_CORRUPT_HUB_DETAIL =
   "Local storage for saved cards is damaged. Import an encrypted backup or recovery code below — humanity.llc cannot repair this browser file.";
 
+/** iOS Safari ITP storage eviction notice (P2-1 · R4). */
+export const SAFARI_ITP_NOTICE_EYEBROW = "iPhone storage";
+
+export const SAFARI_ITP_NOTICE_TITLE = "Safari may clear saved ownership";
+
+export const SAFARI_ITP_NOTICE_DETAIL_BROWSER =
+  "If you do not visit humanity.llc in Safari for about seven days of normal browser use, iOS may delete saved cards and keys on this device. Add to Home Screen and open the app regularly — each visit resets that timer. Keep an encrypted backup if you rely on this phone.";
+
+export const SAFARI_ITP_NOTICE_DETAIL_STANDALONE =
+  "If you do not open this app for about seven days of normal browser use, iOS may delete saved cards and keys on this device. Open humanity.llc from the home screen regularly — each visit resets that timer. Keep an encrypted backup if you rely on this phone.";
+
 /** Hub / wallet empty state — Layer 2 (D9). @see docs/HUB_STRANGER_ONBOARDING.md */
 export const HUB_PINS_BOOKMARKS_ONLY = "Bookmarks only — cannot manage objects";
 

@@ -36,7 +36,7 @@ The original P0 stack (scan rehydrate, sync save, save error surfacing, backup g
 | “Card disabled since visit” on fresh card | **No** | Separate trust killer — [R10](#r10--card-disabled-since-visit-false-positive-prod) |
 | Safari 7-day / clear website data | **No** | Platform wipe — backup/recovery only |
 | PWA created, scan opened in Safari | **Partial** | P1 handoff; session split remains |
-| Keys gone from wallet too | **Partial** | ITP / quota — P0-3 surfaces save failure; corrupt parse still needs P1-4 |
+| Keys gone from wallet too | **Partial** | ITP / quota — P0-3 surfaces save failure; corrupt parse shows P1-4 coach (not empty hub) |
 
 **Honest ship bar:** Treat P0 **plus** R9/R11/R12 (below) as the minimum credible fix for Safari stewards. P0 alone reduces incidence; it does not restore trust while chrome lies.
 
@@ -428,7 +428,7 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 | **P1-1** | Scan: if exactly one wallet signing row, auto-activate like quiet rehydrate (same gates as D10) | Passkey-like scan flow | **Shipped** — P0-1 `scan-tab-keys.mjs` + P0b-3 vouch sole-row path |
 | **P1-2** | Prominent **Ownership not in this tab — tap to restore** when wallet has keys but session empty (all surfaces) | **Shipped** — hub · landing dot · `/wallet/` tab hint · view-only `/created/` Live banner · scan actor band |
 | **P1-3** | PWA scan handoff: ensure all scan entry points use same-tab in standalone ([`PWA_STANDALONE_EXTERNAL_NAVIGATION.md`](PWA_STANDALONE_EXTERNAL_NAVIGATION.md) P1) | Fixes R5 |
-| **P1-4** | On `loadWallet` parse failure, show **corrupt wallet** coach card with export/import links — not empty hub | Fixes R7 · **Step 1 shipped:** hub urgent card + import CTA; not stranger-empty |
+| **P1-4** | On `loadWallet` parse failure, show **corrupt wallet** coach card with export/import links — not empty hub | Fixes R7 · **Shipped** — hub urgent card · `/wallet/` tab hint · import + backup help CTAs |
 
 ### P2 — Platform honesty
 
@@ -492,7 +492,8 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 | 10 | P0b-3 Scan single-row auto-activate (stranger vouch) | **Shipped** | `vouch-scan-sole-signing-activate-core.mjs` · `e2e:vouch-scan-sole-signing` |
 | 11 | P1-2 Ownership not in this tab — restore CTA (all surfaces) | **Shipped** | Hub custody · landing dot · `/wallet/` tab hint · view-only Live banner · scan actor band · `device-ownership-restore-in-tab.mjs` |
 | 12 | P1-3 PWA scan handoff (standalone same-tab) | **Shipped** | `pwa-scan-handoff-core.mjs` · `e2e/device-pwa-scan-handoff.spec.ts` |
-| 13 | P1-4 Corrupt wallet hub coach card | **Step 1 shipped** | `device-wallet-parse-core.mjs` · `device-hub-wallet-corrupt.mjs` · import CTA |
+| 13 | P1-4 Corrupt wallet coach card | **Shipped** | `device-wallet-corrupt-core.mjs` · hub `#device-hub-wallet-corrupt` · `/wallet/` `#wallet-tab-hint` · `e2e:key-loss-sad-path` R7 |
+| 14 | P2-1 Safari ITP storage notice | **Shipped** | `safari-itp-storage-notice-core.mjs` · lazy bootstrap on `/` · `/wallet/` · `/created/` |
 
 **P0-1 spec (reference for reviewers):**
 

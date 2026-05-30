@@ -86,6 +86,14 @@ Setup wizard **hard gate** before step **You're live**:
 - Tests: `npm run worker:test:wallet-corrupt`
 - Tracker: [`SAFARI_KEYS_WIPE_INVESTIGATION.md`](SAFARI_KEYS_WIPE_INVESTIGATION.md) rollout step 13
 
+## Safari P2-1 (shipped)
+
+- **iOS shell pages** (`/`, `/wallet/`, `/created/`): dismissible info card when the device has saved cards — explains ~7-day Safari storage eviction and that **Add to Home Screen** / regular opens reset the timer (R4)
+- Browser vs standalone copy branches in `device-ownership-copy-core.mjs`
+- Modules: `safari-itp-storage-notice-core.mjs` · `safari-itp-storage-notice.mjs` (lazy after status bootstrap)
+- Tests: `npm run worker:test:safari-itp-notice`
+- Tracker: [`SAFARI_KEYS_WIPE_INVESTIGATION.md`](SAFARI_KEYS_WIPE_INVESTIGATION.md) rollout step 14
+
 ## Safari P1-2 (shipped)
 
 - **Hub** custody panel: prominent `wallet_not_in_tab` row — `OWNERSHIP_NOT_IN_TAB_PROMPT` + **Restore control in this tab**

@@ -46,6 +46,11 @@ import(statusCoreUrl.href)
         import.meta.url
       );
       import(standaloneRefreshUrl.href).catch(() => {});
+      const safariItpUrl = new URL(
+        `./safari-itp-storage-notice.mjs?v=${DEVICE_SHELL_ASSET_VERSION}`,
+        import.meta.url
+      );
+      import(safariItpUrl.href).catch(() => {});
     }
   })
   .catch((err) => {
