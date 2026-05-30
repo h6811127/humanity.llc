@@ -4,6 +4,8 @@ import {
   setupMinStepIndex,
   setupProgressKicker,
   shouldOmitSetupSaveStep,
+  canCompleteSetupWizard,
+  setupCompletionBlockedMessage,
 } from "../../site/js/created-setup-core.mjs";
 
 describe("created-setup-core", () => {
@@ -49,5 +51,39 @@ describe("created-setup-core", () => {
   it("uses four-step kicker when save is omitted (5-step wizard with protect)", () => {
     expect(setupProgressKicker(true)).toMatch(/4 steps/);
     expect(setupProgressKicker(false)).toMatch(/5 steps/);
+  });
+
+  it("canCompleteSetupWizard requires wallet save and seatbelt (RC-4)", () => {
+    expect(
+      canCompleteSetupWizard({ walletSaved: true, seatbeltSatisfied: true })
+    ).toBe(true);
+    expect(
+      canCompleteSetupWizard({ walletSaved: false, seatbeltSatisfied: true })
+    ).toBe(false);
+    expect(
+      canCompleteSetupWizard({ walletSaved: true, seatbeltSatisfied: false })
+    ).toBe(false);
+  });
+
+  it("setupCompletionBlockedMessage prefers wallet save over seatbelt (RC-4)", () => {
+    expect(
+      setupCompletionBlockedMessage({
+        walletSaved: false,
+        seatbeltSatisfied: false,
+      })
+    ).toMatch(/Save your control key/i);
+    expect(
+      setupCompletionBlockedMessage({
+        walletSaved: true,
+        seatbeltSatisfied: false,
+        seatbeltBlockMessage: "Export backup first.",
+      })
+    ).toBe("Export backup first.");
+    expect(
+      setupCompletionBlockedMessage({
+        walletSaved: true,
+        seatbeltSatisfied: true,
+      })
+    ).toBe(null);
   });
 });

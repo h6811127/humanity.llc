@@ -3,7 +3,7 @@
 **Status:** Active — product copy + gates audit (no operator key recovery)  
 **Date:** 2026-05-29  
 **Audience:** Product, engineering, QA  
-**Related:** [`SAD_PATH_COVERAGE_AND_BACKLOG.md`](SAD_PATH_COVERAGE_AND_BACKLOG.md) § Key custody · [`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md) · [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) · [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md)
+**Related:** [`SAD_PATH_COVERAGE_AND_BACKLOG.md`](SAD_PATH_COVERAGE_AND_BACKLOG.md) § Key custody · [`HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md`](HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md) · [`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md) · [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) · [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md)
 
 ---
 
@@ -52,6 +52,9 @@ Central strings: `site/js/device-ownership-copy-core.mjs`
 | `VIEW_ONLY_NO_SESSION_WALLET_SAVED` | `#no-session-detail` when wallet has keys but tab does not |
 | `viewOnlyNoSessionDetailHtml(signingKeyCount)` | Runtime branch for `#no-session-detail` (P0-7) |
 | `WALLET_SAVE_STORAGE_FULL` / `WALLET_SAVE_FAILED` | Quota or generic wallet save failure (P0-3) |
+| `WALLET_SAVE_VERIFY_FAILED` | Save write did not round-trip on read-back (RC-1) |
+| `STORAGE_PERSIST_DENIED_*` | iOS warn card when durable storage denied (RC-2) |
+| `SETUP_WALLET_SAVE_REQUIRED` / `SETUP_WALLET_SAVED_*` | Setup wizard wallet save gate (RC-4 · K7) |
 | `BACKUP_INVALID_OWNERSHIP` | Invalid backup payload |
 | `IMPORT_OWNERSHIP_LOADED_TAB` | Successful hub import |
 | `HUB_RESTORE_IMPORT_HINT` / `HUB_RESTORE_IMPORT_SUMMARY` | Hub backup import form (Phase 4) |

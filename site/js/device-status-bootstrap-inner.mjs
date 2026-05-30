@@ -51,6 +51,11 @@ import(statusCoreUrl.href)
         import.meta.url
       );
       import(safariItpUrl.href).catch(() => {});
+      const persistDeniedUrl = new URL(
+        `./safari-storage-persist-denied-notice.mjs?v=${DEVICE_SHELL_ASSET_VERSION}`,
+        import.meta.url
+      );
+      import(persistDeniedUrl.href).catch(() => {});
     }
   })
   .catch((err) => {

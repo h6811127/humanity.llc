@@ -3,7 +3,7 @@
  * See docs/MERCH_FUNNEL_MVP.md.
  */
 import { qrScanUrl, resolverApiOrigin } from "./hc-sign.mjs";
-import { renderQrToImage } from "./qr-render.mjs";
+import { QR_PREVIEW_RENDER_WIDTH, renderQrToImage } from "./qr-render.mjs";
 import { loadShopConfig } from "./shop-config.mjs";
 import {
   appendMerchRefToCreateUrl,
@@ -21,6 +21,7 @@ import { persistCheckoutIntentId } from "./shop-order-status-core.mjs";
 import {
   buildPlannedItemScanUrl,
   buildShopifyCartUrl,
+  customizeStickerMockLayout,
   isPersonalizeCheckoutReady,
   loadCardSessionForCustomize,
   loadCardSigningSessionForCustomize,
@@ -35,6 +36,7 @@ import {
 } from "./shop-proof-consent-core.mjs";
 import { syncMerchBackupNudgeNotice } from "./merch-backup-nudge.mjs";
 import { loadRootSessionRecordForMerch, merchPreCheckoutRecoveryGateState } from "./merch-backup-nudge-core.mjs";
+import { SHOP_CUSTOMIZE_PROOF_PERSISTENCE } from "./shop-merch-copy-core.mjs";
 
 const PERSONALIZE_PROOF_CONSENT_IDS = proofConsentRequiredIds("personalized");
 
@@ -148,6 +150,14 @@ function syncMockPreviewKind() {
   const kind =
     product && personalizeProductDisplay(product).preview === "sticker" ? "sticker" : "hoodie";
   mockEl.dataset.preview = kind;
+  if (kind === "sticker") {
+    const layout = customizeStickerMockLayout(QR_PREVIEW_RENDER_WIDTH);
+    mockEl.style.setProperty("--hc-sticker-card-aspect", String(layout.cardAspect));
+    mockEl.style.setProperty("--hc-sticker-card-width", `${layout.cardWidthPct}%`);
+  } else {
+    mockEl.style.removeProperty("--hc-sticker-card-aspect");
+    mockEl.style.removeProperty("--hc-sticker-card-width");
+  }
 }
 
 function cardFallbackScanUrl() {
@@ -443,7 +453,13 @@ function showCardReady(session) {
   void refreshPreview();
 }
 
+function applyMerchCustomizeProofCopy() {
+  const persistenceEl = document.getElementById("shop-customize-proof-persistence");
+  if (persistenceEl) persistenceEl.textContent = SHOP_CUSTOMIZE_PROOF_PERSISTENCE;
+}
+
 async function init() {
+  applyMerchCustomizeProofCopy();
   const urlRef = readMerchRefFromUrl();
   if (urlRef) {
     persistMerchCreateRef(urlRef);

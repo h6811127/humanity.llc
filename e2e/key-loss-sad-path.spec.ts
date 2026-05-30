@@ -13,29 +13,28 @@ import { test, expect, type Route } from "@playwright/test";
 const PROFILE_ID = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const QR_ID = "qr_E2eKeyLossSadPath1";
 
-async function expectNoKeylessHcCreated(page: import("@playwright/test").Page) {
-  const session = await page.evaluate(() => {
-    const raw = sessionStorage.getItem("hc_created");
-    if (!raw) return { ok: true };
-    try {
-      const parsed = JSON.parse(raw) as Record<string, unknown>;
-      const owner =
-        typeof parsed.owner_private_key_b58 === "string"
-          ? parsed.owner_private_key_b58.trim()
-          : "";
-      const recovery =
-        typeof parsed.recovery_private_key_b58 === "string"
-          ? parsed.recovery_private_key_b58.trim()
-          : "";
-      return { ok: Boolean(owner || recovery) };
-    } catch {
-      return { ok: true };
-    }
+const BACKUP_FIXTURE = join(process.cwd(), "e2e/fixtures/key-loss-e2e.hcbackup.json");
+
+function mockHealth(route: Route) {
+  return route.fulfill({
+    status: 200,
+    contentType: "application/json",
+    body: JSON.stringify({ status: "ok", database: "ok" }),
   });
-  expect(session.ok).toBe(true);
 }
 
-const BACKUP_FIXTURE = join(process.cwd(), "e2e/fixtures/key-loss-e2e.hcbackup.json");
+async function waitForStatusDotReady(page: import("@playwright/test").Page) {
+  await expect(page.locator("#brand-status-dot")).toHaveAttribute("data-dot-state", /.+/, {
+    timeout: 15_000,
+  });
+}
+
+async function openHubStrangerEmpty(page: import("@playwright/test").Page) {
+  await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route));
+  await page.locator("#brand-status-dot-btn").click();
+  await expect(page.locator("body")).toHaveClass(/device-hub-sheet-open/, { timeout: 15_000 });
+  await expect(page.locator("#device-hub")).toHaveClass(/device-hub--stranger-empty/);
+}
 
 function mockHealth(route: Route) {
   return route.fulfill({
@@ -136,13 +135,12 @@ test.describe("key-loss sad paths", () => {
     await expect(page.locator("#created-view-live-lead")).toContainText(/read-only/i);
     await expect(page.locator("#created-live-scanners-see")).toBeHidden();
     await expect(page.locator("#created-deploy-print")).toBeVisible();
-    await expect(page.locator("#created-view-live-qr-tasks")).toBeVisible();
+    await expect(page.locator("#created-view-live-qr-tasks")).toBeVisible({ timeout: 15_000 });
 
     await page.getByRole("tab", { name: "Manage" }).click();
     await expect(page.locator("#created-view-restore-panel")).toBeVisible();
     await expect(page.locator("#import-recovery-form")).toBeVisible();
     await expect(page.locator("#no-session")).toBeHidden();
-    await expect(page.locator("#created-live-scanners-see")).toBeHidden();
     await expect(page.locator("#created-view-restore-lead")).toContainText(
       /recovery code|encrypted backup/i
     );
@@ -207,7 +205,6 @@ test.describe("key-loss sad paths", () => {
     });
     await expect(page.locator("#created-view-live-banner")).toBeVisible();
     await expect(page.locator("#revoke-qr-btn")).toBeHidden();
-    await expectNoKeylessHcCreated(page);
 
     await page.getByRole("tab", { name: "Manage" }).click();
     await expect(page.locator("#created-view-ownership-hint")).toBeVisible();

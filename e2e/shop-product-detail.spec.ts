@@ -10,9 +10,9 @@ const GLITCH_PRODUCT_ID = "tier0_glitch_hoodie_v1";
 const GLITCH_PRODUCT = {
   product_id: GLITCH_PRODUCT_ID,
   title: "Glitch LIVE QR hoodie",
-  meaning_line: "Shared campaign QR on a fixed founding garment.",
+  meaning_line: "A live network on fabric — same scan on every unit, not your personal card.",
   story:
-    "Company merch — one live scan destination for every unit. Stewards update what strangers see on the campaign card; buying does not grant control or a vouch.",
+    "Founding company drop — fixed Glitch artwork with a shared campaign QR. Every unit points at one live destination stewards can update; strangers see honest limits when they scan. You are buying witness and wear, not control of the feed and not a vouch.",
   product_class: "limited_drop",
   personalization_indicator: "Company drop",
   requires_card: false,
@@ -87,6 +87,8 @@ test.describe("shop product detail", () => {
       timeout: 15_000,
     });
     await expect(page.locator("#product-status")).toContainText(/coming soon/i);
+    await expect(page.locator("#product-honesty-title")).toContainText("How the scan behaves");
+    await expect(page.locator("#product-honesty-list .list-title").first()).toContainText("Live");
   });
 
   test("shop hub View Glitch drop link reaches product detail", async ({ page }) => {

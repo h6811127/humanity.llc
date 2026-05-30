@@ -1,7 +1,14 @@
 /**
  * QR customizer — pure helpers (artifact intent checkout URLs, session detection).
- * See docs/MERCH_FUNNEL_MVP.md.
+ * See docs/MERCH_FUNNEL_MVP.md · sticker mockup uses qrFrameMetrics portrait card on 3×3″ sheet.
  */
+import { qrFrameMetrics } from "./qr-branding.mjs";
+
+/** Printify kiss-cut billing tier (inches). */
+export const STICKER_MOCK_SHEET_IN = 3;
+
+/** Portrait card trim width on sheet (inches). */
+export const STICKER_MOCK_CARD_WIDTH_IN = 2;
 
 /**
  * @param {unknown} session
@@ -181,6 +188,19 @@ export function buildShopifyCartUrl(checkoutUrl, quantity, lineAttributes = []) 
 export function buildPlannedItemScanUrl(profileId, plannedQrId, origin = "https://humanity.llc") {
   const base = origin.replace(/\/$/, "");
   return `${base}/c/${encodeURIComponent(profileId)}?q=${encodeURIComponent(plannedQrId)}`;
+}
+
+/**
+ * CSS tokens for sticker mockup — portrait card on 3×3″ kiss-cut sheet tier.
+ * @param {number} [qrModuleSize] same module size as `renderQrToImage` / QR_PREVIEW_RENDER_WIDTH
+ */
+export function customizeStickerMockLayout(qrModuleSize = 220) {
+  const frame = qrFrameMetrics(qrModuleSize);
+  return {
+    sheetAspect: 1,
+    cardAspect: frame.totalWidth / frame.totalHeight,
+    cardWidthPct: (STICKER_MOCK_CARD_WIDTH_IN / STICKER_MOCK_SHEET_IN) * 100,
+  };
 }
 
 /**

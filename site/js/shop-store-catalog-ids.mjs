@@ -2,6 +2,8 @@
 
 export const TIER0_FOUNDING_STORE_PRODUCT_ID = "tier0_founding_sticker_v1";
 export const TIER0_GLITCH_HOODIE_STORE_PRODUCT_ID = "tier0_glitch_hoodie_v1";
+export const HOODIE_LIVE_OBJECT_STORE_PRODUCT_ID = "hoodie_live_object_v1";
+export const STICKER_PERSONALIZED_STORE_PRODUCT_ID = "sticker_personalized_v1";
 
 const TIER0_IDS = new Set([
   TIER0_FOUNDING_STORE_PRODUCT_ID,

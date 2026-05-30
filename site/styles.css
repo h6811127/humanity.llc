@@ -1205,10 +1205,12 @@ body.page-flow.has-shell-chrome .page > main.screen {
 .device-system-banner[hidden],
 .device-cross-tab-banner[hidden],
 .device-pwa-install-card[hidden],
+.device-safari-persist-denied-notice-card[hidden],
 .device-safari-itp-notice-card[hidden],
 .device-system-banner:empty,
 .device-cross-tab-banner:empty,
 .device-pwa-install-card:empty,
+.device-safari-persist-denied-notice-card:empty,
 .device-safari-itp-notice-card:empty {
   display: none !important;
   margin: 0;
@@ -5135,11 +5137,31 @@ body.landing-focus-mode .screen-landing {
   aspect-ratio: 4 / 5;
 }
 
-.shop-customize-mock[data-preview="sticker"] .shop-customize-mock__garment {
+.shop-customize-mock[data-preview="sticker"] {
   aspect-ratio: 1;
-  max-width: 220px;
-  margin: 0 auto;
-  border-radius: 16px;
+  max-width: 240px;
+  padding: 10%;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #fafafa 0%, #f0f0f0 100%);
+  border: 0.5px dashed rgba(0, 0, 0, 0.14);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.85),
+    0 10px 28px rgba(0, 0, 0, 0.06);
+}
+
+.shop-customize-mock[data-preview="sticker"] .shop-customize-mock__garment {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--hc-sticker-card-width, 66.67%);
+  aspect-ratio: var(--hc-sticker-card-aspect, 0.715);
+  height: auto;
+  max-width: none;
+  margin: 0;
+  transform: translate(-50%, -50%);
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
 .shop-customize-mock[data-preview="sticker"] .shop-customize-mock__hoodie-neck {
@@ -5161,7 +5183,18 @@ body.landing-focus-mode .screen-landing {
 }
 
 .shop-customize-mock[data-preview="sticker"] .shop-customize-mock__qr-slot {
-  inset: 10%;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--hc-sticker-card-width, 66.67%);
+  aspect-ratio: var(--hc-sticker-card-aspect, 0.715);
+  height: auto;
+  transform: translate(-50%, -50%);
+}
+
+.shop-customize-mock[data-preview="sticker"] .shop-customize-qr-preview {
+  border-radius: 10px;
+  box-shadow: none;
 }
 
 .shop-customize-qr-preview {

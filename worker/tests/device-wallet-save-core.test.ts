@@ -7,9 +7,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   WALLET_SAVE_FAILED,
   WALLET_SAVE_STORAGE_FULL,
+  WALLET_SAVE_VERIFY_FAILED,
+  verifyWalletStorageWrite,
   walletSaveErrorMessage,
   walletSaveOk,
 } from "../../site/js/device-wallet-save-core.mjs";
+import { STORAGE_PROBE_KEY } from "../../site/js/private-browsing-detect-core.mjs";
 import {
   loadWallet,
   resetWalletCachesForTests,
@@ -65,6 +68,21 @@ describe("device-wallet-save-core", () => {
     expect(walletSaveOk({ ok: true })).toBe(true);
     expect(walletSaveOk({ error: WALLET_SAVE_FAILED })).toBe(false);
   });
+
+  it("verifyWalletStorageWrite requires exact read-back (RC-1)", () => {
+    const store = new Map([["hc_wallet", '[{"profile_id":"p1"}]']]);
+    const storage = {
+      getItem: (key: string) => store.get(key) ?? null,
+    };
+    expect(
+      verifyWalletStorageWrite(storage, "hc_wallet", '[{"profile_id":"p1"}]')
+    ).toBe(true);
+    expect(
+      verifyWalletStorageWrite(storage, "hc_wallet", '[{"profile_id":"p2"}]')
+    ).toBe(false);
+    expect(verifyWalletStorageWrite(storage, "hc_wallet", "")).toBe(false);
+    expect(verifyWalletStorageWrite(null, "hc_wallet", "x")).toBe(false);
+  });
 });
 
 describe("saveWallet P0-3", () => {
@@ -74,7 +92,11 @@ describe("saveWallet P0-3", () => {
       qr_id: "qr_xBZTq7M27tueCzBY",
       owner_private_key_b58: "priv",
     };
-    vi.mocked(localStorage.setItem).mockImplementationOnce(() => {
+    vi.mocked(localStorage.setItem).mockImplementation((key, value) => {
+      if (key === STORAGE_PROBE_KEY) {
+        localStore.set(String(key), String(value));
+        return;
+      }
       throw new DOMException("quota", "QuotaExceededError");
     });
 
@@ -85,7 +107,11 @@ describe("saveWallet P0-3", () => {
   });
 
   it("saveSessionToWallet propagates saveWallet errors", () => {
-    vi.mocked(localStorage.setItem).mockImplementation(() => {
+    vi.mocked(localStorage.setItem).mockImplementation((key, value) => {
+      if (key === STORAGE_PROBE_KEY) {
+        localStore.set(String(key), String(value));
+        return;
+      }
       throw new DOMException("quota", "QuotaExceededError");
     });
 
@@ -96,5 +122,60 @@ describe("saveWallet P0-3", () => {
       handle: "demo",
     });
     expect(result).toEqual({ error: WALLET_SAVE_STORAGE_FULL });
+  });
+
+  it("returns verify error when setItem succeeds but read-back is empty (RC-1)", () => {
+    const entry = {
+      profile_id: "p1",
+      qr_id: "qr_xBZTq7M27tueCzBY",
+      owner_private_key_b58: "priv",
+    };
+    vi.mocked(localStorage.setItem).mockImplementation((key, value) => {
+      if (key === STORAGE_PROBE_KEY) {
+        localStore.set(String(key), String(value));
+      }
+    });
+    vi.mocked(localStorage.getItem).mockImplementation((key) => {
+      if (key === "hc_wallet") return null;
+      return localStore.get(String(key)) ?? null;
+    });
+
+    const result = saveWallet([entry]);
+    expect(result).toEqual({ error: WALLET_SAVE_VERIFY_FAILED });
+    expect(loadWallet()).toEqual([]);
+  });
+
+  it("returns verify error when read-back bytes differ (RC-1)", () => {
+    const entry = {
+      profile_id: "p1",
+      qr_id: "qr_xBZTq7M27tueCzBY",
+      owner_private_key_b58: "priv",
+    };
+    vi.mocked(localStorage.setItem).mockImplementation((key, value) => {
+      localStore.set(String(key), String(value));
+    });
+    vi.mocked(localStorage.getItem).mockImplementation((key) => {
+      if (key === "hc_wallet") return "[]";
+      return localStore.get(String(key)) ?? null;
+    });
+
+    const result = saveWallet([entry]);
+    expect(result).toEqual({ error: WALLET_SAVE_VERIFY_FAILED });
+    expect(loadWallet()).toEqual([]);
+  });
+
+  it("returns ephemeral error when localStorage probe fails (RC-6)", () => {
+    vi.mocked(localStorage.setItem).mockImplementation(() => {
+      throw new DOMException("SecurityError");
+    });
+
+    const result = saveWallet([
+      {
+        profile_id: "p1",
+        qr_id: "qr_xBZTq7M27tueCzBY",
+        owner_private_key_b58: "priv",
+      },
+    ]);
+    expect(result.error).toMatch(/private browsing/i);
   });
 });

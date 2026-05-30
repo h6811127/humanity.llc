@@ -242,6 +242,41 @@ export const SAFARI_ITP_NOTICE_DETAIL_BROWSER =
 export const SAFARI_ITP_NOTICE_DETAIL_STANDALONE =
   "If you do not open this app for about seven days of normal browser use, iOS may delete saved cards and keys on this device. Open humanity.llc from the home screen regularly — each visit resets that timer. Keep an encrypted backup if you rely on this phone.";
 
+/** iOS Safari persist() denied — saved ownership may be evicted (RC-2). */
+export const STORAGE_PERSIST_DENIED_EYEBROW = "iPhone storage";
+
+export const STORAGE_PERSIST_DENIED_TITLE = "Saved ownership may not stay on this iPhone";
+
+export const STORAGE_PERSIST_DENIED_DETAIL_BROWSER =
+  "Safari would not keep this site's storage durable. iOS may delete saved cards after you background the browser or when storage is low. Add humanity.llc to your Home Screen, open the app after each save, and export an encrypted backup before relying on this phone.";
+
+export const STORAGE_PERSIST_DENIED_DETAIL_STANDALONE =
+  "This app could not mark its storage as durable. iOS may delete saved cards when storage is low or after long background time. Open humanity.llc from your Home Screen after each save and keep an encrypted backup if you rely on this phone.";
+
+/** Setup wizard — wallet save gate (RC-4 · K7). */
+export const SETUP_WALLET_SAVE_REQUIRED =
+  "Save your control key on this device before continuing.";
+
+export const SETUP_WALLET_SAVED_CONFIRMATION = "Saved on this device.";
+
+export const SETUP_WALLET_SAVED_DONE_DETAIL =
+  "Your control key is saved on this device. Open card controls when you are ready.";
+
+/** Private / ephemeral browsing — create and save blocked (RC-6). */
+export const EPHEMERAL_BROWSING_EYEBROW = "Private browsing";
+
+export const EPHEMERAL_BROWSING_TITLE =
+  "This browser will not keep saved ownership";
+
+export const EPHEMERAL_BROWSING_DETAIL =
+  "Private or temporary browsing modes delete site storage when you close the tab. Open humanity.llc in a normal browser window to create cards and save control on this device.";
+
+export const EPHEMERAL_BROWSING_CREATE_BLOCKED =
+  "Cannot create in private browsing — ownership cannot be saved on this device. Open humanity.llc in a normal browser window and try again.";
+
+export const EPHEMERAL_BROWSING_SAVE_BLOCKED =
+  "Cannot save ownership in private browsing — it will not stay on this device. Open humanity.llc in a normal browser window and save again.";
+
 /** Hub / wallet empty state — Layer 2 (D9). @see docs/HUB_STRANGER_ONBOARDING.md */
 export const HUB_PINS_BOOKMARKS_ONLY = "Bookmarks only — cannot manage objects";
 

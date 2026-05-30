@@ -25,6 +25,7 @@ import {
 import { isTier0StoreProductId } from "./shop-store-catalog-ids.mjs";
 import { tier0MerchRefForProductId } from "./shop-tier0-core.mjs";
 import { bindTier0ProductCheckout } from "./shop-tier0-product-checkout.mjs";
+import { productHonestyBlockForId } from "./shop-merch-copy-core.mjs";
 
 const rowLabelEl = document.getElementById("product-row-label");
 const kickerEl = document.getElementById("product-kicker");
@@ -40,6 +41,17 @@ const errorEl = document.getElementById("product-error");
 const mainEl = document.getElementById("product-main");
 const proofConsentEl = document.getElementById("product-proof-consent");
 const checkoutNoteEl = document.getElementById("product-checkout-note");
+const honestySectionEl = document.getElementById("product-honesty");
+const honestyTitleEl = document.getElementById("product-honesty-title");
+const honestyListEl = document.getElementById("product-honesty-list");
+
+function escapeHtml(text) {
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
 
 function decorateShopCreateLinks() {
   const ref = peekMerchCreateRef();
@@ -58,6 +70,33 @@ function renderProduct(product) {
   if (titleEl) titleEl.textContent = String(product.title ?? "Product");
   if (meaningEl) meaningEl.textContent = String(product.meaning_line ?? "");
   if (storyEl) storyEl.textContent = String(product.story ?? "");
+
+  const honesty = productHonestyBlockForId(String(product.product_id ?? ""));
+  if (honestySectionEl && honestyListEl) {
+    if (honesty) {
+      if (honestyTitleEl) honestyTitleEl.textContent = honesty.title;
+      honestyListEl.replaceChildren(
+        ...honesty.lines.map((line) => {
+          const li = document.createElement("li");
+          li.className = "list-row";
+          const dash = line.indexOf(" — ");
+          const title = dash >= 0 ? line.slice(0, dash) : line;
+          const sub = dash >= 0 ? line.slice(dash + 3) : "";
+          li.innerHTML = `<span class="list-content"><span class="list-title">${escapeHtml(
+            title
+          )}</span>${
+            sub ? `<span class="list-sub">${escapeHtml(sub)}</span>` : ""
+          }</span>`;
+          return li;
+        })
+      );
+      honestySectionEl.hidden = false;
+    } else {
+      honestySectionEl.hidden = true;
+      honestyListEl.replaceChildren();
+    }
+  }
+
 
   if (priceEl) {
     priceEl.textContent = productDetailPriceLabel(product);
