@@ -41,7 +41,7 @@ URL must be canonical HTTPS: `https://humanity.llc/c/{profile_id}?q={qr_id}` (no
 
 Run once before printing and camera testing on **≥3 phones**. Mirrors comprehension pre-flight in [`M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md`](M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md).
 
-1. **Desk regression** — `npm run live-control:printed-qa:preflight` (Vitest desk gate + Playwright full loop).
+1. **Desk regression** — `npm run live-control:printed-qa:desk-gate` (steps 1–4 chain) or `npm run live-control:printed-qa:preflight` alone (Vitest + Playwright full loop).
 2. **Production smoke** (recommended before print) — `npm run live-control:printed-qa:production-smoke` (scan HTML H-01/H-03 markers + challenge JSON POST H-02 on showcase card). Or: `npm run live-control:printed-qa:preflight -- --production-smoke` (includes step 1 desk gates).
 3. **Two-device loop** — `npm run live-control:printed-qa:two-device-loop` (Playwright proxy + copy-paste scan/created URLs for real keys). Confirm: Ask → owner link → **Prove control now** → scanner **Control proven**.
 4. **Print artifact** — `npm run live-control:printed-qa:print-prep` (validates canonical HTTPS scan URL + print/phone checklists). Download QR PNG from `/created/`; verify printed URL is `https://humanity.llc/c/{profile_id}?q={qr_id}` (≥2 cm module; see [`QR_BRANDING.md`](QR_BRANDING.md)). Add `--verify-live` to confirm scan page loads before printing.
@@ -118,7 +118,7 @@ Scanner phone = camera scan from **§ A**. Owner phone = keys on `/created/`.
 | Phones | `[e.g. iPhone 15 Safari, Pixel 8 Chrome, …]` |
 | Result | `[ ] Pass · [ ] Fail — block public live-control demo on print` |
 
-When passed, update `docs/M7_LIVE_CONTROL_ALPHA.md` Step 2 printed-QR line to **passed** with date.
+When passed, run `npm run live-control:printed-qa:sign-off -- --pass --apply --date YYYY-MM-DD` (updates `docs/M7_LIVE_CONTROL_ALPHA.md`).
 
 ---
 

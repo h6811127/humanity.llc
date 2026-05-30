@@ -33,7 +33,7 @@ Update this table when new PRs open.
 | Priority | Item | Owner type | Command / proof |
 |----------|------|------------|-----------------|
 | P0b-1 step 2 sign-off | Card disabled since visit — **prod WebKit** re-verify on humanity.llc after deploy | Human QA | Desk proxy: `npm run e2e:card-disabled-since-visit:webkit` · [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) |
-| H-12 step 4+ | `camera-scorecard` operator script + comprehension gate | Engineering | `live-control:printed-qa:camera-scorecard` (WIP on disk — coordinate before push) |
+| H-12 human § A–C | Printed QR camera QA on ≥3 phones | Human QA | After `live-control:printed-qa:desk-gate` → `live-control:printed-qa:camera-scorecard` → `live-control:printed-qa:sign-off -- --pass --apply` |
 | P3-1 / P3-2 | WebAuthn / optional encrypted persistence | Architecture | Not scheduled |
 
 ---

@@ -302,7 +302,7 @@ This document is the **implementation backlog** for hardening live control **usa
 
 **Action:** Execute [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md) on ≥3 phones.
 
-**Engineering desk gate (before phones):** `live-control:printed-qa:preflight` (step 1) · `live-control:printed-qa:production-smoke` (step 2) · `live-control:printed-qa:two-device-loop` (step 3) · `live-control:printed-qa:print-prep` (step 4–5) · `live-control:printed-qa:camera-scorecard` (§ A–C operator aid)
+**Engineering desk gate (before phones):** `live-control:printed-qa:desk-gate` (steps 1–4 chain) · or stepwise: `preflight` · `production-smoke` · `two-device-loop` · `print-prep` · `live-control:printed-qa:camera-scorecard` (§ A–C) · `live-control:printed-qa:sign-off -- --pass --apply`
 
 **Exit artifact:** Completed § A–C scorecards; failures mapped to H-04–H-10.
 
