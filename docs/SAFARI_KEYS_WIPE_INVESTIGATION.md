@@ -410,8 +410,8 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 | **P0-3** | **try/catch on `saveWallet` / `saveSessionToWallet`** — visible error, `hc_auto_save_failed` | R3 quota | Not repro’d live |
 | **P0-4** | **First-session backup gate** before “done” | R4 true wipe | N/A |
 | **P0-5** | **Scan dot / “Keys on this device” = tab signing state**, not wallet count; **Restore control here** CTA | R9 — **prod** | Flow B — **Shipped** (`scan-page-dot.mjs?v=8`, actor band lead sync) |
-| **P0-6** | **Never persist `hc_created` without `owner_private_key_b58`**; strip keyless session on view-only | R11 — **prod** | Flow C |
-| **P0-7** | **View-only copy** branches on wallet: empty → backup/import; saved → restore in this tab | R13 — **prod** | Flow C |
+| **P0-6** | **Never persist `hc_created` without `owner_private_key_b58`**; strip keyless session on view-only | R11 — **prod** | Flow C — **Shipped** |
+| **P0-7** | **View-only copy** branches on wallet: empty → backup/import; saved → restore in this tab | R13 — **prod** | Flow C — **Shipped** |
 
 ### P0b — Same release train (trust killers)
 
@@ -482,8 +482,8 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 |------|------|--------|-------|
 | 1 | **P0-1** Scan quiet rehydrate + script order | **Shipped** | `scan-tab-keys.mjs` top-level `await maybeQuietTabRehydrate()`; `scan-html.ts` loads scan-tab-keys **before** live-control and vouch-issue |
 | 2 | P0-5 Scan dot honesty | **Shipped** | `scanDeviceStateFromContext` (tab keys only); glance + aria `walletKeysNotInTab`; actor band lead; `scan-page-dot.mjs?v=8` |
-| 3 | P0-6 Keyless session fix | Pending | R11 — `created.mjs` hydrate paths |
-| 4 | P0-7 View-only copy branches | Pending | R13 |
+| 3 | P0-6 Keyless session fix | **Shipped** | R11 — `created-session-core.mjs` + `saveSession` / hydrate guards |
+| 4 | P0-7 View-only copy branches | **Shipped** | R13 — `viewOnly*` copy in `device-ownership-copy-core.mjs` |
 | 5 | P0-2 Sync save on create | Pending | R3 |
 | 6 | P0-3 saveWallet try/catch | Pending | R3 |
 | 7 | P0-4 Backup gate | Pending | R4 |
@@ -559,7 +559,7 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 | `hc_inbox_diag_log` | `sessionStorage` | Debug log buffer | Session |
 | `hc_resolver_sync_tabs` | `localStorage` | Tab sync opt-out | User |
 
-**Critical invariant (target, not yet enforced — P0-6):** `hc_created` should only exist when `owner_private_key_b58` is present. Violated today by `created.mjs` network hydrate (R11).
+**Critical invariant (P0-6 shipped):** `hc_created` should only exist when `owner_private_key_b58` or `recovery_private_key_b58` is present. Enforced in `created.mjs` → `saveSession` / `loadSession` via `created-session-core.mjs`.
 
 ---
 
@@ -570,7 +570,7 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 | Create flow | `create-card.mjs` | **Yes** | After Ed25519 keygen, before navigate to `/created/` |
 | Activate wallet row | `device-keys.mjs` → `activateWalletEntry` | **Yes** | Open controls, quiet rehydrate success, `/created/` deep link |
 | Gated activate | `device-control-activation.mjs` | **Yes** | PIN/unlock wrapper around activate |
-| Session save helper | `created.mjs` → `saveSession` | **Sometimes no** | Revoke/update flows yes; **hydrateSessionFromNetwork / gate merge — metadata only (R11)** |
+| Session save helper | `created.mjs` → `saveSession` | **Yes when persisted** | Revoke/update flows; hydrate/gate merge only when tab has signing key (P0-6) |
 | Clear | `device-keys.mjs` → `clearTabSessionKeys` | N/A | Stop managing in tab; removes item |
 | Vouch stop | `vouch-issue.mjs` | N/A | Calls `clearTabSessionKeys` |
 
@@ -612,8 +612,8 @@ These surfaces can simultaneously show “saved / OK” and block signing — us
 | Scan vouch block | “Open controls in My objects” | Correct | — |
 | Hub on `/` | “Card disabled since visit” on **new** active card | False positive | P0b-1 |
 | `/created/` view-only banner | Visible correctly | — | — |
-| `/created/` `#no-session-detail` | “Finish create in other tab…” | Wrong when wallet empty (Flow C) | P0-7 |
-| `sessionStorage.hc_created` after Flow C | Populated JSON | **No private key** | P0-6 |
+| `/created/` `#no-session-detail` | Wallet-aware restore guidance | Branches on signing wallet count (P0-7) | — |
+| `sessionStorage.hc_created` after Flow C | Absent or has private key | Keyless metadata stripped on read/write (P0-6) | — |
 | Status dot first paint | Brief “not saved” → “saved” | Chrome race | Low priority |
 
 ---
@@ -647,7 +647,7 @@ These surfaces can simultaneously show “saved / OK” and block signing — us
 | S3 PWA → Safari scan | — | **WebKit E2E missing** |
 | S6 ITP 7-day | — | Manual / platform |
 | Scan dot honesty (R9) | Partial `scan-page-dot-contract` | Behavior E2E after P0-5 |
-| R11 keyless session | — | Unit test after P0-6 |
+| R11 keyless session | `worker/tests/created-session-core.test.ts` | E2E K1/K5 in `e2e/key-loss-sad-path.spec.ts` |
 
 ---
 
@@ -675,3 +675,5 @@ Sources: WebKit ITP blog; [`PWA_INSTALL.md`](PWA_INSTALL.md); [`SAFARI_PERFORMAN
 | 2026-05-29 | **Appendix:** storage inventory, write paths, scan script order, gate table, UI catalog, test matrix, rollout tracker |
 | 2026-05-29 | **P0-1 shipped:** scan-tab-keys awaits `maybeQuietTabRehydrate()`; scan-html script order fixed |
 | 2026-05-29 | **P0-5 shipped:** scan dot uses tab signing state; wallet-only keys → hollow `none` + Restore control here |
+| 2026-05-29 | **P0-6 shipped:** never persist keyless `hc_created`; strip on read via `created-session-core.mjs` |
+| 2026-05-29 | **P0-7 shipped:** view-only copy branches on wallet signing count (`viewOnlyNoSessionDetail`, restore lead) |

@@ -49,7 +49,8 @@ Central strings: `site/js/device-ownership-copy-core.mjs`
 |----------|-----|
 | `OWNERSHIP_NOT_LOADED_TAB` | Revoke / save / wallet errors |
 | `VIEW_ONLY_CARD_TITLE` | `/created/` view mode hero |
-| `VIEW_ONLY_NO_SESSION_DETAIL` | `#no-session-detail` guidance |
+| `VIEW_ONLY_NO_SESSION_DETAIL` / `viewOnlyNoSessionDetail()` | `#no-session-detail` guidance (wallet-aware) |
+| `viewOnlyRestoreLead()` | `#created-view-restore-lead` in view mode |
 | `BACKUP_WRONG_PASSPHRASE` | `.hcbackup` decrypt failure |
 | `BACKUP_INVALID_OWNERSHIP` | Invalid backup payload |
 | `IMPORT_OWNERSHIP_LOADED_TAB` | Successful hub import |

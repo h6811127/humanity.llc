@@ -51,6 +51,11 @@ import {
 } from "./created-workspace.mjs";
 import { createdViewRestoreHashKey } from "./created-view-mode-core.mjs";
 import {
+  CREATED_SESSION_STORAGE_KEY,
+  sessionHasTabSigningKey,
+  shouldPersistCreatedSession,
+} from "./created-session-core.mjs";
+import {
   applyCreatedViewModeUi,
   clearCreatedViewModeUi,
   focusCreatedViewRestore,
@@ -58,7 +63,8 @@ import {
 import { logDeviceActivity } from "./device-activity.mjs";
 import { verificationRecordFromStatusBody } from "./device-wallet-network-core.mjs";
 import { activateWalletEntryGated } from "./device-control-activation.mjs";
-import { isWalletSaved, loadWallet, saveSessionToWallet } from "./device-wallet.mjs";
+import { viewOnlyNoSessionDetail } from "./device-ownership-copy-core.mjs";
+import { isWalletSaved, loadWallet, loadWalletSummary, saveSessionToWallet } from "./device-wallet.mjs";
 import { applyHumanTrustIconToElement } from "./human-trust-ui.mjs";
 import {
   applyCreatedRoutePendingShell,
@@ -102,15 +108,29 @@ function setNoSessionNotice(html) {
 
 function loadSession() {
   try {
-    const raw = sessionStorage.getItem("hc_created");
-    return raw ? JSON.parse(raw) : null;
+    const raw = sessionStorage.getItem(CREATED_SESSION_STORAGE_KEY);
+    const parsed = raw ? JSON.parse(raw) : null;
+    if (parsed && !sessionHasTabSigningKey(parsed)) {
+      sessionStorage.removeItem(CREATED_SESSION_STORAGE_KEY);
+      return null;
+    }
+    return parsed;
   } catch {
     return null;
   }
 }
 
 function saveSession(next) {
-  sessionStorage.setItem("hc_created", JSON.stringify(next));
+  if (!shouldPersistCreatedSession(next)) {
+    try {
+      sessionStorage.removeItem(CREATED_SESSION_STORAGE_KEY);
+    } catch {
+      /* private mode */
+    }
+    return false;
+  }
+  sessionStorage.setItem(CREATED_SESSION_STORAGE_KEY, JSON.stringify(next));
+  return true;
 }
 
 function initVouchReturnBanner() {
@@ -714,8 +734,10 @@ async function hydrateSessionFromNetwork() {
       existing.pilot_template || inferPilotTemplate(card.manifesto_line),
     ...(streams.length ? { object_streams: streams } : {}),
   };
-  saveSession(next);
   data = next;
+  if (sessionHasTabSigningKey(next)) {
+    saveSession(next);
+  }
   if (handleEl) handleEl.textContent = `@${card.handle}`;
   if (manifestoEl) manifestoEl.textContent = card.manifesto_line;
 }
@@ -765,8 +787,10 @@ if (gate.card?.handle && gate.card?.manifesto_line) {
       pilot_template:
         existing.pilot_template || inferPilotTemplate(String(gate.card.manifesto_line)),
     };
-    saveSession(next);
     data = next;
+    if (sessionHasTabSigningKey(next)) {
+      saveSession(next);
+    }
   }
 }
 
@@ -960,9 +984,11 @@ initVouchReturnBanner();
 workspaceMode = getWorkspaceMode();
 applyCreatedWorkspaceMode(workspaceMode);
 
+const viewModeSigningWalletKeyCount = loadWalletSummary().signingKeyCount;
+
 if (workspaceMode === "view" && profileId && activeQrId) {
   if (noSessionEl) noSessionEl.hidden = true;
-  applyCreatedViewModeUi();
+  applyCreatedViewModeUi({ signingWalletKeyCount: viewModeSigningWalletKeyCount });
   createdTabs = initCreatedTabs();
   const restoreHash = createdViewRestoreHashKey(location.hash);
   if (restoreHash) {
@@ -973,6 +999,9 @@ if (workspaceMode === "view" && profileId && activeQrId) {
   }
 } else if (workspaceMode === "view" && noSessionEl) {
   noSessionEl.hidden = false;
+  setNoSessionNotice(
+    viewOnlyNoSessionDetail({ signingWalletKeyCount: viewModeSigningWalletKeyCount })
+  );
 }
 
 if (profileId && activeQrId) {

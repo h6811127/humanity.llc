@@ -28,14 +28,55 @@ export const BACKUP_WRONG_PASSPHRASE =
 /** `/created/` view mode when signing keys are not in this tab (K1 · K5). */
 export const VIEW_ONLY_CARD_TITLE = "View this card";
 
-export const VIEW_ONLY_NO_SESSION_DETAIL =
-  "Open the Manage tab and use Restore ownership below — recovery code or encrypted backup file. Save ownership on this device only works in the browser where you created the card.";
+/** Wallet empty — Flow C / K1 (P0-7). */
+export const VIEW_ONLY_NO_SESSION_DETAIL_WALLET_EMPTY =
+  "This device has no saved ownership for your object. Open the Manage tab and use Restore ownership — paste a recovery code or import an encrypted backup file. humanity.llc cannot restore keys for you.";
+
+/** Wallet has signing keys but not in this tab — Flow B (P0-7). */
+export const VIEW_ONLY_NO_SESSION_DETAIL_WALLET_SAVED =
+  "Ownership is saved on this device but not in this tab. Open Manage and restore ownership below, or open My objects and tap Open controls.";
+
+/** @deprecated Use {@link viewOnlyNoSessionDetail} — kept for copy-guard imports. */
+export const VIEW_ONLY_NO_SESSION_DETAIL = VIEW_ONLY_NO_SESSION_DETAIL_WALLET_EMPTY;
 
 export const VIEW_ONLY_MANAGE_TAB_LEAD =
   "Read-only network snapshot and restore paths. Signing controls appear after you restore ownership in this tab.";
 
+export const VIEW_ONLY_MANAGE_TAB_LEAD_WALLET_SAVED =
+  "Read-only network snapshot. Signing controls return after you open controls from My objects or restore ownership below.";
+
+/** Wallet empty — primary restore path (P0-7). */
 export const VIEW_ONLY_RESTORE_LEAD =
   "Paste the recovery code you saved at create, or import an encrypted backup file. humanity.llc cannot restore your object for you.";
+
+export const VIEW_ONLY_RESTORE_LEAD_WALLET_SAVED =
+  "Ownership is already saved on this device. Open My objects and tap Open controls, or paste a recovery code below to restore in this tab.";
+
+/**
+ * @param {{ signingWalletKeyCount?: number }} [options]
+ */
+export function viewOnlyNoSessionDetail(options = {}) {
+  const count = options.signingWalletKeyCount ?? 0;
+  return count > 0
+    ? VIEW_ONLY_NO_SESSION_DETAIL_WALLET_SAVED
+    : VIEW_ONLY_NO_SESSION_DETAIL_WALLET_EMPTY;
+}
+
+/**
+ * @param {{ signingWalletKeyCount?: number }} [options]
+ */
+export function viewOnlyRestoreLead(options = {}) {
+  const count = options.signingWalletKeyCount ?? 0;
+  return count > 0 ? VIEW_ONLY_RESTORE_LEAD_WALLET_SAVED : VIEW_ONLY_RESTORE_LEAD;
+}
+
+/**
+ * @param {{ signingWalletKeyCount?: number }} [options]
+ */
+export function viewOnlyManageTabLead(options = {}) {
+  const count = options.signingWalletKeyCount ?? 0;
+  return count > 0 ? VIEW_ONLY_MANAGE_TAB_LEAD_WALLET_SAVED : VIEW_ONLY_MANAGE_TAB_LEAD;
+}
 
 export const DEFAULT_FOR_ATTESTATION = "Default for attestation";
 

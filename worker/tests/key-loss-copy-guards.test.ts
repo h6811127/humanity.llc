@@ -14,7 +14,11 @@ import {
   BACKUP_WRONG_PASSPHRASE,
   OWNERSHIP_NOT_LOADED_TAB,
   VIEW_ONLY_CARD_TITLE,
-  VIEW_ONLY_NO_SESSION_DETAIL,
+  VIEW_ONLY_NO_SESSION_DETAIL_WALLET_EMPTY,
+  VIEW_ONLY_RESTORE_LEAD,
+  VIEW_ONLY_RESTORE_LEAD_WALLET_SAVED,
+  viewOnlyNoSessionDetail,
+  viewOnlyRestoreLead,
 } from "../../site/js/device-ownership-copy-core.mjs";
 import { createdHeroTitleForMode } from "../../site/js/created-workspace.mjs";
 
@@ -26,8 +30,16 @@ describe("key-loss copy guards", () => {
     const html = readFileSync(join(root, "site/created/index.html"), "utf8");
     expect(html).toContain("Ownership not loaded in this tab");
     expect(html).toContain("created-view-restore-panel");
-    expect(VIEW_ONLY_NO_SESSION_DETAIL).toMatch(/Restore ownership/i);
-    expect(VIEW_ONLY_NO_SESSION_DETAIL).toMatch(/recovery code|encrypted backup/i);
+    expect(VIEW_ONLY_NO_SESSION_DETAIL_WALLET_EMPTY).toMatch(/Restore ownership/i);
+    expect(VIEW_ONLY_NO_SESSION_DETAIL_WALLET_EMPTY).toMatch(/recovery code|encrypted backup/i);
+    expect(viewOnlyNoSessionDetail({ signingWalletKeyCount: 0 })).toBe(
+      VIEW_ONLY_NO_SESSION_DETAIL_WALLET_EMPTY
+    );
+    expect(viewOnlyNoSessionDetail({ signingWalletKeyCount: 1 })).toMatch(/Open controls/i);
+    expect(viewOnlyRestoreLead({ signingWalletKeyCount: 0 })).toBe(VIEW_ONLY_RESTORE_LEAD);
+    expect(viewOnlyRestoreLead({ signingWalletKeyCount: 1 })).toBe(
+      VIEW_ONLY_RESTORE_LEAD_WALLET_SAVED
+    );
   });
 
   it("K2: wrong passphrase copy is plain language", () => {

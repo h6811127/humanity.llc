@@ -5,14 +5,16 @@
 
 import {
   OWNERSHIP_NOT_LOADED_TAB,
-  VIEW_ONLY_MANAGE_TAB_LEAD,
-  VIEW_ONLY_RESTORE_LEAD,
+  viewOnlyManageTabLead,
+  viewOnlyRestoreLead,
 } from "./device-ownership-copy-core.mjs";
 
 /**
  * Show restore panel and hide signing-only controls.
+ * @param {{ signingWalletKeyCount?: number }} [options]
  */
-export function applyCreatedViewModeUi() {
+export function applyCreatedViewModeUi(options = {}) {
+  const signingWalletKeyCount = options.signingWalletKeyCount ?? 0;
   if (typeof document === "undefined") return;
   document.body.dataset.createdMode = "view";
 
@@ -24,11 +26,13 @@ export function applyCreatedViewModeUi() {
   if (controlLead) controlLead.hidden = true;
   if (viewLead) {
     viewLead.hidden = false;
-    viewLead.textContent = VIEW_ONLY_MANAGE_TAB_LEAD;
+    viewLead.textContent = viewOnlyManageTabLead({ signingWalletKeyCount });
   }
 
   const restoreLead = document.getElementById("created-view-restore-lead");
-  if (restoreLead) restoreLead.textContent = VIEW_ONLY_RESTORE_LEAD;
+  if (restoreLead) {
+    restoreLead.textContent = viewOnlyRestoreLead({ signingWalletKeyCount });
+  }
 
   const ownershipHint = document.getElementById("created-view-ownership-hint");
   if (ownershipHint) ownershipHint.textContent = OWNERSHIP_NOT_LOADED_TAB;
