@@ -53,8 +53,8 @@ Full animation rules: [`VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPL
 
 | Phase | L1 corner dot | L2 live check hero |
 |-------|---------------|-------------------|
-| **First paint** | Static red mark · `aria-label` home | `scan-live-check--pending` · strip shows **Checking live status…** · body rows hidden |
-| **Checking** (~380ms min) | No loop pulse | Checking copy on strip |
+| **First paint** | Static red mark · `aria-label` home | `scan-live-check--pending` · strip shows resolver label from SSR · body rows hidden |
+| **Checking** (~380ms min, skipped when SSR strip matches `data-arrive-label`) | No loop pulse | Legacy/cached HTML may still show **Checking…** — client holds then settles |
 | **Settle** | One-shot `scan-page-dot--settle` | Strip → resolver label (e.g. **Active**) · `.scan-arrive-item` stagger · `scan-safety--pulse` on card · limits fade in |
 | **After** | Static | All motion stopped |
 
@@ -72,7 +72,7 @@ Strangers and non-active scans: no band markup.
 
 | Path | Role |
 |------|------|
-| `site/js/scan-live-check-arrive-core.mjs` | Timing constants (Vitest) |
+| `site/js/scan-live-check-arrive-core.mjs` | Timing constants + `shouldUseScanArriveSsrFastPath()` (Vitest) |
 | `site/js/scan-live-check-arrive.mjs` | Orchestration; dispatches `hc-scan-live-check-settled` |
 | `site/js/scan-page-dot.mjs` | Listens for settled → dot sync |
 | `worker/src/resolver/scan-html.ts` | `scan-live-check--pending` hero, `data-arrive-label`, arrive classes |

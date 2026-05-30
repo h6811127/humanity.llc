@@ -227,7 +227,7 @@ export function renderHeroStatusStrip(vm: ScanViewModel): string {
   const status = safetyStatusDisplay(vm);
   return `<div class="scan-safety-strip ${status.stripClass} scan-arrive-strip" role="status" data-arrive-label="${escapeHtml(status.label)}">
       <span class="scan-safety-strip-icon" aria-hidden="true"></span>
-      <span class="scan-safety-strip-label scan-arrive-status-label">Checking live status…</span>
+      <span class="scan-safety-strip-label scan-arrive-status-label">${escapeHtml(status.label)}</span>
     </div>`;
 }
 

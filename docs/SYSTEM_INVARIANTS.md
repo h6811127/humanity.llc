@@ -32,7 +32,7 @@ npm run worker:test -- worker/tests/device-status-shell-modules.test.ts worker/t
 npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts e2e/device-cross-tab-keys.spec.ts e2e/scan-page-dot.spec.ts
 ```
 
-Canonical UX spec: [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md). Load failure postmortem: [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md). Open boot follow-ups: [`SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md`](SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md) (RC-8–RC-14).
+Canonical UX spec: [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md). Load failure postmortem: [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md). Open boot follow-ups: [`SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md`](SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md) (RC-9–RC-14).
 
 ---
 
@@ -139,3 +139,16 @@ New floating UI must use `--surface-popover-*` per [`UI_COLOR_SCHEME_STANDARD.md
 - Large wallets (~10+ saved root cards): poll budget and shell perf limits in [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) still apply.
 
 Canonical: [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md)
+
+---
+
+## Scan page — live check arrive
+
+| Invariant | Detail |
+|-----------|--------|
+| SSR fast path | Worker SSR renders the settled strip label in `.scan-arrive-status-label` (matching `data-arrive-label`). Client skips `SCAN_ARRIVE_MIN_CHECKING_MS` when labels agree and `navigator.onLine`; row stagger + hero settle pulse unchanged. Offline or legacy cached HTML keeps checking motion. |
+| Reduced motion | `prefers-reduced-motion` → instant reveal (no stagger, no pulse). |
+
+**Regression:** `npm run worker:test:scan-live-check-arrive` · `npm run e2e:scan-hero-visual`
+
+Canonical: [`SCAN_PAGE_TRUST_UI.md`](SCAN_PAGE_TRUST_UI.md) · [`SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md`](SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md) (RC-8)

@@ -1094,7 +1094,7 @@ function renderScanTabKeysScript(vm: ScanViewModel, origin: string): string {
 
 function renderScanLiveCheckArriveScript(origin: string): string {
   const assetOrigin = pagesJsOrigin(origin);
-  const mod = JSON.stringify(`${assetOrigin}/js/scan-live-check-arrive.mjs?v=1`);
+  const mod = JSON.stringify(`${assetOrigin}/js/scan-live-check-arrive.mjs?v=2`);
   return `<script type="module" src=${mod}></script>`;
 }
 

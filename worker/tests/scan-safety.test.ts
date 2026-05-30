@@ -128,7 +128,8 @@ describe("scan-safety", () => {
     expect(html).toContain("scan-live-check--pending");
     expect(html).toContain("scan-live-check-arrive.mjs");
     expect(html).toContain("data-arrive-label");
-    expect(html).toContain("Checking live status…");
+    expect(html).toContain("Active");
+    expect(html).not.toContain("Checking live status…");
     expect(html).toContain('id="scan-actor-band"');
     expect(html).toContain("scan-actor-band.mjs");
     expect(html).toContain('data-scan-active="1"');

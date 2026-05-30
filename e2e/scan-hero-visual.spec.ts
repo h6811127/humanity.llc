@@ -48,9 +48,7 @@ test.describe("scan hero visual (tier 4)", () => {
     const hero = page.locator("#scan-safety-header");
     const label = page.locator(".scan-arrive-status-label");
 
-    await expect(label).toHaveText("Checking live status…");
-    await expect(hero).toHaveClass(/scan-live-check--pending/);
-
+    // RC-8: Worker SSR embeds data-arrive-label — client skips 380ms checking hold.
     await expect(label).toHaveText("Active", { timeout: 8_000 });
     await expect(hero).not.toHaveClass(/scan-live-check--pending/, { timeout: 8_000 });
     await expect(page.locator(".scan-hero-title")).toBeVisible();

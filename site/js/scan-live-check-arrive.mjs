@@ -7,6 +7,7 @@ import {
   SCAN_ARRIVE_MIN_CHECKING_MS,
   SCAN_ARRIVE_ROW_STAGGER_MS,
   SCAN_ARRIVE_SETTLE_MS,
+  shouldSkipScanArriveCheckingPhase,
 } from "./scan-live-check-arrive-core.mjs";
 
 const PENDING_CLASS = "scan-live-check--pending";
@@ -87,17 +88,24 @@ async function runArriveSequence(hero) {
   const label = resolvedLabel(hero);
   const statusEl = statusLabelEl(hero);
   const items = [...hero.querySelectorAll(".scan-arrive-item")];
+  const skipChecking = shouldSkipScanArriveCheckingPhase({
+    arriveLabel: label,
+    statusText: statusEl?.textContent,
+    online: navigator.onLine !== false,
+  });
 
   if (reduced) {
     settleInstant(hero);
     return;
   }
 
-  if (statusEl) statusEl.textContent = SCAN_ARRIVE_CHECKING_LABEL;
-
-  await new Promise((r) => setTimeout(r, SCAN_ARRIVE_MIN_CHECKING_MS));
-
-  if (statusEl && label) statusEl.textContent = label;
+  if (!skipChecking) {
+    if (statusEl) statusEl.textContent = SCAN_ARRIVE_CHECKING_LABEL;
+    await new Promise((r) => setTimeout(r, SCAN_ARRIVE_MIN_CHECKING_MS));
+    if (statusEl && label) statusEl.textContent = label;
+  } else if (statusEl && label && statusEl.textContent?.trim() !== label) {
+    statusEl.textContent = label;
+  }
 
   items.forEach((el, i) => {
     window.setTimeout(() => revealItem(el, false), i * SCAN_ARRIVE_ROW_STAGGER_MS);

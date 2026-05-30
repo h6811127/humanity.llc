@@ -1,6 +1,6 @@
 # Shell page load content flash — investigation
 
-**Status:** RC-1–RC-7 **shipped** (2026-05-30) · RC-8–RC-14 open for follow-up  
+**Status:** RC-1–RC-8 **shipped** (2026-05-30) · RC-9–RC-14 open for follow-up  
 **Date:** 2026-05-30  
 **Reported symptom:** Opening any shell or device page shows wrong or “random” data for a brief moment, then content disappears or is replaced with local device truth. Distracting and ugly.  
 **Related:** [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md) (stub → archive) · [`HUB_CARD_SAFARI_RELIABILITY.md`](HUB_CARD_SAFARI_RELIABILITY.md) · [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH_QA_2026-05-26.md) · [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) · [`CREATED_QR_BOOTSTRAP_FIX.md`](CREATED_QR_BOOTSTRAP_FIX.md)
@@ -213,9 +213,9 @@ Any step that paints before the next step completes can flash “wrong” data.
 
 **User-visible effect:** Status strip and pills **animate** from pending to settled even when SSR data was already correct — by design ([`SCAN_PAGE_TRUST_UI.md`](SCAN_PAGE_TRUST_UI.md)), but reads as “flash then change.”
 
-**Viewer device layer:** Scan page dot may upgrade from static brand dot to dynamic steward/keys dot after eligibility read (`SCAN_PAGE_DEVICE_DOT.md` progressive activation).
+**Fix (shipped):** Worker SSR renders the settled strip label in `.scan-arrive-status-label` (matching `data-arrive-label`). Client `shouldSkipScanArriveCheckingPhase()` skips `SCAN_ARRIVE_MIN_CHECKING_MS` when labels agree and the device is online; row stagger + settle pulse remain. Offline/cached HTML that still shows **Checking…** keeps the checking motion. Module cache bust `scan-live-check-arrive.mjs?v=2` in `scan-html.ts`.
 
-**Evidence:** `scan-html.ts` `scan-live-check--pending`; `scan-live-check-arrive.mjs`; `SCAN_PAGE_DEVICE_DOT.md` § First paint.
+**Evidence:** `scan-html.ts` `scan-live-check--pending`; `scan-live-check-arrive.mjs`; `SCAN_PAGE_DEVICE_DOT.md` § First paint. Tests: `npm run worker:test:scan-live-check-arrive`.
 
 ---
 
@@ -291,7 +291,7 @@ Any step that paints before the next step completes can flash “wrong” data.
 | `/created/` hero + tabs | RC-1, RC-2, RC-9, RC-13 | HTML + route shell | Workspace mode + session + status poll |
 | Hub saved cards | RC-4, RC-5, RC-7, RC-11 | Summary/cache + innerHTML | Network poll + chrome refresh |
 | Status dot | RC-3, RC-6, RC-14 | Core offline paint | Full status + health fetch |
-| Scan hero | RC-8 | SSR + pending class | `scan-live-check-arrive` settle |
+| Scan hero | RC-8 | SSR + pending class | `scan-live-check-arrive` settle (SSR fast path skips checking hold) |
 | Wallet page | RC-4, RC-7, RC-10 | Same hub patterns | Poll + wallet-page-chrome |
 | Landing `/` | RC-3, RC-5, RC-7 | Stranger hub HTML | Wallet count + status bootstrap |
 
@@ -303,7 +303,7 @@ Any step that paints before the next step completes can flash “wrong” data.
 2. **`localStorage.hc_wallet_summary` + `sessionStorage.hc_wallet_network_cache`** seeded with stale revoked/steward mix → reload `/wallet/` — watch chip flip.
 3. **Two tabs**, close one → watch remaining tab badge ([`CROSS_TAB_KEYS_FLASH…`](CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md) protocol).
 4. **`localStorage.hc_debug = "1"`** → hub build stamp + console `formatSiteBuildConsoleLine` to correlate deploy vs cache bust ([`SITE_BUILD_VERSIONING.md`](SITE_BUILD_VERSIONING.md)).
-5. Scan: hard reload on active card — watch pending → settled animation regardless of correct SSR.
+5. Scan: hard reload on active card — strip should settle without redundant **Checking** hold when SSR `data-arrive-label` matches resolver (RC-8).
 
 ---
 
@@ -311,6 +311,7 @@ Any step that paints before the next step completes can flash “wrong” data.
 
 ```bash
 npm run worker:test:shell-boot
+npm run worker:test:scan-live-check-arrive
 npm run worker:test -- worker/tests/device-status-shell-modules.test.ts
 ```
 
@@ -322,7 +323,7 @@ After status-graph or hub network changes, also run dot/inbox E2E per [`DEVICE_O
 
 - Does not replace feature-specific postmortems (card-disabled, cross-tab, status-dot load failure).
 - Does not propose splitting the device shell into a separate app — only documents why the current **HTML + deferred JS** architecture produces the reported flashes.
-- RC-8+ fixes remain future work unless noted **Shipped** in § Suggested doc cross-links.
+- RC-9+ fixes remain future work unless noted **Shipped** in § Suggested doc cross-links.
 
 ---
 
@@ -338,7 +339,7 @@ After status-graph or hub network changes, also run dot/inbox E2E per [`DEVICE_O
 | Cross-tab boot flash | **Shipped (RC-6)** — suppress cross-tab chrome until `data-boot=ready`; skip prime during boot |
 | Hub innerHTML boot flash | **Shipped (RC-7)** — defer hub render until boot ready; `device-boot-gated` hub sections |
 | Copy alignment | Rename Manage → Advanced or update all docs to say **Manage** |
-| Scan arrive animation | Skip pending when SSR and client agree; or reduce `SCAN_ARRIVE_MIN_CHECKING_MS` |
+| Scan arrive animation | **Shipped (RC-8)** — SSR fast path when `data-arrive-label` present; skip `SCAN_ARRIVE_MIN_CHECKING_MS` |
 
 ---
 
@@ -356,3 +357,4 @@ After status-graph or hub network changes, also run dot/inbox E2E per [`DEVICE_O
 | 2026-05-30 | Verification gate — `npm run worker:test:shell-boot` |
 | 2026-05-30 | RC-6 fix: defer cross-tab chrome until shell boot ready; skip prime during boot |
 | 2026-05-30 | RC-7 fix: defer hub innerHTML rebuild until boot ready; boot-ready event + CSS gate |
+| 2026-05-30 | RC-8 fix: scan arrive SSR fast path — skip checking hold when `data-arrive-label` embedded; `scan-live-check-arrive.mjs?v=2` |
