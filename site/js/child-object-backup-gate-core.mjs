@@ -1,6 +1,6 @@
 /**
  * Backup seatbelt before many child objects (step 16).
- * @see docs/ROOT_CARD_AND_CHILD_OBJECTS.md § Backup and recovery
+ * @see docs/ROOT_CARD_AND_CHILD_OBJECTS.md § Backup gate notice visibility
  */
 
 /** Block additional child objects when this many active objects exist without backup seatbelt. */

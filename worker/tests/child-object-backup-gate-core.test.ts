@@ -1,4 +1,9 @@
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
+
+const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 
 import {
   CHILD_OBJECT_BACKUP_GATE_BLOCK_AT_ACTIVE_COUNT,
@@ -72,5 +77,26 @@ describe("childObjectBackupGateNoticeCopy", () => {
       /recovery method/i
     );
     expect(childObjectBackupGateNoticeCopy({ blocked: false, warn: false })).toBeNull();
+  });
+});
+
+describe("child-object backup gate UI", () => {
+  it("hidden backup-gate notices do not display (flex override guard)", () => {
+    const styles = readFileSync(join(root, "site/styles.css"), "utf8");
+    expect(styles).toMatch(
+      /\.child-object-backup-gate\[hidden\][\s\S]*display:\s*none\s*!important/
+    );
+  });
+
+  it("created Live add-object panels ship hidden backup-gate placeholders", () => {
+    const html = readFileSync(join(root, "site/created/index.html"), "utf8");
+    expect(html).toContain('id="child-object-status-plate-backup-gate"');
+    expect(html).toContain('id="child-object-lost-item-backup-gate"');
+    expect(html).toMatch(
+      /id="child-object-status-plate-backup-gate"[\s\S]*class="[^"]*child-object-backup-gate[^"]*"[\s\S]*hidden/
+    );
+    expect(html).toMatch(
+      /id="child-object-lost-item-backup-gate"[\s\S]*class="[^"]*child-object-backup-gate[^"]*"[\s\S]*hidden/
+    );
   });
 });

@@ -2362,6 +2362,14 @@ a.hub-card-menu-item {
   margin: 12px 0;
 }
 
+.child-object-backup-gate[hidden] {
+  display: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  min-height: 0 !important;
+  border: none !important;
+}
+
 .create-flat-pilot-compat-summary {
   cursor: pointer;
   list-style: none;

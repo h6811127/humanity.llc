@@ -272,6 +272,30 @@ Delegated capabilities must be root-signed, scoped, expiring, revocable, and cle
 14. **Create flow convergence (shipped):** `/create/` emphasizes general Humanity Card; status plate / lost item show Add-on-Live nudge when a general root with keys exists (labeled `hc-emphasis-card--info` with **Recommended path** eyebrow + paired CTA pills; compact stacked layout; E2E `e2e/create-flow-convergence.spec.ts` in device-shell CI bundle); legacy standalone pilot forms stay in a disclosure; landing copy updated.
 15. **Register + first QR (first slice shipped):** `/created/` Add status plate / lost-item relay runs register + first `issue-qr` in one action (`child-object-register-issue.mjs`); per-row **Issue scan link** remains for retries and legacy rows.
 16. **Backup gate (first slice shipped):** warn before a 2nd active child object without backup seatbelt; block a 3rd+ until `recovery_key_acknowledged`, encrypted backup export, or backup import (`child-object-backup-gate-core.mjs`, threshold `2`).
+
+#### Backup gate notice visibility
+
+**Surfaces:** `/created/` Live → **Add status plate under this root** and **Add lost-item relay under this root** (`#child-object-status-plate-backup-gate`, `#child-object-lost-item-backup-gate`). Populated by `child-object-backup-gate.mjs`.
+
+**Contract:** A backup gate notice must occupy **zero layout** when gate logic returns no copy (`childObjectBackupGateNoticeCopy` → `null`). No empty yellow or red chrome while the steward has zero active child objects or has already saved a recovery seatbelt.
+
+| Gate state | `hidden` | Visible copy |
+|------------|----------|--------------|
+| Allowed — first object, no seatbelt yet | `true` | *(none)* |
+| Allowed — seatbelt satisfied | `true` | *(none)* |
+| Warn — 1 active child, no seatbelt | `false` | **Save a recovery method before your tree grows** + body + **Add recovery method** |
+| Blocked — 2+ active children, no seatbelt | `false` | **Save a recovery method before adding another object** + body + **Add recovery method**; submit disabled |
+
+**Failure mode (fixed):** Placeholder markup ships with `class="hc-notice hc-notice--warning"` and `[hidden]`. Author `.hc-notice { display: flex }` can override HTML `[hidden]` in WebKit — empty tinted bars appear above both add-object forms. Same class of bug as `#owner-revoked-banner` ([`CREATED_UI_SAFARI_HELP_REVOKE_INVESTIGATION.md`](CREATED_UI_SAFARI_HELP_REVOKE_INVESTIGATION.md) §2).
+
+**Fix rollout:**
+
+| Step | Status | Work |
+|------|--------|------|
+| 1 | **Shipped** | CSS: `.child-object-backup-gate[hidden] { display: none !important; … }` in `site/styles.css` |
+| 2 | **Shipped** | Vitest guard: assert hidden backup-gate rule in `worker/tests/child-object-backup-gate-core.test.ts` |
+| 3 | Pending | Manual QA: `/created/` Live on general root — no empty bars before first child object; warn/block copy when gate fires |
+
 17. **Delegated capabilities (deferred):** scoped, expiring, root-signed child keys — **do not implement** until product gates in [`DELEGATED_CHILD_CAPABILITIES_GATE.md`](DELEGATED_CHILD_CAPABILITIES_GATE.md) pass (named team/event pilot, capability matrix, anti-surveillance review). Schema RFC: [`DELEGATED_CHILD_CAPABILITY_SCHEMA.md`](DELEGATED_CHILD_CAPABILITY_SCHEMA.md).
 
 **Sequence status:** Steps **1–16 shipped** (May 2026). Step **17** is the next **product-gated** slice, not the next default engineering slice.
