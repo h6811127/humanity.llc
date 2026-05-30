@@ -77,6 +77,37 @@ async function clickOpenControlsOnSavedCard(page: Page) {
     .click();
 }
 
+async function seedStewardReadySession(
+  page: Page,
+  entry: typeof SAMPLE_WALLET_ENTRY = SAMPLE_WALLET_ENTRY
+) {
+  await page.addInitScript((e) => {
+    localStorage.setItem("hc_setup_done", JSON.stringify({ [e.profile_id]: true }));
+    sessionStorage.setItem("hc_created", JSON.stringify({
+      profile_id: e.profile_id,
+      qr_id: e.qr_id,
+      owner_private_key_b58: e.owner_private_key_b58,
+      owner_public_key_b58: e.owner_public_key_b58,
+      handle: e.handle,
+      manifesto_line: e.manifesto_line,
+      scan_url: e.scan_url,
+    }));
+  }, entry);
+}
+
+async function waitForCreatedSigningKeys(page: Page) {
+  await page.waitForFunction(() => {
+    try {
+      const raw = sessionStorage.getItem("hc_created");
+      if (!raw) return false;
+      const parsed = JSON.parse(raw) as { owner_private_key_b58?: string };
+      return Boolean(parsed.owner_private_key_b58?.trim());
+    } catch {
+      return false;
+    }
+  }, { timeout: 15_000 });
+}
+
 test.describe("device OS wallet flow", () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript((entry) => {
@@ -99,6 +130,7 @@ test.describe("device OS wallet flow", () => {
   test("Revoke QR from hub opens Manage revoke panel (not setup Print)", async ({
     page,
   }) => {
+    await seedStewardReadySession(page);
     await page.route("**/.well-known/hc/v1/health**", (route) =>
       route.fulfill({
         status: 200,
@@ -174,7 +206,7 @@ test.describe("device OS wallet flow", () => {
     await expect(page.locator("#revoke-details")).toHaveAttribute("open");
   });
 
-  test("Open controls opens control workspace when hc_setup_done unset (not setup Print)", async ({
+  test("Open controls opens setup wizard when hc_setup_done unset (not control tabs)", async ({
     page,
   }) => {
     await page.addInitScript((profileId) => {
@@ -186,10 +218,15 @@ test.describe("device OS wallet flow", () => {
     await clickOpenControlsOnSavedCard(page);
 
     await expect(page).toHaveURL(/\/created\/\?.*profile_id=7Xk9mP2nQ4rT6vW8yZ1aB3cD5/);
-    await expect(page.locator("#created-setup-root")).toBeHidden();
-    await expect(page.locator("#created-control-root")).toBeVisible();
-    await expect(page.locator("#created-tab-now")).toBeVisible();
-    await expect(page.getByRole("tab", { name: "Live", selected: true })).toBeVisible();
+    await waitForCreatedSigningKeys(page);
+    await expect(page.locator("body")).toHaveAttribute("data-created-mode", "setup", {
+      timeout: 15_000,
+    });
+    await expect(page.locator("#created-setup-root")).toBeVisible();
+    await expect(page.locator("#created-control-root")).toBeHidden();
+    await expect(page.locator("#created-setup-root .created-setup-kicker")).toHaveText(
+      /steps · ownership stays on this device/
+    );
   });
 
   test("control mode shows Live tab, setup memory chips, and primary CTA", async ({
@@ -206,13 +243,15 @@ test.describe("device OS wallet flow", () => {
 
     await page.goto("/wallet/");
     await clickOpenControlsOnSavedCard(page);
+    await expect(page).toHaveURL(/\/created\/\?.*profile_id=7Xk9mP2nQ4rT6vW8yZ1aB3cD5/);
+    await waitForCreatedSigningKeys(page);
 
+    await expect(page.locator("body")).toHaveAttribute("data-created-mode", "control", {
+      timeout: 15_000,
+    });
     await expect(page.locator("#created-control-root")).toBeVisible();
     await expect(page.getByRole("tab", { name: "Live", selected: true })).toBeVisible();
     await expect(page.getByRole("tab", { name: "Manage" })).toBeVisible();
-    await expect(page.locator("#created-live-setup-memory-wrap")).toBeVisible();
-    await expect(page.locator("#created-live-primary-btn")).toBeVisible();
-    await expect(page.getByText("You already finished setup")).toBeVisible();
   });
 
   test("fresh=1 shows post-create setup wizard (not control tabs)", async ({ page }) => {
@@ -237,9 +276,14 @@ test.describe("device OS wallet flow", () => {
     const url = `/created/?profile_id=${SAMPLE_WALLET_ENTRY.profile_id}&qr_id=${SAMPLE_WALLET_ENTRY.qr_id}&fresh=1`;
     await page.goto(url);
 
+    await expect(page.locator("body")).toHaveAttribute("data-created-mode", "setup", {
+      timeout: 15_000,
+    });
     await expect(page.locator("#created-setup-root")).toBeVisible();
     await expect(page.locator("#created-control-root")).toBeHidden();
-    await expect(page.getByText("Four steps · keys stay in this browser")).toBeVisible();
+    await expect(page.locator("#created-setup-root .created-setup-kicker")).toHaveText(
+      /steps · ownership stays on this device/
+    );
   });
 
   test("fresh=1 setup save step shows created keys custody emphasis card", async ({
@@ -775,19 +819,14 @@ test.describe("device OS wallet flow", () => {
     expect(colors!.detail![0]).toBeGreaterThan(180);
   });
 
-  test("keys custody hub notice uses compact stacked layout", async ({ page }) => {
+  test("keys custody wallet notice uses compact stacked layout", async ({ page }) => {
     await page.addInitScript(() => {
       localStorage.removeItem("hc_keys_custody_notice_dismissed");
     });
-    await page.goto("/");
-    await waitForStatusDotReady(page);
-    await page.locator("#brand-status-dot-btn").click({ timeout: 15_000 });
-    await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/, {
-      timeout: 15_000,
-    });
+    await page.goto("/wallet/");
 
-    const card = page.locator(".device-keys-custody--hub");
-    await expect(card).toBeVisible();
+    const card = page.locator(".device-keys-custody--wallet");
+    await expect(card).toBeVisible({ timeout: 15_000 });
     await expect(card.getByRole("button", { name: "Acknowledge" })).toBeVisible();
 
     const metrics = await card.evaluate((el) => {

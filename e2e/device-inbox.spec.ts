@@ -175,7 +175,9 @@ test.describe("device inbox - live proof", () => {
     await page.goto("/wallet/");
     await waitForLiveProofChrome(page);
     await expect(page.locator("#device-hub-live-control-group")).toBeVisible();
-    await expect(page.getByText("Live proof waiting")).toBeVisible();
+    await expect(
+      page.locator("#device-hub-live-control-group").getByText("Live proof waiting")
+    ).toBeVisible();
     await expect(
       page.locator("#device-hub-live-control-group").getByText("E2E Test Card")
     ).toBeVisible();
