@@ -77,6 +77,15 @@ Setup wizard **hard gate** before step **You're live**:
 - Modules: `vouch-scan-sole-signing-activate-core.mjs` · `vouch-issue.mjs` · `device-quiet-tab-rehydrate.mjs`
 - Tests: `npm run worker:test:vouch-scan-sole-activate` · `npm run e2e:vouch-scan-sole-signing`
 
+## Safari P1-4 (step 1 shipped)
+
+- On `hc_wallet` parse failure, hub shows urgent **`#device-hub-wallet-corrupt`** emphasis card (not stranger-empty hub)
+- **Import backup** CTA scrolls to hub import group
+- Saved-cards empty state suppressed while corrupt
+- Modules: `device-wallet-parse-core.mjs` · `device-hub-wallet-corrupt.mjs` · `device-wallet.mjs` (`getWalletLoadKind` / `isWalletStorageCorrupt`)
+- Tests: `npm run worker:test:wallet-corrupt`
+- Tracker: [`SAFARI_KEYS_WIPE_INVESTIGATION.md`](SAFARI_KEYS_WIPE_INVESTIGATION.md) rollout step 13
+
 ## Safari P1-2 (shipped)
 
 - **Hub** custody panel: prominent `wallet_not_in_tab` row — `OWNERSHIP_NOT_IN_TAB_PROMPT` + **Restore control in this tab**

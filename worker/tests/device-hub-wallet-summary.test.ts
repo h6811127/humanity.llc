@@ -47,4 +47,11 @@ describe("device hub wallet summary hydration", () => {
     expect(src).toContain("isHubStrangerEmptyState");
     expect(src).toContain("HUB_STRANGER_EMPTY_CLASS");
   });
+
+  it("shows corrupt wallet coach card instead of stranger-empty saved list", () => {
+    expect(src).toContain("renderHubWalletCorruptCard");
+    expect(src).toContain("isWalletStorageCorrupt");
+    expect(src).toContain("walletCorrupt: isWalletStorageCorrupt()");
+    expect(src).toContain("Saved ownership on this device could not be read");
+  });
 });

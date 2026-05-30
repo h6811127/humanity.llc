@@ -16,6 +16,14 @@ describe("device-hub-stranger-empty-core", () => {
     expect(isHubStrangerEmptyState({ walletCount: 1 })).toBe(false);
     expect(isHubStrangerEmptyState({ pinCount: 1 })).toBe(false);
     expect(isHubStrangerEmptyState({ inboxActionCount: 1 })).toBe(false);
+    expect(
+      isHubStrangerEmptyState({
+        walletCount: 0,
+        pinCount: 0,
+        inboxActionCount: 0,
+        walletCorrupt: true,
+      })
+    ).toBe(false);
   });
 
   it("detects landing home path", () => {

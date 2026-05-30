@@ -10,6 +10,7 @@ import { setLastActiveProfileId } from "./device-quiet-tab-rehydrate-prefs.mjs";
 import { scheduleStoragePersistRequest } from "./device-storage-persist.mjs";
 import { walletSaveErrorMessage } from "./device-wallet-save-core.mjs";
 import { mergeOwnershipSeatbeltFields } from "./created-first-session-gate-core.mjs";
+import { classifyWalletStorageRaw } from "./device-wallet-parse-core.mjs";
 
 export const WALLET_STORAGE_KEY = "hc_wallet";
 export const WALLET_SUMMARY_STORAGE_KEY = "hc_wallet_summary";
@@ -23,6 +24,9 @@ let walletCache = null;
 let walletSummaryCacheRaw = null;
 /** @type {WalletSummary | null} */
 let walletSummaryCache = null;
+
+/** @type {"empty" | "ok" | "corrupt"} */
+let walletLoadKind = "empty";
 
 /** Matches resolver / pin parsing (`device-pins.mjs`). */
 const QR_ID_RE = /^qr_[1-9A-HJ-NP-Za-km-z_]{8,64}$/;
@@ -212,19 +216,44 @@ function cloneWalletSummary(summary) {
   };
 }
 
+/** @returns {"empty" | "ok" | "corrupt"} */
+export function getWalletLoadKind() {
+  return walletLoadKind;
+}
+
+export function isWalletStorageCorrupt() {
+  return walletLoadKind === "corrupt";
+}
+
+/**
+ * @param {ReturnType<typeof classifyWalletStorageRaw>} classified
+ * @param {string | null} raw
+ */
+function materializeWalletLoad(classified, raw) {
+  walletLoadKind = classified.kind;
+  if (classified.kind === "corrupt") {
+    walletCacheRaw = raw;
+    walletCache = [];
+    walletSummaryCacheRaw = raw;
+    walletSummaryCache = buildWalletSummary([], walletRawFingerprint(raw));
+    return [];
+  }
+  const entries = classified.kind === "empty" ? [] : classified.entries;
+  walletCacheRaw = raw;
+  walletCache = entries;
+  cacheWalletSummary(entries, raw);
+  return entries.slice();
+}
+
 export function loadWallet() {
   try {
     const raw = localStorage.getItem(WALLET_STORAGE_KEY);
-    if (raw === walletCacheRaw && walletCache) {
-      return walletCache.slice();
+    if (raw === walletCacheRaw && walletCache !== null) {
+      return walletLoadKind === "corrupt" ? [] : walletCache.slice();
     }
-    const parsed = raw ? JSON.parse(raw) : [];
-    const entries = Array.isArray(parsed) ? parsed : [];
-    walletCacheRaw = raw;
-    walletCache = entries;
-    cacheWalletSummary(entries, raw);
-    return entries.slice();
+    return materializeWalletLoad(classifyWalletStorageRaw(raw), raw);
   } catch {
+    walletLoadKind = "corrupt";
     walletCacheRaw = null;
     walletCache = [];
     walletSummaryCacheRaw = null;
@@ -283,6 +312,7 @@ export function saveWallet(entries) {
   } catch {
     /* private mode — wallet row still persisted */
   }
+  walletLoadKind = entries.length > 0 ? "ok" : "empty";
   walletCacheRaw = serialized;
   walletCache = entries;
   walletSummaryCacheRaw = serialized;

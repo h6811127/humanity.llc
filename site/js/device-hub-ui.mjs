@@ -40,6 +40,7 @@ import {
   findWalletEntryById,
   findWalletEntryByProfileId,
   getWalletCount,
+  isWalletStorageCorrupt,
   listWalletDisplayEntries,
   loadWallet,
   loadWalletSummary,
@@ -133,6 +134,7 @@ import {
   HUB_STRANGER_EMPTY_CLASS,
   isHubStrangerEmptyState,
 } from "./device-hub-stranger-empty-core.mjs";
+import { renderHubWalletCorruptCard } from "./device-hub-wallet-corrupt.mjs";
 import {
   getLiveControlPending,
   openLiveControlProof,
@@ -1482,6 +1484,11 @@ function renderSavedRows(opts = {}) {
 
   savedList.innerHTML = "";
   if (entries.length === 0) {
+    if (isWalletStorageCorrupt()) {
+      setHubSectionEmpty(savedGroup, savedList, savedEmptyEl, true, "");
+      if (savedEmptyEl) savedEmptyEl.hidden = true;
+      return;
+    }
     setHubSectionEmpty(
       savedGroup,
       savedList,
@@ -1948,6 +1955,12 @@ function renderPinRows() {
 
 function refreshEmptyHint() {
   if (!emptyHint) return;
+  if (isWalletStorageCorrupt()) {
+    emptyHint.hidden = false;
+    emptyHint.textContent =
+      "Saved ownership on this device could not be read. Use Import backup below.";
+    return;
+  }
   const hasData =
     getWalletCount() > 0 ||
     loadPins().length > 0 ||
@@ -1957,10 +1970,12 @@ function refreshEmptyHint() {
 }
 
 function applyHubStrangerEmptyChrome() {
+  renderHubWalletCorruptCard();
   const stranger = isHubStrangerEmptyState({
     walletCount: getWalletCount(),
     pinCount: loadPins().length,
     inboxActionCount: notificationCount(),
+    walletCorrupt: isWalletStorageCorrupt(),
   });
   const roots = new Set(
     [deviceHub, document.getElementById("device-hub")].filter(

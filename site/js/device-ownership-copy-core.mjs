@@ -194,6 +194,15 @@ export function otherTabSwitchConfirmMessage(hereSnippet, thereSnippet) {
   );
 }
 
+/** Hub when `hc_wallet` JSON cannot be parsed (R7 · Safari P1-4). */
+export const WALLET_CORRUPT_HUB_EYEBROW = "Saved ownership unreadable";
+
+export const WALLET_CORRUPT_HUB_TITLE =
+  "Ownership data on this device could not be read";
+
+export const WALLET_CORRUPT_HUB_DETAIL =
+  "Local storage for saved cards is damaged. Import an encrypted backup or recovery code below — humanity.llc cannot repair this browser file.";
+
 /** Hub / wallet empty state — Layer 2 (D9). @see docs/HUB_STRANGER_ONBOARDING.md */
 export const HUB_PINS_BOOKMARKS_ONLY = "Bookmarks only — cannot manage objects";
 
