@@ -20,10 +20,11 @@
 
 | ID | Branch | Status | Do not duplicate |
 |----|--------|--------|------------------|
-| **#107** | `cursor/ownership-restore-phase3-ab8a` | Open — merge `main` + Phase 3 QR tasks | `/created/` view Live readonly, Protect setup memory chip, P1-RESTORE QA |
-| **main** | `main` | Safari P3-3, P2-3, P1-4, corrupt wallet, hub summary guard | Source of truth for shipped Safari steps |
+| **#107** | `cursor/ownership-restore-phase3-ab8a` | Merged to `main` pending — conflicts resolved | `/created/` view Live readonly, Protect setup memory chip, P1-RESTORE QA |
+| **#108** | `cursor/cloud-agent-1780082490008-1q2uv` | Open — merge `main` (P0-6/P0-7 + PWA) | Consolidated onto `device-tab-session-core` + `created-view-only-copy-core`; P1-PWA-N E2E kept |
+| **main** | `main` | Safari steps 1–17 shipped | Source of truth for shipped Safari keys |
 
-After **#107** merges, update this table and delete the row.
+After **#107** / **#108** merge, update this table and delete closed rows.
 
 ---
 
@@ -83,6 +84,8 @@ npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts
 | 2026-05-29 | **#107** merge conflicts resolved on `pr-107-merge`: combined Phase 3 readonly QR tasks with `main` Safari P3-3 + P1-2 view banner; added `#created-view-live-qr-tasks` HTML; restored `getSession`/`setSession` on setup |
 | 2026-05-29 | Safari rollout **step 17** (P3-3 hub summary guard) shipped on `main` (`e9961c29`) |
 | 2026-05-29 | Safari **P2-3** WebKit E2E shipped (`01c2e8b1`) |
+| 2026-05-29 | **#108** merge: P0-6/P0-7 deduped to `main` paths; `created-session-core` aliases `device-tab-session-core`; P1-PWA-N standalone history-back E2E retained |
+| 2026-05-29 | **#107** merge: Phase 3 QR tasks + `main` Safari/ownership shipped sections |
 
 ---
 

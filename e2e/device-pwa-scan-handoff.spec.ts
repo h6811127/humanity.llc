@@ -196,6 +196,22 @@ test.describe("device PWA scan handoff (P1-PWA-N)", () => {
     await expect(page.locator("#created-setup-root")).toBeVisible();
   });
 
+  test("standalone test scan returns via history back (P1-PWA-N step 3)", async ({ page }) => {
+    await seedCreatedSetupTestStep(page, true);
+    await stubCreatedResolver(page);
+    await page.goto(createdSetupTestUrl(), { waitUntil: "domcontentloaded" });
+
+    await expect(page.locator("#created-setup-panel-test")).toBeVisible({ timeout: 20_000 });
+    await page.locator('[data-setup-action="test-scan"]').click();
+
+    await expect(page).toHaveURL(/scan-active/, { timeout: 10_000 });
+    await page.goBack();
+    await expect(page).toHaveURL(/\/created\//);
+    await expect(page).toHaveURL(/#setup-test/);
+    await expect(page.locator("#created-setup-panel-test")).toBeVisible();
+    await expect(page.locator("#created-setup-panel-done")).toBeHidden();
+  });
+
   test("browser tab test scan opens new window (regression)", async ({ page, context }) => {
     await seedCreatedSetupTestStep(page, false);
     await stubCreatedResolver(page);
@@ -261,7 +277,9 @@ test.describe("device PWA scan handoff (P1-PWA-N)", () => {
     await expect(page.getByRole("link", { name: /E2E PWA pin/i }).first()).toBeVisible({
       timeout: 15_000,
     });
-    await page.getByRole("link", { name: /E2E PWA pin/i }).first().click();
+    const pinLink = page.getByRole("link", { name: /E2E PWA pin/i }).first();
+    await expect(pinLink).not.toContainText(/new tab/i);
+    await pinLink.click();
     await expect(page).toHaveURL(/scan-active/, { timeout: 10_000 });
     await expect(page).toHaveURL(/hc_return=/);
   });
