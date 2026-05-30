@@ -81,6 +81,8 @@ npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts
 
 | Date | Event |
 |------|--------|
+| 2026-05-30 | Hub card disappeared Safari — **RC-16** wallet memo visibility resync |
+| 2026-05-30 | Hub card disappeared Safari — **RC-3 slice 2** setup Done → PWA install handoff |
 | 2026-05-30 | Hub card disappeared Safari — **RC-15** wallet summary integrity heartbeat on hub open |
 | 2026-05-29 | Hub card disappeared Safari — **RC-14** hub search false-empty fix (stranger transition clear + no-match copy) |
 | 2026-05-29 | Hub card disappeared Safari — **RC-3** setup iOS custody + Home Screen notices on Protect/Done |

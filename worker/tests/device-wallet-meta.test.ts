@@ -17,6 +17,7 @@ import {
   reconcileWalletSummaryIntegrity,
   resetWalletCachesForTests,
   saveWallet,
+  syncWalletCacheFromDisk,
   WALLET_STORAGE_KEY,
   WALLET_SUMMARY_STORAGE_KEY,
 } from "../../site/js/device-wallet.mjs";
@@ -215,5 +216,16 @@ describe("device wallet metadata hot paths", () => {
     expect(reconcileWalletSummaryIntegrity()).toEqual({ repaired: true });
     expect(getWalletCount()).toBe(1);
     expect(reconcileWalletSummaryIntegrity()).toEqual({ repaired: false });
+  });
+
+  it("syncWalletCacheFromDisk drops stale memo after disk eviction (RC-16)", () => {
+    const wallet = JSON.stringify([entry("a", "profile-meta-a", QR_A, true)]);
+    localStore.set(WALLET_STORAGE_KEY, wallet);
+    expect(loadWallet()).toHaveLength(1);
+    localStore.delete(WALLET_STORAGE_KEY);
+
+    expect(syncWalletCacheFromDisk()).toEqual({ invalidated: true });
+    expect(getWalletCount()).toBe(0);
+    expect(syncWalletCacheFromDisk()).toEqual({ invalidated: false });
   });
 });

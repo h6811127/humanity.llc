@@ -1,7 +1,7 @@
 # Investigation: Saved card disappeared from hub (iPhone Safari)
 
 **Date:** 2026-05-29 (opened from steward report — card saved, hub empty ~20 min later)  
-**Status:** Active — RC-1–RC-6/RC-13–RC-15 shipped; RC-3 partial (PWA handoff shipped)  
+**Status:** Active — RC-1–RC-6/RC-13–RC-16 shipped; RC-3 engineering mitigations complete  
 **Reporter:** Steward on iPhone Safari after create + explicit save  
 **Related:** [`SAFARI_KEYS_WIPE_INVESTIGATION.md`](SAFARI_KEYS_WIPE_INVESTIGATION.md) · [`KEY_LOSS_SAD_PATH_MATRIX.md`](KEY_LOSS_SAD_PATH_MATRIX.md) · [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md) · [`PWA_INSTALL.md`](PWA_INSTALL.md)
 
@@ -223,15 +223,16 @@ Fix backlog order matches this list. **RC-1, RC-2, RC-4, and RC-6 are implemente
 
 ---
 
-### RC-16 — In-memory wallet cache stale
+### RC-16 — In-memory wallet cache stale **(fix shipped)**
 
 | Field | Detail |
 |-------|--------|
 | **Layer** | Client — `device-wallet.mjs` memo |
-| **Mechanism** | `walletCacheRaw` memo; `storage` event invalidates on cross-tab writes. Same-tab eviction without reload: memo could be stale until reload — reload reads empty localStorage correctly. |
+| **Mechanism** | `walletCacheRaw` memo; `storage` event invalidates on cross-tab writes. Same-tab eviction without reload could leave memo warm until navigation. |
 | **User pattern** | Edge case without navigation after external wipe. |
-| **Still possible?** | **Rare** |
-| **Fix** | `storage` listener shipped |
+| **Still possible?** | **Very unlikely** after visibility resync |
+| **Fix** | **Shipped** — `syncWalletCacheFromDisk()` on `visibilitychange` when tab visible; dispatches `hc-device-hub-changed` when memo diverges from disk |
+| **Tests** | `npm run worker:test:wallet-cache-rc16` |
 
 ---
 
@@ -396,11 +397,12 @@ Run on the **tab where the hub looks empty** (Safari → Develop → device → 
 | **1** | RC-1 | Post-save read-back in `saveWallet` | **Shipped** |
 | **2** | RC-2 | Persist-denied iOS warning card | **Shipped** |
 | **3** | RC-4 | Setup cannot complete until `isWalletSaved` | **Shipped** |
-| 4 | RC-3 | Reinforce backup-before-live + Home Screen guidance | Partial — P0-4 · P2-1 · setup Protect/Done iOS notices · Done → PWA install handoff **shipped** |
+| 4 | RC-3 | Reinforce backup-before-live + Home Screen guidance | **Shipped** — P0-4 · P2-1 · setup Protect/Done iOS notices · Done → PWA install handoff |
 | 5 | RC-6 | Private mode detection | **Shipped** |
 | 6 | RC-13 | Canonical origin enforcement | **Shipped** |
 | 7 | RC-14 | Search/cap UX audit | **Shipped** (search clear + no-match copy) |
 | 8 | RC-15 | Hub open integrity heartbeat | **Shipped** |
+| 9 | RC-16 | Same-tab wallet memo resync on visibility | **Shipped** |
 
 ---
 
@@ -416,6 +418,7 @@ Run on the **tab where the hub looks empty** (Safari → Develop → device → 
 | RC-13 | `npm run worker:test:canonical-origin` |
 | RC-14 | `npm run worker:test:hub-search-rc14` |
 | RC-15 | `npm run worker:test:wallet-summary-integrity` |
+| RC-16 | `npm run worker:test:wallet-cache-rc16` |
 | RC-7 | `npm run worker:test:wallet-corrupt` · `npm run e2e:key-loss-sad-path` |
 | RC-8, RC-9 | `npm run e2e:safari-keys-persistence` |
 | Copy | `npm run worker:test:key-loss-copy` |
@@ -426,6 +429,7 @@ Run on the **tab where the hub looks empty** (Safari → Develop → device → 
 
 | Date | Event |
 |------|--------|
+| 2026-05-30 | **RC-16** visibility resync for stale wallet memo after same-tab eviction |
 | 2026-05-30 | **RC-3 slice 2** setup Done → PWA install card handoff + same-tab `hc-setup-done-marked` refresh |
 | 2026-05-29 | **RC-4** setup finish gated on wallet save + done-step confirmation |
 | 2026-05-30 | **RC-15** hub-open wallet summary integrity heartbeat |

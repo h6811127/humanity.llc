@@ -614,6 +614,19 @@ Automated: `npm run worker:test:safari-persist-denied-notice`.
 
 Automated: `npm run worker:test:setup-ios-custody`.
 
+### P2-RC16 · Wallet memo visibility resync (RC-16 shipped)
+
+**Spec:** [`HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md`](HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md) RC-16 · **Modules:** `device-wallet-cache-visibility-core.mjs` · `device-wallet.mjs`
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Load hub with saved card · DevTools delete `hc_wallet` (do not reload) | Background tab · return to tab |
+| 2 | Open hub after visibility resume | Stranger-empty hub (not stale saved rows from memo) |
+
+**Fail signals:** Hub still shows saved rows after disk wipe without reload.
+
+Automated: `npm run worker:test:wallet-cache-rc16`.
+
 ### P2-RC14 · Hub search false-empty (RC-14 shipped)
 
 **Spec:** [`HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md`](HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md) RC-14 · **Modules:** `device-hub-search-core.mjs` · `device-hub-ui.mjs`

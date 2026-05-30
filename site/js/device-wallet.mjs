@@ -23,6 +23,9 @@ import {
   serializeWalletSummaryForStorage,
 } from "./device-wallet-summary-core.mjs";
 import { walletSummaryIntegrityNeedsRepair } from "./device-wallet-summary-integrity-core.mjs";
+import {
+  shouldInvalidateWalletCacheOnVisibility,
+} from "./device-wallet-cache-visibility-core.mjs";
 
 export const WALLET_STORAGE_KEY = "hc_wallet";
 export const WALLET_SUMMARY_STORAGE_KEY = "hc_wallet_summary";
@@ -466,6 +469,33 @@ export function invalidateWalletCache() {
 }
 
 /**
+ * Reconcile in-memory wallet memo with disk after same-tab eviction (RC-16).
+ * @returns {{ invalidated: boolean }}
+ */
+export function syncWalletCacheFromDisk() {
+  if (typeof localStorage === "undefined") {
+    return { invalidated: false };
+  }
+  try {
+    const diskRaw = localStorage.getItem(WALLET_STORAGE_KEY);
+    if (
+      !shouldInvalidateWalletCacheOnVisibility({
+        memoWalletRaw: walletCacheRaw,
+        memoSummaryRaw: walletSummaryCacheRaw,
+        diskWalletRaw: diskRaw,
+      })
+    ) {
+      return { invalidated: false };
+    }
+    invalidateWalletCache();
+    loadWallet();
+    return { invalidated: true };
+  } catch {
+    return { invalidated: false };
+  }
+}
+
+/**
  * Re-read hc_wallet vs hc_wallet_summary and rebuild summary when desynced (RC-15).
  * @returns {{ repaired: boolean }}
  */
@@ -515,6 +545,16 @@ if (typeof window !== "undefined" && typeof window.addEventListener === "functio
       invalidateWalletCache();
     }
   });
+
+  if (typeof document !== "undefined" && typeof document.addEventListener === "function") {
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState !== "visible") return;
+      const { invalidated } = syncWalletCacheFromDisk();
+      if (invalidated) {
+        window.dispatchEvent(new Event("hc-device-hub-changed"));
+      }
+    });
+  }
 }
 
 /** Row subtitle  -  always show network handle + id so labels cannot lie. */
