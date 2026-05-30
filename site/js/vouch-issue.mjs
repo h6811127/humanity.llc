@@ -406,7 +406,7 @@ function mountUseKeysHereButtons(eligible) {
         btn.disabled = false;
         return;
       }
-      await runVouchFlow();
+      await runVouchFlow({ manualActivate: true });
     });
     explainerActions.appendChild(btn);
   }
@@ -555,6 +555,25 @@ async function tryAutoActivateSoleSigningWalletForVouch(voucheeProfileId, opts =
   if (!entry) return false;
 
   return activateWalletEntryForVouchScan(entry, "auto_activate_vouch_keys_sole");
+}
+
+/** P0b-3: scan-tab-keys may rehydrate sole row before vouch-issue runs. */
+function vouchLoadedFromSoleSigningRow(voucherProfileId, voucheeProfileId) {
+  if (!voucherProfileId || isDefaultVouchProfile(voucherProfileId)) return false;
+  const sole = soleSigningVouchActivateEntry(loadWallet(), voucheeProfileId);
+  return sole?.profile_id === voucherProfileId;
+}
+
+function inferSoleSigningAutoLoad(voucherProfileId, voucheeProfileId, opts) {
+  if (opts.manualActivate || opts.skipAutoActivate) return false;
+  if (
+    opts.soleSigningActivated === true ||
+    opts.soleRowRehydrated === true ||
+    opts.quietRehydrateActivated === true
+  ) {
+    return false;
+  }
+  return vouchLoadedFromSoleSigningRow(voucherProfileId, voucheeProfileId);
 }
 
 /**
@@ -819,6 +838,7 @@ async function runVouchFlow(opts = {}) {
       return runVouchFlow({
         autoActivateAttempted: true,
         quietRehydrateActivated: true,
+        soleRowRehydrated: true,
       });
     }
     await showNoKeysExplainer(voucheeProfileId);
@@ -883,7 +903,10 @@ async function runVouchFlow(opts = {}) {
   const autoLoadedDefault =
     opts.autoActivateAttempted && isDefaultVouchProfile(voucherProfileId);
   const autoLoadedSole =
-    opts.soleSigningActivated === true || opts.soleRowRehydrated === true;
+    opts.soleSigningActivated === true ||
+    opts.soleRowRehydrated === true ||
+    opts.quietRehydrateActivated === true ||
+    inferSoleSigningAutoLoad(voucherProfileId, voucheeProfileId, opts);
   const voucherDisplay =
     session.handle ? `@${session.handle}` : session.wallet_label || toneHint;
   let attestLabel = `Attesting as ${voucherDisplay} · ${toneHint}`;

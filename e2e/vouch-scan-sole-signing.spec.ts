@@ -132,7 +132,9 @@ test.describe("P0b-3 scan sole signing row vouch", () => {
     expect(session.profile_id).toBe(VOUCHER_PROFILE);
     expect(session.owner_private_key_b58).toBeTruthy();
 
-    await expect(page.getByRole("button", { name: /loaded from this device/i })).toBeVisible();
+    await expect(page.locator("#vouch-status")).toContainText(/loaded from this device/i, {
+      timeout: 15_000,
+    });
   });
 
   test("does not auto-load vouch UI when multiple signing rows exist", async ({ page }) => {
