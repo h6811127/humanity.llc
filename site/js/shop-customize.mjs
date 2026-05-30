@@ -36,6 +36,7 @@ import {
 } from "./shop-proof-consent-core.mjs";
 import { syncMerchBackupNudgeNotice } from "./merch-backup-nudge.mjs";
 import { loadRootSessionRecordForMerch, merchPreCheckoutRecoveryGateState } from "./merch-backup-nudge-core.mjs";
+import { SHOP_CUSTOMIZE_PROOF_PERSISTENCE } from "./shop-merch-copy-core.mjs";
 
 const PERSONALIZE_PROOF_CONSENT_IDS = proofConsentRequiredIds("personalized");
 
@@ -452,7 +453,13 @@ function showCardReady(session) {
   void refreshPreview();
 }
 
+function applyMerchCustomizeProofCopy() {
+  const persistenceEl = document.getElementById("shop-customize-proof-persistence");
+  if (persistenceEl) persistenceEl.textContent = SHOP_CUSTOMIZE_PROOF_PERSISTENCE;
+}
+
 async function init() {
+  applyMerchCustomizeProofCopy();
   const urlRef = readMerchRefFromUrl();
   if (urlRef) {
     persistMerchCreateRef(urlRef);
