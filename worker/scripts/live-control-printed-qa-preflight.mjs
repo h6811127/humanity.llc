@@ -15,10 +15,7 @@ import { spawnSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import {
-  smokeProductionLiveControlChallenge,
-  smokeProductionScanPage,
-} from "./hosted-rollout-scan-smoke.mjs";
+import { runPrintedQaProductionSmoke } from "./live-control-printed-qa-production-smoke.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
@@ -34,14 +31,11 @@ export function printPrintedQaChecklist(lines = printedQaManualChecklist()) {
 export function printedQaManualChecklist() {
   return [
     "",
-    "Manual next steps (docs/M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md):",
+    "Manual next steps (pre-flight step 3):",
     "",
-    "  1. Print QR PNG from /created/ (≥2 cm module; HTTPS URL on print).",
-    "  2. Owner keys on /created/ in a second device or browser profile.",
-    "  3. § A — Camera scan → scan page (P1–P5 on each phone).",
-    "  4. § B — Live proof loop from camera-opened session (B1–B6).",
-    "  5. § C — In-person layout spot check (C1–C3).",
-    "  6. Sign-off table in runbook; update M7_LIVE_CONTROL_ALPHA.md when passed.",
+    "  npm run live-control:printed-qa:two-device-loop",
+    "",
+    "  Then steps 4–5: print QR → § A–C on ≥3 phones (docs/M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md).",
     "",
     "Manual QA entry: docs/DEVICE_OS_QA.md § P1-LCP",
     "",
@@ -87,8 +81,7 @@ export async function runPrintedQaPreflight(opts = {}) {
   }
 
   if (productionSmoke) {
-    await smokeProductionScanPage(apiOrigin);
-    await smokeProductionLiveControlChallenge(apiOrigin);
+    await runPrintedQaProductionSmoke({ apiOrigin });
   } else {
     console.log(
       "\n⏭  Skipped production smoke (add --production-smoke before printing for live cards)"

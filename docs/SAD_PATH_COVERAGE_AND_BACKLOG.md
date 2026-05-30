@@ -70,10 +70,10 @@ Agents are strong at **systematic enumeration** against docs and code. Humans an
 | **H-09** | **Scan refresh mid-wait** | Scanner refreshes during wait | Must re-ask even if challenge pending |
 | **H-10** | **Expiry retry affordance** | Challenge window ends | Stranger does not notice they can ask again |
 | H-11 | Comprehension runbook | Unscripted strangers | **Passed** 2026-05-29 |
-| H-12 | Printed camera QA | ≥3 phones, camera scan | Step 1: `npm run live-control:printed-qa:preflight` |
+| H-12 | Printed camera QA | ≥3 phones, camera scan | Pre-flight steps 1–3: `live-control:printed-qa:*` scripts |
 | H-13 | Full-loop Playwright E2E | **Shipped** — `npm run e2e:live-control-loop` | Poll→proven + refresh resume + expiry retry |
 
-**Human next step (Slice E):** H-12 § A–C on ≥3 phones after `npm run live-control:printed-qa:preflight -- --production-smoke` — see [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md).
+**Human next step (Slice E):** H-12 § A–C on ≥3 phones after pre-flight steps 1–3 — see [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md).
 
 ### 2. Key custody and continuity (by design, still sad)
 

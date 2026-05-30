@@ -53,10 +53,13 @@ export function scanPageSmokeFailure(status, bodyText) {
 
 /**
  * @param {string} [apiOrigin]
+ * @param {{ verifyHardening?: boolean }} [opts]
  */
 export async function smokeProductionScanPage(
-  apiOrigin = (process.env.API_ORIGIN || "https://humanity.llc").replace(/\/$/, "")
+  apiOrigin = (process.env.API_ORIGIN || "https://humanity.llc").replace(/\/$/, ""),
+  opts = {}
 ) {
+  const verifyHardening = opts.verifyHardening ?? false;
   const url = resolveScanSmokeUrl(apiOrigin);
   console.log(`\n▶ Smoke scan page (${url})`);
   const res = await fetch(url, {
@@ -71,6 +74,17 @@ export async function smokeProductionScanPage(
     console.error("Run: npm run worker:migrate:remote");
     console.error("See: docs/SCAN_WORKER_1101_POSTMORTEM.md");
     process.exit(1);
+  }
+  if (verifyHardening) {
+    const missing = scanPageLiveControlHardeningMissing(text);
+    if (missing.length) {
+      console.error(
+        `scan page missing live-control hardening markers (H-01/H-03): ${missing.join(", ")}`
+      );
+      console.error("Deploy worker with Slice A scan-html changes before printed QA.");
+      process.exit(1);
+    }
+    console.log("scan page live-control hardening markers OK (H-01/H-03)");
   }
   console.log(`scan page OK (${res.status})`);
 }
@@ -93,6 +107,20 @@ export function resolveLiveControlSmokeIds(apiOrigin, env = process.env) {
 }
 
 /**
+ * Operator URLs for H-12 pre-flight step 3 (two-browser loop).
+ *
+ * @param {string} apiOrigin
+ * @param {NodeJS.ProcessEnv} [env]
+ */
+export function resolvePrintedQaOperatorUrls(apiOrigin, env = process.env) {
+  const origin = apiOrigin.replace(/\/$/, "");
+  const { profileId, qrId } = resolveLiveControlSmokeIds(origin, env);
+  const scanUrl = resolveScanSmokeUrl(origin, env);
+  const createdUrl = `${origin}/created/?profile_id=${encodeURIComponent(profileId)}&qr_id=${encodeURIComponent(qrId)}`;
+  return { scanUrl, createdUrl, profileId, qrId };
+}
+
+/**
  * @param {number} status
  * @param {string} bodyText
  * @returns {boolean}
@@ -104,12 +132,60 @@ export function liveControlChallengeSmokeFailure(status, bodyText) {
   return false;
 }
 
+/** H-01/H-03 client hardening markers expected in production scan HTML. */
+export const SCAN_PAGE_LIVE_CONTROL_HARDENING_MARKERS = [
+  "parseLiveControlJsonResponse",
+  "Could not create live proof request.",
+  "Having trouble checking proof status. Tap to retry.",
+  'id="live-control-poll-retry"',
+];
+
+/**
+ * @param {string} html
+ * @returns {string[]}
+ */
+export function scanPageLiveControlHardeningMissing(html) {
+  return SCAN_PAGE_LIVE_CONTROL_HARDENING_MARKERS.filter((marker) => !html.includes(marker));
+}
+
+/**
+ * @param {number} status
+ * @param {string} bodyText
+ * @returns {string[]}
+ */
+export function liveControlChallengeResponseIssues(status, bodyText) {
+  const issues = [];
+  if (liveControlChallengeSmokeFailure(status, bodyText)) {
+    issues.push(`HTTP ${status} or Cloudflare 1101 HTML body (H-02)`);
+    return issues;
+  }
+  if (status !== 201) {
+    issues.push(`expected HTTP 201, got ${status}`);
+    return issues;
+  }
+  try {
+    const body = JSON.parse(bodyText);
+    if (typeof body.challenge_id !== "string" || !body.challenge_id) {
+      issues.push("missing challenge_id in JSON body");
+    }
+    if (typeof body.status_url !== "string" || !body.status_url) {
+      issues.push("missing status_url in JSON body");
+    }
+  } catch {
+    issues.push("challenge POST body is not JSON (H-02)");
+  }
+  return issues;
+}
+
 /**
  * @param {string} [apiOrigin]
+ * @param {{ verifyJson?: boolean }} [opts]
  */
 export async function smokeProductionLiveControlChallenge(
-  apiOrigin = (process.env.API_ORIGIN || "https://humanity.llc").replace(/\/$/, "")
+  apiOrigin = (process.env.API_ORIGIN || "https://humanity.llc").replace(/\/$/, ""),
+  opts = {}
 ) {
+  const verifyJson = opts.verifyJson ?? false;
   const { profileId, qrId } = resolveLiveControlSmokeIds(apiOrigin);
   const url = `${apiOrigin}/.well-known/hc/v1/cards/${encodeURIComponent(profileId)}/live-control/challenges`;
   console.log(`\n▶ Smoke live-control challenge POST (${url})`);
@@ -125,6 +201,18 @@ export async function smokeProductionLiveControlChallenge(
     }),
   });
   const text = await res.text();
+  if (verifyJson) {
+    const issues = liveControlChallengeResponseIssues(res.status, text);
+    if (issues.length) {
+      console.error(`live-control challenge smoke failed: ${issues.join("; ")}`);
+      console.error("Run: npm run worker:repair-live-control-challenges-fk -- --remote");
+      console.error("See: docs/LIVE_PROOF_FAILURE_INVESTIGATION.md");
+      process.exit(1);
+    }
+    console.log("live-control challenge JSON OK (H-02)");
+    console.log(`live-control challenge OK (${res.status})`);
+    return;
+  }
   if (liveControlChallengeSmokeFailure(res.status, text)) {
     console.error(
       `live-control challenge smoke failed (${res.status}) — possible FK drift on live_control_challenges`

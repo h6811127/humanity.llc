@@ -68,6 +68,8 @@
     "e2e:created-control": "playwright test e2e/created-control.spec.ts",
     "e2e:live-control-loop": "playwright test e2e/live-control-loop.spec.ts",
     "live-control:printed-qa:preflight": "node worker/scripts/live-control-printed-qa-preflight.mjs",
+    "live-control:printed-qa:production-smoke": "node worker/scripts/live-control-printed-qa-production-smoke.mjs",
+    "live-control:printed-qa:two-device-loop": "node worker/scripts/live-control-printed-qa-two-device-loop.mjs",
     "e2e:install": "playwright install chromium webkit",
     "e2e:safari": "playwright test e2e/safari-shell-scroll.spec.ts e2e/scan-cross-tab-banner-webkit.spec.ts",
     "e2e:vouch-scan-sole-signing": "playwright test e2e/vouch-scan-sole-signing.spec.ts",

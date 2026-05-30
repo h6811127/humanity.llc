@@ -28,13 +28,11 @@ describe("live-control-printed-qa-preflight", () => {
     );
   });
 
-  it("manual checklist covers runbook sections A–C and sign-off", () => {
+  it("manual checklist points to step 3 two-device loop", () => {
     const lines = printedQaManualChecklist();
     const text = lines.join("\n");
-    expect(text).toContain("§ A");
-    expect(text).toContain("§ B");
-    expect(text).toContain("§ C");
-    expect(text).toContain("Sign-off");
+    expect(text).toContain("live-control:printed-qa:two-device-loop");
+    expect(text).toContain("§ A–C");
     expect(text).toContain("P1-LCP");
     expect(printPrintedQaChecklist).toBeTypeOf("function");
   });

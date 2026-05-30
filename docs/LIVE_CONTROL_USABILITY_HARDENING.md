@@ -302,7 +302,7 @@ This document is the **implementation backlog** for hardening live control **usa
 
 **Action:** Execute [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md) on ≥3 phones.
 
-**Engineering desk gate (before phones):** `npm run live-control:printed-qa:preflight` · `--production-smoke` before print · `--skip-e2e` for Vitest-only
+**Engineering desk gate (before phones):** `live-control:printed-qa:preflight` (step 1) · `live-control:printed-qa:production-smoke` (step 2) · `live-control:printed-qa:two-device-loop` (step 3)
 
 **Exit artifact:** Completed § A–C scorecards; failures mapped to H-04–H-10.
 
@@ -312,6 +312,8 @@ This document is the **implementation backlog** for hardening live control **usa
 - [ ] Any layout/copy failures tracked against items in this doc.
 - [x] Desk regression passes (`worker/tests/live-control-printed-qa.test.ts`).
 - [x] Step 1 operator preflight script ships (`npm run live-control:printed-qa:preflight`).
+- [x] Step 2 production smoke script ships (`npm run live-control:printed-qa:production-smoke`; H-01–H-03 markers).
+- [x] Step 3 two-device loop script ships (`npm run live-control:printed-qa:two-device-loop`).
 
 ---
 
@@ -368,7 +370,7 @@ This document is the **implementation backlog** for hardening live control **usa
 | `worker:repair-live-control-challenges-fk` | Shipped | Run after child-object QR rebuild if needed |
 | Child-object rebuild includes `live_control_challenges` | Shipped | `child-object-qr-schema-rebuild.sql` |
 | `PRAGMA foreign_key_check` in health or ops script | **Shipped** | `GET /health` → `foreign_keys: ok \| violation` (503 when violation) |
-| H-01–H-03 in production | **Planned** | Client + server error hardening |
+| H-01–H-03 in production | **Shipped** | `npm run live-control:printed-qa:production-smoke` (scan hardening + challenge JSON) |
 
 ---
 
@@ -445,4 +447,5 @@ flowchart TD
 | 2026-05-29 | Slice E shipped: H-13 `e2e/live-control-loop.spec.ts` (ask→proven, refresh resume, expiry retry) |
 | 2026-05-29 | Slice D shipped: H-09 sessionStorage resume + H-10 expiry retry UX (`scan-html.ts`, `scan-pass.css`) |
 | 2026-05-29 | Slice E engineering: H-13 `e2e/live-control-loop.spec.ts`, H-14 client test refresh, H-15 health `foreign_keys` gate |
-| 2026-05-29 | H-12 step 1 preflight: `live-control:printed-qa:preflight` (desk Vitest + loop E2E + optional production smoke) |
+| 2026-05-29 | H-12 step 3 two-device loop: `live-control:printed-qa:two-device-loop` (Playwright proxy + operator URLs) |
+| 2026-05-29 | H-12 step 2 production smoke: `live-control:printed-qa:production-smoke` (H-01–H-03 live verification) |

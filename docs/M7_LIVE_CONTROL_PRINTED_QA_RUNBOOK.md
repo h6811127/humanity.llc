@@ -42,8 +42,8 @@ URL must be canonical HTTPS: `https://humanity.llc/c/{profile_id}?q={qr_id}` (no
 Run once before printing and camera testing on **≥3 phones**. Mirrors comprehension pre-flight in [`M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md`](M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md).
 
 1. **Desk regression** — `npm run live-control:printed-qa:preflight` (Vitest desk gate + Playwright full loop).
-2. **Production smoke** (recommended before print) — `npm run live-control:printed-qa:preflight -- --production-smoke` (scan HTML + live-control challenge POST on showcase card).
-3. **Two-device loop** — paste scan URL in a second browser; **Ask for live proof** → owner **Prove control now** → scanner **Control proven** (confirms keys + resolver without camera).
+2. **Production smoke** (recommended before print) — `npm run live-control:printed-qa:production-smoke` (scan HTML H-01/H-03 markers + challenge JSON POST H-02 on showcase card). Or: `npm run live-control:printed-qa:preflight -- --production-smoke` (includes step 1 desk gates).
+3. **Two-device loop** — `npm run live-control:printed-qa:two-device-loop` (Playwright proxy + copy-paste scan/created URLs for real keys). Confirm: Ask → owner link → **Prove control now** → scanner **Control proven**.
 4. **Print artifact** — download QR PNG from `/created/`; verify printed URL is `https://humanity.llc/c/{profile_id}?q={qr_id}` (≥2 cm module; see [`QR_BRANDING.md`](QR_BRANDING.md)).
 5. **Phones ready** — stock Camera app on iOS Safari path, Android Chrome path, third device if available.
 
