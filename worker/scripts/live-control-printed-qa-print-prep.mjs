@@ -61,7 +61,7 @@ export function printedQaPhonesReadyChecklist() {
     "  ☐ Third device if available",
     "",
     "Then run § A–C on ≥3 phones:",
-    "  docs/M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md",
+    "  npm run live-control:printed-qa:camera-scorecard",
     "",
     "Manual QA entry: docs/DEVICE_OS_QA.md § P1-LCP",
     "",
@@ -137,7 +137,7 @@ export async function runPrintedQaPrintPrep(opts = {}) {
     console.log(line);
   }
 
-  console.log("✅ H-12 step 4 print prep OK — complete manual print + § A–C on phones.");
+  console.log("✅ H-12 step 4 print prep OK — run camera scorecard, then complete § A–C on phones.");
 }
 
 async function main() {

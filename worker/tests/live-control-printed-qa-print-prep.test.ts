@@ -77,7 +77,7 @@ describe("live-control-printed-qa-print-prep", () => {
 
     const phones = printedQaPhonesReadyChecklist().join("\n");
     expect(phones).toContain("stock Camera");
-    expect(phones).toContain("§ A–C");
+    expect(phones).toContain("live-control:printed-qa:camera-scorecard");
     expect(phones).toContain("P1-LCP");
   });
 });

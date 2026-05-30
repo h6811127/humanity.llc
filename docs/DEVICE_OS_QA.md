@@ -320,7 +320,7 @@ See [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md).
 
 ### P1-LCP · Live control printed QR camera QA (M7 Step 2)
 
-**Runbook:** [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md) · pre-flight: `live-control:printed-qa:preflight` → `production-smoke` → `two-device-loop`.
+**Runbook:** [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md) · pre-flight: `live-control:printed-qa:preflight` → `production-smoke` → `two-device-loop` → `print-prep` → `camera-scorecard`.
 
 | Step | Action | Expected |
 |------|--------|----------|

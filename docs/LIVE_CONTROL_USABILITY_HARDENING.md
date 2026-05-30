@@ -302,7 +302,7 @@ This document is the **implementation backlog** for hardening live control **usa
 
 **Action:** Execute [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md) on ≥3 phones.
 
-**Engineering desk gate (before phones):** `live-control:printed-qa:preflight` (step 1) · `live-control:printed-qa:production-smoke` (step 2) · `live-control:printed-qa:two-device-loop` (step 3) · `live-control:printed-qa:print-prep` (step 4–5)
+**Engineering desk gate (before phones):** `live-control:printed-qa:preflight` (step 1) · `live-control:printed-qa:production-smoke` (step 2) · `live-control:printed-qa:two-device-loop` (step 3) · `live-control:printed-qa:print-prep` (step 4–5) · `live-control:printed-qa:camera-scorecard` (§ A–C operator aid)
 
 **Exit artifact:** Completed § A–C scorecards; failures mapped to H-04–H-10.
 
@@ -316,6 +316,8 @@ This document is the **implementation backlog** for hardening live control **usa
 - [x] Step 3 two-device loop script ships (`npm run live-control:printed-qa:two-device-loop`).
 - [x] Step 4 print prep script ships (`npm run live-control:printed-qa:print-prep`; canonical URL validation + print/phone checklists).
 - [x] C3 desk proxy: ask again after success issues fresh owner link (`e2e/live-control-loop.spec.ts`).
+- [x] B5 / C1 / C2 desk proxies: proof display expiry, portrait stack, wide split (`e2e/live-control-loop.spec.ts`).
+- [x] Camera scorecard operator script ships (`npm run live-control:printed-qa:camera-scorecard`).
 
 ---
 
@@ -449,6 +451,8 @@ flowchart TD
 | 2026-05-29 | Slice E shipped: H-13 `e2e/live-control-loop.spec.ts` (ask→proven, refresh resume, expiry retry) |
 | 2026-05-29 | Slice D shipped: H-09 sessionStorage resume + H-10 expiry retry UX (`scan-html.ts`, `scan-pass.css`) |
 | 2026-05-29 | Slice E engineering: H-13 `e2e/live-control-loop.spec.ts`, H-14 client test refresh, H-15 health `foreign_keys` gate |
+| 2026-05-29 | H-12 camera scorecard: `live-control:printed-qa:camera-scorecard` (§ A–C operator aid + sign-off) |
+| 2026-05-29 | H-12 B5/C1/C2 E2E desk proxies in `e2e/live-control-loop.spec.ts` |
 | 2026-05-29 | H-12 step 4 print prep: `live-control:printed-qa:print-prep` (canonical URL validation + print/phone checklists) |
 | 2026-05-29 | H-10 / C3 E2E: ask again after success issues fresh owner link |
 | 2026-05-29 | H-12 step 3 two-device loop: `live-control:printed-qa:two-device-loop` (Playwright proxy + operator URLs) |

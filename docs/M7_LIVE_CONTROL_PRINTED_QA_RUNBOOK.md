@@ -1,6 +1,6 @@
 # M7 — Live control printed QR camera QA
 
-**Status:** Runbook ready; step 1 desk preflight shipped — human camera QA pending (≥3 phones)  
+**Status:** Runbook ready; pre-flight steps 1–4 shipped — human § A–C camera QA pending (≥3 phones)  
 **Gate:** `docs/M7_LIVE_CONTROL_ALPHA.md` Step 2 · `docs/V1_IMPLEMENTATION_BACKLOG.md` H-003 · `docs/V1_ASSUMPTION_REGISTER.md` A-005  
 **Prerequisite:** Step 1 shipped; in-person layout + expiry UI shipped; comprehension runbook ready.
 
@@ -45,7 +45,8 @@ Run once before printing and camera testing on **≥3 phones**. Mirrors comprehe
 2. **Production smoke** (recommended before print) — `npm run live-control:printed-qa:production-smoke` (scan HTML H-01/H-03 markers + challenge JSON POST H-02 on showcase card). Or: `npm run live-control:printed-qa:preflight -- --production-smoke` (includes step 1 desk gates).
 3. **Two-device loop** — `npm run live-control:printed-qa:two-device-loop` (Playwright proxy + copy-paste scan/created URLs for real keys). Confirm: Ask → owner link → **Prove control now** → scanner **Control proven**.
 4. **Print artifact** — `npm run live-control:printed-qa:print-prep` (validates canonical HTTPS scan URL + print/phone checklists). Download QR PNG from `/created/`; verify printed URL is `https://humanity.llc/c/{profile_id}?q={qr_id}` (≥2 cm module; see [`QR_BRANDING.md`](QR_BRANDING.md)). Add `--verify-live` to confirm scan page loads before printing.
-5. **Phones ready** — stock Camera app on iOS Safari path, Android Chrome path, third device if available. Then § A–C below.
+5. **Phones ready** — stock Camera app on iOS Safari path, Android Chrome path, third device if available.
+6. **Camera scorecard** — `npm run live-control:printed-qa:camera-scorecard` (§ A–C checklists + sign-off template). Complete on ≥3 phones using the **printed QR** from step 4.
 
 Fast desk-only (skip Playwright): `npm run live-control:printed-qa:preflight -- --skip-e2e`
 
