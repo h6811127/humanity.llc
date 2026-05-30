@@ -85,12 +85,15 @@ flowchart TB
 
 ### Shortcuts & settings (homepage `/` only)
 
-| Control | `localStorage` | Default | Copy (draft) |
-|---------|----------------|---------|--------------|
-| **Share network checks across tabs** | `hc_resolver_sync_tabs` | `"1"` (on) | Sub: *Other open tabs use the same last check on this device* |
-| (optional) **Refresh all open tabs** | — (action) | — | Sub: *One network check, then update every tab* — triggers manual sync (§ Manual refresh) |
+| Control | `localStorage` | Default | Copy (draft) | Standalone PWA |
+|---------|----------------|---------|--------------|----------------|
+| **Share network checks across tabs** | `hc_resolver_sync_tabs` | `"1"` (on) | Sub: *Other open tabs use the same last check on this device* | **Hidden** — § [`PWA_INSTALL.md`](PWA_INSTALL.md) Browser context vs PWA context |
+| **Refresh all open tabs** | — (action) | — | Sub: *One network check, then update every tab* | **Hidden** — use Check network, PTR, or hub glance Refresh |
+| **Open last object in new tabs** | `hc_quiet_tab_rehydrate` | on (unset = on) | Tier 2 multi-card rehydrate | **Hidden** — Tier 1 unaffected; pref still applies |
 
 Placement: after **Browser alerts**, before **My cards** in `#landing-device-settings` ([`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md)).
+
+**Visibility:** [`pwa-browser-tab-shortcuts.mjs`](../site/js/pwa-browser-tab-shortcuts.mjs) hides the three rows when `readStandaloneModeFromWindow()` is true. **Hide ≠ disable** — `initResolverTabSync()` and quiet rehydrate bootstrap unchanged; stewards edit prefs from a **browser tab** on `/` when using hybrid PWA + browser.
 
 ### Hub network tools
 
@@ -309,3 +312,4 @@ When `"0"`: behavior matches today (per-tab session cache).
 | 2026-05-27 | Live proof monitoring cross-tab E2E + session key Vitest |
 | 2026-05-27 | Phase 1a E2E + broadcast/skip fixes (shell v52) |
 | 2026-05-27 | Phase 3 step 1 — live-control on unified `hc-resolver-sync` channel |
+| 2026-05-30 | Tab-native shortcut rows hidden in standalone PWA — [`PWA_INSTALL.md`](PWA_INSTALL.md) § Browser context vs PWA context |

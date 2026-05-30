@@ -84,7 +84,8 @@ How standalone new-tab behavior interacts with existing device-layer contracts:
 |--------|----------------------------------------|--------------------------------------|
 | **sessionStorage `hc_created`** | Keys stay in PWA; Safari tab has **no** signing keys unless quiet rehydrate runs | Keys remain; back returns to wizard |
 | **Cross-tab keys inbox** | PWA + Safari may show `cross_tab_keys` if both contexts heartbeat — confusing during setup | No extra tab; no spurious cross-tab chrome |
-| **Quiet tab rehydrate** ([`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md)) | Safari scan tab may rehydrate or show take-control notice | Not triggered |
+| **Quiet tab rehydrate** | Safari scan tab may rehydrate or show take-control notice | Not triggered |
+| **Tab-native shortcuts** | Visible on `/` Shortcuts & settings | **Hidden** in standalone — [`PWA_INSTALL.md`](PWA_INSTALL.md) § Browser context vs PWA context |
 | **Setup wizard history** | PWA history stack preserved; user must app-switch back; wizard may already be on **done** step | **Continue** never navigates away (P1b); optional preview via **Open scan page** + return banner |
 | **Vouch / sign-as** ([`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md)) | Preview in Safari without keys is correct for stranger view; signing needs same context | Owner preview same-tab still stranger UI; signing affordances unchanged |
 | **Status dot / hub** | Unchanged in PWA while user is in Safari | Dot hidden while on scan page; returns on back |

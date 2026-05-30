@@ -437,6 +437,40 @@ Manual **P1-PWA-R** steps 11–12.
 
 ---
 
+## Phase 10 — Browser vs PWA shortcut visibility
+
+### Intent
+
+Hide homepage Shortcuts rows that describe **browser-tab** behavior when the shell runs in standalone PWA. Background resolver sync and quiet rehydrate unchanged.
+
+### Scope
+
+| Module | Role |
+|--------|------|
+| `pwa-standalone-refresh-core.mjs` | `BROWSER_TAB_ONLY_SHORTCUT_BUTTON_IDS`, `shouldHideBrowserTabOnlyShortcuts()` |
+| `pwa-browser-tab-shortcuts.mjs` | `hideBrowserTabOnlyShortcutRows()`, `initBrowserTabOnlyShortcutsVisibility()` |
+| `landing-device-hub.mjs` | Call visibility init before hub toggles |
+
+### Out of scope
+
+- Forcing `hc_resolver_sync_tabs` or `hc_quiet_tab_rehydrate` off in standalone
+- Hiding **Check network** or hub glance Refresh row
+- Moving prefs to Advanced / hybrid-only UI (future)
+
+### Verification
+
+```bash
+npm run worker:test -- worker/tests/pwa-browser-tab-shortcuts.test.ts worker/tests/pwa-standalone-refresh-core.test.ts
+```
+
+Manual **P1-PWA-R** steps 13–14.
+
+### Status
+
+**Shipped 2026-05-30** — spec in [`PWA_INSTALL.md`](PWA_INSTALL.md) § Browser context vs PWA context.
+
+---
+
 ## H-007 closure — resume E2E + doc sync
 
 ### Intent
@@ -502,6 +536,7 @@ See [`PWA_INSTALL.md`](PWA_INSTALL.md) § Standalone refresh & resume for full s
 
 | Date | Change |
 |------|--------|
+| 2026-05-30 | Phase 10 shipped — hide tab-native homepage shortcuts in standalone |
 | 2026-05-29 | H-007 closure — resume E2E smoke; Phases 6–9 doc sync |
 | 2026-05-29 | Phase 9 shipped — hub Refresh row, first PTR tip, install card copy |
 | 2026-05-29 | Phase 8 shipped — stale shell nudge; H-007 closed |

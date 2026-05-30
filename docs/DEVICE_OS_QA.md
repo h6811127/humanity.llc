@@ -556,8 +556,10 @@ Automated (Phase 0+): `npm run worker:test:pwa-install` · Phase 3–4: `npm run
 | 10 | `/create/` or scan URL in standalone (if navigated there) | **No** PTR chrome |
 | 11 | Standalone on `/` or `/wallet/` · hub glance **Refresh** row (Phase 9) | Tap runs soft refresh; “Updated” indicator; works even when hub sheet open |
 | 12 | First standalone session (Phase 9) | One-time PTR tip visible; **Got it** dismisses; does not return on next open |
+| 13 | Standalone on `/` · scroll to **Shortcuts & settings** (Phase 10) | **Share network checks**, **Refresh all tabs**, and **Open last object in new tabs** rows **absent**; Appearance and Browser alerts still visible |
+| 14 | Browser tab on `/` (same device) | Tab-native shortcut rows **visible**; toggles work |
 
-**Fail signals:** Standalone user must kill app to see card status change; pull triggers 10+ unscoped status GETs; PTR fires during hub sheet drag; auto `location.reload()` on every resume; refresh module on status graph breaks dot (**P0-3**).
+**Fail signals:** Standalone user must kill app to see card status change; pull triggers 10+ unscoped status GETs; PTR fires during hub sheet drag; auto `location.reload()` on every resume; refresh module on status graph breaks dot (**P0-3**); tab-native shortcuts visible in standalone PWA.
 
 Automated (when shipped): `npm run worker:test -- worker/tests/pwa-standalone-refresh-core.test.ts` · extend `npm run e2e:pwa-install`.
 

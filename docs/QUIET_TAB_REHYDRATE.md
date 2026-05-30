@@ -107,7 +107,9 @@ After Tier 1 preconditions (empty tab, no unlock gate), when **two or more** sig
 
 ### Hub toggle
 
-`#device-quiet-tab-rehydrate-toggle` in device hub shortcuts (`site/index.html`); initialized from `landing-device-hub.mjs` via `initQuietTabRehydrateToggle()`.
+`#device-quiet-tab-rehydrate-toggle` in homepage Shortcuts & settings (`site/index.html`); initialized from `landing-device-hub.mjs` via `initQuietTabRehydrateToggle()`.
+
+**Standalone PWA:** Row **hidden** — no in-app “new tab” concept. Tier 1 (exactly one saved signing row) still rehydrates on every shell/scan load. Tier 2 follows `hc_quiet_tab_rehydrate` (default on) without UI in standalone; stewards change the pref from a **browser tab** on `/` if needed. See [`PWA_INSTALL.md`](PWA_INSTALL.md) § Browser context vs PWA context.
 
 ---
 
@@ -135,6 +137,7 @@ After successful bootstrap rehydrate (`activateWalletEntryGated` succeeds):
 |------|--------|
 | Pure rules | `site/js/device-quiet-tab-rehydrate-core.mjs` |
 | Device prefs + hub toggle | `site/js/device-quiet-tab-rehydrate-prefs.mjs` |
+| Standalone visibility gate | `site/js/pwa-browser-tab-shortcuts.mjs` |
 | Bootstrap hook + Tier 3 demotion | `site/js/device-quiet-tab-rehydrate.mjs` |
 | Last-active writes | `device-keys.mjs`, `device-wallet.mjs`, `create-card.mjs` |
 | Last-active clear on remove | `device-wallet-removed-profiles.mjs` |

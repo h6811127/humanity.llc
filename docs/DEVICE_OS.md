@@ -159,7 +159,9 @@ See `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md` for storage and search.
 
 Resolver health for the status dot is fetched in **`site/js/device-status.mjs`** (`fetchResolverHealth`). Wallet status polls and live-proof inbox refresh run from **`site/js/device-hub-ui.mjs`** when the hub is mounted. **`site/js/device-os-coordinator.mjs`** (300ms debounce) remains for tests and optional use but is not auto-started from the status bootstrap (see `docs/UI_UX_REVERT_PLAN.md` step 2).
 
-**PWA standalone (Phases 6–8):** Installed stewards lose browser reload affordances. **`pwa-standalone-refresh.mjs`** runs a **soft refresh pipeline** on standalone resume and pull-to-refresh, plus a stale-shell nudge when live `/js/build-meta.mjs` ≠ in-memory `SITE_BUILD_META` — without auto-starting the full coordinator or `location.reload()` on every open. See [`PWA_INSTALL.md`](PWA_INSTALL.md) § Standalone refresh & resume.
+**PWA standalone (Phases 6–9):** Installed stewards lose browser reload affordances. **`pwa-standalone-refresh.mjs`** runs a **soft refresh pipeline** on standalone resume and pull-to-refresh, plus a stale-shell nudge when live `/js/build-meta.mjs` ≠ in-memory `SITE_BUILD_META` — without auto-starting the full coordinator or `location.reload()` on every open. See [`PWA_INSTALL.md`](PWA_INSTALL.md) § Standalone refresh & resume.
+
+**Browser vs PWA (Phase 10):** Tab-native homepage shortcuts (resolver sync, refresh all tabs, quiet rehydrate toggle) are **hidden in standalone**; PWA uses PTR, resume refresh, and hub glance Refresh instead. Background sync/rehydrate behavior unchanged — [`PWA_INSTALL.md`](PWA_INSTALL.md) § Browser context vs PWA context.
 
 | Event | Role |
 |-------|------|
@@ -190,6 +192,7 @@ Manual regression: [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) (**P1-1** — no duplica
 | 11 | Cross-tab keys banner (`device-tab-presence.mjs`) | ✅ |
 | 12 | PWA install Phases 1–5 (`pwa-install-*`) | ✅ — [`PWA_INSTALL.md`](PWA_INSTALL.md) · H-006 closed |
 | 12b | PWA standalone refresh Phases 6–8 | ✅ — H-007 closed |
+| 12c | PWA browser vs PWA shortcut visibility (Phase 10) | ✅ — [`PWA_INSTALL.md`](PWA_INSTALL.md) § Browser context vs PWA context |
 | 13 | Deferred: resolver-wide search / directory |  -  |
 |  -  | Deferred: per-card revoke on landing hub |  -  (use Manage) |
 

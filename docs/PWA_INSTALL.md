@@ -1,8 +1,8 @@
 # PWA install (device shell)
 
-**Status:** Spec + contract modules shipped · **Phases 1–9 shipped** (standalone refresh complete)  
+**Status:** Spec locked · **Phases 1–9 shipped** (standalone refresh complete) · **Phase 10 shipped** (browser vs PWA shortcut visibility)  
 **Audience:** Product, frontend, ops  
-**Related:** [`DEVICE_OS.md`](DEVICE_OS.md) · [`PWA_INSTALL_IMPLEMENTATION.md`](PWA_INSTALL_IMPLEMENTATION.md) · [`VISUAL_DEVICE_SHELL.md`](VISUAL_DEVICE_SHELL.md) · [`SITE_BUILD_VERSIONING.md`](SITE_BUILD_VERSIONING.md) · [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md) · [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`IPHONE_HUB_DOT_UNCLICKABLE_INVESTIGATION.md`](IPHONE_HUB_DOT_UNCLICKABLE_INVESTIGATION.md) · [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md) · [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) · [`features/QR Public Profile v1.0.md`](features/QR%20Public%20Profile%20v1.0.md)
+**Related:** [`DEVICE_OS.md`](DEVICE_OS.md) · [`PWA_INSTALL_IMPLEMENTATION.md`](PWA_INSTALL_IMPLEMENTATION.md) · [`DEVICE_TAB_RESOLVER_SYNC.md`](DEVICE_TAB_RESOLVER_SYNC.md) · [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) · [`PWA_STANDALONE_EXTERNAL_NAVIGATION.md`](PWA_STANDALONE_EXTERNAL_NAVIGATION.md) · [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) · [`VISUAL_DEVICE_SHELL.md`](VISUAL_DEVICE_SHELL.md) · [`SITE_BUILD_VERSIONING.md`](SITE_BUILD_VERSIONING.md) · [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md) · [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`IPHONE_HUB_DOT_UNCLICKABLE_INVESTIGATION.md`](IPHONE_HUB_DOT_UNCLICKABLE_INVESTIGATION.md) · [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md) · [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) · [`features/QR Public Profile v1.0.md`](features/QR%20Public%20Profile%20v1.0.md)
 
 ---
 
@@ -38,6 +38,116 @@ Before adding UI, map the feature using [`DEVICE_OS.md`](DEVICE_OS.md):
 | Reference / shop / features pages | **No** (v1) | **No** |
 
 Rationale: flow and scan pages optimize for **one-shot tasks** or **stranger trust**; install belongs where users already manage custody.
+
+---
+
+## Browser context vs PWA context
+
+**Canonical split.** The device shell runs in two top-level browsing contexts. Product copy, shortcuts, and refresh affordances must match the context the steward is actually in — not assume every user has a browser tab bar.
+
+**Detection:** `readStandaloneModeFromWindow()` in [`pwa-standalone-refresh-core.mjs`](../site/js/pwa-standalone-refresh-core.mjs) — `display-mode: standalone` + legacy `navigator.standalone` on iOS.
+
+### Mental model
+
+| | **Browser context** | **PWA context (standalone)** |
+|---|---------------------|------------------------------|
+| **How stewards open the shell** | Safari / Chrome tab on `humanity.llc` | Home-screen icon → `start_url` `/` |
+| **Navigation chrome** | URL bar, native reload, multi-tab bar | No URL bar; no in-app tab bar |
+| **Typical window count** | 1–N tabs on same origin | Usually **one window** |
+| **`window.open` / `target="_blank"`** | New tab on same origin | Often **system browser** (leaves PWA) — [`PWA_STANDALONE_EXTERNAL_NAVIGATION.md`](PWA_STANDALONE_EXTERNAL_NAVIGATION.md) |
+| **Primary refresh affordances** | Browser reload menu | Resume soft refresh, pull-to-refresh, hub glance **Refresh** row — § Standalone refresh & resume |
+| **Cross-tab vocabulary in UI** | Appropriate (“other tabs”, “new tab”) | Misleading — prefer window/context language or hide |
+
+Both contexts share the **same device layer** (wallet in `localStorage`, hub, inbox, status dot). Install does **not** add server custody or a new key channel.
+
+### Storage and signing (platform nuance)
+
+| Storage | Browser tab | PWA window | Notes |
+|---------|-------------|------------|-------|
+| `localStorage` (`hc_wallet`, prefs) | Same origin profile | Same origin profile | **Usually shared** when both contexts exist on one device |
+| `sessionStorage` (`hc_created` tab keys) | Per tab | Per PWA window | Never shared across contexts |
+| iPhone PWA vs Safari | — | — | May behave as **separate wallet buckets** for signing — not equivalent to “two browser tabs”. See [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) · [`device-pwa-session-mismatch-core.mjs`](../site/js/device-pwa-session-mismatch-core.mjs) |
+
+**Product sentence (browser):** *Open as many tabs as you like — network checks and keys can stay in sync on this device.*
+
+**Product sentence (PWA):** *One home-screen app — pull to refresh, same saved objects, no tab bar.*
+
+### Parallel cross-context systems
+
+Two shipped mechanisms target **multi-tab browser** usage. They remain **active in PWA** (defaults unchanged) but **browser-tab UI** is hidden in standalone:
+
+```mermaid
+flowchart LR
+  subgraph browser [Browser — multi-tab]
+    RS[Resolver tab sync hc-resolver-sync]
+    QTR[Quiet tab rehydrate]
+    CT[Cross-tab keys presence]
+  end
+
+  subgraph pwa [PWA — single window]
+    PTR[Pull-to-refresh]
+    RES[Resume soft refresh]
+    SCAN[In-app scanner S3]
+  end
+
+  RS --> CT
+  QTR --> CT
+```
+
+| System | Doc | Browser UI | PWA UI | Background in PWA |
+|--------|-----|------------|--------|---------------------|
+| **Resolver tab sync** | [`DEVICE_TAB_RESOLVER_SYNC.md`](DEVICE_TAB_RESOLVER_SYNC.md) | Share network checks · Refresh all tabs | **Hidden** | `initResolverTabSync()` still runs; `hc_resolver_sync_tabs` default on |
+| **Quiet tab rehydrate** | [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) | Open last object in new tabs | **Hidden** | Tier 1 (one saved object) always; Tier 2 follows `hc_quiet_tab_rehydrate` default on |
+| **Cross-tab keys / custody** | [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) | Inbox + hub custody rows | Same when hybrid contexts open | PWA window heartbeats like a tab |
+| **PWA session mismatch** | [`SAFARI_KEYS_WIPE_INVESTIGATION.md`](SAFARI_KEYS_WIPE_INVESTIGATION.md) R5 | Wallet tab hint | Hub custody · scan actor band | When keys were last used in the *other* context |
+| **Standalone refresh** | § Standalone refresh & resume | N/A (browser has native reload) | PTR · resume · glance Refresh | Standalone-only |
+
+### Tab-native shortcuts — browser only
+
+Homepage **Shortcuts & settings** (`#landing-device-settings` on `/` only) includes three rows aimed at **multi-tab browser** stewards. **Hidden in standalone** via [`pwa-browser-tab-shortcuts.mjs`](../site/js/pwa-browser-tab-shortcuts.mjs):
+
+| Row | `localStorage` / action | Why hidden in PWA |
+|-----|-------------------------|-------------------|
+| **Share network checks** | `hc_resolver_sync_tabs` (default on) | Single window; “other tabs” copy is wrong. Sync machinery harmless at default-on. |
+| **Refresh all tabs** | Manual `refreshResolverChecksFromHub()` | Redundant with **Check network**, PTR, resume soft refresh, and hub glance **Refresh** row. |
+| **Open last object in new tabs** | `hc_quiet_tab_rehydrate` (default on) | No in-app “new tab”; Tier 1 rehydrate unaffected. |
+
+**Hide ≠ disable.** Preferences and bootstrap behavior are unchanged. Stewards who use **both** PWA and browser tabs can still change prefs from a **browser tab** on `/` (shortcuts visible there). Do **not** force prefs off in standalone.
+
+**Hybrid power users (PWA + browser tab open):** Resolver sync and rehydrate can still help across contexts on desktop/Android. Hiding UI in PWA avoids misleading copy; browser tab remains the settings surface for tab-native prefs.
+
+### PWA-native refresh affordances
+
+When tab-native shortcuts are hidden, stewards still have:
+
+| Affordance | Surface | Trigger |
+|------------|---------|---------|
+| Resume soft refresh | `/`, `/wallet/` | App switcher return · bfcache `pageshow` |
+| Pull-to-refresh | `/`, `/wallet/` | Manual pull (standalone only) |
+| Hub glance **Refresh** row | `/`, `/wallet/` | Tap — Phase 9 |
+| **Check network** | Hub network tools | Manual poll + broadcast when sync on |
+| Stale shell banner | `/`, `/wallet/` | Live `/js/build-meta.mjs` ≠ client stamp → hard reload CTA |
+
+Do **not** conflate **data refresh (soft)** with **shell reload (hard)** — § Standalone refresh & resume.
+
+### Navigation policy (summary)
+
+| Action | Browser | PWA |
+|--------|---------|-----|
+| Steward scan preview | New tab (optional) | Same-tab + return banner — [`pwa-scan-handoff-core.mjs`](../site/js/pwa-scan-handoff-core.mjs) |
+| Hub / wallet internal links | Same tab | Same tab |
+| Camera QR inbound | Safari (system) | Use in-app scanner or clipboard handoff — [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) |
+| Merch checkout | Same-tab handoff | Same-tab handoff |
+
+Wallet pin and steward scan link subtitles **omit “new tab”** in standalone (same pattern as shortcut hiding).
+
+### Regression
+
+```bash
+npm run worker:test -- worker/tests/pwa-standalone-refresh-core.test.ts worker/tests/pwa-browser-tab-shortcuts.test.ts
+```
+
+Manual: [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) **P1-PWA-R** step 13 (shortcuts hidden in standalone) · **P1-1** (resolver sync still works from browser tabs).
 
 ---
 
@@ -91,6 +201,7 @@ flowchart TB
 | `site/js/pwa-standalone-refresh-core.mjs` | Standalone detection, soft-refresh pipeline contract, PTR + stale shell + affordance rules | **6–9** ✅ |
 | `site/js/pwa-standalone-refresh.mjs` | Resume listeners, PTR, stale banner, hub Refresh row + PTR tip | **6–9** ✅ |
 | `site/js/pwa-standalone-affordances-html.mjs` | Hub Refresh row + first PTR tip markup | **9** ✅ |
+| `site/js/pwa-browser-tab-shortcuts.mjs` | Hide browser-tab-only homepage shortcuts in standalone | **10** ✅ |
 | `site/js/pwa-stale-shell-banner-html.mjs` | Stale shell emphasis card markup | **8** ✅ |
 | Shell HTML (`index`, `wallet`, `created`) | `<link rel="manifest">`, apple-touch-icon | 1 |
 | `worker/tests/pwa-install-metadata.test.ts` | Metadata contract tests | **Contract shipped** |
@@ -227,14 +338,15 @@ window.addEventListener("appinstalled", () => {
 
 ## Cross-tab, custody, and inbox interactions
 
-An installed PWA is a **separate browsing context** (same profile storage, separate tab/window in presence system).
+An installed PWA is a **separate browsing context** (same profile storage in most cases, separate window in the presence system). **Browser vs PWA product split:** § Browser context vs PWA context.
 
 | Scenario | Expected behavior |
 |----------|-------------------|
 | Browser tab + PWA both open with keys | Cross-tab inbox / custody panel applies ([`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md)) |
-| Keys in PWA, user opens `/` in Safari | **iPhone:** separate wallet buckets — not the same as two browser tabs. Use [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) handoff or in-app scanner |
+| Keys in PWA, user opens `/` in Safari | **iPhone:** may be separate wallet buckets — not the same as two browser tabs. Use [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) handoff or in-app scanner |
 | Camera QR → Safari while card is in PWA | **Cannot vouch in Safari.** S1 copy+paste handoff or S3 in-app scanner in PWA |
 | PWA scan preview (`window.open` / `target="_blank"`) | **P1 shipped:** same-tab in standalone via [`pwa-scan-handoff-core.mjs`](../site/js/pwa-scan-handoff-core.mjs) — [`PWA_STANDALONE_EXTERNAL_NAVIGATION.md`](PWA_STANDALONE_EXTERNAL_NAVIGATION.md) |
+| Tab-native shortcuts in standalone | **Hidden** — Share network checks · Refresh all tabs · Open last object in new tabs; prefs + sync machinery unchanged |
 | User installs from `/wallet/` | `start_url` still `/`; opening icon lands on hub-first landing |
 | Orphan flash after card delete | Old PWA window may heartbeat until closed — documented in [`CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md`](CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md) |
 
@@ -511,6 +623,7 @@ Implementation checklist: [`PWA_INSTALL_IMPLEMENTATION.md`](PWA_INSTALL_IMPLEMEN
 | **7** | Pull-to-refresh on `/` and `/wallet/` (standalone) | ✅ |
 | **8** | Stale shell nudge (health `build` vs client stamp → reload CTA) | ✅ |
 | **9** | Hub Refresh row, first PTR tip, install-card copy | ✅ |
+| **10** | Hide browser-tab-only homepage shortcuts in standalone | ✅ |
 
 ### Phase 4 rollout gate (after Phases 1–3)
 
@@ -556,12 +669,22 @@ Spec: § Standalone refresh & resume · Backlog **H-007**.
 
 **Do not** ship shell-caching service worker as a substitute for Phases 6–9.
 
+### Phase 10 — Browser vs PWA shortcut visibility (shipped)
+
+Spec: § Browser context vs PWA context.
+
+- [x] `BROWSER_TAB_ONLY_SHORTCUT_BUTTON_IDS` + `shouldHideBrowserTabOnlyShortcuts()` in `pwa-standalone-refresh-core.mjs`
+- [x] `pwa-browser-tab-shortcuts.mjs` — hide `#landing-device-settings` rows in standalone
+- [x] Vitest `worker/tests/pwa-browser-tab-shortcuts.test.ts`
+- [x] Manual **P1-PWA-R** step 13
+
 ---
 
 ## Changelog
 
 | Date | Change |
 |------|--------|
+| 2026-05-30 | Phase 10 — § Browser context vs PWA context; hide tab-native shortcuts in standalone; cross-doc sync |
 | 2026-05-29 | H-007 closure — resume E2E smoke; Phases 6–9 doc sync; PWA-R1–R4 resolved |
 | 2026-05-29 | Phase 9 shipped — hub Refresh row, first PTR tip, install card copy |
 | 2026-05-29 | Phase 8 shipped — stale shell nudge; H-007 closed |

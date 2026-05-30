@@ -69,7 +69,7 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 **Landing trust UI:** Intro mode shows **Design choices**, **Clear limits**, and **Documentation** as stacked `.landing-disclosure-card` rows (icon + title + subtitle + chevron). The status-plate **flow strip** (plate → scan → live state) uses `.flow-strip--model` and picks up dark surfaces from `site/css/theme-dark.css` when `hc_theme` is dark.
 
-**Shortcuts & settings (shipped):** On the **homepage** (`/`) only - section after the studio example (unified list rows: Appearance, **Browser alerts** (background OS notifications for live proof), saved cards, manage, auto-save, focus). Hub sheet on all routes has **home icon** (left) and status line (center); Create lives beside the saved-items heading; no shortcuts block in the hub.
+**Shortcuts & settings (shipped):** On the **homepage** (`/`) only - section after the studio example (unified list rows: Appearance, **Browser alerts** (background OS notifications for live proof), **Share network checks**, **Refresh all tabs**, **Open last object in new tabs** (browser context only — hidden in standalone PWA per [`PWA_INSTALL.md`](PWA_INSTALL.md)), saved cards, manage, auto-save, focus). Hub sheet on all routes has **home icon** (left) and status line (center); Create lives beside the saved-items heading; no shortcuts block in the hub.
 
 **Hub header simplification (Steps 1-2):** Create moves out of the sheet's top status rail and into the saved-items section header as compact **+ New**. The top rail shows Home plus a single-line resolver/device status where zero saved or pinned counts stay subordinate, while Close remains the sheet escape. See [`HUB_HEADER_SIMPLIFICATION.md`](HUB_HEADER_SIMPLIFICATION.md).
 

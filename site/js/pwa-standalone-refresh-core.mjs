@@ -45,6 +45,24 @@ export const PWA_REFRESH_ROW_ID = "device-pwa-refresh-row";
 export const PWA_PTR_TIP_ID = "device-pwa-ptr-tip";
 
 /**
+ * Homepage Shortcuts rows that describe browser-tab behavior — hidden in standalone.
+ * @see docs/PWA_INSTALL.md § Browser context vs PWA context
+ */
+export const BROWSER_TAB_ONLY_SHORTCUT_BUTTON_IDS = [
+  "device-resolver-sync-toggle",
+  "device-resolver-refresh-all-tabs",
+  "device-quiet-tab-rehydrate-toggle",
+];
+
+/**
+ * Tab-sync and new-tab rehydrate shortcuts use browser-tab framing; hide in standalone.
+ * @param {boolean} standalone
+ */
+export function shouldHideBrowserTabOnlyShortcuts(standalone) {
+  return standalone === true;
+}
+
+/**
  * @param {string} pathname
  */
 export function isPullToRefreshPath(pathname) {

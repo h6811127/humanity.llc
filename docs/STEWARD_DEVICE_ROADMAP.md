@@ -119,7 +119,7 @@ flowchart LR
 | “Saving many cards turns on monitoring” | **No.** Watch and Browser alerts are **opt-in** ([`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Operating modes). |
 | “PWA install registers a shell service worker” | **No** for Phases 1–5 ([`PWA_INSTALL.md`](PWA_INSTALL.md)). **`/sw-live-proof.mjs`** is a **separate**, narrow SW for live proof only. |
 | “PWA on home screen auto-reloads every open” | **No.** **Soft refresh** on resume + optional pull — not `location.reload()` every time ([`PWA_INSTALL.md`](PWA_INSTALL.md) § Standalone refresh & resume). |
-| “PWA has browser tabs like Safari” | **No.** `window.open` / `target="_blank"` for scan preview leaves the installed app — [`PWA_STANDALONE_EXTERNAL_NAVIGATION.md`](PWA_STANDALONE_EXTERNAL_NAVIGATION.md). |
+| “PWA has browser tabs like Safari” | **No.** `window.open` / `target="_blank"` for scan preview leaves the installed app — [`PWA_STANDALONE_EXTERNAL_NAVIGATION.md`](PWA_STANDALONE_EXTERNAL_NAVIGATION.md). Tab-native shortcuts hidden in standalone — [`PWA_INSTALL.md`](PWA_INSTALL.md) § Browser context vs PWA context. |
 | “Cross-tab keys should OS-notify me” | **Never** — inbox/chrome only ([`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md)). |
 
 ---

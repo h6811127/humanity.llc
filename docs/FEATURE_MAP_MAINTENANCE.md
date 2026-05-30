@@ -58,7 +58,7 @@ What ships today
 | Status dot / steward green | [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) | Shell pages; `/help/` → live-control (link fix in P1) |
 | Cross-tab keys chrome | [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) | Hub banners |
 | Browser alerts + `sw-live-proof.mjs` | [`DEVICE_INBOX.md`](DEVICE_INBOX.md) § Background alerts | Opt-in; live proof only |
-| Resolver tab sync | [`DEVICE_TAB_RESOLVER_SYNC.md`](DEVICE_TAB_RESOLVER_SYNC.md) | Homepage toggle |
+| Resolver tab sync | [`DEVICE_TAB_RESOLVER_SYNC.md`](DEVICE_TAB_RESOLVER_SYNC.md) | Homepage toggle (browser context; hidden in standalone — [`PWA_INSTALL.md`](PWA_INSTALL.md)) |
 | PWA install | [`PWA_INSTALL.md`](PWA_INSTALL.md) | Steward shell pages only |
 | Keys custody notices | [`KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md`](KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md) | Hub / wallet |
 | Child-object backup gate | [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) | `/created/` |
