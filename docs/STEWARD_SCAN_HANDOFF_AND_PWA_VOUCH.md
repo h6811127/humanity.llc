@@ -1,6 +1,6 @@
 # Steward scan handoff — camera, Safari, PWA, and vouch
 
-**Status:** Active — **S1 shipped** (clipboard handoff) · **S2 shipped** (hub recovery import) · **S3 shipped** (in-app QR scanner) · **S4 shipped** (product guidance) · **S5 shipped** (steward scan query param)  
+**Status:** Active — **S1 shipped** · **S2 shipped** · **S3 shipped** · **S4 shipped** · **S5 shipped** · **S6 shipped** (short handoff URL)  
 **Date:** 2026-05-30  
 **Audience:** Product, design, engineering, QA  
 **Related:** [`PWA_STANDALONE_EXTERNAL_NAVIGATION.md`](PWA_STANDALONE_EXTERNAL_NAVIGATION.md) · [`PWA_INSTALL.md`](PWA_INSTALL.md) · [`V1_DECISION_LOCK.md`](V1_DECISION_LOCK.md) (HTTPS print QR) · [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`OWNERSHIP_RESTORE_UX_PLAN.md`](OWNERSHIP_RESTORE_UX_PLAN.md) · [`KEY_LOSS_SAD_PATH_MATRIX.md`](KEY_LOSS_SAD_PATH_MATRIX.md)
@@ -44,7 +44,7 @@ This is distinct from **P1 shipped** steward scan preview (PWA → scan same-tab
 | **S3** | In-app QR scanner | **Shipped** | Open PWA → **Scan QR to vouch** → same-tab scan + keys |
 | **S4** | Product guidance | **Shipped** | Hub Restore & scan label + iPhone vouch guidance; PWA install + setup copy |
 | **S5** | Scan-page steward param | **Shipped** | `?hc_steward=1` → handoff UI first on Safari |
-| **S6** | Short handoff URL | Planned | Branded interstitial for camera landings |
+| **S6** | Short handoff URL | **Shipped** | `humanity.llc/v/{code}` interstitial for camera landings |
 | **S7** | Dual-QR print materials | Planned | Public QR + steward handoff QR on internal collateral |
 | **S8** | Native app / Universal Links | Future | Camera opens app when installed |
 
@@ -95,9 +95,18 @@ Scan URL may include `hc_steward=1` (or `true`) so Safari landings show handoff-
 
 Modules: [`scan-pwa-camera-handoff-core.mjs`](../site/js/scan-pwa-camera-handoff-core.mjs), [`vouch-issue.mjs`](../site/js/vouch-issue.mjs), [`scan-actor-band.mjs`](../site/js/scan-actor-band.mjs).
 
-### S6 — Short handoff URL (planned)
+### S6 — Short handoff URL (shipped)
 
-Example: `humanity.llc/v/{code}` → interstitial with copy link + steps. Branding layer on S1.
+`GET /v/{code}` decodes a compact scan reference and shows a branded interstitial before the full scan page. Camera landings on steward collateral can use shorter URLs than full `/c/…?q=…` links.
+
+**Behavior:**
+
+- `{code}` is base64url-encoded `{profile_id}:{qr_id}` ([`steward-handoff-code-core.mjs`](../site/js/steward-handoff-code-core.mjs)).
+- Interstitial copy + **Copy scan link** (full URL with `hc_steward=1`) + **Continue to scan page**.
+- Optional `?go=1` redirects immediately to the steward scan URL.
+- Build short links with `buildStewardHandoffShortUrl(scanUrl, origin)`.
+
+Modules: [`steward-handoff.ts`](../worker/src/resolver/steward-handoff.ts), [`steward-handoff-html.ts`](../worker/src/resolver/steward-handoff-html.ts).
 
 ### S7 — Dual-QR materials (planned)
 
@@ -153,6 +162,8 @@ flowchart TB
 | `device-hub-steward-vouch-guidance.mjs` | S4 hub iPhone vouch guidance card |
 | `device-hub-steward-vouch-guidance-core.mjs` | S4 guidance gating |
 | `vouch-issue.mjs` | Vouch flow + S1 Safari explainer |
+| `steward-handoff-code-core.mjs` | Encode/decode `/v/{code}` + short URL builder (S6) |
+| `steward-handoff.ts` | Worker `/v/{code}` interstitial handler (S6) |
 | `pwa-scan-handoff-core.mjs` | PWA → scan (outbound, P1 shipped) |
 
 ### Tests
@@ -181,6 +192,8 @@ Add to [`ownership-restore:verify`](package.json) or new `steward-scan-handoff:v
 
 | Date | Change |
 |------|--------|
+| 2026-05-30 | **S6 shipped** — `/v/{code}` steward handoff interstitial + code encoder |
+| 2026-05-30 | **S5 shipped** — `?hc_steward=1` Safari handoff-first landing |
 | 2026-05-30 | **S4 shipped** — hub Restore & scan label, iPhone vouch guidance card, PWA install + setup copy |
 | 2026-05-30 | **S3 shipped** — in-app hub QR scanner (`device-hub-qr-scanner.mjs`) |
 | 2026-05-30 | Initial roadmap; S1–S2 shipped |
