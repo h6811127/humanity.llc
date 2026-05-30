@@ -257,7 +257,7 @@ export function initCreatedDashboard({
 
   initCreatedLiveSetupMemory({
     getProfileId: profileId,
-    getSession: opts.getSession,
+    getSession,
     setupComplete: () => {
       const pid = profileId();
       return pid ? isSetupDone(pid) : true;
@@ -266,7 +266,7 @@ export function initCreatedDashboard({
 
   initCreatedLivePrimaryCta({
     getProfileId: profileId,
-    getSession: opts.getSession,
+    getSession,
     hasSigningKeys: () => hasSigningKeys?.() ?? false,
     resolverReachable: () =>
       document.body.dataset.createdResolverReachable !== "offline",

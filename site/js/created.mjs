@@ -17,7 +17,7 @@ import { inferPilotTemplate, parseManifestoDisplay } from "./manifesto-display.m
 import { parseObjectStreamsFromDocument } from "./object-streams-core.mjs";
 import { createdLiveProofPollShouldRun, liveProofPanelMostlyVisible, shouldScrollLiveProofPanelIntoView } from "./created-live-proof-poll-core.mjs";
 import { initCreatedTabs } from "./created-tabs.mjs";
-import { initCreatedDashboard } from "./created-dashboard.mjs?v=6";
+import { initCreatedDashboard } from "./created-dashboard.mjs?v=7";
 import {
   markFirstRevokeDone,
   syncUpdateStatusTaskGate,
