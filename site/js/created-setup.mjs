@@ -27,7 +27,13 @@ import {
 import {
   SETUP_WALLET_SAVED_CONFIRMATION,
   SETUP_WALLET_SAVED_DONE_DETAIL,
+  SETUP_SEATBELT_IOS_SAFARI_HINT,
+  SETUP_DONE_IOS_HOME_SCREEN_EYEBROW,
+  SETUP_DONE_IOS_HOME_SCREEN_TITLE,
+  SETUP_DONE_IOS_HOME_SCREEN_DETAIL,
 } from "./device-ownership-copy-core.mjs";
+import { shouldShowSetupIosSafariCustodyNotice } from "./created-setup-ios-custody-core.mjs";
+import { isIosWebKitUserAgent } from "./safari-itp-storage-notice-core.mjs";
 import { stewardScanOpenedFeedback } from "./pwa-scan-handoff-core.mjs";
 import { openStewardScanPreviewFromWindow } from "./pwa-scan-handoff.mjs";
 import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
@@ -87,6 +93,11 @@ export function initCreatedSetup(opts) {
   const setupQrImg = document.getElementById("created-setup-qr-img");
   const doneBtn = document.getElementById("created-setup-finish");
   const walletSavedConfirmEl = document.getElementById("created-setup-wallet-saved-confirm");
+  const iosSafariHintEl = document.getElementById("created-setup-ios-safari-hint");
+  const iosHomeScreenNoticeEl = document.getElementById("created-setup-ios-home-screen-notice");
+  const iosHomeScreenEyebrowEl = document.getElementById("created-setup-ios-home-screen-eyebrow");
+  const iosHomeScreenTitleEl = document.getElementById("created-setup-ios-home-screen-title");
+  const iosHomeScreenDetailEl = document.getElementById("created-setup-ios-home-screen-detail");
   const progressKicker = root.querySelector(".created-setup-kicker");
   const saveProgressItem = root.querySelector('[data-setup-step="save"]');
 
@@ -226,6 +237,42 @@ export function initCreatedSetup(opts) {
     }
   }
 
+  function iosSafariCustodyVisible() {
+    return shouldShowSetupIosSafariCustodyNotice({
+      isIosWebKit: isIosWebKitUserAgent(navigator.userAgent, navigator),
+      standalone: readStandaloneModeFromWindow(window),
+    });
+  }
+
+  function syncSetupIosSafariCustodyNotices() {
+    const show = iosSafariCustodyVisible();
+    const step = currentStep();
+
+    if (iosSafariHintEl) {
+      const showHint = show && step === "protect";
+      iosSafariHintEl.hidden = !showHint;
+      if (showHint) {
+        iosSafariHintEl.textContent = SETUP_SEATBELT_IOS_SAFARI_HINT;
+      }
+    }
+
+    if (iosHomeScreenNoticeEl) {
+      const showDone = show && step === "done";
+      iosHomeScreenNoticeEl.hidden = !showDone;
+      if (showDone) {
+        if (iosHomeScreenEyebrowEl) {
+          iosHomeScreenEyebrowEl.textContent = SETUP_DONE_IOS_HOME_SCREEN_EYEBROW;
+        }
+        if (iosHomeScreenTitleEl) {
+          iosHomeScreenTitleEl.textContent = SETUP_DONE_IOS_HOME_SCREEN_TITLE;
+        }
+        if (iosHomeScreenDetailEl) {
+          iosHomeScreenDetailEl.textContent = SETUP_DONE_IOS_HOME_SCREEN_DETAIL;
+        }
+      }
+    }
+  }
+
   function syncSetupFinishButton() {
     if (!doneBtn || currentStep() !== "done") return;
     const canFinish = canCompleteSetupWizard({
@@ -262,6 +309,7 @@ export function initCreatedSetup(opts) {
     if (doneBtn) doneBtn.hidden = step !== "done";
     if (step === "protect") seatbeltCtl?.refresh?.();
     syncSetupWalletSavedConfirm();
+    syncSetupIosSafariCustodyNotices();
     syncSetupFinishButton();
   }
 

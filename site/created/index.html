@@ -19,6 +19,16 @@
           /* ignore */
         }
       })();
+      (function () {
+        if (location.hostname === "www.humanity.llc") {
+          location.replace(
+            "https://humanity.llc" +
+              location.pathname +
+              location.search +
+              location.hash
+          );
+        }
+      })();
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=4" />
     <link rel="stylesheet" href="/styles.css?v=129" />
@@ -396,6 +406,11 @@
               <button type="submit" class="btn-secondary">Download encrypted backup</button>
             </form>
             <p class="form-status" id="created-setup-export-backup-status" hidden></p>
+            <p
+              class="form-hint created-setup-ios-safari-hint"
+              id="created-setup-ios-safari-hint"
+              hidden
+            ></p>
           </div>
 
           <div class="created-setup-panel" data-setup-panel="done" id="created-setup-panel-done" hidden>
@@ -410,6 +425,21 @@
               hidden
               role="status"
             ></p>
+            <div
+              class="hc-emphasis-card hc-emphasis-card--info created-setup-ios-home-screen-notice"
+              id="created-setup-ios-home-screen-notice"
+              hidden
+              role="note"
+            >
+              <div class="hc-emphasis-card__main">
+                <span class="hc-emphasis-card__dot hc-emphasis-card__dot--info" aria-hidden="true"></span>
+                <div class="hc-emphasis-card__copy">
+                  <p class="hc-emphasis-card__eyebrow" id="created-setup-ios-home-screen-eyebrow"></p>
+                  <p class="hc-emphasis-card__title" id="created-setup-ios-home-screen-title"></p>
+                  <p class="hc-emphasis-card__detail" id="created-setup-ios-home-screen-detail"></p>
+                </div>
+              </div>
+            </div>
             <button type="button" class="btn-primary" id="created-setup-finish">
               Open card controls
             </button>

@@ -596,6 +596,23 @@ Automated: `npm run worker:test:pwa-install` · `npm run e2e:pwa-install` (P4 de
 
 Automated: `npm run worker:test:safari-persist-denied-notice`.
 
+### P2-RC3 · Setup wizard iOS Safari custody notices (RC-3 shipped)
+
+**Spec:** [`HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md`](HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md) RC-3 · **Modules:** `created-setup-ios-custody-core.mjs` · `created-setup.mjs`
+
+**Prerequisites:** iPhone Safari (not Home Screen PWA) · fresh create through setup wizard.
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Reach **Protect** step | `#created-setup-ios-safari-hint` visible — seven-day Safari eviction + backup importance |
+| 2 | Complete seatbelt · advance to **You're live** | Info card `#created-setup-ios-home-screen-notice` — Add to Home Screen guidance |
+| 3 | Open same flow from Home Screen PWA | **No** iOS hints (standalone) |
+| 4 | Desktop Chrome through setup | **No** iOS hints |
+
+**Fail signals:** Hints on desktop or standalone; missing on iOS Safari Protect/Done; copy mentions private keys or localStorage.
+
+Automated: `npm run worker:test:setup-ios-custody`.
+
 ### P1-8 · Hosted tier budget (Phase 10 — E2 staging)
 
 **Status:** E2 client probe staging; production enablement still waits on M4 sign-off and rollout gates. Spec: [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Phase 10 — hosted tier rows (M7) · build order: [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md).

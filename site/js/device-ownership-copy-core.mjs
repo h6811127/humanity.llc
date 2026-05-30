@@ -100,6 +100,19 @@ export const SETUP_SEATBELT_BLOCK_CONTINUE =
 export const SETUP_SEATBELT_RECOVERY_SAVED_STATUS =
   "Recovery code marked saved. You can also download an encrypted backup below.";
 
+/** Setup protect step — iOS Safari storage eviction (RC-3). */
+export const SETUP_SEATBELT_IOS_SAFARI_HINT =
+  "On iPhone Safari, saved cards can be deleted after about seven days without a visit, or when storage is low. Your recovery code or encrypted backup is how you get control back if that happens.";
+
+/** Setup done step — Home Screen guidance after first live (RC-3). */
+export const SETUP_DONE_IOS_HOME_SCREEN_EYEBROW = "iPhone tip";
+
+export const SETUP_DONE_IOS_HOME_SCREEN_TITLE =
+  "Add to Home Screen after you finish here";
+
+export const SETUP_DONE_IOS_HOME_SCREEN_DETAIL =
+  "Tap Share → Add to Home Screen, then open humanity.llc from your home screen regularly. Each visit resets Safari's storage timer. Keep your recovery backup if this phone is your only copy of control.";
+
 export const DEFAULT_FOR_ATTESTATION = "Default for attestation";
 
 export const DEFAULT_FOR_ATTESTATION_ON_SCAN = "Default for attestation on scan";

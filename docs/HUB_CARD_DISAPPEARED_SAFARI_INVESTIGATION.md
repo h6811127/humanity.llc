@@ -72,7 +72,7 @@ Fix backlog order matches this list. **RC-1, RC-2, RC-4, and RC-6 are implemente
 | **Mechanism** | See R4 in [`SAFARI_KEYS_WIPE_INVESTIGATION.md`](SAFARI_KEYS_WIPE_INVESTIGATION.md): 7-day no-interaction rule, iOS cache cleanup, Settings → Clear Website Data, Home Screen PWA vs in-browser **separate ITP timers**. |
 | **User pattern** | Hub stranger-empty; status dot also shows no saved ownership; no backup. |
 | **Still possible?** | **Yes** — by design without backup |
-| **Fix backlog** | RC-2 notice; P2-1 ITP notice (shipped); mandatory backup export before “You're live” (P0-4 shipped). |
+| **Fix backlog** | RC-2 notice; P2-1 ITP notice (shipped); mandatory backup export before “You're live” (P0-4 shipped); setup wizard iOS Safari custody + Home Screen guidance on Protect/Done (RC-3 slice shipped). |
 
 ---
 
@@ -393,9 +393,9 @@ Run on the **tab where the hub looks empty** (Safari → Develop → device → 
 | **1** | RC-1 | Post-save read-back in `saveWallet` | **Shipped** |
 | **2** | RC-2 | Persist-denied iOS warning card | **Shipped** |
 | **3** | RC-4 | Setup cannot complete until `isWalletSaved` | **Shipped** |
-| 4 | RC-3 | Reinforce backup-before-live + Home Screen guidance | Partial (P0-4, P2-1) |
+| 4 | RC-3 | Reinforce backup-before-live + Home Screen guidance | Partial — P0-4 · P2-1 · setup Protect/Done iOS notices **shipped** |
 | 5 | RC-6 | Private mode detection | **Shipped** |
-| 6 | RC-13 | Canonical origin enforcement | Open |
+| 6 | RC-13 | Canonical origin enforcement | **Shipped** |
 | 7 | RC-14 | Search/cap UX audit | Open |
 | 8 | RC-15 | Hub open integrity heartbeat | Open |
 
@@ -408,7 +408,9 @@ Run on the **tab where the hub looks empty** (Safari → Develop → device → 
 | RC-1, RC-5 | `npm run worker:test -- worker/tests/device-wallet-save-core.test.ts` |
 | RC-2 | `npm run worker:test:safari-persist-denied-notice` |
 | RC-4 | `npm run worker:test:setup-protect` · `worker/tests/created-setup-core.test.ts` |
+| RC-3 | `npm run worker:test:setup-ios-custody` |
 | RC-6 | `npm run worker:test:private-browsing` |
+| RC-13 | `npm run worker:test:canonical-origin` |
 | RC-7 | `npm run worker:test:wallet-corrupt` · `npm run e2e:key-loss-sad-path` |
 | RC-8, RC-9 | `npm run e2e:safari-keys-persistence` |
 | Copy | `npm run worker:test:key-loss-copy` |
@@ -420,5 +422,8 @@ Run on the **tab where the hub looks empty** (Safari → Develop → device → 
 | Date | Event |
 |------|--------|
 | 2026-05-29 | **RC-4** setup finish gated on wallet save + done-step confirmation |
+| 2026-05-30 | **RC-13** canonical `www` → apex redirect + debug hub origin line |
 | 2026-05-29 | **RC-2** persist-denied iOS warn card shipped |
+| 2026-05-29 | Initial catalog from steward report; **RC-1** read-back gate shipped |
+n card shipped |
 | 2026-05-29 | Initial catalog from steward report; **RC-1** read-back gate shipped |
