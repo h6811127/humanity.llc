@@ -5,7 +5,7 @@
  *   npm run card-disabled-since-visit:desk-gate
  *   npm run card-disabled-since-visit:desk-gate:fast   # --skip-e2e
  *
- * @see docs/SAFARI_KEYS_WIPE_INVESTIGATION.md P0b-1
+ * @see docs/SAFARI_KEYS_CUSTODY.md P0b-1
  * @see docs/DEVICE_OS_QA.md § P1-P0b-1
  */
 import { spawnSync } from "node:child_process";
@@ -35,7 +35,7 @@ export function runCardDisabledSinceVisitDeskGate(opts = {}) {
   const skipE2e = opts.skipE2e ?? false;
 
   console.log("P0b-1 card disabled since visit — desk gate (R10)");
-  console.log("Docs: docs/SAFARI_KEYS_WIPE_INVESTIGATION.md P0b-1\n");
+  console.log("Docs: docs/SAFARI_KEYS_CUSTODY.md P0b-1\n");
 
   console.log("▶ Vitest regression bundle");
   run(["run", "worker:test:card-disabled-since-visit"]);

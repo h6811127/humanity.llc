@@ -188,11 +188,14 @@ Individual suites:
 ```bash
 npm run worker:test:steward-scan-handoff   # S1–S3 core + hub HTML guards
 npm run worker:test:qr-branding            # S7 encode guard + handoff render (RC-1)
+npm run e2e:steward-scan-handoff           # all desk E2E below (CI: test-site.yml)
 npm run e2e:steward-dual-qr                # S7 control Full-size QR + setup #setup-qr steward img[src]
 npm run e2e:hub-in-app-qr-scanner          # S3 hub dialog + chrome entry + mocked decode → scan URL
 npm run e2e:steward-scan-handoff-fallback  # S1 open scan link + S5 hc_steward + S6 /v/ interstitial
 npm run e2e:key-loss-sad-path              # hub restore visible (K2)
 ```
+
+**CI (shipped):** `.github/workflows/test-site.yml` runs `npm run e2e:steward-scan-handoff` (P1-PWA-V desk).
 
 ---
 
@@ -209,6 +212,7 @@ npm run e2e:key-loss-sad-path              # hub restore visible (K2)
 
 | Date | Change |
 |------|--------|
+| 2026-05-30 | **CI closure** — `e2e:steward-scan-handoff` in `test-site.yml` (P1-PWA-V desk) |
 | 2026-05-30 | **S7 shipped** — `/created/` dual-QR public + steward handoff download/copy |
 | 2026-05-30 | **S6 shipped** — `/v/{code}` steward handoff interstitial + code encoder |
 | 2026-05-30 | **S5 shipped** — `?hc_steward=1` Safari handoff-first landing |

@@ -1,5 +1,6 @@
 import {
   DEFAULT_PRINT_TEMPLATE_ID,
+  GLITCH_HOODIE_TEMPLATE_ID,
   HOODIE_PRINT_TEMPLATE_ID,
   TIER0_BATCH_PRINT_TEMPLATE_ID,
 } from "./print-catalog";
@@ -82,6 +83,21 @@ export function resolvePrintifyArtworkConfig(
     );
   }
 
+  if (templateId === GLITCH_HOODIE_TEMPLATE_ID) {
+    return resolveArtworkFromEnv(
+      env,
+      "PERSONALIZE_GLITCH_HOODIE_PRINTIFY_BLUEPRINT_ID",
+      "PERSONALIZE_GLITCH_HOODIE_PRINTIFY_PRINT_PROVIDER_ID",
+      "PERSONALIZE_GLITCH_HOODIE_PRINTIFY_VARIANT_ID",
+      "PERSONALIZE_GLITCH_HOODIE_PRINTIFY_PLACEHOLDER",
+      "PERSONALIZE_GLITCH_HOODIE_PRINTIFY_IMAGE_X",
+      "PERSONALIZE_GLITCH_HOODIE_PRINTIFY_IMAGE_Y",
+      "PERSONALIZE_GLITCH_HOODIE_PRINTIFY_IMAGE_SCALE",
+      "PERSONALIZE_GLITCH_HOODIE_PRINTIFY_IMAGE_ANGLE",
+      "front"
+    );
+  }
+
   if (templateId === DEFAULT_PRINT_TEMPLATE_ID) {
     return resolveArtworkFromEnv(
       env,
@@ -102,6 +118,8 @@ export function resolvePrintifyArtworkConfig(
 
 export function templateRequiresArtworkUpload(templateId: string): boolean {
   return (
-    templateId === DEFAULT_PRINT_TEMPLATE_ID || templateId === HOODIE_PRINT_TEMPLATE_ID
+    templateId === DEFAULT_PRINT_TEMPLATE_ID ||
+    templateId === HOODIE_PRINT_TEMPLATE_ID ||
+    templateId === GLITCH_HOODIE_TEMPLATE_ID
   );
 }

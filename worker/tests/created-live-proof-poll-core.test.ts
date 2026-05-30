@@ -2,9 +2,21 @@ import { describe, expect, it } from "vitest";
 
 import {
   createdLiveProofPollShouldRun,
+  createdLiveProofPendingPollShouldRun,
   liveProofPanelMostlyVisible,
   shouldScrollLiveProofPanelIntoView,
 } from "../../site/js/created-live-proof-poll-core.mjs";
+
+describe("createdLiveProofPendingPollShouldRun", () => {
+  it("polls in view mode when the tab is visible", () => {
+    expect(
+      createdLiveProofPendingPollShouldRun({ documentVisible: true })
+    ).toBe(true);
+    expect(
+      createdLiveProofPendingPollShouldRun({ documentVisible: false })
+    ).toBe(false);
+  });
+});
 
 describe("createdLiveProofPollShouldRun", () => {
   it("requires visible document and signing keys", () => {

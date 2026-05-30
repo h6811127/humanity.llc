@@ -1,6 +1,6 @@
 /**
  * Shared corrupt-wallet UX (Safari P1-4 · R7).
- * @see docs/SAFARI_KEYS_WIPE_INVESTIGATION.md R7
+ * @see docs/SAFARI_KEYS_CUSTODY.md R7
  */
 
 import {

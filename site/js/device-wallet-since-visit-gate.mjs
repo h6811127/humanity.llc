@@ -3,14 +3,21 @@
  * @see docs/CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md
  */
 import { getLiveControlPollHealth } from "./device-live-control-inbox-core.mjs";
+import { isDeviceBootReadyState } from "./device-shell-boot-core.mjs";
+import { hasWalletNetworkTruthPoll } from "./device-wallet-network-truth.mjs";
+import {
+  normalizeResolverHealthForSinceVisit,
+  RESOLVER_HEALTH_UNSET,
+  shouldSuppressCardDisabledSinceVisitAlertsCore,
+} from "./device-wallet-since-visit-gate-core.mjs";
 
-/** @type {'ok' | 'degraded' | 'offline'} */
-let resolverHealthStatus = "offline";
+/** @type {'unset' | 'ok' | 'degraded' | 'offline'} */
+let resolverHealthStatus = RESOLVER_HEALTH_UNSET;
 
 /** @type {'ok' | 'degraded' | 'offline'} */
 let walletStatusPollHealth = "ok";
 
-/** @returns {'ok' | 'degraded' | 'offline'} */
+/** @returns {'unset' | 'ok' | 'degraded' | 'offline'} */
 export function getResolverHealthStatus() {
   return resolverHealthStatus;
 }
@@ -22,7 +29,7 @@ export function getWalletStatusPollHealth() {
 
 /** @param {'ok' | 'degraded' | 'offline'} status */
 export function setResolverHealthStatusForSinceVisit(status) {
-  resolverHealthStatus = status === "ok" || status === "degraded" || status === "offline" ? status : "offline";
+  resolverHealthStatus = normalizeResolverHealthForSinceVisit(status);
 }
 
 /** @param {'ok' | 'degraded' | 'offline'} status G4: per-card status polls untrustworthy (e.g. 429). */
@@ -31,14 +38,37 @@ export function setWalletStatusPollHealthForSinceVisit(status) {
     status === "ok" || status === "degraded" || status === "offline" ? status : "offline";
 }
 
+/** @internal Vitest only */
+export function resetSinceVisitGateForTests() {
+  resetSinceVisitGateOnShellResume();
+}
+
+/** bfcache resume — drop poll authority until health + wallet polls re-run. */
+export function resetSinceVisitGateOnShellResume() {
+  resolverHealthStatus = RESOLVER_HEALTH_UNSET;
+  walletStatusPollHealth = "ok";
+}
+
+function readShellBootReadyForSinceVisit() {
+  if (typeof document === "undefined") return true;
+  const boot = document.body?.dataset?.boot;
+  if (!boot) return false;
+  return isDeviceBootReadyState(boot);
+}
+
 /** True when since-visit banners, inbox rows, and dot overlay must stay hidden. */
 export function shouldSuppressCardDisabledSinceVisitAlerts() {
-  if (resolverHealthStatus === "degraded" || resolverHealthStatus === "offline") {
-    return true;
-  }
-  if (walletStatusPollHealth === "degraded" || walletStatusPollHealth === "offline") {
-    return true;
-  }
-  const liveProofHealth = getLiveControlPollHealth();
-  return liveProofHealth === "degraded" || liveProofHealth === "offline";
+  return shouldSuppressCardDisabledSinceVisitAlertsCore({
+    resolverHealth: resolverHealthStatus,
+    walletStatusPollHealth,
+    liveProofPollHealth: getLiveControlPollHealth(),
+    hasWalletNetworkPoll: hasWalletNetworkTruthPoll(),
+    shellBootReady: readShellBootReadyForSinceVisit(),
+  });
 }
+
+export {
+  normalizeResolverHealthForSinceVisit,
+  RESOLVER_HEALTH_UNSET,
+  shouldSuppressCardDisabledSinceVisitAlertsCore,
+} from "./device-wallet-since-visit-gate-core.mjs";

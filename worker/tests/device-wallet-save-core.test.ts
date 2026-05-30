@@ -1,6 +1,6 @@
 /**
  * P0-3 wallet save error handling (R3).
- * @see docs/SAFARI_KEYS_WIPE_INVESTIGATION.md
+ * @see docs/SAFARI_KEYS_CUSTODY.md
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 

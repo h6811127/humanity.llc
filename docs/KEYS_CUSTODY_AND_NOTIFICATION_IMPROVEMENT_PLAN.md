@@ -12,6 +12,8 @@ A meaningfully better keys and key-notification system is **possible** without s
 
 Engineering already shipped the cross-tab **notification rebuild** (Phases 1–6 in [`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md)). **This plan (Phases 1–7) is complete** as of May 2026 — custody panel, inbox semantics, scale guardrails, and legacy banner demotion. Scan cross-tab banner intentionally retained.
 
+**Keys custody card spacing (closed May 2026):** Hub/wallet custody emphasis cards use **F3 stacked layout** + **compact density tokens** — not global marketing `--hc-emphasis-card-gap-section`. Do not lower global 24px gap; apply compact tier on `.device-keys-custody.hc-emphasis-card` only. **Regression:** `npm run worker:test:keys-custody` · `npm run e2e:keys-custody`. Details: [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md) · [`archive/KEYS_CUSTODY_EMPHASIS_CARD_SPACING_INVESTIGATION.md`](archive/KEYS_CUSTODY_EMPHASIS_CARD_SPACING_INVESTIGATION.md).
+
 ---
 
 ## What exists today

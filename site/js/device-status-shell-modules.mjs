@@ -10,7 +10,7 @@
  * Bump on all shell HTML (`device-status-bootstrap.mjs?v=N`) and on every
  * `./peer.mjs?v=N` import between files in DEVICE_STATUS_SHELL_JS_FILES.
  */
-export const DEVICE_SHELL_ASSET_VERSION = 75;
+export const DEVICE_SHELL_ASSET_VERSION = 79;
 
 /** @deprecated Use DEVICE_SHELL_ASSET_VERSION */
 export const DEVICE_STATUS_BOOTSTRAP_CACHE_BUST = DEVICE_SHELL_ASSET_VERSION;
@@ -25,6 +25,7 @@ export const DEVICE_STATUS_SHELL_JS_FILES = [
   "device-status-load-error.mjs",
   "device-status-dot-boot-core.mjs",
   "device-status-dot-boot.mjs",
+  "device-status-dot-view-transition-core.mjs",
   "build-meta-browser.mjs",
   "device-status-core.mjs",
   "device-status.mjs",
@@ -33,9 +34,12 @@ export const DEVICE_STATUS_SHELL_JS_FILES = [
   "device-ownership-not-in-tab-core.mjs",
   "device-chrome-refresh-core.mjs",
   "device-chrome-refresh.mjs",
+  "device-live-proof-banner.mjs",
   "device-shell-boot-core.mjs",
   "device-hub-boot-core.mjs",
   "device-shell-boot.mjs",
+  "device-shell-resume-core.mjs",
+  "device-shell-resume.mjs",
   "device-inbox-sheet-loader.mjs",
   "device-hub-sheet-loader.mjs",
   "device-inbox-loader.mjs",
@@ -54,8 +58,10 @@ export const DEVICE_STATUS_SHELL_JS_FILES = [
   "device-hub-keys-custody.mjs",
   "device-presence-inbox-stability-core.mjs",
   "device-quiet-tab-rehydrate-core.mjs",
+  "device-quiet-tab-rehydrate-boot-core.mjs",
   "device-quiet-tab-rehydrate-prefs.mjs",
   "device-quiet-tab-rehydrate.mjs",
+  "device-quiet-tab-rehydrate-bootstrap.mjs",
   "device-inbox.mjs",
   "device-tab-presence-core.mjs",
   "device-tab-presence.mjs",

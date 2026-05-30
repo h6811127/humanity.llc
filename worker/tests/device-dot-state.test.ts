@@ -183,16 +183,16 @@ describe("describeDotState", () => {
     expect(steward.next).not.toContain("Open steward review queue");
   });
 
-  it("offers steward queue action when url is available", () => {
+  it("prioritizes vouch guidance over steward queue when url is available", () => {
     const steward = describeDotState("ok", "steward", "none", {
       stewardReady: true,
       queueUrl: "/operator/vouch-audit.html",
     });
     expect(steward.id).toBe("steward");
+    expect(steward.next).toContain("Scan someone else's QR to vouch");
     expect(steward.action).toEqual({
-      kind: "open_steward_queue",
-      label: "Open steward queue",
-      href: "/operator/vouch-audit.html",
+      kind: "open_controls",
+      label: "Open controls",
     });
   });
 

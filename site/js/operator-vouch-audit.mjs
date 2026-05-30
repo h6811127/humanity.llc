@@ -38,7 +38,7 @@ function token() {
 function setStatus(text, isError = false) {
   if (!statusEl) return;
   statusEl.textContent = text;
-  statusEl.style.color = isError ? "var(--red)" : "";
+  statusEl.dataset.tone = isError ? "error" : "neutral";
 }
 
 function setHideReviewed(next) {
@@ -66,6 +66,10 @@ function escapeHtml(str) {
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;");
+}
+
+function formatFlagKind(kind) {
+  return String(kind || "unknown").replaceAll("_", " ");
 }
 
 async function postDismiss(flag, note, dismissedBy) {
@@ -122,7 +126,7 @@ function renderFlags() {
     : currentFlags;
 
   if (visible.length === 0) {
-    flagsEl.innerHTML = `<li class="list-item"><span class="list-sub">No flags to review.</span></li>`;
+    flagsEl.innerHTML = `<li class="operator-audit-empty">No flags to review.</li>`;
     return;
   }
 
@@ -134,27 +138,63 @@ function renderFlags() {
         ? `Reviewed by ${escapeHtml(dismissal.dismissed_by)}`
         : "";
       const reviewedAt = dismissal?.dismissed_at
-        ? ` · ${new Date(dismissal.dismissed_at).toLocaleString()}`
+        ? new Date(dismissal.dismissed_at).toLocaleString()
         : "";
+      const priority = flag.triage?.priority || "unknown";
+      const threats = (flag.triage?.threat_ids || []).join(", ") || "none";
       return `
-      <li class="list-item" data-flag-key="${escapeHtml(flag.flag_key)}">
-        <div class="list-main">
-          <div class="list-title">${escapeHtml(flag.kind)}</div>
-          <div class="list-sub">Profiles: ${escapeHtml(displayProfiles(flag))}</div>
-          <div class="list-sub">Priority: ${escapeHtml(flag.triage?.priority || "unknown")} · Threats: ${escapeHtml((flag.triage?.threat_ids || []).join(", "))}</div>
-          <div class="list-sub">${escapeHtml(flag.triage?.action || "")}</div>
-          ${
-            dismissal
-              ? `<div class="list-sub">Reviewed: ${escapeHtml(reviewedBy + reviewedAt)}</div>`
-              : ""
-          }
-        </div>
-        <div class="created-keys-actions" style="margin-top:8px">
-          <input class="input audit-note" type="text" maxlength="500" placeholder="Dismissal note" value="${escapeHtml(note)}" />
-          <input class="input audit-by" type="text" maxlength="120" placeholder="dismissed_by (optional)" />
-          <button type="button" class="btn-secondary audit-dismiss">Save dismissal</button>
-          <button type="button" class="btn-danger audit-clear" ${dismissal ? "" : "disabled"}>Clear</button>
-        </div>
+      <li class="operator-audit-flag" data-flag-key="${escapeHtml(flag.flag_key)}">
+        <article class="operator-audit-flag-card${dismissal ? " operator-audit-flag-card--reviewed" : ""}">
+          <header class="operator-audit-flag-head">
+            <p class="operator-audit-flag-kind">${escapeHtml(formatFlagKind(flag.kind))}</p>
+            <p class="operator-audit-flag-priority">${escapeHtml(String(priority))} priority</p>
+          </header>
+          <dl class="operator-audit-flag-meta">
+            <div>
+              <dt>Profiles</dt>
+              <dd class="mono">${escapeHtml(displayProfiles(flag))}</dd>
+            </div>
+            <div>
+              <dt>Threat IDs</dt>
+              <dd>${escapeHtml(threats)}</dd>
+            </div>
+            <div class="operator-audit-flag-action">
+              <dt>Suggested action</dt>
+              <dd>${escapeHtml(flag.triage?.action || "Review manually.")}</dd>
+            </div>
+            ${
+              dismissal
+                ? `<div class="operator-audit-flag-reviewed">
+              <dt>Review record</dt>
+              <dd>${escapeHtml(reviewedBy)}${reviewedAt ? ` · ${escapeHtml(reviewedAt)}` : ""}</dd>
+            </div>`
+                : ""
+            }
+          </dl>
+          <div class="operator-audit-flag-form">
+            <label class="field-label" for="audit-note-${escapeHtml(flag.flag_key)}">Dismissal note</label>
+            <input
+              class="input audit-note"
+              id="audit-note-${escapeHtml(flag.flag_key)}"
+              type="text"
+              maxlength="500"
+              placeholder="Why this flag is benign or resolved"
+              value="${escapeHtml(note)}"
+            />
+            <label class="field-label" for="audit-by-${escapeHtml(flag.flag_key)}">Reviewed by (optional)</label>
+            <input
+              class="input audit-by"
+              id="audit-by-${escapeHtml(flag.flag_key)}"
+              type="text"
+              maxlength="120"
+              placeholder="Your handle or initials"
+            />
+            <div class="operator-audit-flag-buttons">
+              <button type="button" class="btn-secondary audit-dismiss">Save dismissal</button>
+              <button type="button" class="btn-danger audit-clear" ${dismissal ? "" : "disabled"}>Clear</button>
+            </div>
+          </div>
+        </article>
       </li>`;
     })
     .join("");

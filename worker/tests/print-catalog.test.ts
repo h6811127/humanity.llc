@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import {
   DEFAULT_PRINT_TEMPLATE_ID,
+  GLITCH_HOODIE_STORE_PRODUCT_ID,
+  GLITCH_HOODIE_TEMPLATE_ID,
   HOODIE_LIVE_OBJECT_PRODUCT_ID,
   HOODIE_PRINT_TEMPLATE_ID,
   STICKER_PERSONALIZED_PRODUCT_ID,
@@ -13,6 +15,12 @@ describe("resolvePrintTemplateIdForProduct", () => {
   it("maps hoodie product to hoodie template", () => {
     expect(resolvePrintTemplateIdForProduct(HOODIE_LIVE_OBJECT_PRODUCT_ID)).toBe(
       HOODIE_PRINT_TEMPLATE_ID
+    );
+  });
+
+  it("maps Glitch hoodie product to Glitch template", () => {
+    expect(resolvePrintTemplateIdForProduct(GLITCH_HOODIE_STORE_PRODUCT_ID)).toBe(
+      GLITCH_HOODIE_TEMPLATE_ID
     );
   });
 
@@ -28,6 +36,7 @@ describe("resolvePrintTemplateIdForProduct", () => {
 describe("getPrintCatalogProduct", () => {
   it("includes Tier 1 hoodie and sticker templates", () => {
     expect(getPrintCatalogProduct(HOODIE_PRINT_TEMPLATE_ID)?.type).toBe("hoodie");
+    expect(getPrintCatalogProduct(GLITCH_HOODIE_TEMPLATE_ID)?.type).toBe("hoodie");
     expect(getPrintCatalogProduct(DEFAULT_PRINT_TEMPLATE_ID)?.product_id).toBe(
       "prod_sticker_square"
     );

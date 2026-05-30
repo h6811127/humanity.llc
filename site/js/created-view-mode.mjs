@@ -1,7 +1,7 @@
 /**
  * Apply read-only /created/ workspace chrome when keys are not in this tab.
  * @see docs/OWNERSHIP_RESTORE_UX_PLAN.md
- * @see docs/SAFARI_KEYS_WIPE_INVESTIGATION.md P0-7
+ * @see docs/SAFARI_KEYS_CUSTODY.md P0-7
  */
 
 import { OWNERSHIP_NOT_LOADED_TAB } from "./device-ownership-copy-core.mjs";

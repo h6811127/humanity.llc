@@ -16,6 +16,17 @@ const ROWS = [
     story: "Tier 1 belonging.",
     products: [
       {
+        product_id: "glitch_hoodie_v1",
+        title: "Glitch LIVE QR hoodie",
+        meaning_line: "Founding Glitch art — your unique QR.",
+        product_class: "personalized",
+        personalization_indicator: "Personalized QR",
+        detail_path: "/shop/products/glitch_hoodie_v1/",
+        action_path: "/shop/customize/?product=glitch_hoodie_v1",
+        cta_label: "Customize your QR",
+        price_display: "$88 + shipping",
+      },
+      {
         product_id: "sticker_personalized_v1",
         title: "Personalized sticker",
         meaning_line: "Unique QR sticker.",
@@ -49,18 +60,9 @@ const ROWS = [
         product_class: "limited_drop",
         personalization_indicator: "Limited Drop",
         detail_path: "/shop/products/tier0_founding_sticker_v1/",
+        action_path: "/shop/products/tier0_founding_sticker_v1/",
         cta_label: "View product",
         price_display: null,
-      },
-      {
-        product_id: "tier0_glitch_hoodie_v1",
-        title: "Glitch LIVE QR hoodie",
-        meaning_line: "Company drop.",
-        product_class: "limited_drop",
-        personalization_indicator: "Company drop",
-        detail_path: "/shop/products/tier0_glitch_hoodie_v1/",
-        cta_label: "View drop",
-        price_display: "$88 + shipping",
       },
     ],
   },
@@ -88,6 +90,11 @@ const CONFIG = {
     checkout_product_id: "sticker_personalized_v1",
     products: [
       {
+        product_id: "glitch_hoodie_v1",
+        print_template_id: "hc-glitch-hoodie-v1",
+        price_display: "$88 + shipping",
+      },
+      {
         product_id: "sticker_personalized_v1",
         print_template_id: "hc-sticker-square-v1",
         checkout_url: "https://store.example/cart/2:1",
@@ -106,6 +113,11 @@ const CONFIG = {
 const CATALOG = {
   products: [
     {
+      template_id: "hc-glitch-hoodie-v1",
+      type: "hoodie",
+      variants: [{ variant_id: "black-m", enabled: true }],
+    },
+    {
       template_id: "hc-sticker-square-v1",
       type: "sticker",
       variants: [{ variant_id: "2x2-white", enabled: true }],
@@ -119,16 +131,16 @@ const CATALOG = {
 };
 
 describe("shop-store-rows-core", () => {
-  it("marks glitch hoodie coming soon when checkout gated off", () => {
+  it("marks Glitch hoodie preview when personalize checkout gated off", () => {
     expect(
       resolveProductAvailability(CONFIG, CATALOG, {
-        product_id: "tier0_glitch_hoodie_v1",
-        product_class: "limited_drop",
+        product_id: "glitch_hoodie_v1",
+        product_class: "personalized",
       })
-    ).toBe("coming_soon");
+    ).toBe("preview");
     expect(
       resolveProductPriceDisplay(CONFIG, {
-        product_id: "tier0_glitch_hoodie_v1",
+        product_id: "glitch_hoodie_v1",
         price_display: "$88 + shipping",
       })
     ).toBe("$88 + shipping");
@@ -166,8 +178,9 @@ describe("shop-store-rows-core", () => {
 
   it("enriches rows with availability and price", () => {
     const enriched = enrichStoreRows(CONFIG, CATALOG, ROWS);
-    expect(enriched[0]?.products[0]?.availability).toBe("checkout");
-    expect(enriched[0]?.products[1]?.availability).toBe("preview");
+    expect(enriched[0]?.products[0]?.availability).toBe("preview");
+    expect(enriched[0]?.products[1]?.availability).toBe("checkout");
+    expect(enriched[0]?.products[2]?.availability).toBe("preview");
     expect(enriched[1]?.products[0]?.availability).toBe("checkout");
   });
 
@@ -180,7 +193,8 @@ describe("shop-store-rows-core", () => {
   it("renders story rows HTML with product cards", () => {
     const html = renderStoreRowsHtml(enrichStoreRows(CONFIG, CATALOG, ROWS));
     expect(html).toContain('id="shop-row-row_personalize"');
-    expect(html).toContain("Personalized sticker");
+    expect(html).toContain("Glitch LIVE QR hoodie");
+    expect(html).toContain('href="/shop/customize/?product=glitch_hoodie_v1"');
     expect(html).toContain('href="/shop/products/tier0_founding_sticker_v1/"');
   });
 });

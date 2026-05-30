@@ -1,6 +1,6 @@
 /**
  * P0b-1: card-disabled-since-visit false positive on fresh create (R10).
- * @see docs/SAFARI_KEYS_WIPE_INVESTIGATION.md rollout step 8
+ * @see docs/SAFARI_KEYS_CUSTODY.md rollout step 8
  */
 import { describe, expect, it } from "vitest";
 

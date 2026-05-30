@@ -1,6 +1,6 @@
 /**
  * Classify `hc_wallet` localStorage payload (R7 · Safari P1-4).
- * @see docs/SAFARI_KEYS_WIPE_INVESTIGATION.md R7
+ * @see docs/SAFARI_KEYS_CUSTODY.md R7
  */
 
 /** @typedef {"empty" | "ok" | "corrupt"} WalletParseKind */

@@ -70,6 +70,8 @@ function summary(): VerificationSummaryRow {
 describe("scan hero visual contract (v2 depth)", () => {
   it("bundles tier-4 tokens and hero surface rules in scan-pass.css", () => {
     expect(SCAN_PASS_CSS).toContain("--hc-scan-hero-shadow");
+    expect(SCAN_PASS_CSS).toContain("--scan-hero-qr-expanded-max");
+    expect(SCAN_PASS_CSS).toMatch(/\.scan-hero-qr-details\[open\][\s\S]*--scan-hero-qr-expanded-max/);
     expect(SCAN_PASS_CSS).toContain("--hc-scan-hero-fill");
     expect(SCAN_PASS_CSS).toContain("--hc-scan-hero-border");
     expect(SCAN_PASS_CSS).toContain("scan-hero-settle-pulse");

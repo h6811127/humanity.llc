@@ -38,6 +38,15 @@ describe("merchThanksPageUrl", () => {
       )
     ).toBe("https://humanity.llc/shop/thanks/?hc_ref=tier0_glitch");
   });
+
+  it("appends hc_ref for Tier 1 Glitch post-purchase", () => {
+    expect(
+      merchThanksPageUrl(
+        { site_origin: "https://humanity.llc", thanks_path: "/shop/thanks/" },
+        "customize_glitch"
+      )
+    ).toBe("https://humanity.llc/shop/thanks/?hc_ref=customize_glitch");
+  });
 });
 
 describe("isTier0CheckoutOpen", () => {

@@ -2,7 +2,7 @@
 
 **Status:** Working checklist  -  fill in bracketed fields before launch  
 **Canonical strategy:** `docs/MERCH_LED_V1.md`, `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`  
-**Merch QR policy:** `docs/MERCH_QR_LIFECYCLE_POLICY.md` · Tier 0 batch: `docs/TIER0_CAMPAIGN_QR_RUNBOOK.md` · **Company/community merch (e.g. Glitch drop):** `docs/COMPANY_MERCH_AND_COMMUNITY_CAMPAIGN.md` · Support: `docs/MERCH_SUPPORT_MACROS.md`  
+**Merch QR policy:** `docs/MERCH_QR_LIFECYCLE_POLICY.md` · Tier 0 batch: `docs/TIER0_CAMPAIGN_QR_RUNBOOK.md` · **Glitch hoodie launch (Tier 1):** [`MERCH_PRODUCT_COPY.md`](MERCH_PRODUCT_COPY.md) · Tier 0 batch lane: [`COMPANY_MERCH_AND_COMMUNITY_CAMPAIGN.md`](COMPANY_MERCH_AND_COMMUNITY_CAMPAIGN.md) · Support: `docs/MERCH_SUPPORT_MACROS.md`  
 **Copy source:** `docs/LAUNCH_LANGUAGE_KIT.md` (Tier 0 / Tier 1 sections · Sticker FAQ)
 
 ---
@@ -11,15 +11,15 @@
 
 | Field | Tier 0  -  Curiosity | Tier 1  -  Belonging |
 |---|---|---|
-| **Codename** | `[e.g. Signal Sticker]` | `[e.g. Founding Human Line]` |
-| **Purpose** | Walking ads + scan→create | Cohort trust + personalized artifact |
-| **Who can buy** | Open / waitlist-approved | Active Humanity Card holders (personalization); not a protocol invite gate |
-| **Window** | `[start]` → `[end]` | `[start]` → `[end]` (after Tier 0 or overlap final week) |
+| **Codename** | `[e.g. Signal Sticker]` | **`Glitch LIVE QR hoodie`** (founding drop) · optional generic Live Object line |
+| **Purpose** | Walking ads + scan→create | Personalized live object on fabric — **buyer holds keys** |
+| **Who can buy** | Open / waitlist-approved | Create card + customize (`/shop/customize/`) — not a protocol invite gate |
+| **Window** | `[start]` → `[end]` | `[start]` → `[end]` (may overlap Tier 0 sticker) |
 | **Quantity cap** | `[e.g. 500]` or unlimited | `[e.g. 100]` |
-| **SKU count** | 1 design | 1 design (+ personalization when QA ready) |
+| **SKU count** | 1 design (batch QR) | 1+ designs — **Glitch** fixed art + unique QR per unit |
 | **QR model** | Batch QR → landing OK; **no `expires_at`** | Unique item QR (`print_artifact`); **no `expires_at`** |
-| **Price** | `[e.g. $8–12 + ship]` | `[e.g. $15–25 + ship]` |
-| **Status on scan** | Card may be `Registered` only | May show `Founding Human` / `Vouched Human` per policy |
+| **Price** | `[e.g. $8–12 + ship]` | **Glitch:** `[e.g. $88 + ship]` · generic hoodie: `[e.g. $48 + ship]` |
+| **Status on scan** | Card may be `Registered` only | Buyer's card state · may show vouch per policy |
 
 **Hard rule:** Purchasing never grants vouch or “verified” status. Print never says Verified Human.
 
@@ -45,17 +45,19 @@ Check every box before taking money.
 - [ ] Batch QR resolves to correct landing (no stale verification on print)
 - [ ] Analytics: scan count + scan→card-create (no per-scan PII logging)
 
-### Tier 1 (belonging)
+### Tier 1 (belonging) — **Glitch hoodie launch**
 
-**Commerce wiring:** [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) — Printify template + Shopify variant + `shop-config.json` + Worker env; customization on `/shop/customize/`, not Shopify alone.
+**Commerce wiring:** [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) — Printify Glitch template + Shopify variant + `glitch_hoodie_v1` in `shop-config.json` `personalize.products` + Worker env; customization on `/shop/customize/`, not Shopify alone. Copy: [`MERCH_PRODUCT_COPY.md`](MERCH_PRODUCT_COPY.md).
 
 - [ ] Card-creation flow live (public launch)
-- [ ] Checkout verifies active card / owner session for personalized SKUs
-- [ ] Vouch rules published (3 vouch threshold, quotas, 90-day wait)
-- [ ] Shopify metadata spike passed if personalized (`artifact_intent_id` on paid webhook)
-- [ ] Printify sample order passed if per-item unique QR
-- [ ] Support/reprint policy published ([`MERCH_SUPPORT_MACROS.md`](MERCH_SUPPORT_MACROS.md) + policy § Revoke, reprint, and support)
-- [ ] Batch rotate drill completed in staging ([`TIER0_CAMPAIGN_QR_RUNBOOK.md`](TIER0_CAMPAIGN_QR_RUNBOOK.md))
+- [ ] `glitch_hoodie_v1` (or launch hoodie id) in `personalize.products` with checkout URL + variant id
+- [ ] Customizer shows Glitch mock + unique QR preview
+- [ ] Checkout verifies active card / owner session
+- [ ] Shopify metadata spike passed (`artifact_intent_id` on paid webhook)
+- [ ] Printify sample order with **unique** Glitch QR per test order
+- [ ] Support/reprint policy published
+- [ ] Physical QA — [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md)
+- [ ] Post-purchase thanks: `hc_ref=customize_glitch` → `/created/#update-status`
 
 ### Ops
 

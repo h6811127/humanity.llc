@@ -1,9 +1,9 @@
 /**
  * P0b-1 prod WebKit sign-off helpers (R10).
- * @see docs/SAFARI_KEYS_WIPE_INVESTIGATION.md P0b-1
+ * @see docs/SAFARI_KEYS_CUSTODY.md P0b-1
  */
 
-export const SAFARI_KEYS_DOC_REL = "docs/SAFARI_KEYS_WIPE_INVESTIGATION.md";
+export const SAFARI_KEYS_DOC_REL = "docs/SAFARI_KEYS_CUSTODY.md";
 
 /** Marker in P0b-1 rollout table before prod WebKit sign-off. */
 export const P0B1_PROD_WEBKIT_SIGNOFF_PENDING =
@@ -63,13 +63,13 @@ export function cardDisabledSinceVisitSignOffSummaryLines(input) {
   ];
   if (input.result === "pass") {
     lines.push(
-      "On pass with --apply: updates docs/SAFARI_KEYS_WIPE_INVESTIGATION.md P0b-1 status.",
+      "On pass with --apply: updates docs/SAFARI_KEYS_CUSTODY.md P0b-1 status.",
       "Desk gate (engineering): npm run card-disabled-since-visit:desk-gate"
     );
   } else {
     lines.push(
       "On fail: file regression with hc_debug snapshot; do not mark P0b-1 passed.",
-      "See docs/CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md"
+      "See docs/DEVICE_INBOX.md § Incident history"
     );
   }
   lines.push("");

@@ -1,6 +1,6 @@
 /**
  * P0-2 sync auto-save policy (R3).
- * @see docs/SAFARI_KEYS_WIPE_INVESTIGATION.md
+ * @see docs/SAFARI_KEYS_CUSTODY.md
  */
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";

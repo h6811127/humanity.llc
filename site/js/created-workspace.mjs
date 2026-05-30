@@ -4,6 +4,7 @@
  */
 
 import { createdControlRootVisibleForMode } from "./created-view-mode-core.mjs";
+import { setupManageTabHintVisible } from "./created-workspace-manage-visibility-core.mjs";
 
 /** @typedef {"setup" | "control" | "view"} CreatedMode */
 
@@ -29,6 +30,9 @@ export function applyCreatedWorkspaceMode(mode) {
 
   if (setupRoot) setupRoot.hidden = mode !== "setup";
   if (controlRoot) controlRoot.hidden = !createdControlRootVisibleForMode(mode);
+
+  const manageHint = document.getElementById("created-setup-manage-hint");
+  if (manageHint) manageHint.hidden = !setupManageTabHintVisible(mode);
 
   if (heroTitle) {
     heroTitle.textContent = createdHeroTitleForMode(mode);

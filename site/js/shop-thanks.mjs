@@ -4,6 +4,7 @@
  */
 import {
   appendMerchRefToCreateUrl,
+  isGlitchCustomizeMerchRef,
   isTier0GlitchMerchRef,
   isTier1MerchRef,
   persistMerchCreateRef,
@@ -13,6 +14,7 @@ import {
 } from "./merch-funnel-core.mjs";
 import { reconcileThanksMintPanel } from "./shop-thanks-mint.mjs";
 import { syncMerchBackupNudgeNotice } from "./merch-backup-nudge.mjs";
+import { tier1ThanksCopyForMerchRef } from "./shop-merch-copy-core.mjs";
 
 const form = document.getElementById("shop-thanks-status-form");
 const resultEl = document.getElementById("shop-thanks-status-result");
@@ -26,6 +28,9 @@ const tier0EyebrowEl = document.getElementById("shop-thanks-tier0-eyebrow");
 const tier0TitleEl = document.getElementById("shop-thanks-tier0-title");
 const tier0LineEl = document.getElementById("shop-thanks-tier0-line");
 const tier0PurchaseNoteEl = document.getElementById("shop-thanks-tier0-purchase-note");
+const tier1EyebrowEl = document.getElementById("shop-thanks-tier1-eyebrow");
+const tier1TitleEl = document.getElementById("shop-thanks-tier1-title");
+const tier1LineEl = document.getElementById("shop-thanks-tier1-line");
 
 /** @type {Record<string, { title: string; meta: string; eyebrow: string; lineHtml: string; purchaseNoteHtml: string }>} */
 const TIER0_THANKS_COPY = {
@@ -96,16 +101,23 @@ function applyThanksTierCopy() {
     if (tier0PurchaseNoteEl) tier0PurchaseNoteEl.innerHTML = tier0Copy.purchaseNoteHtml;
   }
 
+  if (tier1) {
+    const tier1Copy = tier1ThanksCopyForMerchRef(ref);
+    if (tier1EyebrowEl) tier1EyebrowEl.textContent = tier1Copy.eyebrow;
+    if (tier1TitleEl) tier1TitleEl.textContent = tier1Copy.title;
+    if (tier1LineEl) tier1LineEl.innerHTML = tier1Copy.lineHtml;
+  }
+
   document.title = tier1
-    ? "Thanks · Live Object order · humanity.llc"
+    ? isGlitchCustomizeMerchRef(ref)
+      ? "Thanks · Glitch hoodie · humanity.llc"
+      : "Thanks · Live Object order · humanity.llc"
     : glitch
       ? "Thanks · Glitch hoodie · humanity.llc"
       : "Thanks · Founding sticker · humanity.llc";
   const meta = document.querySelector('meta[name="description"]');
   if (meta instanceof HTMLMetaElement) {
-    meta.content = tier1
-      ? "Thanks for your personalized Live Object order. Update what scanners read from your phone — same ink, new meaning."
-      : tier0Copy.meta;
+    meta.content = tier1 ? tier1ThanksCopyForMerchRef(ref).meta : tier0Copy.meta;
   }
   syncThanksBackupNudge();
 }

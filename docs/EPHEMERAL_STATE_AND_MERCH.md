@@ -11,6 +11,8 @@
 
 **Same ink, new meaning** — the QR on a hoodie or sticker is fixed; what strangers read at scan time is **signed resolver state** the owner can change from their phone without reprinting.
 
+**Glitch founding hoodie (2026-05-30):** launches on this model — fixed Glitch **art**, **unique** QR per buyer, buyer signs updates ([`MERCH_PRODUCT_COPY.md`](MERCH_PRODUCT_COPY.md)). Not shared-batch campaign ink.
+
 This is the product moat. It is **L0–L2 object intelligence**, not AI.
 
 ---

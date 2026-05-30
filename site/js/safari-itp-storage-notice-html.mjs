@@ -1,6 +1,6 @@
 /**
  * Safari ITP storage notice emphasis card (P2-1).
- * @see docs/SAFARI_KEYS_WIPE_INVESTIGATION.md P2-1
+ * @see docs/SAFARI_KEYS_CUSTODY.md P2-1
  */
 
 import {

@@ -1,7 +1,7 @@
 /**
  * Tab session (`hc_created`) persistence rules for /created/ (P0-6).
  * Thin alias over `device-tab-session-core` — single source of truth with `device-keys.mjs`.
- * @see docs/SAFARI_KEYS_WIPE_INVESTIGATION.md § R11 / P0-6
+ * @see docs/SAFARI_KEYS_CUSTODY.md § R11 / P0-6
  */
 
 export const CREATED_SESSION_STORAGE_KEY = "hc_created";

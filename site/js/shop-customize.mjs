@@ -7,6 +7,7 @@ import { QR_PREVIEW_RENDER_WIDTH, renderQrToImage } from "./qr-render.mjs";
 import { loadShopConfig } from "./shop-config.mjs";
 import {
   appendMerchRefToCreateUrl,
+  merchRefForPersonalizeProductId,
   persistMerchCreateRef,
   peekMerchCustomizeRef,
   readMerchRefFromUrl,
@@ -28,6 +29,7 @@ import {
   personalizeProductDisplay,
   personalizeProducts,
   readManifestoLineForCustomize,
+  resolveCustomizePreviewKind,
 } from "./shop-customize-core.mjs";
 import {
   CUSTOMIZE_PREVIEW_FORMING_LABEL,
@@ -49,7 +51,7 @@ import {
 } from "./shop-proof-consent-core.mjs";
 import { syncMerchBackupNudgeNotice } from "./merch-backup-nudge.mjs";
 import { loadRootSessionRecordForMerch, merchPreCheckoutRecoveryGateState } from "./merch-backup-nudge-core.mjs";
-import { SHOP_CUSTOMIZE_PROOF_PERSISTENCE } from "./shop-merch-copy-core.mjs";
+import { SHOP_CUSTOMIZE_PROOF_PERSISTENCE, customizeHeroForProduct, customizeHonestyRowsForProduct } from "./shop-merch-copy-core.mjs";
 
 const PERSONALIZE_PROOF_CONSENT_IDS = proofConsentRequiredIds("personalized");
 
@@ -74,6 +76,10 @@ const checkoutBtn = document.getElementById("shop-customize-checkout");
 const interestSection = document.getElementById("shop-customize-interest");
 const proofConsentEl = document.getElementById("shop-proof-consent");
 const createLink = document.getElementById("shop-customize-create-link");
+const heroEyebrowEl = document.getElementById("shop-customize-hero-eyebrow");
+const heroTitleEl = document.getElementById("shop-customize-hero-title");
+const heroLeadEl = document.getElementById("shop-customize-hero-lead");
+const honestyListEl = document.getElementById("shop-customize-honesty-list");
 
 /** @type {Record<string, unknown> | null} */
 let shopConfig = null;
@@ -177,9 +183,8 @@ function renderProductPicker() {
       activeIntent = null;
       previewMode = null;
       clearShippingEstimate();
-      if (display.preview === "hoodie") {
-        persistMerchCreateRef("customize_hoodie");
-      }
+      persistMerchCreateRef(merchRefForPersonalizeProductId(display.productId));
+      syncProductCopy(product);
       for (const child of productRow.querySelectorAll(".shop-customize-product-btn")) {
         const active = child.dataset.productId === selectedProductId;
         child.classList.toggle("is-active", active);
@@ -191,11 +196,37 @@ function renderProductPicker() {
   }
 }
 
+function syncProductCopy(product) {
+  if (!product) return;
+  const display = personalizeProductDisplay(product);
+  const hero = customizeHeroForProduct(display.productId);
+  if (heroEyebrowEl) heroEyebrowEl.textContent = hero.eyebrow;
+  if (heroTitleEl) heroTitleEl.textContent = hero.title;
+  if (heroLeadEl) heroLeadEl.textContent = hero.lead;
+  if (honestyListEl) {
+    honestyListEl.replaceChildren();
+    for (const row of customizeHonestyRowsForProduct(display.productId)) {
+      const li = document.createElement("li");
+      li.className = "list-row";
+      const content = document.createElement("span");
+      content.className = "list-content";
+      const title = document.createElement("span");
+      title.className = "list-title";
+      title.textContent = row.title;
+      const sub = document.createElement("span");
+      sub.className = "list-sub";
+      sub.textContent = row.sub;
+      content.append(title, sub);
+      li.append(content);
+      honestyListEl.appendChild(li);
+    }
+  }
+}
+
 function syncMockPreviewKind() {
   if (!mockEl) return;
   const product = selectedProduct();
-  const kind =
-    product && personalizeProductDisplay(product).preview === "sticker" ? "sticker" : "hoodie";
+  const kind = product ? resolveCustomizePreviewKind(product) : "hoodie";
   mockEl.dataset.preview = kind;
   if (kind === "sticker") {
     const layout = customizeStickerMockLayout(QR_PREVIEW_RENDER_WIDTH);
@@ -506,7 +537,13 @@ function showCardReady(session) {
   }
   renderProductPicker();
   const product = selectedProduct();
-  if (product) syncCheckoutUi(product);
+  if (product) {
+    persistMerchCreateRef(
+      merchRefForPersonalizeProductId(personalizeProductDisplay(product).productId)
+    );
+    syncProductCopy(product);
+    syncCheckoutUi(product);
+  }
   void refreshPreview();
 }
 

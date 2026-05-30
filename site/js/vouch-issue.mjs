@@ -561,6 +561,37 @@ async function tryAutoActivateDefaultVouchKeys(voucheeProfileId, opts = {}) {
   return activateWalletEntryForVouchScan(entry, "auto_activate_vouch_keys");
 }
 
+/** Multi-wallet scan: load a steward-eligible card other than the vouchee. */
+async function tryAutoActivateEligibleVouchProfile(voucheeProfileId, opts = {}) {
+  if (opts.skipAutoActivate || userSkippedAutoActivateOnThisScan()) return false;
+
+  const eligible = await findEligibleWalletVouchers(voucheeProfileId);
+  const skipProfileId =
+    typeof opts.skipProfileId === "string" ? opts.skipProfileId.trim() : "";
+  const currentId = loadSession()?.profile_id;
+  /** @type {Array<{ entry: Record<string, unknown> }>} */
+  const candidates = [];
+
+  for (const item of eligible) {
+    const pid = String(item.entry?.profile_id || "");
+    if (!pid || pid === voucheeProfileId) continue;
+    if (skipProfileId && pid === skipProfileId) continue;
+    if (currentId && pid === currentId) continue;
+    if (!(await walletEntryPassesVouchActivationGate(item.entry))) continue;
+    candidates.push(item);
+  }
+
+  if (candidates.length === 0) return false;
+
+  const defaultId = getDefaultVouchProfileId();
+  const pick =
+    (defaultId
+      ? candidates.find((item) => item.entry.profile_id === defaultId)
+      : null) ?? candidates[0];
+
+  return activateWalletEntryForVouchScan(pick.entry, "auto_activate_vouch_eligible");
+}
+
 /** P0b-3: sole signing row on device — no default-vouch opt-in required. */
 async function tryAutoActivateSoleSigningWalletForVouch(voucheeProfileId, opts = {}) {
   if (opts.skipAutoActivate || userSkippedAutoActivateOnThisScan()) return false;
@@ -900,11 +931,14 @@ async function runVouchFlow(opts = {}) {
       typeof rehydrated.profileId === "string" &&
       rehydrated.profileId !== voucheeProfileId
     ) {
-      return runVouchFlow({
-        autoActivateAttempted: true,
-        quietRehydrateActivated: true,
-        soleRowRehydrated: true,
-      });
+      return runVouchFlow({ autoActivateAttempted: true, soleRowRehydrated: true });
+    }
+    const eligibleActivated = await tryAutoActivateEligibleVouchProfile(
+      voucheeProfileId,
+      opts
+    );
+    if (eligibleActivated) {
+      return runVouchFlow({ autoActivateAttempted: true, eligibleActivated: true });
     }
     await showNoKeysExplainer(voucheeProfileId);
     return;
@@ -917,6 +951,12 @@ async function runVouchFlow(opts = {}) {
 
   const voucherProfileId = session.profile_id;
   if (voucherProfileId === voucheeProfileId) {
+    const switched = await tryAutoActivateEligibleVouchProfile(voucheeProfileId, {
+      skipProfileId: voucheeProfileId,
+    });
+    if (switched) {
+      return runVouchFlow({ autoActivateAttempted: true, eligibleSwitched: true });
+    }
     showExplainerHtml(
       "Cannot vouch for your own profile. Open another person’s scan while <strong>your</strong> identity is loaded in this tab."
     );
@@ -931,8 +971,15 @@ async function runVouchFlow(opts = {}) {
   }
 
   let voucherStatus;
+  const walletEntry = loadWallet().find((e) => e.profile_id === voucherProfileId);
+  const voucherQrId =
+    (typeof session.qr_id === "string" && session.qr_id) ||
+    walletEntryQrId(walletEntry) ||
+    null;
   try {
-    const res = await fetch(getCardStatusUrl(voucherProfileId));
+    const res = await fetch(getCardStatusUrl(voucherProfileId, voucherQrId), {
+      cache: "no-store",
+    });
     voucherStatus = await res.json();
   } catch {
     showIneligible("Could not load your card status. Check connection and refresh.");
@@ -951,6 +998,12 @@ async function runVouchFlow(opts = {}) {
   }
 
   if (!isEligibleVoucherState(voucherState)) {
+    const switched = await tryAutoActivateEligibleVouchProfile(voucheeProfileId, {
+      skipProfileId: voucherProfileId,
+    });
+    if (switched) {
+      return runVouchFlow({ autoActivateAttempted: true, eligibleSwitched: true });
+    }
     showIneligible(
       "Your card must be Vouched Human or Steward on this network before you can vouch."
     );

@@ -7,14 +7,18 @@
 
 ---
 
-## First launch recommendation (2026-05-27)
+## First launch recommendation (2026-05-30)
 
 **Lead with Tier 1 personalized merch** — scan live wear → create card → `/shop/customize/` → unique LIVE OBJECT QR → Shopify checkout → Printify fulfillment.
 
+**Founding drop:** **Glitch LIVE QR hoodie** — fixed Glitch artwork, **unique QR per buyer**, target id `glitch_hoodie_v1` in `personalize.products` ([`MERCH_PRODUCT_COPY.md`](MERCH_PRODUCT_COPY.md)). **Not** shared-batch `tier0_glitch_hoodie_v1`.
+
 | Launch path | Real product? | Notes |
 |-------------|---------------|-------|
-| **Tier 1** `/shop/customize/` + artifact intent | **Yes** — customizeability is the wedge | Hoodie or sticker with **unique `print_artifact` per unit** |
+| **Tier 1 Glitch hoodie** `/shop/customize/` + artifact intent | **Yes** — **primary launch wedge** | Fixed Glitch art · unique `print_artifact` per unit · buyer holds keys |
+| **Tier 1** generic hoodie / sticker | **Yes** | Same plumbing · optional second SKUs |
 | **Tier 0** batch founding sticker | Optional curiosity SKU | Shared campaign QR; no customizer |
+| **Tier 0 shared-batch Glitch PDP** (`tier0_glitch_hoodie_v1`) | **No** (deprecated for launch) | Pre-printed same URL on every unit — superseded 2026-05-30 |
 | **Shopify hoodie alone** (Printify publish, no customizer flow) | **No** — payment SKU only | Static print file; not per-buyer QR |
 | **Status plate / door pilot** | Optional Phase A vertical | Not the primary GTM wedge post-M5 |
 
@@ -258,17 +262,17 @@ Mirrors [`hosted:rollout:step*`](HOSTED_TIER_G0_READINESS.md) for merch funnel c
 | 1 | `npm run merch-funnel:rollout:step1` | Validate repo `shop-config.json` + merch funnel Vitest |
 | 1 strict | `npm run merch-funnel:rollout:step1 -- --strict` | Fail if launch SKU lacks `checkout_url` |
 | 2 preflight | `npm run merch-funnel:rollout:step2 -- --preflight` | Local shop-config + rollout unit tests (no fetch) |
-| 2 | `SITE_ORIGIN=https://humanity.llc npm run merch-funnel:rollout:step2 -- --verify` | Smoke deployed Pages config + Glitch PDP shell + store API + repo drift |
+| 2 | `SITE_ORIGIN=https://humanity.llc npm run merch-funnel:rollout:step2 -- --verify` | Smoke deployed Pages config + shop/customize + store API + repo drift |
 | 2 CI | `deploy-pages.yml` → `merch-funnel:rollout:post-deploy -- --pages` | Post-deploy step 2 verify (non-`--strict`; warnings OK until operator pastes URLs) |
 | 3 preflight | `npm run merch-funnel:rollout:step3 -- --preflight` | `humanity.llc/v1/*` route + rollout Vitest (no API) |
-| 3 | `API_ORIGIN=https://humanity.llc npm run merch-funnel:rollout:step3 -- --verify` | Health, print catalog, store rows + Glitch product, artifact-intent route |
+| 3 | `API_ORIGIN=https://humanity.llc npm run merch-funnel:rollout:step3 -- --verify` | Health, print catalog, store rows + artifact-intent route |
 | 3 CI | `deploy-worker.yml` → `merch-funnel:rollout:post-deploy -- --worker` | Post-deploy step 3 verify after Worker deploy |
 | 4 | `npm run merch-funnel:rollout:step4` | Worker env + route checklist (`wrangler.toml`, `index.ts` store catalog) |
 | 5 | `npm run merch-funnel:rollout:step5` | Launch gates + physical QA checklist |
 | 5 preflight | `npm run merch-funnel:rollout:step5 -- --preflight` | Automated `verify:merch-funnel` + print QA Vitest |
-| 5 verify | `SITE_ORIGIN=https://humanity.llc npm run merch-funnel:rollout:step5 -- --verify` | Preflight + production Glitch PDP/API + config audit (digital gate) |
+| 5 verify | `SITE_ORIGIN=https://humanity.llc npm run merch-funnel:rollout:step5 -- --verify` | Preflight + production shop/customize + store API + config audit (digital gate) |
 | 6 preflight | `npm run merch-funnel:rollout:step6 -- --preflight` | Rollout unit tests + `verify:merch-funnel` (no Playwright) |
-| 6 | `npm run merch-funnel:rollout:step6 -- --verify` | Engineering close-out: preflight + `e2e:merch-funnel` + production Glitch PDP/API + `verify-config` |
+| 6 | `npm run merch-funnel:rollout:step6 -- --verify` | Engineering close-out: preflight + `e2e:merch-funnel` + production shop API + `verify-config` |
 | **Complete** | `npm run merch-funnel:rollout:complete -- --verify` | Step 6 + scan merch test; prints operator-only next steps |
 | Post-deploy all | `npm run merch-funnel:rollout:post-deploy -- --all` | Steps 2 + 3 production verify (Pages + Worker) |
 

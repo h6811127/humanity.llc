@@ -566,6 +566,11 @@ export function resetWalletCachesForTests() {
   walletSummaryReconciledThisVisit = false;
 }
 
+/** Test-only: simulate first-visit reconcile complete (RC-5 fast path). */
+export function markWalletSummaryReconciledForTests() {
+  walletSummaryReconciledThisVisit = true;
+}
+
 export function isWalletSummaryReconciledThisVisit() {
   return walletSummaryReconciledThisVisit;
 }

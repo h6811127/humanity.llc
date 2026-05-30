@@ -4,6 +4,7 @@
  */
 
 import { validateOfficialScanUrl } from "./qr-scan-url-lock.mjs";
+import { normalizeScannedQrPayload } from "./device-hub-qr-scanner-decode-core.mjs";
 export {
   barcodeDetectorSupported,
   hubCameraScanSupported,
@@ -12,9 +13,11 @@ export {
 
 /**
  * @param {number} [walletCount]
+ * @param {{ stewardReady?: boolean, hasTabSigningKeys?: boolean }} [opts]
  */
-export function shouldShowHubQrScanner(walletCount = 0) {
-  return walletCount >= 1;
+export function shouldShowHubQrScanner(walletCount = 0, opts = {}) {
+  if (walletCount >= 1) return true;
+  return Boolean(opts.stewardReady && opts.hasTabSigningKeys);
 }
 
 /**
@@ -23,7 +26,12 @@ export function shouldShowHubQrScanner(walletCount = 0) {
  */
 export function shouldShowHubScanQrChrome(input = {}) {
   const walletCount = input.walletCount ?? 0;
-  return shouldShowHubQrScanner(walletCount) && input.standalone === true;
+  return (
+    shouldShowHubQrScanner(walletCount, {
+      stewardReady: input.stewardReady,
+      hasTabSigningKeys: input.hasTabSigningKeys,
+    }) && input.standalone === true
+  );
 }
 
 /**
@@ -32,7 +40,7 @@ export function shouldShowHubScanQrChrome(input = {}) {
  * @returns {string | null}
  */
 export function resolveScannedQrToScanUrl(raw, defaultOrigin = "https://humanity.llc") {
-  let candidate = String(raw ?? "").trim();
+  let candidate = normalizeScannedQrPayload(raw);
   if (!candidate) return null;
 
   if (!/^https?:\/\//i.test(candidate)) {

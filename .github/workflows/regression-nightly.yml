@@ -1,0 +1,55 @@
+# Cross-surface regression belt — catches path-filter gaps on test-site / deploy-worker.
+# @see docs/SYSTEM_INVARIANTS.md · docs/PRODUCT_WORKSTREAM_COORDINATION.md
+name: Regression nightly
+
+on:
+  schedule:
+    - cron: "0 9 * * *"
+  workflow_dispatch:
+
+jobs:
+  vitest-and-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - run: npm run worker:test
+      - name: Hub card disappeared (fast)
+        run: npm run hub-card-disappeared:verify:fast
+      - name: Ownership restore Vitest
+        run: |
+          npm run worker:test:view-only-restore
+          npm run worker:test:hub-restore-always
+      - name: Steward scan handoff (fast)
+        run: npm run steward-scan-handoff:verify:fast
+      - name: Safari keys regression Vitest
+        run: |
+          npm run worker:test -- \
+            worker/tests/device-quiet-tab-rehydrate.test.ts \
+            worker/tests/device-tab-session.test.ts \
+            worker/tests/device-wallet-save-core.test.ts
+
+  e2e-belt:
+    runs-on: ubuntu-latest
+    needs: vitest-and-verify
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium webkit
+      - name: Cross-surface E2E belt
+        run: |
+          npm run e2e:safari-keys-persistence
+          npm run e2e:scan-page-dot
+          npm run e2e:key-loss-sad-path
+          npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts
+        env:
+          CI: "true"

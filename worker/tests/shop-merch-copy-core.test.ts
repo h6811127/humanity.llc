@@ -1,25 +1,63 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  customizeHeroForProduct,
+  customizeHonestyRowsForProduct,
+  pdpHonestyBlockFromRows,
   productHonestyBlockForId,
+  SHOP_CUSTOMIZE_HONESTY_ROWS_GLITCH,
   SHOP_CUSTOMIZE_PROOF_PERSISTENCE,
+  TIER1_HONESTY_SECTION_TITLE,
+  tier1ThanksCopyForMerchRef,
 } from "../../site/js/shop-merch-copy-core.mjs";
 
 describe("shop-merch-copy-core", () => {
-  it("exposes Glitch honesty block", () => {
-    const block = productHonestyBlockForId("tier0_glitch_hoodie_v1");
-    expect(block?.title).toBe("How the scan behaves");
-    expect(block?.lines).toHaveLength(3);
-    expect(block?.lines[0]).toMatch(/^Live —/);
-    expect(block?.lines[1]).toMatch(/Not yours/);
+  it("exposes Glitch Tier 1 honesty block aligned with customizer rows", () => {
+    const block = productHonestyBlockForId("glitch_hoodie_v1");
+    expect(block).toEqual(pdpHonestyBlockFromRows(SHOP_CUSTOMIZE_HONESTY_ROWS_GLITCH));
+    expect(block?.title).toBe(TIER1_HONESTY_SECTION_TITLE);
+    expect(block?.lines[0]).toMatch(/hub → Update status/i);
   });
 
-  it("exposes Live Object hoodie fossil line", () => {
+  it("exposes legacy Glitch honesty block as superseded", () => {
+    const block = productHonestyBlockForId("tier0_glitch_hoodie_v1");
+    expect(block?.title).toBe("Superseded for launch");
+    expect(block?.lines).toHaveLength(3);
+    expect(block?.lines[1]).toMatch(/deprecated/i);
+    expect(block?.lines[1]).toMatch(/glitch_hoodie_v1/i);
+  });
+
+  it("exposes Live Object hoodie Tier 1 honesty register", () => {
     const block = productHonestyBlockForId("hoodie_live_object_v1");
+    expect(block?.title).toBe(TIER1_HONESTY_SECTION_TITLE);
     expect(block?.lines.some((line) => line.startsWith("Fossil —"))).toBe(true);
+    expect(block?.lines[0]).toMatch(/each unit/i);
   });
 
   it("customize persistence consent mentions recovery", () => {
     expect(SHOP_CUSTOMIZE_PROOF_PERSISTENCE).toMatch(/lose keys without recovery/i);
+  });
+
+  it("exposes Glitch customizer hero and honesty rows", () => {
+    const hero = customizeHeroForProduct("glitch_hoodie_v1");
+    expect(hero.title).toBe("Glitch LIVE QR hoodie");
+    expect(hero.eyebrow).toMatch(/Founding drop/i);
+    const rows = customizeHonestyRowsForProduct("glitch_hoodie_v1");
+    expect(rows).toHaveLength(3);
+    expect(rows[0]?.title).toBe("Live");
+    expect(rows[0]?.sub).toMatch(/your unit/i);
+  });
+
+  it("uses Live Object honesty rows for generic hoodie customizer", () => {
+    const rows = customizeHonestyRowsForProduct("hoodie_live_object_v1");
+    expect(rows[0]?.sub).toMatch(/each unit/i);
+  });
+
+  it("exposes Glitch Tier 1 thanks copy for customize_glitch ref", () => {
+    const copy = tier1ThanksCopyForMerchRef("customize_glitch");
+    expect(copy.eyebrow).toMatch(/Founding drop/i);
+    expect(copy.title).toMatch(/Glitch/i);
+    expect(copy.meta).toMatch(/Glitch LIVE QR hoodie/i);
+    expect(tier1ThanksCopyForMerchRef("customize_hoodie").title).toMatch(/Same ink/i);
   });
 });

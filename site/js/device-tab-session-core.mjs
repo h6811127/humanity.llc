@@ -1,6 +1,6 @@
 /**
  * Tab session (`hc_created`) signing-material guards (pure).
- * @see docs/SAFARI_KEYS_WIPE_INVESTIGATION.md P0-6
+ * @see docs/SAFARI_KEYS_CUSTODY.md P0-6
  */
 
 /**

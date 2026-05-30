@@ -189,6 +189,7 @@ function readPollScope() {
       inboxSheetOpen: false,
       walletPage: false,
       watchEnabled: false,
+      stewardShellPage: false,
     });
   }
   return resolveLiveControlPollScope({
@@ -196,6 +197,7 @@ function readPollScope() {
     inboxSheetOpen: document.body.classList.contains("device-inbox-sheet-open"),
     walletPage: document.body.classList.contains("page-wallet"),
     watchEnabled: isWatchLiveProofEnabled(),
+    stewardShellPage: Boolean(document.getElementById("shell-notif-badge")),
   });
 }
 

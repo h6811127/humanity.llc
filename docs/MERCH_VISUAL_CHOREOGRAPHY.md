@@ -163,7 +163,7 @@ Cross-ref funnel steps: [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) § Funnel (
 | LIVE OBJECT band + QR | Full scan trust modules |
 | “Updates from your phone” | Credential codes |
 
-**Product fork rule:** Differentiate **mock silhouette and copy** (hoodie vs sticker), not scan resolver. Tier 0 Glitch hoodie keeps distinct PDP copy; scan shell stays shared.
+**Product fork rule:** Differentiate **mock silhouette and copy** (Glitch hoodie vs generic hoodie vs sticker), not scan resolver. **Glitch launch** uses Glitch mock + Tier 1 customizer copy ([`MERCH_PRODUCT_COPY.md`](MERCH_PRODUCT_COPY.md)); scan shell stays shared notary for all `print_artifact` scans.
 
 **Prototype target:** `/prototypes/customize-preview-demo.html` (planned) — tune timing without touching production scan. Scan timing lab remains [`/prototypes/scan-trust-ui-demo.html`](../site/prototypes/scan-trust-ui-demo.html).
 

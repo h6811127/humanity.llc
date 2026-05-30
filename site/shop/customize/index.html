@@ -12,7 +12,7 @@
       content="Preview your LIVE OBJECT QR on a hoodie or sticker, then checkout through humanity.llc. Buying merch does not verify you."
     />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=133" />
+    <link rel="stylesheet" href="/styles.css?v=134" />
   </head>
   <body class="screen-shop-body">
     <div class="page">
@@ -25,9 +25,9 @@
 
       <main class="screen screen-shop screen-shop-customize">
         <section class="hero hero-compact shop-hero">
-          <p class="hero-eyebrow">Tier 1 · personalize</p>
-          <h1>Customize your live object</h1>
-          <p class="hero-line">
+          <p class="hero-eyebrow" id="shop-customize-hero-eyebrow">Tier 1 · personalize</p>
+          <h1 id="shop-customize-hero-title">Customize your live object</h1>
+          <p class="hero-line" id="shop-customize-hero-lead">
             Your unique QR on the garment. Change what strangers read from your phone; the ink
             stays the same.
           </p>
@@ -35,7 +35,7 @@
 
         <section class="shop-product-honesty" aria-labelledby="shop-customize-honesty-title">
           <h2 class="group-label" id="shop-customize-honesty-title">Your pen, not the page</h2>
-          <ul class="list list-compact shop-product-honesty-list">
+          <ul class="list list-compact shop-product-honesty-list" id="shop-customize-honesty-list">
             <li class="list-row">
               <span class="list-content">
                 <span class="list-title">Live</span>
@@ -117,6 +117,10 @@
             <div class="shop-customize-mock is-loading" id="shop-customize-mock" data-preview="hoodie">
               <div class="shop-customize-mock__garment" aria-hidden="true">
                 <span class="shop-customize-mock__hoodie-neck" aria-hidden="true"></span>
+                <span class="shop-customize-mock__glitch-art" aria-hidden="true">
+                  <span class="shop-customize-mock__glitch-word">GLITCH</span>
+                  <span class="shop-customize-mock__glitch-live">LIVE</span>
+                </span>
               </div>
               <div
                 class="shop-customize-mock__vessel"
@@ -307,6 +311,6 @@
         </section>
       </main>
     </div>
-    <script src="/js/shop-customize.mjs?v=8" type="module"></script>
+    <script src="/js/shop-customize.mjs?v=9" type="module"></script>
   </body>
 </html>

@@ -166,8 +166,6 @@ import { renderQrToImage } from ${mod};
 var slot = document.getElementById("pass-qr-slot");
 if (slot && !slot.querySelector("svg") && slot.dataset.scanUrl) {
   var img = document.createElement("img");
-  img.width = 88;
-  img.height = 88;
   img.alt = "QR code for this card scan link";
   slot.prepend(img);
   renderQrToImage(img, slot.dataset.scanUrl).catch(function () {});

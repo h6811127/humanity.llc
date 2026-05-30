@@ -5,6 +5,7 @@ export const ALLOWED_MERCH_FUNNEL_REFS = new Set([
   "tier0_glitch",
   "customize_shop",
   "customize_hoodie",
+  "customize_glitch",
   "scan_customize",
 ]);
 

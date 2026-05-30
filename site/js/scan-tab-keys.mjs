@@ -1,6 +1,6 @@
 /**
  * Scan pages: quiet rehydrate (D10) + tab-key presence + cross-tab notice.
- * @see docs/SAFARI_KEYS_WIPE_INVESTIGATION.md P0-1
+ * @see docs/SAFARI_KEYS_CUSTODY.md P0-1
  * @see docs/QUIET_TAB_REHYDRATE.md
  * @see docs/VOUCH_READY_KEYS_DESIGN.md Phase 4
  * @see docs/CROSS_TAB_KEYS_REBUILD_PLAN.md Phase 3
@@ -15,7 +15,19 @@ import { startCrossTabNotificationState } from "./device-cross-tab-state.mjs";
 import { maybeQuietTabRehydrate } from "./device-quiet-tab-rehydrate.mjs";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
 
-await maybeQuietTabRehydrate();
+/** Scan vouchee profile — never quiet-rehydrate the card being scanned (multi-wallet vouch). */
+function readScanVoucheeProfileId() {
+  const header = document.getElementById("scan-safety-header");
+  const fromHeader =
+    header instanceof HTMLElement ? header.dataset.profileId?.trim() : "";
+  if (fromHeader) return fromHeader;
+  const vouchRow = document.getElementById("vouch-row");
+  const fromVouch =
+    vouchRow instanceof HTMLElement ? vouchRow.dataset.voucheeProfileId?.trim() : "";
+  return fromVouch || null;
+}
+
+await maybeQuietTabRehydrate({ excludeProfileId: readScanVoucheeProfileId() });
 
 startTabKeysPresence();
 startCrossTabNotificationState();

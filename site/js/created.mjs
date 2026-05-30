@@ -15,7 +15,11 @@ import { initQrRotate } from "./created-qr-rotate.mjs";
 import { initQrExtend } from "./created-qr-extend.mjs";
 import { inferPilotTemplate, parseManifestoDisplay } from "./manifesto-display.mjs";
 import { parseObjectStreamsFromDocument } from "./object-streams-core.mjs";
-import { createdLiveProofPollShouldRun, liveProofPanelMostlyVisible, shouldScrollLiveProofPanelIntoView } from "./created-live-proof-poll-core.mjs";
+import {
+  createdLiveProofPollShouldRun,
+  liveProofPanelMostlyVisible,
+  shouldScrollLiveProofPanelIntoView,
+} from "./created-live-proof-poll-core.mjs";
 import { initCreatedTabs } from "./created-tabs.mjs";
 import { initCreatedDashboard } from "./created-dashboard.mjs?v=7";
 import {
@@ -61,6 +65,7 @@ import {
   DUAL_QR_SECTION_LEAD,
   DUAL_QR_STEWARD_HINT,
   DUAL_QR_STEWARD_LABEL,
+  LIVE_CONTROL_SIGNING_KEYS_MISSING,
   PRINT_SHARE_STEWARD_DISCOVERY,
   PRINT_SHARE_STEWARD_FULL_SIZE_CTA,
 } from "./device-ownership-copy-core.mjs";
@@ -98,6 +103,13 @@ import { getCardJsonUrl, getCardStatusUrl } from "./hc-sign.mjs";
 import { resolverErrorMessage } from "./resolver-user-error-core.mjs";
 import { viewOnlyNoSessionDetailHtml } from "./created-view-only-copy-core.mjs";
 import { markDeviceBootReady } from "./device-shell-boot.mjs";
+import { SHELL_BFCACHE_RESTORE_EVENT } from "./device-shell-resume-core.mjs";
+import { ensureQuietTabRehydrateBootstrap } from "./device-quiet-tab-rehydrate-bootstrap.mjs";
+import {
+  createdHumanTrustCopyBeforePoll,
+  createdHumanTrustIconInput,
+  shouldShowCreatedStewardReviewQueue,
+} from "./created-verification-boot-core.mjs";
 
 const params = new URLSearchParams(location.search);
 const profileIdParam = params.get("profile_id")?.trim() || null;
@@ -174,6 +186,8 @@ function initVouchReturnBanner() {
     }
   });
 }
+
+await ensureQuietTabRehydrateBootstrap();
 
 let data = loadSession();
 
@@ -291,6 +305,7 @@ const saveRequiredBadge = document.getElementById("created-save-required-badge")
 const jsonLink = document.getElementById("card-json-link");
 const revokeDetails = document.getElementById("revoke-details");
 const stewardReviewDetails = document.getElementById("steward-review-details");
+let createdVerificationPollConfirmed = false;
 const copyProfileIdBtn = document.getElementById("copy-profile-id");
 const statusPlateTipEl = document.getElementById("created-status-plate-tip");
 const lostItemTipEl = document.getElementById("created-lost-item-tip");
@@ -609,8 +624,7 @@ function initLiveControlProof() {
     const keys = currentSigningKeys();
     btn.disabled = !keys || !activeChallengeId;
     if (!keys) {
-      status.textContent =
-        "Open this proof link in the original created tab, or unlock a saved recovery key / encrypted backup in Advanced. humanity.llc cannot prove control for you.";
+      status.textContent = LIVE_CONTROL_SIGNING_KEYS_MISSING;
       btn.disabled = true;
     } else if (activeChallengeId) {
       if (lead) lead.hidden = true;
@@ -880,42 +894,31 @@ function displayVouchSubtitle(subtitle) {
   return subtitle.replace(/\s*-\s*registered on this operator/i, "").trim() || subtitle;
 }
 
-function applyHumanTrustDisplay(ht, verification) {
-  if (!ht) return;
-  const label = displayVouchLabel(ht.label);
+function applyHumanTrustDisplay(ht, verification, opts = {}) {
+  const pollConfirmed = opts.pollConfirmed ?? createdVerificationPollConfirmed;
+  const copy = createdHumanTrustCopyBeforePoll(pollConfirmed, ht);
+  const label = pollConfirmed && ht ? displayVouchLabel(ht.label) : copy.label;
+  const subtitle =
+    pollConfirmed && ht ? displayVouchSubtitle(ht.subtitle) : copy.subtitle;
+
   if (humanTrustLabelEl) {
     humanTrustLabelEl.textContent = label;
   }
   if (humanTrustSubEl) {
-    humanTrustSubEl.textContent = displayVouchSubtitle(ht.subtitle);
+    humanTrustSubEl.textContent = subtitle;
   }
-  applyHumanTrustIconToElement(humanTrustIconEl, {
-    label: ht.label ?? label,
-    subtitle: ht.subtitle,
-    state: verification?.state ?? null,
-  });
-  const state = verification?.state ?? null;
+  applyHumanTrustIconToElement(
+    humanTrustIconEl,
+    createdHumanTrustIconInput(ht, verification, pollConfirmed)
+  );
+  const state = pollConfirmed ? verification?.state ?? null : null;
   if (stewardReviewDetails) {
-    // Operator workflow entry appears only for stewards in this tab.
-    stewardReviewDetails.hidden = state !== "steward";
+    stewardReviewDetails.hidden = !shouldShowCreatedStewardReviewQueue(state, pollConfirmed);
   }
   syncLiveCockpit();
 }
 
-if (data?.verification?.label) {
-  applyHumanTrustDisplay({
-    label: data.verification.label,
-    subtitle:
-      data.verification.vouch_count > 0
-        ? `${data.verification.vouch_count} accepted vouch${data.verification.vouch_count === 1 ? "" : "es"}`
-        : "No accepted vouches yet.",
-  });
-} else {
-  applyHumanTrustDisplay({
-    label: "Vouch status",
-    subtitle: "No accepted vouches yet.",
-  });
-}
+applyHumanTrustDisplay(null, null, { pollConfirmed: false });
 
 if (networkCardStatusEl) {
   const cardState = data?.status || gate.card?.status;
@@ -964,8 +967,15 @@ async function refreshNetworkStatus() {
         networkQrExpiresEl.textContent = "No expiry set";
       }
     }
+    createdVerificationPollConfirmed = true;
     if (scan.human_trust) {
-      applyHumanTrustDisplay(scan.human_trust, scan.verification);
+      applyHumanTrustDisplay(scan.human_trust, scan.verification, { pollConfirmed: true });
+    } else {
+      applyHumanTrustDisplay(
+        { label: "Vouch status", subtitle: "No accepted vouches yet." },
+        verificationRecordFromStatusBody(body),
+        { pollConfirmed: true }
+      );
     }
     const verification = verificationRecordFromStatusBody(body);
     if (data) {
@@ -995,6 +1005,21 @@ async function refreshNetworkStatus() {
   }
   updateHeroMeta();
 }
+
+let createdBfcacheResumeBound = false;
+function bindCreatedShellBfcacheResume() {
+  if (createdBfcacheResumeBound) return;
+  createdBfcacheResumeBound = true;
+  window.addEventListener(SHELL_BFCACHE_RESTORE_EVENT, () => {
+    createdVerificationPollConfirmed = false;
+    applyHumanTrustDisplay(null, null, { pollConfirmed: false });
+    if (networkCardStatusEl) {
+      networkCardStatusEl.textContent = "Checking…";
+    }
+    void refreshNetworkStatus().finally(() => markDeviceBootReady());
+  });
+}
+bindCreatedShellBfcacheResume();
 
 setResolverReachable(true);
 

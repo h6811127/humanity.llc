@@ -1,6 +1,6 @@
 /**
  * Wallet persistence error copy and classification (P0-3 · R3 · RC-1 read-back).
- * @see docs/SAFARI_KEYS_WIPE_INVESTIGATION.md P0-3
+ * @see docs/SAFARI_KEYS_CUSTODY.md P0-3
  * @see docs/HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md RC-1
  * @see docs/PRODUCT_LANGUAGE_STRATEGY.md
  */

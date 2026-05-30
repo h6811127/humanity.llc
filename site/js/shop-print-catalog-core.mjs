@@ -9,9 +9,11 @@ import { personalizeProducts } from "./shop-customize-core.mjs";
 export const TIER0_BATCH_PRINT_TEMPLATE_ID = "hc-tier0-sticker-batch-v1";
 export const DEFAULT_PRINT_TEMPLATE_ID = "hc-sticker-square-v1";
 export const HOODIE_LIVE_OBJECT_TEMPLATE_ID = "hc-hoodie-live-object-v1";
+export const GLITCH_HOODIE_TEMPLATE_ID = "hc-glitch-hoodie-v1";
 
 /** @type {Record<string, string>} */
 export const DEFAULT_PRINT_TEMPLATE_BY_PRODUCT_ID = {
+  glitch_hoodie_v1: GLITCH_HOODIE_TEMPLATE_ID,
   hoodie_live_object_v1: HOODIE_LIVE_OBJECT_TEMPLATE_ID,
   sticker_personalized_v1: DEFAULT_PRINT_TEMPLATE_ID,
 };
@@ -99,7 +101,9 @@ export function mergePersonalizeWithCatalog(config, catalogProducts) {
             ? catalogEntry.title
             : "Personalized item",
       preview:
-        configProduct.preview === "sticker" || configProduct.preview === "hoodie"
+        configProduct.preview === "sticker" ||
+        configProduct.preview === "hoodie" ||
+        configProduct.preview === "glitch_hoodie"
           ? configProduct.preview
           : previewKindFromCatalogType(catalogEntry.type),
       catalog_title: catalogEntry.title,
@@ -153,6 +157,12 @@ export function readInitialPersonalizeProductId(products, url = globalThis.locat
   const normalized = param.trim().toLowerCase();
   if (normalized === "hoodie") {
     const match = products.find((product) => product.preview === "hoodie");
+    if (match?.product_id) return String(match.product_id);
+  }
+  if (normalized === "glitch") {
+    const match = products.find(
+      (product) => product.preview === "glitch_hoodie" || product.product_id === "glitch_hoodie_v1"
+    );
     if (match?.product_id) return String(match.product_id);
   }
   if (normalized === "sticker") {

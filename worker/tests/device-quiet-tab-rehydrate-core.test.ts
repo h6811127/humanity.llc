@@ -43,8 +43,31 @@ describe("device-quiet-tab-rehydrate-core", () => {
       { profile_id: "b", owner_private_key_b58: "k2" },
     ];
     expect(resolveQuietTabRehydrateTarget(wallet, "b")).toEqual(wallet[1]);
-    expect(resolveQuietTabRehydrateTarget(wallet, "missing")).toBeNull();
-    expect(resolveQuietTabRehydrateTarget(wallet, null)).toBeNull();
+    expect(resolveQuietTabRehydrateTarget(wallet, "missing")).toEqual(wallet[0]);
+    expect(resolveQuietTabRehydrateTarget(wallet, null)).toEqual(wallet[0]);
+  });
+
+  it("excludes scan vouchee profile from quiet rehydrate target", () => {
+    const wallet = [
+      { profile_id: "steward", owner_private_key_b58: "k1" },
+      { profile_id: "vouchee", owner_private_key_b58: "k2" },
+    ];
+    expect(resolveQuietTabRehydrateTarget(wallet, "vouchee", "vouchee")).toEqual(
+      wallet[0]
+    );
+    expect(resolveQuietTabRehydrateTarget(wallet, null, "vouchee")).toEqual(
+      wallet[0]
+    );
+    expect(resolveQuietTabRehydrateTarget(wallet, "vouchee", "vouchee")).toEqual(
+      wallet[0]
+    );
+    expect(
+      resolveQuietTabRehydrateTarget(
+        [{ profile_id: "only", owner_private_key_b58: "k" }],
+        null,
+        "only"
+      )
+    ).toBeNull();
   });
 
   it("allows rehydrate for single saved card without tab control", () => {

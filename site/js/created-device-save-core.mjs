@@ -1,6 +1,6 @@
 /**
  * Auto-save timing rules for /created/ and post-create navigation (P0-2 · R3).
- * @see docs/SAFARI_KEYS_WIPE_INVESTIGATION.md P0-2
+ * @see docs/SAFARI_KEYS_CUSTODY.md P0-2
  */
 
 /**

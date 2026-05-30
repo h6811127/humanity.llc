@@ -1,14 +1,36 @@
 # Company merch & community campaign QR
 
-**Status:** Canonical product spec (2026-05-28) — captures founder intent from pre-repo conversations (e.g. Glitch founding sweatshirt)  
+**Status:** Canonical product spec (2026-05-28) — **Tier 0 batch primitive** · Glitch **launch** moved to Tier 1 (2026-05-30)  
 **Audience:** Founder, ops, engineering, future governance  
-**Not the same as:** Tier 1 personalized wear ([`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md)) · per-buyer `/shop/customize/`
+**Glitch launch copy:** [`MERCH_PRODUCT_COPY.md`](MERCH_PRODUCT_COPY.md) · [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md)  
+**Not the same as:** Tier 1 personalized wear — except **Glitch founding hoodie**, which **is** Tier 1 personalized wear at launch
 
 ---
 
-## One-sentence product
+## One-sentence product (Tier 0 batch lane)
 
-**Company / community merch** is physical ink with a **shared HTTPS QR** that resolves to a **single live Humanity Card** (campaign profile). Strangers see **current signed state**; buyers do **not** get control of that card. The **community** influences what the scan shows only through an explicit **governance + key-custody** process—not by purchasing the garment.
+**Company / community batch merch** is physical ink with a **shared HTTPS QR** that resolves to a **single live Humanity Card** (campaign profile). Strangers see **current signed state**; buyers do **not** get control of that card. The **community** influences what the scan shows only through an explicit **governance + key-custody** process—not by purchasing the garment.
+
+**Examples today:** founding signal sticker (`tier0_founding_sticker_v1`). **Not** the Glitch hoodie at launch — see § Glitch launch decision.
+
+---
+
+## Glitch launch decision (2026-05-30)
+
+The **Glitch LIVE QR hoodie** is the **founding garment drop** but launches on the **Tier 1 personalize path**, not Tier 0 shared batch:
+
+| Property | Glitch at launch |
+|----------|------------------|
+| Visual | Fixed Glitch artwork (same design language on every unit) |
+| QR | **Unique** `print_artifact` per buyer — minted after paid order |
+| Checkout | `/shop/customize/` → artifact intent → Shopify → Printify |
+| Control | **Buyer** updates scan content from their card (keys + backup) |
+| Target store id | `glitch_hoodie_v1` in `personalize.products` (engineering pending) |
+| Price signal | $88 + shipping (config) |
+
+**Why:** Founding prototype was personal card QR on fabric; launch wedge is **same ink, new meaning** on **your** object ([`EPHEMERAL_STATE_AND_MERCH.md`](EPHEMERAL_STATE_AND_MERCH.md)), not witness-only shared campaign ink.
+
+**Superseded:** `tier0_glitch_hoodie_v1` as shared-batch `limited_drop` / `tier0_inventory` — retained in repo temporarily for catalog smoke; **not** launch checkout. Do not paste `TIER0_SHOPIFY_INVENTORY_VARIANT_IDS` for Glitch launch.
 
 ---
 
@@ -16,11 +38,11 @@
 
 Founding conversations (including outside Cursor) described:
 
-- A **fixed-design** sweatshirt (e.g. “Glitch” aesthetic from a one-off QR render) sold as **company merch**, not customizable.
-- A **generalized QR** on every unit pointing at one live destination.
-- A hope that **what that destination says** could eventually be something “we democratically decide.”
+- A **fixed-design** sweatshirt (e.g. “Glitch” aesthetic from a one-off QR render).
+- Early notes also described a **generalized QR** on every unit pointing at one live destination (Tier 0 batch) — **that model applies to stickers and future campaign series**, not Glitch hoodie launch.
+- A hope that **what a campaign destination says** could eventually be something “we democratically decide.”
 
-That intent overlaps existing **Tier 0 batch** policy but was never named or owned in `docs/`. This file is the **owner doc** for that lane.
+This file owns the **Tier 0 batch / community campaign** lane. Glitch hoodie launch is documented in [`MERCH_PRODUCT_COPY.md`](MERCH_PRODUCT_COPY.md).
 
 ---
 
@@ -28,21 +50,22 @@ That intent overlaps existing **Tier 0 batch** policy but was never named or own
 
 | Layer | Owner | What “own” means |
 |-------|--------|------------------|
-| **Product definition** | This doc + [`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md) Tier 0 | Batch QR rules, no calendar expiry, commerce firewall |
-| **Merch GTM** | [`MERCH_LED_V1.md`](MERCH_LED_V1.md) Phase B | Curiosity drop before personalized line |
-| **Shop UX** | [`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md) · [`features/Storefront v1.0.md`](features/Storefront%20v1.0.md) | Story-row **Founding objects**; no customizer |
-| **Campaign QR ops** | [`TIER0_CAMPAIGN_QR_RUNBOOK.md`](TIER0_CAMPAIGN_QR_RUNBOOK.md) | Mint, rotate, physical QA |
-| **Launch checklist** | [`FOUNDING_DROP_BRIEF.md`](FOUNDING_DROP_BRIEF.md) Tier 0 | Gates before taking money |
-| **Democratic *process*** (future) | [`DEMOCRATIC_INFRASTRUCTURE.md`](DEMOCRATIC_INFRASTRUCTURE.md) · [`commons/COMMONS_ROADMAP.md`](commons/COMMONS_ROADMAP.md) | **Not** merch MVP—governance for *who may sign updates* |
-| **Engineering** | `tier0_*` env · `store-catalog` `limited_drop` · Shopify webhook `tier0_batch` | See § Implementation map |
+| **Tier 0 batch definition** | This doc + [`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md) | Shared QR rules, no calendar expiry, commerce firewall |
+| **Glitch hoodie launch** | [`MERCH_PRODUCT_COPY.md`](MERCH_PRODUCT_COPY.md) + [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) | Tier 1 customizer, unique QR, owner keys |
+| **Merch GTM** | [`MERCH_LED_V1.md`](MERCH_LED_V1.md) Phase B | Curiosity (sticker / scan) + belonging (personalized wear incl. Glitch) |
+| **Shop UX — Tier 0** | [`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md) | Founding sticker · no customizer |
+| **Shop UX — Tier 1** | [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) | `/shop/customize/` · Glitch + Live Object hoodies |
+| **Campaign QR ops (batch only)** | [`TIER0_CAMPAIGN_QR_RUNBOOK.md`](TIER0_CAMPAIGN_QR_RUNBOOK.md) | Mint, rotate, physical QA for **shared** batch QRs |
+| **Launch checklist** | [`FOUNDING_DROP_BRIEF.md`](FOUNDING_DROP_BRIEF.md) | Tier 0 sticker + Tier 1 Glitch gates |
+| **Democratic *process*** (future) | [`DEMOCRATIC_INFRASTRUCTURE.md`](DEMOCRATIC_INFRASTRUCTURE.md) | Not merch MVP |
 
-**Rule:** New SKUs (Glitch hoodie, Series B sticker, etc.) are **instances** of this doc. Do not fold them into Tier 1 `print_artifact` or `/shop/customize/` unless explicitly launching a **second product class**.
+**Rule:** New **shared-batch** SKUs (Series B sticker, etc.) are instances of § Tier 0 batch below. **Glitch hoodie** is **not** a Tier 0 batch instance at launch.
 
 ---
 
 ## Tier 0 batch (canonical architecture)
 
-Already specified elsewhere; summarized here as the **community merch primitive**:
+Community merch **primitive** for shared campaign ink:
 
 | Property | Value |
 |----------|--------|
@@ -55,7 +78,7 @@ Already specified elsewhere; summarized here as the **community merch primitive*
 | Rotation | Operator (or future governance) may **`replaced`** batch QR; old ink still resolves honestly |
 
 ```text
-Many garments / stickers
+Many stickers / garments (batch lane only)
     → same printed URL (?q=qr_campaign_…)
     → one profile_id (campaign card)
     → manifesto / status / limits updated by whoever holds signing keys
@@ -63,50 +86,35 @@ Many garments / stickers
 
 ---
 
-## Glitch founding drop (first instance — optional SKU)
+## Glitch aesthetic (visual brand — not a protocol type)
 
-**Glitch** is a **marketing name** for the first company-merch experiment, not a separate protocol type.
+**Glitch** is a **marketing name** for founding garment art, not a separate protocol type.
 
 | Field | Guidance |
 |-------|----------|
 | **Visual** | QR artwork may look “glitched”; trust is still **HTTPS + signed resolver state**, not the bitmap aesthetic |
-| **Origin story** | Often started as a **personal card** QR the founder controlled, then printed on a sweatshirt |
-| **Shopify** | Static product (e.g. `glitch-live-qr-hoodie`) — payment SKU only; story lives on humanity.llc |
-| **Fulfillment** | Pre-printed inventory **or** Printify batch — pick one; do not run Tier 1 per-order artwork upload for this SKU |
-| **Scan destination** | Whatever **campaign profile** owns the printed `qr_id` at ship time |
-
-When the drop is formalized, add a row to [`FOUNDING_DROP_BRIEF.md`](FOUNDING_DROP_BRIEF.md) and `site/data/shop-config.json` (see § Shop wiring gap).
+| **Origin story** | Started as a **personal card** QR on a sweatshirt — aligns with Tier 1 launch |
+| **Launch checkout** | `/shop/customize/` with `glitch_hoodie_v1` (target) — **not** pre-printed shared batch |
+| **Scan destination (launch)** | Each buyer’s **`print_artifact`** on **their** `profile_id` |
 
 ---
 
 ## Key custody — who controls what scanners see
 
-**“Community controls the sweatshirt”** is only true in product terms if we separate:
+### Tier 0 batch (sticker, future series)
 
-1. **What the network shows** — signed fields on the **campaign card** (manifesto line, status, limits).
-2. **Who can sign changes** — whoever holds the **Ed25519 private key** for that `profile_id` (browser / backup / recovery).
+**“Community controls the sticker”** means governance of **campaign card** key holders — not buyer editing.
 
-There is **no** v1 “all buyers edit the scan page” feature. Democratic participation is **governance of key holders and published updates**, not Shopify order metadata.
+| Model | Custody | Use |
+|-------|---------|-----|
+| **B. Dedicated campaign card** (recommended) | New `profile_id` for the batch | Founding sticker production |
+| **C. Multi-steward / governance** (future) | 2-of-3 or elected stewards | Commons Pass era |
 
-### v1 options (pick explicitly)
+See [`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md) D-M2.
 
-| Model | Custody | Pros | Cons |
-|-------|---------|------|------|
-| **A. Founder personal card** (Glitch prototype) | Your existing card keys on one or more devices | Fastest; keys you already created | Scan looks like **your** handle; conflates person and movement; bad if you revoke/disable personally |
-| **B. Dedicated campaign card** (recommended in D-M2) | New `profile_id` (e.g. `@founding_signal` / `@humanity_commons`) — keys in steward vault + backup | Clear “not a passport”; rotation without touching personal card | Requires new create + reprint if QR URL changes |
-| **C. Multi-steward / governance** (future) | 2-of-3 or elected stewards; published changelog of manifesto updates | Matches “democratically decide” | Needs process + tooling (Commons Pass era) |
+### Tier 1 Glitch hoodie (launch)
 
-**Open decision D-M2** in [`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md) recommends **B** for production runs. **A** is acceptable for a **small pilot** if scan copy says it is a **founding experiment**, not “every holder controls this.”
-
-### If keys are on another device
-
-Use shipped portability ([`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md)):
-
-1. On the device that created the card: export encrypted backup **or** display recovery key (if set).
-2. On the device you use now: `/created/?profile_id=…` → import backup / recovery → update manifesto or revoke.
-3. If no backup exists: you **cannot** sign updates from a new device; you can still **scan** (read-only). Plan migration to campaign card **B** before a large print run.
-
-**Do not** print more units until you know which `profile_id` + `qr_id` are on the ink and you have a **recovery path** for that profile.
+**Buyer controls what strangers read** on **their** printed QR while they hold signing keys (+ recovery). Same custody model as any `print_artifact` — [`KEY_LOSS_SAD_PATH_MATRIX.md`](KEY_LOSS_SAD_PATH_MATRIX.md).
 
 ---
 
@@ -114,31 +122,22 @@ Use shipped portability ([`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTAB
 
 | Phase | What strangers get | How “we” decide content |
 |-------|-------------------|-------------------------|
-| **v1 (now)** | Live scan of **one campaign card** | Founder/steward updates manifesto/status with signing keys; optional public note on scan (“Founding artifact · not a person”) |
-| **v1b (ops)** | Same | Documented votes / forum / meeting minutes → **one steward** signs the agreed text (process outside app) |
-| **v2 (product)** | Same ink | Multi-steward signing or org-issued updates ([`commons/COMMONS_ROADMAP.md`](commons/COMMONS_ROADMAP.md)) |
-| **Anti-pattern** | — | Letting Shopify buyers edit scan content · implying purchase = membership in governance |
+| **v1 batch (sticker)** | Live scan of **one campaign card** | Steward signs agreed campaign copy |
+| **v1 Glitch hoodie** | Live scan of **buyer’s card** | **Buyer** signs their manifesto/status |
+| **v2 (product)** | Same ink | Multi-steward or org-issued updates ([`commons/COMMONS_ROADMAP.md`](commons/COMMONS_ROADMAP.md)) |
 
-Creative experiments (rotation, Series A/B, sunset copy) live in [`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md) § Creative ideas — link them here when prioritized.
+**Anti-pattern:** Implying purchase of a **personalized** Glitch hoodie grants membership in **campaign** governance.
 
 ---
 
 ## Company merch line (how multiple drops fit)
 
-A **line** is a sequence of **limited drops**, each with:
-
-- Fixed artwork (may include a fixed QR bitmap),
-- One batch `qr_id` (or a defined small set),
-- Optional Shopify SKU,
-- Published **governance note** for what the campaign card represents for that series.
-
-| Drop | Tier | Customizer | Example store id (when wired) |
-|------|------|------------|-------------------------------|
-| Founding signal sticker | Tier 0 | No | `tier0_founding_sticker_v1` (shipped in catalog) |
-| Glitch LIVE QR hoodie | Tier 0 | No | `tier0_glitch_hoodie_v1` (shipped in catalog) |
-| Personalized hoodie | Tier 1 | Yes | `hoodie_live_object_v1` |
-
-**Luxury / high price** on company merch is a **positioning** choice (FOUNDING_DROP_BRIEF), not a protocol feature.
+| Drop | Tier | Customizer | Store id |
+|------|------|------------|----------|
+| Founding signal sticker | Tier 0 batch | No | `tier0_founding_sticker_v1` |
+| **Glitch LIVE QR hoodie (launch)** | **Tier 1** | **Yes** | **`glitch_hoodie_v1`** (target) |
+| Live Object hoodie (generic) | Tier 1 | Yes | `hoodie_live_object_v1` |
+| ~~Glitch shared-batch PDP~~ | ~~Tier 0~~ | ~~No~~ | ~~`tier0_glitch_hoodie_v1`~~ — **deprecated for launch** |
 
 ---
 
@@ -146,31 +145,29 @@ A **line** is a sequence of **limited drops**, each with:
 
 | Capability | Status | Notes |
 |------------|--------|-------|
-| Tier 0 policy + runbook | Shipped (docs) | |
-| `/shop/` founding row + `/shop/founding/` | Shipped (sticker) | Glitch hoodie on **Founding objects** row → `/shop/products/tier0_glitch_hoodie_v1/` |
-| `GET /v1/store/rows` · `GET /v1/store/products/{id}` | Shipped (Worker) | SF-001 catalog API — `rollout:step3 -- --verify` · engineering done: `rollout:complete -- --verify` |
-| `TIER0_SHOPIFY_VARIANT_IDS` + `TIER0_CAMPAIGN_PROFILE_ID` | Operator env | Batch Printify SKUs (e.g. founding sticker) |
-| `TIER0_SHOPIFY_INVENTORY_VARIANT_IDS` | Operator env | Pre-printed inventory SKUs (e.g. Glitch hoodie) — webhook `tier0_inventory`, no Printify queue |
-| Paid webhook `tier0_batch` | Shipped | Queues batch Printify template |
-| Paid webhook `tier0_inventory` | Shipped | Processing commerce order only — Shopify fulfills from stock |
-| Democratic voting on scan text | **Not shipped** | |
-| `tier0.products[]` in `shop-config.json` | **Shipped** | `site/js/shop-tier0-core.mjs` · legacy `tier0` block still maps to founding sticker |
+| Tier 0 policy + runbook | Shipped (docs) | Sticker batch |
+| `/shop/customize/` + artifact intent | Shipped | **Launch path for Glitch** |
+| `tier0_glitch_hoodie_v1` shared-batch PDP | Shipped (legacy) | **Superseded** — rewire catalog + shop hub |
+| `glitch_hoodie_v1` in `personalize.products` | **Pending** | See [`MERCH_PRODUCT_COPY.md`](MERCH_PRODUCT_COPY.md) § Engineering rewire |
+| `TIER0_SHOPIFY_INVENTORY_VARIANT_IDS` for Glitch | **Do not use** | Was shared-batch experiment |
+| Paid webhook Tier 1 mint + Printify | Shipped | Use for Glitch launch |
+| Paid webhook `tier0_batch` | Shipped | Founding sticker only |
 
-**Shop honesty copy (Glitch PDP):** [`MERCH_PRODUCT_COPY.md`](MERCH_PRODUCT_COPY.md) · `site/js/shop-merch-copy-core.mjs`
+**Shop honesty copy:** [`MERCH_PRODUCT_COPY.md`](MERCH_PRODUCT_COPY.md) · `site/js/shop-merch-copy-core.mjs`
 
-**Engineering follow-ups** (when Glitch or Series B ships): see [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) § Operator setup; paste Shopify variant ids into Worker env (`TIER0_SHOPIFY_*`) and `shop-config.json`; run `npm run merch-funnel:verify-config -- --require-tier0=tier0_glitch_hoodie_v1` before `checkout_open: true`; physical QA per [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md). **Post-purchase URL (Glitch):** `https://humanity.llc/shop/thanks/?hc_ref=tier0_glitch` — shown on `/shop/products/tier0_glitch_hoodie_v1/` when checkout is open.
+**Operator sequence (Glitch launch):** [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) § Operator close-out — paste **`personalize.products`** Shopify variants · `merch-funnel:verify-config -- --require-checkout` · physical QA · `personalize.checkout_open: true` · post-purchase `hc_ref=customize_glitch`.
 
 ---
 
-## Operator checklist (own the first drop)
+## Operator checklist (Tier 0 batch — sticker only)
 
 - [ ] Record printed `profile_id`, `qr_id`, and HTTPS URL on ink.
-- [ ] Confirm signing key access (this device, backup, or recovery) — [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md).
-- [ ] Decide custody model **A** (pilot) vs **B** (campaign card) before scaling print quantity.
+- [ ] Confirm signing key access for **campaign card** — [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md).
 - [ ] Scan copy: bearer limits · buying ≠ vouch · batch pointer (not buyer’s card).
-- [ ] Shopify variant + `shop-config` + optional `TIER0_SHOPIFY_VARIANT_IDS`.
+- [ ] Shopify variant + `shop-config` tier0 founding sticker + optional `TIER0_SHOPIFY_VARIANT_IDS`.
 - [ ] Physical QA — [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md).
-- [ ] If using personal card for pilot: plan migration to campaign card before drop #2.
+
+**Glitch hoodie launch checklist:** [`MERCH_PRODUCT_COPY.md`](MERCH_PRODUCT_COPY.md) § Engineering rewire + [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) operator close-out.
 
 ---
 
@@ -178,12 +175,12 @@ A **line** is a sequence of **limited drops**, each with:
 
 | Doc | Use |
 |-----|-----|
-| [`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md) | Tier 0 / Tier 1 rules · D-M2 campaign ownership |
-| [`TIER0_CAMPAIGN_QR_RUNBOOK.md`](TIER0_CAMPAIGN_QR_RUNBOOK.md) | Mint & rotate batch QR |
+| [`MERCH_PRODUCT_COPY.md`](MERCH_PRODUCT_COPY.md) | Glitch launch copy + rewire checklist |
+| [`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md) | Tier 0 / Tier 1 rules |
+| [`TIER0_CAMPAIGN_QR_RUNBOOK.md`](TIER0_CAMPAIGN_QR_RUNBOOK.md) | Mint & rotate **batch** QR |
 | [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) | Shopify vs Printify vs humanity.llc |
 | [`FOUNDING_DROP_BRIEF.md`](FOUNDING_DROP_BRIEF.md) | Launch gates |
-| [`MANIFESTO_STATUS_UPDATE.md`](MANIFESTO_STATUS_UPDATE.md) | Changing live copy without reprinting |
-| [`DEMOCRATIC_INFRASTRUCTURE.md`](DEMOCRATIC_INFRASTRUCTURE.md) | Long-term democratic ownership of infrastructure |
+| [`EPHEMERAL_STATE_AND_MERCH.md`](EPHEMERAL_STATE_AND_MERCH.md) | Same ink, new meaning (Glitch launch moat) |
 
 ---
 
@@ -191,4 +188,5 @@ A **line** is a sequence of **limited drops**, each with:
 
 | Date | Note |
 |------|------|
-| 2026-05-28 | Initial spec — company/community merch lane, Glitch instance, key custody, democratic roadmap |
+| 2026-05-28 | Initial spec — company/community merch lane, Glitch instance, key custody |
+| 2026-05-30 | **Glitch launch → Tier 1 customizable**; this doc scoped to Tier 0 batch primitive; `tier0_glitch_hoodie_v1` shared-batch deprecated for launch |

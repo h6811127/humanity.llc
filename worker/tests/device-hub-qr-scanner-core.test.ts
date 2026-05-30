@@ -3,7 +3,10 @@ import { describe, expect, it } from "vitest";
 import {
   decodeQrFromImageData,
   hubCameraScanSupported,
+  isAndroidUserAgent,
+  normalizeScannedQrPayload,
   pickQrScanBackend,
+  scaleScanFrameDimensions,
 } from "../../site/js/device-hub-qr-scanner-decode-core.mjs";
 import {
   barcodeDetectorSupported,
@@ -32,6 +35,15 @@ describe("shouldShowHubQrScanner", () => {
     expect(shouldShowHubQrScanner(0)).toBe(false);
     expect(shouldShowHubQrScanner(1)).toBe(true);
   });
+
+  it("shows for steward with tab signing keys even before wallet save", () => {
+    expect(
+      shouldShowHubQrScanner(0, { stewardReady: true, hasTabSigningKeys: true })
+    ).toBe(true);
+    expect(
+      shouldShowHubQrScanner(0, { stewardReady: true, hasTabSigningKeys: false })
+    ).toBe(false);
+  });
 });
 
 describe("shouldShowHubScanQrChrome (Phase B)", () => {
@@ -39,6 +51,17 @@ describe("shouldShowHubScanQrChrome (Phase B)", () => {
     expect(shouldShowHubScanQrChrome({ walletCount: 0, standalone: true })).toBe(false);
     expect(shouldShowHubScanQrChrome({ walletCount: 1, standalone: false })).toBe(false);
     expect(shouldShowHubScanQrChrome({ walletCount: 1, standalone: true })).toBe(true);
+  });
+
+  it("allows steward tab keys in standalone PWA before wallet save", () => {
+    expect(
+      shouldShowHubScanQrChrome({
+        walletCount: 0,
+        standalone: true,
+        stewardReady: true,
+        hasTabSigningKeys: true,
+      })
+    ).toBe(true);
   });
 });
 
@@ -66,6 +89,35 @@ describe("pickQrScanBackend (Safari fallback)", () => {
       });
     }
   });
+
+  it("returns hybrid on Android even when BarcodeDetector exists", () => {
+    const originalBd = globalThis.BarcodeDetector;
+    const originalNavigator = globalThis.navigator;
+    // @ts-expect-error test stub
+    globalThis.BarcodeDetector = class MockBarcodeDetector {};
+    Object.defineProperty(globalThis, "navigator", {
+      configurable: true,
+      value: {
+        userAgent: "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 Chrome/124.0.0.0",
+        mediaDevices: { getUserMedia: () => Promise.resolve({}) },
+      },
+    });
+    try {
+      expect(isAndroidUserAgent()).toBe(true);
+      expect(barcodeDetectorSupported()).toBe(true);
+      expect(pickQrScanBackend()).toBe("hybrid");
+    } finally {
+      if (originalBd) globalThis.BarcodeDetector = originalBd;
+      else {
+        // @ts-expect-error test cleanup
+        delete globalThis.BarcodeDetector;
+      }
+      Object.defineProperty(globalThis, "navigator", {
+        configurable: true,
+        value: originalNavigator,
+      });
+    }
+  });
 });
 
 describe("decodeQrFromImageData", () => {
@@ -77,6 +129,22 @@ describe("decodeQrFromImageData", () => {
   it("returns null when jsQR finds nothing", () => {
     const jsQr = () => null;
     expect(decodeQrFromImageData(new Uint8ClampedArray(4), 2, 2, jsQr)).toBeNull();
+  });
+});
+
+describe("scaleScanFrameDimensions", () => {
+  it("keeps small frames unchanged", () => {
+    expect(scaleScanFrameDimensions(480, 360)).toEqual({ width: 480, height: 360 });
+  });
+
+  it("downscales large camera frames for mobile decode", () => {
+    expect(scaleScanFrameDimensions(1920, 1080)).toEqual({ width: 640, height: 360 });
+  });
+});
+
+describe("normalizeScannedQrPayload", () => {
+  it("strips null bytes and whitespace", () => {
+    expect(normalizeScannedQrPayload(` ${SCAN_URL}\0 `)).toBe(SCAN_URL);
   });
 });
 

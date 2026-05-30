@@ -1,6 +1,6 @@
 /**
  * Restore saved ownership into this tab (hub · wallet · scan).
- * @see docs/SAFARI_KEYS_WIPE_INVESTIGATION.md P1-2
+ * @see docs/SAFARI_KEYS_CUSTODY.md P1-2
  */
 import { openCardNowPage } from "./device-keys.mjs";
 import { activateWalletEntryGated } from "./device-control-activation.mjs";

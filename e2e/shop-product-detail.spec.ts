@@ -1,44 +1,55 @@
 import { test, expect } from "@playwright/test";
 
 /**
- * Shop product detail — Pages splat must not redirect-loop (Glitch drop and peers).
+ * Shop product detail — Pages splat must not redirect-loop (Glitch + peers).
  * @see docs/DEVICE_SHELL_E2E_CI_REMEDIATION.md § Step 1
+ * @see docs/MERCH_PRODUCT_COPY.md § Engineering rewire step 3
  */
 
-const GLITCH_PRODUCT_ID = "tier0_glitch_hoodie_v1";
+const GLITCH_PRODUCT_ID = "glitch_hoodie_v1";
+const LEGACY_GLITCH_PRODUCT_ID = "tier0_glitch_hoodie_v1";
 
 const GLITCH_PRODUCT = {
   product_id: GLITCH_PRODUCT_ID,
   title: "Glitch LIVE QR hoodie",
-  meaning_line: "A live network on fabric — same scan on every unit, not your personal card.",
+  meaning_line: "Founding Glitch art on your chest — your unique QR, your live line.",
   story:
-    "Founding company drop — fixed Glitch artwork with a shared campaign QR. Every unit points at one live destination stewards can update; strangers see honest limits when they scan. You are buying witness and wear, not control of the feed and not a vouch.",
-  product_class: "limited_drop",
-  personalization_indicator: "Company drop",
-  requires_card: false,
-  supports_personalization: false,
+    "Fixed Glitch garment design with a unique revocable QR tied to your Humanity Card. Change what strangers read from your phone without reprinting. Commerce does not verify you or grant a vouch.",
+  product_class: "personalized",
+  personalization_indicator: "Personalized QR",
+  requires_card: true,
+  supports_personalization: true,
   price_display: "$88 + shipping",
   detail_path: `/shop/products/${GLITCH_PRODUCT_ID}/`,
-  row_ids: ["row_founding"],
+  action_path: `/shop/customize/?product=${GLITCH_PRODUCT_ID}`,
+  row_ids: ["row_personalize"],
+};
+
+const LEGACY_GLITCH_REDIRECT = {
+  redirect: true,
+  legacy_product_id: LEGACY_GLITCH_PRODUCT_ID,
+  ...GLITCH_PRODUCT,
+  redirect_to: `/shop/customize/?product=${GLITCH_PRODUCT_ID}`,
 };
 
 const E2E_SHOP_CONFIG = {
   version: 1,
   site_origin: "http://127.0.0.1:8788",
-  tier0: {
+  tier0: { products: [] },
+  personalize: {
+    checkout_open: false,
+    checkout_product_id: GLITCH_PRODUCT_ID,
     products: [
       {
         product_id: GLITCH_PRODUCT_ID,
+        print_template_id: "hc-glitch-hoodie-v1",
         title: "Glitch LIVE QR hoodie",
         price_display: "$88 + shipping",
         checkout_url: "",
-        checkout_open: false,
         shopify_variant_id: "",
-        fulfillment: "shopify_inventory",
       },
     ],
   },
-  personalize: { checkout_open: false, products: [] },
 };
 
 async function stubProductDetailApis(page: import("@playwright/test").Page) {
@@ -54,7 +65,15 @@ async function stubProductDetailApis(page: import("@playwright/test").Page) {
     route.fulfill({
       status: 200,
       contentType: "application/json",
-      body: JSON.stringify({ products: [] }),
+      body: JSON.stringify({
+        products: [
+          {
+            template_id: "hc-glitch-hoodie-v1",
+            type: "hoodie",
+            variants: [{ variant_id: "black-m", enabled: true }],
+          },
+        ],
+      }),
     })
   );
 
@@ -63,6 +82,14 @@ async function stubProductDetailApis(page: import("@playwright/test").Page) {
       status: 200,
       contentType: "application/json",
       body: JSON.stringify(GLITCH_PRODUCT),
+    })
+  );
+
+  await page.route(`**/v1/store/products/${LEGACY_GLITCH_PRODUCT_ID}**`, (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(LEGACY_GLITCH_REDIRECT),
     })
   );
 }
@@ -75,7 +102,7 @@ test.describe("shop product detail", () => {
     await stubProductDetailApis(page);
   });
 
-  test("Glitch drop URL loads without redirect loop", async ({ page }) => {
+  test("Glitch Tier 1 product URL loads without redirect loop", async ({ page }) => {
     const response = await page.goto(`/shop/products/${GLITCH_PRODUCT_ID}/`, {
       waitUntil: "domcontentloaded",
     });
@@ -86,18 +113,31 @@ test.describe("shop product detail", () => {
     await expect(page.locator("#product-title")).toContainText("Glitch LIVE QR hoodie", {
       timeout: 15_000,
     });
-    await expect(page.locator("#product-status")).toContainText(/coming soon/i);
-    await expect(page.locator("#product-honesty-title")).toContainText("How the scan behaves");
+    await expect(page.locator("#product-status")).toContainText(/preview live/i);
+    await expect(page.locator("#product-honesty-title")).toContainText("Your pen, not the page");
     await expect(page.locator("#product-honesty-list .list-title").first()).toContainText("Live");
+    await expect(page.locator("#product-action-btn")).toHaveAttribute(
+      "href",
+      `/shop/customize/?product=${GLITCH_PRODUCT_ID}`
+    );
   });
 
-  test("shop hub View Glitch drop link reaches product detail", async ({ page }) => {
-    await page.goto("/shop/");
-    await page.getByRole("link", { name: "View Glitch drop" }).click();
-    await page.waitForURL(new RegExp(`/shop/products/${GLITCH_PRODUCT_ID}/`), {
+  test("legacy shared-batch Glitch URL redirects to customizer", async ({ page }) => {
+    await page.goto(`/shop/products/${LEGACY_GLITCH_PRODUCT_ID}/`, {
+      waitUntil: "domcontentloaded",
+    });
+    await page.waitForURL(new RegExp(`/shop/customize/\\?product=${GLITCH_PRODUCT_ID}`), {
       timeout: 10_000,
     });
-    await expect(page.locator("#product-title")).toContainText("Glitch LIVE QR hoodie", {
+  });
+
+  test("shop hub Customize Glitch hoodie link reaches customizer", async ({ page }) => {
+    await page.goto("/shop/");
+    await page.getByRole("link", { name: "Customize Glitch hoodie" }).click();
+    await page.waitForURL(new RegExp(`/shop/customize/\\?product=${GLITCH_PRODUCT_ID}`), {
+      timeout: 10_000,
+    });
+    await expect(page.locator("#shop-customize-hero-title")).toContainText("Glitch LIVE QR hoodie", {
       timeout: 10_000,
     });
   });

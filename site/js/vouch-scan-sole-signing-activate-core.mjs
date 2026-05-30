@@ -1,6 +1,6 @@
 /**
  * Sole saved signing row auto-activate for scan vouch (P0b-3 · mirrors D10 Tier 1).
- * @see docs/SAFARI_KEYS_WIPE_INVESTIGATION.md P0b-3
+ * @see docs/SAFARI_KEYS_CUSTODY.md P0b-3
  */
 
 import { soleSigningWalletEntry } from "./device-quiet-tab-rehydrate-core.mjs";

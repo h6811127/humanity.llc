@@ -1,10 +1,10 @@
 /**
  * P0b-1 desk gate helpers — card disabled since visit (R10).
- * @see docs/SAFARI_KEYS_WIPE_INVESTIGATION.md P0b-1
+ * @see docs/SAFARI_KEYS_CUSTODY.md P0b-1
  * @see docs/CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md
  */
 
-export const P0B1_DESK_GATE_DOC = "docs/SAFARI_KEYS_WIPE_INVESTIGATION.md";
+export const P0B1_DESK_GATE_DOC = "docs/SAFARI_KEYS_CUSTODY.md";
 export const P0B1_QA_DOC = "docs/DEVICE_OS_QA.md";
 export const P0B1_QA_SECTION = "P1-P0b-1";
 

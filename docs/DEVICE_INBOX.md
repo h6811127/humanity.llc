@@ -333,3 +333,15 @@ Since phase 3 (`device-inbox-sheet.mjs`), `device-status.mjs` imports the inbox 
 - Background alerts: contextual opt-in + deep link to sign flow for first pending proof. ✅
 - Resolver degraded/offline never increments badge count. ✅
 - No new resolver APIs required for phases 1–5.
+
+---
+
+## Incident history: card disabled since visit false positive
+
+**Closed 2026-05-26.** Banner, hub `#device-hub-card-disabled-group`, inbox badge, and dot overlay for `card_disabled_since_visit` must never be driven from `sessionStorage.hc_wallet_network_cache` alone.
+
+**Contract (all required):** resolver-confirmed map for that PID · `scan.kind === "card_revoked"` from that poll · since-visit gate open (health ok) · baseline `hc_wallet_last_seen_network` was not already revoked.
+
+**Regression:** `npm run worker:test:card-disabled-since-visit` · `npm run e2e:card-disabled-since-visit`
+
+Full analysis: [`archive/CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](archive/CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md) · invariants: [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) § Card disabled since visit.

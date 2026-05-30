@@ -2,7 +2,7 @@ import { test, expect, type Page, type Route } from "@playwright/test";
 
 /**
  * P0b-3 — scan vouch auto-loads sole saved signing row without default-vouch setup.
- * @see docs/SAFARI_KEYS_WIPE_INVESTIGATION.md P0b-3
+ * @see docs/SAFARI_KEYS_CUSTODY.md P0b-3
  * @see docs/VOUCH_READY_KEYS_DESIGN.md
  *
  * Static fixture on Pages :8788. Regenerate: npm run site:generate-scan-e2e-fixture

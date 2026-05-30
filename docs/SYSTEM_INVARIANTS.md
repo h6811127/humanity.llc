@@ -32,7 +32,7 @@ npm run worker:test -- worker/tests/device-status-shell-modules.test.ts worker/t
 npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts e2e/device-cross-tab-keys.spec.ts e2e/scan-page-dot.spec.ts
 ```
 
-Canonical UX spec: [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md). Load failure postmortem: [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md). Open boot follow-ups: [`SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md`](SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md) (RC-9–RC-14).
+Canonical UX spec: [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md). Load failure postmortem: [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md). Open boot follow-ups: [`SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md`](SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md) (RC-12–RC-14).
 
 ---
 
@@ -62,7 +62,7 @@ All of the following are required to show the banner:
 
 1. `resolverConfirmedMap[pid] === true` (network status fetch this visit)
 2. `scan.kind === "card_revoked"` from that poll
-3. Since-visit gate open (resolver health ok + live-proof poll health ok)
+3. Since-visit gate open (resolver health known and `ok`, live-proof poll health ok, **and** at least one wallet poll confirmed this visit — RC-11)
 4. Baseline `hc_wallet_last_seen_network[pid]` was not already `card_revoked`
 
 **Regression:** `npm run worker:test:card-disabled-since-visit` · `npm run e2e:card-disabled-since-visit`
@@ -90,7 +90,7 @@ Canonical inbox taxonomy: [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
 | Invariant | Detail |
 |-----------|--------|
 | Two stores | Signing needs `sessionStorage.hc_created` with private key; `localStorage.hc_wallet` survives tabs but does not sign until copied into session. |
-| Quiet rehydrate | `maybeQuietTabRehydrate()` on shell boot (`device-status.mjs`) and scan (`scan-tab-keys.mjs`) **before** vouch/live-control scripts. |
+| Quiet rehydrate | `maybeQuietTabRehydrate()` on shell boot (`device-status.mjs`) and scan (`scan-tab-keys.mjs`) **before** vouch/live-control scripts. Shell pages share `ensureQuietTabRehydrateBootstrap()` — `/created/` and `/wallet/` await before reading `hc_created` (RC-10). |
 | Scan script order | `scan-tab-keys.mjs` must load and finish (top-level await) **before** `vouch-issue.mjs` and live-control in `scan-html.ts`. |
 | Tab session writes | Never persist `hc_created` without `owner_private_key_b58` or recovery private key (`setTabSession` / P0-6). |
 | Scan dot honesty | Dot / actor band reflect **tab signing state**, not wallet count alone (P0-5). |
@@ -139,6 +139,17 @@ New floating UI must use `--surface-popover-*` per [`UI_COLOR_SCHEME_STANDARD.md
 - Large wallets (~10+ saved root cards): poll budget and shell perf limits in [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) still apply.
 
 Canonical: [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md)
+
+---
+
+## Created page — verification boot (RC-9)
+
+| Invariant | Detail |
+|-----------|--------|
+| Human-trust row | `/created/` shows **Checking…** on human-trust icon/copy until first successful resolver status poll; steward review queue hidden until poll confirms `verification.state === "steward"`. |
+| Poll confirmed | Mark poll confirmed on any successful status response, not only when `scan.human_trust` is present. |
+
+**Regression:** `npm run worker:test -- worker/tests/created-verification-boot.test.ts`
 
 ---
 

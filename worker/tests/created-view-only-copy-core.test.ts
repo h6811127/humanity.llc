@@ -1,6 +1,6 @@
 /**
  * P0-7 view-only copy branches (R13).
- * @see docs/SAFARI_KEYS_WIPE_INVESTIGATION.md
+ * @see docs/SAFARI_KEYS_CUSTODY.md
  */
 import { describe, expect, it } from "vitest";
 

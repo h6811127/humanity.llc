@@ -10,10 +10,11 @@
     />
     <meta name="theme-color" content="#ffffff" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=69" />
+    <link rel="stylesheet" href="/styles.css?v=131" />
+    <link rel="stylesheet" href="/css/theme-dark.css?v=29" />
   </head>
   <body>
-    <div class="page feature-page">
+    <div class="page feature-page operator-audit-page">
       <header class="top">
         <a class="top-brand" href="/">
           <span class="pass-dot" aria-hidden="true"></span>
@@ -32,30 +33,32 @@
           </p>
         </section>
 
-        <section class="group">
+        <section class="group operator-audit-panel">
           <h2 class="group-label">Auth</h2>
-          <label class="field-label" for="audit-token">OPERATOR_AUDIT_TOKEN</label>
-          <input id="audit-token" class="input" type="password" autocomplete="off" />
-          <p class="list-sub">Stored in this browser tab only. Required for operator endpoints.</p>
+          <div class="operator-audit-auth">
+            <label class="field-label" for="audit-token">OPERATOR_AUDIT_TOKEN</label>
+            <input id="audit-token" class="input" type="password" autocomplete="off" />
+            <p class="form-hint">Stored in this browser tab only. Required for operator endpoints.</p>
+          </div>
         </section>
 
-        <section class="group">
+        <section class="group operator-audit-panel">
           <h2 class="group-label">Queue controls</h2>
-          <div class="created-keys-actions">
+          <div class="operator-audit-toolbar">
             <button type="button" class="btn-secondary" id="audit-refresh">Refresh</button>
             <button type="button" class="btn-secondary" id="audit-toggle-reviewed">
               Hide reviewed
             </button>
           </div>
-          <p id="audit-status" class="list-sub" role="status" aria-live="polite"></p>
+          <p id="audit-status" class="operator-audit-status" role="status" aria-live="polite"></p>
         </section>
 
-        <section class="group">
+        <section class="group operator-audit-panel">
           <h2 class="group-label">Flags</h2>
-          <ol id="audit-flags" class="list" aria-live="polite"></ol>
+          <ul id="audit-flags" class="operator-audit-flags" aria-live="polite"></ul>
         </section>
       </main>
     </div>
-    <script type="module" src="/js/operator-vouch-audit.mjs?v=2"></script>
+    <script type="module" src="/js/operator-vouch-audit.mjs?v=3"></script>
   </body>
 </html>

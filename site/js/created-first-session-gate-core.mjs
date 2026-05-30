@@ -1,6 +1,6 @@
 /**
  * First-session backup gate before control workspace (P0-4 · R4).
- * @see docs/SAFARI_KEYS_WIPE_INVESTIGATION.md P0-4
+ * @see docs/SAFARI_KEYS_CUSTODY.md P0-4
  * @see docs/OWNERSHIP_RESTORE_UX_PLAN.md Phase 2
  */
 

@@ -251,13 +251,14 @@ Merch and stranger tests do **not** block on further M5.5 work unless QA finds a
 
 **Product stance:** The device OS is **not** wallet monitoring SaaS. Resolver truth appears when users **look** (expand hub, tap refresh, sign on `/created/`). Automatic multi-card live-proof polling is **opt-in**, **scoped**, **leader-tab only**, and capped at **400 auto GETs per UTC day per device** (manual **Check for live proof** always works). Large wallets (≥10 saved) narrow auto live-proof to the active card + pending challenges and show hub guidance. See **[`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md)**.
 
-**Poll (Phases 1–5 shipped):** `GET …/live-control/challenges` runs only when **Watch for live proof** is on (`hc_watch_live_proof === "1"`, **default off**) and scope is active: hub sheet **expanded** or **inbox sheet** open (not bare `/wallet/` with hub collapsed). Resolver health must be **`ok`**; **one card per tick** (round-robin); **60s** idle / **5s** when proof is waiting. **Check for live proof** on the hub runs one round-robin check when watch is off. Wallet status chips refresh on hub expand or `/wallet/` (not collapsed landing; **≥60s** debounce on `visibilitychange`). Modules: `device-live-control-poll-scheduler.mjs`, `device-live-control-inbox.mjs`, `device-hub-network-tools.mjs`.
+**Poll (Phases 1–5 shipped):** `GET …/live-control/challenges` runs only when **Watch for live proof** is on (`hc_watch_live_proof === "1"`, **default off**) and scope is active: hub sheet **expanded**, **inbox sheet** open, or **any steward shell page** (/, /wallet/, /create/) while watch is on. Resolver health must be **`ok`**; **one card per tick** (round-robin); **60s** idle / **5s** when proof is waiting. **Check for live proof** on the hub runs one round-robin check when watch is off. Wallet status chips refresh on hub expand or `/wallet/` (not collapsed landing; **≥60s** debounce on `visibilitychange`). Modules: `device-live-control-poll-scheduler.mjs`, `device-live-control-inbox.mjs`, `device-hub-network-tools.mjs`.
 
 **Hub network tools (Phase 5):** **Check network** (burst, up to N status GETs), **Check for live proof** (one round-robin GET), last-checked status line, **Watch for live proof** checkbox. Two different cost shapes — document together in UI copy but estimate separately in ops.
 
 **UI:**
 
 - Hub group **Live proof waiting**  -  one row per pending challenge (card label, “Someone is waiting”).
+- Page-level **Prove live control** urgent banner on `/`, `/wallet/`, and `/create/` when inbox has pending challenges (`device-live-proof-banner.mjs`; `/created/` keeps `#live-control-proof` only).
 - Status line adds **`N proof waiting`** (highlighted) when N &gt; 0.
 - Row tap → **Open controls** for that card → `/created/?profile_id&qr_id&live_challenge&return_url` (from resolver `owner_url`).
 

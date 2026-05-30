@@ -224,15 +224,24 @@ export function customizeStickerMockLayout(qrModuleSize = 220) {
 
 /**
  * @param {Record<string, unknown>} product
+ * @returns {"sticker" | "hoodie" | "glitch_hoodie"}
+ */
+export function resolveCustomizePreviewKind(product) {
+  const preview = typeof product?.preview === "string" ? product.preview.trim() : "";
+  if (preview === "sticker" || preview === "glitch_hoodie") return preview;
+  const productId = String(product?.product_id ?? "").trim();
+  if (productId === "glitch_hoodie_v1") return "glitch_hoodie";
+  return "hoodie";
+}
+
+/**
+ * @param {Record<string, unknown>} product
  */
 export function personalizeProductDisplay(product) {
   return {
     productId: String(product.product_id),
     title: typeof product.title === "string" ? product.title : "Personalized item",
-    preview:
-      product.preview === "sticker" || product.preview === "hoodie"
-        ? product.preview
-        : "hoodie",
+    preview: resolveCustomizePreviewKind(product),
     priceDisplay:
       typeof product.price_display === "string" && product.price_display.trim()
         ? product.price_display.trim()

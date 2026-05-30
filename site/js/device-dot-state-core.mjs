@@ -8,6 +8,7 @@ import {
   OWNERSHIP_NOT_IN_TAB_SUBTITLE,
   RESTORE_CONTROL_HERE,
   RESTORE_CONTROL_IN_THIS_TAB,
+  STEWARD_REVIEW_QUEUE_MANAGE_HINT,
 } from "./device-ownership-copy-core.mjs";
 import { walletOwnershipNotInTab } from "./device-ownership-not-in-tab-core.mjs";
 
@@ -32,7 +33,7 @@ export function deviceStateFromContext({ unsavedTabKeys, stewardReady, savedWall
 
 /**
  * Scan page device axis: tab signing state only (not wallet row count).
- * Wallet-only keys map to `none` (hollow ring) — see docs/SAFARI_KEYS_WIPE_INVESTIGATION.md P0-5.
+ * Wallet-only keys map to `none` (hollow ring) — see docs/SAFARI_KEYS_CUSTODY.md P0-5.
  *
  * @param {{ unsavedTabKeys: boolean, stewardReady: boolean, hasTabSigningKeys: boolean }}
  */
@@ -183,8 +184,15 @@ function stewardNextLine({ overlayText, queueUrl, pageKind }) {
   if (pageKind === "wallet") {
     return "Steward control is ready on this device; open a saved card when you need to attest.";
   }
-  if (queueUrl) return "Open steward review queue.";
-  return "Open controls for steward actions.";
+  if (pageKind === "scan") {
+    return "Scroll to Issue vouch on this scan when attesting for someone else.";
+  }
+  const vouchLead =
+    "Scan someone else's QR to vouch, or use Scan QR to vouch in the device hub.";
+  if (queueUrl) {
+    return `${vouchLead} ${STEWARD_REVIEW_QUEUE_MANAGE_HINT}`;
+  }
+  return `${vouchLead} Open controls for QR tools and network status.`;
 }
 
 /**
@@ -293,9 +301,9 @@ export function describeDotState(network, device, overlay, opts = {}) {
           : stewardNextLine({ overlayText, queueUrl, pageKind }),
       action:
         overlayQuickActionForPage(overlay, pageKind) ??
-        (queueUrl
-          ? { kind: "open_steward_queue", label: "Open steward queue", href: queueUrl }
-          : { kind: "open_controls", label: "Open controls" }),
+        (pageKind === "scan"
+          ? { kind: "scan_scroll_vouch", label: "Go to vouch" }
+          : openControlsAction),
     };
   }
   if (device === "keys") {

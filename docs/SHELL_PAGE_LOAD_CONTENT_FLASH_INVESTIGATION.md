@@ -1,6 +1,6 @@
 # Shell page load content flash — investigation
 
-**Status:** RC-1–RC-8 **shipped** (2026-05-30) · RC-9–RC-14 open for follow-up  
+**Status:** RC-1–RC-14 **shipped** (2026-05-30)  
 **Date:** 2026-05-30  
 **Reported symptom:** Opening any shell or device page shows wrong or “random” data for a brief moment, then content disappears or is replaced with local device truth. Distracting and ugly.  
 **Related:** [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md) (stub → archive) · [`HUB_CARD_SAFARI_RELIABILITY.md`](HUB_CARD_SAFARI_RELIABILITY.md) · [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH_QA_2026-05-26.md) · [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) · [`CREATED_QR_BOOTSTRAP_FIX.md`](CREATED_QR_BOOTSTRAP_FIX.md)
@@ -203,6 +203,8 @@ Any step that paints before the next step completes can flash “wrong” data.
 
 ### RC-8 · Scan page SSR truth + client “live check arrive” animation
 
+**Status:** Fixed (2026-05-30) — SSR strip shows resolved label; client skips checking hold when strip agrees with `data-arrive-label` (online).
+
 **Surfaces:** `GET /c/{profile_id}?q=…` (Worker HTML).
 
 **Mechanism:**
@@ -221,66 +223,86 @@ Any step that paints before the next step completes can flash “wrong” data.
 
 ### RC-9 · Session vs resolver verification lag on `/created/`
 
+**Status:** Fixed (2026-05-30) — human-trust row shows **Checking…** until first successful `refreshNetworkStatus()`; steward review queue hidden until poll confirms `verification.state === "steward"`.
+
 **Surfaces:** Live tab cockpit, Manage steward disclosures, human-trust row.
 
-**Mechanism:**
+**Mechanism (historical):**
 
 1. `applyHumanTrustDisplay` may run from **session** or signed card JSON (`verification.level: 1, Registered`) before `refreshNetworkStatus` returns live `verification.state: steward`.
-2. Steward-only disclosures (`#steward-vouch-privileges-details`, `#steward-review-details`) toggle on `state === "steward"` only after network refresh updates `applyHumanTrustDisplay`.
+2. Steward-only disclosures (`#steward-review-details`) toggle on `state === "steward"` only after network refresh updates `applyHumanTrustDisplay`.
 
 **User-visible effect:** Green steward dot (from summary/session) while copy still says Registered; steward Manage items **pop in** after poll.
 
-**Evidence:** `created.mjs` `applyHumanTrustDisplay`, `refreshNetworkStatus`; public card JSON vs `GET …/status` divergence documented in [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md).
+**Fix:** `created-verification-boot-core.mjs` — defer human-trust icon/copy and steward review queue until `createdVerificationPollConfirmed` after resolver status poll.
+
+**Evidence:** `created.mjs` `applyHumanTrustDisplay`, `refreshNetworkStatus`; public card JSON vs `GET …/status` divergence documented in [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md). Tests: `worker/tests/created-verification-boot.test.ts`.
 
 ---
 
 ### RC-10 · Quiet tab rehydrate changing tab session mid-boot
 
+**Status:** Fixed (2026-05-30) — shared `ensureQuietTabRehydrateBootstrap()`; `/created/` and `/wallet/` await rehydrate before reading `hc_created`.
+
 **Surfaces:** All shell pages + scan (after P0-1).
 
-**Mechanism:** `maybeQuietTabRehydrate()` in `device-status.mjs` boot may **activate a wallet row** into `hc_created` after first paint. Components that read session once at module init see empty keys; components that listen for events see keys appear — UI shifts (save banners, vouch readiness, custody cards).
+**Mechanism (historical):**
 
-**Evidence:** [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md); [`SAFARI_KEYS_CUSTODY.md`](SAFARI_KEYS_CUSTODY.md) scan module order.
+1. `maybeQuietTabRehydrate()` in `device-status.mjs` boot may **activate a wallet row** into `hc_created` after first paint. Components that read session once at module init see empty keys; components that listen for events see keys appear — UI shifts (save banners, vouch readiness, custody cards).
+
+**Fix:** `device-quiet-tab-rehydrate-bootstrap.mjs` dedupes bootstrap rehydrate into one promise; `device-status.mjs`, `created.mjs`, and `wallet-page.mjs` await it before session-dependent paint. `/wallet/` also refreshes tab-save chrome on `hc-quiet-tab-rehydrated`.
+
+**Evidence:** [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md); [`SAFARI_KEYS_CUSTODY.md`](SAFARI_KEYS_CUSTODY.md) scan module order. Tests: `worker/tests/device-quiet-tab-rehydrate-bootstrap.test.ts`.
 
 ---
 
 ### RC-11 · Resolver health gate flips “since visit” suppression (G5)
 
+**Status:** Fixed (2026-05-30) — resolver health starts **`unset`**; since-visit UI stays suppressed until `data-boot=ready`, health is known, and at least one wallet poll confirms this visit (`hasWalletNetworkTruthPoll`).
+
 **Surfaces:** Hub disabled-since-visit banners, inbox.
 
-**Mechanism:** `resolverHealthStatus` initializes **`offline`** in `device-wallet-since-visit-gate.mjs`. Banners suppressed at first, then enabled after health → `ok`, then re-applied from `latestResolved*` maps — can **flash on** if cache poisoned.
+**Mechanism (historical):** `resolverHealthStatus` initialized **`offline`** in `device-wallet-since-visit-gate.mjs`. Banners suppressed at first, then enabled after health → `ok`, then re-applied from stale maps — could **flash on** before wallet poll.
 
-**Evidence:** [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md) § G5, G1–G3.
+**Fix:** `device-wallet-since-visit-gate-core.mjs` — `unset` boot health + require wallet poll before opening gate when health is `ok`.
 
----
-
-### RC-12 · bfcache / PWA standalone resume
-
-**Surfaces:** PWA home screen app, Safari back-forward.
-
-**Mechanism:** Restored tabs replay old DOM + old storage snapshots. `pageshow` handlers and standalone refresh (`pwa-standalone-refresh.mjs`) may reload or refresh **after** one frame of stale UI.
-
-**Evidence:** [`PWA_INSTALL.md`](PWA_INSTALL.md); `device-wallet-network.mjs` pageshow baseline reset comment (CARD_DISABLED doc).
+**Evidence:** [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md) § G5. Tests: `npm run worker:test:card-disabled-since-visit`.
 
 ---
 
-### RC-13 · Manage tab hidden until control mode (not a flash — visibility)
+### RC-12 · bfcache / PWA standalone resume — **Shipped**
 
-**Surfaces:** `/created/` steward UX.
+**Surfaces:** PWA home screen app, Safari back-forward on `/`, `/wallet/`, `/create/`, `/created/`.
 
-**Mechanism:** `#created-control-root` hidden during setup. User on first-run wizard never sees **Manage** tab. Copy that says “Advanced” or “after setup” is easy to miss when setup is incomplete or user expects controls immediately after create.
+**Mechanism:** Restored tabs replay old DOM + old in-memory poll state for at least one frame before debounced standalone refresh runs.
 
-**Evidence:** `created-workspace.mjs`; `site/created/index.html` `#created-control-root hidden`.
+**Fix:** `pageshow` + `persisted` → synchronous `handleShellBfcacheRestore()` — re-enter `data-boot=pending` + `data-dot-boot=pending`, reset since-visit gate + cross-tab cache + dot bootstrap settled flag, dispatch `hc-shell-bfcache-resume`, immediate `refreshDeviceChrome({ immediate: true })`. `/created/` re-polls status then `markDeviceBootReady()`.
+
+**Evidence:** [`PWA_INSTALL.md`](PWA_INSTALL.md); `device-shell-resume.mjs` · `device-wallet-network.mjs` pageshow baseline reset. Tests: `npm run worker:test:shell-boot` (`device-shell-resume-core.test.ts`).
 
 ---
 
-### RC-14 · Dot / hub `startViewTransition` on state change
+### RC-13 · Manage tab hidden until control mode — **Shipped**
 
-**Surfaces:** Shell status dot when browser supports View Transitions API and reduced-motion off.
+**Surfaces:** `/created/` steward UX during first-run setup.
 
-**Mechanism:** `applyDot()` wraps class changes in `document.startViewTransition(run)` when hub sheet closed — deliberate cross-fade that can read as flash.
+**Mechanism (historical):** `#created-control-root` stays hidden during setup, so users never saw the **Manage** tab while the wizard ran. Copy still said “Advanced” in places, and the done step said “advanced options” without naming **Manage**.
 
-**Evidence:** `device-status.mjs` `applyDot` ~302–312.
+**Fix:** Persistent setup hint (`#created-setup-manage-hint`) visible while `data-created-mode=setup`; done panel names **Live** vs **Manage**; user-visible “Advanced” tab pointers aligned to **Manage** (`device-ownership-copy-core.mjs`, `device-dot-state-core.mjs`, `created.mjs`).
+
+**Evidence:** `created-workspace-manage-visibility-core.mjs` · `created-workspace.mjs` · `site/created/index.html`. Tests: `npm run worker:test:shell-boot` (`created-workspace-manage-visibility.test.ts`).
+
+---
+
+### RC-14 · Dot / hub `startViewTransition` on state change — **Shipped**
+
+**Surfaces:** Shell status dot when the browser supports View Transitions API and reduced-motion is off.
+
+**Mechanism (historical):** `applyDot()` wrapped class changes in `document.startViewTransition()` when the hub sheet was closed — a deliberate cross-fade that read as a load flash while boot settled.
+
+**Fix:** `shouldSkipDotViewTransition()` skips View Transitions during shell boot (`data-boot` pending), before dot bootstrap settles, on first paint, when the dot state key is unchanged, and for cross-tab overlay-only flaps (existing policy).
+
+**Evidence:** `device-status-dot-view-transition-core.mjs` · `device-status.mjs` `applyDot`. Tests: `npm run worker:test:shell-boot` (`device-status-dot-view-transition.test.ts`).
 
 ---
 
@@ -323,7 +345,7 @@ After status-graph or hub network changes, also run dot/inbox E2E per [`DEVICE_O
 
 - Does not replace feature-specific postmortems (card-disabled, cross-tab, status-dot load failure).
 - Does not propose splitting the device shell into a separate app — only documents why the current **HTML + deferred JS** architecture produces the reported flashes.
-- RC-9+ fixes remain future work unless noted **Shipped** in § Suggested doc cross-links.
+- RC-12+ fixes remain future work unless noted **Shipped** in § Suggested doc cross-links.
 
 ---
 
@@ -338,8 +360,14 @@ After status-graph or hub network changes, also run dot/inbox E2E per [`DEVICE_O
 | `/created/` shell race | **Shipped (RC-2)** — workspace mode before unhide; route shell never reveals roots |
 | Cross-tab boot flash | **Shipped (RC-6)** — suppress cross-tab chrome until `data-boot=ready`; skip prime during boot |
 | Hub innerHTML boot flash | **Shipped (RC-7)** — defer hub render until boot ready; `device-boot-gated` hub sections |
-| Copy alignment | Rename Manage → Advanced or update all docs to say **Manage** |
-| Scan arrive animation | **Shipped (RC-8)** — SSR fast path when `data-arrive-label` present; skip `SCAN_ARRIVE_MIN_CHECKING_MS` |
+| Copy alignment | **Shipped (RC-13)** — setup Manage hint + Live/Manage done copy; user strings say **Manage** not Advanced tab |
+| Scan arrive animation | **Shipped (RC-8)** — SSR strip label matches `data-arrive-label`; skip checking hold when labels agree |
+| Created verification lag | **Shipped (RC-9)** — checking human-trust row + hidden steward queue until status poll |
+| Quiet rehydrate boot race | **Shipped (RC-10)** — shared bootstrap promise; page modules await before session read |
+| Since-visit health boot flash | **Shipped (RC-11)** — `unset` health + shell boot + wallet poll before since-visit show |
+| bfcache / standalone resume flash | **Shipped (RC-12)** — `pageshow` persisted re-enters boot pending; immediate chrome refresh · shell v77 |
+| Setup Manage discoverability | **Shipped (RC-13)** — setup hint + done panel Live/Manage copy; Advanced tab strings → Manage |
+| Dot view-transition load flash | **Shipped (RC-14)** — skip `startViewTransition` during boot / unchanged dot state · shell v78 |
 
 ---
 
@@ -358,3 +386,10 @@ After status-graph or hub network changes, also run dot/inbox E2E per [`DEVICE_O
 | 2026-05-30 | RC-6 fix: defer cross-tab chrome until shell boot ready; skip prime during boot |
 | 2026-05-30 | RC-7 fix: defer hub innerHTML rebuild until boot ready; boot-ready event + CSS gate |
 | 2026-05-30 | RC-8 fix: scan arrive SSR fast path — skip checking hold when `data-arrive-label` embedded; `scan-live-check-arrive.mjs?v=2` |
+| 2026-05-30 | RC-8 refine: SSR strip shows resolved label; skip checking when strip agrees with `data-arrive-label` |
+| 2026-05-30 | RC-9 fix: defer /created/ human-trust + steward queue until resolver status poll |
+| 2026-05-30 | RC-10 fix: shared quiet rehydrate bootstrap; /created/ + /wallet/ await before session read · shell v76 |
+| 2026-05-30 | RC-11 fix: since-visit suppress until health unset clears, boot ready, and wallet poll confirms |
+| 2026-05-30 | RC-12 fix: bfcache resume re-enters boot pending + immediate chrome refresh; /created/ re-poll · shell v77 · `created.mjs?v=78` |
+| 2026-05-30 | RC-13 fix: setup Manage tab hint + Live/Manage done copy; user-facing Advanced tab pointers → Manage · `created.mjs?v=79` |
+| 2026-05-30 | RC-14 fix: skip dot View Transitions during boot and unchanged state · shell v78 |

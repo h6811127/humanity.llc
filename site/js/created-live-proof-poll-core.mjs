@@ -23,6 +23,15 @@ export function createdLiveProofPollShouldRun(scope) {
 }
 
 /**
+ * View-mode /created/: detect pending live-proof requests without signing keys loaded.
+ *
+ * @param {{ documentVisible: boolean }} scope
+ */
+export function createdLiveProofPendingPollShouldRun(scope) {
+  return scope.documentVisible === true;
+}
+
+/**
  * Whether `#live-control-proof` is already salient without scrolling.
  *
  * @param {{

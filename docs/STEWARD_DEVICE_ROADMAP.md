@@ -4,7 +4,7 @@
 **Audience:** Product, engineering, support, onboarding  
 **Opened:** 2026-05-28
 
-Use this page when you need **one map** of steward-facing device work. Detailed rules stay in the linked docs; update those first, then adjust status rows here if the summary drifts.
+Use this page when you need **one map** of steward-facing device work. Detailed rules stay in the linked docs; engineering invariants: [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md). Doc policy: [`DOC_MAINTENANCE.md`](DOC_MAINTENANCE.md).
 
 **Public / recruiter feature map:** [`FEATURE_MAP_MAINTENANCE.md`](FEATURE_MAP_MAINTENANCE.md) · live hub at `/features-available-now.html` (generated from `site/scripts/generate-feature-pages.mjs`).
 
@@ -129,6 +129,7 @@ flowchart LR
 | Area | Shipped (reference / free) | Next / hosted | Canonical detail |
 |------|----------------------------|---------------|------------------|
 | **Key model** | Root + child object API; nested hub/My cards rows; resolver list reconcile; create convergence; register+QR; backup gate (steps 13–16) | Delegated child keys (step 17, product-gated) | [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) · [`DELEGATED_CHILD_CAPABILITIES_GATE.md`](DELEGATED_CHILD_CAPABILITIES_GATE.md) |
+| **Safari keys custody** | P0–P2 shipped: scan rehydrate, tab-honest dot, keyless session guard, ITP notice, PWA mismatch | P3 WebAuthn / optional persistence (not scheduled) | [`SAFARI_KEYS_CUSTODY.md`](SAFARI_KEYS_CUSTODY.md) · [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) |
 | **Portability** | Owner revoke path; backup/recovery; hub import → `/created/` | Shipped in repo; manual second-device QA | [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) |
 | **Inbox + custody panel** | Phases 1–14 inbox; custody plan 1–7 | Per-card watch flags (catalog L9+) | [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md`](KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md) |
 | **Browser alerts** | v2 A–D + `sw-live-proof.mjs` | Same UX; less polling when SSE healthy | [`DEVICE_INBOX.md`](DEVICE_INBOX.md) § Background alerts roadmap |

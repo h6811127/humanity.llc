@@ -599,6 +599,10 @@ body.page-flow.has-shell-chrome .page > main.screen {
   font-weight: 600;
 }
 
+.device-live-proof-banner:not(.hc-emphasis-card) {
+  margin: 0 var(--pad) 8px;
+}
+
 .device-hub-glance-row--liveproof .device-hub-glance-btn {
   border-color: rgba(180, 140, 20, 0.35);
   background: rgba(180, 140, 20, 0.08);
@@ -1723,6 +1727,7 @@ a.hub-card-menu-item {
 .landing-framing.hc-emphasis-card,
 .landing-final-cta.hc-emphasis-card,
 .device-cross-tab-banner.hc-emphasis-card,
+.device-live-proof-banner.hc-emphasis-card,
 .device-pwa-install-card.hc-emphasis-card,
 #wallet-tab-hint.hc-emphasis-card,
 #device-hub-crosstab-notice.hc-emphasis-card,
@@ -1736,6 +1741,7 @@ a.hub-card-menu-item {
 .landing-framing.hc-emphasis-card .hc-emphasis-card__main,
 .landing-final-cta.hc-emphasis-card .hc-emphasis-card__main,
 .device-cross-tab-banner.hc-emphasis-card .hc-emphasis-card__main,
+.device-live-proof-banner.hc-emphasis-card .hc-emphasis-card__main,
 .device-pwa-install-card.hc-emphasis-card .hc-emphasis-card__main,
 #wallet-tab-hint.hc-emphasis-card .hc-emphasis-card__main,
 #device-hub-crosstab-notice.hc-emphasis-card .hc-emphasis-card__main,
@@ -1747,6 +1753,7 @@ a.hub-card-menu-item {
 .landing-framing.hc-emphasis-card .hc-emphasis-card__actions,
 .landing-final-cta.hc-emphasis-card .hc-emphasis-card__actions,
 .device-cross-tab-banner.hc-emphasis-card .hc-emphasis-card__actions,
+.device-live-proof-banner.hc-emphasis-card .hc-emphasis-card__actions,
 .device-pwa-install-card.hc-emphasis-card .hc-emphasis-card__actions,
 #wallet-tab-hint.hc-emphasis-card .hc-emphasis-card__actions,
 #device-hub-crosstab-notice.hc-emphasis-card .hc-emphasis-card__actions,
@@ -5372,8 +5379,92 @@ body.landing-focus-mode .screen-landing {
   background: rgba(0, 0, 0, 0.04);
 }
 
-.shop-customize-mock[data-preview="hoodie"] .shop-customize-mock__garment {
+.shop-customize-mock__glitch-art {
+  display: none;
+}
+
+.shop-customize-mock[data-preview="hoodie"] .shop-customize-mock__garment,
+.shop-customize-mock[data-preview="glitch_hoodie"] .shop-customize-mock__garment {
   aspect-ratio: 4 / 5;
+}
+
+.shop-customize-mock[data-preview="glitch_hoodie"] .shop-customize-mock__garment {
+  background: linear-gradient(168deg, #242424 0%, #121212 52%, #080808 100%);
+  border-color: rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 20px 44px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.shop-customize-mock[data-preview="glitch_hoodie"] .shop-customize-mock__hoodie-neck {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.shop-customize-mock[data-preview="glitch_hoodie"] .shop-customize-mock__glitch-art {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  position: absolute;
+  left: 50%;
+  top: 14%;
+  transform: translateX(-50%);
+  width: 72%;
+  padding: 10px 8px 12px;
+  border-radius: 10px;
+  background:
+    linear-gradient(
+      118deg,
+      rgba(219, 27, 67, 0.18) 0%,
+      rgba(255, 255, 255, 0.04) 42%,
+      rgba(0, 180, 255, 0.12) 100%
+    ),
+    rgba(0, 0, 0, 0.35);
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    inset 0 0 0 1px rgba(219, 27, 67, 0.12),
+    0 6px 18px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+
+.shop-customize-mock[data-preview="glitch_hoodie"] .shop-customize-mock__glitch-art::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.03) 0,
+    rgba(255, 255, 255, 0.03) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  pointer-events: none;
+  opacity: 0.55;
+}
+
+.shop-customize-mock__glitch-word,
+.shop-customize-mock__glitch-live {
+  position: relative;
+  z-index: 1;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.shop-customize-mock__glitch-word {
+  font-size: 15px;
+  color: #ffffff;
+  text-shadow:
+    -1px 0 rgba(219, 27, 67, 0.85),
+    1px 0 rgba(0, 180, 255, 0.65);
+}
+
+.shop-customize-mock__glitch-live {
+  font-size: 10px;
+  color: rgba(219, 27, 67, 0.92);
+  letter-spacing: 0.22em;
 }
 
 .shop-customize-mock[data-preview="sticker"] {
@@ -5425,9 +5516,15 @@ body.landing-focus-mode .screen-landing {
   max-width: 88%;
 }
 
-.shop-customize-mock[data-preview="hoodie"] .shop-customize-mock__vessel {
+.shop-customize-mock[data-preview="hoodie"] .shop-customize-mock__vessel,
+.shop-customize-mock[data-preview="glitch_hoodie"] .shop-customize-mock__vessel {
   top: 24%;
   width: 62%;
+}
+
+.shop-customize-mock[data-preview="glitch_hoodie"] .shop-customize-mock__vessel {
+  top: 38%;
+  width: 58%;
 }
 
 .shop-customize-mock[data-preview="sticker"] .shop-customize-mock__vessel {
@@ -5536,7 +5633,8 @@ body.landing-focus-mode .screen-landing {
   width: 100%;
 }
 
-.shop-customize-mock[data-preview="hoodie"] .shop-customize-mock__qr-slot {
+.shop-customize-mock[data-preview="hoodie"] .shop-customize-mock__qr-slot,
+.shop-customize-mock[data-preview="glitch_hoodie"] .shop-customize-mock__qr-slot {
   width: 100%;
 }
 
@@ -6928,12 +7026,14 @@ details[open] > .created-advanced-summary::after {
 }
 
 .device-cross-tab-banner.hc-emphasis-card,
+.device-live-proof-banner.hc-emphasis-card,
 .device-pwa-install-card.hc-emphasis-card,
 #wallet-tab-hint.hc-emphasis-card {
   margin: 0 0 14px;
 }
 
 .device-cross-tab-banner.hc-emphasis-card,
+.device-live-proof-banner.hc-emphasis-card,
 .device-pwa-install-card.hc-emphasis-card {
   margin-left: var(--pad);
   margin-right: var(--pad);
@@ -6941,6 +7041,7 @@ details[open] > .created-advanced-summary::after {
 
 /* Safari flex-wrap + narrow column — match scan (docs/SCAN_CROSS_TAB_BANNER_SAFARI_LAYOUT_INVESTIGATION.md) */
 .device-cross-tab-banner.hc-emphasis-card .hc-emphasis-card__main,
+.device-live-proof-banner.hc-emphasis-card .hc-emphasis-card__main,
 .device-pwa-install-card.hc-emphasis-card .hc-emphasis-card__main,
 #wallet-tab-hint.hc-emphasis-card .hc-emphasis-card__main,
 #device-hub-crosstab-notice.hc-emphasis-card .hc-emphasis-card__main {
@@ -6949,6 +7050,7 @@ details[open] > .created-advanced-summary::after {
 }
 
 .device-cross-tab-banner.hc-emphasis-card .hc-emphasis-card__actions,
+.device-live-proof-banner.hc-emphasis-card .hc-emphasis-card__actions,
 .device-pwa-install-card.hc-emphasis-card .hc-emphasis-card__actions,
 #wallet-tab-hint.hc-emphasis-card .hc-emphasis-card__actions,
 #device-hub-crosstab-notice.hc-emphasis-card .hc-emphasis-card__actions {

@@ -7,8 +7,10 @@ import {
   customizeStickerMockLayout,
   isPersonalizeCheckoutReady,
   loadCardSessionForCustomize,
+  personalizeProductDisplay,
   personalizeProducts,
   readManifestoLineForCustomize,
+  resolveCustomizePreviewKind,
   STICKER_MOCK_CARD_WIDTH_IN,
   STICKER_MOCK_SHEET_IN,
 } from "../../site/js/shop-customize-core.mjs";
@@ -104,6 +106,31 @@ describe("isPersonalizeCheckoutReady", () => {
     };
     expect(isPersonalizeCheckoutReady(config, sticker)).toBe(true);
     expect(isPersonalizeCheckoutReady(config, hoodie)).toBe(false);
+  });
+});
+
+describe("resolveCustomizePreviewKind", () => {
+  it("maps glitch product id and preview token", () => {
+    expect(resolveCustomizePreviewKind({ product_id: "glitch_hoodie_v1" })).toBe("glitch_hoodie");
+    expect(
+      resolveCustomizePreviewKind({ product_id: "glitch_hoodie_v1", preview: "glitch_hoodie" })
+    ).toBe("glitch_hoodie");
+    expect(resolveCustomizePreviewKind({ product_id: "hoodie_live_object_v1" })).toBe("hoodie");
+    expect(resolveCustomizePreviewKind({ product_id: "sticker_personalized_v1", preview: "sticker" })).toBe(
+      "sticker"
+    );
+  });
+});
+
+describe("personalizeProductDisplay", () => {
+  it("preserves glitch_hoodie preview kind", () => {
+    expect(
+      personalizeProductDisplay({
+        product_id: "glitch_hoodie_v1",
+        preview: "glitch_hoodie",
+        title: "Glitch LIVE QR hoodie",
+      }).preview
+    ).toBe("glitch_hoodie");
   });
 });
 

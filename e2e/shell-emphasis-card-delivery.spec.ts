@@ -219,4 +219,67 @@ test.describe("shell emphasis card delivery (import regression Step 4)", () => {
       expect(metrics.cardBg).not.toBe("rgb(255, 255, 255)");
     });
   });
+
+  test.describe("shell live proof banner", () => {
+    test.beforeEach(async ({ page }) => {
+      await page.addInitScript((entry) => {
+        localStorage.setItem(
+          "hc_setup_done",
+          JSON.stringify({ [entry.profile_id]: true })
+        );
+        localStorage.setItem("hc_wallet", JSON.stringify([entry]));
+        localStorage.setItem("hc_watch_live_proof", "1");
+        sessionStorage.setItem(
+          "hc_created",
+          JSON.stringify({
+            profile_id: entry.profile_id,
+            qr_id: entry.qr_id,
+            handle: entry.handle,
+            manifesto_line: entry.manifesto_line,
+            scan_url: entry.scan_url,
+            owner_public_key_b58: entry.owner_public_key_b58,
+            owner_private_key_b58: entry.owner_private_key_b58,
+          })
+        );
+      }, WALLET_ENTRY);
+      await stubCreatedResolver(page);
+      const signUrl = new URL("/created/", "http://127.0.0.1:8788");
+      signUrl.searchParams.set("profile_id", WALLET_ENTRY.profile_id);
+      signUrl.searchParams.set("qr_id", WALLET_ENTRY.qr_id);
+      signUrl.searchParams.set("live_challenge", LIVE_PROOF_CHALLENGE_ID);
+      await page.route("**/.well-known/hc/v1/cards/**/live-control/challenges**", (route) =>
+        route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            status: "pending",
+            challenge_id: LIVE_PROOF_CHALLENGE_ID,
+            owner_url: signUrl.href,
+            return_url: WALLET_ENTRY.scan_url,
+            expires_at: new Date(Date.now() + 600_000).toISOString(),
+          }),
+        })
+      );
+    });
+
+    test("wallet shows urgent live proof banner when challenge pending", async ({ page }) => {
+      await page.goto("/wallet/");
+
+      const banner = page.locator("#device-live-proof-banner");
+      await expect(banner).toBeVisible({ timeout: 15_000 });
+      await expect(banner).toHaveClass(/hc-emphasis-card--urgent/);
+      await expect(banner.getByRole("button", { name: "Prove control now" })).toBeVisible();
+
+      assertStyledEmphasisCard(await measureEmphasisCard(page, "#device-live-proof-banner"));
+    });
+
+    test("created page uses panel instead of shell banner", async ({ page }) => {
+      await page.goto(
+        `/created/?profile_id=${WALLET_ENTRY.profile_id}&qr_id=${WALLET_ENTRY.qr_id}&live_challenge=${LIVE_PROOF_CHALLENGE_ID}`
+      );
+
+      await expect(page.locator("#live-control-proof")).toBeVisible({ timeout: 15_000 });
+      await expect(page.locator("#device-live-proof-banner")).toBeHidden();
+    });
+  });
 });

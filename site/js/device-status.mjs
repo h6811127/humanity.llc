@@ -2,7 +2,7 @@
  * Floating status dot, notification badge, hub sheet host.
  * @see docs/STATUS_INDICATOR_STEWARD_GREEN.md
  */
-import { closeInboxSheet, openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=75";
+import { closeInboxSheet, openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=79";
 import { buildStatusSegments } from "./device-counts.mjs";
 import { loadPins } from "./device-pins.mjs";
 import {
@@ -10,12 +10,12 @@ import {
   isLandingStrangerChrome,
   LANDING_STRANGER_CHROME_CLASS,
 } from "./device-hub-stranger-empty-core.mjs";
-import { shouldSkipCrossTabOverlayViewTransition } from "./device-presence-inbox-stability-core.mjs";
+import { shouldSkipDotViewTransition } from "./device-status-dot-view-transition-core.mjs";
 import { fetchResolverHealth } from "./device-network-health.mjs";
 import { setResolverHealthStatusForSinceVisit } from "./device-wallet-since-visit-gate.mjs";
 
 export const RESOLVER_HEALTH_CHANGED = "hc-resolver-health-changed";
-import { maybeQuietTabRehydrate } from "./device-quiet-tab-rehydrate.mjs?v=75";
+import { ensureQuietTabRehydrateBootstrap } from "./device-quiet-tab-rehydrate-bootstrap.mjs";
 import { scheduleStoragePersistRequest } from "./device-storage-persist.mjs";
 import { resolverApiOrigin } from "./hc-sign.mjs";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
@@ -30,7 +30,7 @@ import {
   getInboxDotOverlay,
   notificationCount,
   preloadInboxModule,
-} from "./device-inbox-loader.mjs?v=75";
+} from "./device-inbox-loader.mjs?v=79";
 import {
   inboxBadgeAriaLabel,
   inboxBadgeTitle,
@@ -39,29 +39,29 @@ import {
   inboxBadgeChromaKind,
   inboxBadgeCountText,
   inboxCountFromItems,
-} from "./device-inbox-core.mjs?v=75";
+} from "./device-inbox-core.mjs?v=79";
 import { closeGlancePopover, isGlancePopoverOpen } from "./device-hub-glance-popover.mjs";
 import {
   initHubIntroCoachmark,
   onHubOpenedFromIntro,
 } from "./device-hub-intro-coachmark.mjs";
 import { logDotDiagnostic } from "./device-dot-diagnostics.mjs";
-import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=75";
+import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=79";
 import {
   NETWORK_BASELINE_CHANGED,
   NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
 import "./device-shell-motion.mjs";
-import "./device-shell-chrome.mjs?v=75";
+import "./device-shell-chrome.mjs?v=79";
 import "./device-theme.mjs";
-import { initBrowserNotifications } from "./device-browser-notifications-loader.mjs?v=75";
-import { reconcileHubSheetState } from "./device-hub-sheet-loader.mjs?v=75";
+import { initBrowserNotifications } from "./device-browser-notifications-loader.mjs?v=79";
+import { reconcileHubSheetState } from "./device-hub-sheet-loader.mjs?v=79";
 import { startCrossTabNotificationState } from "./device-cross-tab-state.mjs";
 import {
   refreshDeviceChrome,
   setRefreshStatusSurfaces,
   startDeviceChromeRefresh,
-} from "./device-chrome-refresh.mjs?v=75";
+} from "./device-chrome-refresh.mjs?v=79";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
 import {
   broadcastHealthSnapshotIfEligible,
@@ -86,7 +86,7 @@ import {
   shellStatusLinePrimaryInChrome,
   shouldCelebrateStewardTransition,
   statusAriaLabel,
-} from "./device-dot-state-core.mjs?v=75";
+} from "./device-dot-state-core.mjs?v=79";
 import {
   DOT_STATE_CHANGED,
   getNetworkStatus,
@@ -95,10 +95,11 @@ import {
   setHubExpandedHook,
   setHubExpanded as setHubExpandedCore,
   setNetworkStatus,
-} from "./device-status-core.mjs?v=75";
+} from "./device-status-core.mjs?v=79";
 import {
   markDotBootstrapSettled,
   markDotBootReadyIfSettled,
+  isDotBootstrapSettled,
 } from "./device-status-dot-boot.mjs";
 
 export { DOT_STATE_CHANGED };
@@ -304,11 +305,15 @@ function applyDot() {
     lastDotSnapshot = { network: networkStatus, device, overlay };
     markDotBootReadyIfSettled();
   };
-  const skipTransition =
-    prefersReducedMotion() ||
-    hubSheetOpen() ||
-    typeof document.startViewTransition !== "function" ||
-    shouldSkipCrossTabOverlayViewTransition(lastDotSnapshot, nextSnapshot);
+  const skipTransition = shouldSkipDotViewTransition({
+    prefersReducedMotion: prefersReducedMotion(),
+    hubSheetOpen: hubSheetOpen(),
+    viewTransitionsSupported: typeof document.startViewTransition === "function",
+    shellBootState: document.body?.dataset?.boot,
+    dotBootstrapSettled: isDotBootstrapSettled(),
+    previousSnapshot: lastDotSnapshot,
+    nextSnapshot,
+  });
 
   if (skipTransition) {
     run();
@@ -607,7 +612,7 @@ window.addEventListener("hc-focus-hub-search", () => {
 });
 
 async function bootDeviceStatusShell() {
-  await maybeQuietTabRehydrate();
+  await ensureQuietTabRehydrateBootstrap();
   scheduleStoragePersistRequest({ reason: "shell_bootstrap" });
   startTabKeysPresence();
   initBrowserNotifications();

@@ -22,8 +22,9 @@ import {
   productDetailUsesTier0InlineCheckout,
   readProductIdFromPath,
 } from "./shop-product-detail-core.mjs";
-import { isTier0StoreProductId } from "./shop-store-catalog-ids.mjs";
+import { isTier0StoreProductId, GLITCH_HOODIE_STORE_PRODUCT_ID } from "./shop-store-catalog-ids.mjs";
 import { tier0MerchRefForProductId } from "./shop-tier0-core.mjs";
+import { merchRefForPersonalizeProductId } from "./merch-funnel-core.mjs";
 import { bindTier0ProductCheckout } from "./shop-tier0-product-checkout.mjs";
 import { productHonestyBlockForId } from "./shop-merch-copy-core.mjs";
 
@@ -147,9 +148,12 @@ async function initProductDetail() {
     return;
   }
 
-  const merchRef = isTier0StoreProductId(productId)
-    ? tier0MerchRefForProductId(productId)
-    : "customize_shop";
+  const merchRef =
+    productId === GLITCH_HOODIE_STORE_PRODUCT_ID
+      ? merchRefForPersonalizeProductId(GLITCH_HOODIE_STORE_PRODUCT_ID)
+      : isTier0StoreProductId(productId)
+        ? tier0MerchRefForProductId(productId)
+        : "customize_shop";
   persistMerchCreateRef(merchRef);
   decorateShopCreateLinks();
 
@@ -160,6 +164,10 @@ async function initProductDetail() {
       fetchPrintCatalog(origin).catch(() => ({ products: [] })),
       fetchStoreProduct(origin, productId),
     ]);
+    if (productPayload.redirect === true && productPayload.redirect_to) {
+      location.replace(String(productPayload.redirect_to));
+      return;
+    }
     const product = enrichProductDetail(config, catalogPayload, productPayload);
     renderProduct(product);
     if (productDetailUsesTier0InlineCheckout(product)) {

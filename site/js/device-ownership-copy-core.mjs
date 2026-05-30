@@ -282,6 +282,22 @@ export const SETUP_WALLET_SAVED_CONFIRMATION = "Saved on this device.";
 export const SETUP_WALLET_SAVED_DONE_DETAIL =
   "Your control key is saved on this device. Open card controls when you are ready.";
 
+/** Setup wizard — Manage tab unlocks after setup (RC-13). */
+export const SETUP_MANAGE_TAB_HINT =
+  "Revoke, recovery, and steward tools unlock under the Manage tab after you tap Open card controls.";
+
+/** Setup done panel — Live vs Manage split (RC-13). */
+export const SETUP_DONE_PANEL_LEAD =
+  "Object now resolves live on the network. The same QR stays valid as status changes. Update copy on Live; revoke, recovery, and steward tools are under Manage.";
+
+/** Live control proof — keys missing in this tab (RC-13 copy alignment). */
+export const LIVE_CONTROL_SIGNING_KEYS_MISSING =
+  "Open this proof link in the original created tab, or unlock a saved recovery key or encrypted backup in Manage. humanity.llc cannot prove control for you.";
+
+/** Status dot steward queue pointer (RC-13 copy alignment). */
+export const STEWARD_REVIEW_QUEUE_MANAGE_HINT =
+  "Operator review queue is under Manage on Open controls.";
+
 /** Private / ephemeral browsing — create and save blocked (RC-6). */
 export const EPHEMERAL_BROWSING_EYEBROW = "Private browsing";
 

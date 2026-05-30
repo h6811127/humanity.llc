@@ -12,10 +12,10 @@ describe("store-rows-handler", () => {
     expect(body.rows).toHaveLength(2);
     expect(body.rows[0].row_id).toBe("row_personalize");
     expect(body.rows[0].products[0]).toMatchObject({
-      product_id: "hoodie_live_object_v1",
+      product_id: "glitch_hoodie_v1",
       personalization_indicator: "Personalized QR",
-      detail_path: "/shop/products/hoodie_live_object_v1/",
-      cta_label: "View product",
+      detail_path: "/shop/products/glitch_hoodie_v1/",
+      cta_label: "Customize your QR",
     });
   });
 

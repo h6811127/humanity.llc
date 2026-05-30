@@ -209,7 +209,9 @@ export function renderProductCardHtml(product) {
   const statusClass =
     product.availability === "checkout" ? " shop-hub-status--live" : "";
   const status = `<p class="shop-hub-status${statusClass}">${escapeHtml(productAvailabilityLabel(product))}</p>`;
-  const detailPath = escapeHtml(product.detail_path || "/shop/");
+  const detailPath = escapeHtml(
+    product.action_path || product.detail_path || "/shop/"
+  );
   const cta = escapeHtml(product.cta_label || "View product");
 
   return `<article class="shop-hub-card">

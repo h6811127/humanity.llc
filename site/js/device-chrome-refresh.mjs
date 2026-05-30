@@ -18,18 +18,23 @@ import {
   shouldShowOrphanRemovedKeysNotice,
 } from "./device-cross-tab-visibility.mjs";
 import { renderCrossTabKeysBanner } from "./device-cross-tab-banner.mjs";
+import { renderLiveProofBanner } from "./device-live-proof-banner.mjs";
 import { refreshHubGlance } from "./device-hub-glance.mjs";
 import { refreshHubInboxAlertsFromChrome } from "./device-hub-ui.mjs";
 import { loadInboxSheetModule } from "./device-inbox-sheet-loader.mjs";
 import {
   loadInboxModule,
   resetPresenceInboxGatherCache,
-} from "./device-inbox-loader.mjs?v=75";
+} from "./device-inbox-loader.mjs?v=79";
 import { getOrphanRemovedTabsWithKeys, getOtherTabsWithKeys } from "./device-tab-presence.mjs";
 import { primeCrossTabNotificationState } from "./device-cross-tab-state.mjs";
 import { refreshWalletContextFromChrome } from "./wallet-page-chrome.mjs";
 import { markDeviceBootReadyIfShellPage } from "./device-shell-boot.mjs";
 import { isDeviceBootReadyState } from "./device-shell-boot-core.mjs";
+import {
+  initShellBfcacheResumeGate,
+  SHELL_BFCACHE_RESTORE_EVENT,
+} from "./device-shell-resume.mjs";
 import { shouldSuppressCrossTabChromeUntilShellBoot } from "./device-cross-tab-boot-core.mjs";
 
 /** @type {(() => void) | null} */
@@ -124,6 +129,7 @@ async function runChromeRefreshAsync() {
   inbox.beginDeviceChromeRefreshTick();
   try {
     refreshStatusSurfaces?.();
+    renderLiveProofBanner();
     renderCrossTabKeysBanner();
     refreshHubGlance();
     refreshHubInboxAlertsFromChrome();
@@ -139,6 +145,7 @@ async function runChromeRefreshAsync() {
       isDeviceBootReadyState(document.body?.dataset?.boot);
     if (bootJustReady) {
       refreshStatusSurfaces?.();
+      renderLiveProofBanner();
       renderCrossTabKeysBanner();
     }
   } finally {
@@ -210,4 +217,9 @@ export function startDeviceChromeRefresh() {
   });
   window.addEventListener("hc-wallet-removed-profiles-changed", onImmediateChromeEvent);
   window.addEventListener("storage", onStorageKey);
+  initShellBfcacheResumeGate();
+  window.addEventListener(SHELL_BFCACHE_RESTORE_EVENT, () => {
+    resetPresenceInboxGatherCache();
+    refreshDeviceChrome({ immediate: true });
+  });
 }

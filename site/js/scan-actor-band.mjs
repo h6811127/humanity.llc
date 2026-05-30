@@ -1,7 +1,7 @@
 /**
  * L3 actor band on scan — appears after live check settles (Path 2 S3).
  * @see docs/SCAN_PAGE_TRUST_UI.md
- * @see docs/SAFARI_KEYS_WIPE_INVESTIGATION.md P1-2 step 2
+ * @see docs/SAFARI_KEYS_CUSTODY.md P1-2 step 2
  */
 import { getTabSession } from "./device-keys.mjs";
 import {

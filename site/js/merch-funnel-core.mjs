@@ -2,6 +2,10 @@
  * Merch funnel attribution (M8.4) — session-only ref carry + allowed ref list.
  * No PII; aggregate server counters only.
  */
+import {
+  GLITCH_HOODIE_STORE_PRODUCT_ID,
+  HOODIE_LIVE_OBJECT_STORE_PRODUCT_ID,
+} from "./shop-store-catalog-ids.mjs";
 
 export const MERCH_FUNNEL_SESSION_KEY = "hc_merch_create_ref";
 export const MERCH_FUNNEL_POST_CREATE_KEY = "hc_merch_customize_ref";
@@ -13,6 +17,7 @@ export const ALLOWED_MERCH_REFS = new Set([
   "tier0_glitch",
   "customize_shop",
   "customize_hoodie",
+  "customize_glitch",
   "scan_customize",
 ]);
 
@@ -21,6 +26,7 @@ export const CUSTOMIZE_HANDOFF_REFS = new Set([
   "scan_customize",
   "customize_shop",
   "customize_hoodie",
+  "customize_glitch",
 ]);
 
 /** localStorage map profile_id → true for Tier 1 ephemeral-state owners. */
@@ -106,6 +112,22 @@ export function isTier1MerchRef(ref) {
 /** Tier 0 Glitch / company drop hoodie (shared campaign QR). */
 export function isTier0GlitchMerchRef(ref) {
   return normalizeMerchRef(ref) === "tier0_glitch";
+}
+
+/** Tier 1 Glitch founding hoodie (unique QR per buyer). */
+export function isGlitchCustomizeMerchRef(ref) {
+  return normalizeMerchRef(ref) === "customize_glitch";
+}
+
+/**
+ * @param {string | null | undefined} productId
+ * @returns {string}
+ */
+export function merchRefForPersonalizeProductId(productId) {
+  const id = typeof productId === "string" ? productId.trim() : "";
+  if (id === GLITCH_HOODIE_STORE_PRODUCT_ID) return "customize_glitch";
+  if (id === HOODIE_LIVE_OBJECT_STORE_PRODUCT_ID) return "customize_hoodie";
+  return "customize_shop";
 }
 
 /**
@@ -204,7 +226,12 @@ export function merchCustomizeUrlFromRef(ref, origin = "https://humanity.llc") {
   const normalized = normalizeMerchRef(ref);
   if (!normalized || !shouldHandoffToCustomize(normalized)) return null;
   const base = origin.replace(/\/$/, "");
-  return `${base}/shop/customize/?hc_ref=${encodeURIComponent(normalized)}`;
+  const u = new URL(`${base}/shop/customize/`);
+  u.searchParams.set("hc_ref", normalized);
+  if (normalized === "customize_glitch") {
+    u.searchParams.set("product", "glitch");
+  }
+  return `${base}${u.pathname}${u.search}${u.hash}`;
 }
 
 /**

@@ -45,6 +45,7 @@
   --hc-scan-surface-fg-subtle: rgba(60, 60, 67, 0.58);
   --hc-scan-surface-border: rgba(60, 60, 67, 0.14);
   --hc-scan-surface-chevron: rgba(60, 60, 67, 0.34);
+  --scan-hero-qr-expanded-max: min(320px, calc(100% - 16px));
   --hc-emphasis-card-fill-active: linear-gradient(
     160deg,
     #f6f8f7 0%,
@@ -1775,6 +1776,22 @@ a {
 
 .scan-hero-qr-details[open] .scan-hero-qr {
   margin-top: 10px;
+  max-width: var(--scan-hero-qr-expanded-max);
+  width: 100%;
+  margin-inline: auto;
+}
+
+.scan-hero-qr-details[open] .scan-hero-qr svg,
+.scan-hero-qr-details[open] .scan-hero-qr img,
+.scan-hero-qr-details[open] .scan-hero-qr .hc-qr-frame-svg {
+  width: 100%;
+  height: auto;
+  max-width: var(--scan-hero-qr-expanded-max);
+}
+
+.scan-hero-qr-details[open] .pass-qr img {
+  width: 100%;
+  height: auto;
 }
 
 .scan-hero-trust {

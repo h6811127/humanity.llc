@@ -144,7 +144,7 @@ import {
 import { tabNoticeCount } from "./device-counts.mjs";
 import { mountHubBuildStamp } from "./device-hub-build-stamp.mjs";
 import { mountHubNetworkTools } from "./device-hub-network-tools.mjs";
-import { syncInboxBackdropForOpenHub } from "./device-sheet-backdrop-sync.mjs?v=75";
+import { syncInboxBackdropForOpenHub } from "./device-sheet-backdrop-sync.mjs?v=79";
 import {
   HUB_STRANGER_EMPTY_CLASS,
   isHubStrangerEmptyState,

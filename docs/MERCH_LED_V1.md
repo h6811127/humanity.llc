@@ -1,7 +1,7 @@
 # Merch-Led V1: Curiosity + Belonging
 
 **Status:** Canonical wedge (v1 GTM) · **Phase B in progress**  -  Tier 0 story shop at `/shop/`  
-**Current focus (2026-05-27, post-M5):** **Merch funnel MVP** — Tier 1 personalized wear (hoodie / sticker with unique QR), not status plates as primary launch wedge.  
+**Current focus (2026-05-30, post-M5):** **Merch funnel MVP** — **Glitch hoodie** as Tier 1 personalized founding drop (fixed art, unique QR per buyer) + optional Tier 0 founding sticker; not status plates as primary wedge. See [`MERCH_PRODUCT_COPY.md`](MERCH_PRODUCT_COPY.md).  
 **Purpose:** Lead with physical artifacts as viral distribution while pairing **proof of curiosity** (spread) with **proof of belonging** (retention). Commons Pass and organizer tooling follow once people already wear the object.
 
 **Implementation tracker:** `docs/SHOP_TIER0_IMPLEMENTATION.md` (Pages UI, waitlist interest, Shopify handoff checklist).  

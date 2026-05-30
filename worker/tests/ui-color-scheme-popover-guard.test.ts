@@ -139,7 +139,7 @@ describe("UI color scheme popover guard", () => {
       "site/organizer-revoke/index.html",
     ]) {
       const html = readSiteCss(page);
-      const linkIdx = html.indexOf('href="/css/hc-emphasis-card.css?v=4"');
+      const linkIdx = html.indexOf('href="/css/hc-emphasis-card.css?v=5"');
       const stylesIdx = html.indexOf('href="/styles.css?v=');
       expect(linkIdx, page).toBeGreaterThanOrEqual(0);
       expect(stylesIdx, page).toBeGreaterThan(linkIdx);

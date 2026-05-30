@@ -17,7 +17,9 @@ Do not conflate these — each has a different job:
 | **Product specs** | `docs/features/*.md` (5 files) | Formal requirements: Humanity Card, Human Verification, QR Public Profile, Storefront, Printify |
 | **Steward device index** | [`STEWARD_DEVICE_ROADMAP.md`](STEWARD_DEVICE_ROADMAP.md) | Engineering truth for shell, inbox, hosted tier, PWA, polling |
 
-**Conflict rule:** Policy and behavior live in canonical docs (`DEVICE_INBOX.md`, `MERCH_FUNNEL_MVP.md`, etc.). The public map **summarizes** shipped state; if they disagree, fix the canonical doc first, then regenerate the map.
+**Conflict rule:** Policy and behavior live in canonical docs (`DEVICE_INBOX.md`, `MERCH_FUNNEL_MVP.md`, etc.) and [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md). The public map **summarizes** shipped state; if they disagree, fix the canonical doc first, then regenerate the map.
+
+**Doc maintenance:** [`DOC_MAINTENANCE.md`](DOC_MAINTENANCE.md) — when to write specs vs archive investigations.
 
 **Cross-links:**
 

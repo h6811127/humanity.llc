@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { verificationRecordFromLabelState } from "../../site/js/device-wallet-network-core.mjs";
 import {
   loadWalletSummary,
+  markWalletSummaryReconciledForTests,
   mergeWalletEntryFromSession,
   resetWalletCachesForTests,
   saveWallet,
@@ -145,7 +146,10 @@ describe("loadWalletSummary", () => {
         owner_private_key_b58: "priv",
       },
     ]);
+    loadWalletSummary();
+
     resetWalletCachesForTests();
+    markWalletSummaryReconciledForTests();
 
     const realParse = JSON.parse;
     const parseSpy = vi.spyOn(JSON, "parse").mockImplementation((value) => {

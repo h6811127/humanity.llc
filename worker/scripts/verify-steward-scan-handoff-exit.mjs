@@ -41,9 +41,7 @@ for (const args of gates) {
 }
 
 if (!skipE2e) {
-  run(["run", "e2e:steward-dual-qr"]);
-  run(["run", "e2e:hub-in-app-qr-scanner"]);
-  run(["run", "e2e:steward-scan-handoff-fallback"]);
+  run(["run", "e2e:steward-scan-handoff"]);
 }
 
 console.log("\n✅ Steward scan handoff gate passed (S1–S7 + dual-QR investigation).");

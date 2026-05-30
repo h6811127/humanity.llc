@@ -499,6 +499,22 @@ test.describe("device inbox - live proof poll scope (request budget phases 1–3
     expect(challengeFetches).toBe(0);
   });
 
+  test("landing with collapsed hub polls when watch is on", async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("hc_watch_live_proof", "1");
+    });
+
+    let challengeFetches = 0;
+    await page.route("**/.well-known/hc/v1/cards/**/live-control/challenges**", (route) => {
+      challengeFetches += 1;
+      return mockNoChallenge(route);
+    });
+
+    await page.goto("/");
+    await expect(page.locator("#device-hub")).toHaveClass(/device-hub-collapsed/);
+    await expect.poll(() => challengeFetches, { timeout: 15_000 }).toBeGreaterThan(0);
+  });
+
   test("landing polls live-control after hub expands when watch is on", async ({ page }) => {
     await page.addInitScript(() => {
       localStorage.setItem("hc_watch_live_proof", "1");

@@ -24,3 +24,8 @@ export function isDotBootstrapSettled() {
 export function resetDotBootstrapSettledForTests() {
   bootstrapSettled = false;
 }
+
+/** bfcache resume — core must defer dot paint until status re-settles. */
+export function resetDotBootstrapSettledForResume() {
+  bootstrapSettled = false;
+}

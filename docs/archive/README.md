@@ -23,4 +23,4 @@ These files record closed investigations and one-off merge notes. Critical rules
 | `REVOKE_UI_INVESTIGATION.md` | Phase 0 fix | [`CARD_WORKSPACE_PHASE0.md`](../CARD_WORKSPACE_PHASE0.md) |
 | `CREATED_UI_SAFARI_HELP_REVOKE_INVESTIGATION.md` | read-only | [`M4_CREATED_REVOKE_UI.md`](../M4_CREATED_REVOKE_UI.md) |
 | `PR_80_MERGE_CONFLICT_INVESTIGATION.md` | historical | — |
-| `SAFARI_KEYS_WIPE_INVESTIGATION.md` | 2026-05-30 | [`SAFARI_KEYS_CUSTODY.md`](../SAFARI_KEYS_CUSTODY.md) |
+| `GITHUB_CI_FAILURE_INVESTIGATION.md` | 2026-05-30 | [`CLOUDFLARE_CI_SECRETS.md`](../CLOUDFLARE_CI_SECRETS.md) · `.github/workflows/regression-nightly.yml` |

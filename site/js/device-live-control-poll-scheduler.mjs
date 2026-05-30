@@ -27,11 +27,13 @@ export function liveControlPollIntervalMs(pendingCount, policy) {
  *   inboxSheetOpen: boolean,
  *   walletPage: boolean,
  *   watchEnabled?: boolean,
+ *   stewardShellPage?: boolean,
  * }} scope
  */
 export function liveControlPollingShouldRun(scope) {
   if (scope.inboxSheetOpen) return true;
   if (scope.hubExpanded) return true;
+  if (scope.watchEnabled && scope.stewardShellPage) return true;
   if (scope.walletPage && scope.watchEnabled) return true;
   return false;
 }
@@ -110,6 +112,7 @@ export function isDeviceHubExpanded(hubEl) {
  *   inboxSheetOpen?: boolean,
  *   walletPage?: boolean,
  *   watchEnabled?: boolean,
+ *   stewardShellPage?: boolean,
  * }} input
  */
 export function resolveLiveControlPollScope(input) {
@@ -118,6 +121,7 @@ export function resolveLiveControlPollScope(input) {
     inboxSheetOpen: input.inboxSheetOpen === true,
     walletPage: input.walletPage === true,
     watchEnabled: input.watchEnabled === true,
+    stewardShellPage: input.stewardShellPage === true,
   });
 }
 

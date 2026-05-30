@@ -15,8 +15,15 @@ import {
   shouldShowHubQrScanner,
   shouldShowHubScanQrChrome,
 } from "./device-hub-qr-scanner-core.mjs";
-import { startJsQrDetectLoop } from "./device-hub-qr-scanner-decode.mjs";
-import { getWalletCount } from "./device-wallet.mjs";
+import { waitForVideoScanReady } from "./device-hub-qr-scanner-decode-core.mjs";
+import {
+  startHybridDetectLoop,
+  startJsQrDetectLoop,
+  startNativeDetectLoop,
+} from "./device-hub-qr-scanner-decode.mjs";
+import { getTabSession } from "./device-keys.mjs";
+import { hasStewardVerification } from "./device-dot-state-core.mjs";
+import { getWalletCount, loadWalletSummary } from "./device-wallet.mjs";
 import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
 
 /** @type {MediaStream | null} */
@@ -78,39 +85,6 @@ function closeScannerDialog() {
   dialog?.close();
 }
 
-/**
- * @param {BarcodeDetector} detector
- * @param {HTMLVideoElement} video
- * @param {(url: string) => void} onFound
- */
-function startNativeDetectLoop(detector, video, onFound) {
-  let stopped = false;
-  const tick = async () => {
-    if (stopped || video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
-      if (!stopped) requestAnimationFrame(tick);
-      return;
-    }
-    try {
-      const codes = await detector.detect(video);
-      for (const code of codes) {
-        const url = resolveScannedQrToScanUrl(code.rawValue, location.origin);
-        if (url) {
-          stopped = true;
-          onFound(url);
-          return;
-        }
-      }
-    } catch {
-      /* frame not ready */
-    }
-    if (!stopped) requestAnimationFrame(tick);
-  };
-  requestAnimationFrame(tick);
-  return () => {
-    stopped = true;
-  };
-}
-
 function onScanUrlFound(url) {
   const dialog = scannerDialog();
   void stopCamera();
@@ -143,11 +117,19 @@ async function openScannerDialog() {
 
   try {
     activeStream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: { ideal: "environment" } },
+      video: {
+        facingMode: { ideal: "environment" },
+        width: { ideal: 1280, max: 1920 },
+        height: { ideal: 720, max: 1080 },
+      },
       audio: false,
     });
+    video.muted = true;
+    video.playsInline = true;
+    video.setAttribute("playsinline", "");
     video.srcObject = activeStream;
     await video.play();
+    await waitForVideoScanReady(video);
 
     const onRaw = (raw) => {
       const url = resolveScannedQrToScanUrl(raw, location.origin);
@@ -155,8 +137,12 @@ async function openScannerDialog() {
     };
 
     if (backend === "native") {
-      const detector = new globalThis.BarcodeDetector({ formats: ["qr_code"] });
-      stopScanLoop = startNativeDetectLoop(detector, video, onScanUrlFound);
+      stopScanLoop = startNativeDetectLoop(video, onRaw);
+      if (!stopScanLoop) {
+        stopScanLoop = await startJsQrDetectLoop(video, onRaw);
+      }
+    } else if (backend === "hybrid") {
+      stopScanLoop = await startHybridDetectLoop(video, onRaw);
     } else {
       stopScanLoop = await startJsQrDetectLoop(video, onRaw);
     }
@@ -170,12 +156,23 @@ async function openScannerDialog() {
   }
 }
 
+function hubQrScannerOpts() {
+  const session = getTabSession();
+  const summary = loadWalletSummary();
+  return {
+    stewardReady: summary.stewardReady || hasStewardVerification(session),
+    hasTabSigningKeys: Boolean(session?.owner_private_key_b58),
+  };
+}
+
 function syncHubScanQrSurfaces() {
   const walletCount = getWalletCount();
-  const showHub = shouldShowHubQrScanner(walletCount);
+  const stewardOpts = hubQrScannerOpts();
+  const showHub = shouldShowHubQrScanner(walletCount, stewardOpts);
   const showChrome = shouldShowHubScanQrChrome({
     walletCount,
     standalone: readStandaloneModeFromWindow(window),
+    ...stewardOpts,
   });
   const btn = document.getElementById("hub-scan-qr-btn");
   const strip = document.getElementById("device-hub-steward-tools");

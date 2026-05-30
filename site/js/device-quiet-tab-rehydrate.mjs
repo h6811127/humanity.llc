@@ -41,16 +41,22 @@ export function applyQuietRehydrateCrossTabDemotion(profileId) {
 }
 
 /**
+ * @param {{ excludeProfileId?: string | null }} [opts]
  * @returns {Promise<{ ok: true, profileId: string } | { skipped: string }>}
  */
-export async function maybeQuietTabRehydrate() {
+export async function maybeQuietTabRehydrate(opts = {}) {
   const session = getTabSession();
   const hasTabControl = Boolean(session?.owner_private_key_b58);
   const wallet = loadWallet();
   const signingEntries = walletEntriesWithSigningKeys(wallet);
   const quietRehydrateEnabled = isQuietTabRehydrateEnabled();
   const lastActiveProfileId = getLastActiveProfileId();
-  const entry = resolveQuietTabRehydrateTarget(wallet, lastActiveProfileId);
+  const excludeProfileId = opts.excludeProfileId ?? null;
+  const entry = resolveQuietTabRehydrateTarget(
+    wallet,
+    lastActiveProfileId,
+    excludeProfileId
+  );
   const profileId = typeof entry?.profile_id === "string" ? entry.profile_id : "";
 
   if (

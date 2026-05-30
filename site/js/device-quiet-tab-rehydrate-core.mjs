@@ -22,14 +22,28 @@ export function soleSigningWalletEntry(entries) {
 /**
  * @param {Array<{ owner_private_key_b58?: string, profile_id?: string }>} entries
  * @param {string | null} lastActiveProfileId
+ * @param {string | null | undefined} [excludeProfileId] never auto-load this profile (e.g. scan vouchee)
  * @returns {Record<string, unknown> | null}
  */
-export function resolveQuietTabRehydrateTarget(entries, lastActiveProfileId) {
-  const signing = walletEntriesWithSigningKeys(entries);
+export function resolveQuietTabRehydrateTarget(
+  entries,
+  lastActiveProfileId,
+  excludeProfileId = null
+) {
+  const exclude =
+    typeof excludeProfileId === "string" && excludeProfileId.trim()
+      ? excludeProfileId.trim()
+      : null;
+  const signing = walletEntriesWithSigningKeys(entries).filter(
+    (entry) => !exclude || entry.profile_id !== exclude
+  );
   if (signing.length === 0) return null;
   if (signing.length === 1) return signing[0];
-  if (!lastActiveProfileId) return null;
-  return signing.find((entry) => entry.profile_id === lastActiveProfileId) ?? null;
+  if (lastActiveProfileId && lastActiveProfileId !== exclude) {
+    const match = signing.find((entry) => entry.profile_id === lastActiveProfileId);
+    if (match) return match;
+  }
+  return signing[0] ?? null;
 }
 
 /**

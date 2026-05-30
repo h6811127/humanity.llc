@@ -4,7 +4,8 @@
  * @see docs/MERCH_HEADLESS_COMMERCE.md § Production rollout
  */
 
-export const GLITCH_PDP_PATH = "/shop/products/tier0_glitch_hoodie_v1/";
+export const GLITCH_PDP_PATH = "/shop/products/glitch_hoodie_v1/";
+export const LEGACY_GLITCH_PDP_PATH = "/shop/products/tier0_glitch_hoodie_v1/";
 
 /**
  * @param {string} siteOrigin
@@ -44,7 +45,7 @@ export async function smokeShopGlitchProductPage(siteOrigin, opts = {}) {
   console.log("✓ Shop PDP shell OK (200, product detail module present)");
 
   const apiOrigin = (opts.apiOrigin ?? base).replace(/\/$/, "");
-  const apiUrl = `${apiOrigin}/v1/store/products/tier0_glitch_hoodie_v1`;
+  const apiUrl = `${apiOrigin}/v1/store/products/glitch_hoodie_v1`;
   console.log(`\n▶ Store API (${apiUrl})`);
   const apiRes = await fetch(apiUrl, { headers: { Accept: "application/json" } });
   const apiBody = await apiRes.json().catch(() => ({}));
@@ -58,9 +59,27 @@ export async function smokeShopGlitchProductPage(siteOrigin, opts = {}) {
     );
     process.exit(1);
   }
-  if (apiBody?.product_id !== "tier0_glitch_hoodie_v1") {
+  if (apiBody?.product_id !== "glitch_hoodie_v1") {
     console.error("✗ Store product API returned unexpected product_id");
     process.exit(1);
   }
+  if (apiBody?.product_class !== "personalized") {
+    console.error("✗ Glitch hoodie must be product_class personalized");
+    process.exit(1);
+  }
   console.log(`✓ Store product API OK (${apiBody.title ?? "Glitch hoodie"})`);
+
+  const legacyUrl = `${apiOrigin}/v1/store/products/tier0_glitch_hoodie_v1`;
+  console.log(`\n▶ Legacy redirect (${legacyUrl})`);
+  const legacyRes = await fetch(legacyUrl, { headers: { Accept: "application/json" } });
+  const legacyBody = await legacyRes.json().catch(() => ({}));
+  if (!legacyRes.ok || legacyBody?.redirect !== true) {
+    console.error("✗ Legacy tier0_glitch_hoodie_v1 must redirect to Tier 1 Glitch SKU");
+    process.exit(1);
+  }
+  if (!String(legacyBody.redirect_to ?? "").includes("glitch_hoodie_v1")) {
+    console.error("✗ Legacy Glitch redirect_to must target /shop/customize/?product=glitch_hoodie_v1");
+    process.exit(1);
+  }
+  console.log("✓ Legacy shared-batch Glitch id redirects to customize");
 }

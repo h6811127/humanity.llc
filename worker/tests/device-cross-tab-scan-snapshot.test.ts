@@ -1,4 +1,4 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
 const PROFILE_A = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const PROFILE_B = "7Xk9mP2nQ4rT6vW8yZ1aB3cD6";
@@ -35,6 +35,13 @@ describe("cross-tab scan snapshot (Phase 3)", () => {
       },
     ];
     invalidateCrossTabNotificationState();
+    vi.stubGlobal("document", {
+      body: { dataset: { boot: "ready" } },
+    });
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   it("requires two reads before showing scan entries", () => {

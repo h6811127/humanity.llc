@@ -61,6 +61,7 @@ function readPushConnectionContext() {
     inboxSheetOpen: document.body.classList.contains("device-inbox-sheet-open"),
     walletPage: document.body.classList.contains("page-wallet"),
     watchEnabled: isWatchLiveProofEnabled(),
+    stewardShellPage: Boolean(document.getElementById("shell-notif-badge")),
   });
   return {
     pushEntitled: stewardPushSubscribeAllowed(getStewardEntitlementsPolicy()),

@@ -10,10 +10,12 @@ import {
   appendMerchRefToHref,
   handoffMerchRefAfterCreate,
   hasTier1EphemeralOwner,
+  isGlitchCustomizeMerchRef,
   isTier0GlitchMerchRef,
   isTier1MerchRef,
   markTier1EphemeralOwner,
   merchCustomizeUrlFromRef,
+  merchRefForPersonalizeProductId,
   normalizeMerchRef,
   peekMerchCustomizeRef,
   shouldHandoffToCustomize,
@@ -26,6 +28,7 @@ describe("merch-funnel-core (server)", () => {
     expect(normalizeMerchFunnelRef("tier0_sticker")).toBe("tier0_sticker");
     expect(normalizeMerchFunnelRef(" TIER0_SHOP ")).toBe("tier0_shop");
     expect(normalizeMerchFunnelRef("customize_hoodie")).toBe("customize_hoodie");
+    expect(normalizeMerchFunnelRef("customize_glitch")).toBe("customize_glitch");
     expect(normalizeMerchFunnelRef("unknown_campaign")).toBeNull();
     expect(normalizeMerchFunnelRef("")).toBeNull();
   });
@@ -89,10 +92,14 @@ describe("merch-funnel-core (client)", () => {
 
   it("builds customize URL and created card visibility", () => {
     expect(shouldHandoffToCustomize("scan_customize")).toBe(true);
+    expect(shouldHandoffToCustomize("customize_glitch")).toBe(true);
     expect(shouldHandoffToCustomize("tier0_sticker")).toBe(false);
     expect(
       merchCustomizeUrlFromRef("scan_customize", "https://humanity.llc")
     ).toBe("https://humanity.llc/shop/customize/?hc_ref=scan_customize");
+    expect(
+      merchCustomizeUrlFromRef("customize_glitch", "https://humanity.llc")
+    ).toBe("https://humanity.llc/shop/customize/?hc_ref=customize_glitch&product=glitch");
     expect(
       shouldShowCreatedMerchCustomizeCard({ fresh: true, merchRef: "scan_customize" })
     ).toBe(true);
@@ -147,9 +154,15 @@ describe("merch-funnel-core (client)", () => {
     expect(hasTier1EphemeralOwner("profile_a")).toBe(true);
     expect(hasTier1EphemeralOwner("profile_b")).toBe(false);
     expect(isTier1MerchRef("customize_hoodie")).toBe(true);
+    expect(isTier1MerchRef("customize_glitch")).toBe(true);
     expect(isTier1MerchRef("tier0_sticker")).toBe(false);
+    expect(isGlitchCustomizeMerchRef("customize_glitch")).toBe(true);
+    expect(isGlitchCustomizeMerchRef("customize_hoodie")).toBe(false);
     expect(isTier0GlitchMerchRef("tier0_glitch")).toBe(true);
     expect(isTier0GlitchMerchRef("tier0_shop")).toBe(false);
     expect(normalizeMerchRef("tier0_glitch")).toBe("tier0_glitch");
+    expect(merchRefForPersonalizeProductId("glitch_hoodie_v1")).toBe("customize_glitch");
+    expect(merchRefForPersonalizeProductId("hoodie_live_object_v1")).toBe("customize_hoodie");
+    expect(merchRefForPersonalizeProductId("sticker_personalized_v1")).toBe("customize_shop");
   });
 });

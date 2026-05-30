@@ -5,6 +5,8 @@
  */
 
 import {
+  GLITCH_HOODIE_STORE_PRODUCT_ID,
+  GLITCH_HOODIE_TEMPLATE_ID,
   HOODIE_LIVE_OBJECT_STORE_PRODUCT_ID,
   HOODIE_LIVE_OBJECT_TEMPLATE_ID,
   STICKER_PERSONALIZED_STORE_PRODUCT_ID,
@@ -49,6 +51,19 @@ export interface StoreCatalogRow {
 export const TIER0_FOUNDING_STORE_PRODUCT_ID = "tier0_founding_sticker_v1";
 export const TIER0_GLITCH_HOODIE_STORE_PRODUCT_ID = "tier0_glitch_hoodie_v1";
 
+export { GLITCH_HOODIE_STORE_PRODUCT_ID };
+
+/** Legacy shared-batch Glitch PDP → Tier 1 personalize launch SKU. */
+const LEGACY_STORE_PRODUCT_REDIRECTS: Record<string, string> = {
+  [TIER0_GLITCH_HOODIE_STORE_PRODUCT_ID]: GLITCH_HOODIE_STORE_PRODUCT_ID,
+};
+
+export function getLegacyStoreProductRedirect(productId: string): string | null {
+  const id = productId.trim();
+  if (!id) return null;
+  return LEGACY_STORE_PRODUCT_REDIRECTS[id] ?? null;
+}
+
 export function storeProductDetailPath(productId: string): string {
   const id = productId.trim();
   return `/shop/products/${encodeURIComponent(id)}/`;
@@ -65,6 +80,24 @@ export function storeProductActionPath(product: StoreCatalogProduct): string {
 }
 
 const LAUNCH_PRODUCTS: StoreCatalogProduct[] = [
+  {
+    product_id: GLITCH_HOODIE_STORE_PRODUCT_ID,
+    title: "Glitch LIVE QR hoodie",
+    meaning_line: "Founding Glitch art on your chest — your unique QR, your live line.",
+    story:
+      "Fixed Glitch garment design with a unique revocable QR tied to your Humanity Card. Change what strangers read from your phone without reprinting. Commerce does not verify you or grant a vouch.",
+    product_class: "personalized",
+    personalization_indicator: "Personalized QR",
+    requires_card: true,
+    supports_personalization: true,
+    fulfillment_provider: "printify",
+    print_template_id: GLITCH_HOODIE_TEMPLATE_ID,
+    price_display: "$88 + shipping",
+    detail_path: storeProductDetailPath(GLITCH_HOODIE_STORE_PRODUCT_ID),
+    cta_label: "Customize your QR",
+    status: "published",
+    row_ids: ["row_personalize"],
+  },
   {
     product_id: STICKER_PERSONALIZED_STORE_PRODUCT_ID,
     title: "Personalized sticker",
@@ -121,10 +154,10 @@ const LAUNCH_PRODUCTS: StoreCatalogProduct[] = [
   },
   {
     product_id: TIER0_GLITCH_HOODIE_STORE_PRODUCT_ID,
-    title: "Glitch LIVE QR hoodie",
-    meaning_line: "A live network on fabric — same scan on every unit, not your personal card.",
+    title: "Glitch LIVE QR hoodie (legacy shared batch)",
+    meaning_line: "Deprecated — shared campaign QR on every unit. Launch uses personalized Glitch.",
     story:
-      "Founding company drop — fixed Glitch artwork with a shared campaign QR. Every unit points at one live destination stewards can update; strangers see honest limits when they scan. You are buying witness and wear, not control of the feed and not a vouch.",
+      "Superseded 2026-05-30. Founding Glitch hoodie launches on Tier 1 personalize (unique QR per buyer). This legacy catalog id pointed at shared-batch Tier 0 inventory — not the launch checkout path.",
     product_class: "limited_drop",
     personalization_indicator: "Company drop",
     requires_card: false,
@@ -134,8 +167,8 @@ const LAUNCH_PRODUCTS: StoreCatalogProduct[] = [
     price_display: "$88 + shipping",
     detail_path: storeProductDetailPath(TIER0_GLITCH_HOODIE_STORE_PRODUCT_ID),
     cta_label: "View drop",
-    status: "published",
-    row_ids: ["row_founding"],
+    status: "hidden",
+    row_ids: [],
   },
 ];
 
@@ -145,8 +178,12 @@ const ROWS: StoreCatalogRow[] = [
     title: "Make it yours",
     subtitle: "Tier 1 belonging",
     story:
-      "Preview your branded LIVE OBJECT QR on wearables. Each physical unit gets a unique revocable code; you update what strangers see from your phone without reprinting.",
-    product_ids: [HOODIE_LIVE_OBJECT_STORE_PRODUCT_ID, STICKER_PERSONALIZED_STORE_PRODUCT_ID],
+      "Preview your branded LIVE OBJECT QR on wearables. Founding Glitch drop plus generic hoodies and stickers — each physical unit gets a unique revocable code; you update what strangers see from your phone without reprinting.",
+    product_ids: [
+      GLITCH_HOODIE_STORE_PRODUCT_ID,
+      HOODIE_LIVE_OBJECT_STORE_PRODUCT_ID,
+      STICKER_PERSONALIZED_STORE_PRODUCT_ID,
+    ],
     sort_order: 1,
     status: "published",
   },
@@ -155,8 +192,8 @@ const ROWS: StoreCatalogRow[] = [
     title: "Founding objects",
     subtitle: "Tier 0 curiosity",
     story:
-      "Batch artifacts with a shared campaign QR — curiosity on the street. Glitch is the live billboard; personalized wear is your own pen on the object.",
-    product_ids: [TIER0_FOUNDING_STORE_PRODUCT_ID, TIER0_GLITCH_HOODIE_STORE_PRODUCT_ID],
+      "Batch artifacts with a shared campaign QR — curiosity on the street. Founding sticker only at launch; Glitch hoodie is personalized wear in Make it yours.",
+    product_ids: [TIER0_FOUNDING_STORE_PRODUCT_ID],
     sort_order: 2,
     status: "published",
   },
@@ -273,6 +310,7 @@ export interface StoreRowProductCard {
   requires_card: boolean;
   availability: "preview" | "checkout" | "coming_soon";
   detail_path: string;
+  action_path: string;
   cta_label: string;
 }
 
@@ -296,6 +334,7 @@ export function toStoreRowProductCard(product: StoreCatalogProduct): StoreRowPro
     requires_card: product.requires_card,
     availability: "coming_soon",
     detail_path: product.detail_path,
+    action_path: storeProductActionPath(product),
     cta_label: product.cta_label,
   };
 }

@@ -25,15 +25,21 @@ export const TIER0_BATCH_PRINT_TEMPLATE_ID = "hc-tier0-sticker-batch-v1";
 /** Tier 1 Live Object hoodie — unique QR per physical unit (Printify QA gated). */
 export const HOODIE_LIVE_OBJECT_TEMPLATE_ID = "hc-hoodie-live-object-v1";
 
+/** Tier 1 Glitch founding hoodie — fixed Glitch art, unique QR per buyer. */
+export const GLITCH_HOODIE_TEMPLATE_ID = "hc-glitch-hoodie-v1";
+
 /** Storefront product ids (shop-config / artifact intent). */
 export const STICKER_PERSONALIZED_STORE_PRODUCT_ID = "sticker_personalized_v1";
 export const HOODIE_LIVE_OBJECT_STORE_PRODUCT_ID = "hoodie_live_object_v1";
+export const GLITCH_HOODIE_STORE_PRODUCT_ID = "glitch_hoodie_v1";
 
 const STORE_PRODUCT_TEMPLATE: Record<string, string> = {
   [STICKER_PERSONALIZED_STORE_PRODUCT_ID]: DEFAULT_PRINT_TEMPLATE_ID,
   [HOODIE_LIVE_OBJECT_STORE_PRODUCT_ID]: HOODIE_LIVE_OBJECT_TEMPLATE_ID,
+  [GLITCH_HOODIE_STORE_PRODUCT_ID]: GLITCH_HOODIE_TEMPLATE_ID,
   prod_sticker_square: DEFAULT_PRINT_TEMPLATE_ID,
   prod_hoodie_live_object: HOODIE_LIVE_OBJECT_TEMPLATE_ID,
+  prod_glitch_hoodie: GLITCH_HOODIE_TEMPLATE_ID,
 };
 
 const CATALOG: PrintCatalogProduct[] = [
@@ -60,6 +66,26 @@ const CATALOG: PrintCatalogProduct[] = [
     description:
       "Champion S700 (Printify blueprint 528) — front-chest LIVE OBJECT QR, unique revocable code per unit.",
     product_id: "prod_hoodie_live_object",
+    variants: [
+      {
+        variant_id: "black-m",
+        label: "Black / M",
+        enabled: true,
+      },
+      {
+        variant_id: "black-l",
+        label: "Black / L",
+        enabled: true,
+      },
+    ],
+  },
+  {
+    template_id: GLITCH_HOODIE_TEMPLATE_ID,
+    type: "hoodie",
+    title: "Glitch LIVE QR hoodie",
+    description:
+      "Champion S700 (Printify blueprint 528) — fixed Glitch founding art with unique LIVE QR per buyer.",
+    product_id: "prod_glitch_hoodie",
     variants: [
       {
         variant_id: "black-m",

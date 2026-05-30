@@ -21,6 +21,7 @@ import {
 export const APPROVED_PRINT_TEMPLATE_IDS = new Set([
   "hc-sticker-square-v1",
   "hc-hoodie-live-object-v1",
+  "hc-glitch-hoodie-v1",
 ]);
 
 const PLACEHOLDER_VARIANT = /^(YOUR_|VARIANT|12345678901234)/i;

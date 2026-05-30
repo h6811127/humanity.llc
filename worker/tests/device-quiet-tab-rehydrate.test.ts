@@ -9,7 +9,7 @@ describe("device-quiet-tab-rehydrate wiring", () => {
       "utf8"
     );
     expect(src).toContain("maybeQuietTabRehydrate");
-    expect(src).toContain("await maybeQuietTabRehydrate()");
+    expect(src).toContain("await maybeQuietTabRehydrate(");
     const awaitIdx = src.indexOf("await maybeQuietTabRehydrate()");
     const presenceIdx = src.indexOf("startTabKeysPresence()");
     expect(presenceIdx).toBeGreaterThan(awaitIdx);
@@ -22,7 +22,7 @@ describe("device-quiet-tab-rehydrate wiring", () => {
     );
     expect(src).toContain("maybeQuietTabRehydrate");
     expect(src).toContain("bootDeviceStatusShell");
-    expect(src).toContain("await maybeQuietTabRehydrate()");
+    expect(src).toContain("await maybeQuietTabRehydrate(");
   });
 
   it("quiet rehydrate applies Tier 3 cross-tab demotion on success", () => {
@@ -58,6 +58,6 @@ describe("device-quiet-tab-rehydrate wiring", () => {
     expect(vouchSrc).toContain("trySoleSigningRowRehydrateForScan");
     expect(vouchSrc).toContain("tryAutoActivateSoleSigningWalletForVouch");
     expect(vouchSrc).toContain("soleSigningActivated: true");
-    expect(vouchSrc).toContain("quietRehydrateActivated: true");
+    expect(vouchSrc).toContain("soleRowRehydrated: true");
   });
 });

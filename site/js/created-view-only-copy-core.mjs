@@ -1,6 +1,6 @@
 /**
  * View-only /created/ copy branches on saved wallet signing rows (P0-7 · R13).
- * @see docs/SAFARI_KEYS_WIPE_INVESTIGATION.md P0-7
+ * @see docs/SAFARI_KEYS_CUSTODY.md P0-7
  * @see docs/KEY_LOSS_SAD_PATH_MATRIX.md
  */
 

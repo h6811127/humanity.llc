@@ -20,7 +20,19 @@ on:
       - "worker/tests/wrangler-merch-routes.test.ts"
       - "worker/scripts/verify-merch-funnel*.mjs"
       - "worker/scripts/verify-hub-card-disappeared-exit.mjs"
+      - "worker/scripts/verify-steward-scan-handoff-exit.mjs"
       - "worker/scripts/merch-funnel-rollout*.mjs"
+      - "worker/tests/steward-handoff.test.ts"
+      - "worker/tests/steward-dual-qr-core.test.ts"
+      - "worker/tests/qr-encode-url-core.test.ts"
+      - "worker/tests/scan-qr-branding.test.ts"
+      - "worker/tests/device-hub-qr-scanner-core.test.ts"
+      - "worker/tests/scan-pwa-camera-handoff-core.test.ts"
+      - "worker/tests/device-hub-steward-vouch-guidance-core.test.ts"
+      - "worker/tests/device-hub-import-recovery-core.test.ts"
+      - "e2e/steward-dual-qr-created.spec.ts"
+      - "e2e/hub-in-app-qr-scanner.spec.ts"
+      - "e2e/steward-scan-handoff-fallback.spec.ts"
       - "site/js/shop-config-rollout-core.mjs"
       - "worker/tests/shop-config-rollout.test.ts"
       - "worker/tests/merch-funnel-rollout.test.ts"
@@ -45,7 +57,19 @@ on:
       - "worker/tests/wrangler-merch-routes.test.ts"
       - "worker/scripts/verify-merch-funnel*.mjs"
       - "worker/scripts/verify-hub-card-disappeared-exit.mjs"
+      - "worker/scripts/verify-steward-scan-handoff-exit.mjs"
       - "worker/scripts/merch-funnel-rollout*.mjs"
+      - "worker/tests/steward-handoff.test.ts"
+      - "worker/tests/steward-dual-qr-core.test.ts"
+      - "worker/tests/qr-encode-url-core.test.ts"
+      - "worker/tests/scan-qr-branding.test.ts"
+      - "worker/tests/device-hub-qr-scanner-core.test.ts"
+      - "worker/tests/scan-pwa-camera-handoff-core.test.ts"
+      - "worker/tests/device-hub-steward-vouch-guidance-core.test.ts"
+      - "worker/tests/device-hub-import-recovery-core.test.ts"
+      - "e2e/steward-dual-qr-created.spec.ts"
+      - "e2e/hub-in-app-qr-scanner.spec.ts"
+      - "e2e/steward-scan-handoff-fallback.spec.ts"
       - "site/js/shop-config-rollout-core.mjs"
       - "worker/tests/shop-config-rollout.test.ts"
       - "worker/tests/merch-funnel-rollout.test.ts"
@@ -96,6 +120,10 @@ jobs:
           CI: "true"
       - name: Resolver tab sync E2E (Phase 10 P1-1 regression)
         run: npm run e2e:device-resolver-sync
+        env:
+          CI: "true"
+      - name: Steward scan handoff E2E (P1-PWA-V desk)
+        run: npm run e2e:steward-scan-handoff
         env:
           CI: "true"
       - name: Hosted steward E2E (M8)

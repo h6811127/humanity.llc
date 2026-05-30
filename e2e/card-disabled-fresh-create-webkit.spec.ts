@@ -3,7 +3,7 @@ import { test, expect, type Page } from "@playwright/test";
 /**
  * P0b-1 step 2 — WebKit desk proxy for fresh-create “card disabled since visit” (R10).
  * Prod WebKit sign-off still required on humanity.llc after deploy.
- * @see docs/SAFARI_KEYS_WIPE_INVESTIGATION.md P0b-1 · R10
+ * @see docs/SAFARI_KEYS_CUSTODY.md P0b-1 · R10
  * @see docs/SAD_PATH_COVERAGE_AND_BACKLOG.md S30
  */
 

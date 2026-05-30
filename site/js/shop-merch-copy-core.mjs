@@ -1,30 +1,89 @@
 /**
  * Merch PDP / customizer honesty copy — canonical text in docs/MERCH_PRODUCT_COPY.md
  */
-import { TIER0_GLITCH_HOODIE_STORE_PRODUCT_ID } from "./shop-store-catalog-ids.mjs";
+import { TIER0_GLITCH_HOODIE_STORE_PRODUCT_ID, GLITCH_HOODIE_STORE_PRODUCT_ID } from "./shop-store-catalog-ids.mjs";
 
 /** Product ids mirrored from worker store-catalog (avoid import churn). */
 export const HOODIE_LIVE_OBJECT_STORE_PRODUCT_ID = "hoodie_live_object_v1";
 export const STICKER_PERSONALIZED_STORE_PRODUCT_ID = "sticker_personalized_v1";
 
 /** @typedef {{ title: string, lines: string[] }} ProductHonestyBlock */
+/** @typedef {{ title: string, sub: string }} CustomizeHonestyRow */
+
+export const TIER1_HONESTY_SECTION_TITLE = "Your pen, not the page";
+
+/** @type {CustomizeHonestyRow[]} */
+export const SHOP_CUSTOMIZE_HONESTY_ROWS_GLITCH = [
+  {
+    title: "Live",
+    sub: "After fulfillment, your unit’s QR resolves to your card. Update status from /created/ (or hub → Update status) — same ink, new meaning.",
+  },
+  {
+    title: "Fossil",
+    sub: "If you lose signing access without recovery or backup, you may not be able to edit again; scans can still show the last thing you published until you revoke the item.",
+  },
+  {
+    title: "Keys",
+    sub: "Keys stay in your browser; save ownership on this device and set recovery before you rely on the shirt in public.",
+  },
+];
+
+/** @type {CustomizeHonestyRow[]} */
+export const SHOP_CUSTOMIZE_HONESTY_ROWS_LIVE_OBJECT = [
+  {
+    title: "Live",
+    sub: "After fulfillment, each unit’s QR resolves to your card. Update status from /created/ (or hub → Update status) — same ink, new meaning.",
+  },
+  {
+    title: "Fossil",
+    sub: "If you lose signing access without recovery or backup, you may not be able to edit again; scans can still show the last thing you published until you revoke the item or disable the card with keys.",
+  },
+  {
+    title: "Keys",
+    sub: "Keys stay in your browser; save ownership on this device and set recovery before you rely on the shirt in public.",
+  },
+];
+
+/** @type {CustomizeHonestyRow[]} */
+export const SHOP_CUSTOMIZE_HONESTY_ROWS_DEFAULT = [
+  {
+    title: "Live",
+    sub: "After fulfillment, your QR points at your card. Update what strangers read without reprinting.",
+  },
+  {
+    title: "Fossil",
+    sub: "Lose signing access without recovery and you may not edit again; the scan can keep showing the last line you published until you revoke the item.",
+  },
+  {
+    title: "Keys",
+    sub: "Control stays in your browser. Save ownership on this device and set recovery before you wear this in public.",
+  },
+];
+
+/**
+ * @param {CustomizeHonestyRow[]} rows
+ * @param {string} [title]
+ * @returns {ProductHonestyBlock}
+ */
+export function pdpHonestyBlockFromRows(rows, title = TIER1_HONESTY_SECTION_TITLE) {
+  return {
+    title,
+    lines: rows.map((row) => `${row.title} — ${row.sub}`),
+  };
+}
 
 /** @type {Record<string, ProductHonestyBlock>} */
 export const SHOP_PRODUCT_HONESTY_BLOCKS = {
+  [GLITCH_HOODIE_STORE_PRODUCT_ID]: pdpHonestyBlockFromRows(SHOP_CUSTOMIZE_HONESTY_ROWS_GLITCH),
+  [HOODIE_LIVE_OBJECT_STORE_PRODUCT_ID]: pdpHonestyBlockFromRows(
+    SHOP_CUSTOMIZE_HONESTY_ROWS_LIVE_OBJECT
+  ),
   [TIER0_GLITCH_HOODIE_STORE_PRODUCT_ID]: {
-    title: "How the scan behaves",
+    title: "Superseded for launch",
     lines: [
-      "Live — The QR always opens humanity.llc; campaign stewards can change what strangers read without reprinting this batch.",
-      "Not yours — Buying does not give you signing keys or a vouch. Holding the hoodie does not prove you control the card behind the scan.",
-      "Your own object — Want your QR on a garment? Use the Live Object hoodie or sticker — each unit is unique to one card.",
-    ],
-  },
-  [HOODIE_LIVE_OBJECT_STORE_PRODUCT_ID]: {
-    title: "How the scan behaves",
-    lines: [
-      "Live — After fulfillment, your unit’s QR points at your card. Update what strangers read from your phone; the ink stays the same.",
-      "Fossil — Lose signing access without recovery and you may not edit again; scans can still show the last line you published until you revoke the item.",
-      "Keys — Control stays in your browser. Save ownership on this device and set recovery before you wear this in public.",
+      "Launch path — Glitch hoodie is Tier 1 personalized wear: fixed founding art, unique QR per buyer.",
+      "Not this PDP — Shared-batch tier0_glitch_hoodie_v1 is deprecated; use /shop/customize/?product=glitch_hoodie_v1.",
+      "Your own object — Each buyer holds keys and updates what strangers read from their phone — not a shared campaign scan.",
     ],
   },
   [STICKER_PERSONALIZED_STORE_PRODUCT_ID]: {
@@ -48,13 +107,76 @@ export function productHonestyBlockForId(productId) {
 }
 
 export const SHOP_CUSTOMIZE_HONESTY = {
-  sectionTitle: "Your pen, not the page",
-  lines: [
-    "Live — Your QR on the garment. After checkout and fulfillment, update what strangers read from your phone without reprinting.",
-    "Fossil — Lose signing access without recovery and you may not be able to edit again; the scan can keep showing the last thing you published.",
-    "Keys — Keys stay in this browser. Save ownership on this device and set a recovery path before the shirt matters in public.",
-  ],
+  sectionTitle: TIER1_HONESTY_SECTION_TITLE,
+  lines: SHOP_CUSTOMIZE_HONESTY_ROWS_DEFAULT.map((row) => `${row.title} — ${row.sub}`),
 };
 
 export const SHOP_CUSTOMIZE_PROOF_PERSISTENCE =
   "Printed ink persists. I can revoke this item’s QR while I have signing access; if I lose keys without recovery, strangers may still read the last published scan until I revoke.";
+
+/** @typedef {{ eyebrow: string, title: string, lead: string }} CustomizeHeroCopy */
+
+/** @type {CustomizeHeroCopy} */
+export const SHOP_CUSTOMIZE_HERO_DEFAULT = {
+  eyebrow: "Tier 1 · personalize",
+  title: "Customize your live object",
+  lead: "Your unique QR on the garment. Change what strangers read from your phone; the ink stays the same.",
+};
+
+/** @type {CustomizeHeroCopy} */
+export const SHOP_CUSTOMIZE_HERO_GLITCH = {
+  eyebrow: "Founding drop · personalized",
+  title: "Glitch LIVE QR hoodie",
+  lead: "Founding Glitch art on your chest — your unique QR, your live line.",
+};
+
+/**
+ * @param {string | null | undefined} productId
+ * @returns {CustomizeHeroCopy}
+ */
+export function customizeHeroForProduct(productId) {
+  const id = typeof productId === "string" ? productId.trim() : "";
+  if (id === GLITCH_HOODIE_STORE_PRODUCT_ID) return SHOP_CUSTOMIZE_HERO_GLITCH;
+  return SHOP_CUSTOMIZE_HERO_DEFAULT;
+}
+
+/**
+ * @param {string | null | undefined} productId
+ * @returns {CustomizeHonestyRow[]}
+ */
+export function customizeHonestyRowsForProduct(productId) {
+  const id = typeof productId === "string" ? productId.trim() : "";
+  if (id === GLITCH_HOODIE_STORE_PRODUCT_ID) return SHOP_CUSTOMIZE_HONESTY_ROWS_GLITCH;
+  if (id === HOODIE_LIVE_OBJECT_STORE_PRODUCT_ID) return SHOP_CUSTOMIZE_HONESTY_ROWS_LIVE_OBJECT;
+  return SHOP_CUSTOMIZE_HONESTY_ROWS_DEFAULT;
+}
+
+/** @typedef {{ eyebrow: string, title: string, lineHtml: string, meta: string }} Tier1ThanksCopy */
+
+/** @type {Tier1ThanksCopy} */
+export const TIER1_THANKS_COPY_DEFAULT = {
+  eyebrow: "Tier 1 · thanks",
+  title: "Same ink — you choose what it means",
+  lineHtml:
+    "Your personalized Live Object is in production. When it arrives, <strong>scan it before you wear it</strong>. The QR on the garment stays fixed; what strangers read updates when you change your signed public line from your phone.",
+  meta: "Thanks for your personalized Live Object order. Update what scanners read from your phone — same ink, new meaning.",
+};
+
+/** @type {Tier1ThanksCopy} */
+export const TIER1_THANKS_COPY_GLITCH = {
+  eyebrow: "Founding drop · thanks",
+  title: "Your Glitch ink ships — you hold the pen",
+  lineHtml:
+    "Thanks for backing the founding Glitch LIVE QR hoodie. When it arrives, <strong>scan your unique QR before you wear it</strong>. Fixed Glitch art on the garment; what strangers read updates when you change your signed line from your phone.",
+  meta: "Thanks for your Glitch LIVE QR hoodie order. Update what scanners read from your phone — same ink, new meaning.",
+};
+
+/**
+ * @param {string | null | undefined} merchRef
+ * @returns {Tier1ThanksCopy}
+ */
+export function tier1ThanksCopyForMerchRef(merchRef) {
+  const ref = typeof merchRef === "string" ? merchRef.trim().toLowerCase() : "";
+  if (ref === "customize_glitch") return TIER1_THANKS_COPY_GLITCH;
+  return TIER1_THANKS_COPY_DEFAULT;
+}

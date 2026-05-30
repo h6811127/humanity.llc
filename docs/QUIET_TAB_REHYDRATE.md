@@ -142,7 +142,7 @@ After successful bootstrap rehydrate (`activateWalletEntryGated` succeeds):
 | Last-active writes | `device-keys.mjs`, `device-wallet.mjs`, `create-card.mjs` |
 | Last-active clear on remove | `device-wallet-removed-profiles.mjs` |
 | Shell cross-tab filter | `device-tab-presence.mjs` (`getOtherTabsWithKeys`) |
-| Wire | `site/js/device-status.mjs` (await before `startTabKeysPresence` / chrome refresh); **`site/js/scan-tab-keys.mjs`** (scan pages, P0-1 — [`SAFARI_KEYS_WIPE_INVESTIGATION.md`](SAFARI_KEYS_WIPE_INVESTIGATION.md)) |
+| Wire | `site/js/device-status.mjs` (await before `startTabKeysPresence` / chrome refresh); **`site/js/scan-tab-keys.mjs`** (scan pages — [`SAFARI_KEYS_CUSTODY.md`](SAFARI_KEYS_CUSTODY.md) P0-1) |
 | Tests | `worker/tests/device-quiet-tab-rehydrate-core.test.ts`, `worker/tests/device-quiet-tab-rehydrate.test.ts` |
 
 ---

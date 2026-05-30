@@ -90,6 +90,30 @@ describe("liveControlPollingShouldRun", () => {
       })
     ).toBe(true);
   });
+
+  it("runs on any steward shell page when watch is on", () => {
+    expect(
+      liveControlPollingShouldRun({
+        hubExpanded: false,
+        inboxSheetOpen: false,
+        walletPage: false,
+        watchEnabled: true,
+        stewardShellPage: true,
+      })
+    ).toBe(true);
+  });
+
+  it("does not run on steward shell page when watch is off", () => {
+    expect(
+      liveControlPollingShouldRun({
+        hubExpanded: false,
+        inboxSheetOpen: false,
+        walletPage: false,
+        watchEnabled: false,
+        stewardShellPage: true,
+      })
+    ).toBe(false);
+  });
 });
 
 describe("liveControlPollAllowedByResolverHealth", () => {
@@ -305,6 +329,31 @@ describe("resolveLiveControlPollScope", () => {
         hubEl: expanded,
         inboxSheetOpen: false,
         walletPage: false,
+      })
+    ).toBe(true);
+  });
+
+  it("scopes steward shell polling when watch is on", () => {
+    /** @type {HTMLElement} */
+    const collapsed = {
+      classList: { contains: (c) => c === "device-hub-collapsed" },
+    };
+    expect(
+      resolveLiveControlPollScope({
+        hubEl: collapsed,
+        inboxSheetOpen: false,
+        walletPage: false,
+        watchEnabled: false,
+        stewardShellPage: true,
+      })
+    ).toBe(false);
+    expect(
+      resolveLiveControlPollScope({
+        hubEl: collapsed,
+        inboxSheetOpen: false,
+        walletPage: false,
+        watchEnabled: true,
+        stewardShellPage: true,
       })
     ).toBe(true);
   });

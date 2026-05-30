@@ -2,7 +2,7 @@ import { test, expect, type Page, type Route } from "@playwright/test";
 
 /**
  * Safari keys persistence — WebKit regression for matrix S2 and S3.
- * @see docs/SAFARI_KEYS_WIPE_INVESTIGATION.md P2-3 · S2 · S3
+ * @see docs/SAFARI_KEYS_CUSTODY.md P2-3 · S2 · S3
  */
 
 const SCAN_FIXTURE = "/e2e-fixtures/scan-active.html";

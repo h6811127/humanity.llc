@@ -35,7 +35,7 @@ Use it when prioritizing hardening before launch surfaces (live proof in person,
 | Safari stuck inbox backdrop | **P5f shipped** — Check network taps after reconcile | [`UI_UX_SAFE_REBUILD_IMPLEMENTATION.md`](UI_UX_SAFE_REBUILD_IMPLEMENTATION.md) § Step 1 |
 | Key-loss setup protect gate (K7) | **Shipped** — recovery ack or backup before Live | [`OWNERSHIP_RESTORE_UX_PLAN.md`](OWNERSHIP_RESTORE_UX_PLAN.md) Phase 2 |
 | Key-loss view-only Live tab (Phase 3) | **Shipped** — read-only QR/deploy; restore banner | Same doc Phase 3 |
-| Hub card disappeared Safari (RC-1–RC-16) | **Closed — monitoring** — `hub-card-disappeared:verify` · P2-RC-MON E2E | [`HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md`](HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md) |
+| Hub card disappeared Safari (RC-1–RC-16) | **Closed — monitoring** — `hub-card-disappeared:verify` · P2-RC-MON E2E | [`HUB_CARD_SAFARI_RELIABILITY.md`](HUB_CARD_SAFARI_RELIABILITY.md) |
 | Steward camera → Safari vouch (K9) | **S1–S3 shipped** | [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) |
 
 ---

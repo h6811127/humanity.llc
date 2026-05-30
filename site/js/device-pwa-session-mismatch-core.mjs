@@ -1,6 +1,6 @@
 /**
  * PWA vs in-browser signing context mismatch (Safari P2-2 · R5).
- * @see docs/SAFARI_KEYS_WIPE_INVESTIGATION.md R5
+ * @see docs/SAFARI_KEYS_CUSTODY.md R5
  */
 
 export const LAST_SIGNING_SHELL_MODE_KEY = "hc_last_signing_shell_mode";

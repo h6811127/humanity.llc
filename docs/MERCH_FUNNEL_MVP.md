@@ -32,7 +32,8 @@ Ordered work after repo review. Update row status as steps complete. Cross-links
 | Blocker | Status |
 |---------|--------|
 | `personalize.checkout_open` | `false` (correct until QA) |
-| `hoodie_live_object_v1` `checkout_url` + `shopify_variant_id` | empty — paste from Shopify |
+| `glitch_hoodie_v1` in `personalize.products` + Shopify variant | **pending** — founding launch SKU ([`MERCH_PRODUCT_COPY.md`](MERCH_PRODUCT_COPY.md)) |
+| `hoodie_live_object_v1` `checkout_url` + `shopify_variant_id` | empty — paste from Shopify (optional generic SKU) |
 | `sticker_personalized_v1` `checkout_url` + `shopify_variant_id` | empty — paste from Shopify |
 | Physical ink QA | not signed — [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md) |
 | Live paid order → Printify submit | not proven — [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) |
@@ -105,12 +106,14 @@ The customizer **does not** call Printify from the browser. It prepares intent +
 
 ---
 
-## Product tiers (unchanged policy)
+## Product tiers (2026-05-30 launch)
 
-| Tier | QR model | Customizer |
-|------|----------|------------|
-| **Tier 0** curiosity | Batch QR on `/shop/` | Not used — buy founding sticker as-is |
-| **Tier 1** belonging | Unique `print_artifact` per unit | **`/shop/customize/`** — hoodie, personalized sticker, etc. |
+| Tier | QR model | Customizer | Launch SKUs |
+|------|----------|------------|-------------|
+| **Tier 0** curiosity | Batch / shared campaign QR | Not used — founding sticker as-is | `tier0_founding_sticker_v1` |
+| **Tier 1** belonging | Unique `print_artifact` per unit | **`/shop/customize/`** | **`glitch_hoodie_v1`** (founding drop, target) · `hoodie_live_object_v1` · `sticker_personalized_v1` |
+
+**Glitch hoodie launches Tier 1** — fixed Glitch art, unique QR per buyer, owner keys. Shared-batch `tier0_glitch_hoodie_v1` is **deprecated for launch** ([`MERCH_PRODUCT_COPY.md`](MERCH_PRODUCT_COPY.md)).
 
 Commerce never grants vouch. Bearer warning on scan + product copy. [`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md).
 
@@ -186,11 +189,12 @@ Aggregate metrics only — no PII. Allowed refs:
 | Ref | When set |
 |-----|----------|
 | `tier0_shop` | `/shop/` |
-| `tier0_glitch` | Glitch hoodie checkout · `/shop/products/tier0_glitch_hoodie_v1/` post-purchase |
 | `tier0_sticker` | Tier 0 campaign scan |
 | `customize_shop` | `/shop/customize/` |
-| `customize_hoodie` | Customizer with hoodie selected |
+| `customize_glitch` | Customizer with **Glitch hoodie** selected (launch target) |
+| `customize_hoodie` | Customizer with generic Live Object hoodie selected |
 | `scan_customize` | Scan page → customize CTA on live wear / print_artifact scans |
+| ~~`tier0_glitch`~~ | ~~Shared-batch Glitch PDP~~ — **deprecated**; use `customize_glitch` |
 
 ---
 
@@ -198,7 +202,8 @@ Aggregate metrics only — no PII. Allowed refs:
 
 | Step | Pass? |
 |------|-------|
-| Glitch drop PDP (`/shop/products/tier0_glitch_hoodie_v1/`) + store catalog API | ✅ Pages splat + Worker `GET /v1/store/products` · E2E `shop-product-detail` · `rollout:step5/6 -- --verify` |
+| Glitch launch via `/shop/customize/` (`glitch_hoodie_v1` target) | ☐ engineering rewire — [`MERCH_PRODUCT_COPY.md`](MERCH_PRODUCT_COPY.md) § Engineering rewire |
+| Legacy Glitch PDP (`tier0_glitch_hoodie_v1`) + store API | ✅ smoke/E2E only — **not** launch checkout path |
 | Stranger scans campaign merch; profile loads with limits + customize CTA | ✅ scan hint · ☐ manual stranger QA |
 | Create card → `/shop/customize/` detects session | ✅ redirect + E2E `e2e/merch-funnel-customize.spec.ts` |
 | Preview shows LIVE OBJECT branded QR on product mockup | ✅ UI |

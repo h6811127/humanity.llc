@@ -2,6 +2,7 @@
  * /wallet/ - dedicated saved-cards page (not the hub bottom sheet).
  */
 import "./device-steward-billing-return-bootstrap.mjs";
+import { ensureQuietTabRehydrateBootstrap } from "./device-quiet-tab-rehydrate-bootstrap.mjs";
 import { logDeviceActivity } from "./device-activity.mjs";
 import { isAutoSaveEnabled, initAutoSaveToggle, isAutoSaveFailed } from "./device-auto-save.mjs";
 import { initDeviceHub, refreshDeviceHub } from "./device-hub-ui.mjs";
@@ -20,6 +21,8 @@ import {
   reconcileWalletSummaryIntegrity,
   saveSessionToWallet,
 } from "./device-wallet.mjs";
+
+await ensureQuietTabRehydrateBootstrap();
 
 const saveForm = document.getElementById("wallet-save-form");
 const saveGroup = document.getElementById("device-hub-save-tab-group");
@@ -183,6 +186,11 @@ bindWalletActiveLink();
 refreshAutoSaveLine();
 updateContextBanners();
 refreshHelpVisibility();
+
+window.addEventListener("hc-quiet-tab-rehydrated", () => {
+  refreshTabSaveGroup();
+  updateContextBanners();
+});
 
 window.addEventListener("hc-device-hub-changed", () => {
   refreshHelpVisibility();

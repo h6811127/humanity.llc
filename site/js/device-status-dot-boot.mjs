@@ -14,6 +14,7 @@ export {
   isDotBootstrapSettled,
   markDotBootstrapSettled,
   resetDotBootstrapSettledForTests,
+  resetDotBootstrapSettledForResume,
   shouldDeferCoreDotPaint,
 } from "./device-status-dot-boot-core.mjs";
 
