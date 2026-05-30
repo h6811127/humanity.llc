@@ -120,3 +120,14 @@ export const CREATED_INCOMPLETE_LINK_MESSAGE =
 
 export const CREATED_SESSION_MISMATCH_HTML =
   'This link is for a different card than the control loaded in this tab. Open <a href="/wallet/">My objects</a> and tap <strong>Open controls</strong> on the card you want.';
+
+/**
+ * Whether `#created-setup-root` / `#created-control-root` stay hidden during route shell apply.
+ * Workspace mode (`applyCreatedWorkspaceMode`) is the only code path that reveals one root.
+ * @see docs/SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md RC-2
+ * @param {{ pending?: boolean, action: CreatedRouteAction }} gate
+ */
+export function createdRouteShellHidesWorkspaceRoots(gate) {
+  void gate;
+  return true;
+}

@@ -3008,3 +3008,22 @@ body.device-shell-created #created-setup-back[hidden] {
 .device-hub-glance-row--refresh .device-hub-glance-title {
   color: var(--surface-popover-accent, var(--red, #db1b43));
 }
+
+/* RC-1 — personalized shell rows hidden until JS sets data-boot=ready */
+body[data-boot="pending"] .device-boot-gated,
+body:not([data-boot="ready"]) .device-boot-gated {
+  visibility: hidden;
+}
+
+body[data-boot="ready"] .device-boot-gated {
+  visibility: visible;
+}
+
+/* RC-3 — status dot hidden until health + session bootstrap settles */
+#brand-status-dot-btn[data-dot-boot="pending"] .shell-status-dot {
+  visibility: hidden;
+}
+
+#brand-status-dot-btn[data-dot-boot="ready"] .shell-status-dot {
+  visibility: visible;
+}

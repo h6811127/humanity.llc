@@ -5,6 +5,7 @@ import {
   classifyCardLookupStatus,
   createdInvalidLinkMessage,
   createdRouteNeedsProfileLookup,
+  createdRouteShellHidesWorkspaceRoots,
   CREATED_INCOMPLETE_LINK_MESSAGE,
   CREATED_SESSION_MISMATCH_HTML,
   isCreatedSessionProfileMismatch,
@@ -209,9 +210,10 @@ export function applyCreatedRouteShell(gate) {
   const vouchBanner = document.getElementById("created-vouch-return-banner");
 
   const blocked = gate.pending || gate.action !== "ok";
+  const hideWorkspaceRoots = createdRouteShellHidesWorkspaceRoots(gate);
 
-  if (setupRoot) setupRoot.hidden = blocked;
-  if (controlRoot) controlRoot.hidden = blocked;
+  if (setupRoot) setupRoot.hidden = hideWorkspaceRoots;
+  if (controlRoot) controlRoot.hidden = hideWorkspaceRoots;
   if (liveProof && blocked) liveProof.hidden = true;
   if (vouchBanner && blocked) vouchBanner.hidden = true;
 

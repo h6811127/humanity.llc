@@ -3,6 +3,10 @@
  * @see docs/STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md § Load-error dot explainer
  * @see docs/PRODUCT_LANGUAGE_STRATEGY.md — Layer 2 outcome copy
  */
+import {
+  markDotBootstrapSettled,
+  markDotBootReady,
+} from "./device-status-dot-boot.mjs";
 
 export const STATUS_LOAD_ERROR_POPOVER_ID = "device-status-load-error-popover";
 export const STATUS_LOAD_ERROR_DISMISS_ID = "device-status-load-error-dismiss";
@@ -172,6 +176,11 @@ export function wireStatusPartialLoadDot(technicalMessage) {
   if (dotBtn instanceof HTMLButtonElement) {
     dotBtn.setAttribute("aria-label", STATUS_PARTIAL_LOAD_ARIA_LABEL);
   }
+  markDotBootstrapSettled();
+  void import("./device-status-core.mjs").then((mod) => {
+    mod.applyCoreDot?.();
+    markDotBootReady();
+  });
   console.error("[humanity] Device status module failed to load (hub core OK):", technicalMessage);
 }
 

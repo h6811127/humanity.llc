@@ -13,10 +13,12 @@ import {
   statusAriaLabel,
   SHELL_DOT_NEUTRAL_EMPTY_CLASS,
   shellDotUsesNeutralEmptyWallet,
-} from "./device-dot-state-core.mjs?v=71";
+} from "./device-dot-state-core.mjs?v=73";
 import { logDotDiagnostic } from "./device-dot-diagnostics.mjs";
-import { closeInboxSheet } from "./device-inbox-sheet-loader.mjs?v=71";
-import { syncInboxBackdropForOpenHub } from "./device-sheet-backdrop-sync.mjs?v=71";
+import { shouldDeferCoreDotPaint } from "./device-status-dot-boot-core.mjs";
+import { markDotBootPending } from "./device-status-dot-boot.mjs";
+import { closeInboxSheet } from "./device-inbox-sheet-loader.mjs?v=73";
+import { syncInboxBackdropForOpenHub } from "./device-sheet-backdrop-sync.mjs?v=73";
 
 export const DOT_STATE_CHANGED = "hc-dot-state-changed";
 
@@ -244,7 +246,10 @@ function wireDotAndHub() {
     setHubExpanded(false, { haptic: false, persist: false });
   });
 
-  applyCoreDot();
+  markDotBootPending();
+  if (!shouldDeferCoreDotPaint()) {
+    applyCoreDot();
+  }
 }
 
 wireDotAndHub();

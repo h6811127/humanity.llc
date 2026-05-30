@@ -8,6 +8,9 @@ on:
     paths:
       - "site/**"
       - "e2e/**"
+      - "worker/tests/device-shell-boot.test.ts"
+      - "worker/tests/device-status-dot-boot.test.ts"
+      - "worker/tests/device-hub-network-boot.test.ts"
       - "worker/tests/merch-funnel*.test.ts"
       - "worker/tests/shop-*.test.ts"
       - "worker/tests/wrangler-merch-routes.test.ts"
@@ -26,6 +29,9 @@ on:
     paths:
       - "site/**"
       - "e2e/**"
+      - "worker/tests/device-shell-boot.test.ts"
+      - "worker/tests/device-status-dot-boot.test.ts"
+      - "worker/tests/device-hub-network-boot.test.ts"
       - "worker/tests/merch-funnel*.test.ts"
       - "worker/tests/shop-*.test.ts"
       - "worker/tests/wrangler-merch-routes.test.ts"

@@ -32,10 +32,10 @@
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=5" />
     <link rel="stylesheet" href="/styles.css?v=132" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=70" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=72" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=30" />
   </head>
-  <body class="has-device-hub-search device-shell-created" data-created-route="pending">
+  <body class="has-device-hub-search device-shell-created" data-created-route="pending" data-boot="pending">
     <script>
       (function () {
         var params = new URLSearchParams(location.search);
@@ -64,6 +64,7 @@
               type="button"
               class="shell-status-dot-btn"
               id="brand-status-dot-btn"
+              data-dot-boot="pending"
               aria-label="Device and system status"
               aria-expanded="false"
               aria-controls="device-hub"
@@ -205,9 +206,9 @@
 
       <main class="screen created-screen">
         <section class="hero hero-compact created-hero">
-          <p class="hero-eyebrow created-hero-handle" id="created-handle"> - </p>
+          <p class="hero-eyebrow created-hero-handle device-boot-gated" id="created-handle"></p>
           <h1 class="created-hero-title">Checking link…</h1>
-          <p class="created-hero-meta" id="created-hero-meta"></p>
+          <p class="created-hero-meta device-boot-gated" id="created-hero-meta"></p>
           <p class="hero-line hero-line-sub created-hero-manifesto" id="created-manifesto" hidden></p>
         </section>
 
@@ -522,7 +523,7 @@
             </div>
           </section>
 
-          <section class="created-live-cockpit" aria-label="Live object">
+          <section class="created-live-cockpit device-boot-gated" aria-label="Live object">
             <div class="created-live-status-strip" id="created-live-status-strip" role="status">
               <span class="created-live-status-chip" id="created-live-network-chip" hidden>Live on network</span>
               <p class="created-live-status-meta" id="created-live-status-meta"></p>
@@ -934,14 +935,14 @@
             <div class="created-advanced-body">
           <section class="group created-status-group" aria-label="Live on network">
             <h2 class="group-label">On the network</h2>
-            <ul class="list list-compact created-status-strip">
+            <ul class="list list-compact created-status-strip device-boot-gated">
               <li class="list-row">
                 <span class="list-icon list-icon-tone-green" aria-hidden="true">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
                 </span>
                 <span class="list-content">
                   <span class="list-title">Card</span>
-                  <span class="list-sub" id="network-card-status">Active</span>
+                  <span class="list-sub" id="network-card-status">Checking…</span>
                 </span>
               </li>
               <li class="list-row">
@@ -968,7 +969,7 @@
                 </span>
                 <span class="list-content">
                   <span class="list-title">Profile ID</span>
-                  <span class="list-sub mono" id="profile-id"> - </span>
+                  <span class="list-sub mono device-boot-gated" id="profile-id"></span>
                 </span>
                 <button type="button" class="created-copy-id" id="copy-profile-id" hidden aria-label="Copy profile ID">
                   Copy
@@ -1882,8 +1883,8 @@
         <p class="form-status" id="device-hub-qr-scanner-status" role="status" hidden></p>
       </div>
     </dialog>
-    <script src="/js/device-status-bootstrap.mjs?v=71" type="module"></script>
+    <script src="/js/device-status-bootstrap.mjs?v=73" type="module"></script>
     <script src="/js/created-hub.mjs?v=3" type="module"></script>
-    <script type="module" src="/js/created.mjs?v=71"></script>
+    <script type="module" src="/js/created.mjs?v=73"></script>
   </body>
 </html>

@@ -32,10 +32,10 @@
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=5" />
     <link rel="stylesheet" href="/styles.css?v=131" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=70" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=72" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=30" />
   </head>
-  <body class="page-wallet has-shell-chrome">
+  <body class="page-wallet has-shell-chrome" data-boot="pending">
     <div class="page">
       <div class="top-chrome top-chrome--float" id="top-chrome">
         <div class="top-chrome-bar top-chrome-bar--wallet" id="top-status">
@@ -45,6 +45,7 @@
               type="button"
               class="shell-status-dot-btn"
               id="brand-status-dot-btn"
+              data-dot-boot="pending"
               aria-label="Scroll to my objects"
               aria-controls="device-hub-saved-group"
             >
@@ -556,7 +557,7 @@
       </div>
     </dialog>
 
-    <script src="/js/device-status-bootstrap.mjs?v=71" type="module"></script>
+    <script src="/js/device-status-bootstrap.mjs?v=73" type="module"></script>
     <script src="/js/wallet-page.mjs?v=5" type="module"></script>
   </body>
 </html>

@@ -8,6 +8,7 @@ import {
   isCreatedSessionProfileMismatch,
   parseCreatedUrlSearch,
   parseHcCreatedSession,
+  createdRouteShellHidesWorkspaceRoots,
   resolveCreatedQrId,
   shouldRedirectCreatedToWallet,
 } from "../../site/js/created-route-gate-core.mjs";
@@ -212,5 +213,14 @@ describe("createdRouteShellState", () => {
   it("sets blocked hero titles", () => {
     expect(createdRouteHeroTitle({ action: "invalid_link" })).toBe("Link not valid");
     expect(createdRouteHeroTitle({ action: "ok" })).toBeNull();
+  });
+});
+
+describe("createdRouteShellHidesWorkspaceRoots", () => {
+  it("keeps setup and control hidden until workspace mode (RC-2)", () => {
+    expect(createdRouteShellHidesWorkspaceRoots({ action: "ok" })).toBe(true);
+    expect(createdRouteShellHidesWorkspaceRoots({ action: "ok", pending: true })).toBe(true);
+    expect(createdRouteShellHidesWorkspaceRoots({ action: "invalid_link" })).toBe(true);
+    expect(createdRouteShellHidesWorkspaceRoots({ action: "session_mismatch" })).toBe(true);
   });
 });

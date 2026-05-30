@@ -259,3 +259,42 @@ export function readCachedVerification(cache, profileId, now, ttlMs = WALLET_NET
     state: entry.verificationState ?? null,
   };
 }
+
+/**
+ * RC-4: show checking chip until resolver confirms this profile this visit.
+ * @param {string | null | undefined} profileId
+ * @param {{ forceChecking?: boolean, fetchNetworkStatus?: boolean }} ctx
+ * @param {(profileId: string) => boolean} isResolverConfirmedProfile
+ */
+export function shouldShowHubNetworkCheckingChip(
+  profileId,
+  ctx,
+  isResolverConfirmedProfile
+) {
+  if (ctx.fetchNetworkStatus === false) return false;
+  if (ctx.forceChecking === true) return true;
+  const pid = typeof profileId === "string" ? profileId.trim() : "";
+  if (!pid) return true;
+  return !isResolverConfirmedProfile(pid);
+}
+
+/**
+ * @param {string | null | undefined} profileId
+ * @param {{ forceChecking?: boolean, fetchNetworkStatus?: boolean }} ctx
+ * @param {(profileId: string) => boolean} isResolverConfirmedProfile
+ * @param {(profileId: string) => string | null | undefined} getCachedStatus
+ */
+export function hubNetworkChipStatusForProfile(
+  profileId,
+  ctx,
+  isResolverConfirmedProfile,
+  getCachedStatus
+) {
+  if (
+    shouldShowHubNetworkCheckingChip(profileId, ctx, isResolverConfirmedProfile)
+  ) {
+    return "checking";
+  }
+  const pid = typeof profileId === "string" ? profileId.trim() : "";
+  return pid ? getCachedStatus(pid) ?? "checking" : "checking";
+}

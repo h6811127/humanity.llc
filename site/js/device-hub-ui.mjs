@@ -70,7 +70,7 @@ import {
   getLatestResolvedAlertState,
   getNetworkLastSeenBaseline,
   getWalletNetworkTruthChipStatus,
-  hasLatestResolverNetworkPoll,
+  isResolverConfirmedProfile,
   CARD_REVOKED_ALERT_STATE,
   isSinceVisitBlockedChipStatus,
   recordNetworkSeen,
@@ -82,6 +82,10 @@ import {
   NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
 import { clearWalletNetworkTruthForProfile } from "./device-wallet-network-truth.mjs";
+import {
+  hubNetworkChipStatusForProfile,
+  shouldShowHubNetworkCheckingChip,
+} from "./device-wallet-network-core.mjs";
 import {
   broadcastNetworkSnapshotIfEligible,
   shouldFollowerSkipAutoNetworkFetch,
@@ -138,7 +142,7 @@ import {
 import { tabNoticeCount } from "./device-counts.mjs";
 import { mountHubBuildStamp } from "./device-hub-build-stamp.mjs";
 import { mountHubNetworkTools } from "./device-hub-network-tools.mjs";
-import { syncInboxBackdropForOpenHub } from "./device-sheet-backdrop-sync.mjs?v=71";
+import { syncInboxBackdropForOpenHub } from "./device-sheet-backdrop-sync.mjs?v=73";
 import {
   HUB_STRANGER_EMPTY_CLASS,
   isHubStrangerEmptyState,
@@ -705,8 +709,8 @@ function entryHasSigningKeys(entry) {
   return Boolean(entry.owner_private_key_b58 || entry.has_signing_key);
 }
 
-function hubCardIconHtml(profileId) {
-  const cached = getCachedVerification(profileId);
+function hubCardIconHtml(profileId, { checking = false } = {}) {
+  const cached = checking ? null : getCachedVerification(profileId);
   const meta = humanTrustIconMeta({
     label: cached?.label,
     state: cached?.state,
@@ -812,13 +816,55 @@ function currentNetworkStatus(profileId, statusMap = {}) {
   if (statusMap[profileId] != null && statusMap[profileId] !== "") {
     return statusMap[profileId];
   }
+  if (
+    hubConfig.fetchNetworkStatus &&
+    profileId &&
+    !isResolverConfirmedProfile(profileId)
+  ) {
+    return "checking";
+  }
   const truthChip = getWalletNetworkTruthChipStatus(profileId);
   if (truthChip != null && truthChip !== "") return truthChip;
   return getCachedNetworkStatus(profileId) ?? "checking";
 }
 
 function currentNetworkScanKind(profileId, scanKindMap = {}) {
-  return scanKindMap[profileId] ?? getCachedNetworkScanKind(profileId) ?? null;
+  if (scanKindMap[profileId] != null) {
+    return scanKindMap[profileId] ?? null;
+  }
+  if (
+    hubConfig.fetchNetworkStatus &&
+    profileId &&
+    !isResolverConfirmedProfile(profileId)
+  ) {
+    return null;
+  }
+  return getCachedNetworkScanKind(profileId) ?? null;
+}
+
+/** @param {{ forceChecking?: boolean }} [opts] */
+function hubNetworkRowCtx(opts = {}) {
+  return {
+    fetchNetworkStatus: hubConfig.fetchNetworkStatus,
+    forceChecking: opts.forceChecking === true,
+  };
+}
+
+function hubRowCheckingChip(profileId, opts = {}) {
+  return shouldShowHubNetworkCheckingChip(
+    profileId,
+    hubNetworkRowCtx(opts),
+    isResolverConfirmedProfile
+  );
+}
+
+function hubRowChipStatus(profileId, opts = {}) {
+  return hubNetworkChipStatusForProfile(
+    profileId,
+    hubNetworkRowCtx(opts),
+    isResolverConfirmedProfile,
+    getCachedNetworkStatus
+  );
 }
 
 function applyNetworkChipsToDom(
@@ -850,8 +896,12 @@ function applyNetworkChipsToDom(
         li.dataset.summaryRow === "1"
           ? loadWalletSummary().rows.find((e) => e.profile_id === pid)
           : findWalletEntryByProfileId(pid);
-      const objectType = classifyObjectType(entry ?? {}, getCachedNetworkQrScope(pid));
-      const cached = getCachedVerification(pid);
+      const checkingChip = hubRowCheckingChip(pid);
+      const objectType = classifyObjectType(
+        entry ?? {},
+        checkingChip ? undefined : getCachedNetworkQrScope(pid)
+      );
+      const cached = checkingChip ? null : getCachedVerification(pid);
       const identity = hubCardIdentityLine({
         objectTypeLabel: objectType.label,
         verificationLabel: cached?.label,
@@ -863,7 +913,8 @@ function applyNetworkChipsToDom(
     }
     const iconEl = li.querySelector(".hub-card-head .list-icon");
     if (iconEl) {
-      const cached = getCachedVerification(pid);
+      const checkingChip = hubRowCheckingChip(pid);
+      const cached = checkingChip ? null : getCachedVerification(pid);
       const meta = humanTrustIconMeta({
         label: cached?.label,
         state: cached?.state,
@@ -1050,7 +1101,7 @@ function applyCachedNetworkChipsOnly() {
   if (entries.length === 0) return;
   applyNetworkChipsToDom(
     Object.fromEntries(
-      entries.map((e) => [e.profile_id, getCachedNetworkStatus(e.profile_id) ?? "checking"])
+      entries.map((e) => [e.profile_id, hubRowChipStatus(e.profile_id)])
     ),
     null,
     {},
@@ -1105,10 +1156,7 @@ async function fetchAndApplyNetworkChips(opts = {}) {
     const { entries } = normalizeWalletQrIds(stored);
     applyNetworkChipsToDom(
       Object.fromEntries(
-        entries.map((e) => [
-          e.profile_id,
-          getCachedNetworkStatus(e.profile_id) ?? "checking",
-        ])
+        entries.map((e) => [e.profile_id, hubRowChipStatus(e.profile_id)])
       ),
       null,
       {},
@@ -1131,7 +1179,7 @@ async function fetchAndApplyNetworkChips(opts = {}) {
   const gen = bumpWalletNetworkApplyGen();
   applyNetworkChipsToDom(
     Object.fromEntries(
-      entries.map((e) => [e.profile_id, getCachedNetworkStatus(e.profile_id) ?? "checking"])
+      entries.map((e) => [e.profile_id, hubRowChipStatus(e.profile_id)])
     ),
     null,
     {},
@@ -1441,7 +1489,7 @@ function bindHubChildObjectRowHandlers() {
  * @param {{ initialChipChecking?: boolean, childReconciled?: boolean, viewportSync?: boolean }} [opts] Use checking chips until the next poll (avoids stale cache flash after wallet edits).
  */
 function renderSavedRows(opts = {}) {
-  const initialChipChecking = opts.initialChipChecking === true;
+  const rowChipOpts = { forceChecking: opts.initialChipChecking === true };
   const summary = loadWalletSummary();
   if (summary.walletFingerprint !== expandedSummaryWalletFingerprint) {
     expandedSummaryWalletFingerprint = summary.walletFingerprint;
@@ -1513,9 +1561,12 @@ function renderSavedRows(opts = {}) {
   setHubSectionEmpty(savedGroup, savedList, savedEmptyEl, false, "");
   for (const entry of entries) {
     const li = document.createElement("li");
+    const checkingChip = hubRowCheckingChip(entry.profile_id, rowChipOpts);
     const objectType = classifyObjectType(
       entry,
-      hubConfig.fetchNetworkStatus ? getCachedNetworkQrScope(entry.profile_id) : undefined
+      hubConfig.fetchNetworkStatus && !checkingChip
+        ? getCachedNetworkQrScope(entry.profile_id)
+        : undefined
     );
     const pilotTemplate =
       entry.pilot_template ||
@@ -1525,9 +1576,10 @@ function renderSavedRows(opts = {}) {
           buildHubCardControls({
             hasKeys: entryHasSigningKeys(entry),
             pendingLiveProof: !!liveControlPendingForEntry(entry),
-            scanKind: hubConfig.fetchNetworkStatus
-              ? getCachedNetworkScanKind(entry.profile_id)
-              : null,
+            scanKind:
+              hubConfig.fetchNetworkStatus && !checkingChip
+                ? getCachedNetworkScanKind(entry.profile_id)
+                : null,
           }),
           pilotTemplate
         )
@@ -1542,9 +1594,10 @@ function renderSavedRows(opts = {}) {
     if (!fullRows) li.dataset.summaryRow = "1";
     const lastUsed = lastActivityForEntry(entry);
     const scan = scanUrlForEntry(entry);
-    const cachedVerification = hubConfig.fetchNetworkStatus
-      ? getCachedVerification(entry.profile_id)
-      : null;
+    const cachedVerification =
+      hubConfig.fetchNetworkStatus && !checkingChip
+        ? getCachedVerification(entry.profile_id)
+        : null;
     const identity = hubCardIdentityLine({
       objectTypeLabel: objectType.label,
       verificationLabel: cachedVerification?.label,
@@ -1553,11 +1606,11 @@ function renderSavedRows(opts = {}) {
     });
     const statusHtml = hubCardStatusHtml(
       entry.profile_id,
-      initialChipChecking ? "checking" : getCachedNetworkStatus(entry.profile_id) ?? "checking",
-      initialChipChecking ? null : getCachedNetworkScanKind(entry.profile_id)
+      hubRowChipStatus(entry.profile_id, rowChipOpts),
+      checkingChip ? null : getCachedNetworkScanKind(entry.profile_id)
     );
     const cardIcon = hubConfig.fetchNetworkStatus
-      ? hubCardIconHtml(entry.profile_id)
+      ? hubCardIconHtml(entry.profile_id, { checking: checkingChip })
       : `<span class="list-icon list-icon-tone-trust" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>`;
     const revokedAlert = hubConfig.fetchNetworkStatus
       ? `<div class="hc-emphasis-card hc-emphasis-card--warn hub-card-status-alert" data-hub-searchable="${escapeHtml(CARD_DISABLED_SINCE_VISIT_SEARCH_SNIPPET)} network" hidden role="status">

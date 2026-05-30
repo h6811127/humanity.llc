@@ -24,10 +24,11 @@ import { loadInboxSheetModule } from "./device-inbox-sheet-loader.mjs";
 import {
   loadInboxModule,
   resetPresenceInboxGatherCache,
-} from "./device-inbox-loader.mjs?v=71";
+} from "./device-inbox-loader.mjs?v=73";
 import { getOrphanRemovedTabsWithKeys, getOtherTabsWithKeys } from "./device-tab-presence.mjs";
 import { primeCrossTabNotificationState } from "./device-cross-tab-state.mjs";
 import { refreshWalletContextFromChrome } from "./wallet-page-chrome.mjs";
+import { markDeviceBootReadyIfShellPage } from "./device-shell-boot.mjs";
 
 /** @type {(() => void) | null} */
 let refreshStatusSurfaces = null;
@@ -126,6 +127,7 @@ async function runChromeRefreshAsync() {
       sheetMod.renderInboxSheet();
     }
     refreshWalletContextFromChrome();
+    markDeviceBootReadyIfShellPage();
   } finally {
     lastPresenceChromeFingerprint = readPresenceChromeFingerprint();
     inbox.endDeviceChromeRefreshTick();

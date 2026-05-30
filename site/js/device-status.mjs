@@ -2,7 +2,7 @@
  * Floating status dot, notification badge, hub sheet host.
  * @see docs/STATUS_INDICATOR_STEWARD_GREEN.md
  */
-import { closeInboxSheet, openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=71";
+import { closeInboxSheet, openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=73";
 import { buildStatusSegments } from "./device-counts.mjs";
 import { loadPins } from "./device-pins.mjs";
 import {
@@ -15,7 +15,7 @@ import { fetchResolverHealth } from "./device-network-health.mjs";
 import { setResolverHealthStatusForSinceVisit } from "./device-wallet-since-visit-gate.mjs";
 
 export const RESOLVER_HEALTH_CHANGED = "hc-resolver-health-changed";
-import { maybeQuietTabRehydrate } from "./device-quiet-tab-rehydrate.mjs?v=71";
+import { maybeQuietTabRehydrate } from "./device-quiet-tab-rehydrate.mjs?v=73";
 import { scheduleStoragePersistRequest } from "./device-storage-persist.mjs";
 import { resolverApiOrigin } from "./hc-sign.mjs";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
@@ -30,7 +30,7 @@ import {
   getInboxDotOverlay,
   notificationCount,
   preloadInboxModule,
-} from "./device-inbox-loader.mjs?v=71";
+} from "./device-inbox-loader.mjs?v=73";
 import {
   inboxBadgeAriaLabel,
   inboxBadgeTitle,
@@ -39,29 +39,29 @@ import {
   inboxBadgeChromaKind,
   inboxBadgeCountText,
   inboxCountFromItems,
-} from "./device-inbox-core.mjs?v=71";
+} from "./device-inbox-core.mjs?v=73";
 import { closeGlancePopover, isGlancePopoverOpen } from "./device-hub-glance-popover.mjs";
 import {
   initHubIntroCoachmark,
   onHubOpenedFromIntro,
 } from "./device-hub-intro-coachmark.mjs";
 import { logDotDiagnostic } from "./device-dot-diagnostics.mjs";
-import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=71";
+import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=73";
 import {
   NETWORK_BASELINE_CHANGED,
   NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
 import "./device-shell-motion.mjs";
-import "./device-shell-chrome.mjs?v=71";
+import "./device-shell-chrome.mjs?v=73";
 import "./device-theme.mjs";
-import { initBrowserNotifications } from "./device-browser-notifications-loader.mjs?v=71";
-import { reconcileHubSheetState } from "./device-hub-sheet-loader.mjs?v=71";
+import { initBrowserNotifications } from "./device-browser-notifications-loader.mjs?v=73";
+import { reconcileHubSheetState } from "./device-hub-sheet-loader.mjs?v=73";
 import { startCrossTabNotificationState } from "./device-cross-tab-state.mjs";
 import {
   refreshDeviceChrome,
   setRefreshStatusSurfaces,
   startDeviceChromeRefresh,
-} from "./device-chrome-refresh.mjs?v=71";
+} from "./device-chrome-refresh.mjs?v=73";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
 import {
   broadcastHealthSnapshotIfEligible,
@@ -86,7 +86,7 @@ import {
   shellStatusLinePrimaryInChrome,
   shouldCelebrateStewardTransition,
   statusAriaLabel,
-} from "./device-dot-state-core.mjs?v=71";
+} from "./device-dot-state-core.mjs?v=73";
 import {
   DOT_STATE_CHANGED,
   getNetworkStatus,
@@ -95,7 +95,11 @@ import {
   setHubExpandedHook,
   setHubExpanded as setHubExpandedCore,
   setNetworkStatus,
-} from "./device-status-core.mjs?v=71";
+} from "./device-status-core.mjs?v=73";
+import {
+  markDotBootstrapSettled,
+  markDotBootReadyIfSettled,
+} from "./device-status-dot-boot.mjs";
 
 export { DOT_STATE_CHANGED };
 
@@ -298,6 +302,7 @@ function applyDot() {
     applyStewardCelebrate(previousDevice, device);
     maybeEmitDotTransition(networkStatus, device, overlay);
     lastDotSnapshot = { network: networkStatus, device, overlay };
+    markDotBootReadyIfSettled();
   };
   const skipTransition =
     prefersReducedMotion() ||
@@ -327,7 +332,9 @@ function statusKeyDot(fill, ring = false) {
 }
 
 function getStewardQueueUrl() {
-  const link = document.querySelector("#steward-review-details a[href]");
+  const details = document.getElementById("steward-review-details");
+  if (!details || details.hidden) return null;
+  const link = details.querySelector("a[href]");
   if (!(link instanceof HTMLAnchorElement)) return null;
   return link.getAttribute("href") || null;
 }
@@ -532,6 +539,7 @@ function refreshSummary() {
 async function refreshNetwork(opts = {}) {
   const manual = opts.manual === true;
   if (!manual && shouldFollowerSkipAutoHealthFetch()) {
+    markDotBootstrapSettled();
     refreshSummary();
     return;
   }
@@ -542,6 +550,7 @@ async function refreshNetwork(opts = {}) {
     new CustomEvent(RESOLVER_HEALTH_CHANGED, { detail: { networkStatus } })
   );
   broadcastHealthSnapshotIfEligible(networkStatus, { manual });
+  markDotBootstrapSettled();
   refreshSummary();
 }
 
@@ -608,12 +617,12 @@ async function bootDeviceStatusShell() {
     refreshSummary();
   });
   startDeviceChromeRefresh();
+  await refreshNetwork();
   refreshDeviceChrome({ immediate: true });
   preloadInboxModule(() => {
     refreshSummary();
     refreshDeviceChrome({ immediate: true });
   });
-  void refreshNetwork();
 }
 
 void bootDeviceStatusShell();

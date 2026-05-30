@@ -97,6 +97,7 @@ import {
 import { getCardJsonUrl, getCardStatusUrl } from "./hc-sign.mjs";
 import { resolverErrorMessage } from "./resolver-user-error-core.mjs";
 import { viewOnlyNoSessionDetailHtml } from "./created-view-only-copy-core.mjs";
+import { markDeviceBootReady } from "./device-shell-boot.mjs";
 
 const params = new URLSearchParams(location.search);
 const profileIdParam = params.get("profile_id")?.trim() || null;
@@ -213,6 +214,10 @@ if (routeGate.action === "redirect_wallet") {
     setNoSessionNotice(routeGate.message ?? "");
   } else if (routeGate.action === "session_mismatch") {
     setNoSessionNotice(routeGate.noticeHtml ?? "");
+  }
+
+  if (routeGate.action !== "ok") {
+    markDeviceBootReady();
   }
 
   if (routeGate.action === "ok") {
@@ -828,10 +833,14 @@ if (gate.card?.handle && gate.card?.manifesto_line) {
   }
 }
 
+// RC-2: reveal setup vs control only after mode is known — never from route shell alone.
+workspaceMode = getWorkspaceMode();
+applyCreatedWorkspaceMode(workspaceMode);
+
 if (data?.handle) {
   handleEl.textContent = `@${data.handle}`;
 } else if (!profileId) {
-  handleEl.textContent = " - ";
+  handleEl.textContent = "";
 }
 
 if (data?.manifesto_line) {
@@ -999,6 +1008,8 @@ if (networkQrExpiresEl) {
 }
 updateHeroMeta();
 
+markDeviceBootReady();
+
 liveObjectCardCtl = initCreatedLiveObjectCard({
   getCardStatusText: () => networkCardStatusEl?.textContent?.trim() ?? "",
   getHandle: () => data?.handle ?? loadSession()?.handle ?? null,
@@ -1035,9 +1046,6 @@ function setupCreatedDashboard() {
 }
 
 initVouchReturnBanner();
-
-workspaceMode = getWorkspaceMode();
-applyCreatedWorkspaceMode(workspaceMode);
 
 if (workspaceMode === "view" && profileId && activeQrId) {
   clearKeylessTabSessionIfPresent();
