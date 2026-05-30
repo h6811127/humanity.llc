@@ -1955,10 +1955,9 @@ function renderPinRows() {
 
 function refreshEmptyHint() {
   if (!emptyHint) return;
+  loadWallet();
   if (isWalletStorageCorrupt()) {
-    emptyHint.hidden = false;
-    emptyHint.textContent =
-      "Saved ownership on this device could not be read. Use Import backup below.";
+    emptyHint.hidden = true;
     return;
   }
   const hasData =

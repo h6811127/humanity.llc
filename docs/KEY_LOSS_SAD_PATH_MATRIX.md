@@ -72,6 +72,7 @@ Automated guards: `npm run worker:test:key-loss-copy`
 | K4 | `e2e/device-cross-tab-keys.spec.ts` |
 | K6 | `e2e/production-sad-path-created.spec.ts` |
 | K7 | `npm run worker:test:setup-protect` |
+| S2, S3 (Safari keys) | `npm run e2e:safari-keys-persistence` |
 | Copy | `npm run worker:test:key-loss-copy` |
 
 ---
@@ -80,4 +81,5 @@ Automated guards: `npm run worker:test:key-loss-copy`
 
 | Date | Notes |
 |------|-------|
+| 2026-05-29 | S2/S3 WebKit regression — `e2e:safari-keys-persistence` (P2-3) |
 | 2026-05-29 | Initial matrix; K1/K2/K5 E2E; copy guards |

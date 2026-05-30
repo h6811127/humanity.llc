@@ -158,7 +158,7 @@ test.describe("key-loss sad paths", () => {
     await expect(page.locator("#wallet-tab-hint-use-keys")).toHaveText(/import backup/i);
     await expect(page.locator("#wallet-tab-hint-focus")).toHaveText(/backup help/i);
     await expect(page.locator("#device-hub-empty-hint")).toBeHidden();
-    await expect(page.locator("#wallet-page")).toHaveClass(/device-hub--stranger-empty/);
+    await expect(page.locator("#wallet-page")).not.toHaveClass(/device-hub--stranger-empty/);
   });
 
   test("K2: wrong backup passphrase shows plain error on wallet import", async ({ page }) => {

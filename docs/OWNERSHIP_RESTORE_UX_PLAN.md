@@ -86,6 +86,12 @@ Setup wizard **hard gate** before step **You're live**:
 - Modules: `device-pwa-session-mismatch-core.mjs` · `device-pwa-session-mismatch.mjs` · `device-pwa-session-mismatch-record.mjs`
 - Tests: `npm run worker:test:pwa-session-mismatch`
 
+## Safari P3-3 (shipped)
+
+- **Defense in depth:** `hc_wallet_summary` rows built via allowlisted `walletSummaryRowFromEntry`; persist path runs `serializeWalletSummaryForStorage` (no `owner_private_key_b58` / `recovery_private_key_b58` in JSON).
+- Module: `site/js/device-wallet-summary-core.mjs` · tests: `npm run worker:test -- worker/tests/device-wallet-summary-core.test.ts worker/tests/device-wallet-meta.test.ts worker/tests/device-wallet-save.test.ts`
+- Tracker: [`SAFARI_KEYS_WIPE_INVESTIGATION.md`](SAFARI_KEYS_WIPE_INVESTIGATION.md) rollout step 17
+
 ## Safari P2-3 (shipped)
 
 - WebKit regression for matrix **S2** (sole-card scan tab rehydrates vouch signing) and **S3** (browser `/wallet/` after standalone signing shows home-screen guidance)

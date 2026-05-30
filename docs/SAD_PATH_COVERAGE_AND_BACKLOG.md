@@ -216,6 +216,7 @@ Canonical matrix: [`HOSTED_OPS_SAD_PATH_MATRIX.md`](HOSTED_OPS_SAD_PATH_MATRIX.m
 | **S31** | **Setup wizard test scan no auto-advance in browser (P0b-2 / R12)** | `e2e/device-pwa-scan-handoff.spec.ts` · `worker/tests/pwa-scan-handoff-core.test.ts` |
 | **S32** | **Scan sole signing row vouch auto-activate (P0b-3)** | `npm run worker:test:vouch-scan-sole-activate` · `npm run e2e:vouch-scan-sole-signing` |
 | **S33** | **Corrupt `hc_wallet` urgent tab hint on `/wallet/` (P1-4 / R7)** | `npm run worker:test:wallet-corrupt` · `e2e/key-loss-sad-path.spec.ts` (R7) |
+| **S34** | **Safari S2 scan rehydrate + S3 PWA/browser mismatch (P2-3)** | `npm run e2e:safari-keys-persistence` |
 
 Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH_QA_2026-05-26.md) § Recommended test matrix.
 
@@ -241,6 +242,7 @@ Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH
 | **P1-HE · Hub stranger-empty import always visible (Phase 4)** | `npm run worker:test:hub-restore-always` · `npm run e2e:key-loss-sad-path` (K2) |
 | **P1-VOUCH-SOLE · Scan sole-row vouch without default (P0b-3)** | `npm run e2e:vouch-scan-sole-signing` |
 | **P1-WALLET-CORRUPT · Corrupt wallet tab hint (P1-4 / R7)** | `npm run worker:test:wallet-corrupt` · `npm run e2e:key-loss-sad-path` (R7) |
+| **P2-SAFARI-KEYS · WebKit keys persistence (P2-3 / S2–S3)** | `npm run e2e:safari-keys-persistence` |
 
 ---
 
@@ -248,6 +250,7 @@ Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH
 
 | Date | Notes |
 |------|-------|
+| 2026-05-29 | P2-3 shipped — WebKit S2 scan rehydrate + S3 wallet mismatch E2E (S34) |
 | 2026-05-29 | P1-4 shipped — corrupt wallet hub + `/wallet/` tab hint (S33) |
 | 2026-05-29 | P0b-3 shipped — scan sole-signing-row vouch E2E (S32) |
 | 2026-05-29 | P0b-2 E2E — browser setup test scan waits for second Continue (S31) |

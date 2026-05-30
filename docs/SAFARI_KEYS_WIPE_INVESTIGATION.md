@@ -444,7 +444,7 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 |---|--------|-----------|
 | **P3-1** | Evaluate **Secure Enclave / WebAuthn** wrapping of wallet keys (unlock to sign, not raw keys in session) | Reduce sessionStorage dependence |
 | **P3-2** | Optional encrypted persistence outside ITP window (only with user consent) | Controversial — document threat model |
-| **P3-3** | Never store raw private keys in hub summary paths; audit accidental strip | Defense in depth |
+| **P3-3** | Never store raw private keys in hub summary paths; audit accidental strip | Defense in depth · **Shipped** — `device-wallet-summary-core.mjs` allowlist rows + persist tripwire |
 
 **Explicit non-fix:** Server-side key custody — contradicts product trust model ([`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md)).
 
@@ -496,6 +496,7 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 | 14 | P2-1 Safari ITP storage notice | **Shipped** | `safari-itp-storage-notice-core.mjs` · lazy bootstrap on `/` · `/wallet/` · `/created/` |
 | 15 | P2-2 PWA vs browser session mismatch | **Shipped** | `hc_last_signing_shell_mode` · hub custody · wallet tab hint · scan actor band |
 | 16 | P2-3 WebKit keys persistence E2E | **Shipped** | `e2e/safari-keys-persistence.spec.ts` · S2 scan rehydrate · S3 wallet mismatch |
+| 17 | P3-3 Hub summary key-material guard | **Shipped** | `device-wallet-summary-core.mjs` · `serializeWalletSummaryForStorage` · Vitest `device-wallet-summary-core.test.ts` |
 
 **P0-1 spec (reference for reviewers):**
 

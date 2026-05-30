@@ -22,3 +22,27 @@ describe("classifyWalletStorageRaw", () => {
     expect(classifyWalletStorageRaw("{not-json").kind).toBe("corrupt");
   });
 });
+
+describe("saveWallet corrupt guard (P1-4)", () => {
+  it("refuses to overwrite corrupt hc_wallet with a normalized empty array", async () => {
+    const wallet = await import("../../site/js/device-wallet.mjs");
+    const storage = new Map<string, string>();
+    storage.set("hc_wallet", "{not-json");
+    const ls = {
+      getItem: (k: string) => storage.get(k) ?? null,
+      setItem: (k: string, v: string) => {
+        storage.set(k, v);
+      },
+      removeItem: (k: string) => {
+        storage.delete(k);
+      },
+    };
+    // @ts-expect-error test stub
+    globalThis.localStorage = ls;
+    wallet.loadWallet();
+    expect(wallet.isWalletStorageCorrupt()).toBe(true);
+    const result = wallet.saveWallet([]);
+    expect(result.error).toMatch(/could not be read/i);
+    expect(storage.get("hc_wallet")).toBe("{not-json");
+  });
+});
