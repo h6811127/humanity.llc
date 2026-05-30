@@ -9,12 +9,15 @@ import {
 } from "./device-pwa-session-mismatch-core.mjs";
 import {
   PWA_MISMATCH_DETAIL_BROWSER,
+  PWA_MISMATCH_DETAIL_BROWSER_EMPTY,
   PWA_MISMATCH_DETAIL_STANDALONE,
   PWA_MISMATCH_TITLE_BROWSER,
+  PWA_MISMATCH_TITLE_BROWSER_EMPTY,
   PWA_MISMATCH_TITLE_STANDALONE,
 } from "./device-ownership-copy-core.mjs";
 import { getWalletSigningKeyCount } from "./device-wallet.mjs";
 import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
+import { isIosWebKitUserAgent } from "./safari-itp-storage-notice-core.mjs";
 
 function readLastSigningShellMode() {
   try {
@@ -30,13 +33,29 @@ function readLastSigningShellMode() {
 export function gatherPwaSessionMismatch(win) {
   const w = win ?? (typeof window !== "undefined" ? window : null);
   const session = getTabSession();
+  const nav = w?.navigator;
   const mismatch = detectPwaSessionMismatch({
     standalone: readStandaloneModeFromWindow(w),
     hasTabSigningKeys: tabSessionHasSigningKeys(session),
     walletSigningKeyCount: getWalletSigningKeyCount(),
     lastSigningShellMode: readLastSigningShellMode(),
+    isIosWebKit: nav
+      ? isIosWebKitUserAgent(nav.userAgent || "", {
+          platform: nav.platform,
+          maxTouchPoints: nav.maxTouchPoints,
+        })
+      : false,
   });
   if (!mismatch) return null;
+
+  if (mismatch.iosEmptyWalletAfterPwa) {
+    return {
+      ...mismatch,
+      title: PWA_MISMATCH_TITLE_BROWSER_EMPTY,
+      detail: PWA_MISMATCH_DETAIL_BROWSER_EMPTY,
+      canRestoreInThisTab: false,
+    };
+  }
 
   if (mismatch.canRestoreInThisTab) {
     return {

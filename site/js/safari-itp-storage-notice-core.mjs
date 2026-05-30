@@ -42,6 +42,8 @@ export function isIosWebKitUserAgent(userAgent, nav = {}) {
  *   savedCardCount?: number;
  *   dismissedAtIso?: string | null;
  *   deviceStatusLoadError?: boolean;
+ *   standalone?: boolean;
+ *   lastSigningShellMode?: "standalone" | "browser" | null;
  *   nowMs?: number;
  * }} input
  */
@@ -52,13 +54,18 @@ export function shouldShowSafariItpStorageNotice(input) {
     savedCardCount = 0,
     dismissedAtIso = null,
     deviceStatusLoadError = false,
+    standalone = false,
+    lastSigningShellMode = null,
     nowMs = Date.now(),
   } = input;
 
   if (!isIosWebKit) return false;
   if (deviceStatusLoadError) return false;
   if (!isPwaShellPagePath(pathname)) return false;
-  if (savedCardCount < SAFARI_ITP_NOTICE_MIN_SAVED_CARDS) return false;
+  const hasSavedCards = savedCardCount >= SAFARI_ITP_NOTICE_MIN_SAVED_CARDS;
+  const iosBrowserAfterPwa =
+    !standalone && lastSigningShellMode === "standalone";
+  if (!hasSavedCards && !iosBrowserAfterPwa) return false;
   if (isSafariItpNoticeDismissSnoozed(dismissedAtIso, nowMs)) return false;
   return true;
 }

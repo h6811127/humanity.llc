@@ -37,6 +37,14 @@ describe("shouldShowSafariItpStorageNotice (P2-1)", () => {
       false
     );
     expect(
+      shouldShowSafariItpStorageNotice({
+        ...baseInput,
+        savedCardCount: 0,
+        standalone: false,
+        lastSigningShellMode: "standalone",
+      })
+    ).toBe(true);
+    expect(
       shouldShowSafariItpStorageNotice({ ...baseInput, deviceStatusLoadError: true })
     ).toBe(false);
   });

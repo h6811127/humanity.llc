@@ -42,16 +42,17 @@ export function rememberLastSigningShellMode(mode) {
  *   hasTabSigningKeys: boolean,
  *   walletSigningKeyCount: number,
  *   lastSigningShellMode?: SigningShellMode | null,
+ *   isIosWebKit?: boolean,
  * }} input
  * @returns {{
  *   lastMode: SigningShellMode,
  *   currentMode: SigningShellMode,
  *   canRestoreInThisTab: boolean,
+ *   iosEmptyWalletAfterPwa?: boolean,
  * } | null}
  */
 export function detectPwaSessionMismatch(input) {
   const walletSigningKeyCount = input.walletSigningKeyCount ?? 0;
-  if (walletSigningKeyCount < 1) return null;
   if (input.hasTabSigningKeys) return null;
 
   const lastMode = input.lastSigningShellMode ?? null;
@@ -59,6 +60,22 @@ export function detectPwaSessionMismatch(input) {
 
   const currentMode = signingShellModeFromStandalone(input.standalone);
   if (lastMode === currentMode) return null;
+
+  if (
+    input.isIosWebKit &&
+    currentMode === "browser" &&
+    lastMode === "standalone" &&
+    walletSigningKeyCount < 1
+  ) {
+    return {
+      lastMode,
+      currentMode,
+      canRestoreInThisTab: false,
+      iosEmptyWalletAfterPwa: true,
+    };
+  }
+
+  if (walletSigningKeyCount < 1) return null;
 
   return {
     lastMode,

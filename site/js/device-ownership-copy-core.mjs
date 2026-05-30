@@ -102,7 +102,7 @@ export const SETUP_SEATBELT_RECOVERY_SAVED_STATUS =
 
 /** Setup protect step — iOS Safari storage eviction (RC-3). */
 export const SETUP_SEATBELT_IOS_SAFARI_HINT =
-  "On iPhone Safari, saved cards can be deleted after about seven days without a visit, or when storage is low. Your recovery code or encrypted backup is how you get control back if that happens.";
+  "On iPhone Safari, saved cards can be deleted after about seven days without a visit, or when storage is low. If you add humanity.llc to your Home Screen, use only that icon — Safari tabs are a separate copy. Keep your recovery code or encrypted backup.";
 
 /** Setup done step — Home Screen guidance after first live (RC-3). */
 export const SETUP_DONE_IOS_HOME_SCREEN_EYEBROW = "iPhone tip";
@@ -111,7 +111,7 @@ export const SETUP_DONE_IOS_HOME_SCREEN_TITLE =
   "Add to Home Screen after you finish here";
 
 export const SETUP_DONE_IOS_HOME_SCREEN_DETAIL =
-  "After you open card controls, look for the Add to Home Screen card on this page. Tap Share → Add to Home Screen, then open humanity.llc from your home screen regularly. Each visit resets Safari's storage timer. Keep your recovery backup if this phone is your only copy of control.";
+  "Tap Share → Add to Home Screen, then manage your cards only from that icon. On iPhone, Safari tabs keep a separate copy — creating or saving in Safari after install can look like cards disappeared. Keep your recovery backup.";
 
 export const DEFAULT_FOR_ATTESTATION = "Default for attestation";
 
@@ -233,27 +233,34 @@ export const WALLET_CORRUPT_HELP_HREF = "/help/#ownership";
 export const RESTORE_CONTROL_IN_THIS_APP = "Restore control in this app";
 
 export const PWA_MISMATCH_TITLE_STANDALONE =
-  "Ownership was last active in Safari";
+  "Use only this app on iPhone";
 
 export const PWA_MISMATCH_DETAIL_STANDALONE =
-  "Saved cards are on this device, but signing was last active in a Safari tab. Restore control in this app.";
+  "On iPhone, Safari and this home screen app keep separate saved cards. Do not also create or manage cards in Safari tabs. Restore control here to sign in this app.";
 
 export const PWA_MISMATCH_TITLE_BROWSER =
-  "Ownership may be in your Home Screen app";
+  "Use your Home Screen app on iPhone";
 
 export const PWA_MISMATCH_DETAIL_BROWSER =
-  "Signing was last active in the installed app. Open humanity.llc from your home screen and restore control there.";
+  "On iPhone, Safari and the installed app do not share saved cards. After Add to Home Screen, open humanity.llc only from that icon — not Safari. To use Safari again, export a backup from the home screen app and import it here.";
+
+/** Safari tab with no wallet rows after the user last signed in the home screen app (iOS storage split). */
+export const PWA_MISMATCH_TITLE_BROWSER_EMPTY =
+  "Your cards are in the Home Screen app";
+
+export const PWA_MISMATCH_DETAIL_BROWSER_EMPTY =
+  "On iPhone, Safari and the installed app keep separate saved cards. Open humanity.llc from your home screen icon — not this Safari tab. To manage cards here instead, export a backup from the app and import it below.";
 
 /** iOS Safari ITP storage eviction notice (P2-1 · R4). */
 export const SAFARI_ITP_NOTICE_EYEBROW = "iPhone storage";
 
-export const SAFARI_ITP_NOTICE_TITLE = "Safari may clear saved ownership";
+export const SAFARI_ITP_NOTICE_TITLE = "On iPhone, pick one app";
 
 export const SAFARI_ITP_NOTICE_DETAIL_BROWSER =
-  "If you do not visit humanity.llc in Safari for about seven days of normal browser use, iOS may delete saved cards and keys on this device. Add to Home Screen and open the app regularly — each visit resets that timer. Keep an encrypted backup if you rely on this phone.";
+  "Safari and your Home Screen app store cards separately. If you added humanity.llc to your Home Screen, use only that icon — not Safari tabs. Safari may also delete saved cards after about seven days without a visit. Keep an encrypted backup.";
 
 export const SAFARI_ITP_NOTICE_DETAIL_STANDALONE =
-  "If you do not open this app for about seven days of normal browser use, iOS may delete saved cards and keys on this device. Open humanity.llc from the home screen regularly — each visit resets that timer. Keep an encrypted backup if you rely on this phone.";
+  "Use only this home screen icon on iPhone — not Safari tabs. iOS keeps them as separate saved wallets. Open this app regularly so iOS does not clear storage. Keep an encrypted backup.";
 
 /** iOS Safari persist() denied — saved ownership may be evicted (RC-2). */
 export const STORAGE_PERSIST_DENIED_EYEBROW = "iPhone storage";

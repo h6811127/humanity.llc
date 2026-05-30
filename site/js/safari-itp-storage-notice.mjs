@@ -4,6 +4,10 @@
  */
 
 import { getWalletCount } from "./device-wallet.mjs";
+import {
+  parseLastSigningShellMode,
+  LAST_SIGNING_SHELL_MODE_KEY,
+} from "./device-pwa-session-mismatch-core.mjs";
 import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
 import {
   isIosWebKitUserAgent,
@@ -35,6 +39,14 @@ function deviceStatusLoadError() {
   return document.getElementById("top-chrome")?.dataset.deviceStatusError === "1";
 }
 
+function readLastSigningShellMode() {
+  try {
+    return parseLastSigningShellMode(localStorage.getItem(LAST_SIGNING_SHELL_MODE_KEY));
+  } catch {
+    return null;
+  }
+}
+
 function gatherNoticeInput() {
   return {
     pathname: window.location.pathname,
@@ -43,6 +55,7 @@ function gatherNoticeInput() {
     dismissedAtIso: readDismissedAtIso(),
     deviceStatusLoadError: deviceStatusLoadError(),
     standalone: readStandaloneModeFromWindow(window),
+    lastSigningShellMode: readLastSigningShellMode(),
   };
 }
 
@@ -99,7 +112,11 @@ function bindListeners() {
   document.addEventListener("hc-cross-tab-custody-invalidated", scheduleRenderNoticeCard);
   window.addEventListener("hc-live-control-inbox-changed", scheduleRenderNoticeCard);
   window.addEventListener("storage", (e) => {
-    if (e.key === "hc_wallet" || e.key === SAFARI_ITP_NOTICE_DISMISS_KEY) {
+    if (
+      e.key === "hc_wallet" ||
+      e.key === SAFARI_ITP_NOTICE_DISMISS_KEY ||
+      e.key === LAST_SIGNING_SHELL_MODE_KEY
+    ) {
       scheduleRenderNoticeCard();
     }
   });

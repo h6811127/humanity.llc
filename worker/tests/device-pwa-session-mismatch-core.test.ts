@@ -41,6 +41,23 @@ describe("device-pwa-session-mismatch-core", () => {
     });
   });
 
+  it("detects iOS Safari after Home Screen app when wallet is empty in this tab", () => {
+    expect(
+      detectPwaSessionMismatch({
+        standalone: false,
+        hasTabSigningKeys: false,
+        walletSigningKeyCount: 0,
+        lastSigningShellMode: "standalone",
+        isIosWebKit: true,
+      })
+    ).toEqual({
+      lastMode: "standalone",
+      currentMode: "browser",
+      canRestoreInThisTab: false,
+      iosEmptyWalletAfterPwa: true,
+    });
+  });
+
   it("returns null when tab already has keys or modes match", () => {
     expect(
       detectPwaSessionMismatch({
