@@ -278,7 +278,8 @@ Use this when users report “the status dot does nothing” on every page. On c
 |------|-----------------------------|
 | `/`, `/create/`, `/created/` | Toggles hub bottom sheet (`#device-hub.device-hub--sheet`) — first tap opens, second closes |
 | `/wallet/` (`body.page-wallet`) | **Does not open a hub sheet** — scrolls to `#device-hub-saved-group` only (wallet has no `#device-hub` host) |
-| **Any shell page when `data-device-status-error` is set** | Load-error coach card (`#device-status-load-error-popover`) auto-shows; dot tap toggles it — **does not** open hub; see [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md) § Load-error dot explainer |
+| **Any shell page when `data-device-status-error` is set** | Load-error coach card auto-shows; dot tap toggles it — **does not** open hub |
+| **Partial load (`data-device-status-partial`)** | Amber ring; dot tap opens hub; inbox badge / full checks unavailable until refresh — see postmortem § P2 Step 3 |
 
 Handler chain: `dotBtn` click → `openHubFromChrome()` → `setHubExpanded()` → `setHubSheetOpen()` when `device-hub--sheet` is present (`site/js/device-status.mjs`, `site/js/device-hub-sheet.mjs`). Glance-first-on-dot was removed in commit `77816d1`; `toggleGlancePopover()` is not wired to the dot.
 
@@ -309,11 +310,11 @@ Do not ship a blind “click fix” without matching the failure mode above. Pre
 
 ### 1. Harden module load (inbox dependency) — ✅ shipped
 
-Since `2b5d105`, `device-status.mjs` imports `device-inbox-sheet.mjs` at top level. Any missing file or throw in that graph prevents **all** dot behavior.
+Since `2b5d105`, inbox dependencies lived on the status graph. **`device-inbox-sheet-loader.mjs`** and **`device-inbox-loader.mjs`** (P2 Step 1, 2026-05-29) shrink the static graph: sheet and gather modules load dynamically; dot/hub still work if inbox subgraph fails after boot.
 
 - **Deploy:** Ensure Pages deploy includes every new `site/js/device-inbox*.mjs` (and `device-browser-notifications-core.mjs`) alongside HTML; bump cache-bust query on shell scripts when adding imports.
-- **Runtime (shipped):** `site/js/device-status-bootstrap.mjs` is a thin entry (only static import: `device-status-load-error.mjs`) that dynamically imports `device-status-bootstrap-inner.mjs`. Inner loads `device-status.mjs`; either failure sets `data-device-status-error` and wires the load-error explainer. Shell pages load bootstrap (`?v=${DEVICE_SHELL_ASSET_VERSION}`), not `device-status.mjs` directly.
-- **CI (shipped):** `e2e/device-status-dot.spec.ts` — `shell status modules are reachable`, `status bootstrap loads and records dot_click in diagnostics`, `status load error shows coach card`, `bootstrap inner failure shows load-error coach card`.
+- **Runtime (shipped):** `site/js/device-status-bootstrap.mjs` is a thin entry (only static import: `device-status-load-error.mjs`) that dynamically imports `device-status-bootstrap-inner.mjs`. Inner loads **`device-status-core.mjs` then `device-status.mjs`** (P2 Step 2): core registers dot/hub open. **P2 Step 3:** if only `device-status.mjs` fails, `data-device-status-partial` (amber ring), hub still opens, no coach hijack; total failure still uses red ring + load-error coach. **`device-inbox-loader.mjs`** (P2 Step 1) dynamically loads `device-inbox.mjs`. Shell pages load bootstrap (`?v=${DEVICE_SHELL_ASSET_VERSION}`), not `device-status.mjs` directly.
+- **CI (shipped):** `e2e/device-status-dot.spec.ts` — `shell status modules are reachable`, `status bootstrap loads and records dot_click in diagnostics`, `status partial load opens hub without error coach hijack`, `total status load error shows coach card`, `bootstrap inner failure shows load-error coach card` · `worker/tests/device-status-core.test.ts` · `worker/tests/device-status-partial-load.test.ts` · `worker/tests/device-status-lazy-inbox.test.ts` (inbox + hub-sheet loaders) · `worker/tests/device-inbox-loader.test.ts`.
 
 ### 2. Hub open-state single source of truth — ✅ shipped
 

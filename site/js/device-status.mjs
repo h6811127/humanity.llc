@@ -2,7 +2,7 @@
  * Floating status dot, notification badge, hub sheet host.
  * @see docs/STATUS_INDICATOR_STEWARD_GREEN.md
  */
-import { closeInboxSheet, openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=64";
+import { closeInboxSheet, openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=70";
 import { buildStatusSegments } from "./device-counts.mjs";
 import { loadPins } from "./device-pins.mjs";
 import {
@@ -15,7 +15,8 @@ import { fetchResolverHealth } from "./device-network-health.mjs";
 import { setResolverHealthStatusForSinceVisit } from "./device-wallet-since-visit-gate.mjs";
 
 export const RESOLVER_HEALTH_CHANGED = "hc-resolver-health-changed";
-import { maybeQuietTabRehydrate } from "./device-quiet-tab-rehydrate.mjs?v=64";
+import { maybeQuietTabRehydrate } from "./device-quiet-tab-rehydrate.mjs?v=70";
+import { scheduleStoragePersistRequest } from "./device-storage-persist.mjs";
 import { resolverApiOrigin } from "./hc-sign.mjs";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
 import {
@@ -27,6 +28,10 @@ import {
   gatherInboxInput,
   getInboxItems,
   getInboxDotOverlay,
+  notificationCount,
+  preloadInboxModule,
+} from "./device-inbox-loader.mjs?v=70";
+import {
   inboxBadgeAriaLabel,
   inboxBadgeTitle,
   inboxBadgeChromaClass,
@@ -34,34 +39,29 @@ import {
   inboxBadgeChromaKind,
   inboxBadgeCountText,
   inboxCountFromItems,
-  notificationCount,
-} from "./device-inbox.mjs?v=64";
+} from "./device-inbox-core.mjs?v=70";
 import { closeGlancePopover, isGlancePopoverOpen } from "./device-hub-glance-popover.mjs";
 import {
   initHubIntroCoachmark,
   onHubOpenedFromIntro,
 } from "./device-hub-intro-coachmark.mjs";
 import { logDotDiagnostic } from "./device-dot-diagnostics.mjs";
-import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=64";
+import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=70";
 import {
   NETWORK_BASELINE_CHANGED,
   NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
 import "./device-shell-motion.mjs";
-import "./device-shell-chrome.mjs?v=64";
+import "./device-shell-chrome.mjs?v=70";
 import "./device-theme.mjs";
-import { initBrowserNotifications } from "./device-browser-notifications-loader.mjs?v=64";
-import {
-  isHubSheet,
-  reconcileHubSheetState,
-  setHubSheetOpen,
-} from "./device-hub-sheet.mjs?v=64";
+import { initBrowserNotifications } from "./device-browser-notifications-loader.mjs?v=70";
+import { reconcileHubSheetState } from "./device-hub-sheet-loader.mjs?v=70";
 import { startCrossTabNotificationState } from "./device-cross-tab-state.mjs";
 import {
   refreshDeviceChrome,
   setRefreshStatusSurfaces,
   startDeviceChromeRefresh,
-} from "./device-chrome-refresh.mjs?v=64";
+} from "./device-chrome-refresh.mjs?v=70";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
 import {
   broadcastHealthSnapshotIfEligible,
@@ -79,17 +79,34 @@ import {
   dotTransitionKey,
   hasStewardVerification,
   hubStatusLineItemsFromSegments,
+  scanWalletKeysNotInTab,
   SHELL_DOT_NEUTRAL_EMPTY_CLASS,
   shellChromeStatusLineFromSegments,
   shellDotUsesNeutralEmptyWallet,
   shellStatusLinePrimaryInChrome,
   shouldCelebrateStewardTransition,
   statusAriaLabel,
-} from "./device-dot-state-core.mjs?v=64";
+} from "./device-dot-state-core.mjs?v=70";
+import {
+  DOT_STATE_CHANGED,
+  getNetworkStatus,
+  hubSheetOpen,
+  openHubFromChrome,
+  setHubExpandedHook,
+  setHubExpanded as setHubExpandedCore,
+  setNetworkStatus,
+} from "./device-status-core.mjs?v=70";
 
-export const DOT_STATE_CHANGED = "hc-dot-state-changed";
+export { DOT_STATE_CHANGED };
 
-const HUB_OPEN_KEY = "hc_hub_open";
+export function setHubExpanded(open, opts) {
+  setHubExpandedCore(open, opts);
+}
+
+setHubExpandedHook((open) => {
+  if (open) onHubOpenedFromIntro();
+  refreshDeviceChrome({ immediate: true });
+});
 
 const NETWORK_CLASSES = [
   "pass-dot-status-network-ok",
@@ -119,7 +136,7 @@ const hub = document.getElementById("device-hub");
 const walletPage = document.getElementById("wallet-page");
 const systemBanner = document.getElementById("device-system-banner");
 
-let networkStatus = "offline";
+let networkStatus = getNetworkStatus();
 /** @type {{ network: string, device: string, overlay: string } | null} */
 let lastDotSnapshot = null;
 let stewardCelebrateTimer = null;
@@ -168,6 +185,19 @@ function deviceState() {
   });
 }
 
+function shellDotSigningContext() {
+  const session = getTabSession();
+  const hasTabSigningKeys = Boolean(session?.owner_private_key_b58);
+  const summary = loadWalletSummary();
+  return {
+    walletKeysNotInTab: scanWalletKeysNotInTab(
+      summary.signingKeyCount,
+      hasTabSigningKeys
+    ),
+    signingKeyCount: summary.signingKeyCount,
+  };
+}
+
 function dotOverlayState() {
   return getInboxDotOverlay();
 }
@@ -178,45 +208,6 @@ function isWalletPage() {
   return document.body.classList.contains("page-wallet");
 }
 
-
-export function setHubExpanded(open, { persist = true, haptic = false } = {}) {
-  if (!hub) return;
-  if (open) {
-    closeGlancePopover();
-    closeInboxSheet();
-    onHubOpenedFromIntro();
-  }
-  if (isHubSheet()) {
-    setHubSheetOpen(open);
-  } else {
-    hub.classList.toggle("device-hub-collapsed", !open);
-    window.dispatchEvent(new Event("hc-live-control-poll-scope-changed"));
-  }
-  if (dotBtn) dotBtn.setAttribute("aria-expanded", open ? "true" : "false");
-  if (persist) {
-    sessionStorage.setItem(HUB_OPEN_KEY, open ? "1" : "0");
-  }
-  if (haptic) {
-    hapticTap();
-    logDotDiagnostic({
-      type: "hub_toggle",
-      open,
-      bodyOpen: document.body.classList.contains("device-hub-sheet-open"),
-      hubCollapsed: hub?.classList.contains("device-hub-collapsed") ?? null,
-    });
-  }
-  refreshDeviceChrome({ immediate: true });
-}
-
-function hubSheetOpen() {
-  if (hub?.classList.contains("device-hub-collapsed")) {
-    return false;
-  }
-  return (
-    document.body.classList.contains("device-hub-sheet-open") ||
-    (hub && !hub.classList.contains("device-hub-collapsed"))
-  );
-}
 
 function maybeEmitDotTransition(network, device, overlay) {
   const key = dotTransitionKey(network, device, overlay);
@@ -295,9 +286,13 @@ function applyDot() {
     dot.dataset.dotOverlay = overlay;
     dotBtn?.setAttribute("data-dot-state", dotState);
     dotBtn?.setAttribute("data-dot-overlay", overlay);
+    const signing = shellDotSigningContext();
     dotBtn?.setAttribute(
       "aria-label",
-      statusAriaLabel(networkStatus, device, overlay, { pageKind: dotPageKind() })
+      statusAriaLabel(networkStatus, device, overlay, {
+        pageKind: dotPageKind(),
+        walletKeysNotInTab: signing.walletKeysNotInTab,
+      })
     );
     renderDotExplainability(networkStatus, device, overlay);
     applyStewardCelebrate(previousDevice, device);
@@ -360,11 +355,13 @@ function renderDotExplainer(container, descriptor, compact = false) {
 
 function renderDotExplainability(network, device, overlay) {
   const summary = loadWalletSummary();
+  const signing = shellDotSigningContext();
   const descriptor = describeDotState(network, device, overlay, {
     stewardReady: hasStewardReadyKeys(),
     queueUrl: getStewardQueueUrl(),
     pageKind: dotPageKind(),
-    singleSavedCardWithKeys: summary.signingKeyCount === 1,
+    singleSavedCardWithKeys: signing.signingKeyCount === 1,
+    walletKeysNotInTab: signing.walletKeysNotInTab,
   });
   const keyRoot = document.getElementById("device-hub-status-key");
   if (keyRoot) {
@@ -539,6 +536,7 @@ async function refreshNetwork(opts = {}) {
     return;
   }
   networkStatus = await fetchResolverHealth(resolverApiOrigin());
+  setNetworkStatus(networkStatus);
   setResolverHealthStatusForSinceVisit(networkStatus);
   window.dispatchEvent(
     new CustomEvent(RESOLVER_HEALTH_CHANGED, { detail: { networkStatus } })
@@ -552,6 +550,7 @@ window.addEventListener(RESOLVER_HEALTH_PEER_SYNC, (e) => {
     ?.networkStatus;
   if (status !== "ok" && status !== "degraded" && status !== "offline") return;
   networkStatus = status;
+  setNetworkStatus(networkStatus);
   setResolverHealthStatusForSinceVisit(networkStatus);
   window.dispatchEvent(
     new CustomEvent(RESOLVER_HEALTH_CHANGED, { detail: { networkStatus } })
@@ -559,56 +558,13 @@ window.addEventListener(RESOLVER_HEALTH_PEER_SYNC, (e) => {
   refreshSummary();
 });
 
-function scrollWalletToSaved() {
-  const target =
-    document.getElementById("device-hub-saved-group") ||
-    document.getElementById("wallet-page");
-  target?.scrollIntoView({
-    behavior: prefersReducedMotion() ? "auto" : "smooth",
-    block: "start",
-  });
-}
-
-function openWalletFromChrome() {
-  closeGlancePopover();
-  scrollWalletToSaved();
-  hapticTap();
-}
-
-function openHubFromChrome() {
-  closeGlancePopover();
-  if (isWalletPage()) {
-    openWalletFromChrome();
-    return;
-  }
-  if (!hub) {
-    location.href = "/";
-    return;
-  }
-  hapticTap();
-  if (hubSheetOpen()) {
-    setHubExpanded(false, { haptic: true, persist: false });
-    return;
-  }
-  setHubExpanded(true, { haptic: true, persist: false });
-}
-
 if (hub) {
-  sessionStorage.setItem(HUB_OPEN_KEY, "0");
-  setHubExpanded(false, { persist: false });
   reconcileHubSheetState();
   renderStatusKey();
   initHubIntroCoachmark();
 } else if (isWalletPage()) {
   renderStatusKey();
 }
-
-dotBtn?.addEventListener("click", (e) => {
-  e.preventDefault();
-  e.stopPropagation();
-  logDotDiagnostic({ type: "dot_click" });
-  openHubFromChrome();
-});
 
 notifBtn?.addEventListener("click", (e) => {
   e.preventDefault();
@@ -632,11 +588,6 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
-window.addEventListener("hc-hub-sheet-close", () => {
-  if (!hub) return;
-  setHubExpanded(false, { haptic: false, persist: false });
-});
-
 window.addEventListener("hc-focus-hub-search", () => {
   if (isWalletPage()) {
     document.getElementById("device-hub-search")?.focus({ preventScroll: true });
@@ -648,6 +599,7 @@ window.addEventListener("hc-focus-hub-search", () => {
 
 async function bootDeviceStatusShell() {
   await maybeQuietTabRehydrate();
+  scheduleStoragePersistRequest({ reason: "shell_bootstrap" });
   startTabKeysPresence();
   initBrowserNotifications();
   initResolverTabSync();
@@ -657,6 +609,10 @@ async function bootDeviceStatusShell() {
   });
   startDeviceChromeRefresh();
   refreshDeviceChrome({ immediate: true });
+  preloadInboxModule(() => {
+    refreshSummary();
+    refreshDeviceChrome({ immediate: true });
+  });
   void refreshNetwork();
 }
 

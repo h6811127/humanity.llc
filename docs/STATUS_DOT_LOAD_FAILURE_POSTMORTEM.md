@@ -8,7 +8,9 @@
 
 ## Executive summary
 
-The **red ring** around the status dot is **not** the product’s “unsaved keys” pulsing-red state. It is an **intentional load-failure affordance** added on 2026-05-25: when `device-status.mjs` fails to import, `device-status-bootstrap.mjs` sets `data-device-status-error` on `#top-chrome`, and CSS draws a red **outline** on `#brand-status-dot-btn`. The hub, inbox badge, and normal dot state machine do **not** run — but the dot is **not** a silent dead control: bootstrap wires a minimal click handler that opens a Layer 2 explainer popover (`site/js/device-status-load-error.mjs`) with refresh guidance.
+The **red ring** around the status dot is **not** the product’s “unsaved keys” pulsing-red state. It is an **intentional total load-failure affordance** (2026-05-25): when the bootstrap graph cannot load `device-status-core.mjs`, `#top-chrome` gets `data-device-status-error` and CSS draws a red **outline** on the dot. Bootstrap wires a load-error coach card (`site/js/device-status-load-error.mjs`) with refresh guidance — not a silent dead control.
+
+**Partial failure** (2026-05-29, P2 Step 3): when **core** loads but `device-status.mjs` fails, `#top-chrome[data-device-status-partial]` shows an **amber** outline; the dot still **opens the hub**. Inbox badge and full dot state need a refresh.
 
 The regression on `main` was caused by **shipping an ES module import without the target file** in the status dot’s dependency graph-not by removing hub behavior or rearchitecting the dot. A follow-up commit added the missing file and extended E2E to guard the import graph.
 
@@ -22,7 +24,7 @@ The regression on `main` was caused by **shipping an ES module import without th
 |-------------|-----------|
 | Red **ring** (outline) on dot | `#top-chrome[data-device-status-error] .shell-status-dot-btn { outline: 2px solid … }` in `site/css/device-shell.css` |
 | Dead on **every** shell page (`/`, `/create/`, `/created/`, `/wallet/`) | Same bootstrap script on all shell HTML; one shared import graph |
-| No hub toggle / no `dot_click` in diagnostics | `device-status.mjs` never evaluated; hub opener in `device-status.mjs` never runs |
+| No hub toggle / no `dot_click` in diagnostics | **Total** failure: core never loaded. **Partial** failure: core runs; full status/inbox badge may be missing |
 | Dot tap shows load-error explainer (2026-05-29+) | Bootstrap `wireStatusLoadErrorDot()` — popover `#device-status-load-error-popover` with Now / Why / Next + **Refresh page** |
 | Console | `[humanity] Device status module failed to load:` from `device-status-bootstrap.mjs` (technical message; not shown in UI) |
 | Network tab | Typically **404** on a static `/js/*.mjs` in the graph (e.g. missing `device-inbox-card-disabled.mjs`) |
@@ -97,21 +99,23 @@ Approximate duration on `main`: **~6 minutes** between introducing the bad impor
 
 ```mermaid
 flowchart LR
-  HTML["Shell HTML<br/>device-status-bootstrap.mjs?v=21"]
-  BOOT["device-status-bootstrap.mjs"]
-  STATUS["device-status.mjs"]
-  INBOX["device-inbox-sheet.mjs"]
-  CORE["device-inbox-card-disabled.mjs<br/>…20+ siblings"]
-  DOT["#brand-status-dot-btn<br/>click → openHubFromChrome"]
+  HTML["Shell HTML<br/>device-status-bootstrap.mjs"]
+  BOOT["device-status-bootstrap.mjs<br/>load-error only"]
+  INNER["device-status-bootstrap-inner.mjs"]
+  CORE["device-status-core.mjs<br/>dot + hub open"]
+  STATUS["device-status.mjs<br/>badge, dot paint, polls"]
+  LOADERS["inbox / hub-sheet loaders<br/>dynamic import"]
+  DOT["#brand-status-dot-btn"]
 
   HTML --> BOOT
-  BOOT -->|dynamic import| STATUS
-  STATUS --> INBOX
-  INBOX --> CORE
-  STATUS --> DOT
+  BOOT -->|dynamic| INNER
+  INNER --> CORE
+  INNER --> STATUS
+  STATUS --> LOADERS
+  CORE --> DOT
 ```
 
-**Contract:** One failed **static** import anywhere in the graph prevents the dot from working. That is deliberate tradeoff for a single deploy unit and consistent inbox/dot semantics-not a reason to delete the inbox integration.
+**Contract:** **Total** failure (core or inner bootstrap) → red ring + load-error coach; hub does not open. **Partial** failure (`device-status.mjs` only) → amber ring, hub opens via core. Lazy loaders shrink the static graph so inbox/hub-sheet subgraph failures are less likely to block core boot.
 
 ---
 
@@ -151,8 +155,11 @@ Check these in order (module may be fixed in git but not in the environment you 
 | Idea | Benefit |
 |------|---------|
 | **Vitest import-graph smoke** | ✅ Shipped: `site/js/device-status-shell-modules.mjs` + `worker/tests/device-status-shell-modules.test.ts`; Playwright uses the same manifest via `deviceStatusShellModulePaths()`. |
-| **Lazy inbox sheet import** | `device-status.mjs` dynamically imports `device-inbox-sheet.mjs` only when opening inbox from dot/badge; dot click/hub path works if inbox sheet fails (reduced blast radius). Product decision: dot explainer “open inbox” would need a fallback message. |
-| **Split `device-status-core.mjs`** | Pure dot state + hub opener in a minimal module; inbox/notifications as plugins. Larger refactor; only if graph keeps growing. |
+| **Lazy inbox sheet import** | ✅ Shipped: `device-inbox-sheet-loader.mjs`; `device-status.mjs` and `device-chrome-refresh.mjs` use dynamic import for the sheet. |
+| **Lazy inbox module import (Step 1)** | ✅ Shipped: `device-inbox-loader.mjs`; `device-status.mjs` no longer static-imports `device-inbox.mjs`; badge/overlay use safe fallbacks until preload completes. `device-chrome-refresh.mjs` awaits `loadInboxModule()` for gather ticks. |
+| **Split `device-status-core.mjs` (Step 2)** | ✅ Shipped: `device-status-core.mjs` wires dot tap + hub open with lazy `device-hub-sheet.mjs`; `device-status-bootstrap-inner.mjs` loads core before `device-status.mjs` so hub works if the full status graph fails. |
+| **Partial load affordance (Step 3)** | ✅ Shipped: when core loads but `device-status.mjs` fails, `#top-chrome[data-device-status-partial]` (amber ring), hub still opens, no load-error coach hijack; total failure still uses `data-device-status-error` + coach card. |
+| **Lazy hub-sheet reconcile (Step 4)** | ✅ Shipped: `device-hub-sheet-loader.mjs`; `device-status.mjs` no longer static-imports `device-hub-sheet.mjs` for init reconcile (core already lazy-loads hub sheet for open/close). |
 
 ### P3 - Monitoring
 
@@ -187,7 +194,8 @@ When `import("./device-status.mjs")` fails, inner bootstrap calls `wireStatusLoa
 | Dot tap | Toggles coach card visibility when dismissed |
 | Copy (Layer 2) | **Now:** controls didn’t finish loading · **Why:** download/cache/network · **Next:** refresh / hard refresh |
 | Actions | **Refresh page** — `location.reload()` · **Got it** — dismiss card (outline remains) |
-| Hub / inbox | Not opened — full status graph did not load |
+| Hub / inbox | Not opened on **total** failure; on **partial** failure (core OK, `device-status.mjs` failed) hub opens, inbox badge/network checks unavailable until refresh |
+| Partial failure | `#top-chrome[data-device-status-partial]` — amber outline; dot tap opens hub; no auto coach card |
 | Hub intro coachmark | Suppressed when `data-device-status-error` is set (existing guard) |
 
 **Product language:** Outcome copy only in the popover; technical import errors stay in `console.error` for engineers.
@@ -209,10 +217,10 @@ When `import("./device-status.mjs")` fails, inner bootstrap calls `wireStatusLoa
 
 ### Simulated load failure
 
-1. Block or 404 `device-status.mjs` in DevTools → `#top-chrome` has `data-device-status-error`; dot shows red outline.
-2. Block or 404 `device-status-bootstrap-inner.mjs` (or `build-meta-browser.mjs`) → same error affordance via thin bootstrap entry.
-3. Without tapping the dot, `#device-status-load-error-popover` becomes visible with Now / Why / Next copy.
-4. **Refresh page** reloads the tab; **Got it** dismisses the card; hub does not open on dot tap in error state.
+1. Block or 404 `device-status.mjs` only → `#top-chrome[data-device-status-partial]`; amber outline; dot tap **opens hub**; load-error coach card does **not** auto-show.
+2. Block or 404 `device-status-core.mjs` or `device-status-bootstrap-inner.mjs` → `#top-chrome[data-device-status-error]`; red outline; coach card auto-shows.
+3. Without tapping the dot on total failure, `#device-status-load-error-popover` becomes visible with Now / Why / Next copy.
+4. **Refresh page** reloads the tab; **Got it** dismisses the card; hub does not open on dot tap in **total** error state.
 
 ---
 

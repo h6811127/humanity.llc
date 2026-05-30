@@ -3,7 +3,11 @@
  * @see docs/CARD_WORKSPACE_UX.md
  */
 
-import { isWalletSaved } from "./device-wallet.mjs";
+import { isWalletSaved, findWalletEntryByProfileId } from "./device-wallet.mjs";
+import {
+  firstSessionSetupRequired,
+  ownershipBackupSeatbeltSatisfied,
+} from "./created-first-session-gate-core.mjs";
 
 export const SETUP_DONE_KEY = "hc_setup_done";
 
@@ -15,6 +19,8 @@ export const SETUP_DONE_KEY = "hc_setup_done";
  *   freshParam?: boolean,
  *   hasSigningKeys?: boolean,
  *   walletSaved?: boolean,
+ *   setupDone?: boolean,
+ *   seatbeltSatisfied?: boolean,
  * }} input
  * @returns {CreatedMode}
  */
@@ -24,14 +30,23 @@ export function resolveCreatedMode(input) {
     freshParam = false,
     hasSigningKeys = false,
     walletSaved = false,
+    setupDone = false,
+    seatbeltSatisfied = false,
   } = input;
 
   if (!profileId) return "view";
   if (!hasSigningKeys) return "view";
 
-  // Post-create wizard only while fresh or keys not yet on this device.
-  // Returning stewards (hub Open controls / #revoke) skip setup even if hc_setup_done unset.
-  if (freshParam || !walletSaved) return "setup";
+  if (
+    firstSessionSetupRequired({
+      freshParam,
+      walletSaved,
+      setupDone,
+      seatbeltSatisfied,
+    })
+  ) {
+    return "setup";
+  }
   return "control";
 }
 
@@ -59,10 +74,14 @@ export function markSetupDone(profileId) {
   localStorage.setItem(SETUP_DONE_KEY, JSON.stringify(map));
 }
 
-/** Backfill hc_setup_done when the card is already saved on this device. */
-export function syncSetupDoneForSavedProfile(profileId) {
+/** Backfill hc_setup_done when wallet row already has a recovery seatbelt (legacy). */
+export function syncSetupDoneForSavedProfile(profileId, walletEntry = null) {
   if (!profileId || isSetupDone(profileId)) return;
-  if (isWalletSaved(profileId)) markSetupDone(profileId);
+  if (!isWalletSaved(profileId)) return;
+  const entry = walletEntry ?? findWalletEntryByProfileId(profileId);
+  if (ownershipBackupSeatbeltSatisfied(null, entry)) {
+    markSetupDone(profileId);
+  }
 }
 
 /**
@@ -71,17 +90,23 @@ export function syncSetupDoneForSavedProfile(profileId) {
  * @param {() => Record<string, unknown> | null} getSession
  */
 export function modeFromPage(profileId, freshParam, getSession) {
-  if (profileId && !freshParam) syncSetupDoneForSavedProfile(profileId);
-
   const session = getSession();
+  const walletEntry = profileId ? findWalletEntryByProfileId(profileId) : null;
+  if (profileId && !freshParam) {
+    syncSetupDoneForSavedProfile(profileId, walletEntry);
+  }
+
   const hasSigningKeys = !!(
     session?.owner_private_key_b58 || session?.recovery_private_key_b58
   );
   const walletSaved = profileId ? isWalletSaved(profileId) : false;
+  const seatbeltSatisfied = ownershipBackupSeatbeltSatisfied(session, walletEntry);
   return resolveCreatedMode({
     profileId,
     freshParam,
     hasSigningKeys,
     walletSaved,
+    setupDone: profileId ? isSetupDone(profileId) : false,
+    seatbeltSatisfied,
   });
 }

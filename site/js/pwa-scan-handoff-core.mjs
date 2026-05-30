@@ -73,7 +73,7 @@ export function stewardScanOpenedFeedback(standalone, opts = {}) {
       : "Opened scan preview — use Back to return here.";
   }
   if (opts.setupWizard) {
-    return "Opened scan page — check it from another device, then continue.";
+    return "Opened scan in a new tab — tap Continue again here when you're ready.";
   }
   return "Opened scan page in a new tab.";
 }
@@ -293,9 +293,10 @@ export function openStewardScanPreview(url, options = {}) {
 }
 
 /**
- * Setup wizard: auto-advance past test scan only in browser tabs.
+ * Setup wizard: auto-advance past test scan after opening preview (P0b-2 / R12).
+ * Browser `window.open` leaves an empty session in the new tab — never auto-advance.
  * @param {boolean} standalone
  */
 export function shouldAutoAdvanceSetupTestScan(standalone) {
-  return !standalone;
+  return standalone;
 }

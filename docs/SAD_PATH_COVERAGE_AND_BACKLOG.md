@@ -32,6 +32,9 @@ Use it when prioritizing hardening before launch surfaces (live proof in person,
 | Large wallet / power user | **Guardrails shipped** (comfort + large hints; E2E W1–W3) | [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Open issues |
 | Social / trust misunderstanding | **Copy exists**; comprehension not fully re-run | [`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md) |
 | Hosted ops (billing return) | **O1–O2 E2E shipped** (2026-05-29) | [`HOSTED_OPS_SAD_PATH_MATRIX.md`](HOSTED_OPS_SAD_PATH_MATRIX.md) |
+| Safari stuck inbox backdrop | **P5f shipped** — Check network taps after reconcile | [`UI_UX_SAFE_REBUILD_IMPLEMENTATION.md`](UI_UX_SAFE_REBUILD_IMPLEMENTATION.md) § Step 1 |
+| Key-loss setup protect gate (K7) | **Shipped** — recovery ack or backup before Live | [`OWNERSHIP_RESTORE_UX_PLAN.md`](OWNERSHIP_RESTORE_UX_PLAN.md) Phase 2 |
+| Key-loss view-only Live tab (Phase 3) | **Shipped** — read-only QR/deploy; restore banner | Same doc Phase 3 |
 
 ---
 
@@ -67,10 +70,10 @@ Agents are strong at **systematic enumeration** against docs and code. Humans an
 | **H-09** | **Scan refresh mid-wait** | Scanner refreshes during wait | Must re-ask even if challenge pending |
 | **H-10** | **Expiry retry affordance** | Challenge window ends | Stranger does not notice they can ask again |
 | H-11 | Comprehension runbook | Unscripted strangers | **Passed** 2026-05-29 |
-| H-12 | Printed camera QA | ≥3 phones, camera scan | Desk gate: `npm run worker:test:live-control-printed-qa` |
+| H-12 | Printed camera QA | ≥3 phones, camera scan | Pre-flight steps 1–3: `live-control:printed-qa:*` scripts |
 | H-13 | Full-loop Playwright E2E | **Shipped** — `npm run e2e:live-control-loop` | Poll→proven + refresh resume + expiry retry |
 
-**Human next step (Slice E):** H-12 printed camera QA runbook on ≥3 phones — see [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md).
+**Human next step (Slice E):** H-12 § A–C on ≥3 phones after pre-flight steps 1–3 — see [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md).
 
 ### 2. Key custody and continuity (by design, still sad)
 
@@ -91,6 +94,7 @@ Agents are strong at **systematic enumeration** against docs and code. Humans an
 | Create in Tab B, hub in Tab A | Automated: `e2e/device-cross-tab-keys.spec.ts` |
 | Vouch from scan without keys in this tab | Explained in UI; high bounce risk |
 | Two phones both “active” | Cross-tab presence churn |
+| Stuck inbox backdrop blocks taps | **Shipped P5f** — `syncInboxBackdropForOpenHub` + CSS pass-through · `e2e/device-hub-check-network-backdrop.spec.ts` |
 | iPhone hub dot dead / scroll lag | [`SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md`](SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md) |
 
 ### 4. Large wallet / power user (~10+ root cards)
@@ -165,12 +169,13 @@ Canonical matrix: [`HOSTED_OPS_SAD_PATH_MATRIX.md`](HOSTED_OPS_SAD_PATH_MATRIX.m
 |----------|------|-------------|-------|
 | **P0** | Live proof scanner recovery | **H-09 + H-10** — sessionStorage resume + expiry retry UX | **Shipped** 2026-05-29 |
 | **P0** | Live proof comprehension | Execute H-11 / H-12 runbooks with ≥5 strangers | Product / QA |
-| **P1** | Key-loss paths | **Matrix + K1/K2/K5 E2E shipped** — view-mode restore UI gap tracked in [`OWNERSHIP_RESTORE_UX_PLAN.md`](OWNERSHIP_RESTORE_UX_PLAN.md) Phase 1 | Product + eng |
+| **P1** | Key-loss paths | **K1/K2/K5 + P0-4 + Phase 3–4 shipped** — P0b-1 step 2 prod WebKit re-verify; manual P1-RESTORE / P1-HE | Product + QA |
 | **P1** | Merch checkout | **Matrix shipped** — operator physical QA + live payment before `checkout_open: true` | Engineering + Ops |
 | **P2** | Large wallet guardrails | **Shipped** — `e2e/wallet-scale-guardrail.spec.ts` (W1–W3) | Shell |
 | **P2** | Scan URL hints | **Shipped** — `scan-malformed-hint.ts` + Vitest | Resolver |
 | **P2** | H-13 full-loop E2E | `e2e/live-control-loop.spec.ts` | **Shipped** 2026-05-29 |
 | **P2** | Hosted billing return (O1–O2) | **Shipped** — `e2e/hosted-tier-billing-return.spec.ts` | Ops |
+| **P2** | Stuck inbox backdrop (P5f) | **Shipped** — `e2e/device-hub-check-network-backdrop.spec.ts` | Shell |
 
 ---
 
@@ -203,6 +208,15 @@ Canonical matrix: [`HOSTED_OPS_SAD_PATH_MATRIX.md`](HOSTED_OPS_SAD_PATH_MATRIX.m
 | **S23** | **Wallet label without signing keys (K5)** | `e2e/key-loss-sad-path.spec.ts` |
 | **S24** | **Hosted billing return without tab keys (O1)** | `e2e/hosted-tier-billing-return.spec.ts` |
 | **S25** | **Hosted billing return links after keys load (O2)** | Same |
+| **S26** | **Check network after stuck inbox backdrop (P5f)** | `e2e/device-hub-check-network-backdrop.spec.ts` |
+| **S27** | **Setup protect gate before Live (K7)** | `worker/tests/created-setup-seatbelt.test.ts` · `worker/tests/key-loss-copy-guards.test.ts` |
+| **S28** | **View-only Live tab read-only signage (Phase 3)** | `worker/tests/created-view-live-core.test.ts` · `e2e/key-loss-sad-path.spec.ts` (K1) |
+| **S29** | **Hub import visible in stranger-empty (Phase 4)** | `worker/tests/device-hub-restore-always.test.ts` · `e2e/key-loss-sad-path.spec.ts` (K2) |
+| **S30** | **Fresh create hub row no since-visit FP (P0b-1 / R10)** | `e2e/device-os-wallet.spec.ts` · `worker/tests/card-disabled-since-visit-regression.test.ts` |
+| **S31** | **Setup wizard test scan no auto-advance in browser (P0b-2 / R12)** | `e2e/device-pwa-scan-handoff.spec.ts` · `worker/tests/pwa-scan-handoff-core.test.ts` |
+| **S32** | **Scan sole signing row vouch auto-activate (P0b-3)** | `npm run worker:test:vouch-scan-sole-activate` · `npm run e2e:vouch-scan-sole-signing` |
+| **S33** | **Corrupt `hc_wallet` urgent tab hint on `/wallet/` (P1-4 / R7)** | `npm run worker:test:wallet-corrupt` · `e2e/key-loss-sad-path.spec.ts` (R7) |
+| **S34** | **Safari S2 scan rehydrate + S3 PWA/browser mismatch (P2-3)** | `npm run e2e:safari-keys-persistence` |
 
 Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH_QA_2026-05-26.md) § Recommended test matrix.
 
@@ -222,6 +236,13 @@ Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH
 | **P1-LW-SCALE · Wallet scale guardrails (W1–W3)** | `npm run e2e:wallet-scale-guardrail` |
 | **P1-KL · Key-loss view-only + backup import (K1–K2)** | `npm run e2e:key-loss-sad-path` |
 | **P1-HOSTED-BR · Billing checkout return (O1–O2)** | `npm run e2e:hosted-tier-billing-return` |
+| **P5f · Stuck inbox backdrop vs Check network** | `npm run e2e:device-hub-check-network-backdrop` · [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) § P5f |
+| **P1-SETUP-PROTECT · Setup protect gate (K7)** | `npm run worker:test:setup-protect` |
+| **P1-RESTORE · View-only Live + restore paths (K1 Phase 3)** | `npm run worker:test:view-only-restore` · `npm run e2e:key-loss-sad-path` |
+| **P1-HE · Hub stranger-empty import always visible (Phase 4)** | `npm run worker:test:hub-restore-always` · `npm run e2e:key-loss-sad-path` (K2) |
+| **P1-VOUCH-SOLE · Scan sole-row vouch without default (P0b-3)** | `npm run e2e:vouch-scan-sole-signing` |
+| **P1-WALLET-CORRUPT · Corrupt wallet tab hint (P1-4 / R7)** | `npm run worker:test:wallet-corrupt` · `npm run e2e:key-loss-sad-path` (R7) |
+| **P2-SAFARI-KEYS · WebKit keys persistence (P2-3 / S2–S3)** | `npm run e2e:safari-keys-persistence` |
 
 ---
 
@@ -229,6 +250,16 @@ Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH
 
 | Date | Notes |
 |------|-------|
+| 2026-05-29 | P2-3 shipped — WebKit S2 scan rehydrate + S3 wallet mismatch E2E (S34) |
+| 2026-05-29 | P1-4 shipped — corrupt wallet hub + `/wallet/` tab hint (S33) |
+| 2026-05-29 | P0b-3 shipped — scan sole-signing-row vouch E2E (S32) |
+| 2026-05-29 | P0b-2 E2E — browser setup test scan waits for second Continue (S31) |
+| 2026-05-29 | P0b-1 step 1 — fresh create hub R10 E2E + baseline-null Vitest (S30) |
+| 2026-05-29 | Safari P0b-2 — setup wizard test scan no auto-advance in browser tab |
+| 2026-05-29 | P0-4 first-session backup gate + Phase 4 step 2 hub import copy convergence |
+| 2026-05-29 | Ownership restore Phase 4 step 1 — hub import always visible (S29) |
+| 2026-05-29 | Ownership restore Phase 3 step 1 — view-only Live tab (S28) |
+| 2026-05-29 | K7 setup protect gate + P5f stuck backdrop regression index (S26–S27) |
 | 2026-05-29 | Hosted ops sad-path matrix + O1–O2 E2E index (`HOSTED_OPS_SAD_PATH_MATRIX.md`) |
 | 2026-05-29 | Key-loss matrix + K1/K2/K5 E2E (`KEY_LOSS_SAD_PATH_MATRIX.md`) |
 | 2026-05-29 | P2 wallet scale guardrails E2E (W1–W3); scan URL hints marked shipped |

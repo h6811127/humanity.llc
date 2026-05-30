@@ -101,9 +101,10 @@ describe("pwa-scan-handoff-core", () => {
     expect(stewardScanLinkHtmlAttrs(true)).toBe("");
     expect(stewardScanLinkHtmlAttrs(false)).toContain('target="_blank"');
     expect(stewardScanOpenedFeedback(true)).toMatch(/Back to return/i);
+    expect(stewardScanOpenedFeedback(false, { setupWizard: true })).toMatch(/Continue again/i);
     expect(stewardScanOpenedFeedback(false)).toMatch(/new tab/i);
-    expect(shouldAutoAdvanceSetupTestScan(true)).toBe(false);
-    expect(shouldAutoAdvanceSetupTestScan(false)).toBe(true);
+    expect(shouldAutoAdvanceSetupTestScan(true)).toBe(true);
+    expect(shouldAutoAdvanceSetupTestScan(false)).toBe(false);
   });
 
   it("applyStewardScanLinkElement toggles target", () => {

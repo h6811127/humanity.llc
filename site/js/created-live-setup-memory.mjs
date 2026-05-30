@@ -2,7 +2,9 @@
  * DOM sync for Live tab setup memory chips.
  */
 
-import { isWalletSaved } from "./device-wallet.mjs";
+import { ownershipBackupSeatbeltSatisfied } from "./created-first-session-gate-core.mjs";
+import { isSetupDone } from "./created-mode.mjs";
+import { findWalletEntryByProfileId, isWalletSaved } from "./device-wallet.mjs";
 import {
   liveSetupMemoryKicker,
   resolveLiveSetupMemory,
@@ -43,10 +45,15 @@ export function initCreatedLiveSetupMemory(opts) {
     const profileId = opts.getProfileId?.() ?? null;
     const done = loadDoneActions(profileId);
     const walletSaved = !!(profileId && isWalletSaved(profileId));
+    const walletEntry = profileId ? findWalletEntryByProfileId(profileId) : null;
+    const protectDone =
+      !!(profileId && isSetupDone(profileId)) ||
+      ownershipBackupSeatbeltSatisfied(null, walletEntry);
     const memory = resolveLiveSetupMemory({
       walletSaved,
       printDone: done.has("download-qr") || done.has("print-qr"),
       testScanDone: done.has("test-scan"),
+      protectDone,
       setupComplete: opts.setupComplete?.() ?? true,
     });
 

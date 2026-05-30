@@ -80,7 +80,7 @@ Hero → small QR → Save + Open scan → "More tasks" flat list → keys strip
 
 | Problem | Why it hurts |
 |---------|----------------|
-| **Wizard hangover** | Step numbers + "Required" on Save after setup already walked Save → Print → Test → Live |
+| **Wizard hangover** | Step numbers + "Required" on Save after setup already walked Save → Print → Test → Live | **Mitigated (D11b):** when auto-save succeeded, setup opens on Print and hides the Save progress step |
 | **Flat "More tasks"** | Download / Print / Test / Update / Revoke look equally important; Revoke beside Print feels wrong |
 | **Duplicate stories** | Open scan appears twice; QR exists in preview, task list, and giant section |
 | **Weak hero** | "Live QR ready" without network truth or emotional payoff |

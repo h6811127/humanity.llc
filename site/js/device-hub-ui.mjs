@@ -40,6 +40,7 @@ import {
   findWalletEntryById,
   findWalletEntryByProfileId,
   getWalletCount,
+  isWalletStorageCorrupt,
   listWalletDisplayEntries,
   loadWallet,
   loadWalletSummary,
@@ -128,10 +129,12 @@ import {
 import { tabNoticeCount } from "./device-counts.mjs";
 import { mountHubBuildStamp } from "./device-hub-build-stamp.mjs";
 import { mountHubNetworkTools } from "./device-hub-network-tools.mjs";
+import { syncInboxBackdropForOpenHub } from "./device-sheet-backdrop-sync.mjs?v=70";
 import {
   HUB_STRANGER_EMPTY_CLASS,
   isHubStrangerEmptyState,
 } from "./device-hub-stranger-empty-core.mjs";
+import { renderHubWalletCorruptCard } from "./device-hub-wallet-corrupt.mjs";
 import {
   getLiveControlPending,
   openLiveControlProof,
@@ -1481,6 +1484,11 @@ function renderSavedRows(opts = {}) {
 
   savedList.innerHTML = "";
   if (entries.length === 0) {
+    if (isWalletStorageCorrupt()) {
+      setHubSectionEmpty(savedGroup, savedList, savedEmptyEl, true, "");
+      if (savedEmptyEl) savedEmptyEl.hidden = true;
+      return;
+    }
     setHubSectionEmpty(
       savedGroup,
       savedList,
@@ -1947,6 +1955,11 @@ function renderPinRows() {
 
 function refreshEmptyHint() {
   if (!emptyHint) return;
+  loadWallet();
+  if (isWalletStorageCorrupt()) {
+    emptyHint.hidden = true;
+    return;
+  }
   const hasData =
     getWalletCount() > 0 ||
     loadPins().length > 0 ||
@@ -1956,10 +1969,12 @@ function refreshEmptyHint() {
 }
 
 function applyHubStrangerEmptyChrome() {
+  renderHubWalletCorruptCard();
   const stranger = isHubStrangerEmptyState({
     walletCount: getWalletCount(),
     pinCount: loadPins().length,
     inboxActionCount: notificationCount(),
+    walletCorrupt: isWalletStorageCorrupt(),
   });
   const roots = new Set(
     [deviceHub, document.getElementById("device-hub")].filter(

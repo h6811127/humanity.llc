@@ -36,7 +36,9 @@ import {
 } from "./lost-item-relay-loop-scorecard.mjs";
 import { syncCreatedPilotStewardCopy } from "./pilot-steward-copy.mjs";
 import { initCreatedDeviceSave } from "./created-device-save.mjs";
-import { markSetupDone, modeFromPage } from "./created-mode.mjs";
+import { markSetupDone, modeFromPage, isSetupDone } from "./created-mode.mjs";
+import { ownershipBackupSeatbeltSatisfied } from "./created-first-session-gate-core.mjs";
+import { findWalletEntryByProfileId } from "./device-wallet.mjs";
 import { initCreatedMerchFunnel } from "./created-merch-funnel.mjs";
 import { initCreatedChildObject } from "./created-child-object.mjs";
 import { initCreatedLostItemRelay } from "./created-child-object-lost-item.mjs";
@@ -49,10 +51,24 @@ import {
   clearFreshUrlParam,
   restoreKeysStripToControlPanel,
 } from "./created-workspace.mjs";
+import { createdViewRestoreHashKey } from "./created-view-mode-core.mjs";
+import { createdViewDefaultTabId } from "./created-view-live-core.mjs";
+import {
+  applyCreatedViewModeUi,
+  clearCreatedViewModeUi,
+  focusCreatedViewRestore,
+} from "./created-view-mode.mjs";
+import { initCreatedViewLiveReadonly } from "./created-view-live-readonly.mjs";
 import { logDeviceActivity } from "./device-activity.mjs";
 import { verificationRecordFromStatusBody } from "./device-wallet-network-core.mjs";
+import {
+  clearKeylessTabSessionIfPresent,
+  getTabSession,
+  setTabSession,
+  tabSessionHasSigningKeys,
+} from "./device-keys.mjs";
 import { activateWalletEntryGated } from "./device-control-activation.mjs";
-import { isWalletSaved, loadWallet, saveSessionToWallet } from "./device-wallet.mjs";
+import { isWalletSaved, loadWallet, getWalletSigningKeyCount, saveSessionToWallet } from "./device-wallet.mjs";
 import { applyHumanTrustIconToElement } from "./human-trust-ui.mjs";
 import {
   applyCreatedRoutePendingShell,
@@ -61,6 +77,7 @@ import {
 } from "./created-route-gate.mjs";
 import { getCardJsonUrl, getCardStatusUrl } from "./hc-sign.mjs";
 import { resolverErrorMessage } from "./resolver-user-error-core.mjs";
+import { viewOnlyNoSessionDetailHtml } from "./created-view-only-copy-core.mjs";
 
 const params = new URLSearchParams(location.search);
 const profileIdParam = params.get("profile_id")?.trim() || null;
@@ -94,17 +111,30 @@ function setNoSessionNotice(html) {
   noSessionEl.innerHTML = `<p class="hc-notice-body">${html}</p>`;
 }
 
-function loadSession() {
-  try {
-    const raw = sessionStorage.getItem("hc_created");
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
+function applyViewOnlyNoSessionCopy() {
+  setNoSessionNotice(viewOnlyNoSessionDetailHtml(getWalletSigningKeyCount()));
 }
 
+function loadSession() {
+  return getTabSession();
+}
+
+/** @param {Record<string, unknown>} next */
 function saveSession(next) {
-  sessionStorage.setItem("hc_created", JSON.stringify(next));
+  setTabSession(next);
+}
+
+/**
+ * Update in-page session state; persist only when signing keys are present (P0-6).
+ * @param {Record<string, unknown>} next
+ */
+function applyCreatedSessionState(next) {
+  if (tabSessionHasSigningKeys(next)) {
+    saveSession(next);
+  } else {
+    clearKeylessTabSessionIfPresent();
+  }
+  data = next;
 }
 
 function initVouchReturnBanner() {
@@ -180,6 +210,9 @@ if (routeGate.action === "redirect_wallet") {
  * @param {{ profileId: string, qrId: string, card?: Record<string, unknown> }} gate
  */
 async function bootCreatedMain(gate) {
+clearKeylessTabSessionIfPresent();
+data = loadSession() ?? data;
+
 const apiOrigin = resolverApiOrigin();
 const scanOrigin =
   apiOrigin.includes("127.0.0.1") || apiOrigin.includes("localhost")
@@ -348,7 +381,15 @@ function getWorkspaceMode() {
 
 function enterControlWorkspace() {
   workspaceMode = "control";
-  if (profileId) markSetupDone(profileId);
+  if (profileId) {
+    const walletEntry = findWalletEntryByProfileId(profileId);
+    if (
+      isSetupDone(profileId) ||
+      ownershipBackupSeatbeltSatisfied(loadSession(), walletEntry)
+    ) {
+      markSetupDone(profileId);
+    }
+  }
   clearFreshUrlParam();
   clearCreatedViewModeUi();
   applyCreatedWorkspaceMode("control");
@@ -708,8 +749,7 @@ async function hydrateSessionFromNetwork() {
       existing.pilot_template || inferPilotTemplate(card.manifesto_line),
     ...(streams.length ? { object_streams: streams } : {}),
   };
-  saveSession(next);
-  data = next;
+  applyCreatedSessionState(next);
   if (handleEl) handleEl.textContent = `@${card.handle}`;
   if (manifestoEl) manifestoEl.textContent = card.manifesto_line;
 }
@@ -759,8 +799,7 @@ if (gate.card?.handle && gate.card?.manifesto_line) {
       pilot_template:
         existing.pilot_template || inferPilotTemplate(String(gate.card.manifesto_line)),
     };
-    saveSession(next);
-    data = next;
+    applyCreatedSessionState(next);
   }
 }
 
@@ -905,12 +944,16 @@ async function refreshNetworkStatus() {
         next.qr_expires_at !== data.qr_expires_at ||
         JSON.stringify(next.verification) !== JSON.stringify(data.verification)
       ) {
-        saveSession(next);
-        data = next;
-        if (profileId && isWalletSaved(profileId)) {
-          saveSessionToWallet(data, "");
+        if (tabSessionHasSigningKeys(next)) {
+          saveSession(next);
+          data = next;
+          if (profileId && isWalletSaved(profileId)) {
+            saveSessionToWallet(data, "");
+          }
+          deviceSaveCtl?.refresh?.();
+        } else {
+          data = next;
         }
-        deviceSaveCtl?.refresh?.();
       }
     }
   } catch {
@@ -954,8 +997,31 @@ initVouchReturnBanner();
 workspaceMode = getWorkspaceMode();
 applyCreatedWorkspaceMode(workspaceMode);
 
-if (workspaceMode === "view" && profileId && activeQrId && noSessionEl) {
+if (workspaceMode === "view" && profileId && activeQrId) {
+  clearKeylessTabSessionIfPresent();
+  data = loadSession();
+  if (noSessionEl) noSessionEl.hidden = true;
+  applyCreatedViewModeUi({ signingKeyCount: getWalletSigningKeyCount() });
+  createdTabs = initCreatedTabs();
+  const restoreHash = createdViewRestoreHashKey(location.hash);
+  createdTabs.select(createdViewDefaultTabId(restoreHash));
+  if (restoreHash) {
+    focusCreatedViewRestore((id) => createdTabs.select(id));
+  }
+  setupCreatedDashboard();
+  dashboardWired = true;
+  initCreatedViewLiveReadonly({
+    getScanUrl: () => {
+      const href = openScanBtn?.getAttribute("href");
+      return href && href.startsWith("http") ? href : null;
+    },
+  });
+  document.getElementById("created-view-live-restore-btn")?.addEventListener("click", () => {
+    focusCreatedViewRestore((id) => createdTabs?.select(id));
+  });
+} else if (workspaceMode === "view" && noSessionEl) {
   noSessionEl.hidden = false;
+  applyViewOnlyNoSessionCopy();
 }
 
 if (profileId && activeQrId) {
@@ -970,6 +1036,8 @@ if (workspaceMode === "setup" && profileId && activeQrId) {
       return deviceSaveCtl.runSave() === true;
     },
     refreshSave: () => deviceSaveCtl?.refresh?.(),
+    getSession: loadSession,
+    setSession: saveSession,
     getScanUrl: () => {
       const href = openScanBtn?.getAttribute("href");
       return href && href.startsWith("http") ? href : null;
@@ -1064,6 +1132,48 @@ if (activeScanUrl) {
   copyBtn.disabled = true;
   if (downloadQrBtn) downloadQrBtn.disabled = true;
   scanUrlEl.textContent = "Scan link unavailable.";
+}
+
+async function bootstrapViewRestoreTools() {
+  if (!profileId || !activeQrId) return;
+
+  try {
+    await hydrateSessionFromNetwork();
+  } catch {
+    /* view mode still shows resolver status + QR from scan URL */
+  }
+
+  const onRestored = () => {
+    enterControlWorkspace();
+    void bootstrapOwnerTools();
+  };
+
+  const backup = initKeyBackupUi({
+    profileId,
+    getSession: loadSession,
+    setSession: saveSession,
+    onKeysUnlocked: onRestored,
+  });
+
+  const recoveryUi = initRecoveryKeyUi({
+    profileId,
+    getSession: loadSession,
+    setSession: saveSession,
+    onKeysUnlocked: onRestored,
+  });
+  recoveryUi?.refresh();
+  backup?.refreshExportVisibility();
+
+  const revoke = initOwnerRevoke({
+    profileId,
+    qrId: activeQrId,
+    scanUrl: activeScanUrl,
+    getSession: loadSession,
+    setSession: saveSession,
+    showError,
+  });
+  revoke?.refresh();
+  void refreshNetworkStatus();
 }
 
 async function bootstrapOwnerTools() {
@@ -1268,6 +1378,10 @@ async function bootstrapOwnerTools() {
 }
 
 if (profileId && activeQrId) {
-  void bootstrapOwnerTools();
+  if (workspaceMode === "view") {
+    void bootstrapViewRestoreTools();
+  } else if (workspaceMode === "control") {
+    void bootstrapOwnerTools();
+  }
 }
 }

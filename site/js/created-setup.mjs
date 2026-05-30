@@ -6,16 +6,25 @@
 import { mountKeysCustody } from "./device-keys-custody.mjs";
 import { isAutoSaveEnabled, isAutoSaveFailed } from "./device-auto-save.mjs";
 import { shouldShowSessionOnlyOwnershipWarning } from "./device-ownership-notice-core.mjs";
-import { isWalletSaved } from "./device-wallet.mjs";
+import { findWalletEntryByProfileId, isWalletSaved } from "./device-wallet.mjs";
+import { isSetupDone } from "./created-mode.mjs";
+import { ownershipBackupSeatbeltSatisfied } from "./created-first-session-gate-core.mjs";
+import {
+  setupMinStepIndex,
+  setupProgressKicker,
+  shouldOmitSetupSaveStep,
+} from "./created-setup-core.mjs";
 import { clearFreshUrlParam } from "./created-workspace.mjs";
 import { markSetupDone } from "./created-mode.mjs";
 import { stewardFocusKeyFromHash } from "./created-tabs.mjs";
 import { SETUP_STEP_IDS, setupStepIndexFromHash } from "./created-setup-hash.mjs";
 import {
   initCreatedSetupSeatbelt,
-  setupOwnershipSeatbeltSatisfied,
 } from "./created-setup-seatbelt.mjs";
-import { stewardScanOpenedFeedback } from "./pwa-scan-handoff-core.mjs";
+import {
+  shouldAutoAdvanceSetupTestScan,
+  stewardScanOpenedFeedback,
+} from "./pwa-scan-handoff-core.mjs";
 import { openStewardScanPreviewFromWindow } from "./pwa-scan-handoff.mjs";
 import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
 
@@ -52,8 +61,14 @@ export function initCreatedSetup(opts) {
 
   const stewardFocus = stewardFocusKeyFromHash();
   if (stewardFocus && isWalletSaved(profileId) && onStewardDeepLink) {
-    onStewardDeepLink();
-    return;
+    const walletEntry = findWalletEntryByProfileId(profileId);
+    if (
+      isSetupDone(profileId) ||
+      ownershipBackupSeatbeltSatisfied(getSession(), walletEntry)
+    ) {
+      onStewardDeepLink();
+      return;
+    }
   }
 
   const panels = [...root.querySelectorAll("[data-setup-panel]")];
@@ -67,17 +82,54 @@ export function initCreatedSetup(opts) {
   const qrPreviewWrap = document.getElementById("created-setup-qr-preview");
   const setupQrImg = document.getElementById("created-setup-qr-img");
   const doneBtn = document.getElementById("created-setup-finish");
+  const progressKicker = root.querySelector(".created-setup-kicker");
+  const saveProgressItem = root.querySelector('[data-setup-step="save"]');
+
+  function omitSaveStepNow() {
+    return shouldOmitSetupSaveStep({
+      savedOnDevice: isWalletSaved(profileId),
+      autoSaveEnabled: isAutoSaveEnabled(),
+      autoSaveFailed: isAutoSaveFailed(profileId),
+    });
+  }
+
+  function minStepIndexNow() {
+    return setupMinStepIndex(omitSaveStepNow());
+  }
+
+  function syncSetupProgressChrome() {
+    const omit = omitSaveStepNow();
+    if (progressKicker) {
+      progressKicker.textContent = setupProgressKicker(omit);
+    }
+    if (saveProgressItem) {
+      saveProgressItem.hidden = omit;
+      saveProgressItem.setAttribute("aria-hidden", omit ? "true" : "false");
+    }
+  }
+
+  syncSetupProgressChrome();
+
+  function seatbeltSatisfiedNow() {
+    return ownershipBackupSeatbeltSatisfied(
+      getSession(),
+      findWalletEntryByProfileId(profileId)
+    );
+  }
 
   const seatbeltCtl = initCreatedSetupSeatbelt({
     profileId,
     getSession,
     setSession,
-    onSeatbeltChange: () => syncSeatbeltContinue(),
+    onSeatbeltChange: () => {
+      syncSeatbeltContinue();
+      refreshSave?.();
+    },
   });
 
   function syncSeatbeltContinue() {
     if (!continueBtn || currentStep() !== "protect") return;
-    const ok = setupOwnershipSeatbeltSatisfied(getSession());
+    const ok = seatbeltSatisfiedNow();
     continueBtn.disabled = !ok;
     continueBtn.setAttribute("aria-disabled", ok ? "false" : "true");
   }
@@ -125,6 +177,8 @@ export function initCreatedSetup(opts) {
   let stepIndex = 0;
   let feedbackTimer = null;
   let liveTransitionTimer = null;
+  /** Browser test-scan opens `_blank`; second Continue advances without re-opening (P0b-2). */
+  let testScanPreviewOpened = false;
 
   function showFeedback(message, isError = false) {
     if (!feedbackEl) return;
@@ -170,8 +224,8 @@ export function initCreatedSetup(opts) {
       panel.hidden = panel.dataset.setupPanel !== step;
     });
     if (backBtn) {
-      backBtn.hidden = stepIndex === 0;
-      backBtn.disabled = stepIndex === 0;
+      backBtn.hidden = stepIndex <= minStepIndexNow();
+      backBtn.disabled = stepIndex <= minStepIndexNow();
     }
     if (continueBtn) {
       continueBtn.hidden = step === "done";
@@ -191,7 +245,13 @@ export function initCreatedSetup(opts) {
 
   function goToStep(index, { pushHistory = false } = {}) {
     const prevStep = currentStep();
-    stepIndex = Math.max(0, Math.min(index, STEPS.length - 1));
+    stepIndex = Math.max(minStepIndexNow(), Math.min(index, STEPS.length - 1));
+    if (currentStep() === "test" && prevStep !== "test") {
+      testScanPreviewOpened = false;
+    }
+    if (prevStep === "test" && currentStep() !== "test") {
+      testScanPreviewOpened = false;
+    }
     syncIndicators();
     if (currentStep() === "save" && keysStrip) {
       keysStrip.hidden = false;
@@ -253,16 +313,23 @@ export function initCreatedSetup(opts) {
         return;
       }
       const standalone = readStandaloneModeFromWindow(window);
+      if (testScanPreviewOpened && !shouldAutoAdvanceSetupTestScan(standalone)) {
+        goToStep(stepIndex + 1, { pushHistory: true });
+        return;
+      }
       if (!openStewardScanPreviewFromWindow(url, { setupWizard: true })) {
         showFeedback("Scan link is not ready yet.", true);
         return;
       }
+      testScanPreviewOpened = true;
       showFeedback(stewardScanOpenedFeedback(standalone, { setupWizard: true }));
-      goToStep(stepIndex + 1, { pushHistory: true });
+      if (shouldAutoAdvanceSetupTestScan(standalone)) {
+        goToStep(stepIndex + 1, { pushHistory: true });
+      }
       return;
     }
     if (step === "protect") {
-      if (!setupOwnershipSeatbeltSatisfied(getSession())) {
+      if (!seatbeltSatisfiedNow()) {
         showFeedback(seatbeltCtl?.blockMessage?.() ?? "Save a recovery path first.", true);
         syncSeatbeltContinue();
         return;
@@ -272,7 +339,7 @@ export function initCreatedSetup(opts) {
   }
 
   function complete() {
-    if (!setupOwnershipSeatbeltSatisfied(getSession())) {
+    if (!seatbeltSatisfiedNow()) {
       showFeedback(seatbeltCtl?.blockMessage?.() ?? "Save a recovery path first.", true);
       const protectIdx = STEPS.indexOf("protect");
       if (protectIdx >= 0) goToStep(protectIdx);
@@ -291,7 +358,7 @@ export function initCreatedSetup(opts) {
   backBtn?.addEventListener("click", (e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (stepIndex <= 0) return;
+    if (stepIndex <= minStepIndexNow()) return;
     goToStep(stepIndex - 1);
   });
 
@@ -299,8 +366,8 @@ export function initCreatedSetup(opts) {
     if (root.hidden) return;
     const nextStep = event.state?.setupStep;
     if (typeof nextStep === "number" && event.state?.setup) {
-      let idx = Math.max(0, Math.min(nextStep, STEPS.length - 1));
-      if (idx > STEPS.indexOf("protect") && !setupOwnershipSeatbeltSatisfied(getSession())) {
+      let idx = Math.max(minStepIndexNow(), Math.min(nextStep, STEPS.length - 1));
+      if (idx > STEPS.indexOf("protect") && !seatbeltSatisfiedNow()) {
         idx = STEPS.indexOf("protect");
       }
       stepIndex = idx;
@@ -356,7 +423,11 @@ export function initCreatedSetup(opts) {
 
   window.addEventListener("hc-device-hub-changed", () => {
     syncSetupKeysCustody();
+    syncSetupProgressChrome();
     if (currentStep() === "save") syncIndicators();
+    if (omitSaveStepNow() && stepIndex < minStepIndexNow()) {
+      goToStep(minStepIndexNow());
+    }
   });
   window.addEventListener("hc-created-qr-ready", syncSetupQrPreview);
 
@@ -366,9 +437,9 @@ export function initCreatedSetup(opts) {
     if (idx > STEPS.indexOf("protect") && !setupOwnershipSeatbeltSatisfied(getSession())) {
       idx = STEPS.indexOf("protect");
     }
-    stepIndex = idx;
-  } else if (canLeaveSaveStep()) {
-    stepIndex = 1;
+    stepIndex = Math.max(minStepIndexNow(), idx);
+  } else if (canLeaveSaveStep() || omitSaveStepNow()) {
+    stepIndex = Math.max(1, minStepIndexNow());
   }
   syncIndicators();
   if (currentStep() === "qr") syncSetupQrPreview();

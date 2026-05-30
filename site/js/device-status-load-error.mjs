@@ -10,6 +10,17 @@ export const STATUS_LOAD_ERROR_DISMISS_ID = "device-status-load-error-dismiss";
 export const STATUS_LOAD_ERROR_ARIA_LABEL =
   "Device controls failed to load. See details below the status dot.";
 
+export const STATUS_PARTIAL_LOAD_ARIA_LABEL =
+  "Status: basic hub available. Refresh for inbox badge and full checks.";
+
+/** @type {{ kicker: string, now: string, why: string, next: string }} */
+export const STATUS_PARTIAL_LOAD_EXPLAINER = {
+  kicker: "Some controls didn't load",
+  now: "You can still open the device hub from the dot.",
+  why: "Inbox badge and network checks didn't finish loading—often cache or a partial download.",
+  next: "Refresh this page for the full status dot and notices.",
+};
+
 /** @type {{ kicker: string, now: string, why: string, next: string }} */
 export const STATUS_LOAD_ERROR_EXPLAINER = {
   kicker: "Controls couldn't load",
@@ -101,6 +112,69 @@ function scheduleLoadErrorCoachCard() {
   }, delay);
 }
 
+function wireLoadErrorDocumentHandlers() {
+  if (document.documentElement.dataset.statusLoadErrorDocWired === "1") return;
+  document.documentElement.dataset.statusLoadErrorDocWired = "1";
+
+  document.addEventListener("click", (event) => {
+    if (!isLoadErrorCoachCardOpen()) return;
+    if (!(event.target instanceof Element)) return;
+    if (
+      event.target.closest(`#${STATUS_LOAD_ERROR_POPOVER_ID}, #brand-status-dot-btn`)
+    ) {
+      return;
+    }
+    setLoadErrorCoachCardOpen(false);
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && isLoadErrorCoachCardOpen()) {
+      setLoadErrorCoachCardOpen(false);
+    }
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!(event.target instanceof Element)) return;
+    const action = event.target.closest("[data-status-load-error-action]");
+    if (!action) return;
+    const kind = action.getAttribute("data-status-load-error-action");
+    if (kind === "refresh") {
+      window.location.reload();
+      return;
+    }
+    if (kind === "dismiss") {
+      setLoadErrorCoachCardOpen(false);
+    }
+  });
+}
+
+function wireLoadErrorDotToggleHandler(dotBtn) {
+  if (!(dotBtn instanceof HTMLButtonElement)) return;
+  if (dotBtn.dataset.statusLoadErrorWired === "1") return;
+  dotBtn.dataset.statusLoadErrorWired = "1";
+  dotBtn.addEventListener("click", (event) => {
+    event.stopPropagation();
+    setLoadErrorCoachCardOpen(!isLoadErrorCoachCardOpen());
+  });
+}
+
+/**
+ * Core loaded but device-status.mjs failed — hub still works; amber ring, no coach hijack.
+ * @param {string} technicalMessage
+ */
+export function wireStatusPartialLoadDot(technicalMessage) {
+  const chrome = document.getElementById("top-chrome");
+  const dotBtn = document.getElementById("brand-status-dot-btn");
+  if (chrome) {
+    chrome.removeAttribute("data-device-status-error");
+    chrome.dataset.deviceStatusPartial = "1";
+  }
+  if (dotBtn instanceof HTMLButtonElement) {
+    dotBtn.setAttribute("aria-label", STATUS_PARTIAL_LOAD_ARIA_LABEL);
+  }
+  console.error("[humanity] Device status module failed to load (hub core OK):", technicalMessage);
+}
+
 /**
  * Mark chrome in error state and show load-error coach card.
  * @param {string} technicalMessage
@@ -109,6 +183,7 @@ export function wireStatusLoadErrorDot(technicalMessage) {
   const chrome = document.getElementById("top-chrome");
   const dotBtn = document.getElementById("brand-status-dot-btn");
   if (chrome) {
+    chrome.removeAttribute("data-device-status-partial");
     chrome.dataset.deviceStatusError = "1";
   }
   if (dotBtn instanceof HTMLButtonElement) {
@@ -119,51 +194,9 @@ export function wireStatusLoadErrorDot(technicalMessage) {
 
   ensureLoadErrorCoachCard();
   scheduleLoadErrorCoachCard();
+  wireLoadErrorDotToggleHandler(dotBtn);
 
-  if (dotBtn instanceof HTMLButtonElement && dotBtn.dataset.statusLoadErrorWired !== "1") {
-    dotBtn.dataset.statusLoadErrorWired = "1";
-    dotBtn.addEventListener("click", (event) => {
-      event.stopPropagation();
-      setLoadErrorCoachCardOpen(!isLoadErrorCoachCardOpen());
-    });
-  }
-
-  if (document.documentElement.dataset.statusLoadErrorDocWired !== "1") {
-    document.documentElement.dataset.statusLoadErrorDocWired = "1";
-
-    document.addEventListener("click", (event) => {
-      if (!isLoadErrorCoachCardOpen()) return;
-      if (!(event.target instanceof Element)) return;
-      if (
-        event.target.closest(
-          `#${STATUS_LOAD_ERROR_POPOVER_ID}, #brand-status-dot-btn`
-        )
-      ) {
-        return;
-      }
-      setLoadErrorCoachCardOpen(false);
-    });
-
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && isLoadErrorCoachCardOpen()) {
-        setLoadErrorCoachCardOpen(false);
-      }
-    });
-
-    document.addEventListener("click", (event) => {
-      if (!(event.target instanceof Element)) return;
-      const action = event.target.closest("[data-status-load-error-action]");
-      if (!action) return;
-      const kind = action.getAttribute("data-status-load-error-action");
-      if (kind === "refresh") {
-        window.location.reload();
-        return;
-      }
-      if (kind === "dismiss") {
-        setLoadErrorCoachCardOpen(false);
-      }
-    });
-  }
+  wireLoadErrorDocumentHandlers();
 
   console.error("[humanity] Device status module failed to load:", technicalMessage);
 }

@@ -3,6 +3,8 @@
  * @see docs/CARD_WORKSPACE_UX.md
  */
 
+import { createdControlRootVisibleForMode } from "./created-view-mode-core.mjs";
+
 /** @typedef {"setup" | "control" | "view"} CreatedMode */
 
 /**

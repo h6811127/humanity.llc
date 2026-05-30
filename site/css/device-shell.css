@@ -173,6 +173,11 @@ body.device-hub-sheet-open .shell-status-cluster,
   outline-offset: 2px;
 }
 
+#top-chrome[data-device-status-partial] .shell-status-dot-btn {
+  outline: 2px solid var(--amber, #f59e0b);
+  outline-offset: 2px;
+}
+
 /* Glance menu anchored to status dot */
 .device-hub-glance-popover {
   position: absolute;
@@ -1631,6 +1636,12 @@ button.device-hub-notice-banner {
   display: none !important;
 }
 
+/* Restore path always visible — docs/OWNERSHIP_RESTORE_UX_PLAN.md Phase 4 */
+.device-hub--stranger-empty [data-hub-restore-always],
+#wallet-page.device-hub--stranger-empty [data-hub-restore-always] {
+  display: block !important;
+}
+
 .device-hub-status-key-label {
   margin: 0 0 6px;
   font-size: 11px;
@@ -2258,6 +2269,11 @@ body.device-hub-sheet-open {
 }
 
 .device-inbox-backdrop[hidden] {
+  pointer-events: none;
+}
+
+/* Stuck .is-visible after inbox close must not swallow taps (Check network, wallet chrome). */
+body:not(.device-inbox-sheet-open) .device-inbox-backdrop.is-visible {
   pointer-events: none;
 }
 

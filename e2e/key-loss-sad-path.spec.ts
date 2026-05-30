@@ -87,11 +87,25 @@ test.describe("key-loss sad paths", () => {
     });
     await expect(page.locator("#created-control-root")).toBeVisible();
     await expect(page.locator("#created-setup-root")).toBeHidden();
+    await expect(page.locator("#created-view-live-banner")).toBeVisible();
+    await expect(page.locator("#created-view-live-lead")).toContainText(/read-only/i);
+    await expect(page.locator("#created-live-scanners-see")).toBeHidden();
+    await expect(page.locator("#created-deploy-print")).toBeVisible();
+
+    await page.getByRole("tab", { name: "Manage" }).click();
     await expect(page.locator("#created-view-restore-panel")).toBeVisible();
     await expect(page.locator("#import-recovery-form")).toBeVisible();
     await expect(page.locator("#no-session")).toBeHidden();
     await expect(page.locator("#created-view-live-qr-tasks")).toBeVisible();
     await expect(page.locator("#created-live-scanners-see")).toBeHidden();
+
+    const sessionRaw = await page.evaluate(() =>
+      sessionStorage.getItem("hc_created")
+    );
+    if (sessionRaw) {
+      const parsed = JSON.parse(sessionRaw) as Record<string, unknown>;
+      expect(parsed.owner_private_key_b58).toBeTruthy();
+    }
   });
 
   test("K5: wallet label without signing keys still view-only on /created/", async ({ page }) => {
@@ -119,17 +133,48 @@ test.describe("key-loss sad paths", () => {
     await expect(page.getByRole("heading", { name: "View this card" })).toBeVisible({
       timeout: 15_000,
     });
-    await expect(page.locator("#created-view-ownership-hint")).toBeVisible();
+    await expect(page.locator("#created-view-live-banner")).toBeVisible();
     await expect(page.locator("#revoke-qr-btn")).toBeHidden();
+
+    await page.getByRole("tab", { name: "Manage" }).click();
+    await expect(page.locator("#created-view-ownership-hint")).toBeVisible();
+  });
+
+  test("R7: corrupt hc_wallet shows urgent tab hint on /wallet/ not empty-wallet copy", async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      sessionStorage.clear();
+      localStorage.clear();
+      localStorage.setItem("hc_device_hub_intro_dismissed", "1");
+      localStorage.setItem("hc_wallet", "{not-valid-json");
+    });
+    await stubCardRoutes(page);
+    await page.goto("/wallet/");
+
+    const tabHint = page.locator("#wallet-tab-hint");
+    await expect(tabHint).toBeVisible({ timeout: 15_000 });
+    await expect(tabHint).toHaveAttribute("role", "alert", { timeout: 15_000 });
+    await expect(page.locator("#wallet-tab-hint-title")).toContainText(/could not be read/i);
+    await expect(page.locator("#wallet-tab-hint-detail")).toContainText(/import a backup/i);
+    await expect(page.locator("#wallet-tab-hint-use-keys")).toHaveText(/import backup/i);
+    await expect(page.locator("#wallet-tab-hint-focus")).toHaveText(/backup help/i);
+    await expect(page.locator("#device-hub-empty-hint")).toBeHidden();
+    await expect(page.locator("#wallet-page")).not.toHaveClass(/device-hub--stranger-empty/);
   });
 
   test("K2: wrong backup passphrase shows plain error on wallet import", async ({ page }) => {
     await page.goto("/wallet/");
 
+    await expect(page.locator('[data-hub-group="import"]')).toBeVisible();
+    await expect(page.locator("#wallet-page")).toHaveClass(/device-hub--stranger-empty/);
+
     await page.locator("#hub-import-form").evaluate((el) => {
       const details = el.closest("details");
       if (details instanceof HTMLDetailsElement) details.open = true;
     });
+
+    await expect(page.locator("#hub-import-passphrase")).toBeVisible();
 
     await page.locator("#hub-import-passphrase").fill("wrong-passphrase-here");
     await page.locator("#hub-import-form input[type='file']").setInputFiles(BACKUP_FIXTURE);

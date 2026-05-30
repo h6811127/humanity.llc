@@ -13,6 +13,12 @@ import {
   getWalletCount,
   getWalletSigningKeyCount,
 } from "./device-wallet.mjs";
+import { openRestoreControlInThisTab } from "./device-ownership-restore-in-tab.mjs";
+import {
+  RESTORE_CONTROL_IN_THIS_APP,
+  RESTORE_CONTROL_IN_THIS_TAB,
+} from "./device-ownership-copy-core.mjs";
+import { gatherPwaSessionMismatch } from "./device-pwa-session-mismatch.mjs";
 import { isKeysCustodyNoticeDismissed, dismissKeysCustodyNotice } from "./device-keys-custody-core.mjs";
 import { keysCustodyHtml } from "./device-keys-custody.mjs";
 import { isHubStrangerEmptyState } from "./device-hub-stranger-empty-core.mjs";
@@ -59,6 +65,8 @@ function gatherProactiveCustodyInput(session) {
   const signLock = activeProfileId ? getSignLock(activeProfileId) : null;
   const walletEntriesWithKeys = getWalletSigningKeyCount();
 
+  const pwaMismatch = gatherPwaSessionMismatch();
+
   return {
     defaultVouchProfileId: defaultId,
     defaultVouchLabel: defaultEntry ? walletEntryLabel(defaultEntry) : null,
@@ -71,6 +79,9 @@ function gatherProactiveCustodyInput(session) {
           : session?.wallet_label || `${String(activeProfileId).slice(0, 12)}…`
         : null,
     walletEntriesWithKeys,
+    pwaSessionMismatchTitle: pwaMismatch?.title ?? null,
+    pwaSessionMismatchDetail: pwaMismatch?.detail ?? null,
+    pwaSessionMismatchCanRestore: pwaMismatch?.canRestoreInThisTab ?? false,
   };
 }
 
@@ -113,7 +124,13 @@ function walletEntryForVouchHere(primaryProfileId) {
 }
 
 function rowIconTone(row) {
-  if (row.kind === "this_tab_unsaved" || row.kind === "orphan" || row.kind === "sign_lock") {
+  if (
+    row.kind === "this_tab_unsaved" ||
+    row.kind === "orphan" ||
+    row.kind === "sign_lock" ||
+    row.kind === "wallet_not_in_tab" ||
+    row.kind === "pwa_session_mismatch"
+  ) {
     return "amber";
   }
   if (row.kind === "this_tab_active" || row.kind === "vouch_default") return "green";
@@ -122,6 +139,12 @@ function rowIconTone(row) {
 }
 
 function rowActionsHtml(row) {
+  if (row.kind === "pwa_session_mismatch" && row.canRestoreInThisTab) {
+    return `<button type="button" class="device-hub-keys-custody-action" data-hub-custody-restore-tab>${RESTORE_CONTROL_IN_THIS_APP}</button>`;
+  }
+  if (row.kind === "wallet_not_in_tab") {
+    return `<button type="button" class="device-hub-keys-custody-action" data-hub-custody-restore-tab>${RESTORE_CONTROL_IN_THIS_TAB}</button>`;
+  }
   if (row.kind === "this_tab_unsaved") {
     return `<button type="button" class="device-hub-keys-custody-action" data-hub-custody-save>Save ownership on this device</button>`;
   }
@@ -196,6 +219,12 @@ function bindPanelActions(panel, state) {
     const index = Number(li.getAttribute("data-hub-custody-row"));
     const row = state.rows[index];
     if (!row) continue;
+
+    li.querySelector("[data-hub-custody-restore-tab]")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      openRestoreControlInThisTab({ closeHubSheet: true });
+    });
 
     li.querySelector("[data-hub-custody-save]")?.addEventListener("click", (e) => {
       e.preventDefault();

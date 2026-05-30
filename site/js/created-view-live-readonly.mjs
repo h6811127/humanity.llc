@@ -4,6 +4,7 @@
  */
 
 import { VIEW_ONLY_LIVE_QR_TASKS_LEAD } from "./device-ownership-copy-core.mjs";
+import { CREATED_VIEW_LIVE_SIGNING_ONLY_IDS } from "./created-view-live-core.mjs";
 import { openStewardScanPreviewFromWindow } from "./pwa-scan-handoff.mjs";
 import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
 
@@ -11,7 +12,6 @@ import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs"
  * @param {{ getScanUrl?: () => string | null }} opts
  */
 export function initCreatedViewLiveReadonly(opts) {
-  const panel = document.getElementById("created-view-live-qr-tasks");
   const lead = document.getElementById("created-view-live-qr-tasks-lead");
   const openBtn = document.getElementById("created-view-open-scan");
   const copyBtn = document.getElementById("created-view-copy-scan");
@@ -47,7 +47,11 @@ export function initCreatedViewLiveReadonly(opts) {
 
 /** Hide signing Live tab blocks; show read-only QR tasks. */
 export function applyCreatedViewLiveReadonlyUi() {
-  for (const el of document.querySelectorAll("[data-created-live-signing-only]")) {
+  for (const id of CREATED_VIEW_LIVE_SIGNING_ONLY_IDS) {
+    const el = document.getElementById(id);
+    if (el) el.hidden = true;
+  }
+  for (const el of document.querySelectorAll("[data-created-signing-only]")) {
     el.hidden = true;
   }
   const panel = document.getElementById("created-view-live-qr-tasks");
@@ -58,7 +62,4 @@ export function applyCreatedViewLiveReadonlyUi() {
 export function clearCreatedViewLiveReadonlyUi() {
   const panel = document.getElementById("created-view-live-qr-tasks");
   if (panel) panel.hidden = true;
-  for (const el of document.querySelectorAll("[data-created-live-signing-only]")) {
-    el.hidden = false;
-  }
 }

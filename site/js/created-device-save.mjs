@@ -6,6 +6,7 @@ import {
 } from "./device-auto-save.mjs";
 import { logDeviceActivity } from "./device-activity.mjs";
 import { shouldShowCreatedOwnershipSaveUi } from "./device-ownership-notice-core.mjs";
+import { shouldSyncAutoSaveOnCreatedLoad } from "./created-device-save-core.mjs";
 import {
   defaultWalletLabel,
   isWalletSaved,
@@ -46,8 +47,14 @@ export function initCreatedDeviceSave(getSession) {
     });
     if (!showUi) {
       card.hidden = true;
-      if (!saved && isAutoSaveEnabled()) {
-        queueMicrotask(() => runSave({ quiet: true }));
+      if (
+        !saved &&
+        shouldSyncAutoSaveOnCreatedLoad({
+          autoSaveEnabled: isAutoSaveEnabled(),
+          hasSigningKeys: hasKeys,
+        })
+      ) {
+        runSave({ quiet: true });
       }
       return;
     }
@@ -60,7 +67,10 @@ export function initCreatedDeviceSave(getSession) {
     }
     if (saved) {
       const sync = saveSessionToWallet(session, labelInput?.value ?? "");
-      if (sync.ok && sync.updated) {
+      if ("error" in sync) {
+        markAutoSaveFailed(session.profile_id);
+        setStatus(sync.error, true);
+      } else if (sync.ok && sync.updated) {
         window.dispatchEvent(new Event("hc-device-hub-changed"));
       }
     }
@@ -70,8 +80,13 @@ export function initCreatedDeviceSave(getSession) {
     } else if (form && doneEl) {
       form.hidden = false;
       doneEl.hidden = true;
-      if (isAutoSaveEnabled()) {
-        queueMicrotask(() => runSave({ quiet: true }));
+      if (
+        shouldSyncAutoSaveOnCreatedLoad({
+          autoSaveEnabled: isAutoSaveEnabled(),
+          hasSigningKeys: hasKeys,
+        })
+      ) {
+        runSave({ quiet: true });
       }
     }
   }
@@ -90,10 +105,8 @@ export function initCreatedDeviceSave(getSession) {
     const result = saveSessionToWallet(session, labelInput?.value ?? "");
     if ("error" in result) {
       markAutoSaveFailed(session.profile_id);
-      if (!opts.quiet) {
-        setStatus(result.error, true);
-      }
       refresh();
+      setStatus(result.error, true);
       window.dispatchEvent(new Event("hc-device-hub-changed"));
       return false;
     }

@@ -351,7 +351,6 @@ describe("mergeLastSeenFromNetworkMap", () => {
     expect(next).toEqual({
       b: "active",
       c: "card_revoked",
-      a: "active",
     });
     expect(isRevokedSinceLastVisitFromBaseline("active", "card_revoked")).toBe(true);
   });

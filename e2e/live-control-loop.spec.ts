@@ -21,16 +21,16 @@ const PAGES_ORIGIN = new URL(
 
 const CHALLENGE_ID = "e2e_live_control_loop_challenge";
 
-function statusUrl() {
-  return `${PAGES_ORIGIN}/.well-known/hc/v1/cards/${SHOWCASE_PROFILE}/live-control/challenges/${CHALLENGE_ID}`;
-}
-
-function ownerUrl() {
+function ownerUrl(challengeId = CHALLENGE_ID) {
   const url = new URL("/created/", PAGES_ORIGIN);
   url.searchParams.set("profile_id", SHOWCASE_PROFILE);
   url.searchParams.set("qr_id", SHOWCASE_QR);
-  url.searchParams.set("live_challenge", CHALLENGE_ID);
+  url.searchParams.set("live_challenge", challengeId);
   return url.href;
+}
+
+function statusUrlFor(challengeId: string) {
+  return `${PAGES_ORIGIN}/.well-known/hc/v1/cards/${SHOWCASE_PROFILE}/live-control/challenges/${challengeId}`;
 }
 
 type LiveControlMockOptions = {
@@ -40,6 +40,10 @@ type LiveControlMockOptions = {
   statusExpired?: boolean;
   /** Challenge window for POST / pending GET (ms). */
   challengeTtlMs?: number;
+  /** Proof display window after proven (ms). */
+  proofDisplayTtlMs?: number;
+  /** Issue a new challenge_id on each POST (H-10 / C3). */
+  freshChallengePerPost?: boolean;
 };
 
 function createLiveControlHandler(options: LiveControlMockOptions = {}) {
@@ -47,8 +51,12 @@ function createLiveControlHandler(options: LiveControlMockOptions = {}) {
     provenAfterPolls = 1,
     statusExpired = false,
     challengeTtlMs = 120_000,
+    proofDisplayTtlMs = 300_000,
+    freshChallengePerPost = false,
   } = options;
   let statusPolls = 0;
+  let postCount = 0;
+  let activeChallengeId = CHALLENGE_ID;
 
   return async (route: Route) => {
     const request = route.request();
@@ -63,19 +71,27 @@ function createLiveControlHandler(options: LiveControlMockOptions = {}) {
 
     if (method === "POST") {
       statusPolls = 0;
+      postCount += 1;
+      if (freshChallengePerPost && postCount > 1) {
+        activeChallengeId = `${CHALLENGE_ID}_${postCount}`;
+      } else if (freshChallengePerPost && postCount === 1) {
+        activeChallengeId = `${CHALLENGE_ID}_1`;
+      } else {
+        activeChallengeId = CHALLENGE_ID;
+      }
       await route.fulfill({
         status: 201,
         contentType: "application/json",
         body: JSON.stringify({
           type: "live_control_challenge",
           version: "1.0",
-          challenge_id: CHALLENGE_ID,
+          challenge_id: activeChallengeId,
           profile_id: SHOWCASE_PROFILE,
           qr_id: SHOWCASE_QR,
           status: "pending",
-          status_url: statusUrl(),
+          status_url: statusUrlFor(activeChallengeId),
           expires_at: new Date(Date.now() + challengeTtlMs).toISOString(),
-          owner_url: ownerUrl(),
+          owner_url: ownerUrl(activeChallengeId),
         }),
       });
       return;
@@ -106,7 +122,7 @@ function createLiveControlHandler(options: LiveControlMockOptions = {}) {
             status: "pending",
             challenge_id: challengeSegment,
             expires_at: new Date(Date.now() + challengeTtlMs).toISOString(),
-            owner_url: ownerUrl(),
+            owner_url: ownerUrl(challengeSegment),
           }),
         });
         return;
@@ -119,7 +135,7 @@ function createLiveControlHandler(options: LiveControlMockOptions = {}) {
           status: "proven",
           challenge_id: challengeSegment,
           proven_at: provenAt,
-          proof_expires_at: new Date(Date.now() + 300_000).toISOString(),
+          proof_expires_at: new Date(Date.now() + proofDisplayTtlMs).toISOString(),
         }),
       });
       return;
@@ -206,5 +222,73 @@ test.describe("live control scanner loop (H-13)", () => {
     await expect(page.locator("#live-control-request")).toBeEnabled();
     await expect(page.locator("#live-control-request")).toHaveText("Ask for live proof");
     await expect(page.locator("#live-control-status-panel")).toHaveClass(/is-request-expired/);
+  });
+
+  test("ask again after success starts fresh request with new owner link (H-10 / C3)", async ({
+    page,
+  }) => {
+    await wireScanFixture(page, { provenAfterPolls: 1, freshChallengePerPost: true });
+
+    await page.locator("#live-control-request").click();
+    await expect(page.locator("#live-control-owner-panel")).toBeVisible();
+    const firstOwnerHref = await page.locator("#live-control-owner-link").getAttribute("href");
+    expect(firstOwnerHref).toContain(`${CHALLENGE_ID}_1`);
+
+    await expect(page.locator("#live-control-success")).toBeVisible({ timeout: 15_000 });
+    await page.locator("#live-control-request-again").click();
+    await expect(page.locator("#live-control-interactive")).toBeVisible();
+    await expect(page.locator("#live-control-success")).toBeHidden();
+    await expect(page.locator("#live-control-owner-panel")).toBeHidden();
+
+    await page.locator("#live-control-request").click();
+    await expect(page.locator("#live-control-owner-panel")).toBeVisible();
+    const secondOwnerHref = await page.locator("#live-control-owner-link").getAttribute("href");
+    expect(secondOwnerHref).not.toBe(firstOwnerHref);
+    expect(secondOwnerHref).toContain(`${CHALLENGE_ID}_2`);
+    expect(secondOwnerHref).not.toBe("#");
+  });
+});
+
+test.describe("live control printed QA desk proxies (H-12)", () => {
+  test("proof display expiry returns scanner to ask (B5)", async ({ page }) => {
+    await wireScanFixture(page, { provenAfterPolls: 1, proofDisplayTtlMs: 1_500 });
+
+    await page.locator("#live-control-request").click();
+    await expect(page.locator("#live-control-success")).toBeVisible({ timeout: 15_000 });
+
+    await expect(page.locator("#live-control-status")).toContainText("Live proof expired", {
+      timeout: 10_000,
+    });
+    await expect(page.locator("#live-control-interactive")).toBeVisible();
+    await expect(page.locator("#live-control-success")).toBeHidden();
+    await expect(page.locator("#live-control-request")).toBeEnabled();
+    await expect(page.locator("#live-control-request")).toHaveText("Ask for live proof");
+    await expect(page.locator("#live-control-row")).not.toHaveClass(/is-proven/);
+  });
+
+  test("in-person layout stacks on phone and splits at ≥640px when waiting (C1 / C2)", async ({
+    page,
+  }) => {
+    await wireScanFixture(page, { provenAfterPolls: 99 });
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.locator("#live-control-request").click();
+    await expect(page.locator("#live-control-in-person-layout")).toHaveClass(/is-owner-waiting/);
+    await expect(page.locator("#live-control-owner-panel")).toBeVisible();
+
+    const narrowLayout = await page.locator("#live-control-in-person-layout").evaluate((el) => {
+      const style = getComputedStyle(el);
+      return { display: style.display, flexDirection: style.flexDirection };
+    });
+    expect(narrowLayout.display).toBe("flex");
+    expect(narrowLayout.flexDirection).toBe("column");
+
+    await page.setViewportSize({ width: 720, height: 900 });
+    const wideLayout = await page.locator("#live-control-in-person-layout").evaluate((el) => {
+      const style = getComputedStyle(el);
+      return { display: style.display, gridTemplateColumns: style.gridTemplateColumns };
+    });
+    expect(wideLayout.display).toBe("grid");
+    expect(wideLayout.gridTemplateColumns.split(" ").length).toBe(2);
   });
 });

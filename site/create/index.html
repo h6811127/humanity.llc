@@ -24,7 +24,7 @@
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=4" />
     <link rel="stylesheet" href="/styles.css?v=129" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=64" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=69" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=29" />
   </head>
   <body class="page-flow has-shell-chrome has-device-hub-search flow-shell flow-shell-create">
@@ -198,14 +198,12 @@
                 </span>
                 <span class="list-content">
                   <span class="list-title">Import backup file</span>
-                  <span class="list-sub">Move keys to this device</span>
+                  <span class="list-sub hub-import-list-sub"></span>
                 </span>
                 <span class="list-chevron" aria-hidden="true">›</span>
               </summary>
               <form class="device-hub-import-form" id="hub-import-form">
-                <p class="form-hint">
-                  Encrypted .hcbackup.json from your card page  -  never uploaded.
-                </p>
+                <p class="form-hint" id="hub-import-form-hint"></p>
                 <input type="file" accept=".json,application/json" required />
                 <label class="form-label" for="hub-import-passphrase">Passphrase</label>
                 <input
@@ -560,7 +558,7 @@
         </form>
       </main>
     </div>
-    <script src="/js/device-status-bootstrap.mjs?v=64" type="module"></script>
+    <script src="/js/device-status-bootstrap.mjs?v=70" type="module"></script>
     <script src="/js/create-hub.mjs?v=1" type="module"></script>
     <script type="module" src="/js/create-card.mjs?v=17"></script>
   </body>

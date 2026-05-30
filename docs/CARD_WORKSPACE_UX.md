@@ -10,15 +10,15 @@
 
 | Mode | When | UI |
 |------|------|-----|
-| **setup** | Keys in tab and (`fresh=1` or setup not done or not saved to device) | Linear wizard - no tabs |
-| **control** | Keys in tab, setup complete, saved on device | **Live · Manage** ([`CREATED_TASKS_TAB_REDESIGN.md`](CREATED_TASKS_TAB_REDESIGN.md) T1 shipped) |
+| **setup** | Keys in tab and first-session gate not cleared (`fresh=1`, not saved, no `hc_setup_done`, or no recovery seatbelt) | Linear wizard - no tabs |
+| **control** | Keys in tab, saved on device, setup done or recovery seatbelt | **Live · Manage** ([`CREATED_TASKS_TAB_REDESIGN.md`](CREATED_TASKS_TAB_REDESIGN.md) T1 shipped) |
 | **view** | No signing keys in this tab | Read-only notice + unlock paths |
 
 Resolver: `site/js/created-mode.mjs` · `modeFromPage()`.
 
-**Mode gate (May 2026):** **control** when this tab has signing keys and the card is **saved on this device**, unless `?fresh=1` (post-create wizard). `hc_setup_done` is set when the wizard finishes, on wallet save, or when reopening a saved card (`syncSetupDoneForSavedProfile`). Hub **Open controls** / `#revoke` deep-links require control mode - see `docs/HUB_REVOKE_AND_CONTROLS_NAVIGATION.md`.
+**Mode gate (P0-4):** **control** when this tab has signing keys, the card is **saved on this device**, and either the setup wizard finished (`hc_setup_done`) or a recovery seatbelt is present (recovery ack, encrypted backup export, or import). `?fresh=1` always stays in **setup** until Protect completes. `syncSetupDoneForSavedProfile` backfills `hc_setup_done` only when the wallet row already has seatbelt markers. Hub **Open controls** / `#revoke` deep-links require control mode - see `docs/HUB_REVOKE_AND_CONTROLS_NAVIGATION.md`.
 
-Storage: `localStorage.hc_setup_done` - map of `profile_id → true` after wizard finish, save, or saved-card backfill.
+Storage: `localStorage.hc_setup_done` - map of `profile_id → true` after wizard finish (with seatbelt) or legacy backfill with seatbelt on wallet row.
 
 ---
 
@@ -30,7 +30,7 @@ Kicker copy in setup: **"Four steps · keys stay in this browser"** to reinforce
 |------|-------------|------|
 | 1 Save | Save control key to this device | Cannot continue until `isWalletSaved(profile_id)` |
 | 2 Print | Download QR PNG | - |
-| 3 Test scan | Preview what anyone scanning the QR sees (another device) | - |
+| 3 Test scan | Preview scan page (new tab in browser; tap Continue again before Protect) | - |
 | 4 Live | **Open card controls** | Marks setup done, clears `fresh` from URL, enters **control** |
 
 Modules: `created-setup.mjs`, `created-workspace.mjs`.

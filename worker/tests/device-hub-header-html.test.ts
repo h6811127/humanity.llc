@@ -71,7 +71,13 @@ describe("device hub sheet header", () => {
     for (const path of pages) {
       const html = readPage(path);
       expect(html, path).toContain("data-hub-stranger-empty-hide");
+      expect(html, path).toContain("data-hub-restore-always");
       expect(html, path).toContain("Bookmarks only — cannot manage objects");
+      expect(html, path).toContain(
+        'data-hub-group="import" data-hub-restore-always'
+      );
+      expect(html, path).toContain('id="hub-import-form-hint"');
+      expect(html, path).not.toMatch(/Encrypted\s+\.hcbackup/i);
     }
     const landing = readPage("site/index.html");
     expect(landing).toContain("No cards saved yet.");

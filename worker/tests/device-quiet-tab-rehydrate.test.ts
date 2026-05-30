@@ -43,4 +43,21 @@ describe("device-quiet-tab-rehydrate wiring", () => {
     expect(src).toContain("getQuietTabRehydratedProfile");
     expect(src).toContain("filterCrossTabEntriesAfterQuietRehydrate");
   });
+
+  it("exports sole-signing-row scan fallback for vouch (P0b-3)", () => {
+    const rehydrateSrc = fs.readFileSync(
+      path.join(process.cwd(), "site/js/device-quiet-tab-rehydrate.mjs"),
+      "utf8"
+    );
+    const vouchSrc = fs.readFileSync(
+      path.join(process.cwd(), "site/js/vouch-issue.mjs"),
+      "utf8"
+    );
+    expect(rehydrateSrc).toContain("trySoleSigningRowRehydrateForScan");
+    expect(rehydrateSrc).toContain("walletEntriesWithSigningKeys(loadWallet())");
+    expect(vouchSrc).toContain("trySoleSigningRowRehydrateForScan");
+    expect(vouchSrc).toContain("tryAutoActivateSoleSigningWalletForVouch");
+    expect(vouchSrc).toContain("soleSigningActivated: true");
+    expect(vouchSrc).toContain("quietRehydrateActivated: true");
+  });
 });
