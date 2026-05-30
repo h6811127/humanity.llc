@@ -61,6 +61,8 @@ import {
   DUAL_QR_SECTION_LEAD,
   DUAL_QR_STEWARD_HINT,
   DUAL_QR_STEWARD_LABEL,
+  PRINT_SHARE_STEWARD_DISCOVERY,
+  PRINT_SHARE_STEWARD_FULL_SIZE_CTA,
 } from "./device-ownership-copy-core.mjs";
 import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
 import {
@@ -261,6 +263,8 @@ const dualQrPublicLabelEl = document.getElementById("created-dual-qr-public-labe
 const dualQrPublicHintEl = document.getElementById("created-dual-qr-public-hint");
 const dualQrStewardLabelEl = document.getElementById("created-dual-qr-steward-label");
 const dualQrStewardHintEl = document.getElementById("created-dual-qr-steward-hint");
+const printStewardDiscoveryEl = document.getElementById("created-print-steward-discovery");
+const printStewardCtaEl = document.getElementById("created-print-steward-cta");
 const openScanBtn = document.getElementById("open-scan");
 const profileIdEl = document.getElementById("profile-id");
 const humanTrustLabelEl = document.getElementById("human-trust-label");
@@ -1114,6 +1118,16 @@ function syncStewardDualQrMaterials(scanUrl) {
   if (dualQrStewardHintEl) dualQrStewardHintEl.textContent = DUAL_QR_STEWARD_HINT;
   if (downloadQrBtn) downloadQrBtn.textContent = DOWNLOAD_PUBLIC_QR;
 
+  const showStewardPrintDiscovery = materials.hasStewardHandoff;
+  if (printStewardDiscoveryEl) {
+    printStewardDiscoveryEl.textContent = PRINT_SHARE_STEWARD_DISCOVERY;
+    printStewardDiscoveryEl.hidden = !showStewardPrintDiscovery;
+  }
+  if (printStewardCtaEl) {
+    printStewardCtaEl.textContent = PRINT_SHARE_STEWARD_FULL_SIZE_CTA;
+    printStewardCtaEl.hidden = !showStewardPrintDiscovery;
+  }
+
   if (copyStewardHandoffBtn) {
     if (!materials.stewardHandoffUrl) {
       copyStewardHandoffBtn.hidden = true;
@@ -1147,6 +1161,8 @@ function syncStewardDualQrMaterials(scanUrl) {
       downloadStewardQrBtn.disabled = true;
     }
     if (stewardHandoffUrlEl) stewardHandoffUrlEl.hidden = true;
+    if (printStewardDiscoveryEl) printStewardDiscoveryEl.hidden = true;
+    if (printStewardCtaEl) printStewardCtaEl.hidden = true;
     return Promise.resolve();
   }
 

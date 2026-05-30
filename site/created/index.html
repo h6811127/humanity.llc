@@ -781,8 +781,22 @@
                       tape the printout.
                     </li>
                   </ol>
+                  <p
+                    class="form-hint created-print-steward-discovery"
+                    id="created-print-steward-discovery"
+                    hidden
+                  ></p>
                   <button type="button" class="btn-secondary" data-created-action="download-qr">
                     Download QR image
+                  </button>
+                  <button
+                    type="button"
+                    class="btn-secondary"
+                    id="created-print-steward-cta"
+                    data-created-action="scroll-qr"
+                    hidden
+                  >
+                    View steward handoff QR
                   </button>
                 </div>
               </details>
@@ -1870,6 +1884,6 @@
     </dialog>
     <script src="/js/device-status-bootstrap.mjs?v=71" type="module"></script>
     <script src="/js/created-hub.mjs?v=3" type="module"></script>
-    <script type="module" src="/js/created.mjs?v=70"></script>
+    <script type="module" src="/js/created.mjs?v=71"></script>
   </body>
 </html>

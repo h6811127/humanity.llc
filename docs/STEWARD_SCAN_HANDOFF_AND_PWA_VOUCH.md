@@ -117,7 +117,7 @@ Modules: [`steward-handoff.ts`](../worker/src/resolver/steward-handoff.ts), [`st
 | Public | Strangers | `https://humanity.llc/c/…?q=…` (unchanged) |
 | Steward (optional on internal print) | Stewards at events | `https://humanity.llc/v/{code}` handoff interstitial (S6) |
 
-**UI:** `/created/` → **Full-size QR** shows side-by-side public + steward previews, **Download public QR**, **Download steward QR**, and **Copy steward handoff link**. Public print contract unchanged ([`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md)).
+**UI:** `/created/` → **Full-size QR** shows side-by-side public + steward previews, **Download public QR**, **Download steward QR**, and **Copy steward handoff link**. **Print & share QR** downloads public only and cross-links to Full-size QR when steward handoff is available (RC-2). Public print contract unchanged ([`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md)).
 
 Modules: [`steward-dual-qr-core.mjs`](../site/js/steward-dual-qr-core.mjs), [`created.mjs`](../site/js/created.mjs), [`qr-render.mjs`](../site/js/qr-render.mjs) (handoff URL encoding).
 

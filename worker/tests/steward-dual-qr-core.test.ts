@@ -72,15 +72,19 @@ describe("/created/ dual-QR HTML guards (S7)", () => {
     expect(html).toContain('id="copy-steward-handoff"');
     expect(html).toContain('id="created-steward-qr-col"');
     expect(html).toContain('id="created-setup-steward-qr-img"');
+    expect(html).toContain('id="created-print-steward-discovery"');
+    expect(html).toContain('id="created-print-steward-cta"');
     expect(html).toContain("Download public QR");
   });
 
-  it("created.mjs wires dual QR materials", async () => {
+  it("created.mjs wires dual QR materials and print discovery", async () => {
     const { readFileSync } = await import("node:fs");
     const { join } = await import("node:path");
     const src = readFileSync(join(process.cwd(), "site/js/created.mjs"), "utf8");
     expect(src).toContain("buildStewardDualQrMaterials");
     expect(src).toContain("syncStewardDualQrMaterials");
     expect(src).toContain("renderBrandedQrToImage");
+    expect(src).toContain("PRINT_SHARE_STEWARD_DISCOVERY");
+    expect(src).toContain("created-print-steward-discovery");
   });
 });

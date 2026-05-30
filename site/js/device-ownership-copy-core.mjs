@@ -388,6 +388,12 @@ export const DOWNLOAD_STEWARD_QR = "Download steward QR";
 
 export const DOWNLOAD_PUBLIC_QR = "Download public QR";
 
+/** Print & share disclosure → Full-size QR steward discovery (RC-2 / S7). */
+export const PRINT_SHARE_STEWARD_DISCOVERY =
+  "This downloads the public QR for strangers. For an optional steward handoff QR on internal collateral, open Full-size QR below — never replace the public code on outward-facing print.";
+
+export const PRINT_SHARE_STEWARD_FULL_SIZE_CTA = "View steward handoff QR";
+
 /** Hub in-app QR scanner (S3). */
 export const HUB_SCAN_QR_BTN = "Scan QR to vouch";
 
