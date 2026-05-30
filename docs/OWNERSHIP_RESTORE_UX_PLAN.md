@@ -1,8 +1,8 @@
 # Ownership restore and view-mode UX plan
 
-**Status:** Phase 4 step 2 shipped (hub import copy convergence); Phase 4 step 1 shipped (hub restore always visible); Phase 3 step 1 shipped (view-mode Live tab); Phase 2 shipped (setup wizard hard gate)  
+**Status:** Phase 4 step 2 shipped (hub import copy convergence); Phase 4 step 1 shipped (hub restore always visible); **Phase 3 shipped** (view Live read-only QR tasks + banner); Phase 2 shipped (setup wizard hard gate); Phase 1 shipped (restore panel wiring)  
 **Audience:** Product, design, engineering, QA  
-**Related:** [`OWNERSHIP_AND_CONTROL_MODEL.md`](OWNERSHIP_AND_CONTROL_MODEL.md) · [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) · [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) · [`KEY_LOSS_SAD_PATH_MATRIX.md`](KEY_LOSS_SAD_PATH_MATRIX.md)
+**Related:** [`OWNERSHIP_AND_CONTROL_MODEL.md`](OWNERSHIP_AND_CONTROL_MODEL.md) · [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) · [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) · [`KEY_LOSS_SAD_PATH_MATRIX.md`](KEY_LOSS_SAD_PATH_MATRIX.md) · [`PRODUCT_WORKSTREAM_COORDINATION.md`](PRODUCT_WORKSTREAM_COORDINATION.md)
 
 ## Locked decisions
 
@@ -31,15 +31,18 @@ Setup wizard **hard gate** before step **You're live**:
 - Modules: `created-setup-seatbelt.mjs` · `child-object-backup-gate-core.mjs`
 - Tests: `created-setup-hash.test.ts` · `created-setup-seatbelt.test.ts` · `key-loss-copy-guards` (K7)
 
-## Phase 3 (step 1 shipped)
+## Phase 3 (shipped)
 
 - **Live tab** default on view-only `/created/` (Manage when `#recovery` / `#backup` / `#restore`)
-- Read-only banner `#created-view-live-banner` + **Restore ownership** → Manage restore panel
-- Hide signing-only Live blocks (primary CTA, publish form, custody, live proof, setup memory); keep deploy disclosures (print, test scan, copy link, download QR)
+- Read-only banner `#created-view-live-banner` + **Restore ownership** → Manage restore panel (P1-2 wallet-saved branch)
+- View-mode **QR and signage** section `#created-view-live-qr-tasks` below object card (`created-view-live-readonly.mjs`)
+- Signing-only Live blocks hidden via `data-created-signing-only` + `CREATED_VIEW_LIVE_SIGNING_ONLY_IDS` (publish form, custody, primary CTA, live proof, setup memory)
+- Setup memory chips include **Protect** (five steps); visible read-only in view and control
 - P0-7 wallet-branch copy on `#no-session-detail` and Manage restore leads (`created-view-only-copy-core.mjs`)
 - `bootstrapViewRestoreTools` hydrates public copy from resolver when session is partial
-- Modules: `created-view-live-core.mjs` · `created-view-mode.mjs` · `created-view-only-copy-core.mjs`
-- Tests: `npm run worker:test:view-only-restore` · `e2e:key-loss-sad-path` (K1)
+- Modules: `created-view-live-core.mjs` · `created-view-live-readonly.mjs` · `created-view-mode.mjs` · `created-view-only-copy-core.mjs`
+- Tests: `npm run worker:test:view-only-restore` · `worker/tests/created-view-live-readonly-core.test.ts` · `e2e:key-loss-sad-path` (K1)
+- Manual: [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) **P1-RESTORE**
 
 ## Phase 4 (step 1 shipped)
 

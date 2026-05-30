@@ -17,6 +17,10 @@ import {
   CREATED_VIEW_LIVE_PROOF_ID,
   CREATED_VIEW_LIVE_SIGNING_ONLY_IDS,
 } from "./created-view-live-core.mjs";
+import {
+  applyCreatedViewLiveReadonlyUi,
+  clearCreatedViewLiveReadonlyUi,
+} from "./created-view-live-readonly.mjs";
 
 /**
  * Show restore panel and hide signing-only controls.
@@ -91,6 +95,8 @@ export function applyCreatedViewModeUi(opts = {}) {
     const backupDetails = document.getElementById("backup-details");
     if (backupDetails instanceof HTMLDetailsElement) backupDetails.open = true;
   }
+
+  applyCreatedViewLiveReadonlyUi();
 }
 
 /** Restore signing UI after keys load into this tab. */
@@ -120,6 +126,8 @@ export function clearCreatedViewModeUi() {
     const el = document.getElementById(id);
     if (el) el.hidden = false;
   }
+
+  clearCreatedViewLiveReadonlyUi();
 }
 
 /**

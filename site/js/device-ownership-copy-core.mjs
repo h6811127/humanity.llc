@@ -68,6 +68,9 @@ export const VIEW_ONLY_MANAGE_TAB_LEAD_SAVED =
 /** @deprecated Use `viewOnlyManageTabLead(signingKeyCount)`. */
 export const VIEW_ONLY_MANAGE_TAB_LEAD = VIEW_ONLY_MANAGE_TAB_LEAD_EMPTY;
 
+export const VIEW_ONLY_LIVE_QR_TASKS_LEAD =
+  "Preview or share this QR without signing. To change what scanners see, restore ownership under Manage.";
+
 export const VIEW_ONLY_RESTORE_LEAD_EMPTY =
   "Paste the recovery code you saved at create, or import an encrypted backup file. humanity.llc cannot restore your object for you.";
 

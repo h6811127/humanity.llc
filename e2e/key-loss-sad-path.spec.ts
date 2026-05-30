@@ -96,6 +96,8 @@ test.describe("key-loss sad paths", () => {
     await expect(page.locator("#created-view-restore-panel")).toBeVisible();
     await expect(page.locator("#import-recovery-form")).toBeVisible();
     await expect(page.locator("#no-session")).toBeHidden();
+    await expect(page.locator("#created-view-live-qr-tasks")).toBeVisible();
+    await expect(page.locator("#created-live-scanners-see")).toBeHidden();
 
     const sessionRaw = await page.evaluate(() =>
       sessionStorage.getItem("hc_created")

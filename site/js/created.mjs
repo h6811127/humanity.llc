@@ -58,6 +58,7 @@ import {
   clearCreatedViewModeUi,
   focusCreatedViewRestore,
 } from "./created-view-mode.mjs";
+import { initCreatedViewLiveReadonly } from "./created-view-live-readonly.mjs";
 import { logDeviceActivity } from "./device-activity.mjs";
 import { verificationRecordFromStatusBody } from "./device-wallet-network-core.mjs";
 import {
@@ -1009,6 +1010,12 @@ if (workspaceMode === "view" && profileId && activeQrId) {
   }
   setupCreatedDashboard();
   dashboardWired = true;
+  initCreatedViewLiveReadonly({
+    getScanUrl: () => {
+      const href = openScanBtn?.getAttribute("href");
+      return href && href.startsWith("http") ? href : null;
+    },
+  });
   document.getElementById("created-view-live-restore-btn")?.addEventListener("click", () => {
     focusCreatedViewRestore((id) => createdTabs?.select(id));
   });
