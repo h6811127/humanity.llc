@@ -696,6 +696,7 @@ Sources: WebKit ITP blog; [`PWA_INSTALL.md`](PWA_INSTALL.md); [`SAFARI_PERFORMAN
 | 2026-05-29 | **P1-2 step 1 shipped:** shell tab-honest dot + hub `wallet_not_in_tab` restore row |
 | 2026-05-29 | **P2-2 shipped:** PWA vs Safari session mismatch — `hc_last_signing_shell_mode` · hub · wallet · scan actor band |
 | 2026-05-29 | **P0-1 runtime E2E shipped:** WebKit sole-row rehydrate + multi-card gate negative in `safari-keys-persistence` |
+| 2026-05-30 | **P0b-1 step 2 desk gate + sign-off scripts:** `card-disabled-since-visit:desk-gate` · `card-disabled-since-visit:sign-off` · **P1-P0b-1** QA |
 | 2026-05-29 | **P0b-1 step 2 desk proxy shipped:** WebKit fresh-create R10 in `card-disabled-fresh-create-webkit.spec.ts` |
 | 2026-05-29 | **R9 E2E shipped:** `e2e/scan-page-dot.spec.ts` Flow B — hollow `ok:none` dot + restore glance when wallet saved, tab empty |
 | 2026-05-29 | **P2-3b shipped:** S3 standalone scan actor band restore CTA · scan E2E fixture regen |

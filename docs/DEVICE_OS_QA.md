@@ -434,6 +434,25 @@ Automated: `e2e/device-status-dot.spec.ts` § hub sheet header chrome (steps 4�
 
 Automated: `npm run worker:test:hub-restore-always` · `npm run e2e:key-loss-sad-path` (K2-landing · K2-create · K2 wallet)
 
+### P1-P0b-1 · Card disabled since visit fresh create (R10 · prod WebKit)
+
+**Spec:** [`SAFARI_KEYS_WIPE_INVESTIGATION.md`](SAFARI_KEYS_WIPE_INVESTIGATION.md) P0b-1 · [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md)
+
+**Prerequisites:** Run desk gate first: `npm run card-disabled-since-visit:desk-gate` · then **iPhone Safari on https://humanity.llc** after deploy.
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Fresh create → save on device → finish setup (same Safari session) | Card row shows **Reachable** (or checking → reachable) |
+| 2 | Open hub on `/` within ~5 minutes of first save | **No** `#device-hub-card-disabled-group` |
+| 3 | Saved row detail | **No** “Card disabled on the network since your last visit.” |
+| 4 | Background Safari · return · reopen hub | Banner still absent while resolver reports **active** |
+
+**Fail signals:** Since-visit banner on a **new** active card; inbox `card_disabled` without resolver `card_revoked`.
+
+Engineering: `npm run worker:test:card-disabled-since-visit` · `npm run e2e:card-disabled-since-visit:webkit`
+
+Sign-off: `npm run card-disabled-since-visit:sign-off -- --pass --apply --date YYYY-MM-DD --device "iPhone Safari"`
+
 ### P2-SLC · Hub stranger landing chrome
 
 **Spec:** [`HUB_STRANGER_ONBOARDING.md`](HUB_STRANGER_ONBOARDING.md) § P2

@@ -32,7 +32,7 @@ Update this table when new PRs open.
 
 | Priority | Item | Owner type | Command / proof |
 |----------|------|------------|-----------------|
-| P0b-1 step 2 sign-off | Card disabled since visit — **prod WebKit** re-verify on humanity.llc after deploy | Human QA | Desk proxy: `npm run e2e:card-disabled-since-visit:webkit` · [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) |
+| P0b-1 step 2 sign-off | Card disabled since visit — **prod WebKit** re-verify on humanity.llc after deploy | Human QA | Desk gate: `npm run card-disabled-since-visit:desk-gate` · manual **P1-P0b-1** · sign-off: `card-disabled-since-visit:sign-off` |
 | H-12 human § A–C | Printed QR camera QA on ≥3 phones | Human QA | After `live-control:printed-qa:desk-gate` → `live-control:printed-qa:camera-scorecard` → `live-control:printed-qa:sign-off -- --pass --apply` |
 | P3-1 / P3-2 | WebAuthn / optional encrypted persistence | Architecture | Not scheduled |
 
@@ -82,6 +82,7 @@ npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts
 | Date | Event |
 |------|--------|
 | 2026-05-30 | Hub card disappeared Safari — **P2-RC-MON E2E** + CI verify gate |
+| 2026-05-30 | P0b-1 — **desk gate + sign-off scripts** for prod WebKit R10 re-verify |
 | 2026-05-30 | Hub card disappeared Safari — **closed monitoring only** + `hub-card-disappeared:verify` + hub debug wallet snapshot |
 | 2026-05-30 | Hub card disappeared Safari — **RC-3 slice 2** setup Done → PWA install handoff |
 | 2026-05-30 | Hub card disappeared Safari — **RC-15** wallet summary integrity heartbeat on hub open |

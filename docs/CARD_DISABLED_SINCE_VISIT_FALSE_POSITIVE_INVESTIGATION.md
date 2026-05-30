@@ -872,8 +872,9 @@ Slices 1–8 in [`DEVICE_HUB_REPAIR_SPEC.md`](DEVICE_HUB_REPAIR_SPEC.md) fixed *
 
 | Step | Action |
 |------|--------|
-| 1 | Run `npm run worker:test:card-disabled-since-visit` and `npm run e2e:card-disabled-since-visit` before release. |
-| 2 | After deploy, hard-refresh; use § “If you still see the bug” (resolver `scan.kind`, storage keys). |
-| 3 | New false positive on fixed bundle → file regression in Vitest/E2E, then reopen investigation (do not patch without repro). |
+| 1 | Run `npm run card-disabled-since-visit:desk-gate` before release (Vitest + WebKit desk proxy). |
+| 2 | After deploy, prod WebKit **P1-P0b-1** on humanity.llc; sign-off: `npm run card-disabled-since-visit:sign-off -- --pass --apply`. |
+| 3 | Hard-refresh; use § “If you still see the bug” (resolver `scan.kind`, storage keys). |
+| 4 | New false positive on fixed bundle → file regression in Vitest/E2E, then reopen investigation (do not patch without repro). |
 
 **Unrelated optional hardening:** status-dot load blast radius - [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md) P2 (lazy inbox sheet import).
