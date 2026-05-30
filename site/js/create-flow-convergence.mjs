@@ -40,7 +40,6 @@ export function syncCreateFlowConvergence(template) {
     rootCount: roots.length,
   });
 
-  if (nudgeEl) nudgeEl.hidden = false;
   if (titleEl) titleEl.textContent = copy.title;
   if (bodyEl) bodyEl.textContent = copy.body;
 
@@ -74,4 +73,6 @@ export function syncCreateFlowConvergence(template) {
       compatEl.open = !copy.collapseLegacyForm;
     }
   }
+
+  if (nudgeEl) nudgeEl.hidden = false;
 }

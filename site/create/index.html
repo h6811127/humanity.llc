@@ -334,27 +334,32 @@
             </div>
             <div
               id="create-add-object-nudge"
-              class="hc-notice hc-notice--info create-add-object-nudge"
+              class="hc-emphasis-card hc-emphasis-card--info create-add-object-nudge"
               hidden
               role="note"
+              aria-labelledby="create-add-object-nudge-eyebrow create-add-object-nudge-title"
             >
-              <span class="hc-notice-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M12 16v-4M12 8h.01" />
-                </svg>
-              </span>
-              <div class="hc-notice-content">
-                <p class="hc-notice-title" id="create-add-object-nudge-title"></p>
-                <p class="hc-notice-body" id="create-add-object-nudge-body"></p>
-                <div class="hc-notice-actions">
-                  <a class="btn-secondary" id="create-add-object-nudge-primary" href="/wallet/"
-                    >Add on Live</a
-                  >
-                  <button type="button" class="hc-notice-ack" id="create-add-object-nudge-general">
-                    Use general card
-                  </button>
+              <div class="hc-emphasis-card__main">
+                <span class="hc-emphasis-card__dot hc-emphasis-card__dot--info" aria-hidden="true"></span>
+                <div class="hc-emphasis-card__copy">
+                  <p class="hc-emphasis-card__eyebrow" id="create-add-object-nudge-eyebrow">
+                    Recommended path
+                  </p>
+                  <p class="hc-emphasis-card__title" id="create-add-object-nudge-title"></p>
+                  <p class="hc-emphasis-card__detail" id="create-add-object-nudge-body"></p>
                 </div>
+              </div>
+              <div class="hc-emphasis-card__actions">
+                <a class="hc-emphasis-card__cta" id="create-add-object-nudge-primary" href="#"
+                  >Add on Live</a
+                >
+                <button
+                  type="button"
+                  class="hc-emphasis-card__cta hc-emphasis-card__cta--secondary"
+                  id="create-add-object-nudge-general"
+                >
+                  Use general card
+                </button>
               </div>
             </div>
           </section>
