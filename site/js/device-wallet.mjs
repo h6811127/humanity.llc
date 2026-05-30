@@ -300,6 +300,12 @@ export function loadWalletSummary() {
 }
 
 export function saveWallet(entries) {
+  if (isWalletStorageCorrupt()) {
+    return {
+      error:
+        "Saved ownership on this device could not be read. Import a backup before saving again.",
+    };
+  }
   const serialized = JSON.stringify(entries);
   const summary = buildWalletSummary(entries, walletRawFingerprint(serialized));
   try {

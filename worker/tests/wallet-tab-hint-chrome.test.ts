@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  shouldShowWalletCorruptHint,
   shouldShowWalletOwnershipNotInTabHint,
   shouldShowWalletTabHintCrossTabChrome,
 } from "../../site/js/wallet-tab-hint-chrome-core.mjs";
@@ -19,6 +20,14 @@ describe("shouldShowWalletTabHintCrossTabChrome", () => {
   it("hides when there is no cross-tab or orphan signal", () => {
     expect(shouldShowWalletTabHintCrossTabChrome(false, 0, 0)).toBe(false);
     expect(shouldShowWalletTabHintCrossTabChrome(true, 0, 0)).toBe(false);
+  });
+});
+
+describe("shouldShowWalletCorruptHint", () => {
+  it("is true only when wallet load kind is corrupt", () => {
+    expect(shouldShowWalletCorruptHint("corrupt")).toBe(true);
+    expect(shouldShowWalletCorruptHint("ok")).toBe(false);
+    expect(shouldShowWalletCorruptHint("empty")).toBe(false);
   });
 });
 

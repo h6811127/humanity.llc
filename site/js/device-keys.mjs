@@ -46,6 +46,11 @@ export function setTabSession(session) {
     return false;
   }
   sessionStorage.setItem("hc_created", packed.serialized);
+  if (tabSessionHasSigningKeys(session)) {
+    import("./device-pwa-session-mismatch-record.mjs")
+      .then((mod) => mod.recordSigningShellModeFromWindow(window))
+      .catch(() => {});
+  }
   window.dispatchEvent(new Event("hc-device-hub-changed"));
   return true;
 }

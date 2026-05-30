@@ -55,6 +55,8 @@ Central strings: `site/js/device-ownership-copy-core.mjs`
 | `BACKUP_INVALID_OWNERSHIP` | Invalid backup payload |
 | `IMPORT_OWNERSHIP_LOADED_TAB` | Successful hub import |
 | `HUB_RESTORE_IMPORT_HINT` / `HUB_RESTORE_IMPORT_SUMMARY` | Hub backup import form (Phase 4) |
+| `WALLET_CORRUPT_*` | Corrupt `hc_wallet` hub + `/wallet/` tab hint (P1-4 · R7) |
+| `PWA_MISMATCH_*` / `RESTORE_CONTROL_IN_THIS_APP` | PWA vs Safari session split (P2-2 · R5) |
 
 Automated guards: `npm run worker:test:key-loss-copy`
 

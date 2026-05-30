@@ -50,6 +50,20 @@ describe("buildHubKeysCustodyPanel", () => {
     ]);
   });
 
+  it("shows PWA session mismatch row instead of wallet-not-in-tab when shell modes differ (P2-2)", () => {
+    const state = buildHubKeysCustodyPanel({
+      tabNoticeCount: 0,
+      hasActiveKeys: false,
+      walletEntriesWithKeys: 1,
+      educationDismissed: true,
+      pwaSessionMismatchTitle: "Ownership was last active in Safari",
+      pwaSessionMismatchDetail: "Restore control in this app.",
+      pwaSessionMismatchCanRestore: true,
+    });
+    expect(state.rows.map((r) => r.kind)).toEqual(["pwa_session_mismatch"]);
+    expect(state.rows[0].canRestoreInThisTab).toBe(true);
+  });
+
   it("shows wallet-not-in-tab restore row when saved keys exist but tab is empty (P1-2)", () => {
     const state = buildHubKeysCustodyPanel({
       tabNoticeCount: 0,
@@ -113,6 +127,18 @@ describe("buildHubKeysCustodyPanel", () => {
     });
     expect(state.rows.map((r) => r.kind)).toEqual(["this_tab_active", "sign_lock"]);
     expect(state.rows[1].title).toContain("PIN");
+  });
+
+  it("shows pwa session mismatch before wallet-not-in-tab (P2-2)", () => {
+    const state = buildHubKeysCustodyPanel({
+      walletEntriesWithKeys: 1,
+      educationDismissed: true,
+      pwaSessionMismatchTitle: "Ownership was last active in Safari",
+      pwaSessionMismatchDetail: "Restore control in this app.",
+      pwaSessionMismatchCanRestore: true,
+    });
+    expect(state.rows.map((r) => r.kind)).toEqual(["pwa_session_mismatch"]);
+    expect(state.rows[0].canRestoreInThisTab).toBe(true);
   });
 
   it("prefers wallet-not-in-tab over vouch nudge when tab empty (P1-2)", () => {

@@ -77,12 +77,27 @@ Setup wizard **hard gate** before step **You're live**:
 - Modules: `vouch-scan-sole-signing-activate-core.mjs` · `vouch-issue.mjs` · `device-quiet-tab-rehydrate.mjs`
 - Tests: `npm run worker:test:vouch-scan-sole-activate` · `npm run e2e:vouch-scan-sole-signing`
 
-## Safari P1-4 (step 1 shipped)
+## Safari P2-2 (shipped)
+
+- When `hc_last_signing_shell_mode` differs from the current shell and the wallet has signing rows but this tab cannot sign, show context-specific copy (R5 session split)
+- **Standalone app** after Safari signing: hub / wallet / scan offer **Restore control in this app** (`openRestoreControlInThisTab`)
+- **Safari browser** after standalone signing: informational copy to open the Home Screen app (no false restore CTA)
+- Record mode on `setTabSession` when tab gains signing keys
+- Modules: `device-pwa-session-mismatch-core.mjs` · `device-pwa-session-mismatch.mjs` · `device-pwa-session-mismatch-record.mjs`
+- Tests: `npm run worker:test:pwa-session-mismatch`
+
+## Safari P2-3 (shipped)
+
+- WebKit regression for matrix **S2** (sole-card scan tab rehydrates vouch signing) and **S3** (browser `/wallet/` after standalone signing shows home-screen guidance)
+- `e2e/safari-keys-persistence.spec.ts` · `npm run e2e:safari-keys-persistence`
+- Tracker: [`SAFARI_KEYS_WIPE_INVESTIGATION.md`](SAFARI_KEYS_WIPE_INVESTIGATION.md) rollout step 16
+
+## Safari P1-4 (shipped)
 
 - On `hc_wallet` parse failure, hub shows urgent **`#device-hub-wallet-corrupt`** emphasis card (not stranger-empty hub)
-- **Import backup** CTA scrolls to hub import group
-- Saved-cards empty state suppressed while corrupt
-- Modules: `device-wallet-parse-core.mjs` · `device-hub-wallet-corrupt.mjs` · `device-wallet.mjs` (`getWalletLoadKind` / `isWalletStorageCorrupt`)
+- Hub **Import backup** + **Backup help** via `device-wallet-corrupt-core.mjs`; saved-cards empty hint hidden while corrupt
+- **`/wallet/`** `#wallet-tab-hint` uses shared corrupt copy + import/help CTAs
+- Modules: `device-wallet-parse-core.mjs` · `device-hub-wallet-corrupt.mjs` · `device-wallet-corrupt-core.mjs` · `wallet-page-chrome.mjs`
 - Tests: `npm run worker:test:wallet-corrupt`
 - Tracker: [`SAFARI_KEYS_WIPE_INVESTIGATION.md`](SAFARI_KEYS_WIPE_INVESTIGATION.md) rollout step 13
 

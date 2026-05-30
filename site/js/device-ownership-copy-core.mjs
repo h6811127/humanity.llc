@@ -203,6 +203,31 @@ export const WALLET_CORRUPT_HUB_TITLE =
 export const WALLET_CORRUPT_HUB_DETAIL =
   "Local storage for saved cards is damaged. Import an encrypted backup or recovery code below — humanity.llc cannot repair this browser file.";
 
+/** /wallet/ tab hint when `hc_wallet` is corrupt (P1-4 step 2). */
+export const WALLET_CORRUPT_PAGE_DETAIL =
+  "Saved cards on this device could not be read. Import a backup file below or open Backup help.";
+
+export const WALLET_CORRUPT_IMPORT_CTA = "Import backup";
+
+export const WALLET_CORRUPT_HELP_CTA = "Backup help";
+
+export const WALLET_CORRUPT_HELP_HREF = "/help/#ownership";
+
+/** PWA vs Safari signing context split (P2-2 · R5). */
+export const RESTORE_CONTROL_IN_THIS_APP = "Restore control in this app";
+
+export const PWA_MISMATCH_TITLE_STANDALONE =
+  "Ownership was last active in Safari";
+
+export const PWA_MISMATCH_DETAIL_STANDALONE =
+  "Saved cards are on this device, but signing was last active in a Safari tab. Restore control in this app.";
+
+export const PWA_MISMATCH_TITLE_BROWSER =
+  "Ownership may be in your Home Screen app";
+
+export const PWA_MISMATCH_DETAIL_BROWSER =
+  "Signing was last active in the installed app. Open humanity.llc from your home screen and restore control there.";
+
 /** iOS Safari ITP storage eviction notice (P2-1 · R4). */
 export const SAFARI_ITP_NOTICE_EYEBROW = "iPhone storage";
 

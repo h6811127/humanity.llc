@@ -2,8 +2,6 @@
  * Hub emphasis when `hc_wallet` parse fails (Safari P1-4 · R7).
  */
 import {
-  emphasisCardActionsHtml,
-  emphasisCardCtaSecondary,
   emphasisCardShellHtml,
 } from "./device-emphasis-card-html.mjs";
 import {
@@ -12,6 +10,11 @@ import {
   WALLET_CORRUPT_HUB_TITLE,
 } from "./device-ownership-copy-core.mjs";
 import { isWalletStorageCorrupt } from "./device-wallet.mjs";
+import {
+  scrollToHubImportForm,
+  walletCorruptActionsHtml,
+  WALLET_CORRUPT_IMPORT_ATTR,
+} from "./device-wallet-corrupt-core.mjs";
 
 const HOST_ID = "device-hub-wallet-corrupt";
 
@@ -30,27 +33,19 @@ function ensureHost() {
   return host;
 }
 
-function scrollHubToImport() {
-  const target =
-    document.getElementById("hub-import-form") ??
-    document.querySelector(".device-hub-import");
-  target?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-  const details = target instanceof HTMLDetailsElement ? target : target?.closest("details");
-  if (details instanceof HTMLDetailsElement) {
-    details.open = true;
-  }
-}
-
 let actionsBound = false;
 
 function bindActions(host) {
   if (actionsBound) return;
   actionsBound = true;
   host.addEventListener("click", (e) => {
-    const btn = e.target instanceof Element ? e.target.closest("[data-hub-wallet-corrupt-import]") : null;
+    const btn =
+      e.target instanceof Element
+        ? e.target.closest(`[${WALLET_CORRUPT_IMPORT_ATTR}]`)
+        : null;
     if (!btn) return;
     e.preventDefault();
-    scrollHubToImport();
+    scrollToHubImportForm();
   });
 }
 
@@ -73,9 +68,7 @@ export function renderHubWalletCorruptCard() {
     title: WALLET_CORRUPT_HUB_TITLE,
     detail: WALLET_CORRUPT_HUB_DETAIL,
     dot: "urgent",
-    actionsHtml: emphasisCardActionsHtml([
-      emphasisCardCtaSecondary("Import backup", "data-hub-wallet-corrupt-import"),
-    ]),
+    actionsHtml: walletCorruptActionsHtml(),
   });
   bindActions(host);
   return true;

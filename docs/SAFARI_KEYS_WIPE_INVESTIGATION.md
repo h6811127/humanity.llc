@@ -434,8 +434,8 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 
 | # | Change | Rationale |
 |---|--------|-----------|
-| **P2-1** | Safari / iOS in-product notice: 7-day inactivity eviction + “Add to Home Screen resets timer” | Sets expectations for R4 |
-| **P2-2** | Detect standalone vs browser wallet/session mismatch; one-tap **Restore control in this app** | R5 |
+| **P2-1** | Safari / iOS in-product notice: 7-day inactivity eviction + “Add to Home Screen resets timer” | Sets expectations for R4 · **Shipped** — `safari-itp-storage-notice.mjs` on shell pages |
+| **P2-2** | Detect standalone vs browser wallet/session mismatch; one-tap **Restore control in this app** | R5 · **Shipped** — `device-pwa-session-mismatch-core.mjs` · hub · `/wallet/` · scan actor band |
 | **P2-3** | WebKit E2E: `e2e/safari-keys-persistence.spec.ts` for S2, S3 on WebKit project | Regression |
 
 ### P3 — Architectural (longer term)
@@ -494,6 +494,7 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 | 12 | P1-3 PWA scan handoff (standalone same-tab) | **Shipped** | `pwa-scan-handoff-core.mjs` · `e2e/device-pwa-scan-handoff.spec.ts` |
 | 13 | P1-4 Corrupt wallet coach card | **Shipped** | `device-wallet-corrupt-core.mjs` · hub `#device-hub-wallet-corrupt` · `/wallet/` `#wallet-tab-hint` · `e2e:key-loss-sad-path` R7 |
 | 14 | P2-1 Safari ITP storage notice | **Shipped** | `safari-itp-storage-notice-core.mjs` · lazy bootstrap on `/` · `/wallet/` · `/created/` |
+| 15 | P2-2 PWA vs browser session mismatch | **Shipped** | `hc_last_signing_shell_mode` · hub custody · wallet tab hint · scan actor band |
 
 **P0-1 spec (reference for reviewers):**
 

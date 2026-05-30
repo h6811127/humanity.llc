@@ -15,6 +15,7 @@ import {
   defaultWalletLabel,
   getWalletCount,
   isWalletSaved,
+  isWalletStorageCorrupt,
   loadWallet,
   saveSessionToWallet,
 } from "./device-wallet.mjs";
@@ -51,7 +52,18 @@ function refreshAutoSaveLine() {
 
 function refreshHelpVisibility() {
   if (!helpDetails) return;
-  helpDetails.hidden = getWalletCount() > 0;
+  helpDetails.hidden = getWalletCount() > 0 || isWalletStorageCorrupt();
+}
+
+function refreshEmptyHint() {
+  const emptyHint = document.getElementById("device-hub-empty-hint");
+  if (!emptyHint) return;
+  loadWallet();
+  if (isWalletStorageCorrupt()) {
+    emptyHint.hidden = true;
+    return;
+  }
+  emptyHint.hidden = getWalletCount() > 0;
 }
 
 function bindWalletActiveLink() {
@@ -65,6 +77,7 @@ function bindWalletActiveLink() {
 }
 
 function updateContextBanners() {
+  refreshEmptyHint();
   refreshWalletContextFromChrome();
 }
 

@@ -7,8 +7,10 @@ import { getTabSession } from "./device-keys.mjs";
 import {
   OWNERSHIP_NOT_IN_TAB_PROMPT,
   RESTORE_CONTROL_HERE,
+  RESTORE_CONTROL_IN_THIS_APP,
 } from "./device-ownership-copy-core.mjs";
 import { walletOwnershipNotInTab } from "./device-ownership-not-in-tab-core.mjs";
+import { gatherPwaSessionMismatch } from "./device-pwa-session-mismatch.mjs";
 import { activateRestoreControlInThisTab } from "./device-ownership-restore-in-tab.mjs";
 import { getWalletCount, loadWalletSummary } from "./device-wallet.mjs";
 import { getDefaultVouchProfileId } from "./vouch-ready-keys.mjs";
@@ -70,12 +72,17 @@ function syncActorBandCopy() {
   const walletNotInTab = walletOwnershipNotInTab(signingCount, hasTabKeys);
 
   if (walletNotInTab) {
+    const pwaMismatch = gatherPwaSessionMismatch();
     root.classList.add("scan-actor-band--restore-prompt");
     if (title) title.textContent = "Ownership on this device";
-    if (lead) lead.textContent = OWNERSHIP_NOT_IN_TAB_PROMPT;
+    if (lead) {
+      lead.textContent = pwaMismatch?.detail ?? OWNERSHIP_NOT_IN_TAB_PROMPT;
+    }
     if (restoreBtn) {
-      restoreBtn.hidden = false;
-      restoreBtn.textContent = RESTORE_CONTROL_HERE;
+      restoreBtn.hidden = Boolean(pwaMismatch && !pwaMismatch.canRestoreInThisTab);
+      restoreBtn.textContent = pwaMismatch?.canRestoreInThisTab
+        ? RESTORE_CONTROL_IN_THIS_APP
+        : RESTORE_CONTROL_HERE;
     }
     if (vouchBtn) vouchBtn.hidden = true;
     return;

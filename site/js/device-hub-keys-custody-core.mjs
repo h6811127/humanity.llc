@@ -25,7 +25,7 @@ import {
 } from "./device-ownership-copy-core.mjs";
 import { walletOwnershipNotInTab } from "./device-ownership-not-in-tab-core.mjs";
 
-/** @typedef {'this_tab_active' | 'this_tab_unsaved' | 'cross_tab' | 'cross_tab_summary' | 'orphan' | 'vouch_default' | 'sign_lock' | 'vouch_nudge' | 'wallet_scale' | 'wallet_not_in_tab'} HubKeysCustodyRowKind */
+/** @typedef {'this_tab_active' | 'this_tab_unsaved' | 'cross_tab' | 'cross_tab_summary' | 'orphan' | 'vouch_default' | 'sign_lock' | 'vouch_nudge' | 'wallet_scale' | 'pwa_session_mismatch' | 'wallet_not_in_tab'} HubKeysCustodyRowKind */
 
 /**
  * @typedef {object} HubKeysCustodyPresenceEntry
@@ -41,6 +41,7 @@ import { walletOwnershipNotInTab } from "./device-ownership-not-in-tab-core.mjs"
  * @property {string} title
  * @property {string} subtitle
  * @property {HubKeysCustodyPresenceEntry} [entry]
+ * @property {boolean} [canRestoreInThisTab]
  */
 
 /**
@@ -74,6 +75,9 @@ export function labelForHubKeysCustodyEntry(entry) {
  *   savedCardCount?: number,
  *   walletScaleHint?: string | null,
  *   walletScaleTitle?: string | null,
+ *   pwaSessionMismatchTitle?: string | null,
+ *   pwaSessionMismatchDetail?: string | null,
+ *   pwaSessionMismatchCanRestore?: boolean,
  * }} input
  * @returns {HubKeysCustodyPanelState}
  */
@@ -94,6 +98,9 @@ export function buildHubKeysCustodyPanel(input) {
     savedCardCount = 0,
     walletScaleHint: walletScaleHintText = null,
     walletScaleTitle = null,
+    pwaSessionMismatchTitle = null,
+    pwaSessionMismatchDetail = null,
+    pwaSessionMismatchCanRestore = false,
   } = input;
 
   /** @type {HubKeysCustodyRow[]} */
@@ -119,6 +126,19 @@ export function buildHubKeysCustodyPanel(input) {
   );
 
   if (
+    pwaSessionMismatchTitle &&
+    pwaSessionMismatchDetail &&
+    tabNoticeCount === 0 &&
+    crossTabEntries.length === 0 &&
+    orphanRemovedEntries.length === 0
+  ) {
+    rows.push({
+      kind: "pwa_session_mismatch",
+      title: pwaSessionMismatchTitle,
+      subtitle: pwaSessionMismatchDetail,
+      canRestoreInThisTab: pwaSessionMismatchCanRestore,
+    });
+  } else if (
     walletNotInTab &&
     tabNoticeCount === 0 &&
     crossTabEntries.length === 0 &&
@@ -189,6 +209,7 @@ export function buildHubKeysCustodyPanel(input) {
     !defaultVouchProfileId &&
     tabNoticeCount === 0 &&
     !hasActiveKeys &&
+    !pwaSessionMismatchTitle &&
     !walletNotInTab &&
     crossTabEntries.length === 0 &&
     orphanRemovedEntries.length === 0

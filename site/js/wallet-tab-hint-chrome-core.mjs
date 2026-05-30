@@ -6,6 +6,14 @@
 import { walletOwnershipNotInTab } from "./device-ownership-not-in-tab-core.mjs";
 
 /**
+ * Corrupt `hc_wallet` — show urgent tab hint before cross-tab / not-in-tab (P1-4 step 2).
+ * @param {"empty" | "ok" | "corrupt"} walletLoadKind
+ */
+export function shouldShowWalletCorruptHint(walletLoadKind) {
+  return walletLoadKind === "corrupt";
+}
+
+/**
  * @param {boolean} hasShellBadge
  * @param {number} orphanCount
  * @param {number} crossTabCount
