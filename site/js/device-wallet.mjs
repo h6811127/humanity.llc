@@ -8,7 +8,11 @@ import { verificationRecordFromLabelState } from "./device-wallet-network-core.m
 import { reconcileRemovedProfilesAfterWalletSave } from "./device-wallet-removed-profiles.mjs";
 import { setLastActiveProfileId } from "./device-quiet-tab-rehydrate-prefs.mjs";
 import { scheduleStoragePersistRequest } from "./device-storage-persist.mjs";
-import { walletSaveErrorMessage } from "./device-wallet-save-core.mjs";
+import {
+  verifyWalletStorageWrite,
+  WALLET_SAVE_VERIFY_FAILED,
+  walletSaveErrorMessage,
+} from "./device-wallet-save-core.mjs";
 import { mergeOwnershipSeatbeltFields } from "./created-first-session-gate-core.mjs";
 import { classifyWalletStorageRaw } from "./device-wallet-parse-core.mjs";
 import {
@@ -259,6 +263,9 @@ export function saveWallet(entries) {
     localStorage.setItem(WALLET_STORAGE_KEY, serialized);
   } catch (err) {
     return { error: walletSaveErrorMessage(err) };
+  }
+  if (!verifyWalletStorageWrite(localStorage, WALLET_STORAGE_KEY, serialized)) {
+    return { error: WALLET_SAVE_VERIFY_FAILED };
   }
   try {
     localStorage.setItem(WALLET_SUMMARY_STORAGE_KEY, serializeWalletSummaryForStorage(summary));
