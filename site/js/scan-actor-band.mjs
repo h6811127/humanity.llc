@@ -18,6 +18,12 @@ import {
   SCAN_ACTOR_BAND_REVEAL_MS,
   scanActorBandEligible,
 } from "./scan-actor-band-core.mjs";
+import { isIosWebKitUserAgent } from "./safari-itp-storage-notice-core.mjs";
+import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
+import {
+  readStewardScanQueryParamFromSearch,
+  shouldDeferScanActorBandForStewardHandoff,
+} from "./scan-pwa-camera-handoff-core.mjs";
 
 function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -122,8 +128,19 @@ function bindActions() {
   });
 }
 
+function stewardHandoffDefersActorBand() {
+  const session = getTabSession();
+  return shouldDeferScanActorBandForStewardHandoff({
+    stewardLanding: readStewardScanQueryParamFromSearch(location.search),
+    isIosWebKit: isIosWebKitUserAgent(navigator.userAgent, navigator),
+    standalone: readStandaloneModeFromWindow(window),
+    hasTabKeys: Boolean(session?.owner_private_key_b58),
+  });
+}
+
 function onLiveCheckSettled(event) {
   if (!gatherEligibility()) return;
+  if (stewardHandoffDefersActorBand()) return;
   bindActions();
   revealBand(Boolean(event.detail?.instant) || prefersReducedMotion());
 }

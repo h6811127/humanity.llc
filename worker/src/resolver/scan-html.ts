@@ -1128,7 +1128,7 @@ function renderScanActorBand(vm: ScanViewModel, origin: string): string {
 function renderScanActorBandScript(vm: ScanViewModel, origin: string): string {
   if (vm.kind !== "active" || !vm.profileId) return "";
   const assetOrigin = pagesJsOrigin(origin);
-  const mod = JSON.stringify(`${assetOrigin}/js/scan-actor-band.mjs?v=2`);
+  const mod = JSON.stringify(`${assetOrigin}/js/scan-actor-band.mjs?v=3`);
   return `<script type="module" src=${mod}></script>`;
 }
 

@@ -3,6 +3,8 @@
  * @see docs/PWA_STANDALONE_EXTERNAL_NAVIGATION.md
  */
 
+import { appendStewardScanQueryParam } from "./scan-pwa-camera-handoff-core.mjs";
+
 export const PWA_SCAN_HANDOFF_DOC = "docs/PWA_STANDALONE_EXTERNAL_NAVIGATION.md";
 
 /** Query param on scan URL — steward preview return path (P2). */
@@ -197,7 +199,10 @@ export function shouldShowStewardPreviewReturnBanner(returnUrl) {
 export function buildStewardScanPreviewHref(scanUrl, opts = {}) {
   const href = typeof scanUrl === "string" ? scanUrl.trim() : "";
   if (!isAllowedScanPreviewUrl(href)) return href;
-  if (!opts.standalone || !opts.returnUrl) return href;
+  if (!opts.standalone || !opts.returnUrl) {
+    if (!opts.standalone) return appendStewardScanQueryParam(href);
+    return href;
+  }
   const pageOrigin = opts.pageOrigin ?? "";
   if (!pageOrigin) return href;
   return appendStewardPreviewReturnToScanUrl(href, opts.returnUrl, pageOrigin);

@@ -36,8 +36,15 @@ import { soleSigningVouchActivateEntry } from "./vouch-scan-sole-signing-activat
 import {
   VOUCH_PWA_CAMERA_HANDOFF_LEAD,
   VOUCH_PWA_CAMERA_HANDOFF_STEPS,
+  VOUCH_PWA_STEWARD_PARAM_HANDOFF_LEAD,
+  VOUCH_PWA_STEWARD_PARAM_HANDOFF_STEPS,
 } from "./device-ownership-copy-core.mjs";
-import { shouldShowScanPwaCameraHandoff } from "./scan-pwa-camera-handoff-core.mjs";
+import {
+  appendStewardScanQueryParam,
+  prioritizeStewardHandoffOnScan,
+  readStewardScanQueryParamFromSearch,
+  shouldShowScanPwaCameraHandoff,
+} from "./scan-pwa-camera-handoff-core.mjs";
 import { isIosWebKitUserAgent } from "./safari-itp-storage-notice-core.mjs";
 import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
 import {
@@ -595,7 +602,7 @@ function mountPwaCameraHandoffActions() {
   copyBtn.addEventListener("click", async () => {
     copyBtn.disabled = true;
     try {
-      await navigator.clipboard.writeText(location.href);
+      await navigator.clipboard.writeText(appendStewardScanQueryParam(location.href));
       copyBtn.textContent = "Link copied";
       setStatus("Copied. Open your Home Screen app and paste under Open scan link.", "neutral");
     } catch {
@@ -617,19 +624,27 @@ function mountPwaCameraHandoffActions() {
 async function showNoKeysExplainer(voucheeProfileId) {
   const wallet = loadWallet();
   const walletUrl = `${location.origin}/wallet/`;
+  const stewardLanding = readStewardScanQueryParamFromSearch(location.search);
+  const handoffCtx = {
+    isIosWebKit: isIosWebKitUserAgent(navigator.userAgent, navigator),
+    standalone: readStandaloneModeFromWindow(window),
+    walletCount: wallet.length,
+    stewardLanding,
+  };
 
-  if (
-    shouldShowScanPwaCameraHandoff({
-      isIosWebKit: isIosWebKitUserAgent(navigator.userAgent, navigator),
-      standalone: readStandaloneModeFromWindow(window),
-      walletCount: wallet.length,
-    })
-  ) {
+  if (shouldShowScanPwaCameraHandoff(handoffCtx)) {
+    const lead = stewardLanding
+      ? VOUCH_PWA_STEWARD_PARAM_HANDOFF_LEAD
+      : VOUCH_PWA_CAMERA_HANDOFF_LEAD;
+    const steps = stewardLanding
+      ? VOUCH_PWA_STEWARD_PARAM_HANDOFF_STEPS
+      : VOUCH_PWA_CAMERA_HANDOFF_STEPS;
     showExplainerHtml(
-      `${VOUCH_PWA_CAMERA_HANDOFF_LEAD} ${VOUCH_PWA_CAMERA_HANDOFF_STEPS} ` +
+      `${lead} ${steps} ` +
         `<a href="${location.origin}/features/vouching.html">How vouching works</a>.`
     );
     mountPwaCameraHandoffActions();
+    if (stewardLanding) prioritizeStewardHandoffOnScan();
     return;
   }
 

@@ -1,6 +1,6 @@
 # Steward scan handoff — camera, Safari, PWA, and vouch
 
-**Status:** Active — **S1 shipped** (clipboard handoff) · **S2 shipped** (hub recovery import) · **S3 shipped** (in-app QR scanner) · **S4 shipped** (product guidance)  
+**Status:** Active — **S1 shipped** (clipboard handoff) · **S2 shipped** (hub recovery import) · **S3 shipped** (in-app QR scanner) · **S4 shipped** (product guidance) · **S5 shipped** (steward scan query param)  
 **Date:** 2026-05-30  
 **Audience:** Product, design, engineering, QA  
 **Related:** [`PWA_STANDALONE_EXTERNAL_NAVIGATION.md`](PWA_STANDALONE_EXTERNAL_NAVIGATION.md) · [`PWA_INSTALL.md`](PWA_INSTALL.md) · [`V1_DECISION_LOCK.md`](V1_DECISION_LOCK.md) (HTTPS print QR) · [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`OWNERSHIP_RESTORE_UX_PLAN.md`](OWNERSHIP_RESTORE_UX_PLAN.md) · [`KEY_LOSS_SAD_PATH_MATRIX.md`](KEY_LOSS_SAD_PATH_MATRIX.md)
@@ -43,7 +43,7 @@ This is distinct from **P1 shipped** steward scan preview (PWA → scan same-tab
 | **S2** | Hub recovery import | **Shipped** | Move card Safari ↔ PWA with recovery code + scan link (no file) |
 | **S3** | In-app QR scanner | **Shipped** | Open PWA → **Scan QR to vouch** → same-tab scan + keys |
 | **S4** | Product guidance | **Shipped** | Hub Restore & scan label + iPhone vouch guidance; PWA install + setup copy |
-| **S5** | Scan-page steward param | Planned | `?hc_steward=1` → handoff UI first on Safari |
+| **S5** | Scan-page steward param | **Shipped** | `?hc_steward=1` → handoff UI first on Safari |
 | **S6** | Short handoff URL | Planned | Branded interstitial for camera landings |
 | **S7** | Dual-QR print materials | Planned | Public QR + steward handoff QR on internal collateral |
 | **S8** | Native app / Universal Links | Future | Camera opens app when installed |
@@ -82,9 +82,18 @@ Steward never leaves PWA; printed QR scanned from inside app. Modules: `device-h
 
 Manual QA: **P1-PWA-V** in [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md).
 
-### S5 — Steward query param (planned)
+### S5 — Steward query param (shipped)
 
-Scan URL may include `hc_steward=1` (or similar) so Safari landings show handoff-first UI before stranger trust chrome. Does not auto-open PWA; orients stewards immediately.
+Scan URL may include `hc_steward=1` (or `true`) so Safari landings show handoff-first UI before the L3 actor band and stranger trust chrome. Does not auto-open PWA; orients stewards immediately.
+
+**Behavior:**
+
+- iOS Safari + `hc_steward=1` + no tab keys → PWA handoff explainer even when `hc_wallet` has rows (PWA-only custody).
+- **Copy scan link** always appends `hc_steward=1` when missing.
+- Steward workspace links opened in a **browser tab** (non-standalone) get `hc_steward=1` via `buildStewardScanPreviewHref`.
+- Actor band reveal is skipped while handoff applies; vouch section scrolls into view.
+
+Modules: [`scan-pwa-camera-handoff-core.mjs`](../site/js/scan-pwa-camera-handoff-core.mjs), [`vouch-issue.mjs`](../site/js/vouch-issue.mjs), [`scan-actor-band.mjs`](../site/js/scan-actor-band.mjs).
 
 ### S6 — Short handoff URL (planned)
 
@@ -135,7 +144,7 @@ flowchart TB
 
 | Module | Role |
 |--------|------|
-| `scan-pwa-camera-handoff-core.mjs` | iOS Safari empty-wallet detection |
+| `scan-pwa-camera-handoff-core.mjs` | iOS Safari handoff detection + `hc_steward` param (S5) |
 | `device-hub-open-scan-core.mjs` | Parse pasted scan URLs |
 | `device-hub-open-scan.mjs` | Hub open scan link form |
 | `device-hub-import-recovery.mjs` | Hub recovery code import |

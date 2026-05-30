@@ -348,6 +348,13 @@ export const VOUCH_PWA_CAMERA_HANDOFF_LEAD =
 export const VOUCH_PWA_CAMERA_HANDOFF_STEPS =
   "Copy this scan link → open humanity.llc from your Home Screen → tap the status dot → Open scan link → paste → attest.";
 
+/** Safari steward landing with `?hc_steward=1` (S5). */
+export const VOUCH_PWA_STEWARD_PARAM_HANDOFF_LEAD =
+  "This scan is for stewards who vouch from a Home Screen app. Your camera opened Safari — your steward card is not in this tab.";
+
+export const VOUCH_PWA_STEWARD_PARAM_HANDOFF_STEPS =
+  "Copy this scan link → open humanity.llc from your Home Screen icon → status dot → Open scan link → paste → attest.";
+
 /** Hub in-app QR scanner (S3). */
 export const HUB_SCAN_QR_BTN = "Scan QR to vouch";
 
