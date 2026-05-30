@@ -10,7 +10,7 @@
 
 | Stream | Canonical doc | Engineering tracker | Primary surfaces |
 |--------|---------------|---------------------|------------------|
-| **Steward scan handoff / PWA vouch** | [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) | **S1–S7 shipped** · **RC-1 encode fix** | [`STEWARD_HANDOFF_QR_NOT_DISPLAYING_INVESTIGATION.md`](STEWARD_HANDOFF_QR_NOT_DISPLAYING_INVESTIGATION.md) |
+| **Steward scan handoff / PWA vouch** | [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) | **S1–S7 shipped** · **RC-1 + P1 cache bump shipped** | [`STEWARD_HANDOFF_QR_NOT_DISPLAYING_INVESTIGATION.md`](STEWARD_HANDOFF_QR_NOT_DISPLAYING_INVESTIGATION.md) |
 | **Safari keys / ITP** | [`SAFARI_KEYS_WIPE_INVESTIGATION.md`](SAFARI_KEYS_WIPE_INVESTIGATION.md) | Rollout steps 1–22 (**shipped** on `main`) | `device-quiet-tab-rehydrate*`, `scan-tab-keys`, shell copy, `safari-itp-storage-notice*`, `safari-storage-persist-denied-notice*` (RC-2) |
 | **Ownership restore UX** | [`OWNERSHIP_RESTORE_UX_PLAN.md`](OWNERSHIP_RESTORE_UX_PLAN.md) | Phases 1–4 + Safari cross-refs | `/created/` view mode, hub import, `device-ownership-*` |
 | **H-12 printed live-control QA** | [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md) | H-09–H-13 · sad-path S10–S12 | Scan live proof, `e2e/live-control-loop.spec.ts`, operator scripts |
@@ -83,6 +83,7 @@ npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts
 
 | Date | Event |
 |------|--------|
+| 2026-05-30 | **Steward handoff QR RC-1 + P1** — encode guard unified (`qr-encode-url-core.mjs`); `created.mjs?v=70` · [`STEWARD_HANDOFF_QR_NOT_DISPLAYING_INVESTIGATION.md`](STEWARD_HANDOFF_QR_NOT_DISPLAYING_INVESTIGATION.md) |
 | 2026-05-30 | **Steward handoff QR not displaying** — RC-1 confirmed (`qr-branding` vs `qr-render` guard split) · [`STEWARD_HANDOFF_QR_NOT_DISPLAYING_INVESTIGATION.md`](STEWARD_HANDOFF_QR_NOT_DISPLAYING_INVESTIGATION.md) |
 | 2026-05-30 | **Steward scan handoff S1–S3** — canonical doc + hub QR scanner + clipboard handoff · [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) |
 | 2026-05-30 | **PWA camera handoff** — hub recovery import + Open scan link + vouch Safari explainer |
