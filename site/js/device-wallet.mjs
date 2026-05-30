@@ -13,6 +13,8 @@ import {
   WALLET_SAVE_VERIFY_FAILED,
   walletSaveErrorMessage,
 } from "./device-wallet-save-core.mjs";
+import { EPHEMERAL_BROWSING_SAVE_BLOCKED } from "./device-ownership-copy-core.mjs";
+import { isLocalStorageEphemeral } from "./private-browsing-detect-core.mjs";
 import { mergeOwnershipSeatbeltFields } from "./created-first-session-gate-core.mjs";
 import { classifyWalletStorageRaw } from "./device-wallet-parse-core.mjs";
 import {
@@ -247,6 +249,9 @@ export function loadWalletSummary() {
 }
 
 export function saveWallet(entries) {
+  if (isLocalStorageEphemeral()) {
+    return { error: EPHEMERAL_BROWSING_SAVE_BLOCKED };
+  }
   if (isWalletStorageCorrupt()) {
     return {
       error:

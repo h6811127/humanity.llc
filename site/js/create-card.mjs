@@ -20,6 +20,13 @@ import {
   shouldSyncAutoSaveBeforeCreateNavigate,
 } from "./created-device-save-core.mjs";
 import { defaultWalletLabel, saveSessionToWallet } from "./device-wallet.mjs";
+import {
+  EPHEMERAL_BROWSING_CREATE_BLOCKED,
+  EPHEMERAL_BROWSING_DETAIL,
+  EPHEMERAL_BROWSING_EYEBROW,
+  EPHEMERAL_BROWSING_TITLE,
+} from "./device-ownership-copy-core.mjs";
+import { isEphemeralBrowsingStorage } from "./private-browsing-detect-core.mjs";
 import { buildObjectStreamsFromFormRows } from "./object-streams-core.mjs";
 import {
   qrExpiryFromIssued,
@@ -38,6 +45,17 @@ const form = document.getElementById("create-form");
 const statusEl = document.getElementById("status");
 const submitBtn = document.getElementById("submit");
 const demoBtn = document.getElementById("create-demo-btn");
+const ephemeralNoticeEl = document.getElementById("create-ephemeral-browsing-notice");
+
+let ephemeralBrowsing = false;
+try {
+  ephemeralBrowsing = isEphemeralBrowsingStorage({
+    localStorage,
+    sessionStorage,
+  });
+} catch {
+  ephemeralBrowsing = true;
+}
 const fieldsGeneral = document.getElementById("create-fields-general");
 const fieldsStatusPlate = document.getElementById("create-fields-status-plate");
 const fieldsLostItem = document.getElementById("create-fields-lost-item");
@@ -411,6 +429,10 @@ function readValidatedCreateInput() {
 
 async function submitCreate(e, opts = {}) {
   e?.preventDefault();
+  if (ephemeralBrowsing) {
+    setStatus(EPHEMERAL_BROWSING_CREATE_BLOCKED, true);
+    return;
+  }
   if (submitBtn) submitBtn.disabled = true;
   if (demoBtn) demoBtn.disabled = true;
 
@@ -470,6 +492,27 @@ const urlMerchRef = readMerchRefFromUrl();
 if (urlMerchRef) persistMerchCreateRef(urlMerchRef);
 
 syncCreateFlowConvergence(activeTemplate);
+
+function initEphemeralBrowsingGate() {
+  if (!ephemeralBrowsing) return;
+  if (submitBtn) submitBtn.disabled = true;
+  if (demoBtn) demoBtn.disabled = true;
+  if (!ephemeralNoticeEl) return;
+  ephemeralNoticeEl.hidden = false;
+  ephemeralNoticeEl.className =
+    "hc-emphasis-card hc-emphasis-card--urgent flow-form-warning create-ephemeral-browsing-notice";
+  ephemeralNoticeEl.setAttribute("role", "alert");
+  ephemeralNoticeEl.innerHTML = `<div class="hc-emphasis-card__main">
+    <span class="hc-emphasis-card__dot hc-emphasis-card__dot--urgent" aria-hidden="true"></span>
+    <div class="hc-emphasis-card__copy">
+      <p class="hc-emphasis-card__eyebrow">${EPHEMERAL_BROWSING_EYEBROW}</p>
+      <p class="hc-emphasis-card__title">${EPHEMERAL_BROWSING_TITLE}</p>
+      <p class="hc-emphasis-card__detail">${EPHEMERAL_BROWSING_DETAIL}</p>
+    </div>
+  </div>`;
+}
+
+initEphemeralBrowsingGate();
 
 demoBtn?.addEventListener("click", async () => {
   const handleEl = document.getElementById("handle");

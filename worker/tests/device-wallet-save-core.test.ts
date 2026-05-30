@@ -12,6 +12,7 @@ import {
   walletSaveErrorMessage,
   walletSaveOk,
 } from "../../site/js/device-wallet-save-core.mjs";
+import { STORAGE_PROBE_KEY } from "../../site/js/private-browsing-detect-core.mjs";
 import {
   loadWallet,
   resetWalletCachesForTests,
@@ -91,7 +92,11 @@ describe("saveWallet P0-3", () => {
       qr_id: "qr_xBZTq7M27tueCzBY",
       owner_private_key_b58: "priv",
     };
-    vi.mocked(localStorage.setItem).mockImplementationOnce(() => {
+    vi.mocked(localStorage.setItem).mockImplementation((key, value) => {
+      if (key === STORAGE_PROBE_KEY) {
+        localStore.set(String(key), String(value));
+        return;
+      }
       throw new DOMException("quota", "QuotaExceededError");
     });
 
@@ -102,7 +107,11 @@ describe("saveWallet P0-3", () => {
   });
 
   it("saveSessionToWallet propagates saveWallet errors", () => {
-    vi.mocked(localStorage.setItem).mockImplementation(() => {
+    vi.mocked(localStorage.setItem).mockImplementation((key, value) => {
+      if (key === STORAGE_PROBE_KEY) {
+        localStore.set(String(key), String(value));
+        return;
+      }
       throw new DOMException("quota", "QuotaExceededError");
     });
 
@@ -121,8 +130,15 @@ describe("saveWallet P0-3", () => {
       qr_id: "qr_xBZTq7M27tueCzBY",
       owner_private_key_b58: "priv",
     };
-    vi.mocked(localStorage.setItem).mockImplementation(() => {});
-    vi.mocked(localStorage.getItem).mockReturnValue(null);
+    vi.mocked(localStorage.setItem).mockImplementation((key, value) => {
+      if (key === STORAGE_PROBE_KEY) {
+        localStore.set(String(key), String(value));
+      }
+    });
+    vi.mocked(localStorage.getItem).mockImplementation((key) => {
+      if (key === "hc_wallet") return null;
+      return localStore.get(String(key)) ?? null;
+    });
 
     const result = saveWallet([entry]);
     expect(result).toEqual({ error: WALLET_SAVE_VERIFY_FAILED });
@@ -146,5 +162,20 @@ describe("saveWallet P0-3", () => {
     const result = saveWallet([entry]);
     expect(result).toEqual({ error: WALLET_SAVE_VERIFY_FAILED });
     expect(loadWallet()).toEqual([]);
+  });
+
+  it("returns ephemeral error when localStorage probe fails (RC-6)", () => {
+    vi.mocked(localStorage.setItem).mockImplementation(() => {
+      throw new DOMException("SecurityError");
+    });
+
+    const result = saveWallet([
+      {
+        profile_id: "p1",
+        qr_id: "qr_xBZTq7M27tueCzBY",
+        owner_private_key_b58: "priv",
+      },
+    ]);
+    expect(result.error).toMatch(/private browsing/i);
   });
 });

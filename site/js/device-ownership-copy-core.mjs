@@ -262,6 +262,21 @@ export const SETUP_WALLET_SAVED_CONFIRMATION = "Saved on this device.";
 export const SETUP_WALLET_SAVED_DONE_DETAIL =
   "Your control key is saved on this device. Open card controls when you are ready.";
 
+/** Private / ephemeral browsing — create and save blocked (RC-6). */
+export const EPHEMERAL_BROWSING_EYEBROW = "Private browsing";
+
+export const EPHEMERAL_BROWSING_TITLE =
+  "This browser will not keep saved ownership";
+
+export const EPHEMERAL_BROWSING_DETAIL =
+  "Private or temporary browsing modes delete site storage when you close the tab. Open humanity.llc in a normal browser window to create cards and save control on this device.";
+
+export const EPHEMERAL_BROWSING_CREATE_BLOCKED =
+  "Cannot create in private browsing — ownership cannot be saved on this device. Open humanity.llc in a normal browser window and try again.";
+
+export const EPHEMERAL_BROWSING_SAVE_BLOCKED =
+  "Cannot save ownership in private browsing — it will not stay on this device. Open humanity.llc in a normal browser window and save again.";
+
 /** Hub / wallet empty state — Layer 2 (D9). @see docs/HUB_STRANGER_ONBOARDING.md */
 export const HUB_PINS_BOOKMARKS_ONLY = "Bookmarks only — cannot manage objects";
 

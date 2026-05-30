@@ -1,7 +1,7 @@
 # Investigation: Saved card disappeared from hub (iPhone Safari)
 
 **Date:** 2026-05-29 (opened from steward report — card saved, hub empty ~20 min later)  
-**Status:** Active — RC-1/RC-2 shipped; RC-4+ backlog open  
+**Status:** Active — RC-1/RC-2/RC-4/RC-6 shipped; RC-3+ backlog open  
 **Reporter:** Steward on iPhone Safari after create + explicit save  
 **Related:** [`SAFARI_KEYS_WIPE_INVESTIGATION.md`](SAFARI_KEYS_WIPE_INVESTIGATION.md) · [`KEY_LOSS_SAD_PATH_MATRIX.md`](KEY_LOSS_SAD_PATH_MATRIX.md) · [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md) · [`PWA_INSTALL.md`](PWA_INSTALL.md)
 
@@ -36,7 +36,7 @@ The **~20 minute** delay does **not** match any client-side interval. It usually
 
 ## Root-cause catalog (prioritized)
 
-Fix backlog order matches this list. **RC-1, RC-2, and RC-4 are implemented.**
+Fix backlog order matches this list. **RC-1, RC-2, RC-4, and RC-6 are implemented.**
 
 ### RC-1 — No post-save read-back verification **(product gap · fix shipped)**
 
@@ -101,15 +101,16 @@ Fix backlog order matches this list. **RC-1, RC-2, and RC-4 are implemented.**
 
 ---
 
-### RC-6 — Private / ephemeral browsing
+### RC-6 — Private / ephemeral browsing **(fix shipped)**
 
 | Field | Detail |
 |-------|--------|
 | **Layer** | Platform |
 | **Mechanism** | Private mode: writes may fail or vanish when session ends. |
 | **User pattern** | Worked in session; gone after close. |
-| **Still possible?** | **Yes** |
-| **Fix backlog** | Detect private mode; block create/save with explicit copy. |
+| **Still possible?** | **In-session Safari private yes** — probe catches throw/mismatch only |
+| **Fix** | **Shipped** — `private-browsing-detect-core.mjs` probes `localStorage` + `sessionStorage`; blocks `/create/` submit and `saveWallet()` with explicit copy. |
+| **Tests** | `worker/tests/private-browsing-detect-core.test.ts` · `npm run worker:test:private-browsing` |
 
 ---
 
@@ -393,7 +394,7 @@ Run on the **tab where the hub looks empty** (Safari → Develop → device → 
 | **2** | RC-2 | Persist-denied iOS warning card | **Shipped** |
 | **3** | RC-4 | Setup cannot complete until `isWalletSaved` | **Shipped** |
 | 4 | RC-3 | Reinforce backup-before-live + Home Screen guidance | Partial (P0-4, P2-1) |
-| 5 | RC-6 | Private mode detection | Open |
+| 5 | RC-6 | Private mode detection | **Shipped** |
 | 6 | RC-13 | Canonical origin enforcement | Open |
 | 7 | RC-14 | Search/cap UX audit | Open |
 | 8 | RC-15 | Hub open integrity heartbeat | Open |
@@ -407,6 +408,7 @@ Run on the **tab where the hub looks empty** (Safari → Develop → device → 
 | RC-1, RC-5 | `npm run worker:test -- worker/tests/device-wallet-save-core.test.ts` |
 | RC-2 | `npm run worker:test:safari-persist-denied-notice` |
 | RC-4 | `npm run worker:test:setup-protect` · `worker/tests/created-setup-core.test.ts` |
+| RC-6 | `npm run worker:test:private-browsing` |
 | RC-7 | `npm run worker:test:wallet-corrupt` · `npm run e2e:key-loss-sad-path` |
 | RC-8, RC-9 | `npm run e2e:safari-keys-persistence` |
 | Copy | `npm run worker:test:key-loss-copy` |
