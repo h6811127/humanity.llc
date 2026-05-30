@@ -377,7 +377,7 @@ flowchart TD
 | **S7** | Low storage iOS → many tabs | Session storage may clear | **Yes** |
 | **S8** | Hub remove card → confirm clear other tabs | Intentional key clear | Yes (expected) |
 
-Automated partial coverage: `e2e/key-loss-sad-path.spec.ts` (K1, K5), `e2e/device-cross-tab-keys.spec.ts` (K4). **No WebKit E2E for S2, S3, S6.**
+Automated partial coverage: `e2e/key-loss-sad-path.spec.ts` (K1, K5), `e2e/device-cross-tab-keys.spec.ts` (K4), `e2e:safari-keys-persistence` (S2, S3 WebKit). **No automated S6 (ITP 7-day).**
 
 ---
 
@@ -436,7 +436,7 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 |---|--------|-----------|
 | **P2-1** | Safari / iOS in-product notice: 7-day inactivity eviction + “Add to Home Screen resets timer” | Sets expectations for R4 · **Shipped** — `safari-itp-storage-notice.mjs` on shell pages |
 | **P2-2** | Detect standalone vs browser wallet/session mismatch; one-tap **Restore control in this app** | R5 · **Shipped** — `device-pwa-session-mismatch-core.mjs` · hub · `/wallet/` · scan actor band |
-| **P2-3** | WebKit E2E: `e2e/safari-keys-persistence.spec.ts` for S2, S3 on WebKit project | Regression |
+| **P2-3** | WebKit E2E: `e2e/safari-keys-persistence.spec.ts` for S2, S3 on WebKit project | Regression · **Shipped** — `e2e:safari-keys-persistence` (webkit + iphone-13-pro) |
 
 ### P3 — Architectural (longer term)
 
@@ -495,6 +495,7 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 | 13 | P1-4 Corrupt wallet coach card | **Shipped** | `device-wallet-corrupt-core.mjs` · hub `#device-hub-wallet-corrupt` · `/wallet/` `#wallet-tab-hint` · `e2e:key-loss-sad-path` R7 |
 | 14 | P2-1 Safari ITP storage notice | **Shipped** | `safari-itp-storage-notice-core.mjs` · lazy bootstrap on `/` · `/wallet/` · `/created/` |
 | 15 | P2-2 PWA vs browser session mismatch | **Shipped** | `hc_last_signing_shell_mode` · hub custody · wallet tab hint · scan actor band |
+| 16 | P2-3 WebKit keys persistence E2E | **Shipped** | `e2e/safari-keys-persistence.spec.ts` · S2 scan rehydrate · S3 wallet mismatch |
 
 **P0-1 spec (reference for reviewers):**
 
@@ -648,8 +649,8 @@ These surfaces can simultaneously show “saved / OK” and block signing — us
 | K5 wallet empty | `e2e/key-loss-sad-path.spec.ts` | — |
 | Shell quiet rehydrate wiring | `worker/tests/device-quiet-tab-rehydrate.test.ts` | — |
 | **Scan quiet rehydrate wiring** | `worker/tests/device-quiet-tab-rehydrate.test.ts` (P0-1) | **No runtime E2E** |
-| S2 Camera new tab → scan vouch | — | **WebKit E2E missing** (P2-3) |
-| S3 PWA → Safari scan | — | **WebKit E2E missing** |
+| S2 Camera new tab → scan vouch | `e2e/safari-keys-persistence.spec.ts` (webkit) | — |
+| S3 PWA → Safari scan | Same E2E S3 (`/wallet/` tab hint) | Full scan actor band needs fixture regen for restore btn |
 | S6 ITP 7-day | — | Manual / platform |
 | Scan dot honesty (R9) | Partial `scan-page-dot-contract` | Behavior E2E after P0-5 |
 | R11 keyless session | `worker/tests/device-tab-session.test.ts` | K1 asserts no keyless `hc_created` |
@@ -686,3 +687,5 @@ Sources: WebKit ITP blog; [`PWA_INSTALL.md`](PWA_INSTALL.md); [`SAFARI_PERFORMAN
 | 2026-05-29 | **P0b-3 shipped:** sole signing row scan vouch auto-activate |
 | 2026-05-29 | **P1-2 shipped:** hub · landing dot · `/wallet/` tab hint · view-only Live banner · scan actor band restore CTA |
 | 2026-05-29 | **P1-2 step 1 shipped:** shell tab-honest dot + hub `wallet_not_in_tab` restore row |
+| 2026-05-29 | **P2-2 shipped:** PWA vs Safari session mismatch — `hc_last_signing_shell_mode` · hub · wallet · scan actor band |
+| 2026-05-29 | **P2-3 shipped:** WebKit E2E `e2e/safari-keys-persistence.spec.ts` — matrix S2 scan rehydrate · S3 wallet mismatch |
