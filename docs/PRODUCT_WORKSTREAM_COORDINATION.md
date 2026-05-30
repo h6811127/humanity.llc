@@ -10,7 +10,7 @@
 
 | Stream | Canonical doc | Engineering tracker | Primary surfaces |
 |--------|---------------|---------------------|------------------|
-| **Safari keys / ITP** | [`SAFARI_KEYS_WIPE_INVESTIGATION.md`](SAFARI_KEYS_WIPE_INVESTIGATION.md) | Rollout steps 1–17 (**shipped** on `main`) | `device-quiet-tab-rehydrate*`, `scan-tab-keys`, shell copy, `safari-itp-storage-notice*` |
+| **Safari keys / ITP** | [`SAFARI_KEYS_WIPE_INVESTIGATION.md`](SAFARI_KEYS_WIPE_INVESTIGATION.md) | Rollout steps 1–21 (**shipped** on `main`) | `device-quiet-tab-rehydrate*`, `scan-tab-keys`, shell copy, `safari-itp-storage-notice*` |
 | **Ownership restore UX** | [`OWNERSHIP_RESTORE_UX_PLAN.md`](OWNERSHIP_RESTORE_UX_PLAN.md) | Phases 1–4 + Safari cross-refs | `/created/` view mode, hub import, `device-ownership-*` |
 | **H-12 printed live-control QA** | [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md) | H-09–H-13 · sad-path S10–S12 | Scan live proof, `e2e/live-control-loop.spec.ts`, operator scripts |
 
@@ -32,8 +32,7 @@ After **#107** / **#108** merge, update this table and delete closed rows.
 
 | Priority | Item | Owner type | Command / proof |
 |----------|------|------------|-----------------|
-| P0b-1 step 2 | Card disabled since visit — **prod WebKit** re-verify after deploy | Human QA | [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) · `npm run e2e:card-disabled-since-visit` |
-| Scan R9 E2E | Wallet saved, tab empty — scan dot `walletKeysNotInTab` + restore glance | Engineering | Extend `e2e/scan-page-dot.spec.ts` · Vitest `device-dot-state` P0-5 |
+| P0b-1 step 2 sign-off | Card disabled since visit — **prod WebKit** re-verify on humanity.llc after deploy | Human QA | Desk proxy: `npm run e2e:card-disabled-since-visit:webkit` · [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) |
 | H-12 step 4+ | `camera-scorecard` operator script + comprehension gate | Engineering | `live-control:printed-qa:camera-scorecard` (WIP on disk — coordinate before push) |
 | P3-1 / P3-2 | WebAuthn / optional encrypted persistence | Architecture | Not scheduled |
 
@@ -47,6 +46,7 @@ After **#107** / **#108** merge, update this table and delete closed rows.
 npm run worker:test -- worker/tests/created-view-live-readonly-core.test.ts worker/tests/created-view-mode-core.test.ts worker/tests/created-live-setup-memory.test.ts worker/tests/device-wallet-summary-core.test.ts
 npm run e2e:key-loss-sad-path
 npm run e2e:safari-keys-persistence
+npm run e2e:scan-page-dot
 ```
 
 ### H-12 live-control

@@ -417,7 +417,7 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 
 | # | Change | Rationale |
 |---|--------|-----------|
-| **P0b-1** | Re-verify **card disabled since visit** on fresh create (hub row) | R10 — **prod** false positive; no in-visit baseline seed; first baseline on exit snapshot | **Step 1 shipped** — automated R10 guard on `/` hub; step 2: prod re-verify on WebKit after deploy |
+| **P0b-1** | Re-verify **card disabled since visit** on fresh create (hub row) | R10 — **prod** false positive; no in-visit baseline seed; first baseline on exit snapshot | **Step 1 shipped** — automated R10 guard on `/` hub; **step 2 desk proxy shipped** — `e2e:card-disabled-since-visit:webkit`; prod WebKit sign-off on humanity.llc still required |
 | **P0b-2** | Setup wizard: **no auto-advance** on test scan when `window.open` new tab | R12 | **Shipped** — `created-setup.mjs` · `shouldAutoAdvanceSetupTestScan`; browser needs second Continue |
 | **P0b-3** | On scan, **auto-activate wallet row for signing** when exactly one signing row (mirror D10), not only default-vouch path | Stranger vouch without prior “Default for vouching” setup | **Shipped** — `vouch-scan-sole-signing-activate-core.mjs` · `e2e:vouch-scan-sole-signing` |
 
@@ -427,7 +427,7 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 |---|--------|-----------|
 | **P1-1** | Scan: if exactly one wallet signing row, auto-activate like quiet rehydrate (same gates as D10) | Passkey-like scan flow | **Shipped** — P0-1 `scan-tab-keys.mjs` + P0b-3 vouch sole-row path |
 | **P1-2** | Prominent **Ownership not in this tab — tap to restore** when wallet has keys but session empty (all surfaces) | **Shipped** — hub · landing dot · `/wallet/` tab hint · view-only `/created/` Live banner · scan actor band |
-| **P1-3** | PWA scan handoff: ensure all scan entry points use same-tab in standalone ([`PWA_STANDALONE_EXTERNAL_NAVIGATION.md`](PWA_STANDALONE_EXTERNAL_NAVIGATION.md) P1) | Fixes R5 |
+| **P1-3** | PWA scan handoff: ensure all scan entry points use same-tab in standalone ([`PWA_STANDALONE_EXTERNAL_NAVIGATION.md`](PWA_STANDALONE_EXTERNAL_NAVIGATION.md) P1) | Fixes R5 · **Shipped** — `pwa-scan-handoff-core.mjs` · `e2e/device-pwa-scan-handoff.spec.ts` |
 | **P1-4** | On `loadWallet` parse failure, show **corrupt wallet** coach card with export/import links — not empty hub | Fixes R7 · **Shipped** — hub urgent card · `/wallet/` tab hint · import + backup help CTAs |
 
 ### P2 — Platform honesty
@@ -497,6 +497,10 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 | 15 | P2-2 PWA vs browser session mismatch | **Shipped** | `hc_last_signing_shell_mode` · hub custody · wallet tab hint · scan actor band |
 | 16 | P2-3 WebKit keys persistence E2E | **Shipped** | `e2e/safari-keys-persistence.spec.ts` · S2 scan rehydrate · S3 wallet mismatch |
 | 17 | P3-3 Hub summary key-material guard | **Shipped** | `device-wallet-summary-core.mjs` · `serializeWalletSummaryForStorage` · Vitest `device-wallet-summary-core.test.ts` |
+| 18 | P2-3b S3 scan actor band WebKit | **Shipped** | Regenerated `scan-active.html` restore btn · `safari-keys-persistence` S3 standalone scan test |
+| 19 | R9 scan dot behavior E2E (Flow B) | **Shipped** | `e2e/scan-page-dot.spec.ts` · `ok:none` + restore glance when wallet saved, tab empty |
+| 20 | P0b-1 step 2 WebKit R10 desk proxy | **Shipped** | `e2e/card-disabled-fresh-create-webkit.spec.ts` · `e2e:card-disabled-since-visit:webkit` |
+| 21 | P0-1 scan quiet rehydrate runtime E2E | **Shipped** | `e2e/safari-keys-persistence.spec.ts` — sole-row S2/P0-1 positive · multi-card toggle-off negative |
 
 **P0-1 spec (reference for reviewers):**
 
@@ -649,11 +653,11 @@ These surfaces can simultaneously show “saved / OK” and block signing — us
 | K4 cross-tab clear | `e2e/device-cross-tab-keys.spec.ts` | — |
 | K5 wallet empty | `e2e/key-loss-sad-path.spec.ts` | — |
 | Shell quiet rehydrate wiring | `worker/tests/device-quiet-tab-rehydrate.test.ts` | — |
-| **Scan quiet rehydrate wiring** | `worker/tests/device-quiet-tab-rehydrate.test.ts` (P0-1) | **No runtime E2E** |
+| **Scan quiet rehydrate wiring** | `e2e/safari-keys-persistence.spec.ts` (P0-1 · WebKit) · `worker/tests/device-quiet-tab-rehydrate.test.ts` | — |
 | S2 Camera new tab → scan vouch | `e2e/safari-keys-persistence.spec.ts` (webkit) | — |
-| S3 PWA → Safari scan | Same E2E S3 (`/wallet/` tab hint) | Full scan actor band needs fixture regen for restore btn |
+| S3 PWA → Safari scan | `e2e/safari-keys-persistence.spec.ts` — wallet tab hint + standalone scan actor band | — |
 | S6 ITP 7-day | — | Manual / platform |
-| Scan dot honesty (R9) | Partial `scan-page-dot-contract` | Behavior E2E after P0-5 |
+| Scan dot honesty (R9) | `e2e/scan-page-dot.spec.ts` (Flow B · P0-5) · Vitest `device-dot-state` | — |
 | R11 keyless session | `worker/tests/device-tab-session.test.ts` | K1 asserts no keyless `hc_created` |
 
 ---
@@ -689,4 +693,8 @@ Sources: WebKit ITP blog; [`PWA_INSTALL.md`](PWA_INSTALL.md); [`SAFARI_PERFORMAN
 | 2026-05-29 | **P1-2 shipped:** hub · landing dot · `/wallet/` tab hint · view-only Live banner · scan actor band restore CTA |
 | 2026-05-29 | **P1-2 step 1 shipped:** shell tab-honest dot + hub `wallet_not_in_tab` restore row |
 | 2026-05-29 | **P2-2 shipped:** PWA vs Safari session mismatch — `hc_last_signing_shell_mode` · hub · wallet · scan actor band |
+| 2026-05-29 | **P0-1 runtime E2E shipped:** WebKit sole-row rehydrate + multi-card gate negative in `safari-keys-persistence` |
+| 2026-05-29 | **P0b-1 step 2 desk proxy shipped:** WebKit fresh-create R10 in `card-disabled-fresh-create-webkit.spec.ts` |
+| 2026-05-29 | **R9 E2E shipped:** `e2e/scan-page-dot.spec.ts` Flow B — hollow `ok:none` dot + restore glance when wallet saved, tab empty |
+| 2026-05-29 | **P2-3b shipped:** S3 standalone scan actor band restore CTA · scan E2E fixture regen |
 | 2026-05-29 | **P2-3 shipped:** WebKit E2E `e2e/safari-keys-persistence.spec.ts` — matrix S2 scan rehydrate · S3 wallet mismatch |

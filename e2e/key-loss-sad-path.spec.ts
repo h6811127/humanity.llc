@@ -113,12 +113,12 @@ test.describe("key-loss sad paths", () => {
     await expect(page.locator("#created-view-live-lead")).toContainText(/read-only/i);
     await expect(page.locator("#created-live-scanners-see")).toBeHidden();
     await expect(page.locator("#created-deploy-print")).toBeVisible();
+    await expect(page.locator("#created-view-live-qr-tasks")).toBeVisible();
 
     await page.getByRole("tab", { name: "Manage" }).click();
     await expect(page.locator("#created-view-restore-panel")).toBeVisible();
     await expect(page.locator("#import-recovery-form")).toBeVisible();
     await expect(page.locator("#no-session")).toBeHidden();
-    await expect(page.locator("#created-view-live-qr-tasks")).toBeVisible();
     await expect(page.locator("#created-view-restore-lead")).toContainText(
       /recovery code|encrypted backup/i
     );

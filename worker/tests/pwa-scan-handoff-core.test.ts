@@ -6,7 +6,6 @@ import {
   isAllowedScanPreviewUrl,
   isAllowedStewardPreviewReturnUrl,
   openStewardScanPreview,
-  shouldAutoAdvanceSetupTestScan,
   stewardPreviewReturnBannerLabel,
   stewardScanLinkHtmlAttrs,
   stewardScanOpenedFeedback,
@@ -101,10 +100,9 @@ describe("pwa-scan-handoff-core", () => {
     expect(stewardScanLinkHtmlAttrs(true)).toBe("");
     expect(stewardScanLinkHtmlAttrs(false)).toContain('target="_blank"');
     expect(stewardScanOpenedFeedback(true)).toMatch(/Back to return/i);
-    expect(stewardScanOpenedFeedback(false, { setupWizard: true })).toMatch(/Continue again/i);
+    expect(stewardScanOpenedFeedback(true, { setupWizard: true })).toMatch(/Back to return/i);
+    expect(stewardScanOpenedFeedback(false, { setupWizard: true })).toMatch(/new tab/i);
     expect(stewardScanOpenedFeedback(false)).toMatch(/new tab/i);
-    expect(shouldAutoAdvanceSetupTestScan(true)).toBe(true);
-    expect(shouldAutoAdvanceSetupTestScan(false)).toBe(false);
   });
 
   it("applyStewardScanLinkElement toggles target", () => {

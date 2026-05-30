@@ -230,3 +230,56 @@ test.describe("scan page device dot cross-tab", () => {
     await pageA.close();
   });
 });
+
+test.describe("scan page device dot R9 honesty (P0-5 · Flow B)", () => {
+  const SECOND_WALLET_ENTRY = {
+    ...STEWARD_WALLET_ENTRY,
+    id: "e2e_scan_r9_second",
+    profile_id: "8Ym8nQ3pR5sU7wX9zA2bC4dE6",
+    qr_id: "qr_E2eScanR9SecondCard1",
+    label: "Second scan card",
+    handle: "second_scan",
+    scan_url:
+      "http://127.0.0.1:8788/c/8Ym8nQ3pR5sU7wX9zA2bC4dE6?q=qr_E2eScanR9SecondCard1",
+  };
+
+  test("wallet saved without tab keys shows hollow none state and restore glance", async ({
+    page,
+  }) => {
+    await page.addInitScript(
+      ({ first, second }) => {
+        localStorage.setItem("hc_wallet", JSON.stringify([first, second]));
+        localStorage.setItem("hc_quiet_tab_rehydrate", "0");
+        localStorage.removeItem("hc_last_active_profile_id");
+        sessionStorage.removeItem("hc_created");
+      },
+      { first: STEWARD_WALLET_ENTRY, second: SECOND_WALLET_ENTRY }
+    );
+
+    await gotoScanFixture(page);
+
+    const dot = page.locator("#scan-page-dot");
+    const btn = page.locator("#scan-page-dot-btn");
+
+    await expect(btn).toHaveClass(/scan-page-dot--dynamic/, { timeout: 15_000 });
+    await expect(dot).toHaveAttribute("data-dot-state", "ok:none");
+    await expect(dot).toHaveClass(/scan-page-dot-device-none-eligible/);
+    await expect(btn).toHaveAttribute(
+      "aria-label",
+      /ownership saved on device, not in this tab/i
+    );
+
+    await btn.click();
+    const glance = page.locator("#scan-page-dot-glance");
+    await expect(glance).toBeVisible();
+    await expect(glance.locator(".scan-page-dot-glance-now")).toContainText(
+      /Ownership not in this tab/i
+    );
+    await expect(
+      glance.locator('[data-scan-dot-action="scan_use_keys_here"]')
+    ).toContainText(/Restore control here/i);
+
+    const sessionRaw = await page.evaluate(() => sessionStorage.getItem("hc_created"));
+    expect(sessionRaw).toBeNull();
+  });
+});

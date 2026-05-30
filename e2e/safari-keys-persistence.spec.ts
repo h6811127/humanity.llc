@@ -101,6 +101,27 @@ async function gotoScanFixture(page: Page) {
   await expect(page.locator("#scan-safety-header[data-profile-id]")).toBeVisible();
 }
 
+/** Standalone PWA display mode for S3 scan actor-band restore CTA. */
+async function mockStandaloneDisplayMode(page: Page) {
+  await page.addInitScript(() => {
+    const nativeMatchMedia = window.matchMedia.bind(window);
+    window.matchMedia = (query: string) => {
+      if (query === "(display-mode: standalone)") {
+        return {
+          matches: true,
+          media: query,
+          addEventListener: () => {},
+          removeEventListener: () => {},
+          addListener: () => {},
+          removeListener: () => {},
+          dispatchEvent: () => true,
+        } as MediaQueryList;
+      }
+      return nativeMatchMedia(query);
+    };
+  });
+}
+
 async function wireWalletShellRoutes(page: Page) {
   await page.route("**/.well-known/hc/v1/health**", (route) =>
     route.fulfill({
@@ -114,6 +135,38 @@ async function wireWalletShellRoutes(page: Page) {
   );
 }
 
+test.describe("Scan quiet rehydrate wiring (P0-1 · WebKit)", () => {
+  test("multi-card with rehydrate toggle off leaves scan tab without session keys", async ({
+    page,
+  }) => {
+    const secondEntry = {
+      ...SOLE_VOUCHER_ENTRY,
+      id: "e2e_p01_second",
+      profile_id: "9Zn0oR4qS6tV8wY0aB3cD5eF7",
+      qr_id: "qr_E2eP01SecondCard1",
+      label: "Second steward card",
+      handle: "second_steward",
+      scan_url: "http://127.0.0.1:8788/c/9Zn0oR4qS6tV8wY0aB3cD5eF7?q=qr_E2eP01SecondCard1",
+    };
+
+    await page.addInitScript(
+      ({ sole, second }) => {
+        localStorage.setItem("hc_wallet", JSON.stringify([sole, second]));
+        localStorage.setItem("hc_quiet_tab_rehydrate", "0");
+        localStorage.removeItem("hc_last_active_profile_id");
+      },
+      { sole: SOLE_VOUCHER_ENTRY, second: secondEntry }
+    );
+
+    await gotoScanFixture(page);
+
+    await expect(page.locator("#vouch-interactive")).toBeHidden({ timeout: 15_000 });
+    await expect(page.locator("#vouch-explainer")).toBeVisible();
+    const sessionRaw = await page.evaluate(() => sessionStorage.getItem("hc_created"));
+    expect(sessionRaw).toBeNull();
+  });
+});
+
 test.describe("Safari keys persistence (P2-3)", () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(() => {
@@ -124,7 +177,7 @@ test.describe("Safari keys persistence (P2-3)", () => {
     });
   });
 
-  test("S2: Camera-style scan tab rehydrates sole saved signing row (WebKit)", async ({
+  test("S2 / P0-1: Camera-style scan tab rehydrates sole saved signing row (WebKit)", async ({
     page,
   }) => {
     await page.addInitScript((entry) => {
@@ -184,6 +237,45 @@ test.describe("Safari keys persistence (P2-3)", () => {
       .locator("#wallet-tab-hint-use-keys")
       .evaluate((el) => el.hidden);
     expect(useKeysHidden).toBe(true);
+
+    const sessionRaw = await page.evaluate(() => sessionStorage.getItem("hc_created"));
+    expect(sessionRaw).toBeNull();
+  });
+
+  test("S3: standalone scan after browser signing shows restore-in-app on actor band (WebKit)", async ({
+    page,
+  }) => {
+    const secondEntry = {
+      ...SOLE_VOUCHER_ENTRY,
+      id: "e2e_safari_scan_second",
+      profile_id: "9Zn0oR4qS6tV8wY0aB3cD5eF7",
+      qr_id: "qr_E2eSafariScanSecond1",
+      label: "Second steward card",
+      handle: "second_steward",
+      scan_url: "http://127.0.0.1:8788/c/9Zn0oR4qS6tV8wY0aB3cD5eF7?q=qr_E2eSafariScanSecond1",
+    };
+
+    await mockStandaloneDisplayMode(page);
+    await page.addInitScript(
+      ({ sole, second }) => {
+        localStorage.setItem("hc_wallet", JSON.stringify([sole, second]));
+        localStorage.setItem("hc_last_signing_shell_mode", "browser");
+        localStorage.setItem("hc_quiet_tab_rehydrate", "0");
+        localStorage.removeItem("hc_last_active_profile_id");
+      },
+      { sole: SOLE_VOUCHER_ENTRY, second: secondEntry }
+    );
+
+    await gotoScanFixture(page);
+
+    const band = page.locator("#scan-actor-band");
+    await expect(band).toBeVisible({ timeout: 15_000 });
+    await expect(band).toHaveClass(/scan-actor-band--restore-prompt/);
+
+    const restoreBtn = page.locator("#scan-actor-band-restore");
+    await expect(restoreBtn).toBeVisible();
+    await expect(restoreBtn).toHaveText(/restore control in this app/i);
+    await expect(page.locator("#scan-actor-band-vouch")).toBeHidden();
 
     const sessionRaw = await page.evaluate(() => sessionStorage.getItem("hc_created"));
     expect(sessionRaw).toBeNull();
