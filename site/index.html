@@ -76,7 +76,7 @@
               aria-label="My objects and notices on this device"
               hidden
             >
-              <ul class="device-hub-glance-list" id="device-hub-glance-list"></ul>
+              <ul class="device-hub-glance-list device-boot-gated" id="device-hub-glance-list"></ul>
               <a
                 class="device-hub-glance-help brand-status-sheet-link"
                 href="mailto:info@humanity.llc"
@@ -158,7 +158,7 @@
         <div class="device-hub-body" id="device-hub-body">
           <button type="button" class="device-hub-sheet-close" aria-label="Close">×</button>
           <div class="device-hub-sheet-handle" aria-hidden="true"></div>
-          <div class="device-hub-alerts-top" id="device-hub-alerts-top">
+          <div class="device-hub-alerts-top device-boot-gated" id="device-hub-alerts-top">
             <div class="device-hub-group" id="device-hub-crosstab-notice" hidden role="status"></div>
             <div class="device-hub-group" id="device-hub-notice-group" hidden></div>
             <div
@@ -211,12 +211,12 @@
 
           <h2 class="device-hub-title" id="device-hub-title">Saved in this browser</h2>
           <section
-            class="device-hub-section device-hub-keys-custody-section"
+            class="device-hub-section device-hub-keys-custody-section device-boot-gated"
             id="device-hub-keys-custody"
             aria-labelledby="device-hub-keys-custody-title"
             hidden
           ></section>
-          <p class="form-hint device-hub-lead-sub" id="device-hub-empty-hint">
+          <p class="form-hint device-hub-lead-sub device-boot-gated" id="device-hub-empty-hint">
             No cards saved yet.
             <a href="/create/">Create one</a>
             or
@@ -241,7 +241,7 @@
           </div>
 
           <section
-            class="device-hub-section"
+            class="device-hub-section device-boot-gated"
             id="device-hub-saved-items-section"
             aria-labelledby="device-hub-saved-items-title"
           >
@@ -437,7 +437,7 @@
           </section>
 
           <section
-            class="device-hub-section device-hub-section--secondary"
+            class="device-hub-section device-hub-section--secondary device-boot-gated"
             id="device-hub-actions-section"
             aria-labelledby="device-hub-actions-title"
             data-hub-stranger-empty-hide
@@ -1232,7 +1232,7 @@
       </div>
     </dialog>
     <script src="/js/landing-focus.mjs?v=3" type="module"></script>
-    <script src="/js/device-status-bootstrap.mjs?v=74" type="module"></script>
+    <script src="/js/device-status-bootstrap.mjs?v=75" type="module"></script>
     <script src="/js/landing-device-hub.mjs?v=13" type="module"></script>
     <script src="/js/landing-showcase.mjs?v=2" type="module"></script>
     <script src="/js/landing-showcase-live-object.mjs?v=1" type="module"></script>

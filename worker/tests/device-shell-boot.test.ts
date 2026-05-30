@@ -5,6 +5,7 @@ import path from "node:path";
 import {
   DEVICE_BOOT_PENDING,
   DEVICE_BOOT_READY,
+  DEVICE_BOOT_READY_EVENT,
   isDeviceBootReadyState,
   pageOwnsDeviceBootReady,
 } from "../../site/js/device-shell-boot-core.mjs";
@@ -15,6 +16,7 @@ describe("device-shell-boot-core", () => {
   it("defines pending and ready boot states", () => {
     expect(DEVICE_BOOT_PENDING).toBe("pending");
     expect(DEVICE_BOOT_READY).toBe("ready");
+    expect(DEVICE_BOOT_READY_EVENT).toBe("hc-device-boot-ready");
     expect(isDeviceBootReadyState(DEVICE_BOOT_READY)).toBe(true);
     expect(isDeviceBootReadyState(DEVICE_BOOT_PENDING)).toBe(false);
   });

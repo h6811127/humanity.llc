@@ -89,7 +89,7 @@
         <div class="device-hub-body" id="device-hub-body">
           <button type="button" class="device-hub-sheet-close" aria-label="Close">×</button>
           <div class="device-hub-sheet-handle" aria-hidden="true"></div>
-          <div class="device-hub-alerts-top" id="device-hub-alerts-top">
+          <div class="device-hub-alerts-top device-boot-gated" id="device-hub-alerts-top">
             <div class="device-hub-group" id="device-hub-crosstab-notice" hidden role="status"></div>
             <div class="device-hub-group" id="device-hub-notice-group" hidden></div>
             <div
@@ -142,12 +142,12 @@
 
           <h2 class="device-hub-title" id="device-hub-title">Saved in this browser</h2>
           <section
-            class="device-hub-section device-hub-keys-custody-section"
+            class="device-hub-section device-hub-keys-custody-section device-boot-gated"
             id="device-hub-keys-custody"
             aria-labelledby="device-hub-keys-custody-title"
             hidden
           ></section>
-          <p class="form-hint device-hub-lead-sub" id="device-hub-empty-hint" hidden>
+          <p class="form-hint device-hub-lead-sub device-boot-gated" id="device-hub-empty-hint" hidden>
             Finish the form below, then save your control key on the <a href="/created/">card page</a>.
           </p>
 
@@ -169,7 +169,7 @@
           </div>
 
           <section
-            class="device-hub-section"
+            class="device-hub-section device-boot-gated"
             id="device-hub-saved-items-section"
             aria-labelledby="device-hub-saved-items-title"
           >
@@ -347,7 +347,7 @@
           </section>
 
           <section
-            class="device-hub-section device-hub-section--secondary"
+            class="device-hub-section device-hub-section--secondary device-boot-gated"
             id="device-hub-actions-section"
             aria-labelledby="device-hub-actions-title"
             data-hub-stranger-empty-hide
@@ -716,7 +716,7 @@
         <p class="form-status" id="device-hub-qr-scanner-status" role="status" hidden></p>
       </div>
     </dialog>
-    <script src="/js/device-status-bootstrap.mjs?v=74" type="module"></script>
+    <script src="/js/device-status-bootstrap.mjs?v=75" type="module"></script>
     <script src="/js/create-hub.mjs?v=1" type="module"></script>
     <script type="module" src="/js/create-card.mjs?v=19"></script>
   </body>

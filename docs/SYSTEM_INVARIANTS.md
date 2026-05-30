@@ -20,6 +20,7 @@ The floating **status dot** (`#brand-status-dot-btn`) opens the hub on `/`, `/cr
 | Hub open state | Open/close only through `setHubSheetOpen()` / `setHubExpanded()`. `hubSheetOpen()` treats a collapsed `#device-hub` as closed even if `body.device-hub-sheet-open` is stuck. |
 | Clickability CSS | `.top-chrome--float { pointer-events: none }` with `.shell-status-cluster` (and dot/badge) at `pointer-events: auto` when `top-chrome--edge-hidden` or hub/inbox locked. |
 | Boot gate | Shell bodies use `data-boot="pending"` until `markDeviceBootReady()`. Personalized rows stay hidden via `.device-boot-gated` until boot ready. Cross-tab inbox/dot/banner suppressed until `data-boot=ready`. |
+| Hub render boot | Hub saved list, pins, activity, inbox alerts, stranger-empty chrome, and glance defer `innerHTML` until `data-boot=ready`; `markDeviceBootReady()` dispatches `hc-device-boot-ready` for first full hub refresh. |
 | Dot boot | Dot hidden until first settled `applyDot()` after health fetch + quiet rehydrate — no flash of wrong steward/offline state from core-only boot. |
 | Hub network chips | Per-profile chips show **checking** until `isResolverConfirmedProfile(profileId)`; cache ignored for identity/icon/scan-kind until poll confirms. |
 | Wallet summary boot | First `loadWalletSummary()` each visit materializes `hc_wallet` and rebuilds summary; persisted fast path skipped until reconciled (`pageshow` bfcache resets reconcile). |
@@ -27,11 +28,11 @@ The floating **status dot** (`#brand-status-dot-btn`) opens the hub on `/`, `/cr
 **Regression (status graph):**
 
 ```bash
-npm run worker:test -- worker/tests/device-status-shell-modules.test.ts worker/tests/device-status-lazy-inbox.test.ts worker/tests/device-status-load-error.test.ts worker/tests/device-shell-boot.test.ts
+npm run worker:test -- worker/tests/device-status-shell-modules.test.ts worker/tests/device-status-lazy-inbox.test.ts worker/tests/device-status-load-error.test.ts worker/tests/device-shell-boot.test.ts worker/tests/device-hub-boot.test.ts
 npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts e2e/device-cross-tab-keys.spec.ts e2e/scan-page-dot.spec.ts
 ```
 
-Canonical UX spec: [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md). Load failure postmortem: [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md). Open boot follow-ups: [`SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md`](SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md) (RC-7–RC-14).
+Canonical UX spec: [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md). Load failure postmortem: [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md). Open boot follow-ups: [`SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md`](SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md) (RC-8–RC-14).
 
 ---
 

@@ -1,6 +1,6 @@
 # Shell page load content flash — investigation
 
-**Status:** RC-1–RC-6 **shipped** (2026-05-30) · RC-7–RC-14 open for follow-up  
+**Status:** RC-1–RC-7 **shipped** (2026-05-30) · RC-8–RC-14 open for follow-up  
 **Date:** 2026-05-30  
 **Reported symptom:** Opening any shell or device page shows wrong or “random” data for a brief moment, then content disappears or is replaced with local device truth. Distracting and ugly.  
 **Related:** [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md) (stub → archive) · [`HUB_CARD_SAFARI_RELIABILITY.md`](HUB_CARD_SAFARI_RELIABILITY.md) · [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH_QA_2026-05-26.md) · [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) · [`CREATED_QR_BOOTSTRAP_FIX.md`](CREATED_QR_BOOTSTRAP_FIX.md)
@@ -187,13 +187,17 @@ Any step that paints before the next step completes can flash “wrong” data.
 
 ### RC-7 · Hub full re-render via `innerHTML` (no stable SSR shell)
 
+**Status:** Fixed (2026-05-30) — hub saved list, pins, activity, inbox alerts, stranger-empty chrome, and glance popover defer `innerHTML` rebuild until `data-boot=ready`; `device-boot-gated` on hub personalized HTML sections; `hc-device-boot-ready` triggers first full hub render.
+
 **Surfaces:** Hub saved list, pins, activity, inbox alerts.
 
-**Mechanism:** `device-hub-ui.mjs` `renderSavedRows`, `refreshHubActivity`, etc. set `savedList.innerHTML = ""` then rebuild rows. Opening hub or chrome refresh **clears and repopulates** the list. Stranger-empty vs saved chrome toggles `#device-hub-empty-hint`, `#device-hub-keys-custody`, steward tools strip visibility.
+**Mechanism (historical):** `device-hub-ui.mjs` `renderSavedRows`, `refreshHubActivity`, etc. set `savedList.innerHTML = ""` then rebuild rows. Opening hub or chrome refresh **cleared and repopulated** the list on boot before wallet summary and network polls settled. Stranger-empty vs saved chrome toggled `#device-hub-empty-hint`, `#device-hub-keys-custody`, steward tools strip visibility.
 
 **User-visible effect:** Empty state → populated list; or row text changing when verification/network cache updates mid-render.
 
-**Evidence:** `device-hub-ui.mjs` ~1496+; `device-chrome-refresh.mjs` `refreshDeviceChrome({ immediate: true })` on boot.
+**Fix:** `device-hub-boot-core.mjs` gates hub render paths; `markDeviceBootReady()` dispatches `hc-device-boot-ready`; hub modules listen and run one consolidated `refreshDeviceHub()` / `refreshHubGlance()`.
+
+**Evidence:** `device-hub-ui.mjs` ~1496+; `device-chrome-refresh.mjs` `refreshDeviceChrome({ immediate: true })` on boot. Tests: `worker/tests/device-hub-boot.test.ts`.
 
 ---
 
@@ -318,7 +322,7 @@ After status-graph or hub network changes, also run dot/inbox E2E per [`DEVICE_O
 
 - Does not replace feature-specific postmortems (card-disabled, cross-tab, status-dot load failure).
 - Does not propose splitting the device shell into a separate app — only documents why the current **HTML + deferred JS** architecture produces the reported flashes.
-- RC-7+ fixes remain future work unless noted **Shipped** in § Suggested doc cross-links.
+- RC-8+ fixes remain future work unless noted **Shipped** in § Suggested doc cross-links.
 
 ---
 
@@ -332,6 +336,7 @@ After status-graph or hub network changes, also run dot/inbox E2E per [`DEVICE_O
 | Wallet summary reconcile | **Shipped (RC-5)** — first `loadWalletSummary()` rebuilds from `hc_wallet`; no summary fast path pre-materialize |
 | `/created/` shell race | **Shipped (RC-2)** — workspace mode before unhide; route shell never reveals roots |
 | Cross-tab boot flash | **Shipped (RC-6)** — suppress cross-tab chrome until `data-boot=ready`; skip prime during boot |
+| Hub innerHTML boot flash | **Shipped (RC-7)** — defer hub render until boot ready; `device-boot-gated` hub sections |
 | Copy alignment | Rename Manage → Advanced or update all docs to say **Manage** |
 | Scan arrive animation | Skip pending when SSR and client agree; or reduce `SCAN_ARRIVE_MIN_CHECKING_MS` |
 
@@ -350,3 +355,4 @@ After status-graph or hub network changes, also run dot/inbox E2E per [`DEVICE_O
 | 2026-05-30 | RC-5 fix: wallet summary rebuild from hc_wallet on first load; skip summary fast path |
 | 2026-05-30 | Verification gate — `npm run worker:test:shell-boot` |
 | 2026-05-30 | RC-6 fix: defer cross-tab chrome until shell boot ready; skip prime during boot |
+| 2026-05-30 | RC-7 fix: defer hub innerHTML rebuild until boot ready; boot-ready event + CSS gate |

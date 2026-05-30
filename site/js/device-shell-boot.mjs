@@ -5,11 +5,12 @@
 import {
   DEVICE_BOOT_PENDING,
   DEVICE_BOOT_READY,
+  DEVICE_BOOT_READY_EVENT,
   isDeviceBootReadyState,
   pageOwnsDeviceBootReady,
 } from "./device-shell-boot-core.mjs";
 
-export { DEVICE_BOOT_PENDING, DEVICE_BOOT_READY, pageOwnsDeviceBootReady };
+export { DEVICE_BOOT_PENDING, DEVICE_BOOT_READY, DEVICE_BOOT_READY_EVENT, pageOwnsDeviceBootReady };
 
 /**
  * @param {Document | undefined} doc
@@ -26,6 +27,7 @@ export function markDeviceBootReady(doc = document) {
   if (!body) return;
   if (isDeviceBootReadyState(body.dataset.boot)) return;
   body.dataset.boot = DEVICE_BOOT_READY;
+  doc.defaultView?.dispatchEvent(new Event(DEVICE_BOOT_READY_EVENT));
 }
 
 /**

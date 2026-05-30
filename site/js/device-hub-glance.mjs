@@ -13,6 +13,8 @@ import {
   HUB_GLANCE_SCAN_QR_SUB,
   HUB_GLANCE_SCAN_QR_TITLE,
 } from "./device-ownership-copy-core.mjs";
+import { DEVICE_BOOT_READY_EVENT } from "./device-shell-boot.mjs";
+import { hubPersonalizedRenderDeferred } from "./device-hub-boot-core.mjs";
 import {
   getLatestResolvedAlertState,
   getLatestResolvedScanKind,
@@ -306,6 +308,7 @@ export function hubGlanceHasContent() {
 }
 
 export function refreshHubGlance() {
+  if (hubPersonalizedRenderDeferred()) return;
   if (glanceTargets.length === 0) return;
   glanceHasRenderableContent = false;
   for (const target of glanceTargets) {
@@ -316,8 +319,18 @@ export function refreshHubGlance() {
   }
 }
 
+let hubGlanceBootListenerBound = false;
+
 if (glanceTargets.length > 0) {
-  refreshHubGlance();
+  if (!hubGlanceBootListenerBound) {
+    hubGlanceBootListenerBound = true;
+    window.addEventListener(DEVICE_BOOT_READY_EVENT, () => {
+      refreshHubGlance();
+    });
+  }
+  if (!hubPersonalizedRenderDeferred()) {
+    refreshHubGlance();
+  }
   window.addEventListener("hc-device-hub-changed", refreshHubGlance);
   window.addEventListener(NETWORK_REFRESHED, refreshHubGlance);
   window.addEventListener(NETWORK_BASELINE_CHANGED, refreshHubGlance);

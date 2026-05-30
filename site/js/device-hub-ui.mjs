@@ -59,6 +59,8 @@ import {
   walletEntryKeyPreview,
   walletEntryQrId,
 } from "./device-wallet.mjs";
+import { DEVICE_BOOT_READY_EVENT } from "./device-shell-boot.mjs";
+import { hubPersonalizedRenderDeferred } from "./device-hub-boot-core.mjs";
 import { shouldSuppressCardDisabledSinceVisitAlerts } from "./device-wallet-since-visit-gate.mjs";
 import {
   getCachedNetworkSeenAt,
@@ -142,7 +144,7 @@ import {
 import { tabNoticeCount } from "./device-counts.mjs";
 import { mountHubBuildStamp } from "./device-hub-build-stamp.mjs";
 import { mountHubNetworkTools } from "./device-hub-network-tools.mjs";
-import { syncInboxBackdropForOpenHub } from "./device-sheet-backdrop-sync.mjs?v=74";
+import { syncInboxBackdropForOpenHub } from "./device-sheet-backdrop-sync.mjs?v=75";
 import {
   HUB_STRANGER_EMPTY_CLASS,
   isHubStrangerEmptyState,
@@ -516,6 +518,7 @@ let savedEmptyEl;
 let activityEmptyEl;
 /** @type {boolean | null} */
 let hubStrangerEmptyPreviously = null;
+let hubBootReadyListenerBound = false;
 
 function hubEl(id) {
   if (!id) return null;
@@ -1288,6 +1291,7 @@ export async function refreshResolverChecksFromHub() {
 }
 
 function syncHubInboxAlertGroups() {
+  if (hubPersonalizedRenderDeferred()) return;
   renderHubKeysCustodyPanel();
   renderHubInboxAlerts({
     noticeGroup,
@@ -1305,11 +1309,13 @@ function syncHubInboxAlertGroups() {
  * Called by the chrome refresh coordinator to avoid re-rendering the full hub.
  */
 export function refreshHubInboxAlertsFromChrome() {
+  if (hubPersonalizedRenderDeferred()) return;
   syncHubInboxAlertGroups();
   refreshEmptyHint();
 }
 
 function renderActivityRows() {
+  if (hubPersonalizedRenderDeferred()) return;
   const entries = loadActivity().slice(0, HUB_RECENT_DISPLAY_LIMIT);
   if (!activityList || !activityGroup) return;
 
@@ -1489,6 +1495,7 @@ function bindHubChildObjectRowHandlers() {
  * @param {{ initialChipChecking?: boolean, childReconciled?: boolean, viewportSync?: boolean }} [opts] Use checking chips until the next poll (avoids stale cache flash after wallet edits).
  */
 function renderSavedRows(opts = {}) {
+  if (hubPersonalizedRenderDeferred()) return;
   const rowChipOpts = { forceChecking: opts.initialChipChecking === true };
   const summary = loadWalletSummary();
   if (summary.walletFingerprint !== expandedSummaryWalletFingerprint) {
@@ -1984,6 +1991,7 @@ function renderSavedRows(opts = {}) {
 }
 
 function renderPinRows() {
+  if (hubPersonalizedRenderDeferred()) return;
   const pins = loadPins();
   if (!pinsList || !pinsGroup) return;
 
@@ -2018,6 +2026,7 @@ function renderPinRows() {
 }
 
 function refreshEmptyHint() {
+  if (hubPersonalizedRenderDeferred()) return;
   if (!emptyHint) return;
   loadWallet();
   if (isWalletStorageCorrupt()) {
@@ -2033,6 +2042,7 @@ function refreshEmptyHint() {
 }
 
 function applyHubStrangerEmptyChrome() {
+  if (hubPersonalizedRenderDeferred()) return;
   renderHubWalletCorruptCard();
   const stranger = isHubStrangerEmptyState({
     walletCount: getWalletCount(),
@@ -2152,6 +2162,7 @@ function bindDom() {
 }
 
 export function refreshDeviceHub() {
+  if (hubPersonalizedRenderDeferred()) return;
   syncHubInboxAlertGroups();
   syncBrowserNotifPrompts();
   renderActivityRows();
@@ -2210,6 +2221,13 @@ export function initDeviceHub(config = {}) {
   initHubStewardVouchGuidance(hubQueryRoot ?? document);
   mountThemeToggles();
   mountHubBuildStamp(hubQueryRoot ?? document);
+
+  if (!hubBootReadyListenerBound) {
+    hubBootReadyListenerBound = true;
+    window.addEventListener(DEVICE_BOOT_READY_EVENT, () => {
+      refreshDeviceHub();
+    });
+  }
 
   refreshDeviceHub();
   notifyHubChanged();

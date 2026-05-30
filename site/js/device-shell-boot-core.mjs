@@ -5,6 +5,7 @@
 
 export const DEVICE_BOOT_PENDING = "pending";
 export const DEVICE_BOOT_READY = "ready";
+export const DEVICE_BOOT_READY_EVENT = "hc-device-boot-ready";
 
 /**
  * Pages that call markDeviceBootReady from their own module after session populate.
