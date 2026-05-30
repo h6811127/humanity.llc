@@ -13,6 +13,7 @@ import {
   jsonResponse,
   withCors,
 } from "./http/resolver";
+import { maybeCanonicalOriginRedirect } from "./http/canonical-origin";
 import { handlePostArtifactIntent, handlePostArtifactIntentAttach, handlePostArtifactIntentPreMint } from "./resolver/artifact-intents";
 import { handleGetStoreProduct, handleGetStoreRows } from "./store/store-rows-handler";
 import { handleGetStoreOrderStatus } from "./resolver/store-order-status";
@@ -172,6 +173,9 @@ export default {
         headers: corsHeaders(request),
       });
     }
+
+    const canonicalRedirect = maybeCanonicalOriginRedirect(request);
+    if (canonicalRedirect) return canonicalRedirect;
 
     const url = new URL(request.url);
     const path = url.pathname;

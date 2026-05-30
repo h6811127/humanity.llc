@@ -9,12 +9,17 @@ import {
   formatWorkerBuildHubLabel,
   isSiteDebugEnabled,
 } from "./build-meta-browser.mjs";
+import {
+  formatOriginDebugHubLine,
+  shouldShowOriginDebugInHub,
+} from "./canonical-origin-core.mjs";
 import { fetchResolverHealthBuild } from "./device-network-health.mjs";
 import { resolverApiOrigin } from "./hc-sign.mjs";
 
 const STAMP_ID = "device-hub-build-stamp";
 const SITE_LABEL_ID = "device-hub-build-stamp-site";
 const WORKER_LABEL_ID = "device-hub-build-stamp-worker";
+const ORIGIN_LABEL_ID = "device-hub-build-stamp-origin";
 const COPY_ID = "device-hub-build-stamp-copy";
 
 /** @type {import("./build-meta-browser.mjs").WorkerBuildMeta | null} */
@@ -39,6 +44,7 @@ export function mountHubBuildStamp(hubRoot, meta = SITE_BUILD_META) {
     stamp.innerHTML = `
       <p class="device-hub-build-stamp-eyebrow">Build (debug)</p>
       <p class="device-hub-build-stamp-line" id="${SITE_LABEL_ID}"></p>
+      <p class="device-hub-build-stamp-line device-hub-build-stamp-line--origin" id="${ORIGIN_LABEL_ID}"></p>
       <p class="device-hub-build-stamp-line device-hub-build-stamp-line--worker" id="${WORKER_LABEL_ID}"></p>
       <button type="button" class="device-hub-build-stamp-copy" id="${COPY_ID}">
         Copy build info
@@ -65,6 +71,12 @@ export function mountHubBuildStamp(hubRoot, meta = SITE_BUILD_META) {
   const siteLabel = stamp.querySelector(`#${SITE_LABEL_ID}`);
   if (siteLabel) {
     siteLabel.textContent = formatSiteBuildHubLabel(meta);
+  }
+
+  const originLabel = stamp.querySelector(`#${ORIGIN_LABEL_ID}`);
+  if (originLabel) {
+    originLabel.hidden = !shouldShowOriginDebugInHub(location);
+    originLabel.textContent = formatOriginDebugHubLine(location);
   }
 
   if (enabled) {

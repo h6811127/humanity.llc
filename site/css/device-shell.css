@@ -1075,6 +1075,17 @@ button.device-hub-notice-banner {
   word-break: break-all;
 }
 
+.device-hub-build-stamp-line--origin {
+  color: var(--text-muted, #5c5c5c);
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  margin: 0.25rem 0 0;
+}
+
+.device-hub-build-stamp-line--origin[hidden] {
+  display: none;
+}
+
 .device-hub-build-stamp-line--worker {
   margin-top: 4px;
   color: var(--surface-popover-fg-muted);

@@ -193,6 +193,8 @@ export function formatCombinedBuildCopyText(siteMeta, workerBuild, pagePath = ""
     lines.push("worker.build=(unavailable)");
   }
   if (pagePath) lines.push(`page=${pagePath}`);
+  lines.push(`origin=${typeof location !== "undefined" ? location.origin : ""}`);
+  lines.push(`host=${typeof location !== "undefined" ? location.hostname : ""}`);
   return lines.join("\n");
 }
 
