@@ -1,7 +1,7 @@
 # Investigation: Steward handoff QR not displaying on `/created/`
 
 **Date:** 2026-05-30  
-**Status:** Active — **RC-1 fixed** · **P1 cache bump shipped** · **P2 RC-2 discovery shipped** · **P2 E2E shipped**  
+**Status:** **Closed** — RC-1 fixed · P1 cache bump · P2 RC-2 discovery · P2 E2E · **`npm run steward-scan-handoff:verify`**  
 **Reporter:** Steward on iPhone PWA after S7 dual-QR + follow-up commit `8c2bde89`  
 **Related:** [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) § S7 · [`PWA_CREATED_RESOLVER_UNREACHABLE_INVESTIGATION.md`](PWA_CREATED_RESOLVER_UNREACHABLE_INVESTIGATION.md) · [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md)
 
@@ -9,12 +9,14 @@
 
 ## Executive summary
 
-The steward handoff QR **never successfully renders** in the browser today, even when S7 dual-QR logic runs correctly. **RC-1** is a **split guard** in the QR encoder:
+**Resolution (2026-05-30):** Steward handoff QR now renders on `/created/` when dual-QR materials are available. Root cause **RC-1** was a split encode guard between `qr-render.mjs` and `qr-branding.mjs`; fixed via shared `qr-encode-url-core.mjs`. **RC-2** discovery copy cross-links Print & share → Full-size QR. Engineering gate: `npm run steward-scan-handoff:verify`.
+
+**Original failure (RC-1):** The steward handoff QR **did not render** in the browser when S7 dual-QR logic ran correctly, due to a **split guard** in the QR encoder:
 
 | Layer | File | `/v/{code}` handoff URL |
 |-------|------|-------------------------|
 | Entry guard | `qr-render.mjs` → `assertQrEncodeUrl()` | **Allowed** via `isAllowedStewardHandoffEncodeUrl()` |
-| Canvas render | `qr-branding.mjs` → `renderHumanityQrFrameToCanvas()` | **Rejected** — unconditional `assertOfficialScanUrl(text)` |
+| Canvas render | `qr-branding.mjs` → `renderHumanityQrFrameToCanvas()` | **Rejected** — unconditional `assertOfficialScanUrl(text)` *(fixed — shared `qr-encode-url-core.mjs`)* |
 
 Public scan URLs (`/c/{profile_id}?q=…`) pass both layers and render. Handoff URLs pass the first guard then **throw inside the frame renderer**, so `#qr-img-steward` stays empty (or shows alt text *“Could not generate steward handoff QR”* after `8c2bde89`).
 
@@ -50,7 +52,7 @@ Returning stewards (**Open workspace** / **Open controls**) land in **control** 
 | **Browser effect** | `syncStewardDualQrMaterials` may set `#created-steward-qr-col hidden=false`, then `renderBrandedQrToImage` fails; catch sets empty `src` + alt *“Could not generate steward handoff QR”* |
 | **Why tests missed** | `worker/tests/qr-render-contract.test.ts` greps source for `isAllowedStewardHandoffEncodeUrl` only; `worker/tests/steward-dual-qr-core.test.ts` tests URL builders, not canvas render |
 
-**Recommended fix (not implemented):** Shared `assertQrEncodeUrl` (or equivalent) in `qr-branding.mjs` / `qr-scan-url-lock.mjs`; optional credential code from decoded handoff `{profile_id, qr_id}` for frame footer; Vitest that calls `qrToDataUrl` on a real `/v/` URL.
+**Fix shipped:** Shared `assertQrEncodeUrl` in `qr-encode-url-core.mjs`; Vitest + E2E in `qr-encode-url-core.test.ts` and `e2e/steward-dual-qr-created.spec.ts`.
 
 ---
 
@@ -167,7 +169,7 @@ Expected today: **throws** (RC-1). After fix: exits 0 with data URL length logge
 | Test | Current | Needed |
 |------|---------|--------|
 | `steward-dual-qr-core.test.ts` | URL material builders | Keep |
-| `qr-render-contract.test.ts` | Source grep for handoff guard | Add integration: `qrToDataUrl(/v/…)` succeeds |
+| `qr-render-contract.test.ts` | Source grep for handoff guard | **Shipped** — integration in `qr-encode-url-core.test.ts` |
 | E2E | **`e2e/steward-dual-qr-created.spec.ts`** | `/created/` Full-size QR steward `img[src]` non-empty |
 
 ---
@@ -181,6 +183,7 @@ Expected today: **throws** (RC-1). After fix: exits 0 with data URL length logge
 | **P1** | Bump `created.mjs?v=` (and shell stamp if policy requires) on fix deploy | **Shipped** — `v=70` |
 | **P2** | Print & share → Full-size QR discovery copy (RC-2) | **Shipped** — `#created-print-steward-discovery` + CTA |
 | **P2** | E2E steward `img[src]` on Full-size QR | **Shipped** — `npm run e2e:steward-dual-qr` |
+| **Close-out** | Engineering verify gate | **Shipped** — `npm run steward-scan-handoff:verify` |
 
 ---
 
@@ -191,6 +194,7 @@ Expected today: **throws** (RC-1). After fix: exits 0 with data URL length logge
 | 2026-05-30 | S7 shipped (`2bdac7de`) — dual-QR UI + `qr-render` entry guard |
 | 2026-05-30 | Follow-up (`8c2bde89`) — `resolveDualQrScanUrl`, setup steward preview; **RC-1 still open** |
 | 2026-05-30 | **RC-1 fixed** — shared `qr-encode-url-core.mjs`; `renderHumanityQrFrameToCanvas` uses same guard as `qr-render.mjs` |
+| 2026-05-30 | **Investigation closed** — `steward-scan-handoff:verify` exit gate |
 | 2026-05-30 | **P2 E2E shipped** — `e2e/steward-dual-qr-created.spec.ts` steward `img[src]` + Print & share CTA |
 | 2026-05-30 | **P2 RC-2 shipped** — Print & share cross-link to Full-size QR steward materials |
 | 2026-05-30 | **P1 shipped** — `created.mjs?v=70` cache bust after RC-1 deploy |

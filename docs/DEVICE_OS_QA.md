@@ -149,6 +149,14 @@ Spec: [`DEVICE_HUB_INTRO_COACHMARK.md`](DEVICE_HUB_INTRO_COACHMARK.md). Automate
 
 Per [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md): hub card alert links; glance dot explainer + **info@humanity.llc** row; expanded hub status-key explainer; **hub + inbox bottom sheets** (§ QA hub + inbox sheets) — legible in light and dark; sheets opaque under `prefers-reduced-transparency: reduce`.
 
+**Wallet pinned scans (open — May 2026):** [`HUB_DARK_MODE_WHITE_DROPDOWN_INVESTIGATION.md`](HUB_DARK_MODE_WHITE_DROPDOWN_INVESTIGATION.md) — white box on **`/wallet/`** (not hub sheet). `6f904c1f` used `.device-hub` selectors that do not match wallet DOM; **Add pin** (`.wallet-add-details`) has hardcoded `#fafafa`.
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Dark theme; open **`/wallet/`** | **Pinned scans** list uses dark `--shell-fill`, not white |
+| 2 | Expand **Add pin** under Pinned scans | Panel not `#fafafa` / white wash |
+| 3 | iOS **Reduce Transparency** on; repeat steps 1–2 | No light fill leak |
+
 **Automated gate:** `npm run worker:test:ui-color-scheme` (CSS token tripwires on migrated popover selectors).
 
 ### P1-6 · Hub card ⋯ menu (contrast)
@@ -601,7 +609,7 @@ Automated: `npm run worker:test:pwa-install` (includes `pwa-scan-handoff-core.te
 
 **Fail signals:** Camera scan stays in Safari with empty wallet and no handoff copy; in-app scanner opens Safari; vouch blocked despite keys in PWA after in-app scan; steward param shows wallet “Attest as…” instead of handoff on iOS Safari; `/v/` returns 404 on production Worker.
 
-Automated: `npm run worker:test:steward-scan-handoff`
+Automated: `npm run steward-scan-handoff:verify` · `npm run steward-scan-handoff:verify:fast` (desk)
 
 ### P1-PWA-P4 · Install deferral until setup complete (P4 shipped)
 

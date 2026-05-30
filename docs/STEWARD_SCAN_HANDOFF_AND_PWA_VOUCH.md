@@ -1,6 +1,6 @@
 # Steward scan handoff — camera, Safari, PWA, and vouch
 
-**Status:** Active — **S1–S7 shipped** · **S7 steward QR render (RC-1) fixed** — [`STEWARD_HANDOFF_QR_NOT_DISPLAYING_INVESTIGATION.md`](STEWARD_HANDOFF_QR_NOT_DISPLAYING_INVESTIGATION.md) · **S8** future (native app / Universal Links)  
+**Status:** Active — **S1–S7 shipped** · dual-QR investigation **closed** ([`STEWARD_HANDOFF_QR_NOT_DISPLAYING_INVESTIGATION.md`](STEWARD_HANDOFF_QR_NOT_DISPLAYING_INVESTIGATION.md)) · gate **`npm run steward-scan-handoff:verify`** · **S8** future (native app / Universal Links)  
 **Date:** 2026-05-30  
 **Audience:** Product, design, engineering, QA  
 **Related:** [`PWA_STANDALONE_EXTERNAL_NAVIGATION.md`](PWA_STANDALONE_EXTERNAL_NAVIGATION.md) · [`PWA_INSTALL.md`](PWA_INSTALL.md) · [`V1_DECISION_LOCK.md`](V1_DECISION_LOCK.md) (HTTPS print QR) · [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`OWNERSHIP_RESTORE_UX_PLAN.md`](OWNERSHIP_RESTORE_UX_PLAN.md) · [`KEY_LOSS_SAD_PATH_MATRIX.md`](KEY_LOSS_SAD_PATH_MATRIX.md)
@@ -174,7 +174,16 @@ flowchart TB
 | `vouch-issue.mjs` | Vouch flow + S1 Safari explainer |
 | `pwa-scan-handoff-core.mjs` | PWA → scan (outbound, P1 shipped) |
 
-### Tests
+### CI gate (S3 / S7 close-out)
+
+**Shipped:**
+
+```bash
+npm run steward-scan-handoff:verify        # Vitest + E2E
+npm run steward-scan-handoff:verify:fast   # Vitest only (--skip-e2e)
+```
+
+Individual suites:
 
 ```bash
 npm run worker:test:steward-scan-handoff   # S1–S3 core + hub HTML guards
@@ -182,10 +191,6 @@ npm run worker:test:qr-branding            # S7 encode guard + handoff render (R
 npm run e2e:steward-dual-qr                # S7 /created/ steward img[src] + Print discovery (RC-2)
 npm run e2e:key-loss-sad-path              # hub restore visible (K2)
 ```
-
-### CI gate (S3 close-out)
-
-Add to [`ownership-restore:verify`](package.json) or new `steward-scan-handoff:verify` when E2E for in-app scanner lands.
 
 ---
 
