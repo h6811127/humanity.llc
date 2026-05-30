@@ -181,6 +181,29 @@ test.describe("/created/ steward dual-QR (S7)", () => {
     await expect(page.locator("#created-deploy-full-qr")).toHaveAttribute("open", "");
     await expect(page.locator("#qr-img-steward")).toBeVisible();
   });
+
+  test("Copy steward handoff link copies /v/ short URL (P1-PWA-V step 7 · S7)", async ({
+    page,
+    context,
+  }) => {
+    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+    await page.goto(`/created/?profile_id=${SAMPLE.profile_id}&qr_id=${SAMPLE.qr_id}`);
+
+    await expect(page.locator("#qr-img-steward")).toHaveAttribute("src", /^data:image\//, {
+      timeout: 15_000,
+    });
+
+    await page.locator("#created-deploy-full-qr summary").click();
+    await expect(page.locator("#created-deploy-full-qr")).toHaveAttribute("open", "");
+
+    const copyBtn = page.locator("#copy-steward-handoff");
+    await expect(copyBtn).toBeVisible();
+    await copyBtn.click();
+    await expect(copyBtn).toHaveText(/Link copied/i, { timeout: 5000 });
+
+    const copied = await page.evaluate(async () => navigator.clipboard.readText());
+    expect(copied).toMatch(/\/v\/[A-Za-z0-9_-]+/);
+  });
 });
 
 test.describe("/created/ setup wizard Get your QR (fresh=1)", () => {

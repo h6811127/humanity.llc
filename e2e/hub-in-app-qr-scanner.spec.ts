@@ -15,6 +15,12 @@ const PROFILE_ID = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const QR_ID = "qr_E2eKeyLossSadPath1";
 const SCAN_QR_URL = `${PAGES_ORIGIN}/c/${PROFILE_ID}?q=${QR_ID}`;
 
+const VOUCHEE_PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
+const VOUCHEE_QR = "qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
+const VOUCHER_PROFILE = "8Ym8nQ3pR5sU7wX9zA2bC4dE6";
+const VOUCHER_QR = "qr_E2eHubScannerVouch1";
+const VOUCH_SCAN_URL = `${PAGES_ORIGIN}/c/${VOUCHEE_PROFILE}?q=${VOUCHEE_QR}`;
+
 const WALLET_ENTRY = {
   id: "e2e_hub_qr_scanner",
   label: "E2E Hub Scanner",
@@ -26,6 +32,20 @@ const WALLET_ENTRY = {
   scan_url: SCAN_QR_URL,
   owner_public_key_b58: "pubkeyfortestonlyxxxxxxxxxxxx",
   owner_private_key_b58: "privkeyfortestonlyxxxxxxxxx",
+};
+
+const STEWARD_VOUCHER_ENTRY = {
+  id: "e2e_hub_scanner_voucher",
+  label: "E2E Hub scan vouch",
+  saved_at: "2026-05-30T12:00:00.000Z",
+  profile_id: VOUCHER_PROFILE,
+  qr_id: VOUCHER_QR,
+  handle: "hub_voucher",
+  manifesto_line: "Hub scanner vouch test",
+  scan_url: `${PAGES_ORIGIN}/c/${VOUCHER_PROFILE}?q=${VOUCHER_QR}`,
+  owner_public_key_b58: "pubkeyhubscannervouchtestxxxxxx",
+  owner_private_key_b58: "privkeyhubscannervouchtestxxxxx",
+  verification: { state: "steward", label: "Steward" },
 };
 
 const SCAN_FIXTURE_HTML = readFileSync(
@@ -78,6 +98,25 @@ function mockHealth(route: Route) {
   });
 }
 
+function cardStatusBody(
+  profileId: string,
+  qrId: string,
+  verification: { state: string; label: string }
+) {
+  return {
+    version: "1.0",
+    resolver: { operator: "humanity.llc", version: "1.0" },
+    scan: {
+      kind: "active",
+      profile_id: profileId,
+      qr_id: qrId,
+      card: { status: "active", handle: "e2e_vouch" },
+      verification: { state: verification.state, label: verification.label },
+      human_trust: { label: verification.label, subtitle: "", pill_active: false },
+    },
+  };
+}
+
 async function stubHubRoutes(page: Page) {
   await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route));
   await page.route(`**/c/${PROFILE_ID}*`, (route) =>
@@ -89,13 +128,61 @@ async function stubHubRoutes(page: Page) {
   );
 }
 
-async function seedSavedWallet(page: Page, standalone = false) {
+async function stubVouchScanRoutes(page: Page) {
+  await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route));
+  await page.route("**/.well-known/hc/v1/cards/**/live-control/challenges**", (route) =>
+    route.fulfill({ status: 404, contentType: "application/json", body: "{}" })
+  );
+  await page.route("**/.well-known/hc/v1/cards/**", async (route: Route) => {
+    const url = route.request().url();
+    if (!url.includes("/status")) {
+      await route.continue();
+      return;
+    }
+    if (url.includes(VOUCHEE_PROFILE)) {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(
+          cardStatusBody(VOUCHEE_PROFILE, VOUCHEE_QR, {
+            state: "registered",
+            label: "Registered",
+          })
+        ),
+      });
+      return;
+    }
+    if (url.includes(VOUCHER_PROFILE)) {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(
+          cardStatusBody(VOUCHER_PROFILE, VOUCHER_QR, {
+            state: "steward",
+            label: "Steward",
+          })
+        ),
+      });
+      return;
+    }
+    await route.continue();
+  });
+  await page.route(`**/c/${VOUCHEE_PROFILE}*`, (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "text/html; charset=utf-8",
+      body: SCAN_FIXTURE_HTML,
+    })
+  );
+}
+
+async function seedSavedWallet(page: Page, standalone = false, entry = WALLET_ENTRY) {
   if (standalone) {
     await page.addInitScript(withStandaloneDisplayModeScript());
   }
-  await page.addInitScript((entry) => {
-    localStorage.setItem("hc_wallet", JSON.stringify([entry]));
-  }, WALLET_ENTRY);
+  await page.addInitScript((walletEntry) => {
+    localStorage.setItem("hc_wallet", JSON.stringify([walletEntry]));
+  }, entry);
 }
 
 async function waitForStatusDotReady(page: Page) {
@@ -187,6 +274,31 @@ test.describe("hub in-app QR scanner (S3)", () => {
     expect(page.url()).toContain(`q=${QR_ID}`);
     await expect(page.locator("#scan-safety-header[data-profile-id]")).toBeVisible();
     await expect(page.locator("body")).not.toHaveClass(/device-hub-sheet-open/);
+  });
+
+  test("mocked in-app scan loads vouch UI when steward keys are present (P1-PWA-V steps 2–3)", async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      localStorage.removeItem("hc_default_vouch_profile_id");
+      localStorage.removeItem("hc_vouch_auto_activate");
+      sessionStorage.clear();
+    });
+    await stubVouchScanRoutes(page);
+    await page.addInitScript(withMockScanBackendScript(VOUCH_SCAN_URL));
+    await seedSavedWallet(page, true, STEWARD_VOUCHER_ENTRY);
+    await page.goto("/");
+    await waitForStatusDotReady(page);
+    await openHub(page);
+    await waitForHubScanButton(page);
+
+    await page.locator("#hub-scan-qr-btn").click();
+    await page.waitForURL(`**/c/${VOUCHEE_PROFILE}*`, { timeout: 15_000 });
+
+    await expect(page.locator("#vouch-interactive")).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator("#vouch-row")).toBeVisible();
+    await expect(page.locator("#vouch-explainer")).toHaveAttribute("hidden", "");
+    await expect(page.locator("#vouch-explainer-copy")).not.toContainText(/Home Screen app/i);
   });
 
   test("hides scan surfaces when wallet is empty", async ({ page }) => {
