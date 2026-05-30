@@ -191,8 +191,9 @@ Fix backlog order matches this list. **RC-1, RC-2, RC-4, and RC-6 are implemente
 | **Layer** | Deploy / user behavior |
 | **Mechanism** | `humanity.llc` vs `www.humanity.llc`, Pages preview URL, local dev — separate `localStorage` per origin. |
 | **User pattern** | Created on one URL; opened hub on another. |
-| **Still possible?** | **Yes** |
-| **Fix backlog** | Canonical origin redirect; in-app origin indicator in debug hub |
+| **Still possible?** | **Preview URLs yes** — `*.pages.dev` is a separate origin by design |
+| **Fix** | **Shipped** — `www` → apex redirect (shell inline + Worker 301); debug hub origin line when `hc_debug=1` |
+| **Tests** | `npm run worker:test:canonical-origin` |
 
 ---
 
@@ -424,6 +425,4 @@ Run on the **tab where the hub looks empty** (Safari → Develop → device → 
 | 2026-05-29 | **RC-4** setup finish gated on wallet save + done-step confirmation |
 | 2026-05-30 | **RC-13** canonical `www` → apex redirect + debug hub origin line |
 | 2026-05-29 | **RC-2** persist-denied iOS warn card shipped |
-| 2026-05-29 | Initial catalog from steward report; **RC-1** read-back gate shipped |
-n card shipped |
 | 2026-05-29 | Initial catalog from steward report; **RC-1** read-back gate shipped |
