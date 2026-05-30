@@ -36,12 +36,16 @@ describe("landing messaging (Step 3)", () => {
   it("landing title and founder note bridge mission and what ships today", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
     expect(html).toContain("humanity.llc · Live objects on physical tags");
-    expect(html).toContain("What I'm trying to build");
-    expect(html).toContain("Why humanity.llc");
+    expect(html).toContain("Built for commons, not platforms");
+    expect(html).toContain("Why humanity.llc?");
+    expect(html).toContain("webpages that are difficult to edit");
     expect(html).toContain("One primitive, many uses");
-    expect(html).toContain("Different problems, same tool underneath");
+    expect(html).toContain("These are all different problems with the same tool underneath");
+    expect(html).toContain("More ideas on live QRs");
     expect(html).toContain("/what-can-a-qr-do.html");
+    expect(html).toContain("Live QR creation and state management work today");
     expect(html).toContain("Humanity Commons");
+    expect(html).toContain("Named that way because the goal is people organizing");
     expect(html).toContain("See what's live");
     expect(html).toContain("Notes on the build");
     expect(html).toContain("Humanity Commons");
