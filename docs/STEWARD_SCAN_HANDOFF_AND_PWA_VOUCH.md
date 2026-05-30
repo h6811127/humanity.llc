@@ -178,6 +178,8 @@ flowchart TB
 
 ```bash
 npm run worker:test:steward-scan-handoff   # S1–S3 core + hub HTML guards
+npm run worker:test:qr-branding            # S7 encode guard + handoff render (RC-1)
+npm run e2e:steward-dual-qr                # S7 /created/ steward img[src] + Print discovery (RC-2)
 npm run e2e:key-loss-sad-path              # hub restore visible (K2)
 ```
 

@@ -1,7 +1,7 @@
 # Investigation: Steward handoff QR not displaying on `/created/`
 
 **Date:** 2026-05-30  
-**Status:** Active — **RC-1 fixed** · **P1 cache bump shipped** · **P2 RC-2 discovery shipped** · P2 E2E open  
+**Status:** Active — **RC-1 fixed** · **P1 cache bump shipped** · **P2 RC-2 discovery shipped** · **P2 E2E shipped**  
 **Reporter:** Steward on iPhone PWA after S7 dual-QR + follow-up commit `8c2bde89`  
 **Related:** [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) § S7 · [`PWA_CREATED_RESOLVER_UNREACHABLE_INVESTIGATION.md`](PWA_CREATED_RESOLVER_UNREACHABLE_INVESTIGATION.md) · [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md)
 
@@ -168,7 +168,7 @@ Expected today: **throws** (RC-1). After fix: exits 0 with data URL length logge
 |------|---------|--------|
 | `steward-dual-qr-core.test.ts` | URL material builders | Keep |
 | `qr-render-contract.test.ts` | Source grep for handoff guard | Add integration: `qrToDataUrl(/v/…)` succeeds |
-| E2E | None for dual-QR | Optional: `/created/` Full-size QR steward `img[src]` non-empty |
+| E2E | **`e2e/steward-dual-qr-created.spec.ts`** | `/created/` Full-size QR steward `img[src]` non-empty |
 
 ---
 
@@ -180,7 +180,7 @@ Expected today: **throws** (RC-1). After fix: exits 0 with data URL length logge
 | **P0** | Vitest render handoff URL end-to-end | **Shipped** — `worker/tests/qr-encode-url-core.test.ts` (guard + credential code) |
 | **P1** | Bump `created.mjs?v=` (and shell stamp if policy requires) on fix deploy | **Shipped** — `v=70` |
 | **P2** | Print & share → Full-size QR discovery copy (RC-2) | **Shipped** — `#created-print-steward-discovery` + CTA |
-| **P2** | E2E steward `img[src]` on Full-size QR | Open |
+| **P2** | E2E steward `img[src]` on Full-size QR | **Shipped** — `npm run e2e:steward-dual-qr` |
 
 ---
 
@@ -191,6 +191,7 @@ Expected today: **throws** (RC-1). After fix: exits 0 with data URL length logge
 | 2026-05-30 | S7 shipped (`2bdac7de`) — dual-QR UI + `qr-render` entry guard |
 | 2026-05-30 | Follow-up (`8c2bde89`) — `resolveDualQrScanUrl`, setup steward preview; **RC-1 still open** |
 | 2026-05-30 | **RC-1 fixed** — shared `qr-encode-url-core.mjs`; `renderHumanityQrFrameToCanvas` uses same guard as `qr-render.mjs` |
+| 2026-05-30 | **P2 E2E shipped** — `e2e/steward-dual-qr-created.spec.ts` steward `img[src]` + Print & share CTA |
 | 2026-05-30 | **P2 RC-2 shipped** — Print & share cross-link to Full-size QR steward materials |
 | 2026-05-30 | **P1 shipped** — `created.mjs?v=70` cache bust after RC-1 deploy |
 | 2026-05-30 | Investigation opened — RC-1 confirmed via Node repro; doc authored |
