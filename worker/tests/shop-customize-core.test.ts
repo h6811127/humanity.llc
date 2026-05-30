@@ -1,11 +1,15 @@
 import { describe, expect, it } from "vitest";
 
+import { qrFrameMetrics } from "../../site/js/qr-branding.mjs";
 import {
   buildPlannedItemScanUrl,
   buildShopifyCartUrl,
+  customizeStickerMockLayout,
   isPersonalizeCheckoutReady,
   loadCardSessionForCustomize,
   personalizeProducts,
+  STICKER_MOCK_CARD_WIDTH_IN,
+  STICKER_MOCK_SHEET_IN,
 } from "../../site/js/shop-customize-core.mjs";
 
 describe("buildShopifyCartUrl", () => {
@@ -22,6 +26,21 @@ describe("buildShopifyCartUrl", () => {
     expect(parsed.pathname).toBe("/cart/123456:2");
     expect(parsed.searchParams.get("properties[artifact_intent_id]")).toBe("ai_test123");
     expect(parsed.searchParams.get("properties[profile_id]")).toBe("7Xk9mP2nQ4rT6vW8yZ1aB3cD5");
+  });
+});
+
+describe("customizeStickerMockLayout", () => {
+  it("uses portrait card aspect on a square 3×3 sheet tier", () => {
+    const qrModuleSize = 220;
+    const layout = customizeStickerMockLayout(qrModuleSize);
+    const frame = qrFrameMetrics(qrModuleSize);
+    expect(layout.sheetAspect).toBe(1);
+    expect(layout.cardAspect).toBe(frame.totalWidth / frame.totalHeight);
+    expect(layout.cardAspect).toBeGreaterThan(0.8);
+    expect(layout.cardAspect).toBeLessThan(1);
+    expect(layout.cardWidthPct).toBe(
+      (STICKER_MOCK_CARD_WIDTH_IN / STICKER_MOCK_SHEET_IN) * 100
+    );
   });
 });
 
