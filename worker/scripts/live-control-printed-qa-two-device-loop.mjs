@@ -46,9 +46,8 @@ export function printedQaTwoDeviceVerifyChecklist() {
     "  ☐ Prove control now succeeds on /created/",
     "  ☐ Scanner shows Control proven + does not prove legal identity",
     "",
-    "Next (pre-flight steps 4–5):",
-    "  4. Print QR PNG from /created/ (≥2 cm module; HTTPS URL on print).",
-    "  5. Phones ready — then § A–C on ≥3 phones (docs/M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md).",
+    "Next (pre-flight step 4):",
+    "  npm run live-control:printed-qa:print-prep",
     "",
   ];
 }

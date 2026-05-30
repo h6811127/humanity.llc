@@ -50,6 +50,6 @@ describe("live-control-printed-qa-two-device-loop", () => {
 
     const verify = printedQaTwoDeviceVerifyChecklist().join("\n");
     expect(verify).toContain("Expires in M:SS");
-    expect(verify).toContain("§ A–C");
+    expect(verify).toContain("live-control:printed-qa:print-prep");
   });
 });

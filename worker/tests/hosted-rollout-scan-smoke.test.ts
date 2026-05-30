@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
+  buildCanonicalPrintScanUrl,
   liveControlChallengeResponseIssues,
   liveControlChallengeSmokeFailure,
   resolveLiveControlSmokeIds,
@@ -10,6 +11,7 @@ import {
   scanPageSmokeFailure,
   smokeProductionLiveControlChallenge,
   smokeProductionScanPage,
+  validatePrintScanUrl,
 } from "../scripts/hosted-rollout-scan-smoke.mjs";
 
 describe("hosted-rollout-scan-smoke", () => {
@@ -132,5 +134,19 @@ describe("hosted-rollout-scan-smoke", () => {
     await expect(smokeProductionLiveControlChallenge("https://api.test")).rejects.toThrow("exit:1");
 
     exit.mockRestore();
+  });
+
+  it("validatePrintScanUrl and buildCanonicalPrintScanUrl match showcase plate", () => {
+    const { profileId, qrId } = resolveLiveControlSmokeIds("https://humanity.llc");
+    const scanUrl = resolveScanSmokeUrl("https://humanity.llc");
+    const canonical = buildCanonicalPrintScanUrl("https://humanity.llc", profileId, qrId);
+    expect(scanUrl).toBe(canonical);
+    expect(
+      validatePrintScanUrl(scanUrl, {
+        profileId,
+        qrId,
+        expectedOrigin: "https://humanity.llc",
+      })
+    ).toEqual([]);
   });
 });

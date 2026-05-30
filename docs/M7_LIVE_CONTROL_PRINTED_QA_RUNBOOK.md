@@ -44,8 +44,8 @@ Run once before printing and camera testing on **≥3 phones**. Mirrors comprehe
 1. **Desk regression** — `npm run live-control:printed-qa:preflight` (Vitest desk gate + Playwright full loop).
 2. **Production smoke** (recommended before print) — `npm run live-control:printed-qa:production-smoke` (scan HTML H-01/H-03 markers + challenge JSON POST H-02 on showcase card). Or: `npm run live-control:printed-qa:preflight -- --production-smoke` (includes step 1 desk gates).
 3. **Two-device loop** — `npm run live-control:printed-qa:two-device-loop` (Playwright proxy + copy-paste scan/created URLs for real keys). Confirm: Ask → owner link → **Prove control now** → scanner **Control proven**.
-4. **Print artifact** — download QR PNG from `/created/`; verify printed URL is `https://humanity.llc/c/{profile_id}?q={qr_id}` (≥2 cm module; see [`QR_BRANDING.md`](QR_BRANDING.md)).
-5. **Phones ready** — stock Camera app on iOS Safari path, Android Chrome path, third device if available.
+4. **Print artifact** — `npm run live-control:printed-qa:print-prep` (validates canonical HTTPS scan URL + print/phone checklists). Download QR PNG from `/created/`; verify printed URL is `https://humanity.llc/c/{profile_id}?q={qr_id}` (≥2 cm module; see [`QR_BRANDING.md`](QR_BRANDING.md)). Add `--verify-live` to confirm scan page loads before printing.
+5. **Phones ready** — stock Camera app on iOS Safari path, Android Chrome path, third device if available. Then § A–C below.
 
 Fast desk-only (skip Playwright): `npm run live-control:printed-qa:preflight -- --skip-e2e`
 

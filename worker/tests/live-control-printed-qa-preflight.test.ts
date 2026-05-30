@@ -32,6 +32,7 @@ describe("live-control-printed-qa-preflight", () => {
     const lines = printedQaManualChecklist();
     const text = lines.join("\n");
     expect(text).toContain("live-control:printed-qa:two-device-loop");
+    expect(text).toContain("live-control:printed-qa:print-prep");
     expect(text).toContain("§ A–C");
     expect(text).toContain("P1-LCP");
     expect(printPrintedQaChecklist).toBeTypeOf("function");

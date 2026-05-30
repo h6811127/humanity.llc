@@ -273,7 +273,7 @@ This document is the **implementation backlog** for hardening live control **usa
 **Acceptance:**
 
 - [x] Expired state shows retry copy + enabled button.
-- [ ] Second ask creates new challenge; owner panel updates to new `owner_url` (manual two-device QA).
+- [x] Second ask creates new challenge; owner panel updates to new `owner_url` (E2E C3 desk proxy; manual two-device QA for H-12).
 
 ---
 
@@ -302,7 +302,7 @@ This document is the **implementation backlog** for hardening live control **usa
 
 **Action:** Execute [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md) on ≥3 phones.
 
-**Engineering desk gate (before phones):** `live-control:printed-qa:preflight` (step 1) · `live-control:printed-qa:production-smoke` (step 2) · `live-control:printed-qa:two-device-loop` (step 3)
+**Engineering desk gate (before phones):** `live-control:printed-qa:preflight` (step 1) · `live-control:printed-qa:production-smoke` (step 2) · `live-control:printed-qa:two-device-loop` (step 3) · `live-control:printed-qa:print-prep` (step 4–5)
 
 **Exit artifact:** Completed § A–C scorecards; failures mapped to H-04–H-10.
 
@@ -314,6 +314,8 @@ This document is the **implementation backlog** for hardening live control **usa
 - [x] Step 1 operator preflight script ships (`npm run live-control:printed-qa:preflight`).
 - [x] Step 2 production smoke script ships (`npm run live-control:printed-qa:production-smoke`; H-01–H-03 markers).
 - [x] Step 3 two-device loop script ships (`npm run live-control:printed-qa:two-device-loop`).
+- [x] Step 4 print prep script ships (`npm run live-control:printed-qa:print-prep`; canonical URL validation + print/phone checklists).
+- [x] C3 desk proxy: ask again after success issues fresh owner link (`e2e/live-control-loop.spec.ts`).
 
 ---
 
@@ -447,5 +449,7 @@ flowchart TD
 | 2026-05-29 | Slice E shipped: H-13 `e2e/live-control-loop.spec.ts` (ask→proven, refresh resume, expiry retry) |
 | 2026-05-29 | Slice D shipped: H-09 sessionStorage resume + H-10 expiry retry UX (`scan-html.ts`, `scan-pass.css`) |
 | 2026-05-29 | Slice E engineering: H-13 `e2e/live-control-loop.spec.ts`, H-14 client test refresh, H-15 health `foreign_keys` gate |
+| 2026-05-29 | H-12 step 4 print prep: `live-control:printed-qa:print-prep` (canonical URL validation + print/phone checklists) |
+| 2026-05-29 | H-10 / C3 E2E: ask again after success issues fresh owner link |
 | 2026-05-29 | H-12 step 3 two-device loop: `live-control:printed-qa:two-device-loop` (Playwright proxy + operator URLs) |
 | 2026-05-29 | H-12 step 2 production smoke: `live-control:printed-qa:production-smoke` (H-01–H-03 live verification) |

@@ -121,6 +121,67 @@ export function resolvePrintedQaOperatorUrls(apiOrigin, env = process.env) {
 }
 
 /**
+ * Canonical HTTPS scan URL encoded on printed QRs.
+ *
+ * @param {string} origin
+ * @param {string} profileId
+ * @param {string} qrId
+ */
+export function buildCanonicalPrintScanUrl(origin, profileId, qrId) {
+  const base = origin.replace(/\/$/, "");
+  return `${base}/c/${encodeURIComponent(profileId)}?q=${encodeURIComponent(qrId)}`;
+}
+
+/**
+ * Validates scan URL before print (H-12 pre-flight step 4).
+ *
+ * @param {string} scanUrl
+ * @param {{ profileId?: string; qrId?: string; expectedOrigin?: string }} [opts]
+ * @returns {string[]}
+ */
+export function validatePrintScanUrl(scanUrl, opts = {}) {
+  const { profileId, qrId, expectedOrigin } = opts;
+  const issues = [];
+  if (typeof scanUrl !== "string" || !scanUrl.trim()) {
+    issues.push("scan URL is empty");
+    return issues;
+  }
+  if (/^hc:\/\//i.test(scanUrl.trim())) {
+    issues.push("must not use hc:// scheme — print HTTPS resolver URL only");
+  }
+  let parsed;
+  try {
+    parsed = new URL(scanUrl.trim());
+  } catch {
+    issues.push("invalid URL");
+    return issues;
+  }
+  if (parsed.protocol !== "https:") {
+    issues.push("URL must use HTTPS");
+  }
+  if (expectedOrigin && parsed.origin !== expectedOrigin.replace(/\/$/, "")) {
+    issues.push(`origin must be ${expectedOrigin.replace(/\/$/, "")}, got ${parsed.origin}`);
+  }
+  const pathProfile = parsed.pathname.startsWith("/c/")
+    ? decodeURIComponent(parsed.pathname.slice(3))
+    : "";
+  if (!pathProfile) {
+    issues.push("path must be /c/{profile_id}");
+  }
+  const q = parsed.searchParams.get("q")?.trim() ?? "";
+  if (!q.startsWith("qr_")) {
+    issues.push("query q must be a qr_… credential id");
+  }
+  if (profileId && pathProfile !== profileId) {
+    issues.push(`profile_id mismatch (expected ${profileId})`);
+  }
+  if (qrId && q !== qrId) {
+    issues.push(`qr_id mismatch (expected ${qrId}, got ${q || "missing"})`);
+  }
+  return issues;
+}
+
+/**
  * @param {number} status
  * @param {string} bodyText
  * @returns {boolean}
