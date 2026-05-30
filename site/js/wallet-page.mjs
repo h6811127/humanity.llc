@@ -6,6 +6,11 @@ import { ensureQuietTabRehydrateBootstrap } from "./device-quiet-tab-rehydrate-b
 import { logDeviceActivity } from "./device-activity.mjs";
 import { isAutoSaveEnabled, initAutoSaveToggle, isAutoSaveFailed } from "./device-auto-save.mjs";
 import { initDeviceHub, refreshDeviceHub } from "./device-hub-ui.mjs";
+import {
+  DEVICE_BOOT_READY_EVENT,
+  markDeviceBootLocalIfWalletPage,
+} from "./device-shell-boot.mjs";
+import { isDeviceBootReadyState } from "./device-shell-boot-core.mjs";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
 import { shouldShowSessionOnlyOwnershipWarning } from "./device-ownership-notice-core.mjs";
 import { refreshWalletContextFromChrome, walletEntryForSession } from "./wallet-page-chrome.mjs";
@@ -82,6 +87,7 @@ function bindWalletActiveLink() {
 
 function updateContextBanners() {
   refreshEmptyHint();
+  if (!isDeviceBootReadyState(document.body?.dataset?.boot)) return;
   refreshWalletContextFromChrome();
 }
 
@@ -176,6 +182,8 @@ initDeviceHub({
   showLiveControlInbox: true,
 });
 
+markDeviceBootLocalIfWalletPage();
+
 mountKeysCustody("#device-keys-custody-wallet", "wallet", {
   importHref: "#hub-import-form",
 });
@@ -184,8 +192,11 @@ initAutoSaveToggle();
 initTabSave();
 bindWalletActiveLink();
 refreshAutoSaveLine();
-updateContextBanners();
 refreshHelpVisibility();
+
+window.addEventListener(DEVICE_BOOT_READY_EVENT, () => {
+  updateContextBanners();
+});
 
 window.addEventListener("hc-quiet-tab-rehydrated", () => {
   refreshTabSaveGroup();

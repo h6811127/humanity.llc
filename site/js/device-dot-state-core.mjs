@@ -11,6 +11,9 @@ import {
   STEWARD_REVIEW_QUEUE_MANAGE_HINT,
 } from "./device-ownership-copy-core.mjs";
 import { walletOwnershipNotInTab } from "./device-ownership-not-in-tab-core.mjs";
+import { dotOverlayCrossTabPhrase } from "./device-shell-copy-core.mjs";
+
+/** @typedef {import("./device-shell-copy-core.mjs").ShellSurface} ShellSurface */
 
 /**
  * @param {{ verification?: { state?: string, label?: string } } | null | undefined} record
@@ -72,10 +75,13 @@ export function dotOverlayFromCounts({
 
 /** @typedef {"none" | "proof_waiting" | "cross_tab_keys" | "card_disabled_since_visit"} DotInboxOverlay */
 
-/** @param {DotInboxOverlay} overlay */
-export function overlayAriaText(overlay) {
+/**
+ * @param {DotInboxOverlay} overlay
+ * @param {ShellSurface} [surface]
+ */
+export function overlayAriaText(overlay, surface = "browser") {
   if (overlay === "proof_waiting") return "live proof waiting";
-  if (overlay === "cross_tab_keys") return "managing in another tab";
+  if (overlay === "cross_tab_keys") return dotOverlayCrossTabPhrase(surface);
   if (overlay === "card_disabled_since_visit") return "card disabled since last visit";
   return "";
 }
@@ -122,6 +128,7 @@ function overlayQuickActionForPage(overlay, pageKind) {
  */
 export function statusAriaLabel(network, device, overlay, opts = {}) {
   const pageKind = opts.pageKind || "landing";
+  const surface = opts.surface ?? "browser";
   const walletKeysNotInTab = opts.walletKeysNotInTab === true;
   const networkText =
     network === "ok"
@@ -137,7 +144,7 @@ export function statusAriaLabel(network, device, overlay, opts = {}) {
         : device === "keys"
           ? "ownership saved on device"
           : "no ownership saved on device";
-  const overlayText = overlayAriaText(overlay);
+  const overlayText = overlayAriaText(overlay, surface);
   if (walletKeysNotInTab && device === "none") {
     const tabDeviceText = "ownership saved on device, not in this tab";
     const honestBase = overlayText

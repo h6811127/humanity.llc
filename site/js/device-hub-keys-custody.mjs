@@ -320,6 +320,7 @@ export function renderHubKeysCustodyPanel() {
     crossTabEntries: inbox.crossTabEntries,
     orphanRemovedEntries: inbox.orphanRemovedEntries,
     tabSessionLabel: inbox.tabSessionLabel,
+    standalone: inbox.standalone === true,
     hasActiveKeys: Boolean(session?.owner_private_key_b58),
     educationDismissed: isKeysCustodyNoticeDismissed(),
     ...gatherProactiveCustodyInput(session),

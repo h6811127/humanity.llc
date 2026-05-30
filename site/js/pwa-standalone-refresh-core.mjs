@@ -11,6 +11,13 @@ import {
   WALLET_NETWORK_VISIBILITY_REFRESH_MS,
 } from "./device-live-control-poll-scheduler.mjs";
 import { isPwaShellPagePath } from "./pwa-install-metadata-core.mjs";
+import {
+  DEVICE_BOOT_PENDING,
+  DEVICE_BOOT_READY,
+} from "./device-shell-boot-core.mjs";
+
+/** Skip resume soft refresh while shell boot is still pending or just reached ready. */
+export const STANDALONE_RESUME_BOOT_COALESCE_MS = 500;
 
 export const PWA_STANDALONE_REFRESH_DOC = "docs/PWA_INSTALL.md";
 
@@ -377,4 +384,23 @@ export function runStandaloneSoftRefreshPipeline(deps, _ctx = {}) {
     if (step === "wallet") deps.refreshDeviceHub?.();
     if (step === "chrome") deps.refreshDeviceChrome?.({ immediate: true });
   }
+}
+
+/**
+ * @param {string | undefined} bootState
+ * @param {number | null} msSinceBootReady
+ */
+export function shouldDeferStandaloneSoftRefreshWhileBootPending(
+  bootState,
+  msSinceBootReady
+) {
+  if (!bootState || bootState === DEVICE_BOOT_PENDING) return true;
+  if (
+    bootState === DEVICE_BOOT_READY &&
+    msSinceBootReady != null &&
+    msSinceBootReady < STANDALONE_RESUME_BOOT_COALESCE_MS
+  ) {
+    return true;
+  }
+  return false;
 }

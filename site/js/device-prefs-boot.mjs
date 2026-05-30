@@ -14,6 +14,8 @@ import {
   themeTogglePressed,
   themeToggleSub,
 } from "./device-prefs-boot-core.mjs";
+import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
+import { syncBrowserTabOnlyShortcutRows } from "./pwa-browser-tab-shortcuts.mjs";
 
 /** @returns {import("./device-prefs-boot-core.mjs").NotificationPermissionState} */
 function readNotificationPermission() {
@@ -69,6 +71,12 @@ function readPrefsStorage(storage) {
 export function applyDevicePrefsBootToDocument(doc = document, opts = {}) {
   const root = doc?.documentElement;
   if (!root) return;
+
+  const win = doc.defaultView;
+  syncBrowserTabOnlyShortcutRows(
+    doc,
+    readStandaloneModeFromWindow(win ?? undefined)
+  );
 
   const prefs = readPrefsStorage(opts.storage);
   const permission = opts.permission ?? readNotificationPermission();

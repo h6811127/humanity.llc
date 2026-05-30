@@ -3,6 +3,10 @@
  * @see docs/PRODUCT_LANGUAGE_STRATEGY.md
  * @see docs/OWNERSHIP_AND_CONTROL_MODEL.md § Terminology map · D7 · D9g
  */
+import {
+  inboxAriaManagingInOtherContext,
+  inboxAriaOrphanManagingElsewhere,
+} from "./device-shell-copy-core.mjs";
 
 export const OWNERSHIP_NOT_LOADED_TAB = "Ownership not loaded in this tab.";
 
@@ -173,11 +177,10 @@ export const FOUNDING_QR_NOT_OWNER_PROOF =
 /**
  * @param {number} count
  * @param {string} [who]
+ * @param {import("./device-shell-copy-core.mjs").ShellSurface} [surface]
  */
-export function inboxAriaManagingInOtherTab(count, who = "") {
-  const suffix = who ? ` (${who})` : "";
-  if (count > 1) return `managing in ${count} other tabs${suffix}`;
-  return `managing in 1 other tab${suffix}`;
+export function inboxAriaManagingInOtherTab(count, who = "", surface = "browser") {
+  return inboxAriaManagingInOtherContext(count, who, surface);
 }
 
 /** @param {string} [who] */
@@ -186,10 +189,12 @@ export function inboxAriaOwnershipNotSaved(who = "") {
   return `ownership not saved on device${suffix}`;
 }
 
-/** @param {string} [who] */
-export function inboxAriaOrphanManagingOtherTab(who = "") {
-  const suffix = who ? ` (${who})` : "";
-  return `still managing in another tab${suffix}`;
+/**
+ * @param {string} [who]
+ * @param {import("./device-shell-copy-core.mjs").ShellSurface} [surface]
+ */
+export function inboxAriaOrphanManagingOtherTab(who = "", surface = "browser") {
+  return inboxAriaOrphanManagingElsewhere(who, surface);
 }
 
 /**

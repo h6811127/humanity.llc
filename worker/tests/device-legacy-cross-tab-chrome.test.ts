@@ -17,6 +17,10 @@ describe("shouldShowLegacyHubCrossTabChrome", () => {
   it("shows on legacy pages without shell badge or custody panel", () => {
     expect(shouldShowLegacyHubCrossTabChrome(false, false)).toBe(true);
   });
+
+  it("hides legacy hub cross-tab chrome in standalone PWA", () => {
+    expect(shouldShowLegacyHubCrossTabChrome(false, false, true)).toBe(false);
+  });
 });
 
 describe("shouldShowLegacyTabKeysHubNotice", () => {
@@ -24,5 +28,9 @@ describe("shouldShowLegacyTabKeysHubNotice", () => {
     expect(shouldShowLegacyTabKeysHubNotice(true, false)).toBe(false);
     expect(shouldShowLegacyTabKeysHubNotice(false, true)).toBe(false);
     expect(shouldShowLegacyTabKeysHubNotice(false, false)).toBe(true);
+  });
+
+  it("hides legacy tab-keys notice in standalone PWA", () => {
+    expect(shouldShowLegacyTabKeysHubNotice(false, false, true)).toBe(false);
   });
 });

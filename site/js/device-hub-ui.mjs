@@ -59,8 +59,14 @@ import {
   walletEntryKeyPreview,
   walletEntryQrId,
 } from "./device-wallet.mjs";
-import { DEVICE_BOOT_READY_EVENT } from "./device-shell-boot.mjs";
-import { hubPersonalizedRenderDeferred } from "./device-hub-boot-core.mjs";
+import {
+  DEVICE_BOOT_LOCAL_EVENT,
+  DEVICE_BOOT_READY_EVENT,
+} from "./device-shell-boot.mjs";
+import {
+  hubPersonalizedRenderDeferred,
+  hubSavedListRenderDeferred,
+} from "./device-hub-boot-core.mjs";
 import { shouldSuppressCardDisabledSinceVisitAlerts } from "./device-wallet-since-visit-gate.mjs";
 import {
   getCachedNetworkSeenAt,
@@ -119,6 +125,7 @@ import { reconcileChildObjectsForProfileIds } from "./child-object-reconcile.mjs
 import { CHILD_OBJECTS_STORAGE_KEY } from "./child-object-store-core.mjs";
 import {
   childObjectPatchPlan,
+  childObjectRowRenderSignature,
   childObjectRowSignature,
   childObjectRowsUnchanged,
   hubChildObjectRowElementsForProfile,
@@ -150,7 +157,7 @@ import {
 import { tabNoticeCount } from "./device-counts.mjs";
 import { mountHubBuildStamp } from "./device-hub-build-stamp.mjs";
 import { mountHubNetworkTools } from "./device-hub-network-tools.mjs";
-import { syncInboxBackdropForOpenHub } from "./device-sheet-backdrop-sync.mjs?v=79";
+import { syncInboxBackdropForOpenHub } from "./device-sheet-backdrop-sync.mjs?v=81";
 import {
   HUB_STRANGER_EMPTY_CLASS,
   isHubStrangerEmptyState,
@@ -1323,7 +1330,7 @@ export function refreshHubInboxAlertsFromChrome() {
 }
 
 function renderActivityRows() {
-  if (hubPersonalizedRenderDeferred()) return;
+  if (hubSavedListRenderDeferred()) return;
   const entries = loadActivity().slice(0, HUB_RECENT_DISPLAY_LIMIT);
   if (!activityList || !activityGroup) return;
 
@@ -1434,7 +1441,43 @@ function buildHubChildObjectRowElement(parentEntry, childRow, ctx) {
       </span>
     </div>
     ${actionsHtml}`;
+  li.dataset.childRenderSig = childObjectRowRenderSignature(childRow);
   return li;
+}
+
+/**
+ * @param {HTMLElement} li
+ * @param {Record<string, unknown>} parentEntry
+ * @param {Record<string, unknown>} childRow
+ * @param {{ fullRows: boolean, expandedRows: boolean }} ctx
+ */
+function patchHubChildObjectRowElementInPlace(li, parentEntry, childRow, ctx) {
+  const meta = hubChildObjectTypeMeta(childRow.object_type);
+  const rootHandle = hubChildObjectRootHandle(parentEntry);
+  const identity = hubChildObjectIdentityLine({
+    objectTypeLabel: meta.label,
+    rootHandle,
+  });
+  const scanUrl = typeof childRow.scan_url === "string" ? childRow.scan_url : "";
+  const status = hubChildObjectStatusLine({
+    publicState: childRow.public_state,
+    scanUrl,
+    status: childRow.status,
+  });
+  li.className = `hub-card-item hub-card-item--nested hub-card-item--${meta.tone}${
+    ctx.fullRows ? "" : " hub-card-item--summary"
+  }`;
+  li.dataset.hubSearchable = hubChildObjectSearchHaystack(parentEntry, childRow);
+  const titleEl = li.querySelector(".list-title");
+  if (titleEl) titleEl.textContent = hubChildObjectTitle(childRow);
+  const identityEl = li.querySelector(".hub-card-identity");
+  if (identityEl) identityEl.textContent = identity;
+  const statusWrap = li.querySelector(".hub-card-status");
+  if (statusWrap) {
+    statusWrap.className = `hub-card-status hub-card-status--${status.tone}`;
+    const statusLabel = statusWrap.querySelector(".hub-card-status-label");
+    if (statusLabel) statusLabel.textContent = status.label;
+  }
 }
 
 /**
@@ -1518,18 +1561,19 @@ function patchHubChildObjectRowsForProfile(parentEntry, ctx) {
     if (!objectId) continue;
     let li = keepById.get(objectId);
     if (li) {
-      const fresh = buildHubChildObjectRowElement(parentEntry, childRow, {
-        fullRows: ctx.fullRows,
-        expandedRows: ctx.expandedRows,
-      });
-      li.replaceWith(fresh);
-      li = fresh;
+      const renderSig = childObjectRowRenderSignature(childRow);
+      const prevSig = li.dataset.childRenderSig ?? "";
+      if (prevSig !== renderSig) {
+        patchHubChildObjectRowElementInPlace(li, parentEntry, childRow, ctx);
+        li.dataset.childRenderSig = renderSig;
+      }
       keepById.set(objectId, li);
     } else {
       li = buildHubChildObjectRowElement(parentEntry, childRow, {
         fullRows: ctx.fullRows,
         expandedRows: ctx.expandedRows,
       });
+      li.dataset.childRenderSig = childObjectRowRenderSignature(childRow);
     }
     insertAfter.insertAdjacentElement("afterend", li);
     insertAfter = li;
@@ -1627,7 +1671,7 @@ function bindHubChildObjectRowHandlers() {
  * @param {{ initialChipChecking?: boolean, childReconciled?: boolean, viewportSync?: boolean }} [opts] Use checking chips until the next poll (avoids stale cache flash after wallet edits).
  */
 function renderSavedRows(opts = {}) {
-  if (hubPersonalizedRenderDeferred()) return;
+  if (hubSavedListRenderDeferred()) return;
   const rowChipOpts = { forceChecking: opts.initialChipChecking === true };
   const summary = loadWalletSummary();
   if (summary.walletFingerprint !== expandedSummaryWalletFingerprint) {
@@ -2126,7 +2170,7 @@ function renderSavedRows(opts = {}) {
 }
 
 function renderPinRows() {
-  if (hubPersonalizedRenderDeferred()) return;
+  if (hubSavedListRenderDeferred()) return;
   const pins = loadPins();
   if (!pinsList || !pinsGroup) return;
 
@@ -2161,7 +2205,7 @@ function renderPinRows() {
 }
 
 function refreshEmptyHint() {
-  if (hubPersonalizedRenderDeferred()) return;
+  if (hubSavedListRenderDeferred()) return;
   if (!emptyHint) return;
   loadWallet();
   if (isWalletStorageCorrupt()) {
@@ -2296,16 +2340,21 @@ function bindDom() {
   activityEmptyEl = hubEl("device-hub-activity-empty");
 }
 
-export function refreshDeviceHub() {
-  if (hubPersonalizedRenderDeferred()) return;
-  syncHubInboxAlertGroups();
-  syncBrowserNotifPrompts();
+export function refreshDeviceHubLocalContent() {
+  if (hubSavedListRenderDeferred()) return;
   renderActivityRows();
   applyHubStrangerEmptyChrome();
   renderSavedRows();
   renderPinRows();
   applySearchFilter();
   refreshEmptyHint();
+}
+
+export function refreshDeviceHub() {
+  refreshDeviceHubLocalContent();
+  if (hubPersonalizedRenderDeferred()) return;
+  syncHubInboxAlertGroups();
+  syncBrowserNotifPrompts();
   renderHubKeysCustodyPanel();
 }
 
@@ -2359,6 +2408,9 @@ export function initDeviceHub(config = {}) {
 
   if (!hubBootReadyListenerBound) {
     hubBootReadyListenerBound = true;
+    window.addEventListener(DEVICE_BOOT_LOCAL_EVENT, () => {
+      refreshDeviceHubLocalContent();
+    });
     window.addEventListener(DEVICE_BOOT_READY_EVENT, () => {
       refreshDeviceHub();
     });

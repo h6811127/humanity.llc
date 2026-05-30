@@ -6,8 +6,14 @@
 /**
  * @param {boolean} hasShellBadge
  * @param {boolean} hasUnifiedCustodyPanel
+ * @param {boolean} [standalone]
  */
-export function shouldShowLegacyHubCrossTabChrome(hasShellBadge, hasUnifiedCustodyPanel) {
+export function shouldShowLegacyHubCrossTabChrome(
+  hasShellBadge,
+  hasUnifiedCustodyPanel,
+  standalone = false
+) {
+  if (standalone) return false;
   if (hasShellBadge) return false;
   if (hasUnifiedCustodyPanel) return false;
   return true;
@@ -16,8 +22,14 @@ export function shouldShowLegacyHubCrossTabChrome(hasShellBadge, hasUnifiedCusto
 /**
  * @param {boolean} hasShellBadge
  * @param {boolean} hasUnifiedCustodyPanel
+ * @param {boolean} [standalone]
  */
-export function shouldShowLegacyTabKeysHubNotice(hasShellBadge, hasUnifiedCustodyPanel) {
+export function shouldShowLegacyTabKeysHubNotice(
+  hasShellBadge,
+  hasUnifiedCustodyPanel,
+  standalone = false
+) {
+  if (standalone) return false;
   if (hasShellBadge) return false;
   if (hasUnifiedCustodyPanel) return false;
   return true;

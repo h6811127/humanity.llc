@@ -26,6 +26,7 @@ import { getDefaultVouchProfileId } from "./vouch-ready-keys.mjs";
 import { getCrossTabScanSnapshot } from "./device-cross-tab-state.mjs";
 import { hasUnifiedHubKeysCustodyPanel } from "./device-hub-keys-custody.mjs";
 import { shouldShowLegacyHubCrossTabChrome } from "./device-legacy-cross-tab-chrome-core.mjs";
+import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
 import {
   emphasisCardActionsHtml,
   emphasisCardBodyHtml,
@@ -224,7 +225,8 @@ function clearHubCrossTabNotice() {
 function shouldRenderLegacyHubCrossTabChrome() {
   return shouldShowLegacyHubCrossTabChrome(
     Boolean(document.getElementById("shell-notif-badge")),
-    hasUnifiedHubKeysCustodyPanel()
+    hasUnifiedHubKeysCustodyPanel(),
+    readStandaloneModeFromWindow(window)
   );
 }
 

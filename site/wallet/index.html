@@ -32,7 +32,7 @@
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=5" />
     <link rel="stylesheet" href="/styles.css?v=131" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=72" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=81" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=30" />
   </head>
   <body class="page-wallet has-shell-chrome" data-boot="pending">
@@ -129,7 +129,9 @@
       >
         <header class="wallet-page-head">
           <h1 class="wallet-page-title" id="wallet-page-title">My objects on this device</h1>
-          <div id="device-keys-custody-wallet"></div>
+          <div class="device-boot-gated" id="device-keys-custody-wallet-wrap">
+            <div id="device-keys-custody-wallet"></div>
+          </div>
         </header>
 
         <div class="wallet-alerts-top device-boot-gated" id="wallet-alerts-top">
@@ -173,7 +175,7 @@
           </div>
         </div>
 
-        <p class="form-hint wallet-empty-hint device-boot-gated" id="device-hub-empty-hint">
+        <p class="form-hint wallet-empty-hint device-boot-local-gated" id="device-hub-empty-hint">
           No cards saved yet.
           <a href="/create/">Create one</a>
           or
@@ -271,7 +273,7 @@
         </div>
 
         <section
-          class="device-hub-section device-boot-gated"
+          class="device-hub-section device-boot-local-gated"
           id="device-hub-saved-items-section"
           aria-labelledby="device-hub-saved-items-title"
         >
@@ -489,7 +491,7 @@
           </section>
 
         <section
-          class="device-hub-section device-hub-section--secondary device-boot-gated"
+          class="device-hub-section device-hub-section--secondary device-boot-local-gated"
           id="device-hub-actions-section"
           aria-labelledby="device-hub-actions-title"
           data-hub-stranger-empty-hide
@@ -565,7 +567,7 @@
       </div>
     </dialog>
 
-    <script src="/js/device-status-bootstrap.mjs?v=79" type="module"></script>
+    <script src="/js/device-status-bootstrap.mjs?v=81" type="module"></script>
     <script src="/js/wallet-page.mjs?v=5" type="module"></script>
   </body>
 </html>

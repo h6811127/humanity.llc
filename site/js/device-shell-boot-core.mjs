@@ -4,7 +4,10 @@
  */
 
 export const DEVICE_BOOT_PENDING = "pending";
+/** Wallet/localStorage paint before first network chrome refresh (RC-17). */
+export const DEVICE_BOOT_LOCAL = "local";
 export const DEVICE_BOOT_READY = "ready";
+export const DEVICE_BOOT_LOCAL_EVENT = "hc-device-boot-local";
 export const DEVICE_BOOT_READY_EVENT = "hc-device-boot-ready";
 
 /**
@@ -21,4 +24,27 @@ export function pageOwnsDeviceBootReady(pathname = "") {
  */
 export function isDeviceBootReadyState(state) {
   return state === DEVICE_BOOT_READY;
+}
+
+/**
+ * @param {string | undefined} state body dataset.boot
+ */
+export function isDeviceBootLocalState(state) {
+  return state === DEVICE_BOOT_LOCAL;
+}
+
+/**
+ * Saved cards / pins may paint after local wallet reconcile (RC-17).
+ * @param {string | undefined} state
+ */
+export function isDeviceBootLocalOrReadyState(state) {
+  return isDeviceBootLocalState(state) || isDeviceBootReadyState(state);
+}
+
+/**
+ * @param {string} pathname
+ */
+export function isWalletShellPage(pathname = "") {
+  const path = pathname.replace(/\/index\.html$/i, "/");
+  return path === "/wallet/" || path.endsWith("/wallet/");
 }

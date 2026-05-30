@@ -21,6 +21,11 @@ describe("shouldShowWalletTabHintCrossTabChrome", () => {
     expect(shouldShowWalletTabHintCrossTabChrome(false, 0, 0)).toBe(false);
     expect(shouldShowWalletTabHintCrossTabChrome(true, 0, 0)).toBe(false);
   });
+
+  it("hides cross-tab strip in standalone PWA (inbox + custody panel carry copy)", () => {
+    expect(shouldShowWalletTabHintCrossTabChrome(false, 0, 1, true)).toBe(false);
+    expect(shouldShowWalletTabHintCrossTabChrome(false, 1, 0, true)).toBe(false);
+  });
 });
 
 describe("shouldShowWalletCorruptHint", () => {

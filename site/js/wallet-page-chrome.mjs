@@ -3,7 +3,16 @@
  * Click handler for Open controls: `bindWalletActiveOpenControls()` from wallet-page.mjs.
  */
 
-import { gatherInboxInput } from "./device-inbox.mjs?v=79";
+import { gatherInboxInput } from "./device-inbox.mjs?v=81";
+import {
+  controlHereDetail,
+  controlHereEyebrow,
+  keysInOtherContextDetail,
+  keysInOtherContextEyebrow,
+  otherContextPresenceExtra,
+  shellSurfaceFromStandalone,
+} from "./device-shell-copy-core.mjs";
+import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
 import { createdUrlForEntry, getTabSession, openCardNowPage } from "./device-keys.mjs";
 import { activateWalletEntryGated } from "./device-control-activation.mjs";
 import {
@@ -97,6 +106,8 @@ function setTabHint(tabHint, input) {
   const hasShellBadge = Boolean(document.getElementById("shell-notif-badge"));
   const orphanCount = input.orphanRemovedEntries.length;
   const crossTabCount = input.crossTabEntries.length;
+  const standalone = input.standalone === true;
+  const surface = shellSurfaceFromStandalone(standalone);
 
   const eyebrow = document.getElementById("wallet-tab-hint-eyebrow");
   const title = document.getElementById("wallet-tab-hint-title");
@@ -181,7 +192,12 @@ function setTabHint(tabHint, input) {
   }
 
   if (
-    !shouldShowWalletTabHintCrossTabChrome(hasShellBadge, orphanCount, crossTabCount)
+    !shouldShowWalletTabHintCrossTabChrome(
+      hasShellBadge,
+      orphanCount,
+      crossTabCount,
+      standalone
+    )
   ) {
     if (title) title.hidden = true;
     tabHint.hidden = true;
@@ -215,21 +231,17 @@ function setTabHint(tabHint, input) {
   if (crossTabCount > 0) {
     const entry = input.crossTabEntries[0];
     const label = escapeEmphasisHtml(labelForPresence(entry));
-    const extra =
-      crossTabCount > 1
-        ? ` (+${crossTabCount - 1} other tab${crossTabCount === 2 ? "" : "s"})`
-        : "";
+    const extra = otherContextPresenceExtra(crossTabCount - 1, surface);
     const walletEntry = walletEntryForProfile(entry.profile_id);
 
     setTabHintModifier(tabHint, "info");
-    if (eyebrow) eyebrow.textContent = "Keys in another tab";
+    if (eyebrow) eyebrow.textContent = keysInOtherContextEyebrow(surface);
     if (title) {
       title.hidden = false;
       title.innerHTML = `${label}${extra}`;
     }
     if (detail) {
-      detail.textContent =
-        "Save or manage in that tab’s card workspace, or open controls here on this page.";
+      detail.textContent = keysInOtherContextDetail(surface);
     }
     if (focusBtn) focusBtn.hidden = false;
     if (useKeysBtn) useKeysBtn.hidden = !walletEntry?.owner_private_key_b58;
@@ -328,10 +340,11 @@ function refreshWalletActiveBanner() {
   const label =
     session.wallet_label ||
     (session.handle ? `@${session.handle}` : session.profile_id.slice(0, 12));
+  const surface = shellSurfaceFromStandalone(readStandaloneModeFromWindow(window));
   activeBanner.hidden = false;
-  if (activeEyebrow) activeEyebrow.textContent = "Active in this tab";
+  if (activeEyebrow) activeEyebrow.textContent = controlHereEyebrow(surface);
   activeLabel.textContent = label;
-  activeDetail.textContent = "Signing keys stay here until you close this tab.";
+  activeDetail.textContent = controlHereDetail(surface);
   const entry = walletEntryForSession(session);
   if (activeLink && entry) {
     activeLink.href = createdUrlForEntry(entry);

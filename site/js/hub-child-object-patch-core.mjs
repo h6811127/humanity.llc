@@ -1,7 +1,11 @@
 /**
- * Pure helpers for incremental hub child-object row updates (RC-16).
+ * Pure helpers for incremental hub child-object row updates (RC-16 · RC-17).
  * @see docs/SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md
  */
+import {
+  hubChildObjectStatusLine,
+  hubChildObjectTitle,
+} from "./hub-child-object-row-core.mjs";
 
 /**
  * @param {Array<{ object_id?: string }>} rows
@@ -20,6 +24,20 @@ export function childObjectRowSignature(rows) {
  */
 export function childObjectRowsUnchanged(before, after) {
   return before === after;
+}
+
+/**
+ * Stable signature for in-place child row updates (skip replaceWith when unchanged).
+ * @param {Record<string, unknown>} childRow
+ */
+export function childObjectRowRenderSignature(childRow) {
+  const objectId = String(childRow.object_id ?? "").trim();
+  const status = hubChildObjectStatusLine({
+    publicState: childRow.public_state,
+    scanUrl: typeof childRow.scan_url === "string" ? childRow.scan_url : "",
+    status: childRow.status,
+  });
+  return `${objectId}\t${hubChildObjectTitle(childRow)}\t${status.label}\t${status.tone}`;
 }
 
 /**

@@ -6,6 +6,7 @@ import { getInboxItems } from "./device-inbox.mjs";
 import { inboxItemsIncludeKind, inboxWalletEntryLabel } from "./device-inbox-core.mjs";
 import { hasUnifiedHubKeysCustodyPanel } from "./device-hub-keys-custody.mjs";
 import { shouldShowLegacyTabKeysHubNotice } from "./device-legacy-cross-tab-chrome-core.mjs";
+import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
 import { findWalletEntryByProfileId } from "./device-wallet.mjs";
 import { CARD_DISABLED_SINCE_VISIT_ALERT_TEXT } from "./wallet-network-baseline.mjs";
@@ -239,7 +240,8 @@ function renderTabKeysHubNotice(noticeGroup, show, noticeMode) {
   if (
     !shouldShowLegacyTabKeysHubNotice(
       hasShellBadge,
-      hasUnifiedHubKeysCustodyPanel()
+      hasUnifiedHubKeysCustodyPanel(),
+      readStandaloneModeFromWindow(window)
     )
   ) {
     noticeGroup.hidden = true;

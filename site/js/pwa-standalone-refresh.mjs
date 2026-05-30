@@ -26,6 +26,7 @@ import {
   shouldShowStandalonePtrTip,
   shouldShowStandaloneRefreshRow,
   shouldShowStaleShellNudge,
+  shouldDeferStandaloneSoftRefreshWhileBootPending,
   shouldTriggerStandaloneResumeRefresh,
   staleShellHardReloadHref,
   STANDALONE_SOFT_REFRESH_DEBOUNCE_MS,
@@ -38,6 +39,7 @@ import {
 } from "./pwa-standalone-affordances-html.mjs";
 import { pwaStaleShellBannerHtml } from "./pwa-stale-shell-banner-html.mjs";
 import { hideBrowserTabOnlyShortcutRows } from "./pwa-browser-tab-shortcuts.mjs";
+import { msSinceDeviceBootReady } from "./device-shell-boot.mjs";
 
 const PTR_INDICATOR_ID = "device-ptr-indicator";
 const STALE_SHELL_BANNER_ID = "device-pwa-stale-shell-banner";
@@ -76,6 +78,14 @@ function runStandaloneSoftRefresh(reason) {
  */
 function scheduleStandaloneSoftRefresh(reason) {
   if (!readStandaloneModeFromWindow(window)) return;
+  if (
+    shouldDeferStandaloneSoftRefreshWhileBootPending(
+      document.body?.dataset?.boot,
+      msSinceDeviceBootReady()
+    )
+  ) {
+    return;
+  }
   if (debounceTimer != null) {
     clearTimeout(debounceTimer);
   }

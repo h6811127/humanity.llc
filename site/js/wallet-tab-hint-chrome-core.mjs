@@ -17,12 +17,15 @@ export function shouldShowWalletCorruptHint(walletLoadKind) {
  * @param {boolean} hasShellBadge
  * @param {number} orphanCount
  * @param {number} crossTabCount
+ * @param {boolean} [standalone]
  */
 export function shouldShowWalletTabHintCrossTabChrome(
   hasShellBadge,
   orphanCount,
-  crossTabCount
+  crossTabCount,
+  standalone = false
 ) {
+  if (standalone) return false;
   if (orphanCount <= 0 && crossTabCount <= 0) return false;
   if (hasShellBadge) return false;
   return true;

@@ -174,7 +174,19 @@ describe("buildHubKeysCustodyPanel", () => {
     expect(state.rows[0].title).toBe("Managing in 2 other tabs");
     expect(state.rows[0].subtitle).toContain("@alice");
     expect(state.rows[1].title).toBe("@alice");
-    expect(state.rows[1].subtitle).toBe("Managing in another tab");
+    expect(state.rows[1].subtitle).toBe("Managing in 1 other tab");
+  });
+
+  it("uses Safari/window copy for cross-tab rows in standalone", () => {
+    const state = buildHubKeysCustodyPanel({
+      standalone: true,
+      crossTabEntries: [
+        { profile_id: "abc", tabId: "t1", handle: "alice" },
+        { profile_id: "def", tabId: "t2", handle: "bob" },
+      ],
+    });
+    expect(state.rows[0].title).toBe("Managing in 2 other windows");
+    expect(state.rows[1].subtitle).toBe("Managing in Safari");
   });
 
   it("shows wallet scale row when above comfortable card count", () => {

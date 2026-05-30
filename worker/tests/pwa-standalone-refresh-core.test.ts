@@ -15,6 +15,7 @@ import {
   readStandaloneModeFromWindow,
   readStaleShellDismissedForSha,
   runStandaloneSoftRefreshPipeline,
+  shouldDeferStandaloneSoftRefreshWhileBootPending,
   shouldRefreshNetworkChipsOnResume,
   shouldShowStandalonePtrTip,
   shouldShowStandaloneRefreshRow,
@@ -463,6 +464,23 @@ describe("shouldShowStandaloneRefreshRow", () => {
         pathname: "/created/",
         savedCardCount: 1,
       })
+    ).toBe(false);
+  });
+});
+
+describe("shouldDeferStandaloneSoftRefreshWhileBootPending", () => {
+  it("defers while boot pending or within coalesce window after ready", () => {
+    expect(shouldDeferStandaloneSoftRefreshWhileBootPending("pending", null)).toBe(
+      true
+    );
+    expect(shouldDeferStandaloneSoftRefreshWhileBootPending("local", null)).toBe(
+      false
+    );
+    expect(
+      shouldDeferStandaloneSoftRefreshWhileBootPending("ready", 100)
+    ).toBe(true);
+    expect(
+      shouldDeferStandaloneSoftRefreshWhileBootPending("ready", 600)
     ).toBe(false);
   });
 });

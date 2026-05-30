@@ -2,7 +2,12 @@
  * Floating status dot, notification badge, hub sheet host.
  * @see docs/STATUS_INDICATOR_STEWARD_GREEN.md
  */
-import { closeInboxSheet, openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=79";
+import { closeInboxSheet, openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=81";
+import {
+  shellSurfaceFromStandalone,
+  statusKeyCrossTabLine,
+} from "./device-shell-copy-core.mjs";
+import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
 import { buildStatusSegments } from "./device-counts.mjs";
 import { loadPins } from "./device-pins.mjs";
 import {
@@ -30,7 +35,7 @@ import {
   getInboxDotOverlay,
   notificationCount,
   preloadInboxModule,
-} from "./device-inbox-loader.mjs?v=79";
+} from "./device-inbox-loader.mjs?v=81";
 import {
   inboxBadgeAriaLabel,
   inboxBadgeTitle,
@@ -39,29 +44,29 @@ import {
   inboxBadgeChromaKind,
   inboxBadgeCountText,
   inboxCountFromItems,
-} from "./device-inbox-core.mjs?v=79";
+} from "./device-inbox-core.mjs?v=81";
 import { closeGlancePopover, isGlancePopoverOpen } from "./device-hub-glance-popover.mjs";
 import {
   initHubIntroCoachmark,
   onHubOpenedFromIntro,
 } from "./device-hub-intro-coachmark.mjs";
 import { logDotDiagnostic } from "./device-dot-diagnostics.mjs";
-import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=79";
+import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=81";
 import {
   NETWORK_BASELINE_CHANGED,
   NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
 import "./device-shell-motion.mjs";
-import "./device-shell-chrome.mjs?v=79";
+import "./device-shell-chrome.mjs?v=81";
 import "./device-theme.mjs";
-import { initBrowserNotifications } from "./device-browser-notifications-loader.mjs?v=79";
-import { reconcileHubSheetState } from "./device-hub-sheet-loader.mjs?v=79";
+import { initBrowserNotifications } from "./device-browser-notifications-loader.mjs?v=81";
+import { reconcileHubSheetState } from "./device-hub-sheet-loader.mjs?v=81";
 import { startCrossTabNotificationState } from "./device-cross-tab-state.mjs";
 import {
   refreshDeviceChrome,
   setRefreshStatusSurfaces,
   startDeviceChromeRefresh,
-} from "./device-chrome-refresh.mjs?v=79";
+} from "./device-chrome-refresh.mjs?v=81";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
 import {
   broadcastHealthSnapshotIfEligible,
@@ -86,7 +91,7 @@ import {
   shellStatusLinePrimaryInChrome,
   shouldCelebrateStewardTransition,
   statusAriaLabel,
-} from "./device-dot-state-core.mjs?v=79";
+} from "./device-dot-state-core.mjs?v=81";
 import {
   DOT_STATE_CHANGED,
   getNetworkStatus,
@@ -95,7 +100,7 @@ import {
   setHubExpandedHook,
   setHubExpanded as setHubExpandedCore,
   setNetworkStatus,
-} from "./device-status-core.mjs?v=79";
+} from "./device-status-core.mjs?v=81";
 import {
   markDotBootstrapSettled,
   markDotBootReadyIfSettled,
@@ -297,6 +302,7 @@ function applyDot() {
       statusAriaLabel(networkStatus, device, overlay, {
         pageKind: dotPageKind(),
         walletKeysNotInTab: signing.walletKeysNotInTab,
+        surface: shellSurfaceFromStandalone(readStandaloneModeFromWindow(window)),
       })
     );
     renderDotExplainability(networkStatus, device, overlay);
@@ -404,6 +410,8 @@ function renderDotExplainability(network, device, overlay) {
 function renderStatusKey() {
   const el = document.getElementById("device-hub-status-key");
   if (!el) return;
+  const surface = shellSurfaceFromStandalone(readStandaloneModeFromWindow(window));
+  const crossTabLine = statusKeyCrossTabLine(surface);
   el.innerHTML = `
     <p class="device-hub-status-key-label">Status dot reference</p>
     <ul class="device-hub-status-key-list">
@@ -413,7 +421,7 @@ function renderStatusKey() {
       <li>${statusKeyDot("#d97706")} Amber - resolver limited</li>
       <li>${statusKeyDot("#9ca3af")} Gray - resolver offline</li>
       <li>${statusKeyDot("#f59e0b")} Amber notch - live proof waiting</li>
-      <li>${statusKeyDot("#2563eb")} Blue notch - keys in another tab</li>
+      <li>${statusKeyDot("#2563eb")} ${crossTabLine}</li>
     </ul>`;
 }
 

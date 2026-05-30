@@ -20,7 +20,8 @@ import {
   inboxAriaOrphanManagingOtherTab,
   inboxAriaOwnershipNotSaved,
 } from "./device-ownership-copy-core.mjs";
-import { dotOverlayFromCounts } from "./device-dot-state-core.mjs?v=79";
+import { shellSurfaceFromStandalone } from "./device-shell-copy-core.mjs";
+import { dotOverlayFromCounts } from "./device-dot-state-core.mjs?v=81";
 import { liveProofInboxAggregateTitle, liveProofInboxRowSubtitle } from "./device-live-control-inbox-core.mjs";
 
 /** @typedef {'live_proof' | 'tab_keys_unsaved' | 'cross_tab_keys' | 'other_tabs_unsaved_keys' | 'orphan_keys_removed' | 'card_disabled_since_visit'} InboxKind */
@@ -66,6 +67,7 @@ export function inboxItemsIncludeKind(items, kind) {
  *   orphanRemovedEntries?: InboxCrossTabEntry[],
  *   tabSessionLabel?: string,
  *   cardDisabledSinceVisit?: InboxCardDisabledEntry[],
+ *   standalone?: boolean,
  * }} input
  * @returns {InboxItem[]}
  */
@@ -77,7 +79,9 @@ export function buildInboxItems(input) {
     orphanRemovedEntries = [],
     tabSessionLabel = "This tab",
     cardDisabledSinceVisit = [],
+    standalone = false,
   } = input;
+  const surface = shellSurfaceFromStandalone(standalone);
 
   /** @type {InboxItem[]} */
   const items = [];
@@ -108,8 +112,8 @@ export function buildInboxItems(input) {
         kind: "other_tabs_unsaved_keys",
         urgency: "medium",
         count: crossTabCount,
-        title: crossTabAggregateTitle(crossTabCount),
-        subtitle: crossTabAggregateSubtitle(crossTabEntries),
+        title: crossTabAggregateTitle(crossTabCount, surface),
+        subtitle: crossTabAggregateSubtitle(crossTabEntries, { surface }),
         hubScrollTarget: "device-hub-keys-custody",
         meta: { crossTabEntry: entry, crossTabExtra: crossTabCount - 1 },
       });
@@ -118,8 +122,8 @@ export function buildInboxItems(input) {
         kind: "cross_tab_keys",
         urgency: "medium",
         count: crossTabCount,
-        title: crossTabAggregateTitle(1),
-        subtitle: crossTabPresenceLabel(entry),
+        title: crossTabAggregateTitle(1, surface),
+        subtitle: crossTabPresenceLabel(entry, surface),
         hubScrollTarget: "device-hub-keys-custody",
         meta: { crossTabEntry: entry, crossTabExtra: 0 },
       });
@@ -235,6 +239,7 @@ export function cardDisabledProfileIdsFromInbox(items) {
  * @param {{
  *   crossTabEntries?: InboxCrossTabEntry[],
  *   orphanRemovedEntries?: InboxCrossTabEntry[],
+ *   standalone?: boolean,
  * }} [ctx]
  * @returns {InboxItem[]}
  */
@@ -242,7 +247,9 @@ export function expandInboxItemsForChrome(items, ctx = {}) {
   const {
     crossTabEntries = [],
     orphanRemovedEntries = [],
+    standalone = false,
   } = ctx;
+  const surface = shellSurfaceFromStandalone(standalone);
 
   /** @type {InboxItem[]} */
   const expanded = [];
@@ -266,7 +273,7 @@ export function expandInboxItemsForChrome(items, ctx = {}) {
           kind: "cross_tab_keys",
           count: 1,
           urgency: item.urgency,
-          title: crossTabAggregateTitle(1),
+          title: crossTabAggregateTitle(1, surface),
           subtitle: inboxCrossTabLabel(entry),
           hubScrollTarget: item.hubScrollTarget,
           meta: { crossTabEntry: entry },
@@ -303,6 +310,7 @@ export function expandInboxItemsForChrome(items, ctx = {}) {
  *   revokedHintProfileIds?: Set<string>,
  *   crossTabEntries?: InboxCrossTabEntry[],
  *   orphanRemovedEntries?: InboxCrossTabEntry[],
+ *   standalone?: boolean,
  * }} [options]
  * @returns {GlanceRowPlanEntry[]}
  */
@@ -315,6 +323,7 @@ export function buildGlanceRowPlan(inboxItems, walletEntries, options = {}) {
   const displayItems = expandInboxItemsForChrome(inboxItems, {
     crossTabEntries: options.crossTabEntries,
     orphanRemovedEntries: options.orphanRemovedEntries,
+    standalone: options.standalone,
   });
 
   /** @type {GlanceRowPlanEntry[]} */
@@ -431,8 +440,9 @@ export function inboxOverlayCountsFromItems(items) {
 
 /**
  * @param {InboxItem} item
+ * @param {import("./device-shell-copy-core.mjs").ShellSurface} [surface]
  */
-function describeItemForAria(item) {
+function describeItemForAria(item, surface = "browser") {
   if (item.kind === "live_proof") {
     return `${item.count} live proof${item.count === 1 ? "" : "s"}`;
   }
@@ -440,16 +450,16 @@ function describeItemForAria(item) {
     return inboxAriaOwnershipNotSaved(item.subtitle ?? "");
   }
   if (item.kind === "cross_tab_keys") {
-    return inboxAriaManagingInOtherTab(1, item.subtitle ?? "");
+    return inboxAriaManagingInOtherTab(1, item.subtitle ?? "", surface);
   }
   if (item.kind === "other_tabs_unsaved_keys") {
-    return inboxAriaManagingInOtherTab(item.count, item.subtitle ?? "");
+    return inboxAriaManagingInOtherTab(item.count, item.subtitle ?? "", surface);
   }
   if (item.kind === "orphan_keys_removed") {
     const who = item.subtitle
       ? item.subtitle.replace(`${ORPHAN_KEYS_INBOX_SUBTITLE_PREFIX} · `, "")
       : "";
-    return inboxAriaOrphanManagingOtherTab(who);
+    return inboxAriaOrphanManagingOtherTab(who, surface);
   }
   if (item.kind === "card_disabled_since_visit") {
     return item.count === 1
@@ -464,17 +474,19 @@ function describeItemForAria(item) {
  * @param {{
  *   crossTabEntries?: InboxCrossTabEntry[],
  *   orphanRemovedEntries?: InboxCrossTabEntry[],
+ *   standalone?: boolean,
  * }} [ctx]
  */
 export function inboxBadgeAriaLabel(items, ctx) {
   const n = inboxCountFromItems(items);
   if (n === 0) return "Inbox";
 
+  const surface = shellSurfaceFromStandalone(ctx?.standalone === true);
   const displayItems = ctx
     ? expandInboxItemsForChrome(items, ctx)
     : items;
 
-  const parts = displayItems.map(describeItemForAria).filter(Boolean);
+  const parts = displayItems.map((item) => describeItemForAria(item, surface)).filter(Boolean);
   if (parts.length === 0) {
     return n === 1 ? "1 item needs attention" : `${n} items need attention`;
   }
@@ -489,6 +501,7 @@ export function inboxBadgeAriaLabel(items, ctx) {
  * @param {{
  *   crossTabEntries?: InboxCrossTabEntry[],
  *   orphanRemovedEntries?: InboxCrossTabEntry[],
+ *   standalone?: boolean,
  * }} [ctx]
  */
 export function inboxBadgeTitle(items, ctx) {
@@ -496,7 +509,11 @@ export function inboxBadgeTitle(items, ctx) {
   if (n === 0) return "";
 
   const displayItems = ctx
-    ? expandInboxItemsForChrome(items, ctx)
+    ? expandInboxItemsForChrome(items, {
+        crossTabEntries: ctx.crossTabEntries,
+        orphanRemovedEntries: ctx.orphanRemovedEntries,
+        standalone: ctx.standalone,
+      })
     : items;
 
   const parts = displayItems.map((item) => {

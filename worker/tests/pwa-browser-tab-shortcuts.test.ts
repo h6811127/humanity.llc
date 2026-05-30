@@ -28,14 +28,16 @@ describe("BROWSER_TAB_ONLY_SHORTCUT_BUTTON_IDS", () => {
 
 describe("hideBrowserTabOnlyShortcutRows", () => {
   it("hides list-row parents for each shortcut button", () => {
-    /** @type {Record<string, { hidden: boolean; id: string }>} */
+    /** @type {Record<string, { hidden: boolean; id: string; style: { display: string } }>} */
     const rows = {};
     const doc = {
       getElementById(id: string) {
         return {
           closest(selector: string) {
             if (selector !== "li.list-row") return null;
-            if (!rows[id]) rows[id] = { hidden: false, id: `row-${id}` };
+            if (!rows[id]) {
+              rows[id] = { hidden: false, id: `row-${id}`, style: { display: "" } };
+            }
             return rows[id];
           },
         };
@@ -46,6 +48,7 @@ describe("hideBrowserTabOnlyShortcutRows", () => {
 
     for (const id of BROWSER_TAB_ONLY_SHORTCUT_BUTTON_IDS) {
       expect(rows[id]).toMatchObject({ hidden: true, id: `row-${id}` });
+      expect(rows[id].style.display).toBe("none");
     }
   });
 

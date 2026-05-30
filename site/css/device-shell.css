@@ -3009,13 +3009,24 @@ body.device-shell-created #created-setup-back[hidden] {
   color: var(--surface-popover-accent, var(--red, #db1b43));
 }
 
-/* RC-1 — personalized shell rows hidden until JS sets data-boot=ready */
+/* RC-1 — cross-tab / banner chrome hidden until network boot (ready) */
 body[data-boot="pending"] .device-boot-gated,
+body[data-boot="local"] .device-boot-gated,
 body:not([data-boot="ready"]) .device-boot-gated {
   visibility: hidden;
 }
 
 body[data-boot="ready"] .device-boot-gated {
+  visibility: visible;
+}
+
+/* RC-17 — wallet saved list visible after local boot (before network ready) */
+body[data-boot="pending"] .device-boot-local-gated {
+  visibility: hidden;
+}
+
+body[data-boot="local"] .device-boot-local-gated,
+body[data-boot="ready"] .device-boot-local-gated {
   visibility: visible;
 }
 

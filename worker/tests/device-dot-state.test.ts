@@ -153,6 +153,7 @@ describe("overlayAriaText", () => {
   it("maps overlay ids to phrases", () => {
     expect(overlayAriaText("proof_waiting")).toBe("live proof waiting");
     expect(overlayAriaText("cross_tab_keys")).toBe("managing in another tab");
+    expect(overlayAriaText("cross_tab_keys", "standalone")).toBe("managing in Safari");
     expect(overlayAriaText("card_disabled_since_visit")).toBe(
       "card disabled since last visit"
     );

@@ -711,10 +711,41 @@ Spec: § Browser context vs PWA context.
 
 **Open:** WebKit E2E for step 13; bump `device-shell.css?v=` on CSS changes.
 
+### Phase 11 — Standalone shell copy (shipped)
+
+Beyond Phase 10 (three landing shortcut rows), standalone PWA uses **app / window / Safari** language instead of **tab** on high-visibility surfaces. Technical `tab` identifiers in storage and presence keys are unchanged.
+
+- [x] `device-shell-copy-core.mjs` — surface-aware copy (`browser` vs `standalone`)
+- [x] Wired: cross-tab inbox titles, wallet active banner + tab hint copy, status dot aria + hub status key, browser alert prompts, hub keys custody panel
+- [x] Phase 10 hardening: `device-shell.css?v=` on shell pages (81+); `row.style.display = 'none'` + prefs-boot `syncBrowserTabOnlyShortcutRows`
+- [x] Suppress legacy hub cross-tab banner and `/wallet/` cross-tab strip in standalone (inbox + unified custody panel remain)
+- [x] RC-17 wallet: `data-boot=local` saved list; banners/custody at `ready`; child row in-place patch; PWA resume boot coalesce
+- [x] Vitest: `device-shell-copy-core.test.ts`, extended `pwa-browser-tab-shortcuts`, legacy/wallet hint chrome tests
+- [ ] **P1-PWA-R** manual re-sign on **installed iPhone PWA** after deploy — steps 13–14 **plus** copy checklist below
+
+**Manual iPhone PWA re-sign-off (Phase 11 copy)**
+
+On home-screen app after deploy + pull-to-refresh (or reinstall icon):
+
+1. `/` landing — three tab shortcut rows still hidden (Phase 10).
+2. Open hub — no “other tab” in legacy cross-tab banner strip (suppressed); inbox/custody use Safari/window/elsewhere wording when Safari is open.
+3. Status dot explainer / aria — no “another tab” unless browser tab is actually the peer.
+4. `/wallet/` — no “Keys in another tab” emphasis strip; active banner says **Active here** (not “this tab”).
+5. Browser alerts prompt (if shown) — “this app” / background wording, not “this tab”.
+
+**Manual `/wallet/` stability (RC-17)**
+
+1. Cold open installed PWA on `/wallet/` — saved cards visible without multi-second blank saved-section (chips may still go Checking → Active).
+2. Active / tab-hint banners appear after network boot, not before the list.
+3. Child objects under a card do not flash full-list empty/rebuild when network settles.
+4. Return from background within ~1s of open — no double hub refresh wave (resume coalesced with boot).
+
 ## Changelog
 
 | Date | Change |
 |------|--------|
+| 2026-05-30 | Phase 11 — wallet `data-boot=local` + RC-17 DOM stability; shell `v=81` |
+| 2026-05-30 | Phase 11 — standalone shell copy (`device-shell-copy-core`); legacy cross-tab chrome suppressed in PWA |
 | 2026-05-30 | Phase 10 iPhone QA — § iPhone PWA tab-shortcut troubleshooting (folded from draft investigation); **P1-PWA-R** 13–14 re-sign pending on device |
 | 2026-05-30 | Phase 10 CI closure — `e2e:device-resolver-sync` in `test-site.yml` (P1-1 regression) |
 | 2026-05-30 | Phase 10 CI gate — `worker:test:pwa-install` includes `pwa-browser-tab-shortcuts.test.ts` |

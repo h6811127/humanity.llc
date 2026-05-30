@@ -12,6 +12,7 @@ import {
   crossTabAggregateTitle,
   crossTabPresenceLabel,
 } from "./device-cross-tab-copy-core.mjs";
+import { shellSurfaceFromStandalone } from "./device-shell-copy-core.mjs";
 import {
   ORPHAN_KEYS_INBOX_SUBTITLE_PREFIX,
   ORPHAN_KEYS_INBOX_TITLE,
@@ -54,8 +55,12 @@ import { walletOwnershipNotInTab } from "./device-ownership-not-in-tab-core.mjs"
 /**
  * @param {HubKeysCustodyPresenceEntry} entry
  */
-export function labelForHubKeysCustodyEntry(entry) {
-  return crossTabPresenceLabel(entry);
+/**
+ * @param {HubKeysCustodyPresenceEntry} entry
+ * @param {import("./device-shell-copy-core.mjs").ShellSurface} [surface]
+ */
+export function labelForHubKeysCustodyEntry(entry, surface = "browser") {
+  return crossTabPresenceLabel(entry, surface);
 }
 
 /**
@@ -78,6 +83,7 @@ export function labelForHubKeysCustodyEntry(entry) {
  *   pwaSessionMismatchTitle?: string | null,
  *   pwaSessionMismatchDetail?: string | null,
  *   pwaSessionMismatchCanRestore?: boolean,
+ *   standalone?: boolean,
  * }} input
  * @returns {HubKeysCustodyPanelState}
  */
@@ -87,6 +93,7 @@ export function buildHubKeysCustodyPanel(input) {
     crossTabEntries = [],
     orphanRemovedEntries = [],
     tabSessionLabel = "This tab",
+    standalone = false,
     hasActiveKeys = false,
     educationDismissed = true,
     defaultVouchProfileId = null,
@@ -102,6 +109,7 @@ export function buildHubKeysCustodyPanel(input) {
     pwaSessionMismatchDetail = null,
     pwaSessionMismatchCanRestore = false,
   } = input;
+  const surface = shellSurfaceFromStandalone(standalone);
 
   /** @type {HubKeysCustodyRow[]} */
   const rows = [];
@@ -153,7 +161,7 @@ export function buildHubKeysCustodyPanel(input) {
 
   if (shouldShowOrphanRemovedKeysNotice(orphanRemovedEntries.length, tabNoticeCount)) {
     for (const entry of orphanRemovedEntries) {
-      const label = labelForHubKeysCustodyEntry(entry);
+      const label = labelForHubKeysCustodyEntry(entry, surface);
       rows.push({
         kind: "orphan",
         title: ORPHAN_KEYS_INBOX_TITLE,
@@ -167,17 +175,20 @@ export function buildHubKeysCustodyPanel(input) {
     if (crossTabEntries.length >= 2) {
       rows.push({
         kind: "cross_tab_summary",
-        title: crossTabAggregateTitle(crossTabEntries.length),
-        subtitle: crossTabAggregateSubtitle(crossTabEntries),
+        title: crossTabAggregateTitle(crossTabEntries.length, surface),
+        subtitle: crossTabAggregateSubtitle(crossTabEntries, { surface }),
       });
     }
     for (const entry of crossTabEntries) {
-      const label = labelForHubKeysCustodyEntry(entry);
+      const label = labelForHubKeysCustodyEntry(entry, surface);
       rows.push({
         kind: "cross_tab",
-        title: crossTabEntries.length >= 2 ? label : crossTabAggregateTitle(1),
+        title:
+          crossTabEntries.length >= 2 ? label : crossTabAggregateTitle(1, surface),
         subtitle:
-          crossTabEntries.length >= 2 ? "Managing in another tab" : label,
+          crossTabEntries.length >= 2
+            ? crossTabAggregateTitle(1, surface)
+            : label,
         entry,
       });
     }

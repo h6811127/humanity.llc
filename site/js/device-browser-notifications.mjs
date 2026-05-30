@@ -3,6 +3,12 @@
  * @see docs/DEVICE_INBOX.md phases 4+
  */
 import {
+  browserAlertBackgroundCopy,
+  browserAlertWhileOpenCopy,
+  shellSurfaceFromStandalone,
+} from "./device-shell-copy-core.mjs";
+import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
+import {
   browserNotifTogglePressed,
   browserNotifToggleSub,
 } from "./device-prefs-boot-core.mjs";
@@ -13,10 +19,10 @@ import {
   shouldShowBrowserNotifPrompt,
   STORAGE_BROWSER_NOTIF,
   STORAGE_PROMPT_DISMISS,
-} from "./device-browser-notifications-core.mjs?v=79";
+} from "./device-browser-notifications-core.mjs?v=81";
 import { buildLiveControlProofHref } from "./device-live-control-inbox-core.mjs";
 import { getLiveControlPending, getLiveControlPendingCount } from "./device-live-control-inbox.mjs";
-import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=79";
+import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=81";
 import {
   registerLiveProofServiceWorker,
   syncLiveProofServiceWorkerState,
@@ -133,9 +139,11 @@ export function renderBrowserNotifPrompt(host, opts = {}) {
   if (!host) return;
   host.dataset.deviceBrowserNotifPrompt = "1";
   const compact = Boolean(opts.compact);
+  const surface = shellSurfaceFromStandalone(readStandaloneModeFromWindow(window));
   const perm = notificationPermission();
   const show = shouldShowLiveProofNotifPrompt();
   const pending = getLiveControlPendingCount() > 0;
+  const whileOpen = browserAlertWhileOpenCopy(surface);
 
   if (
     perm === "denied" &&
@@ -145,7 +153,7 @@ export function renderBrowserNotifPrompt(host, opts = {}) {
     host.hidden = false;
     host.innerHTML = `
       <p class="device-browser-notif-prompt-copy device-browser-notif-prompt-copy--denied">
-        Background alerts are blocked. Enable notifications in your browser settings, or use the inbox badge while this tab is open.
+        Background alerts are blocked. Enable notifications in your browser settings, or ${whileOpen}.
       </p>`;
     return;
   }
@@ -157,9 +165,7 @@ export function renderBrowserNotifPrompt(host, opts = {}) {
   }
 
   host.hidden = false;
-  const copy = compact
-    ? "Get an alert when this tab is in the background."
-    : "Someone is waiting for live proof. Get an alert when this tab is in the background?";
+  const copy = browserAlertBackgroundCopy(compact, surface);
 
   host.innerHTML = `
     <div class="device-browser-notif-prompt hc-notice hc-notice--info" role="region" aria-label="Background alerts">

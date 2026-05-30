@@ -1,6 +1,6 @@
 # Shell page load content flash — investigation
 
-**Status:** RC-1–RC-16 **shipped** (2026-05-30)  
+**Status:** RC-1–RC-17 **shipped** (2026-05-30)  
 **Date:** 2026-05-30  
 **Reported symptom:** Opening any shell or device page shows wrong or “random” data for a brief moment, then content disappears or is replaced with local device truth. Distracting and ugly.  
 **Related:** [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md) (stub → archive) · [`HUB_CARD_SAFARI_RELIABILITY.md`](HUB_CARD_SAFARI_RELIABILITY.md) · [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH_QA_2026-05-26.md) · [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) · [`CREATED_QR_BOOTSTRAP_FIX.md`](CREATED_QR_BOOTSTRAP_FIX.md)
@@ -330,6 +330,24 @@ Any step that paints before the next step completes can flash “wrong” data.
 
 ---
 
+### RC-17 · Wallet local boot + DOM stability — **Shipped**
+
+**Surfaces:** `/wallet/` saved list, pins, activity, PWA resume on wallet.
+
+**Mechanism (historical):** Entire saved-items block stayed `device-boot-gated` until `await refreshNetwork()` → multi-second blank, then list + banners + chips all appeared together. Child reconcile still `replaceWith` on every poll. Wallet banners ran on init before boot ready.
+
+**Fix:**
+
+- `data-boot="local"` after quiet rehydrate + `initDeviceHub` on wallet (`markDeviceBootLocalIfWalletPage`) — `.device-boot-local-gated` shows saved section; `.device-boot-gated` banners/custody wait for `ready`.
+- `refreshDeviceHubLocalContent()` + `hubSavedListRenderDeferred()` — saved/pins/activity paint at local; inbox/custody at ready.
+- `wallet-page.mjs` — `updateContextBanners()` only after `hc-device-boot-ready`.
+- `patchHubChildObjectRowElementInPlace` + `childObjectRowRenderSignature` — skip `replaceWith` when child row copy unchanged.
+- `shouldDeferStandaloneSoftRefreshWhileBootPending` — PWA resume coalesces with boot pipeline (~500ms after ready).
+
+**Evidence:** `device-shell-boot-core.mjs` · `device-hub-boot-core.mjs` · `wallet-page.mjs` · `site/wallet/index.html` · `pwa-standalone-refresh-core.mjs`. Tests: `device-shell-boot.test.ts`, `device-hub-boot.test.ts`, `hub-child-object-patch-core.test.ts`.
+
+---
+
 ## Surface matrix (quick reference)
 
 | Surface | Primary RC IDs | First paint source | Stabilizes when |
@@ -338,7 +356,7 @@ Any step that paints before the next step completes can flash “wrong” data.
 | Hub saved cards | RC-4, RC-5, RC-7, RC-11 | Summary/cache + innerHTML | Network poll + chrome refresh |
 | Status dot | RC-3, RC-6, RC-14 | Core offline paint | Full status + health fetch |
 | Scan hero | RC-8 | SSR + pending class | `scan-live-check-arrive` settle (SSR fast path skips checking hold) |
-| Wallet page | RC-4, RC-7, RC-10, RC-16 | Same hub patterns | Poll + wallet-page-chrome; child rows patch in place |
+| Wallet page | RC-4, RC-7, RC-10, RC-16, RC-17 | Local list at `data-boot=local`; banners at `ready` | Poll chips; child in-place patch; deferred wallet banners |
 | Landing `/` | RC-3, RC-5, RC-7, RC-15 | Stranger hub HTML + settings HTML defaults | Wallet count + status bootstrap; prefs boot before hub |
 | Landing settings | RC-15 | Static list-sub placeholders | `applyDevicePrefsBootToDocument` + `data-prefs-boot=ready` |
 
@@ -371,7 +389,7 @@ After status-graph or hub network changes, also run dot/inbox E2E per [`DEVICE_O
 
 - Does not replace feature-specific postmortems (card-disabled, cross-tab, status-dot load failure).
 - Does not propose splitting the device shell into a separate app — only documents why the current **HTML + deferred JS** architecture produces the reported flashes.
-- RC-17+ (e.g. split `local` vs `network` boot) remain future work unless noted **Shipped** in § Suggested doc cross-links.
+- RC-18+ remain future work unless noted **Shipped** in § Suggested doc cross-links.
 
 ---
 
@@ -396,6 +414,7 @@ After status-graph or hub network changes, also run dot/inbox E2E per [`DEVICE_O
 | Dot view-transition load flash | **Shipped (RC-14)** — skip `startViewTransition` during boot / unchanged dot state · shell v78 |
 | Landing settings On/Off flash | **Shipped (RC-15)** — `data-prefs-boot`, prefs boot core, gated settings section |
 | Child object list rebuild flash | **Shipped (RC-16)** — incremental child row patch after network reconcile |
+| Wallet blank then list pop | **Shipped (RC-17)** — `data-boot=local` + local-gated saved section; banners at ready |
 
 ---
 
