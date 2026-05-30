@@ -10,6 +10,7 @@ import {
   emphasisCardCtaSecondary,
   escapeEmphasisHtml,
 } from "./device-emphasis-card-html.mjs";
+import { PWA_INSTALL_IOS_DETAIL } from "./device-ownership-copy-core.mjs";
 
 /**
  * @param {{ iosManual: boolean }} opts
@@ -18,7 +19,7 @@ export function pwaInstallCardBodyHtml(opts) {
   const eyebrow = opts.iosManual ? "Add to Home Screen" : "Install on this device";
   const title = "Open your saved cards from the home screen";
   const detail = opts.iosManual
-    ? "Same keys and inbox — no account. Tap Share → Add to Home Screen. On iPhone, use only that home screen icon afterward — Safari tabs are a separate copy."
+    ? PWA_INSTALL_IOS_DETAIL
     : "Same keys and inbox — no account. Pull down anytime to refresh your cards.";
 
   const actions = opts.iosManual

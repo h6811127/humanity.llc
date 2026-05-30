@@ -7,6 +7,7 @@ import {
   HUB_STRANGER_EMPTY_CLASS,
 } from "../../site/js/device-hub-stranger-empty-core.mjs";
 import {
+  HUB_RESTORE_GROUP_LABEL,
   HUB_RESTORE_IMPORT_HINT,
   HUB_RESTORE_IMPORT_SUMMARY,
 } from "../../site/js/device-ownership-copy-core.mjs";
@@ -57,6 +58,9 @@ describe("hub restore always visible (Phase 4)", () => {
       expect(html, path).toContain("Open scan link");
       expect(html, path).toContain('id="hub-scan-qr-btn"');
       expect(html, path).toContain('id="device-hub-qr-scanner"');
+      expect(html, path).toContain('id="device-hub-steward-vouch-guidance"');
+      expect(html, path).toContain('id="device-hub-restore-group-label"');
+      expect(html, path).toContain("Restore &amp; scan");
     }
     const recoverySrc = readPage("site/js/device-hub-import-recovery.mjs");
     expect(recoverySrc).toContain("initHubRecoveryImport");
@@ -64,6 +68,14 @@ describe("hub restore always visible (Phase 4)", () => {
     expect(openScanSrc).toContain("initHubOpenScanLink");
     const qrScannerSrc = readPage("site/js/device-hub-qr-scanner.mjs");
     expect(qrScannerSrc).toContain("initHubQrScanner");
+    const guidanceSrc = readPage("site/js/device-hub-steward-vouch-guidance.mjs");
+    expect(guidanceSrc).toContain("initHubStewardVouchGuidance");
+    expect(guidanceSrc).toContain("HUB_RESTORE_GROUP_LABEL");
+  });
+
+  it("exports converged restore group label copy (S4)", () => {
+    expect(HUB_RESTORE_GROUP_LABEL).toContain("Restore");
+    expect(HUB_RESTORE_GROUP_LABEL).toContain("scan");
   });
 
   it("uses empty hub import hint placeholders hydrated by device-hub-import (Phase 4 step 2)", () => {

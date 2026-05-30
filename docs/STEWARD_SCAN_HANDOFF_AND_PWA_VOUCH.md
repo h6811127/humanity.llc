@@ -1,6 +1,6 @@
 # Steward scan handoff — camera, Safari, PWA, and vouch
 
-**Status:** Active — **S1 shipped** (clipboard handoff) · **S2 shipped** (hub recovery import) · **S3 shipped** (in-app QR scanner)  
+**Status:** Active — **S1 shipped** (clipboard handoff) · **S2 shipped** (hub recovery import) · **S3 shipped** (in-app QR scanner) · **S4 shipped** (product guidance)  
 **Date:** 2026-05-30  
 **Audience:** Product, design, engineering, QA  
 **Related:** [`PWA_STANDALONE_EXTERNAL_NAVIGATION.md`](PWA_STANDALONE_EXTERNAL_NAVIGATION.md) · [`PWA_INSTALL.md`](PWA_INSTALL.md) · [`V1_DECISION_LOCK.md`](V1_DECISION_LOCK.md) (HTTPS print QR) · [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`OWNERSHIP_RESTORE_UX_PLAN.md`](OWNERSHIP_RESTORE_UX_PLAN.md) · [`KEY_LOSS_SAD_PATH_MATRIX.md`](KEY_LOSS_SAD_PATH_MATRIX.md)
@@ -42,7 +42,7 @@ This is distinct from **P1 shipped** steward scan preview (PWA → scan same-tab
 | **S1** | Clipboard handoff | **Shipped** | Camera → Safari → copy link → PWA hub **Open scan link** → vouch |
 | **S2** | Hub recovery import | **Shipped** | Move card Safari ↔ PWA with recovery code + scan link (no file) |
 | **S3** | In-app QR scanner | **Shipped** | Open PWA → **Scan QR to vouch** → same-tab scan + keys |
-| **S4** | Product guidance | **Partial** | iOS one-app copy; vouch workflow docs + QA matrix |
+| **S4** | Product guidance | **Shipped** | Hub Restore & scan label + iPhone vouch guidance; PWA install + setup copy |
 | **S5** | Scan-page steward param | Planned | `?hc_steward=1` → handoff UI first on Safari |
 | **S6** | Short handoff URL | Planned | Branded interstitial for camera landings |
 | **S7** | Dual-QR print materials | Planned | Public QR + steward handoff QR on internal collateral |
@@ -70,13 +70,15 @@ Steward never leaves PWA; printed QR scanned from inside app. Modules: `device-h
 
 **Fallback when camera API unavailable:** link to **Open scan link** (S1).
 
-### S4 — Product guidance
+### S4 — Product guidance (shipped)
 
 | Audience | Guidance |
 |----------|----------|
 | PWA-only stewards who vouch from prints | Use **Scan QR to vouch** (S3) or S1 handoff — not Camera app alone |
 | Camera-first stewards | Keep card in **Safari** or import into Safari before vouching |
 | After Add to Home Screen on iPhone | Manage cards **only** from that icon ([`device-ownership-copy-core.mjs`](../site/js/device-ownership-copy-core.mjs)) |
+
+**UI surfaces:** Hub subgroup **Restore & scan** with iPhone emphasis card ([`device-hub-steward-vouch-guidance.mjs`](../site/js/device-hub-steward-vouch-guidance.mjs)); PWA install iOS detail (`PWA_INSTALL_IOS_DETAIL`); setup Done iPhone tip (`SETUP_DONE_IOS_HOME_SCREEN_DETAIL`).
 
 Manual QA: **P1-PWA-V** in [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md).
 
@@ -139,6 +141,8 @@ flowchart TB
 | `device-hub-import-recovery.mjs` | Hub recovery code import |
 | `device-hub-qr-scanner-core.mjs` | Decode + validate scanned QR text |
 | `device-hub-qr-scanner.mjs` | In-app camera scanner UI |
+| `device-hub-steward-vouch-guidance.mjs` | S4 hub iPhone vouch guidance card |
+| `device-hub-steward-vouch-guidance-core.mjs` | S4 guidance gating |
 | `vouch-issue.mjs` | Vouch flow + S1 Safari explainer |
 | `pwa-scan-handoff-core.mjs` | PWA → scan (outbound, P1 shipped) |
 
@@ -168,5 +172,6 @@ Add to [`ownership-restore:verify`](package.json) or new `steward-scan-handoff:v
 
 | Date | Change |
 |------|--------|
+| 2026-05-30 | **S4 shipped** — hub Restore & scan label, iPhone vouch guidance card, PWA install + setup copy |
 | 2026-05-30 | **S3 shipped** — in-app hub QR scanner (`device-hub-qr-scanner.mjs`) |
 | 2026-05-30 | Initial roadmap; S1–S2 shipped |

@@ -21,6 +21,7 @@ import { initHubBackupImport } from "./device-hub-import.mjs";
 import { initHubRecoveryImport } from "./device-hub-import-recovery.mjs";
 import { initHubOpenScanLink } from "./device-hub-open-scan.mjs";
 import { initHubQrScanner } from "./device-hub-qr-scanner.mjs";
+import { initHubStewardVouchGuidance } from "./device-hub-steward-vouch-guidance.mjs";
 import { mountThemeToggles } from "./device-theme.mjs";
 import { syncBrowserNotifPrompts } from "./device-browser-notifications-loader.mjs";
 import { renderHubInboxAlerts, inboxItemsIncludeKind } from "./device-hub-inbox-alerts.mjs";
@@ -2153,6 +2154,7 @@ export function initDeviceHub(config = {}) {
   initHubRecoveryImport(hubEl("hub-recovery-import-form"), hubEl("hub-recovery-import-status"));
   initHubOpenScanLink(hubEl("hub-open-scan-form"), hubEl("hub-open-scan-status"));
   initHubQrScanner(hubQueryRoot ?? document);
+  initHubStewardVouchGuidance(hubQueryRoot ?? document);
   mountThemeToggles();
   mountHubBuildStamp(hubQueryRoot ?? document);
 
