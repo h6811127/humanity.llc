@@ -86,17 +86,25 @@ describe("child-object backup gate UI", () => {
     expect(styles).toMatch(
       /\.child-object-backup-gate\[hidden\][\s\S]*display:\s*none\s*!important/
     );
+    expect(styles).toMatch(
+      /\.child-object-backup-gate:not\(:has\(\.hc-notice-content\)\)[\s\S]*display:\s*none\s*!important/
+    );
+    expect(styles).toMatch(/\.hc-notice\[hidden\][\s\S]*display:\s*none\s*!important/);
   });
 
-  it("created Live add-object panels ship hidden backup-gate placeholders", () => {
+  it("created Live add-object panels ship hidden backup-gate placeholders without tone class", () => {
     const html = readFileSync(join(root, "site/created/index.html"), "utf8");
     expect(html).toContain('id="child-object-status-plate-backup-gate"');
     expect(html).toContain('id="child-object-lost-item-backup-gate"');
+    expect(html).toContain('href="/styles.css?v=132"');
     expect(html).toMatch(
-      /id="child-object-status-plate-backup-gate"[\s\S]*class="[^"]*child-object-backup-gate[^"]*"[\s\S]*hidden/
+      /id="child-object-status-plate-backup-gate"[\s\S]*class="hc-notice child-object-backup-gate"[\s\S]*hidden/
     );
     expect(html).toMatch(
-      /id="child-object-lost-item-backup-gate"[\s\S]*class="[^"]*child-object-backup-gate[^"]*"[\s\S]*hidden/
+      /id="child-object-lost-item-backup-gate"[\s\S]*class="hc-notice child-object-backup-gate"[\s\S]*hidden/
+    );
+    expect(html).not.toMatch(
+      /id="child-object-status-plate-backup-gate"[\s\S]*hc-notice--warning/
     );
   });
 });

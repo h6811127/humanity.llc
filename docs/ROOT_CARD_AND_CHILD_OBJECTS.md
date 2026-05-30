@@ -286,15 +286,16 @@ Delegated capabilities must be root-signed, scoped, expiring, revocable, and cle
 | Warn — 1 active child, no seatbelt | `false` | **Save a recovery method before your tree grows** + body + **Add recovery method** |
 | Blocked — 2+ active children, no seatbelt | `false` | **Save a recovery method before adding another object** + body + **Add recovery method**; submit disabled |
 
-**Failure mode (fixed):** Placeholder markup ships with `class="hc-notice hc-notice--warning"` and `[hidden]`. Author `.hc-notice { display: flex }` can override HTML `[hidden]` in WebKit — empty tinted bars appear above both add-object forms. Same class of bug as `#owner-revoked-banner` ([`CREATED_UI_SAFARI_HELP_REVOKE_INVESTIGATION.md`](CREATED_UI_SAFARI_HELP_REVOKE_INVESTIGATION.md) §2).
+**Failure mode (fixed):** Placeholder markup shipped with `class="hc-notice hc-notice--warning"` and `[hidden]`. Author `.hc-notice { display: flex }` can override HTML `[hidden]` in WebKit — empty tinted bars appear above both add-object forms. Same class of bug as `#owner-revoked-banner` ([`CREATED_UI_SAFARI_HELP_REVOKE_INVESTIGATION.md`](CREATED_UI_SAFARI_HELP_REVOKE_INVESTIGATION.md) §2). **Hardening:** static HTML omits tone class until JS fills copy; CSS hides `[hidden]` and `:not(:has(.hc-notice-content))`; bump `/created/` `styles.css` cache bust after CSS changes.
 
 **Fix rollout:**
 
 | Step | Status | Work |
 |------|--------|------|
-| 1 | **Shipped** | CSS: `.child-object-backup-gate[hidden] { display: none !important; … }` in `site/styles.css` |
-| 2 | **Shipped** | Vitest guard: assert hidden backup-gate rule in `worker/tests/child-object-backup-gate-core.test.ts` |
-| 3 | Pending | Manual QA: `/created/` Live on general root — no empty bars before first child object; warn/block copy when gate fires |
+| 1 | **Shipped** | CSS: `.child-object-backup-gate[hidden]`, `:not(:has(.hc-notice-content))`, and `.hc-notice[hidden]` in `site/styles.css` |
+| 2 | **Shipped** | Vitest guard: assert hidden backup-gate rules in `worker/tests/child-object-backup-gate-core.test.ts` |
+| 3 | **Shipped** | HTML/JS: no static `hc-notice--warning`; strip tone classes when hiding; `/created/` `styles.css?v=132` |
+| 4 | Pending | Manual QA: `/created/` Live on general root — no empty bars before first child object; warn/block copy when gate fires |
 
 17. **Delegated capabilities (deferred):** scoped, expiring, root-signed child keys — **do not implement** until product gates in [`DELEGATED_CHILD_CAPABILITIES_GATE.md`](DELEGATED_CHILD_CAPABILITIES_GATE.md) pass (named team/event pilot, capability matrix, anti-surveillance review). Schema RFC: [`DELEGATED_CHILD_CAPABILITY_SCHEMA.md`](DELEGATED_CHILD_CAPABILITY_SCHEMA.md).
 

@@ -27,6 +27,7 @@ export function syncChildObjectBackupGateUi(ctx) {
   if (noticeEl) {
     if (!copy) {
       noticeEl.hidden = true;
+      noticeEl.classList.remove("hc-notice--warning", "hc-notice--error");
       noticeEl.replaceChildren();
     } else {
       noticeEl.hidden = false;
