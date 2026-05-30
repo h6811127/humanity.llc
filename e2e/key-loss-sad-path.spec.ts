@@ -7,6 +7,7 @@ import { test, expect, type Route } from "@playwright/test";
  * @see docs/KEY_LOSS_SAD_PATH_MATRIX.md
  * @see docs/OWNERSHIP_RESTORE_UX_PLAN.md (Phase 4 step 3 CI gate)
  * Fixture: npm run e2e:generate-key-loss-fixture
+ * CI: npm run e2e:key-loss-sad-path (ownership-restore:verify)
  */
 
 const PROFILE_ID = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
