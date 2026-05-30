@@ -211,12 +211,12 @@ Canonical matrix: [`HOSTED_OPS_SAD_PATH_MATRIX.md`](HOSTED_OPS_SAD_PATH_MATRIX.m
 | **S26** | **Check network after stuck inbox backdrop (P5f)** | `e2e/device-hub-check-network-backdrop.spec.ts` |
 | **S27** | **Setup protect gate before Live (K7)** | `worker/tests/created-setup-seatbelt.test.ts` · `worker/tests/key-loss-copy-guards.test.ts` |
 | **S28** | **View-only Live tab read-only signage (Phase 3)** | `worker/tests/created-view-live-core.test.ts` · `e2e/key-loss-sad-path.spec.ts` (K1) |
-| **S29** | **Hub import visible in stranger-empty (Phase 4)** | `worker/tests/device-hub-restore-always.test.ts` · `e2e:key-loss-sad-path` (K2 wallet · K2-landing · K2-create) |
-| **S30** | **Fresh create hub row no since-visit FP (P0b-1 / R10)** | `e2e/device-os-wallet.spec.ts` · `worker/tests/card-disabled-since-visit-regression.test.ts` |
-| **S31** | **Setup wizard test scan no auto-advance in browser (P0b-2 / R12)** | `e2e/device-pwa-scan-handoff.spec.ts` · `worker/tests/pwa-scan-handoff-core.test.ts` |
+| **S29** | **Hub import visible in stranger-empty (Phase 4)** | `worker/tests/device-hub-restore-always.test.ts` · `e2e/key-loss-sad-path.spec.ts` (K2 wallet · K2-landing · K2-create) |
+| **S30** | **Fresh create hub row no since-visit FP (P0b-1 / R10)** | `e2e/device-os-wallet.spec.ts` (chromium) · `e2e/card-disabled-fresh-create-webkit.spec.ts` (WebKit) · `worker/tests/card-disabled-since-visit-regression.test.ts` |
+| **S31** | **Setup wizard Continue advances without opening scan (P1b / R12)** | `e2e/device-pwa-scan-handoff.spec.ts` · `worker/tests/pwa-scan-handoff-core.test.ts` |
 | **S32** | **Scan sole signing row vouch auto-activate (P0b-3)** | `npm run worker:test:vouch-scan-sole-activate` · `npm run e2e:vouch-scan-sole-signing` |
 | **S33** | **Corrupt `hc_wallet` urgent tab hint on `/wallet/` (P1-4 / R7)** | `npm run worker:test:wallet-corrupt` · `e2e/key-loss-sad-path.spec.ts` (R7) |
-| **S34** | **Safari S2 scan rehydrate + S3 PWA/browser mismatch (P2-3)** | `npm run e2e:safari-keys-persistence` |
+| **S34** | **Safari S2 scan rehydrate + S3 PWA/browser mismatch (P2-3)** | `npm run e2e:safari-keys-persistence` (wallet + standalone scan actor band) |
 
 Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH_QA_2026-05-26.md) § Recommended test matrix.
 
@@ -253,7 +253,8 @@ Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH
 | 2026-05-29 | P2-3 shipped — WebKit S2 scan rehydrate + S3 wallet mismatch E2E (S34) |
 | 2026-05-29 | P1-4 shipped — corrupt wallet hub + `/wallet/` tab hint (S33) |
 | 2026-05-29 | P0b-3 shipped — scan sole-signing-row vouch E2E (S32) |
-| 2026-05-29 | P0b-2 E2E — browser setup test scan waits for second Continue (S31) |
+| 2026-05-29 | P1b shipped — setup **Continue** decoupled from scan preview; S31 updated (R12) |
+| 2026-05-29 | P0b-2 E2E — browser setup test scan waits for second Continue (S31) — superseded by P1b |
 | 2026-05-29 | P0b-1 step 1 — fresh create hub R10 E2E + baseline-null Vitest (S30) |
 | 2026-05-29 | Safari P0b-2 — setup wizard test scan no auto-advance in browser tab |
 | 2026-05-29 | P0-4 first-session backup gate + Phase 4 step 2 hub import copy convergence |

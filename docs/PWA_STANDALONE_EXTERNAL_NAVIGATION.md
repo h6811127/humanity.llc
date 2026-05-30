@@ -1,6 +1,6 @@
 # PWA standalone — external navigation & new-tab gaps
 
-**Status:** **P1–P4 shipped** (2026-05-29) — standalone scan handoff, return banner, install deferral; P3 deferred  
+**Status:** **P1–P4 + P1b shipped** (2026-05-29) — standalone scan handoff, return banner, install deferral, setup **Continue** decoupled from scan preview; P3 deferred  
 **Audience:** Product, frontend, QA  
 **Related:** [`PWA_INSTALL.md`](PWA_INSTALL.md) · [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) · [`shop-checkout-handoff.mjs`](../site/js/shop-checkout-handoff.mjs) · [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md)
 
@@ -26,28 +26,17 @@ This is distinct from the **cross-tab keys** product (multiple browser tabs on t
 
 ## Root cause inventory
 
-### Primary break: setup wizard test scan
+### Primary break: setup wizard test scan (historical → P1b)
 
-[`created-setup.mjs`](../site/js/created-setup.mjs) advances the wizard **and** opens scan in a new window:
+**Original break (pre-P1):** [`created-setup.mjs`](../site/js/created-setup.mjs) **Continue** on step 3 opened scan preview *and* tried to advance the wizard — duplicating **Open scan page** and breaking PWA progression (no tab bar; `window.open` exits to system browser).
 
-```212:221:site/js/created-setup.mjs
-    if (step === "test") {
-      const url = getScanUrl?.();
-      // ...
-      window.open(url, "_blank", "noopener,noreferrer");
-      showFeedback("Opened scan page - check it from another device, then continue.");
-      goToStep(stepIndex + 1, { pushHistory: true });
-      return;
-    }
-```
+**P1 (2026-05-29):** Inline **Open scan page** uses `openStewardScanPreview` — same-tab in standalone PWA with `hc_return` + **← Back to setup** banner; new tab in browser.
 
-The inline **Test scan** button repeats the same pattern (line 287). Copy in [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) § Manual QA explicitly expects “test scan opens new tab.”
+**P0b-2 (2026-05-29, superseded by P1b):** Browser **Continue** required a second tap after opening scan in a new tab.
 
-**Compounding factors:**
+**P1b (2026-05-29):** **Continue** on the test step **only advances** to Protect (no scan navigation). Preview is optional via **Open scan page**. Test scan has no gate — stewards may skip preview and stay in one PWA context through the full setup loop.
 
-1. Wizard **auto-advances** to the “done” step immediately after `window.open` — the steward does not remain on the test step.
-2. Feedback says “check it from another device” — optimized for desktop multi-tab, not standalone phone.
-3. `/create/` itself uses same-tab `location.replace` to `/created/` (fine); the break is **preview scan**, not card creation.
+Inline **Open scan page** (`data-setup-action="test-scan"`) remains the sole scan-preview entry point during setup.
 
 ### Secondary break: control dashboard scan actions
 
@@ -92,7 +81,7 @@ How standalone new-tab behavior interacts with existing device-layer contracts:
 | **sessionStorage `hc_created`** | Keys stay in PWA; Safari tab has **no** signing keys unless quiet rehydrate runs | Keys remain; back returns to wizard |
 | **Cross-tab keys inbox** | PWA + Safari may show `cross_tab_keys` if both contexts heartbeat — confusing during setup | No extra tab; no spurious cross-tab chrome |
 | **Quiet tab rehydrate** ([`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md)) | Safari scan tab may rehydrate or show take-control notice | Not triggered |
-| **Setup wizard history** | PWA history stack preserved; user must app-switch back; wizard may already be on **done** step | `history.back()` returns to setup; consider **not** auto-advancing on test scan in standalone |
+| **Setup wizard history** | PWA history stack preserved; user must app-switch back; wizard may already be on **done** step | **Continue** never navigates away (P1b); optional preview via **Open scan page** + return banner |
 | **Vouch / sign-as** ([`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md)) | Preview in Safari without keys is correct for stranger view; signing needs same context | Owner preview same-tab still stranger UI; signing affordances unchanged |
 | **Status dot / hub** | Unchanged in PWA while user is in Safari | Dot hidden while on scan page; returns on back |
 | **Merch scan → customize** | `hc_ref` on scan CTAs unaffected | Same |
@@ -118,13 +107,18 @@ openStewardScanPreview(url, { navigation, standalone })
 
 **Wire at:**
 
-- `created-setup.mjs` (continue + inline test scan)
+- `created-setup.mjs` — **Open scan page** inline action only (P1b: **Continue** does not open scan)
 - `created-dashboard.mjs` (`openScanUrl`)
 - Hub / wallet / child-object link builders (remove `target="_blank"` when standalone, or bind click handler)
 
-**Setup wizard tweak (standalone only):** Do **not** auto-advance past the test step until the user taps **Continue** — so app-switching back does not skip the step. Browser tabs can keep today’s auto-advance if desired.
+**Setup wizard contract (P1b):**
 
-**Copy:** Standalone feedback → “Opened scan preview — use Back to return here.” Browser → keep “new tab” wording.
+| Control | Behavior |
+|---------|----------|
+| **Continue** (footer) | Advance test → Protect; never opens scan |
+| **Open scan page** (inline) | Optional preview via `openStewardScanPreview`; PWA same-tab + return banner; browser new tab |
+
+**Copy:** Standalone preview feedback → “Opened scan preview — use Back to return here.” Browser preview → “Opened scan preview in a new tab.” Panel hint clarifies Continue vs preview ([`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) § Setup wizard step 3).
 
 | Pros | Cons |
 |------|------|
@@ -191,15 +185,14 @@ openStewardScanPreview(url, { navigation, standalone })
 
 ## Recommended path
 
-1. **Ship P1** — standalone-aware scan handoff + setup step behavior tweak + Vitest contract tests (`pwa-scan-handoff-core.mjs` or extend `shop-checkout-handoff` pattern).
-2. **Add P1-PWA-N manual QA** (below) and one Playwright case with `display-mode: standalone` emulation opening test scan from `/created/?fresh=1`. **Shipped:** `e2e/device-pwa-scan-handoff.spec.ts` in `npm run e2e:pwa-install`.
-3. **Evaluate P2** after dogfood — if stewards still miss Back, add return banner on scan. **Shipped 2026-05-29:** `hc_return` query + `scan-steward-preview-return.mjs` banner on scan pages.
-4. **Optional P4** — soften install prompt until first setup complete (product call). **Shipped:** `shouldShowPwaInstallSurface` requires `anyWalletSetupDone`; deferral card copy on shell pages until setup completes.
-5. **Do not** pursue P3 unless stranger-path parity requires identical pixels in wizard.
+1. **Ship P1** — standalone-aware scan handoff + Vitest contract tests. **Shipped 2026-05-29.**
+2. **Ship P1b** — decouple setup **Continue** from scan preview; panel hint + feedback copy. **Shipped 2026-05-29.**
+3. **Add P1-PWA-N manual QA** (below) and Playwright cases. **Shipped:** `e2e/device-pwa-scan-handoff.spec.ts` in `npm run e2e:pwa-install`.
+4. **Evaluate P2** — return banner on scan. **Shipped 2026-05-29.**
+5. **Optional P4** — defer install until first setup complete. **Shipped 2026-05-29.**
+6. **Do not** pursue P3 unless stranger-path parity requires identical pixels in wizard.
 
-**Close-out (2026-05-29):** Engineering path complete. Remaining validation is manual **P1-PWA-N** on real installed PWAs (HTTPS). Automated coverage: setup test scan, hub Open scan, wallet pin (`e2e/device-pwa-scan-handoff.spec.ts`).
-
-Update [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) § Manual QA step 3 when P1 ships: “standalone → same-tab preview; browser tab → new tab.”
+**Close-out (2026-05-29):** Engineering path complete through P1b. Remaining validation is manual **P1-PWA-N** on real installed PWAs (HTTPS).
 
 ---
 
@@ -207,16 +200,17 @@ Update [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) § Manual QA step 3 when P
 
 **Prerequisites:** Device with installed PWA + ability to create a test card.
 
-| Step | Action | Expected (after P1) |
-|------|--------|---------------------|
+| Step | Action | Expected (after P1 + P1b) |
+|------|--------|---------------------------|
 | 1 | Installed PWA → `/create/` → complete create | Lands on `/created/?fresh=1` setup wizard **inside PWA** |
-| 2 | Advance to **Test scan** → tap test / continue | Scan opens **in PWA** (no Safari chrome switch) |
-| 3 | System back / swipe back **or tap return banner** | Returns to setup wizard; standalone shows **← Back to setup** when `hc_return` present |
-| 4 | Complete setup → hub **Open scan** on saved card | Same-tab in standalone; new tab in Safari browser |
-| 5 | Browser tab (not installed) → repeat step 2 | Still opens **new tab** (regression guard) |
-| 6 | Wallet pin row “Scan · …” | Same as step 4 |
+| 2 | Advance to **Test scan** → tap **Continue** | Advances to Protect **without** opening scan |
+| 3 | Return to test step (Back) → tap **Open scan page** | Scan opens **in PWA** (no Safari chrome switch) |
+| 4 | System back / swipe back **or tap return banner** | Returns to setup wizard; **← Back to setup** when `hc_return` present |
+| 5 | Complete setup → hub **Open scan** on saved card | Same-tab in standalone; new tab in Safari browser |
+| 6 | Browser tab (not installed) → **Open scan page** on test step | Opens **new tab** (regression guard) |
+| 7 | Wallet pin row “Scan · …” | Same as step 5; subtitle omits “new tab” in standalone |
 
-**Fail signals:** Safari opens automatically; wizard advances to done before user previews scan; cross-tab keys notice during fresh setup; keys missing after back.
+**Fail signals:** Safari opens when tapping **Continue**; wizard stuck on test step after Continue in PWA; cross-tab keys notice during fresh setup.
 
 ---
 
@@ -225,7 +219,7 @@ Update [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) § Manual QA step 3 when P
 | File | Change when implementing P1 |
 |------|----------------------------|
 | `site/js/pwa-scan-handoff-core.mjs` (new) | `openStewardScanPreview`, `scanLinkTargetAttrs(standalone)` |
-| `site/js/created-setup.mjs` | Use handoff; optional standalone advance guard |
+| `site/js/created-setup.mjs` | P1b: **Continue** advances only; **Open scan page** uses handoff |
 | `site/js/created-dashboard.mjs` | Use handoff |
 | `site/js/device-hub-ui.mjs` | Standalone: no `target="_blank"` on scan links |
 | `site/js/card-wallet.mjs` | Standalone: same-tab + copy “Scan” not “new tab” |
@@ -240,10 +234,10 @@ Update [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) § Manual QA step 3 when P
 
 ## Open questions (product)
 
-1. **Auto-advance on test scan** — always wait for Continue in standalone, or only when `window.open` would have been used?
-2. **Hub open scan** — same-tab for all standalone pages, or only during `fresh=1` setup?
-3. **Child object scan links** — same policy as root scan preview?
-4. **Return banner (P2)** — steward-only chrome on scan: acceptable on stranger trust surface with dismiss + no install prompt?
+1. ~~**Auto-advance on test scan**~~ — **Resolved (P1b):** **Continue** never opens scan; only advances. Preview is optional via **Open scan page**.
+2. **Hub open scan** — same-tab for all standalone pages *(P1 ships same-tab for all steward scan links)*.
+3. **Child object scan links** — same policy as root scan preview *(P1)*.
+4. **Return banner (P2)** — steward-only chrome on scan *(shipped)*.
 
 ---
 
@@ -257,3 +251,4 @@ Update [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) § Manual QA step 3 when P
 | 2026-05-29 | **P1-PWA-N E2E** — `e2e/device-pwa-scan-handoff.spec.ts` (standalone same-tab + browser popup regression) |
 | 2026-05-29 | **P4 shipped** — install card gated on `hc_setup_done` for wallet rows; deferral card until first setup complete |
 | 2026-05-29 | **P1-PWA-N E2E extended** — hub Open scan + wallet pin + browser popup regressions in `e2e/device-pwa-scan-handoff.spec.ts` |
+| 2026-05-29 | **P1b shipped** — setup **Continue** decoupled from scan preview; panel hint + feedback; `shouldAutoAdvanceSetupTestScan` removed |

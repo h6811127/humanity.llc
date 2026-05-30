@@ -30,7 +30,7 @@ Kicker copy in setup: **"Four steps · keys stay in this browser"** to reinforce
 |------|-------------|------|
 | 1 Save | Save control key to this device | Cannot continue until `isWalletSaved(profile_id)` |
 | 2 Print | Download QR PNG | - |
-| 3 Test scan | Preview scan page (new tab in browser; tap Continue again before Protect) | - |
+| 3 Test scan | Optional **Open scan page** preview; **Continue** advances to Protect (panel hint explains both) | - |
 | 4 Live | **Open card controls** | Marks setup done, clears `fresh` from URL, enters **control** |
 
 Modules: `created-setup.mjs`, `created-workspace.mjs`.
@@ -110,7 +110,7 @@ See `docs/CARD_WORKSPACE_PHASE0.md` - Open card loads keys, auto-save default on
 
 1. Create card → setup wizard, URL has `fresh=1`, hero says **Set up your live QR**.
 2. Cannot skip step 1 without save (auto-save may complete step 1 immediately).
-3. Download QR on step 2; step 3 **Test scan:** browser tab → new tab; installed PWA → same-tab preview with **← Back to setup** banner ([`PWA_STANDALONE_EXTERNAL_NAVIGATION.md`](PWA_STANDALONE_EXTERNAL_NAVIGATION.md) P1–P2).
+3. Download QR on step 2; step 3 **Test scan:** **Continue** goes to Protect without opening scan; optional **Open scan page** → browser tab opens new tab, installed PWA same-tab with **← Back to setup** banner ([`PWA_STANDALONE_EXTERNAL_NAVIGATION.md`](PWA_STANDALONE_EXTERNAL_NAVIGATION.md) P1–P2, P1b).
 4. **Open card controls** → tabs visible, `fresh` removed, hero **Live QR ready**.
 5. Revisit `/created/?profile_id&qr_id` (no fresh) → control mode directly.
 6. Hub **Open card** on saved row → control with revoke available.

@@ -542,7 +542,7 @@ Automated (Phase 0+): `npm run worker:test:pwa-install` · Phase 3–4: `npm run
 
 Automated (when shipped): `npm run worker:test -- worker/tests/pwa-standalone-refresh-core.test.ts` · extend `npm run e2e:pwa-install`.
 
-### P1-PWA-N · Standalone scan handoff (P1 shipped)
+### P1-PWA-N · Standalone scan handoff (P1 + P1b shipped)
 
 **Spec:** [`PWA_STANDALONE_EXTERNAL_NAVIGATION.md`](PWA_STANDALONE_EXTERNAL_NAVIGATION.md) · **Module:** `site/js/pwa-scan-handoff-core.mjs`
 
@@ -551,13 +551,14 @@ Automated (when shipped): `npm run worker:test -- worker/tests/pwa-standalone-re
 | Step | Action | Expected |
 |------|--------|----------|
 | 1 | Installed PWA → `/create/` → complete create | Lands on `/created/?fresh=1` setup wizard **inside PWA** |
-| 2 | Advance to **Test scan** → tap test / continue | Scan opens **in PWA** (no Safari chrome switch) |
-| 3 | System back / swipe back **or tap return banner** | Returns to setup wizard; standalone shows **← Back to setup** when `hc_return` present |
-| 4 | Complete setup → hub **Open scan** on saved card | Same-tab in standalone; new tab in Safari browser |
-| 5 | Browser tab (not installed) → repeat step 2 | Still opens **new tab** (regression guard) |
-| 6 | Wallet pin row | Same as step 4; subtitle omits “new tab” in standalone |
+| 2 | Advance to **Test scan** → tap **Continue** | Advances to Protect without opening scan |
+| 3 | **Open scan page** (optional) | Scan opens **in PWA** (no Safari chrome switch) |
+| 4 | System back / swipe back **or tap return banner** | Returns to setup wizard; **← Back to setup** when `hc_return` present |
+| 5 | Complete setup → hub **Open scan** on saved card | Same-tab in standalone; new tab in Safari browser |
+| 6 | Browser tab (not installed) → **Open scan page** on test step | Opens **new tab** (regression guard) |
+| 7 | Wallet pin row | Same as step 5; subtitle omits “new tab” in standalone |
 
-**Fail signals:** Safari opens automatically; wizard advances to done before user previews scan; cross-tab keys notice during fresh setup.
+**Fail signals:** Safari opens when tapping **Continue**; wizard stuck on test step after Continue in PWA; cross-tab keys notice during fresh setup.
 
 Automated: `npm run worker:test:pwa-install` (includes `pwa-scan-handoff-core.test.ts`) · `npm run e2e:pwa-install` (`e2e/device-pwa-scan-handoff.spec.ts` — setup test scan, hub Open scan, wallet pin, browser popup regressions).
 

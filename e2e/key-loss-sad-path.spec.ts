@@ -13,6 +13,28 @@ import { test, expect, type Route } from "@playwright/test";
 const PROFILE_ID = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const QR_ID = "qr_E2eKeyLossSadPath1";
 
+async function expectNoKeylessHcCreated(page: import("@playwright/test").Page) {
+  const session = await page.evaluate(() => {
+    const raw = sessionStorage.getItem("hc_created");
+    if (!raw) return { ok: true };
+    try {
+      const parsed = JSON.parse(raw) as Record<string, unknown>;
+      const owner =
+        typeof parsed.owner_private_key_b58 === "string"
+          ? parsed.owner_private_key_b58.trim()
+          : "";
+      const recovery =
+        typeof parsed.recovery_private_key_b58 === "string"
+          ? parsed.recovery_private_key_b58.trim()
+          : "";
+      return { ok: Boolean(owner || recovery) };
+    } catch {
+      return { ok: true };
+    }
+  });
+  expect(session.ok).toBe(true);
+}
+
 const BACKUP_FIXTURE = join(process.cwd(), "e2e/fixtures/key-loss-e2e.hcbackup.json");
 
 function mockHealth(route: Route) {
@@ -114,13 +136,48 @@ test.describe("key-loss sad paths", () => {
     await expect(page.locator("#created-view-live-lead")).toContainText(/read-only/i);
     await expect(page.locator("#created-live-scanners-see")).toBeHidden();
     await expect(page.locator("#created-deploy-print")).toBeVisible();
-    await expect(page.locator("#created-view-live-qr-tasks")).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator("#created-view-live-qr-tasks")).toBeVisible();
 
     await page.getByRole("tab", { name: "Manage" }).click();
     await expect(page.locator("#created-view-restore-panel")).toBeVisible();
     await expect(page.locator("#import-recovery-form")).toBeVisible();
     await expect(page.locator("#no-session")).toBeHidden();
     await expect(page.locator("#created-live-scanners-see")).toBeHidden();
+    await expect(page.locator("#created-view-restore-lead")).toContainText(
+      /recovery code|encrypted backup/i
+    );
+    await expectNoKeylessHcCreated(page);
+  });
+
+  test("K1b: wallet saved but tab empty shows restore-from-device copy", async ({ page }) => {
+    await page.addInitScript(
+      ({ profileId, qrId }) => {
+        localStorage.setItem(
+          "hc_wallet",
+          JSON.stringify([
+            {
+              id: "e2e_other_saved_signing",
+              profile_id: "otherProfileNotThisCard123",
+              qr_id: "qr_other_card",
+              label: "Other saved card",
+              handle: "other_card",
+              owner_private_key_b58: "e2eOwnerPrivKeyForViewOnlyCopyBranch",
+              owner_public_key_b58: "e2eOwnerPubKeyForViewOnlyCopyBranch",
+              saved_at: "2026-05-29T12:00:00.000Z",
+            },
+          ])
+        );
+      },
+      { profileId: PROFILE_ID, qrId: QR_ID }
+    );
+
+    await page.goto(`/created/?profile_id=${PROFILE_ID}&qr_id=${QR_ID}`);
+
+    await expect(page.getByRole("heading", { name: "View this card" })).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(page.locator("#created-view-restore-lead")).toContainText(/Open controls/i);
+    await expectNoKeylessHcCreated(page);
   });
 
   test("K5: wallet label without signing keys still view-only on /created/", async ({ page }) => {
@@ -150,6 +207,7 @@ test.describe("key-loss sad paths", () => {
     });
     await expect(page.locator("#created-view-live-banner")).toBeVisible();
     await expect(page.locator("#revoke-qr-btn")).toBeHidden();
+    await expectNoKeylessHcCreated(page);
 
     await page.getByRole("tab", { name: "Manage" }).click();
     await expect(page.locator("#created-view-ownership-hint")).toBeVisible();
