@@ -12,6 +12,7 @@ on:
       - "worker/tests/shop-*.test.ts"
       - "worker/tests/wrangler-merch-routes.test.ts"
       - "worker/scripts/verify-merch-funnel*.mjs"
+      - "worker/scripts/verify-hub-card-disappeared-exit.mjs"
       - "worker/scripts/merch-funnel-rollout*.mjs"
       - "site/js/shop-config-rollout-core.mjs"
       - "worker/tests/shop-config-rollout.test.ts"
@@ -29,6 +30,7 @@ on:
       - "worker/tests/shop-*.test.ts"
       - "worker/tests/wrangler-merch-routes.test.ts"
       - "worker/scripts/verify-merch-funnel*.mjs"
+      - "worker/scripts/verify-hub-card-disappeared-exit.mjs"
       - "worker/scripts/merch-funnel-rollout*.mjs"
       - "site/js/shop-config-rollout-core.mjs"
       - "worker/tests/shop-config-rollout.test.ts"
@@ -49,6 +51,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run worker:test
+      - name: Hub card disappeared RC gate (monitoring)
+        run: npm run hub-card-disappeared:verify:fast
       # @see docs/OWNERSHIP_RESTORE_UX_PLAN.md Phase 4 step 3
       - name: Ownership restore Vitest (view-only + hub import)
         run: |
@@ -62,6 +66,10 @@ jobs:
         run: npx playwright install --with-deps chromium webkit
       - name: Ownership restore E2E (key-loss sad paths)
         run: npm run e2e:key-loss-sad-path
+        env:
+          CI: "true"
+      - name: Hub wallet debug monitor E2E (P2-RC-MON)
+        run: npm run e2e:hub-wallet-debug-monitor
         env:
           CI: "true"
       - name: Device shell E2E

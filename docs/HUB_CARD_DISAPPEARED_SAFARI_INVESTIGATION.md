@@ -417,7 +417,7 @@ Engineering backlog **RC-1–RC-16 is closed.** True Safari eviction (RC-3) rema
 3. **`walletCount ≥ 1` + stranger-empty hub** → regression; file immediately with snapshot.
 4. **`walletCount: 0`** → true wipe or never saved; recovery path is backup import (not a hub bug).
 
-**Engineering exit gate:** `npm run hub-card-disappeared:verify`
+**Engineering exit gate:** `npm run hub-card-disappeared:verify` (Vitest + P2-RC-MON E2E) · fast CI: `npm run hub-card-disappeared:verify:fast`
 
 ---
 
@@ -438,6 +438,7 @@ Engineering backlog **RC-1–RC-16 is closed.** True Safari eviction (RC-3) rema
 | RC-8, RC-9 | `npm run e2e:safari-keys-persistence` |
 | Copy | `npm run worker:test:key-loss-copy` |
 | **All RC gates** | `npm run hub-card-disappeared:verify` |
+| **P2-RC-MON E2E** | `npm run e2e:hub-wallet-debug-monitor` |
 
 ---
 
@@ -445,6 +446,7 @@ Engineering backlog **RC-1–RC-16 is closed.** True Safari eviction (RC-3) rema
 
 | Date | Event |
 |------|--------|
+| 2026-05-30 | **P2-RC-MON E2E** + CI hub-card-disappeared verify gate |
 | 2026-05-30 | **Closed — monitoring only** — hub debug wallet snapshot + `hub-card-disappeared:verify` exit gate |
 | 2026-05-30 | **RC-16** visibility resync for stale wallet memo after same-tab eviction |
 | 2026-05-30 | **RC-3 slice 2** setup Done → PWA install card handoff + same-tab `hc-setup-done-marked` refresh |

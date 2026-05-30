@@ -4,6 +4,7 @@
  *
  * Usage:
  *   npm run hub-card-disappeared:verify
+ *   npm run hub-card-disappeared:verify:fast   # Vitest only (--skip-e2e)
  *
  * @see docs/HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md § Monitoring only
  */
@@ -12,6 +13,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
+const skipE2e = process.argv.includes("--skip-e2e");
 
 /** @param {string[]} args */
 function run(args) {
@@ -43,6 +45,10 @@ console.log("Docs: docs/HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md\n");
 
 for (const args of gates) {
   run(args);
+}
+
+if (!skipE2e) {
+  run(["run", "e2e:hub-wallet-debug-monitor"]);
 }
 
 console.log("\n✅ Hub card disappeared RC gate passed (RC-1–RC-16).");

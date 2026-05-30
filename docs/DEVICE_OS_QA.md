@@ -637,7 +637,7 @@ Automated: `npm run worker:test:wallet-cache-rc16`.
 | 2 | Tap **Copy build info** | Clipboard includes `--- wallet custody debug ---` block with `walletCount`, `persistFlag`, `likelyRc=` |
 | 3 | Stranger-empty hub with `walletCount ≥ 1` in snapshot | **Regression** — file with copied snapshot |
 
-Engineering gate: `npm run hub-card-disappeared:verify`.
+Engineering gate: `npm run hub-card-disappeared:verify` · E2E: `npm run e2e:hub-wallet-debug-monitor`.
 
 ### P2-RC14 · Hub search false-empty (RC-14 shipped)
 

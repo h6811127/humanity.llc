@@ -77,6 +77,7 @@ Automated guards: `npm run worker:test:key-loss-copy`
 | K7 | `npm run worker:test:setup-protect` |
 | S2, S3 (Safari keys) | `npm run e2e:safari-keys-persistence` |
 | Copy | `npm run worker:test:key-loss-copy` |
+| Hub card disappeared (RC-1–RC-16) | `npm run hub-card-disappeared:verify` · `npm run e2e:hub-wallet-debug-monitor` (P2-RC-MON) |
 
 ---
 

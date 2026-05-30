@@ -72,7 +72,7 @@ export function mountHubBuildStamp(hubRoot, meta = SITE_BUILD_META) {
     }
   }
 
-  const enabled = isSiteDebugEnabled();
+  const enabled = isSiteDebugEnabled(location, localStorage);
   stamp.hidden = !enabled;
 
   const siteLabel = stamp.querySelector(`#${SITE_LABEL_ID}`);
@@ -120,7 +120,7 @@ async function refreshWorkerBuildLine(stamp) {
  */
 async function copyBuildStamp(meta, button) {
   const stamp = button.closest(`#${STAMP_ID}`);
-  if (stamp instanceof HTMLElement && isSiteDebugEnabled()) {
+  if (stamp instanceof HTMLElement && isSiteDebugEnabled(location, localStorage)) {
     await refreshWorkerBuildLine(stamp);
   }
   const text = [
