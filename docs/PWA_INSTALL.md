@@ -1,6 +1,6 @@
 # PWA install (device shell)
 
-**Status:** Spec locked · **Phases 1–9 shipped** (standalone refresh complete) · **Phase 10 shipped** (browser vs PWA shortcut visibility)  
+**Status:** Spec locked · **Phases 1–10 shipped** (install · standalone refresh · browser vs PWA shortcut visibility)  
 **Audience:** Product, frontend, ops  
 **Related:** [`DEVICE_OS.md`](DEVICE_OS.md) · [`PWA_INSTALL_IMPLEMENTATION.md`](PWA_INSTALL_IMPLEMENTATION.md) · [`DEVICE_TAB_RESOLVER_SYNC.md`](DEVICE_TAB_RESOLVER_SYNC.md) · [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) · [`PWA_STANDALONE_EXTERNAL_NAVIGATION.md`](PWA_STANDALONE_EXTERNAL_NAVIGATION.md) · [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) · [`VISUAL_DEVICE_SHELL.md`](VISUAL_DEVICE_SHELL.md) · [`SITE_BUILD_VERSIONING.md`](SITE_BUILD_VERSIONING.md) · [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md) · [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`IPHONE_HUB_DOT_UNCLICKABLE_INVESTIGATION.md`](IPHONE_HUB_DOT_UNCLICKABLE_INVESTIGATION.md) · [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md) · [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) · [`features/QR Public Profile v1.0.md`](features/QR%20Public%20Profile%20v1.0.md)
 
@@ -99,7 +99,7 @@ flowchart LR
 | **Resolver tab sync** | [`DEVICE_TAB_RESOLVER_SYNC.md`](DEVICE_TAB_RESOLVER_SYNC.md) | Share network checks · Refresh all tabs | **Hidden** | `initResolverTabSync()` still runs; `hc_resolver_sync_tabs` default on |
 | **Quiet tab rehydrate** | [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) | Open last object in new tabs | **Hidden** | Tier 1 (one saved object) always; Tier 2 follows `hc_quiet_tab_rehydrate` default on |
 | **Cross-tab keys / custody** | [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) | Inbox + hub custody rows | Same when hybrid contexts open | PWA window heartbeats like a tab |
-| **PWA session mismatch** | [`SAFARI_KEYS_WIPE_INVESTIGATION.md`](SAFARI_KEYS_WIPE_INVESTIGATION.md) R5 | Wallet tab hint | Hub custody · scan actor band | When keys were last used in the *other* context |
+| **PWA session mismatch** | [`SAFARI_KEYS_CUSTODY.md`](SAFARI_KEYS_CUSTODY.md) R5 | Wallet tab hint | Hub custody · scan actor band | When keys were last used in the *other* context |
 | **Standalone refresh** | § Standalone refresh & resume | N/A (browser has native reload) | PTR · resume · glance Refresh | Standalone-only |
 
 ### Tab-native shortcuts — browser only
@@ -115,6 +115,31 @@ Homepage **Shortcuts & settings** (`#landing-device-settings` on `/` only) inclu
 **Hide ≠ disable.** Preferences and bootstrap behavior are unchanged. Stewards who use **both** PWA and browser tabs can still change prefs from a **browser tab** on `/` (shortcuts visible there). Do **not** force prefs off in standalone.
 
 **Hybrid power users (PWA + browser tab open):** Resolver sync and rehydrate can still help across contexts on desktop/Android. Hiding UI in PWA avoids misleading copy; browser tab remains the settings surface for tab-native prefs.
+
+### iPhone PWA — tab shortcuts still visible (QA)
+
+**Symptom:** Home-screen app on iPhone still shows **Share network checks**, **Refresh all tabs**, or **Open last object in new tabs** under **Shortcuts & settings** while Android PWA on the same build looks correct.
+
+**Not a Phase 10 bug if the reporter means:** status dot, **Steward ready** line, hub network chips, or **Browser alerts** — those stay visible in PWA by design. Confirm the exact row title matches one of the three button ids above.
+
+| If Android… | And iPhone… | Likely cause |
+|-------------|-------------|--------------|
+| PWA, shortcuts hidden | PWA, shortcuts visible | **Stale `device-shell.css`** in iOS WKWebView cache (primary) |
+| PWA | Safari tab or EU in-browser “PWA” | **`readStandaloneModeFromWindow()` false** — hide path skipped (expected in browser) |
+| Fresh install | Old install + pull refresh | PWA cache partition not cleared by soft refresh |
+
+**Primary mechanism:** `.landing-device-settings-list > .list-row { display: block }` overrides the visual effect of `hidden` unless `.landing-device-settings-list > .list-row[hidden] { display: none }` is loaded (`d5448038`). JS sets `row.hidden = true`; **old CSS without the `[hidden]` rule leaves rows painted.** iPhone PWA often keeps stale CSS at an unchanged `device-shell.css?v=` while HTML/JS update — same failure class as [`archive/IPHONE_HUB_DOT_UNCLICKABLE_INVESTIGATION.md`](archive/IPHONE_HUB_DOT_UNCLICKABLE_INVESTIGATION.md). Phase 8 stale-shell banner compares **JS** `build-meta` only, not CSS-only skew.
+
+**On-device check (Web Inspector → home-screen app on `/`):**
+
+1. **Standalone:** `navigator.standalone === true` (US home-screen PWA). If false, user is in browser context — shortcuts should show.
+2. **Hide vs paint:** for each shortcut id, if `row.hidden === true` but `getComputedStyle(row).display !== 'none'`, treat as **CSS cache** — not a logic bug.
+3. **Stylesheet:** confirm `.list-row[hidden] { display: none }` appears in loaded `device-shell.css`.
+4. **Recovery:** remove and re-add home-screen icon, or hard reload via Phase 8 stale-shell banner when JS stamp mismatches.
+
+**Automated gaps:** E2E steps 13–14 use Chromium + injected `matchMedia` only — **not real iPhone PWA.** Manual **P1-PWA-R** steps 13–14 need **re-sign-off** on installed iPhone after deploy (iOS sign-off 2026-05-28 predates Phase 10).
+
+**Open follow-ups (not shipped):** bump `device-shell.css?v=` when that file changes (align with [`SITE_BUILD_VERSIONING.md`](SITE_BUILD_VERSIONING.md)); WebKit Playwright coverage for step 13; optional Vitest asserting `[hidden]` rows under landing settings selectors with CSS loaded.
 
 ### PWA-native refresh affordances
 
@@ -682,13 +707,15 @@ Spec: § Browser context vs PWA context.
 - [x] E2E **P1-PWA-R** steps 13–14 (`e2e/device-pwa-install.spec.ts`)
 - [x] `npm run worker:test:pwa-install` includes `pwa-browser-tab-shortcuts.test.ts`
 - [x] CI `test-site.yml` runs `e2e:device-resolver-sync` (P1-1 after Phase 10 hide)
+- [ ] **P1-PWA-R** steps 13–14 manual re-sign on **iPhone home-screen app** after deploy (see § iPhone PWA — tab shortcuts still visible)
 
----
+**Open:** WebKit E2E for step 13; bump `device-shell.css?v=` on CSS changes.
 
 ## Changelog
 
 | Date | Change |
 |------|--------|
+| 2026-05-30 | Phase 10 iPhone QA — § iPhone PWA tab-shortcut troubleshooting (folded from draft investigation); **P1-PWA-R** 13–14 re-sign pending on device |
 | 2026-05-30 | Phase 10 CI closure — `e2e:device-resolver-sync` in `test-site.yml` (P1-1 regression) |
 | 2026-05-30 | Phase 10 CI gate — `worker:test:pwa-install` includes `pwa-browser-tab-shortcuts.test.ts` |
 | 2026-05-30 | Phase 10 — § Browser context vs PWA context; hide tab-native shortcuts in standalone; cross-doc sync |

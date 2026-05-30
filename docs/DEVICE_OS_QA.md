@@ -444,7 +444,7 @@ Automated: `npm run worker:test:hub-restore-always` · `npm run e2e:key-loss-sad
 
 ### P1-P0b-1 · Card disabled since visit fresh create (R10 · prod WebKit)
 
-**Spec:** [`SAFARI_KEYS_WIPE_INVESTIGATION.md`](SAFARI_KEYS_WIPE_INVESTIGATION.md) P0b-1 · [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md)
+**Spec:** [`SAFARI_KEYS_CUSTODY.md`](SAFARI_KEYS_CUSTODY.md) P0b-1 · [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md)
 
 **Prerequisites:** Run desk gate first: `npm run card-disabled-since-visit:desk-gate` · then **iPhone Safari on https://humanity.llc** after deploy.
 
@@ -569,6 +569,8 @@ Automated (Phase 0+): `npm run worker:test:pwa-install` · Phase 3–4: `npm run
 
 **Fail signals:** Standalone user must kill app to see card status change; pull triggers 10+ unscoped status GETs; PTR fires during hub sheet drag; auto `location.reload()` on every resume; refresh module on status graph breaks dot (**P0-3**); tab-native shortcuts visible in standalone PWA.
 
+**iPhone vs Android (2026-05-30):** If only iPhone shows tab-native rows in the home-screen app, see [`PWA_INSTALL.md`](PWA_INSTALL.md) § **iPhone PWA — tab shortcuts still visible (QA)** before treating as a logic bug.
+
 Automated (when shipped): `npm run worker:test -- worker/tests/pwa-standalone-refresh-core.test.ts` · extend `npm run e2e:pwa-install` (includes **P1-PWA-R** steps 13–14).
 
 ### P1-PWA-N · Standalone scan handoff (P1 + P1b shipped)
@@ -609,7 +611,7 @@ Automated: `npm run worker:test:pwa-install` (includes `pwa-scan-handoff-core.te
 
 **Fail signals:** Camera scan stays in Safari with empty wallet and no handoff copy; in-app scanner opens Safari; vouch blocked despite keys in PWA after in-app scan; steward param shows wallet “Attest as…” instead of handoff on iOS Safari; `/v/` returns 404 on production Worker.
 
-Automated: `npm run steward-scan-handoff:verify` · `npm run steward-scan-handoff:verify:fast` (desk) · `npm run e2e:hub-in-app-qr-scanner` (S3 dialog + mocked decode)
+Automated: `npm run steward-scan-handoff:verify` · `npm run steward-scan-handoff:verify:fast` (desk) · `npm run e2e:hub-in-app-qr-scanner` (S3) · `npm run e2e:steward-scan-handoff-fallback` (S1/S5/S6 desk steps 4–7)
 
 ### P1-PWA-P4 · Install deferral until setup complete (P4 shipped)
 
