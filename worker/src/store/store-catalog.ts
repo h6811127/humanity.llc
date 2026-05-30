@@ -86,9 +86,9 @@ const LAUNCH_PRODUCTS: StoreCatalogProduct[] = [
   {
     product_id: HOODIE_LIVE_OBJECT_STORE_PRODUCT_ID,
     title: "Live Object hoodie",
-    meaning_line: "Front-chest LIVE OBJECT QR — unique per physical unit.",
+    meaning_line: "Your unique QR on the chest — you change what strangers read; the ink stays.",
     story:
-      "Tier 1 apparel — preview your branded QR on a hoodie mockup. Each unit gets its own revocable print artifact.",
+      "Tier 1 belonging wear — each hoodie gets its own revocable print artifact tied to your Humanity Card. Update your live line from your phone without reprinting. Lose signing access without recovery and the scan can become a fixed record of the last thing you published.",
     product_class: "personalized",
     personalization_indicator: "Personalized QR",
     requires_card: true,
@@ -122,9 +122,9 @@ const LAUNCH_PRODUCTS: StoreCatalogProduct[] = [
   {
     product_id: TIER0_GLITCH_HOODIE_STORE_PRODUCT_ID,
     title: "Glitch LIVE QR hoodie",
-    meaning_line: "Shared campaign QR on a fixed founding garment.",
+    meaning_line: "A live network on fabric — same scan on every unit, not your personal card.",
     story:
-      "Company merch — one live scan destination for every unit. Stewards update what strangers see on the campaign card; buying does not grant control or a vouch.",
+      "Founding company drop — fixed Glitch artwork with a shared campaign QR. Every unit points at one live destination stewards can update; strangers see honest limits when they scan. You are buying witness and wear, not control of the feed and not a vouch.",
     product_class: "limited_drop",
     personalization_indicator: "Company drop",
     requires_card: false,
@@ -155,7 +155,7 @@ const ROWS: StoreCatalogRow[] = [
     title: "Founding objects",
     subtitle: "Tier 0 curiosity",
     story:
-      "Batch artifacts with a shared campaign QR. A pointer to the experiment, not a passport. Separate from personalized wear; same honesty about limits.",
+      "Batch artifacts with a shared campaign QR — curiosity on the street. Glitch is the live billboard; personalized wear is your own pen on the object.",
     product_ids: [TIER0_FOUNDING_STORE_PRODUCT_ID, TIER0_GLITCH_HOODIE_STORE_PRODUCT_ID],
     sort_order: 2,
     status: "published",

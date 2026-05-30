@@ -2,7 +2,7 @@
 
 **Status:** Active — customizer UI shipped; operator enables products in `shop-config.json`  
 **Parent:** [`MERCH_LED_V1.md`](MERCH_LED_V1.md) · [`V1_FLOW_AUDIT.md`](V1_FLOW_AUDIT.md) · [`features/Storefront v1.0.md`](features/Storefront%20v1.0.md)  
-**Implementation:** [`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md) · `site/shop/customize/`
+**Implementation:** [`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md) · `site/shop/customize/` · honesty copy [`MERCH_PRODUCT_COPY.md`](MERCH_PRODUCT_COPY.md) (**shipped** on PDP + customizer)
 
 ---
 
