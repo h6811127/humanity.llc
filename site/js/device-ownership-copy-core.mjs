@@ -111,7 +111,7 @@ export const SETUP_DONE_IOS_HOME_SCREEN_TITLE =
   "Add to Home Screen after you finish here";
 
 export const SETUP_DONE_IOS_HOME_SCREEN_DETAIL =
-  "Tap Share → Add to Home Screen, then open humanity.llc from your home screen regularly. Each visit resets Safari's storage timer. Keep your recovery backup if this phone is your only copy of control.";
+  "After you open card controls, look for the Add to Home Screen card on this page. Tap Share → Add to Home Screen, then open humanity.llc from your home screen regularly. Each visit resets Safari's storage timer. Keep your recovery backup if this phone is your only copy of control.";
 
 export const DEFAULT_FOR_ATTESTATION = "Default for attestation";
 

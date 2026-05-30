@@ -598,18 +598,19 @@ Automated: `npm run worker:test:safari-persist-denied-notice`.
 
 ### P2-RC3 · Setup wizard iOS Safari custody notices (RC-3 shipped)
 
-**Spec:** [`HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md`](HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md) RC-3 · **Modules:** `created-setup-ios-custody-core.mjs` · `created-setup.mjs`
+**Spec:** [`HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md`](HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md) RC-3 · **Modules:** `created-setup-ios-custody-core.mjs` · `created-setup-pwa-handoff-core.mjs` · `created-setup.mjs` · `pwa-install.mjs`
 
 **Prerequisites:** iPhone Safari (not Home Screen PWA) · fresh create through setup wizard.
 
 | Step | Action | Expected |
 |------|--------|----------|
 | 1 | Reach **Protect** step | `#created-setup-ios-safari-hint` visible — seven-day Safari eviction + backup importance |
-| 2 | Complete seatbelt · advance to **You're live** | Info card `#created-setup-ios-home-screen-notice` — Add to Home Screen guidance |
-| 3 | Open same flow from Home Screen PWA | **No** iOS hints (standalone) |
-| 4 | Desktop Chrome through setup | **No** iOS hints |
+| 2 | Complete seatbelt · advance to **You're live** | Info card `#created-setup-ios-home-screen-notice` — Add to Home Screen guidance; copy references install card after Open card controls |
+| 3 | Tap **Open card controls** | Setup hides; `#device-pwa-install-card` shows iOS Share → Add to Home Screen steps; page scrolls to card |
+| 4 | Open same flow from Home Screen PWA | **No** iOS hints (standalone); **no** install handoff |
+| 5 | Desktop Chrome through setup | **No** iOS hints |
 
-**Fail signals:** Hints on desktop or standalone; missing on iOS Safari Protect/Done; copy mentions private keys or localStorage.
+**Fail signals:** Hints on desktop or standalone; missing on iOS Safari Protect/Done; install card stays on deferral after finish; copy mentions private keys or localStorage.
 
 Automated: `npm run worker:test:setup-ios-custody`.
 

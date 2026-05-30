@@ -409,6 +409,9 @@ export function initCreatedSetup(opts) {
       goToStep(STEPS.indexOf("save"));
       return;
     }
+    void import("./created-setup-pwa-handoff.mjs").then((mod) => {
+      mod.runCreatedSetupPwaInstallHandoff();
+    });
     clearFreshUrlParam();
     onComplete();
   }

@@ -17,6 +17,7 @@ import {
 } from "./pwa-install-ux-core.mjs";
 import { pwaInstallCardBodyHtml, pwaInstallDeferralCardBodyHtml } from "./pwa-install-html.mjs";
 import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
+import { HC_SETUP_DONE_MARKED_EVENT } from "./created-setup-pwa-handoff-core.mjs";
 
 /** @type {BeforeInstallPromptEvent | null} */
 let deferredPrompt = null;
@@ -184,6 +185,7 @@ function bindListeners() {
       scheduleRenderInstallCard();
     }
   });
+  window.addEventListener(HC_SETUP_DONE_MARKED_EVENT, scheduleRenderInstallCard);
 
   scheduleRenderInstallCard();
 }

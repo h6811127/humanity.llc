@@ -8,6 +8,7 @@ import {
   firstSessionSetupRequired,
   ownershipBackupSeatbeltSatisfied,
 } from "./created-first-session-gate-core.mjs";
+import { HC_SETUP_DONE_MARKED_EVENT } from "./created-setup-pwa-handoff-core.mjs";
 
 export const SETUP_DONE_KEY = "hc_setup_done";
 
@@ -73,6 +74,11 @@ export function markSetupDone(profileId) {
   const map = loadSetupDoneMap();
   map[profileId] = true;
   localStorage.setItem(SETUP_DONE_KEY, JSON.stringify(map));
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(
+      new CustomEvent(HC_SETUP_DONE_MARKED_EVENT, { detail: { profileId } })
+    );
+  }
   return true;
 }
 

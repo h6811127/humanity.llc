@@ -33,5 +33,6 @@ describe("RC-3 setup copy", () => {
     }
     expect(SETUP_SEATBELT_IOS_SAFARI_HINT).toMatch(/seven days|7 days/i);
     expect(SETUP_DONE_IOS_HOME_SCREEN_DETAIL).toMatch(/Home Screen/i);
+    expect(SETUP_DONE_IOS_HOME_SCREEN_DETAIL).toMatch(/open card controls/i);
   });
 });

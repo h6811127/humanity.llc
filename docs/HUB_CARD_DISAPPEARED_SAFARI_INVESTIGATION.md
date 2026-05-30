@@ -1,7 +1,7 @@
 # Investigation: Saved card disappeared from hub (iPhone Safari)
 
 **Date:** 2026-05-29 (opened from steward report — card saved, hub empty ~20 min later)  
-**Status:** Active — RC-1–RC-6/RC-13–RC-15 shipped; RC-3 partial  
+**Status:** Active — RC-1–RC-6/RC-13–RC-15 shipped; RC-3 partial (PWA handoff shipped)  
 **Reporter:** Steward on iPhone Safari after create + explicit save  
 **Related:** [`SAFARI_KEYS_WIPE_INVESTIGATION.md`](SAFARI_KEYS_WIPE_INVESTIGATION.md) · [`KEY_LOSS_SAD_PATH_MATRIX.md`](KEY_LOSS_SAD_PATH_MATRIX.md) · [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md) · [`PWA_INSTALL.md`](PWA_INSTALL.md)
 
@@ -72,7 +72,7 @@ Fix backlog order matches this list. **RC-1, RC-2, RC-4, and RC-6 are implemente
 | **Mechanism** | See R4 in [`SAFARI_KEYS_WIPE_INVESTIGATION.md`](SAFARI_KEYS_WIPE_INVESTIGATION.md): 7-day no-interaction rule, iOS cache cleanup, Settings → Clear Website Data, Home Screen PWA vs in-browser **separate ITP timers**. |
 | **User pattern** | Hub stranger-empty; status dot also shows no saved ownership; no backup. |
 | **Still possible?** | **Yes** — by design without backup |
-| **Fix backlog** | RC-2 notice; P2-1 ITP notice (shipped); mandatory backup export before “You're live” (P0-4 shipped); setup wizard iOS Safari custody + Home Screen guidance on Protect/Done (RC-3 slice shipped). |
+| **Fix backlog** | RC-2 notice; P2-1 ITP notice (shipped); mandatory backup export before “You're live” (P0-4 shipped); setup wizard iOS Safari custody + Home Screen guidance on Protect/Done (RC-3 slice 1 shipped); Done → PWA install card handoff after `markSetupDone` (RC-3 slice 2 shipped). |
 
 ---
 
@@ -396,7 +396,7 @@ Run on the **tab where the hub looks empty** (Safari → Develop → device → 
 | **1** | RC-1 | Post-save read-back in `saveWallet` | **Shipped** |
 | **2** | RC-2 | Persist-denied iOS warning card | **Shipped** |
 | **3** | RC-4 | Setup cannot complete until `isWalletSaved` | **Shipped** |
-| 4 | RC-3 | Reinforce backup-before-live + Home Screen guidance | Partial — P0-4 · P2-1 · setup Protect/Done iOS notices **shipped** |
+| 4 | RC-3 | Reinforce backup-before-live + Home Screen guidance | Partial — P0-4 · P2-1 · setup Protect/Done iOS notices · Done → PWA install handoff **shipped** |
 | 5 | RC-6 | Private mode detection | **Shipped** |
 | 6 | RC-13 | Canonical origin enforcement | **Shipped** |
 | 7 | RC-14 | Search/cap UX audit | **Shipped** (search clear + no-match copy) |
@@ -426,6 +426,7 @@ Run on the **tab where the hub looks empty** (Safari → Develop → device → 
 
 | Date | Event |
 |------|--------|
+| 2026-05-30 | **RC-3 slice 2** setup Done → PWA install card handoff + same-tab `hc-setup-done-marked` refresh |
 | 2026-05-29 | **RC-4** setup finish gated on wallet save + done-step confirmation |
 | 2026-05-30 | **RC-15** hub-open wallet summary integrity heartbeat |
 | 2026-05-30 | **RC-14** hub search clear on stranger transition + saved no-match copy |
