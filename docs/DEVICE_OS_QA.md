@@ -609,7 +609,7 @@ Automated: `npm run worker:test:pwa-install` (includes `pwa-scan-handoff-core.te
 
 **Fail signals:** Camera scan stays in Safari with empty wallet and no handoff copy; in-app scanner opens Safari; vouch blocked despite keys in PWA after in-app scan; steward param shows wallet “Attest as…” instead of handoff on iOS Safari; `/v/` returns 404 on production Worker.
 
-Automated: `npm run steward-scan-handoff:verify` · `npm run steward-scan-handoff:verify:fast` (desk)
+Automated: `npm run steward-scan-handoff:verify` · `npm run steward-scan-handoff:verify:fast` (desk) · `npm run e2e:hub-in-app-qr-scanner` (S3 dialog + mocked decode)
 
 ### P1-PWA-P4 · Install deferral until setup complete (P4 shipped)
 

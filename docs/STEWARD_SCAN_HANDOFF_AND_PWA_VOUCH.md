@@ -189,6 +189,7 @@ Individual suites:
 npm run worker:test:steward-scan-handoff   # S1–S3 core + hub HTML guards
 npm run worker:test:qr-branding            # S7 encode guard + handoff render (RC-1)
 npm run e2e:steward-dual-qr                # S7 control Full-size QR + setup #setup-qr steward img[src]
+npm run e2e:hub-in-app-qr-scanner          # S3 hub dialog + chrome entry + mocked decode → scan URL
 npm run e2e:key-loss-sad-path              # hub restore visible (K2)
 ```
 
