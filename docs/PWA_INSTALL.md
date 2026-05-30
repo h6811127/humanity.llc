@@ -144,10 +144,12 @@ Wallet pin and steward scan link subtitles **omit “new tab”** in standalone 
 ### Regression
 
 ```bash
-npm run worker:test -- worker/tests/pwa-standalone-refresh-core.test.ts worker/tests/pwa-browser-tab-shortcuts.test.ts
+npm run worker:test:pwa-install
+npm run e2e:pwa-install              # P1-PWA-R steps 13–14 (standalone hides tab-native shortcuts)
+npm run e2e:device-resolver-sync     # P1-1 two-tab sync (browser context; shortcuts visible)
 ```
 
-Manual: [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) **P1-PWA-R** step 13 (shortcuts hidden in standalone) · **P1-1** (resolver sync still works from browser tabs).
+Manual spot-check: [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) **P1-1** on a real multi-tab browser if E2E is insufficient.
 
 ---
 
@@ -678,6 +680,8 @@ Spec: § Browser context vs PWA context.
 - [x] `device-shell.css` — `.landing-device-settings-list > .list-row[hidden] { display: none }` (author `display:block` must not defeat `[hidden]`)
 - [x] Vitest `worker/tests/pwa-browser-tab-shortcuts.test.ts`
 - [x] E2E **P1-PWA-R** steps 13–14 (`e2e/device-pwa-install.spec.ts`)
+- [x] `npm run worker:test:pwa-install` includes `pwa-browser-tab-shortcuts.test.ts`
+- [x] CI `test-site.yml` runs `e2e:device-resolver-sync` (P1-1 after Phase 10 hide)
 
 ---
 
@@ -685,6 +689,8 @@ Spec: § Browser context vs PWA context.
 
 | Date | Change |
 |------|--------|
+| 2026-05-30 | Phase 10 CI closure — `e2e:device-resolver-sync` in `test-site.yml` (P1-1 regression) |
+| 2026-05-30 | Phase 10 CI gate — `worker:test:pwa-install` includes `pwa-browser-tab-shortcuts.test.ts` |
 | 2026-05-30 | Phase 10 — § Browser context vs PWA context; hide tab-native shortcuts in standalone; cross-doc sync |
 | 2026-05-29 | H-007 closure — resume E2E smoke; Phases 6–9 doc sync; PWA-R1–R4 resolved |
 | 2026-05-29 | Phase 9 shipped — hub Refresh row, first PTR tip, install card copy |

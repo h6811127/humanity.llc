@@ -643,6 +643,7 @@ Goal: make the vertical slice credible for public launch.
 - Phase table in `PWA_INSTALL.md` marks Phases 6–9 shipped. **✅**
 - `npm run worker:test:pwa-install` green. **✅**
 - `npm run e2e:pwa-install` green (resume steps 1 + 3, PTR, affordances). **✅**
+- Phase 10 browser-vs-PWA shortcut hide + P1-1 regression (`e2e:device-resolver-sync` in CI). **✅**
 - Manual **P1-PWA-R** on iOS Safari standalone (HTTPS). **Pending** — automated gates shipped.
 
 ### H-005: Growth Loop Readiness

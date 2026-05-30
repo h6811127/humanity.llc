@@ -452,6 +452,8 @@ Hide homepage Shortcuts rows that describe **browser-tab** behavior when the she
 | `landing-device-hub.mjs` | Call visibility init before hub toggles |
 | `pwa-standalone-refresh.mjs` | Re-apply hide in `syncStandaloneAffordances()` after status bootstrap |
 | `site/css/device-shell.css` | `.list-row[hidden]` under landing settings — author `display:block` must not defeat `[hidden]` |
+| `package.json` | `worker:test:pwa-install` includes `pwa-browser-tab-shortcuts.test.ts`; `e2e:device-resolver-sync` |
+| `.github/workflows/test-site.yml` | CI job `Resolver tab sync E2E (Phase 10 P1-1 regression)` |
 
 ### Out of scope
 
@@ -462,10 +464,12 @@ Hide homepage Shortcuts rows that describe **browser-tab** behavior when the she
 ### Verification
 
 ```bash
-npm run worker:test -- worker/tests/pwa-browser-tab-shortcuts.test.ts worker/tests/pwa-standalone-refresh-core.test.ts
+npm run worker:test:pwa-install
+npm run e2e:pwa-install
+npm run e2e:device-resolver-sync   # P1-1 — browser-tab resolver sync unchanged by Phase 10 hide
 ```
 
-Manual **P1-PWA-R** steps 13–14 · automated in `e2e/device-pwa-install.spec.ts`.
+**P1-PWA-R** steps 13–14 automated in `e2e/device-pwa-install.spec.ts`.
 
 ### Status
 
@@ -538,6 +542,7 @@ See [`PWA_INSTALL.md`](PWA_INSTALL.md) § Standalone refresh & resume for full s
 
 | Date | Change |
 |------|--------|
+| 2026-05-30 | Phase 10 CI closure — `e2e:device-resolver-sync` in `test-site.yml` |
 | 2026-05-30 | Phase 10 shipped — hide tab-native homepage shortcuts in standalone |
 | 2026-05-29 | H-007 closure — resume E2E smoke; Phases 6–9 doc sync |
 | 2026-05-29 | Phase 9 shipped — hub Refresh row, first PTR tip, install card copy |

@@ -1,6 +1,6 @@
 # Device tab resolver sync
 
-**Status:** Phases 1a–1b and 2 (toggle) shipped; E2E follow-up open  
+**Status:** Phases 1a–1b and 2 (toggle) shipped; E2E **P1-1** automated (`npm run e2e:device-resolver-sync`)  
 **Audience:** Product, frontend  
 **Opened:** 2026-05-27  
 **Related:** [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md) · [`UI_UX_REVERTED_FEATURES_CATALOG.md`](UI_UX_REVERTED_FEATURES_CATALOG.md) · [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md)
@@ -252,7 +252,7 @@ When `"0"`: behavior matches today (per-tab session cache).
 - [x] `device-resolver-sync.mjs` + wire broadcast from `refreshWalletNetworkStatuses` completion
 - [x] Follower skip + apply + `NETWORK_REFRESHED`
 - [x] Default on (`hc_resolver_sync_tabs` missing → on)
-- [x] **P1-1** multi-tab case in QA (manual / E2E follow-up)
+- [x] **P1-1** multi-tab case — `npm run e2e:device-resolver-sync` · manual in [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md)
 
 ### Phase 1b — Health snapshot (optional)
 
@@ -295,7 +295,7 @@ When `"0"`: behavior matches today (per-tab session cache).
 | Message parse + TTL | `worker/tests/device-resolver-sync.test.ts` |
 | Follower skip when fresh | same |
 | Merge does not drop resolver-confirmed revoke | same + existing `wallet-network-baseline` tests |
-| E2E two-tab manual check → one burst | `e2e/device-resolver-sync.spec.ts` (phase 1a) ✅ |
+| E2E two-tab manual check → one burst | `e2e/device-resolver-sync.spec.ts` — `npm run e2e:device-resolver-sync` ✅ |
 | Toggle off → two bursts | e2e (phase 2) — sync-off fetch in spec; toggle UI separate case |
 | Live proof checked-at cross-tab + reload | `e2e/device-live-proof-tab-sync.spec.ts` ✅ |
 
@@ -313,3 +313,4 @@ When `"0"`: behavior matches today (per-tab session cache).
 | 2026-05-27 | Phase 1a E2E + broadcast/skip fixes (shell v52) |
 | 2026-05-27 | Phase 3 step 1 — live-control on unified `hc-resolver-sync` channel |
 | 2026-05-30 | Tab-native shortcut rows hidden in standalone PWA — [`PWA_INSTALL.md`](PWA_INSTALL.md) § Browser context vs PWA context |
+| 2026-05-30 | E2E follow-up closed — `npm run e2e:device-resolver-sync` (P1-1) |
