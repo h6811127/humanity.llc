@@ -561,7 +561,7 @@ Automated (Phase 0+): `npm run worker:test:pwa-install` · Phase 3–4: `npm run
 
 **Fail signals:** Standalone user must kill app to see card status change; pull triggers 10+ unscoped status GETs; PTR fires during hub sheet drag; auto `location.reload()` on every resume; refresh module on status graph breaks dot (**P0-3**); tab-native shortcuts visible in standalone PWA.
 
-Automated (when shipped): `npm run worker:test -- worker/tests/pwa-standalone-refresh-core.test.ts` · extend `npm run e2e:pwa-install`.
+Automated (when shipped): `npm run worker:test -- worker/tests/pwa-standalone-refresh-core.test.ts` · extend `npm run e2e:pwa-install` (includes **P1-PWA-R** steps 13–14).
 
 ### P1-PWA-N · Standalone scan handoff (P1 + P1b shipped)
 

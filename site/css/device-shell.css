@@ -566,6 +566,10 @@ body.device-glance-popover-open .device-hub-glance-popover:not([hidden]) {
   background: transparent;
 }
 
+.landing-device-settings-list > .list-row[hidden] {
+  display: none;
+}
+
 .landing-device-settings-list > .list-row:last-child {
   border-bottom: none;
 }

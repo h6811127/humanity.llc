@@ -139,6 +139,18 @@ function withStandaloneDisplayMode() {
   };
 }
 
+const BROWSER_TAB_ONLY_SHORTCUT_SELECTORS = [
+  "#device-resolver-sync-toggle",
+  "#device-resolver-refresh-all-tabs",
+  "#device-quiet-tab-rehydrate-toggle",
+] as const;
+
+async function scrollToLandingDeviceSettings(page: Page) {
+  const section = page.locator("#landing-device-settings");
+  await section.scrollIntoViewIfNeeded();
+  await expect(section).toBeVisible();
+}
+
 function withIosSafariUserAgent() {
   return {
     userAgent:
@@ -511,5 +523,41 @@ test.describe("device PWA install (phase 4 rollout gate)", () => {
 
     await page.evaluate(() => window.__hcStandaloneAffordancesSyncForTests?.());
     await expect(tip).toBeHidden();
+  });
+
+  test("standalone hides browser-tab-only shortcuts (P1-PWA-R step 13)", async ({
+    page,
+  }) => {
+    await page.addInitScript(withStandaloneDisplayMode().content);
+    await seedPwaLandingStorage(page);
+    await wireShellRoutes(page);
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await waitForShellReady(page);
+    await page.waitForFunction(
+      () => typeof window.__hcStandaloneAffordancesSyncForTests === "function",
+      { timeout: 20_000 }
+    );
+    await page.evaluate(() => window.__hcStandaloneAffordancesSyncForTests?.());
+    await scrollToLandingDeviceSettings(page);
+
+    for (const selector of BROWSER_TAB_ONLY_SHORTCUT_SELECTORS) {
+      await expect(page.locator(selector)).toBeHidden();
+    }
+    await expect(page.locator("#device-theme-toggle")).toBeVisible();
+    await expect(page.locator("[data-device-browser-notif-toggle]")).toBeVisible();
+  });
+
+  test("browser tab shows browser-tab-only shortcuts (P1-PWA-R step 14)", async ({
+    page,
+  }) => {
+    await seedPwaLandingStorage(page);
+    await wireShellRoutes(page);
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await waitForShellReady(page);
+    await scrollToLandingDeviceSettings(page);
+
+    for (const selector of BROWSER_TAB_ONLY_SHORTCUT_SELECTORS) {
+      await expect(page.locator(selector)).toBeVisible();
+    }
   });
 });

@@ -450,6 +450,8 @@ Hide homepage Shortcuts rows that describe **browser-tab** behavior when the she
 | `pwa-standalone-refresh-core.mjs` | `BROWSER_TAB_ONLY_SHORTCUT_BUTTON_IDS`, `shouldHideBrowserTabOnlyShortcuts()` |
 | `pwa-browser-tab-shortcuts.mjs` | `hideBrowserTabOnlyShortcutRows()`, `initBrowserTabOnlyShortcutsVisibility()` |
 | `landing-device-hub.mjs` | Call visibility init before hub toggles |
+| `pwa-standalone-refresh.mjs` | Re-apply hide in `syncStandaloneAffordances()` after status bootstrap |
+| `site/css/device-shell.css` | `.list-row[hidden]` under landing settings — author `display:block` must not defeat `[hidden]` |
 
 ### Out of scope
 
@@ -463,7 +465,7 @@ Hide homepage Shortcuts rows that describe **browser-tab** behavior when the she
 npm run worker:test -- worker/tests/pwa-browser-tab-shortcuts.test.ts worker/tests/pwa-standalone-refresh-core.test.ts
 ```
 
-Manual **P1-PWA-R** steps 13–14.
+Manual **P1-PWA-R** steps 13–14 · automated in `e2e/device-pwa-install.spec.ts`.
 
 ### Status
 

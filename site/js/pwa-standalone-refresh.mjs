@@ -37,6 +37,7 @@ import {
   standaloneRefreshRowHtml,
 } from "./pwa-standalone-affordances-html.mjs";
 import { pwaStaleShellBannerHtml } from "./pwa-stale-shell-banner-html.mjs";
+import { hideBrowserTabOnlyShortcutRows } from "./pwa-browser-tab-shortcuts.mjs";
 
 const PTR_INDICATOR_ID = "device-ptr-indicator";
 const STALE_SHELL_BANNER_ID = "device-pwa-stale-shell-banner";
@@ -442,6 +443,7 @@ function syncStandaloneAffordances() {
     hideStandalonePtrTip();
     return;
   }
+  hideBrowserTabOnlyShortcutRows(document);
   const walletPage = document.body.classList.contains("page-wallet");
   mountStandaloneRefreshRow(walletPage);
   syncStandalonePtrTip();

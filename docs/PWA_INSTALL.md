@@ -104,7 +104,7 @@ flowchart LR
 
 ### Tab-native shortcuts — browser only
 
-Homepage **Shortcuts & settings** (`#landing-device-settings` on `/` only) includes three rows aimed at **multi-tab browser** stewards. **Hidden in standalone** via [`pwa-browser-tab-shortcuts.mjs`](../site/js/pwa-browser-tab-shortcuts.mjs):
+Homepage **Shortcuts & settings** (`#landing-device-settings` on `/` only) includes three rows aimed at **multi-tab browser** stewards. **Hidden in standalone** via [`pwa-browser-tab-shortcuts.mjs`](../site/js/pwa-browser-tab-shortcuts.mjs) on landing init and again from [`pwa-standalone-refresh.mjs`](../site/js/pwa-standalone-refresh.mjs) `syncStandaloneAffordances()` after status bootstrap:
 
 | Row | `localStorage` / action | Why hidden in PWA |
 |-----|-------------------------|-------------------|
@@ -675,8 +675,9 @@ Spec: § Browser context vs PWA context.
 
 - [x] `BROWSER_TAB_ONLY_SHORTCUT_BUTTON_IDS` + `shouldHideBrowserTabOnlyShortcuts()` in `pwa-standalone-refresh-core.mjs`
 - [x] `pwa-browser-tab-shortcuts.mjs` — hide `#landing-device-settings` rows in standalone
+- [x] `device-shell.css` — `.landing-device-settings-list > .list-row[hidden] { display: none }` (author `display:block` must not defeat `[hidden]`)
 - [x] Vitest `worker/tests/pwa-browser-tab-shortcuts.test.ts`
-- [x] Manual **P1-PWA-R** step 13
+- [x] E2E **P1-PWA-R** steps 13–14 (`e2e/device-pwa-install.spec.ts`)
 
 ---
 
