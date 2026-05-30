@@ -33,6 +33,16 @@ describe("landing messaging (Step 3)", () => {
     expect(html).not.toContain("A network OS for physical objects");
   });
 
+  it("landing title and founder note bridge mission and what ships today", () => {
+    const html = readFileSync(join(root, "site/index.html"), "utf8");
+    expect(html).toContain("humanity.llc · Live objects on physical tags");
+    expect(html).toContain("The name is the mission");
+    expect(html).toContain("I built this because");
+    expect(html).toContain("Humanity Commons");
+    expect(html).toContain("/features-available-now.html");
+    expect(html).toContain("/studio/");
+  });
+
   it("create page exposes hero ids for template copy sync", () => {
     const html = readFileSync(join(root, "site/create/index.html"), "utf8");
     expect(html).toContain('id="create-hero-title"');
