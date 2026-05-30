@@ -237,7 +237,7 @@ describe("device-emphasis-card-html", () => {
       const html = readFileSync(join(root, page), "utf8");
       expect(html).toContain('href="/css/hc-emphasis-card.css?v=5"');
       expect(html).toContain(`styles.css?v=${v}`);
-      expect(html).toContain("theme-dark.css?v=29");
+      expect(html).toContain("theme-dark.css?v=30");
       expect(html).toContain(`device-shell.css?v=${DEVICE_SHELL_ASSET_VERSION - 1}`);
       expect(html).toContain('id="shell-status-line"');
       expect(html).toContain(`device-status-bootstrap.mjs?v=${DEVICE_SHELL_ASSET_VERSION}`);

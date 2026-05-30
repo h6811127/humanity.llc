@@ -399,6 +399,35 @@ html[data-theme="dark"] .hub-card-details-summary {
   color: #0a84ff;
 }
 
+html[data-theme="dark"] .device-hub #device-hub-pins-list,
+html[data-theme="dark"] .device-hub .list.list-compact {
+  background: var(--shell-fill);
+  border-color: var(--shell-separator);
+  box-shadow: var(--shell-shadow-sm);
+}
+
+html[data-theme="dark"] .device-hub .list.list-compact li {
+  border-bottom-color: var(--shell-separator);
+}
+
+html[data-theme="dark"] .device-hub-keys-custody-row {
+  background: var(--shell-fill);
+  border-color: var(--shell-separator);
+}
+
+html[data-theme="dark"] .device-hub-keys-custody-action--secondary {
+  color: var(--shell-label);
+  border-color: var(--shell-separator);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  html[data-theme="dark"] {
+    --shell-fill: #1c1c1e;
+    --shell-fill-secondary: #2c2c2e;
+    --surface-popover-bg-glass: var(--surface-popover-bg);
+  }
+}
+
 html[data-theme="dark"] .hub-card-identity--steward {
   color: #30d158;
 }

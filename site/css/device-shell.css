@@ -40,7 +40,7 @@
 }
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  :root {
+  :root:not([data-theme="dark"]) {
     --shell-chrome-bg: rgba(242, 242, 247, 0.96);
     --shell-bg-elevated: rgba(255, 255, 255, 0.96);
     --shell-fill: #ffffff;
@@ -50,7 +50,7 @@
 }
 
 @media (prefers-reduced-transparency: reduce) {
-  :root {
+  :root:not([data-theme="dark"]) {
     --shell-chrome-bg: rgba(242, 242, 247, 0.97);
     --shell-chrome-blur: none;
     --shell-blur: none;

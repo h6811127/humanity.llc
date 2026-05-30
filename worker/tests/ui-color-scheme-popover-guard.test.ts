@@ -352,5 +352,16 @@ describe("UI color scheme popover guard", () => {
     assertGuardedRule("site/css/theme-dark.css", "a.wallet-chrome-home", {
       require: ["color: var(--red)", "--shell-fill"],
     });
+    assertGuardedRule("site/css/device-shell.css", ":root:not([data-theme=\"dark\"])", {
+      require: ["--shell-fill: #ffffff"],
+    });
+    assertGuardedRule("site/css/theme-dark.css", "html[data-theme=\"dark\"] .device-hub .list.list-compact", {
+      require: ["var(--shell-fill)", "var(--shell-separator)"],
+      forbid: ["#fff", "#ffffff"],
+    });
+    assertGuardedRule("site/css/theme-dark.css", "html[data-theme=\"dark\"] .device-hub-keys-custody-row", {
+      require: ["var(--shell-fill)", "var(--shell-separator)"],
+      forbid: ["rgba(255, 255, 255"],
+    });
   });
 });

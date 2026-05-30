@@ -177,6 +177,8 @@ Prioritized places that could adopt the same **raised card** pattern. Extraction
 | Cross-tab (landing) | `#device-cross-tab-banner` on `/` | Same as wallet | Tier 1 |
 | System / resolver degraded | `#device-system-banner` | Plain status line | Lower urgency — only if copy includes a CTA; else keep minimal |
 | Keys custody summary | `#device-keys-custody-hub`, `-wallet`, `-compact` | **Shipped** — `--info` / `--warn` emphasis cards (`device-keys-custody-html.test.ts`) |
+| Hub pinned scans list | `#device-hub-pins-list` `.device-hub .list.list-compact` | **Shipped** — dark uses `--shell-fill` (not light `#fff` from reduced-transparency fallbacks); see `theme-dark.css` + `device-shell.css` `:root:not([data-theme="dark"])` |
+| Hub custody row cards | `.device-hub-keys-custody-row` | **Shipped** — dark uses `--shell-fill` / `--shell-separator` |
 
 #### Tier 3 — Card workspace (`/created/`)
 
