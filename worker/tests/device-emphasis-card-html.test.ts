@@ -32,7 +32,7 @@ describe("device-emphasis-card-html", () => {
 
   it("landing index busts styles.css cache when spacing changes", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
-    expect(html).toContain('href="/css/hc-emphasis-card.css?v=4"');
+    expect(html).toContain('href="/css/hc-emphasis-card.css?v=5"');
     expect(html).toContain("styles.css?v=129");
   });
 
@@ -51,7 +51,7 @@ describe("device-emphasis-card-html", () => {
     const styles = readFileSync(join(root, "site/styles.css"), "utf8");
     expect(styles).toContain("--hc-emphasis-card-gap-section: 24px");
     expect(styles).toContain("--hc-emphasis-card-gap-dot: 14px");
-    expect(styles).toContain('hc-emphasis-card.css?v=4');
+    expect(styles).toContain('hc-emphasis-card.css?v=5');
     const emphasis = readFileSync(join(root, "site/css/hc-emphasis-card.css"), "utf8");
     expect(emphasis).toContain("var(--hc-emphasis-card-gap-dot)");
     expect(emphasis).toContain("var(--hc-emphasis-card-gap-copy)");
@@ -180,6 +180,25 @@ describe("device-emphasis-card-html", () => {
     expect(html).not.toContain("form-warning flow-form-warning");
   });
 
+  it("hidden emphasis cards do not display (flex override guard)", () => {
+    const css = readFileSync(join(root, "site/css/hc-emphasis-card.css"), "utf8");
+    expect(css).toMatch(/\.hc-emphasis-card\[hidden\][\s\S]*display:\s*none\s*!important/);
+  });
+
+  it("create convergence nudge uses labeled info emphasis card with paired CTAs", () => {
+    const html = readFileSync(join(root, "site/create/index.html"), "utf8");
+    expect(html).toContain('id="create-add-object-nudge"');
+    expect(html).toContain("hc-emphasis-card--info create-add-object-nudge");
+    expect(html).toContain('id="create-add-object-nudge-eyebrow"');
+    expect(html).toContain("Recommended path");
+    expect(html).toContain('class="hc-emphasis-card__cta" id="create-add-object-nudge-primary"');
+    expect(html).toContain(
+      'class="hc-emphasis-card__cta hc-emphasis-card__cta--secondary"'
+    );
+    expect(html).not.toContain("hc-notice--info create-add-object-nudge");
+    expect(html).not.toMatch(/create-add-object-nudge-general[\s\S]*hc-notice-ack/);
+  });
+
   it("scan bundle propagates compact emphasis spacing tokens", () => {
     const scanPass = readFileSync(join(root, "site/scan-pass.css"), "utf8");
     const bundled = readFileSync(
@@ -208,7 +227,7 @@ describe("device-emphasis-card-html", () => {
     };
     for (const [page, v] of Object.entries(stylesBust)) {
       const html = readFileSync(join(root, page), "utf8");
-      expect(html).toContain('href="/css/hc-emphasis-card.css?v=4"');
+      expect(html).toContain('href="/css/hc-emphasis-card.css?v=5"');
       expect(html).toContain(`styles.css?v=${v}`);
       expect(html).toContain("theme-dark.css?v=29");
       expect(html).toContain(`device-shell.css?v=${DEVICE_SHELL_ASSET_VERSION - 1}`);

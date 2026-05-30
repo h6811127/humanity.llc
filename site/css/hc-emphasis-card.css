@@ -15,6 +15,10 @@
   backdrop-filter: var(--hc-emphasis-card-backdrop);
 }
 
+.hc-emphasis-card[hidden] {
+  display: none !important;
+}
+
 .hc-emphasis-card--active {
   background: var(--hc-emphasis-card-fill-active-glass);
   border-color: var(--hc-emphasis-card-border-active);

@@ -120,7 +120,7 @@ document.getElementById("create-add-object-nudge-general")?.addEventListener("cl
 
 document.getElementById("create-add-object-nudge-primary")?.addEventListener("click", (ev) => {
   const el = ev.currentTarget;
-  if (!(el instanceof HTMLAnchorElement) || el.href) return;
+  if (!(el instanceof HTMLAnchorElement) || el.getAttribute("role") !== "button") return;
   ev.preventDefault();
   setTemplate("general");
 });

@@ -75,6 +75,7 @@
     "card-disabled-since-visit:desk-gate:fast": "node worker/scripts/card-disabled-since-visit-desk-gate.mjs -- --skip-e2e",
     "card-disabled-since-visit:sign-off": "node worker/scripts/card-disabled-since-visit-sign-off.mjs",
     "e2e:created-control": "playwright test e2e/created-control.spec.ts",
+    "e2e:create-flow-convergence": "playwright test e2e/create-flow-convergence.spec.ts",
     "e2e:live-control-loop": "playwright test e2e/live-control-loop.spec.ts",
     "live-control:printed-qa:preflight": "node worker/scripts/live-control-printed-qa-preflight.mjs",
     "live-control:printed-qa:production-smoke": "node worker/scripts/live-control-printed-qa-production-smoke.mjs",
