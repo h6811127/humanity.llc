@@ -1,11 +1,13 @@
 import { join } from "node:path";
 
-import { test, expect } from "@playwright/test";
+import { test, expect, type Route } from "@playwright/test";
 
 /**
  * Key-loss sad paths — view-only / backup import (K1, K2, K5).
  * @see docs/KEY_LOSS_SAD_PATH_MATRIX.md
+ * @see docs/OWNERSHIP_RESTORE_UX_PLAN.md (Phase 4 step 3 CI gate)
  * Fixture: npm run e2e:generate-key-loss-fixture
+ * CI: npm run e2e:key-loss-sad-path (ownership-restore:verify)
  */
 
 const PROFILE_ID = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
@@ -34,6 +36,27 @@ async function expectNoKeylessHcCreated(page: import("@playwright/test").Page) {
 }
 
 const BACKUP_FIXTURE = join(process.cwd(), "e2e/fixtures/key-loss-e2e.hcbackup.json");
+
+function mockHealth(route: Route) {
+  return route.fulfill({
+    status: 200,
+    contentType: "application/json",
+    body: JSON.stringify({ status: "ok", database: "ok" }),
+  });
+}
+
+async function waitForStatusDotReady(page: import("@playwright/test").Page) {
+  await expect(page.locator("#brand-status-dot")).toHaveAttribute("data-dot-state", /.+/, {
+    timeout: 15_000,
+  });
+}
+
+async function openHubStrangerEmpty(page: import("@playwright/test").Page) {
+  await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route));
+  await page.locator("#brand-status-dot-btn").click();
+  await expect(page.locator("body")).toHaveClass(/device-hub-sheet-open/, { timeout: 15_000 });
+  await expect(page.locator("#device-hub")).toHaveClass(/device-hub--stranger-empty/);
+}
 
 async function stubCardRoutes(page: import("@playwright/test").Page) {
   await page.route("**/.well-known/hc/v1/health**", (route) =>
@@ -119,6 +142,7 @@ test.describe("key-loss sad paths", () => {
     await expect(page.locator("#created-view-restore-panel")).toBeVisible();
     await expect(page.locator("#import-recovery-form")).toBeVisible();
     await expect(page.locator("#no-session")).toBeHidden();
+    await expect(page.locator("#created-live-scanners-see")).toBeHidden();
     await expect(page.locator("#created-view-restore-lead")).toContainText(
       /recovery code|encrypted backup/i
     );
@@ -212,10 +236,34 @@ test.describe("key-loss sad paths", () => {
     await expect(page.locator("#wallet-page")).not.toHaveClass(/device-hub--stranger-empty/);
   });
 
+  test("K2-landing: stranger-empty hub on / keeps import backup visible", async ({ page }) => {
+    await page.goto("/");
+    await waitForStatusDotReady(page);
+    await openHubStrangerEmpty(page);
+
+    const importGroup = page.locator('[data-hub-group="import"][data-hub-restore-always]');
+    await expect(importGroup).toBeVisible();
+    await expect(page.locator("#hub-import-form-hint")).toContainText(/\.hcbackup\.json/i, {
+      timeout: 15_000,
+    });
+  });
+
+  test("K2-create: stranger-empty hub on /create/ keeps import backup visible", async ({ page }) => {
+    await page.goto("/create/");
+    await waitForStatusDotReady(page);
+    await openHubStrangerEmpty(page);
+
+    const importGroup = page.locator('[data-hub-group="import"][data-hub-restore-always]');
+    await expect(importGroup).toBeVisible();
+    await expect(page.locator("#hub-import-form-hint")).toContainText(/\.hcbackup\.json/i, {
+      timeout: 15_000,
+    });
+  });
+
   test("K2: wrong backup passphrase shows plain error on wallet import", async ({ page }) => {
     await page.goto("/wallet/");
 
-    await expect(page.locator('[data-hub-group="import"]')).toBeVisible();
+    await expect(page.locator('[data-hub-group="import"][data-hub-restore-always]')).toBeVisible();
     await expect(page.locator("#wallet-page")).toHaveClass(/device-hub--stranger-empty/);
 
     await page.locator("#hub-import-form").evaluate((el) => {

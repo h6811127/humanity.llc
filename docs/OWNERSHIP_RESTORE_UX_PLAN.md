@@ -1,6 +1,6 @@
 # Ownership restore and view-mode UX plan
 
-**Status:** Phase 4 step 2 shipped (hub import copy convergence); Phase 4 step 1 shipped (hub restore always visible); **Phase 3 shipped** (view Live read-only QR tasks + banner); Phase 2 shipped (setup wizard hard gate); Phase 1 shipped (restore panel wiring)  
+**Status:** Phase 4 step 3 shipped (CI regression gate + landing/create stranger-empty import E2E); Phase 4 step 2 shipped (hub import copy convergence); Phase 4 step 1 shipped (hub restore always visible); **Phase 3 shipped** (view Live read-only QR tasks + banner); Phase 2 shipped (setup wizard hard gate); Phase 1 shipped (restore panel wiring)  
 **Audience:** Product, design, engineering, QA  
 **Related:** [`OWNERSHIP_AND_CONTROL_MODEL.md`](OWNERSHIP_AND_CONTROL_MODEL.md) · [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) · [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) · [`KEY_LOSS_SAD_PATH_MATRIX.md`](KEY_LOSS_SAD_PATH_MATRIX.md) · [`PRODUCT_WORKSTREAM_COORDINATION.md`](PRODUCT_WORKSTREAM_COORDINATION.md)
 
@@ -52,6 +52,13 @@ Setup wizard **hard gate** before step **You're live**:
 - Modules: `device-hub-stranger-empty-core.mjs` (`HUB_RESTORE_ALWAYS_ATTR`)
 - Tests: `npm run worker:test:hub-restore-always` · `e2e:key-loss-sad-path` (K2 stranger-empty import visible)
 - Manual: [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) **P1-HE** step 1 (import form visible when empty)
+
+## Phase 4 (step 3 shipped)
+
+- **CI gate** in `.github/workflows/test-site.yml`: `worker:test:view-only-restore` + `worker:test:hub-restore-always` + `e2e:key-loss-sad-path` (K1, K5, K2 wallet + **K2-landing** + **K2-create** stranger-empty import visible)
+- Local bundle: `npm run ownership-restore:verify`
+- E2E fix: K1 asserts **QR and signage** on **Live** tab before switching to Manage (tab pane hides `#created-view-live-qr-tasks`)
+- Manual: [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) **P1-HE** step 1 on `/` and `/create/` (import group visible when empty)
 
 ## Phase 4 (step 2 shipped)
 
