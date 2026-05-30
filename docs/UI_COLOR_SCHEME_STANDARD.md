@@ -177,8 +177,11 @@ Prioritized places that could adopt the same **raised card** pattern. Extraction
 | Cross-tab (landing) | `#device-cross-tab-banner` on `/` | Same as wallet | Tier 1 |
 | System / resolver degraded | `#device-system-banner` | Plain status line | Lower urgency — only if copy includes a CTA; else keep minimal |
 | Keys custody summary | `#device-keys-custody-hub`, `-wallet`, `-compact` | **Shipped** — `--info` / `--warn` emphasis cards (`device-keys-custody-html.test.ts`) |
-| Hub pinned scans list | `#device-hub-pins-list` `.device-hub .list.list-compact` | **Shipped** — dark uses `--shell-fill` (not light `#fff` from reduced-transparency fallbacks); see `theme-dark.css` + `device-shell.css` `:root:not([data-theme="dark"])` |
-| Hub custody row cards | `.device-hub-keys-custody-row` | **Shipped** — dark uses `--shell-fill` / `--shell-separator` |
+| Hub pinned scans list | `#device-hub-pins-list` on **`/wallet/`** (`main.wallet-hub`) | **Open regression** — `6f904c1f` scoped fix to `.device-hub` ancestor; wallet page has no `#device-hub` wrapper. See [`HUB_DARK_MODE_WHITE_DROPDOWN_INVESTIGATION.md`](HUB_DARK_MODE_WHITE_DROPDOWN_INVESTIGATION.md). **Add pin** accordion (`.wallet-add-details`) uses hardcoded `#fafafa` with no dark rule |
+| Hub pinned scans (sheet duplicate) | Same ids under `#device-hub` on `/` | Secondary duplicate markup; not the reported surface |
+| Hub custody row cards | `.device-hub-keys-custody-row` | Wallet custody uses emphasis cards; see investigation if still white |
+| Hub import accordions | `.device-hub-import-block` | On `/wallet/` Restore section — `var(--white)` base; candidate for separate pass |
+| Hub card ⋯ menu | `.hub-card-menu-panel` | Hub/wallet saved-card menu — **P1-6** |
 
 #### Tier 3 — Card workspace (`/created/`)
 
