@@ -99,7 +99,7 @@ npm run site:build-meta && npm run build
 
 - [`site/js/device-hub-build-stamp.mjs`](../site/js/device-hub-build-stamp.mjs) mounts at the bottom of `#device-hub-body` (before the status-key reference).
 - Shown when `localStorage.hc_debug === "1"` or URL `?hc_debug=1` / `?hc_debug=true` ([`isSiteDebugEnabled()`](../site/js/build-meta-browser.mjs)).
-- Displays `SITE_BUILD_META` as `Site {sha} · shell {n} · {source}`; **Copy build info** writes multi-line text for bug reports.
+- Displays `SITE_BUILD_META` as `Site {sha} · shell {n} · {source}`; **Copy build info** writes multi-line text for bug reports (includes wallet custody debug snapshot per [`HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md`](HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md)).
 - Wired from [`initDeviceHub()`](../site/js/device-hub-ui.mjs) on all shell hub pages.
 - Listed in [`DEVICE_STATUS_SHELL_JS_FILES`](../site/js/device-status-shell-modules.mjs) (bump shell asset version when changing).
 

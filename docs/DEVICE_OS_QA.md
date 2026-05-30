@@ -627,6 +627,18 @@ Automated: `npm run worker:test:setup-ios-custody`.
 
 Automated: `npm run worker:test:wallet-cache-rc16`.
 
+### P2-RC-MON · Hub card disappeared monitoring (closed May 2026)
+
+**Spec:** [`HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md`](HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md) § Monitoring only
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Enable debug: `?hc_debug=1` or `localStorage.hc_debug = "1"` · open hub | Build stamp shows wallet debug line (`N saved · parse ok`) |
+| 2 | Tap **Copy build info** | Clipboard includes `--- wallet custody debug ---` block with `walletCount`, `persistFlag`, `likelyRc=` |
+| 3 | Stranger-empty hub with `walletCount ≥ 1` in snapshot | **Regression** — file with copied snapshot |
+
+Engineering gate: `npm run hub-card-disappeared:verify`.
+
 ### P2-RC14 · Hub search false-empty (RC-14 shipped)
 
 **Spec:** [`HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md`](HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md) RC-14 · **Modules:** `device-hub-search-core.mjs` · `device-hub-ui.mjs`

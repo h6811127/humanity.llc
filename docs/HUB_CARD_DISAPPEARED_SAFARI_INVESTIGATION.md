@@ -1,7 +1,7 @@
 # Investigation: Saved card disappeared from hub (iPhone Safari)
 
 **Date:** 2026-05-29 (opened from steward report — card saved, hub empty ~20 min later)  
-**Status:** Active — RC-1–RC-6/RC-13–RC-16 shipped; RC-3 engineering mitigations complete  
+**Status:** **Closed — monitoring only** (May 2026) — RC-1–RC-16 engineering backlog shipped; use diagnostic checklist for new reports  
 **Reporter:** Steward on iPhone Safari after create + explicit save  
 **Related:** [`SAFARI_KEYS_WIPE_INVESTIGATION.md`](SAFARI_KEYS_WIPE_INVESTIGATION.md) · [`KEY_LOSS_SAD_PATH_MATRIX.md`](KEY_LOSS_SAD_PATH_MATRIX.md) · [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md) · [`PWA_INSTALL.md`](PWA_INSTALL.md)
 
@@ -16,7 +16,7 @@ The **~20 minute** delay does **not** match any client-side interval. It usually
 | Question | Answer |
 |----------|--------|
 | Can the server delete my hub row? | **No.** Orphan purge is server-side resolver data after **90 days**; it does not touch browser storage. |
-| Can the hub hide a card while wallet still has it? | **Rare.** Search filter, corrupt parse, or summary/cache bugs — see RC-14–RC-16. |
+| Can the hub hide a card while wallet still has it? | **Very unlikely** after RC-14–RC-16. If `walletCount ≥ 1` in the diagnostic but hub is stranger-empty, **file immediately** (regression). |
 | Is this always true data loss? | **Often yes** when hub is stranger-empty. Sometimes **no** — tab session empty but wallet intact (RC-8). |
 
 ---
@@ -36,7 +36,7 @@ The **~20 minute** delay does **not** match any client-side interval. It usually
 
 ## Root-cause catalog (prioritized)
 
-Fix backlog order matches this list. **RC-1, RC-2, RC-4, and RC-6 are implemented.**
+Fix backlog order matches this list. **RC-1–RC-6 and RC-13–RC-16 are shipped.**
 
 ### RC-1 — No post-save read-back verification **(product gap · fix shipped)**
 
@@ -406,6 +406,21 @@ Run on the **tab where the hub looks empty** (Safari → Develop → device → 
 
 ---
 
+## Monitoring only (May 2026)
+
+Engineering backlog **RC-1–RC-16 is closed.** True Safari eviction (RC-3) remains possible by platform design when stewards skip backup — product mitigations are shipped (persist-denied notice, ITP notice, setup custody, PWA handoff).
+
+**New steward reports**
+
+1. Run the [diagnostic checklist](#diagnostic-checklist-iphone--mac-web-inspector) on the tab where the hub looks empty — or open the hub with **`?hc_debug=1`** / `localStorage.hc_debug = "1"` and use **Copy build info** (includes wallet custody snapshot).
+2. Classify using the result table below.
+3. **`walletCount ≥ 1` + stranger-empty hub** → regression; file immediately with snapshot.
+4. **`walletCount: 0`** → true wipe or never saved; recovery path is backup import (not a hub bug).
+
+**Engineering exit gate:** `npm run hub-card-disappeared:verify`
+
+---
+
 ## Automated regression
 
 | RC | Command |
@@ -422,6 +437,7 @@ Run on the **tab where the hub looks empty** (Safari → Develop → device → 
 | RC-7 | `npm run worker:test:wallet-corrupt` · `npm run e2e:key-loss-sad-path` |
 | RC-8, RC-9 | `npm run e2e:safari-keys-persistence` |
 | Copy | `npm run worker:test:key-loss-copy` |
+| **All RC gates** | `npm run hub-card-disappeared:verify` |
 
 ---
 
@@ -429,6 +445,7 @@ Run on the **tab where the hub looks empty** (Safari → Develop → device → 
 
 | Date | Event |
 |------|--------|
+| 2026-05-30 | **Closed — monitoring only** — hub debug wallet snapshot + `hub-card-disappeared:verify` exit gate |
 | 2026-05-30 | **RC-16** visibility resync for stale wallet memo after same-tab eviction |
 | 2026-05-30 | **RC-3 slice 2** setup Done → PWA install card handoff + same-tab `hc-setup-done-marked` refresh |
 | 2026-05-29 | **RC-4** setup finish gated on wallet save + done-step confirmation |

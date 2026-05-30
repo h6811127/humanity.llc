@@ -10,7 +10,7 @@
  * Bump on all shell HTML (`device-status-bootstrap.mjs?v=N`) and on every
  * `./peer.mjs?v=N` import between files in DEVICE_STATUS_SHELL_JS_FILES.
  */
-export const DEVICE_SHELL_ASSET_VERSION = 70;
+export const DEVICE_SHELL_ASSET_VERSION = 71;
 
 /** @deprecated Use DEVICE_SHELL_ASSET_VERSION */
 export const DEVICE_STATUS_BOOTSTRAP_CACHE_BUST = DEVICE_SHELL_ASSET_VERSION;
@@ -65,6 +65,7 @@ export const DEVICE_STATUS_SHELL_JS_FILES = [
   "device-live-control-poll-leader.mjs",
   "device-hub-ui.mjs",
   "device-hub-build-stamp.mjs",
+  "device-hub-wallet-debug-core.mjs",
   "device-steward-entitlements.mjs",
   "device-steward-entitlements-core.mjs",
   "device-steward-session-core.mjs",
