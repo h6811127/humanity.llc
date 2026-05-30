@@ -1805,10 +1805,14 @@ a.hub-card-menu-item {
   flex: 1 1 100%;
 }
 
+.landing-founder-note .hc-emphasis-card__copy .landing-framing-lead + .landing-framing-lead {
+  margin-top: 14px;
+}
+
 .landing-founder-note.hc-emphasis-card .landing-framing-more-actions {
   flex-direction: column;
-  gap: 10px;
-  margin: 0;
+  gap: 12px;
+  margin: 16px 0 0;
 }
 
 .landing-founder-note.hc-emphasis-card .landing-framing-more-actions > * {

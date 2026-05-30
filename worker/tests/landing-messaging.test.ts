@@ -45,7 +45,9 @@ describe("landing messaging (Step 3)", () => {
     expect(html).toContain("/what-can-a-qr-do.html");
     expect(html).toContain("Live QR creation and state management work today");
     expect(html).toContain("Humanity Commons");
-    expect(html).toContain("Named that way because the goal is people organizing");
+    expect(html).toContain("hoodie displaying today's mood");
+    expect(html).toContain("humanity.llc is where I'm building it");
+    expect(html).toContain("the llc is the legal home, not the philosophy");
     expect(html).toContain("See what's live");
     expect(html).toContain("Notes on the build");
     expect(html).toContain("Humanity Commons");
