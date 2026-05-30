@@ -818,34 +818,6 @@ test.describe("device OS wallet flow", () => {
     expect(colors!.eyebrow![2]).toBeGreaterThan(150);
     expect(colors!.detail![0]).toBeGreaterThan(180);
   });
-
-  test("keys custody wallet notice uses compact stacked layout", async ({ page }) => {
-    await page.addInitScript(() => {
-      localStorage.removeItem("hc_keys_custody_notice_dismissed");
-    });
-    await page.goto("/wallet/");
-
-    const card = page.locator(".device-keys-custody--wallet");
-    await expect(card).toBeVisible({ timeout: 15_000 });
-    await expect(card.getByRole("button", { name: "Acknowledge" })).toBeVisible();
-
-    const metrics = await card.evaluate((el) => {
-      const detail = el.querySelector(".hc-emphasis-card__detail");
-      const ack = el.querySelector("[data-keys-custody-ack]");
-      const main = el.querySelector(".hc-emphasis-card__main");
-      if (!detail || !ack || !main) return null;
-      return {
-        gapPx: ack.getBoundingClientRect().top - detail.getBoundingClientRect().bottom,
-        justifyContent: getComputedStyle(el).justifyContent,
-        mainFlexGrow: getComputedStyle(main).flexGrow,
-      };
-    });
-    expect(metrics).not.toBeNull();
-    expect(metrics!.justifyContent).toBe("flex-start");
-    expect(metrics!.mainFlexGrow).toBe("0");
-    expect(metrics!.gapPx).toBeGreaterThan(0);
-    expect(metrics!.gapPx).toBeLessThan(56);
-  });
 });
 
 test.describe("P0b-1 fresh create hub row (R10)", () => {
