@@ -1,7 +1,7 @@
 # Investigation: Saved card disappeared from hub (iPhone Safari)
 
 **Date:** 2026-05-29 (opened from steward report — card saved, hub empty ~20 min later)  
-**Status:** Active — RC-1/RC-2/RC-4/RC-6 shipped; RC-3+ backlog open  
+**Status:** Active — RC-1/RC-2/RC-4/RC-6/RC-13/RC-14 shipped; RC-3 partial; RC-15+ open  
 **Reporter:** Steward on iPhone Safari after create + explicit save  
 **Related:** [`SAFARI_KEYS_WIPE_INVESTIGATION.md`](SAFARI_KEYS_WIPE_INVESTIGATION.md) · [`KEY_LOSS_SAD_PATH_MATRIX.md`](KEY_LOSS_SAD_PATH_MATRIX.md) · [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md) · [`PWA_INSTALL.md`](PWA_INSTALL.md)
 
@@ -197,15 +197,16 @@ Fix backlog order matches this list. **RC-1, RC-2, RC-4, and RC-6 are implemente
 
 ---
 
-### RC-14 — Hub UI hiding rows (not deleting wallet)
+### RC-14 — Hub UI hiding rows (not deleting wallet) **(fix shipped)**
 
 | Field | Detail |
 |-------|--------|
 | **Layer** | Client — `device-hub-ui.mjs` |
 | **Mechanism** | Active **search query** hides all rows; large-wallet DOM cap (≥10 cards) hides off-screen rows with “N more”; collapsed hub preview shows first 3 only (not zero for single card). |
 | **User pattern** | “Empty” hub with search text in filter; or missed “more saved” row. |
-| **Still possible?** | **Unlikely** for single new card |
-| **Fix backlog** | Clear search on stranger-empty transition; audit cap UX |
+| **Still possible?** | **Cap/collapsed preview yes** — by design; search false-empty **no** |
+| **Fix** | **Shipped** — clear hub search on stranger-empty transition; saved-section “No saved cards match your search” when wallet has rows |
+| **Tests** | `npm run worker:test:hub-search-rc14` |
 
 ---
 
@@ -397,7 +398,7 @@ Run on the **tab where the hub looks empty** (Safari → Develop → device → 
 | 4 | RC-3 | Reinforce backup-before-live + Home Screen guidance | Partial — P0-4 · P2-1 · setup Protect/Done iOS notices **shipped** |
 | 5 | RC-6 | Private mode detection | **Shipped** |
 | 6 | RC-13 | Canonical origin enforcement | **Shipped** |
-| 7 | RC-14 | Search/cap UX audit | Open |
+| 7 | RC-14 | Search/cap UX audit | **Shipped** (search clear + no-match copy) |
 | 8 | RC-15 | Hub open integrity heartbeat | Open |
 
 ---
@@ -412,6 +413,7 @@ Run on the **tab where the hub looks empty** (Safari → Develop → device → 
 | RC-3 | `npm run worker:test:setup-ios-custody` |
 | RC-6 | `npm run worker:test:private-browsing` |
 | RC-13 | `npm run worker:test:canonical-origin` |
+| RC-14 | `npm run worker:test:hub-search-rc14` |
 | RC-7 | `npm run worker:test:wallet-corrupt` · `npm run e2e:key-loss-sad-path` |
 | RC-8, RC-9 | `npm run e2e:safari-keys-persistence` |
 | Copy | `npm run worker:test:key-loss-copy` |
@@ -423,6 +425,7 @@ Run on the **tab where the hub looks empty** (Safari → Develop → device → 
 | Date | Event |
 |------|--------|
 | 2026-05-29 | **RC-4** setup finish gated on wallet save + done-step confirmation |
+| 2026-05-30 | **RC-14** hub search clear on stranger transition + saved no-match copy |
 | 2026-05-30 | **RC-13** canonical `www` → apex redirect + debug hub origin line |
 | 2026-05-29 | **RC-2** persist-denied iOS warn card shipped |
 | 2026-05-29 | Initial catalog from steward report; **RC-1** read-back gate shipped |

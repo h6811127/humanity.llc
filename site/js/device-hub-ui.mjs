@@ -12,6 +12,11 @@ import {
 } from "./device-activity.mjs";
 import { DEFAULT_ATTESTATION_ELIGIBILITY_ALERT } from "./device-ownership-copy-core.mjs";
 import { applyDeviceHubSearch } from "./device-hub-search.mjs";
+import {
+  HUB_SEARCH_NO_SAVED_MATCHES,
+  shouldClearHubSearchOnStrangerTransition,
+  shouldShowSavedSearchEmptyState,
+} from "./device-hub-search-core.mjs";
 import { initHubBackupImport } from "./device-hub-import.mjs";
 import { mountThemeToggles } from "./device-theme.mjs";
 import { syncBrowserNotifPrompts } from "./device-browser-notifications-loader.mjs";
@@ -501,6 +506,8 @@ let shortcutsGroup;
 let pinsEmptyEl;
 let savedEmptyEl;
 let activityEmptyEl;
+/** @type {boolean | null} */
+let hubStrangerEmptyPreviously = null;
 
 function hubEl(id) {
   if (!id) return null;
@@ -1976,6 +1983,13 @@ function applyHubStrangerEmptyChrome() {
     inboxActionCount: notificationCount(),
     walletCorrupt: isWalletStorageCorrupt(),
   });
+  if (
+    shouldClearHubSearchOnStrangerTransition(hubStrangerEmptyPreviously, stranger) &&
+    searchInput?.value
+  ) {
+    searchInput.value = "";
+  }
+  hubStrangerEmptyPreviously = stranger;
   const roots = new Set(
     [deviceHub, document.getElementById("device-hub")].filter(
       (el) => el instanceof HTMLElement
@@ -1994,7 +2008,25 @@ function notifyHubChanged() {
 
 function applySearchFilter() {
   const q = searchInput?.value ?? "";
-  const { matchCount } = applyDeviceHubSearch(deviceHub, q);
+  const { matchCount, groups } = applyDeviceHubSearch(deviceHub, q);
+  const savedGroupState = groups.saved;
+  if (
+    savedEmptyEl &&
+    savedList &&
+    shouldShowSavedSearchEmptyState({
+      walletCount: getWalletCount(),
+      query: q,
+      savedGroupHasItems: savedGroupState?.hasItems === true,
+      savedGroupAnyVisible: savedGroupState?.anyVisible === true,
+    })
+  ) {
+    savedEmptyEl.hidden = false;
+    savedEmptyEl.textContent = HUB_SEARCH_NO_SAVED_MATCHES;
+    savedList.hidden = true;
+    if (savedGroup) savedGroup.hidden = false;
+  } else if (savedList && !q.trim() && getWalletCount() > 0) {
+    savedList.hidden = false;
+  }
   if (!q.trim()) {
     const items = getInboxItems();
     if (hubConfig.showLiveControlInbox && liveControlGroup) {
@@ -2066,11 +2098,11 @@ export function refreshDeviceHub() {
   syncHubInboxAlertGroups();
   syncBrowserNotifPrompts();
   renderActivityRows();
+  applyHubStrangerEmptyChrome();
   renderSavedRows();
   renderPinRows();
   applySearchFilter();
   refreshEmptyHint();
-  applyHubStrangerEmptyChrome();
   renderHubKeysCustodyPanel();
 }
 

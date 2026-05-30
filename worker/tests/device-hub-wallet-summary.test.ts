@@ -42,10 +42,12 @@ describe("device hub wallet summary hydration", () => {
     expect(src).toContain("viewportSync: true");
   });
 
-  it("applies stranger-empty chrome on hub refresh", () => {
+  it("applies stranger-empty chrome before render and clears search on transition (RC-14)", () => {
     expect(src).toContain("applyHubStrangerEmptyChrome");
     expect(src).toContain("isHubStrangerEmptyState");
     expect(src).toContain("HUB_STRANGER_EMPTY_CLASS");
+    expect(src).toContain("shouldClearHubSearchOnStrangerTransition");
+    expect(src).toContain("applyHubStrangerEmptyChrome();\n  renderSavedRows();");
   });
 
   it("shows corrupt wallet coach card instead of stranger-empty saved list", () => {
