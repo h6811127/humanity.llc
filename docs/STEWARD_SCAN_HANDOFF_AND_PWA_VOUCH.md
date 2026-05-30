@@ -1,6 +1,6 @@
 # Steward scan handoff — camera, Safari, PWA, and vouch
 
-**Status:** Active — **S1–S7 shipped** · **S8** future (native app / Universal Links)  
+**Status:** Active — **S1–S7 shipped** · **S7 steward QR render (RC-1) fixed** — [`STEWARD_HANDOFF_QR_NOT_DISPLAYING_INVESTIGATION.md`](STEWARD_HANDOFF_QR_NOT_DISPLAYING_INVESTIGATION.md) · **S8** future (native app / Universal Links)  
 **Date:** 2026-05-30  
 **Audience:** Product, design, engineering, QA  
 **Related:** [`PWA_STANDALONE_EXTERNAL_NAVIGATION.md`](PWA_STANDALONE_EXTERNAL_NAVIGATION.md) · [`PWA_INSTALL.md`](PWA_INSTALL.md) · [`V1_DECISION_LOCK.md`](V1_DECISION_LOCK.md) (HTTPS print QR) · [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`OWNERSHIP_RESTORE_UX_PLAN.md`](OWNERSHIP_RESTORE_UX_PLAN.md) · [`KEY_LOSS_SAD_PATH_MATRIX.md`](KEY_LOSS_SAD_PATH_MATRIX.md)
@@ -45,7 +45,7 @@ This is distinct from **P1 shipped** steward scan preview (PWA → scan same-tab
 | **S4** | Product guidance | **Shipped** | Hub Restore & scan label + iPhone vouch guidance; PWA install + setup copy |
 | **S5** | Scan-page steward param | **Shipped** | `?hc_steward=1` → handoff UI first on Safari |
 | **S6** | Short handoff URL | **Shipped** | `humanity.llc/v/{code}` interstitial for camera landings |
-| **S7** | Dual-QR print materials | **Shipped** | `/created/` public + steward QRs, download, handoff link |
+| **S7** | Dual-QR print materials | **Shipped** | `/created/` public + steward QRs — RC-1 encode guard in `qr-encode-url-core.mjs` |
 | **S8** | Native app / Universal Links | Future | Camera opens app when installed |
 
 ### S1 — Clipboard handoff (shipped)

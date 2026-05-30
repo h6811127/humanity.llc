@@ -3,28 +3,13 @@
  * Preview and download both use {@link renderHumanityQrFrameToCanvas} (finder mark + frame).
  */
 import { renderHumanityQrFrameToCanvas } from "./qr-branding.mjs";
-import { assertOfficialScanUrl } from "./qr-scan-url-lock.mjs";
-import { isAllowedStewardHandoffEncodeUrl } from "./steward-dual-qr-core.mjs";
+import { assertQrEncodeUrl } from "./qr-encode-url-core.mjs";
 
 /** `/created/` hero QR and inline previews (`renderQrToImage`). */
 export const QR_PREVIEW_RENDER_WIDTH = 220;
 
 /** Download PNG button (`downloadQrPng`). */
 export const QR_DOWNLOAD_RENDER_WIDTH = 512;
-
-/**
- * @param {string} text
- */
-function assertQrEncodeUrl(text) {
-  if (!text?.trim()) throw new Error("No URL to encode");
-  try {
-    assertOfficialScanUrl(text);
-    return;
-  } catch {
-    if (isAllowedStewardHandoffEncodeUrl(text)) return;
-    throw new Error("URL is not an official scan or steward handoff link");
-  }
-}
 
 /**
  * @param {string} text

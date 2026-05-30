@@ -631,8 +631,10 @@ function hexToRgb(hex) {
  * @param {number} qrWidth module square size in px
  */
 export async function renderHumanityQrFrameToCanvas(text, qrWidth) {
-  const { assertOfficialScanUrl } = await import("./qr-scan-url-lock.mjs");
-  assertOfficialScanUrl(text);
+  const { assertQrEncodeUrl, credentialCodeForEncodeUrl } = await import(
+    "./qr-encode-url-core.mjs"
+  );
+  assertQrEncodeUrl(text);
   const qrCanvas = document.createElement("canvas");
   const QRCode = (await import("./vendor/qrcode.mjs")).default;
   await QRCode.toCanvas(qrCanvas, text, { ...QR_BRANDED_RENDER_OPTIONS, width: qrWidth });
@@ -646,9 +648,8 @@ export async function renderHumanityQrFrameToCanvas(text, qrWidth) {
     qrCtx.fillRect(0, 0, qrWidth, qrWidth);
     qrCtx.restore();
   }
-  const { credentialCodeFromScanUrl } = await import("./qr-credential-code.mjs");
   const m = qrFrameMetrics(qrWidth, {
-    credentialCode: credentialCodeFromScanUrl(text),
+    credentialCode: credentialCodeForEncodeUrl(text),
   });
   // The created-page preview rounds the `<img>` element with a fixed border-radius,
   // which can clip artwork that touches the canvas edges. Add "quiet padding"

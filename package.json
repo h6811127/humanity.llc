@@ -61,7 +61,7 @@
     "worker:test:scan-actor-band": "vitest run worker/tests/scan-actor-band-core.test.ts",
     "worker:test:ai-explain": "vitest run worker/tests/ai-explain-core.test.ts worker/tests/ai-explain-snapshot.test.ts",
     "worker:test:ai-draft": "vitest run worker/tests/ai-draft-core.test.ts worker/tests/ai-draft-manifesto.test.ts",
-    "worker:test:qr-branding": "vitest run worker/tests/scan-qr-branding.test.ts worker/tests/qr-render-contract.test.ts worker/tests/qr-print-sticker.test.ts",
+    "worker:test:qr-branding": "vitest run worker/tests/scan-qr-branding.test.ts worker/tests/qr-render-contract.test.ts worker/tests/qr-encode-url-core.test.ts worker/tests/qr-print-sticker.test.ts",
     "worker:test:scan-page-dot": "vitest run worker/tests/scan-page-dot-core.test.ts worker/tests/scan-page-dot-glance-core.test.ts worker/tests/scan-page-dot-contract.test.ts worker/tests/device-dot-state.test.ts",
     "worker:test:watch": "vitest",
     "e2e": "playwright test",
