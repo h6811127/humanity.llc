@@ -3,7 +3,13 @@
  * Default on until the user turns it off (`hc_auto_save_device` = "0").
  * @see docs/CARD_WORKSPACE_PHASE0.md
  */
-export const AUTO_SAVE_KEY = "hc_auto_save_device";
+import {
+  autoSaveEnabledFromStorage,
+  autoSaveToggleSub,
+  AUTO_SAVE_KEY,
+} from "./device-prefs-boot-core.mjs";
+
+export { AUTO_SAVE_KEY, autoSaveEnabledFromStorage };
 export const AUTO_SAVE_FAILED_KEY = "hc_auto_save_failed";
 
 /** @param {string} profileId */
@@ -50,14 +56,6 @@ export function isAutoSaveFailed(profileId) {
   }
 }
 
-/**
- * @param {string | null} stored `localStorage` value for {@link AUTO_SAVE_KEY}
- */
-export function autoSaveEnabledFromStorage(stored) {
-  if (stored === "0") return false;
-  return true;
-}
-
 export function isAutoSaveEnabled() {
   return autoSaveEnabledFromStorage(localStorage.getItem(AUTO_SAVE_KEY));
 }
@@ -77,9 +75,7 @@ export function initAutoSaveToggle() {
     const sub = btn.querySelector(".list-sub");
     if (title && sub) {
       title.textContent = "Auto-save";
-      sub.textContent = on
-        ? "On · new cards stay on this device (default)"
-        : "Off · save manually after each create";
+      sub.textContent = autoSaveToggleSub(on);
     } else {
       btn.textContent = on
         ? "Auto-save on · new cards stay on this device (default)"

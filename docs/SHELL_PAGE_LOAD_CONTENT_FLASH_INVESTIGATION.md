@@ -1,6 +1,6 @@
 # Shell page load content flash — investigation
 
-**Status:** RC-1–RC-14 **shipped** (2026-05-30)  
+**Status:** RC-1–RC-16 **shipped** (2026-05-30)  
 **Date:** 2026-05-30  
 **Reported symptom:** Opening any shell or device page shows wrong or “random” data for a brief moment, then content disappears or is replaced with local device truth. Distracting and ugly.  
 **Related:** [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md) (stub → archive) · [`HUB_CARD_SAFARI_RELIABILITY.md`](HUB_CARD_SAFARI_RELIABILITY.md) · [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH_QA_2026-05-26.md) · [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) · [`CREATED_QR_BOOTSTRAP_FIX.md`](CREATED_QR_BOOTSTRAP_FIX.md)
@@ -306,6 +306,30 @@ Any step that paints before the next step completes can flash “wrong” data.
 
 ---
 
+### RC-15 · Landing settings toggles flash wrong On/Off — **Shipped**
+
+**Surfaces:** Landing `/` **Shortcuts & settings** (`#landing-device-settings`).
+
+**Mechanism (historical):** Settings rows were not `device-boot-gated`. Static HTML used mismatched defaults (e.g. auto-save **Off** while storage default is **On**). Module `sync()` ran after first paint; browser alerts synced even later via `device-status.mjs` → `initBrowserNotifications()`.
+
+**Fix:** `device-prefs-boot-core.mjs` (shared toggle copy) · `device-prefs-boot.mjs` (`applyDevicePrefsBootToDocument`) · head inline sets `html[data-prefs-boot=ready]` · `.device-prefs-boot-gated` CSS · neutral `…` placeholders in HTML · `landing-device-hub.mjs` applies prefs before hub init. Existing `*-prefs.mjs` and `syncBrowserNotifToggleButtons` reuse core copy helpers.
+
+**Evidence:** `site/index.html` · `site/css/device-shell.css` · `site/js/device-prefs-boot*.mjs`. Tests: `worker/tests/device-prefs-boot-core.test.ts`.
+
+---
+
+### RC-16 · Wallet child-object full list rebuild — **Shipped**
+
+**Surfaces:** `/wallet/` and expanded hub saved list (general root cards with nested objects).
+
+**Mechanism (historical):** After `reconcileChildObjectsForProfileIds()` network fetch, `scheduleHubChildObjectReconcile` called full `renderSavedRows()` (`savedList.innerHTML = ""`), repainting root + child rows even when only child metadata changed.
+
+**Fix:** `hub-child-object-patch-core.mjs` (signature + patch plan) · `patchHubChildObjectRowsForProfile(s)` in `device-hub-ui.mjs` — add/remove/reorder child `li` nodes in place; full re-render only when parent row missing. Per-profile signatures skip no-op reconciles.
+
+**Evidence:** `device-hub-ui.mjs` `scheduleHubChildObjectReconcile`, `syncHubChildObjectRowSignatures`. Tests: `worker/tests/hub-child-object-patch-core.test.ts`.
+
+---
+
 ## Surface matrix (quick reference)
 
 | Surface | Primary RC IDs | First paint source | Stabilizes when |
@@ -314,8 +338,9 @@ Any step that paints before the next step completes can flash “wrong” data.
 | Hub saved cards | RC-4, RC-5, RC-7, RC-11 | Summary/cache + innerHTML | Network poll + chrome refresh |
 | Status dot | RC-3, RC-6, RC-14 | Core offline paint | Full status + health fetch |
 | Scan hero | RC-8 | SSR + pending class | `scan-live-check-arrive` settle (SSR fast path skips checking hold) |
-| Wallet page | RC-4, RC-7, RC-10 | Same hub patterns | Poll + wallet-page-chrome |
-| Landing `/` | RC-3, RC-5, RC-7 | Stranger hub HTML | Wallet count + status bootstrap |
+| Wallet page | RC-4, RC-7, RC-10, RC-16 | Same hub patterns | Poll + wallet-page-chrome; child rows patch in place |
+| Landing `/` | RC-3, RC-5, RC-7, RC-15 | Stranger hub HTML + settings HTML defaults | Wallet count + status bootstrap; prefs boot before hub |
+| Landing settings | RC-15 | Static list-sub placeholders | `applyDevicePrefsBootToDocument` + `data-prefs-boot=ready` |
 
 ---
 
@@ -333,6 +358,7 @@ Any step that paints before the next step completes can flash “wrong” data.
 
 ```bash
 npm run worker:test:shell-boot
+npm run worker:test -- worker/tests/device-prefs-boot-core.test.ts worker/tests/hub-child-object-patch-core.test.ts
 npm run worker:test:scan-live-check-arrive
 npm run worker:test -- worker/tests/device-status-shell-modules.test.ts
 ```
@@ -345,7 +371,7 @@ After status-graph or hub network changes, also run dot/inbox E2E per [`DEVICE_O
 
 - Does not replace feature-specific postmortems (card-disabled, cross-tab, status-dot load failure).
 - Does not propose splitting the device shell into a separate app — only documents why the current **HTML + deferred JS** architecture produces the reported flashes.
-- RC-12+ fixes remain future work unless noted **Shipped** in § Suggested doc cross-links.
+- RC-17+ (e.g. split `local` vs `network` boot) remain future work unless noted **Shipped** in § Suggested doc cross-links.
 
 ---
 
@@ -368,6 +394,8 @@ After status-graph or hub network changes, also run dot/inbox E2E per [`DEVICE_O
 | bfcache / standalone resume flash | **Shipped (RC-12)** — `pageshow` persisted re-enters boot pending; immediate chrome refresh · shell v77 |
 | Setup Manage discoverability | **Shipped (RC-13)** — setup hint + done panel Live/Manage copy; Advanced tab strings → Manage |
 | Dot view-transition load flash | **Shipped (RC-14)** — skip `startViewTransition` during boot / unchanged dot state · shell v78 |
+| Landing settings On/Off flash | **Shipped (RC-15)** — `data-prefs-boot`, prefs boot core, gated settings section |
+| Child object list rebuild flash | **Shipped (RC-16)** — incremental child row patch after network reconcile |
 
 ---
 
@@ -393,3 +421,4 @@ After status-graph or hub network changes, also run dot/inbox E2E per [`DEVICE_O
 | 2026-05-30 | RC-12 fix: bfcache resume re-enters boot pending + immediate chrome refresh; /created/ re-poll · shell v77 · `created.mjs?v=78` |
 | 2026-05-30 | RC-13 fix: setup Manage tab hint + Live/Manage done copy; user-facing Advanced tab pointers → Manage · `created.mjs?v=79` |
 | 2026-05-30 | RC-14 fix: skip dot View Transitions during boot and unchanged state · shell v78 |
+| 2026-05-30 | RC-15 fix: landing settings prefs boot + shared toggle copy · RC-16 fix: incremental hub child-object row patch |

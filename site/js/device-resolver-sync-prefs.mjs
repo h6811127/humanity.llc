@@ -2,6 +2,7 @@
  * Landing Shortcuts & settings — resolver tab sync (Phase 2).
  * @see docs/DEVICE_TAB_RESOLVER_SYNC.md
  */
+import { resolverSyncToggleSub } from "./device-prefs-boot-core.mjs";
 import { refreshResolverChecksFromHub } from "./device-hub-ui.mjs";
 import {
   readResolverSyncTabsPref,
@@ -18,9 +19,7 @@ export function initResolverSyncTabsToggle() {
     const sub = btn.querySelector(".list-sub");
     if (title && sub) {
       title.textContent = "Share network checks";
-      sub.textContent = on
-        ? "On · other tabs use the same last check"
-        : "Off · each tab checks on its own";
+      sub.textContent = resolverSyncToggleSub(on);
     }
     btn.setAttribute("aria-pressed", on ? "true" : "false");
   }

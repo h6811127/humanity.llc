@@ -2,19 +2,16 @@
  * Quiet tab rehydrate device prefs (D10 Tier 2).
  * @see docs/QUIET_TAB_REHYDRATE.md
  */
+import {
+  quietTabRehydrateEnabledFromStorage,
+  quietTabRehydrateToggleSub,
+  QUIET_TAB_REHYDRATE_KEY,
+} from "./device-prefs-boot-core.mjs";
 
-export const QUIET_TAB_REHYDRATE_KEY = "hc_quiet_tab_rehydrate";
+export { QUIET_TAB_REHYDRATE_KEY, quietTabRehydrateEnabledFromStorage };
 export const LAST_ACTIVE_PROFILE_KEY = "hc_last_active_profile_id";
 export const QUIET_TAB_REHYDRATED_PROFILE_KEY = "hc_quiet_tab_rehydrated_profile";
 export const QUIET_TAB_REHYDRATE_CHANGED = "hc-quiet-tab-rehydrate-changed";
-
-/**
- * @param {string | null} stored `localStorage` value for {@link QUIET_TAB_REHYDRATE_KEY}
- */
-export function quietTabRehydrateEnabledFromStorage(stored) {
-  if (stored === "0") return false;
-  return true;
-}
 
 export function isQuietTabRehydrateEnabled() {
   return quietTabRehydrateEnabledFromStorage(localStorage.getItem(QUIET_TAB_REHYDRATE_KEY));
@@ -89,9 +86,7 @@ export function initQuietTabRehydrateToggle() {
     const sub = btn.querySelector(".list-sub");
     if (title && sub) {
       title.textContent = "Open last object in new tabs";
-      sub.textContent = on
-        ? "On · new tabs continue your last object (default)"
-        : "Off · pick an object when you open a new tab";
+      sub.textContent = quietTabRehydrateToggleSub(on);
     } else {
       btn.textContent = on
         ? "Open last object in new tabs · on (default)"

@@ -3,6 +3,10 @@
  * @see docs/DEVICE_INBOX.md phases 4+
  */
 import {
+  browserNotifTogglePressed,
+  browserNotifToggleSub,
+} from "./device-prefs-boot-core.mjs";
+import {
   inboxKindAllowsOsNotification,
   isBrowserNotifEnabled as readBrowserNotifEnabled,
   osNotificationContentForLiveProof,
@@ -211,21 +215,16 @@ export function syncBrowserNotifPrompts() {
 function syncBrowserNotifToggleButtons() {
   const on = isBrowserNotifEnabled();
   const perm = notificationPermission();
+  const permState =
+    perm === "granted" || perm === "denied" ? perm : perm === "unsupported" ? "unsupported" : "default";
   document.querySelectorAll("[data-device-browser-notif-toggle]").forEach((btn) => {
     if (!(btn instanceof HTMLButtonElement)) return;
-    btn.setAttribute("aria-pressed", on && perm === "granted" ? "true" : "false");
+    btn.setAttribute("aria-pressed", browserNotifTogglePressed(on, permState) ? "true" : "false");
     const title = btn.querySelector(".list-title");
     const sub = btn.querySelector(".list-sub");
     if (title && sub) {
       title.textContent = "Browser alerts";
-      sub.textContent =
-        perm === "unsupported"
-          ? "Not supported in this browser"
-          : on && perm === "granted"
-            ? "On · live proof in background"
-            : perm === "denied"
-              ? "Blocked · enable in system settings"
-              : "Off · tap to allow";
+      sub.textContent = browserNotifToggleSub(on, permState);
     } else {
       btn.textContent =
         !on

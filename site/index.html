@@ -28,6 +28,13 @@
         }
       })();
       (function () {
+        try {
+          document.documentElement.setAttribute("data-prefs-boot", "ready");
+        } catch (e) {
+          /* ignore */
+        }
+      })();
+      (function () {
         if (location.hostname === "www.humanity.llc") {
           location.replace(
             "https://humanity.llc" +
@@ -726,7 +733,7 @@
         </section>
 
         <section
-          class="landing-device-settings"
+          class="landing-device-settings device-prefs-boot-gated"
           id="landing-device-settings"
           aria-labelledby="landing-device-settings-title"
         >
@@ -747,7 +754,7 @@
                 </span>
                 <span class="list-content">
                   <span class="list-title">Appearance</span>
-                  <span class="list-sub">Light · OLED black available</span>
+                  <span class="list-sub">…</span>
                 </span>
                 <span class="list-chevron list-chevron--spacer" aria-hidden="true">›</span>
               </button>
@@ -763,7 +770,7 @@
                 </span>
                 <span class="list-content">
                   <span class="list-title">Browser alerts</span>
-                  <span class="list-sub">Live proof waiting · off</span>
+                  <span class="list-sub">…</span>
                 </span>
                 <span class="list-chevron list-chevron--spacer" aria-hidden="true">›</span>
               </button>
@@ -778,7 +785,7 @@
                 </span>
                 <span class="list-content">
                   <span class="list-title">Share network checks</span>
-                  <span class="list-sub">On · other tabs use the same last check</span>
+                  <span class="list-sub">…</span>
                 </span>
                 <span class="list-chevron list-chevron--spacer" aria-hidden="true">›</span>
               </button>
@@ -829,7 +836,7 @@
                 </span>
                 <span class="list-content">
                   <span class="list-title">Auto-save</span>
-                  <span class="list-sub">Off · save after each create</span>
+                  <span class="list-sub">…</span>
                 </span>
                 <span class="list-chevron list-chevron--spacer" aria-hidden="true">›</span>
               </button>
@@ -841,7 +848,7 @@
                 </span>
                 <span class="list-content">
                   <span class="list-title">Open last object in new tabs</span>
-                  <span class="list-sub">On · new tabs continue your last object (default)</span>
+                  <span class="list-sub">…</span>
                 </span>
                 <span class="list-chevron list-chevron--spacer" aria-hidden="true">›</span>
               </button>
@@ -1241,7 +1248,7 @@
     </dialog>
     <script src="/js/landing-focus.mjs?v=3" type="module"></script>
     <script src="/js/device-status-bootstrap.mjs?v=79" type="module"></script>
-    <script src="/js/landing-device-hub.mjs?v=13" type="module"></script>
+    <script src="/js/landing-device-hub.mjs?v=14" type="module"></script>
     <script src="/js/landing-showcase.mjs?v=2" type="module"></script>
     <script src="/js/landing-showcase-live-object.mjs?v=1" type="module"></script>
     <script src="/js/landing-showcase-lost-item.mjs?v=1" type="module"></script>

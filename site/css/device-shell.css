@@ -3019,6 +3019,15 @@ body[data-boot="ready"] .device-boot-gated {
   visibility: visible;
 }
 
+/* RC-15 — landing settings hidden until prefs boot marks html data-prefs-boot=ready */
+html:not([data-prefs-boot="ready"]) .device-prefs-boot-gated {
+  visibility: hidden;
+}
+
+html[data-prefs-boot="ready"] .device-prefs-boot-gated {
+  visibility: visible;
+}
+
 /* RC-3 — status dot hidden until health + session bootstrap settles */
 #brand-status-dot-btn[data-dot-boot="pending"] .shell-status-dot {
   visibility: hidden;

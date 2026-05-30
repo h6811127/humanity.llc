@@ -2,6 +2,7 @@
  * Device appearance: light vs pure-black dark (OLED-friendly).
  * Preference: localStorage `hc_theme` = `light` | `dark`.
  */
+import { themeTogglePressed, themeToggleSub } from "./device-prefs-boot-core.mjs";
 
 const STORAGE_KEY = "hc_theme";
 
@@ -52,13 +53,12 @@ function syncThemeToggleButtons(theme) {
   const pref = theme ?? getThemePreference();
   document.querySelectorAll("[data-device-theme-toggle]").forEach((btn) => {
     if (!(btn instanceof HTMLButtonElement)) return;
-    btn.setAttribute("aria-pressed", pref === "dark" ? "true" : "false");
+    btn.setAttribute("aria-pressed", themeTogglePressed(pref) ? "true" : "false");
     const title = btn.querySelector(".list-title");
     const sub = btn.querySelector(".list-sub");
     if (title && sub) {
       title.textContent = "Appearance";
-      sub.textContent =
-        pref === "dark" ? "Dark · OLED black" : "Light · default";
+      sub.textContent = themeToggleSub(pref);
     } else {
       btn.textContent = themeToggleLabel(pref);
     }

@@ -117,6 +117,12 @@ import {
 } from "./hub-child-object-row-core.mjs";
 import { reconcileChildObjectsForProfileIds } from "./child-object-reconcile.mjs";
 import { CHILD_OBJECTS_STORAGE_KEY } from "./child-object-store-core.mjs";
+import {
+  childObjectPatchPlan,
+  childObjectRowSignature,
+  childObjectRowsUnchanged,
+  hubChildObjectRowElementsForProfile,
+} from "./hub-child-object-patch-core.mjs";
 import { humanTrustIconMeta, isEligibleVoucherState } from "./human-trust-ui.mjs";
 import { objectTypeLabelFromContext } from "./object-taxonomy-core.mjs";
 import { purgePresenceForProfile } from "./device-tab-presence.mjs";
@@ -306,6 +312,8 @@ let hubConfig = {
 /** Bumped when saved-card DOM is replaced or a new network fetch starts; stale fetches must not apply. */
 let walletNetworkApplyGen = 0;
 let hubChildObjectReconcileGen = 0;
+/** @type {Map<string, string>} */
+const hubChildObjectSigByProfile = new Map();
 let expandedSummaryRowLimit = LARGE_HUB_SUMMARY_ROW_INITIAL_LIMIT;
 let expandedSummaryWalletFingerprint = null;
 /** @type {HTMLElement | null} */
@@ -1449,8 +1457,126 @@ function appendHubChildObjectRowsForRoot(parentEntry, ctx) {
 }
 
 /**
+ * @param {string} profileId
+ */
+function hubRootCardListItem(profileId) {
+  if (!savedList || !profileId) return null;
+  const escaped = CSS.escape(profileId);
+  const row = savedList.querySelector(
+    `li.hub-card-item[data-profile-id="${escaped}"]:not([data-child-object-id])`
+  );
+  return row instanceof HTMLElement ? row : null;
+}
+
+/**
+ * @param {Record<string, unknown>} parentEntry
+ * @param {{ fullRows: boolean, expandedRows: boolean, previewRows: boolean }} ctx
+ */
+function patchHubChildObjectRowsForProfile(parentEntry, ctx) {
+  if (!savedList) return false;
+  const profileId =
+    typeof parentEntry.profile_id === "string" ? parentEntry.profile_id : "";
+  if (!profileId) return false;
+
+  const parentLi = hubRootCardListItem(profileId);
+  if (!parentLi) return false;
+
+  const nextRows = listHubChildObjectsForDisplay(localStorage, profileId);
+  const nextSig = childObjectRowSignature(nextRows);
+  const prevSig = hubChildObjectSigByProfile.get(profileId) ?? "";
+  if (childObjectRowsUnchanged(prevSig, nextSig)) return true;
+
+  const existingEls = hubChildObjectRowElementsForProfile(savedList, profileId);
+  const existingIds = existingEls
+    .map((el) => el.dataset.childObjectId ?? "")
+    .filter(Boolean);
+  const nextIds = nextRows
+    .map((row) => String(row.object_id ?? "").trim())
+    .filter(Boolean);
+  const plan = childObjectPatchPlan(existingIds, nextIds);
+
+  if (!plan.changed && existingIds.length === nextIds.length) {
+    hubChildObjectSigByProfile.set(profileId, nextSig);
+    return true;
+  }
+
+  for (const id of plan.toRemove) {
+    const el = existingEls.find((node) => node.dataset.childObjectId === id);
+    el?.remove();
+  }
+
+  const keepById = new Map(
+    hubChildObjectRowElementsForProfile(savedList, profileId).map((el) => [
+      el.dataset.childObjectId ?? "",
+      el,
+    ])
+  );
+
+  let insertAfter = parentLi;
+  for (const childRow of nextRows) {
+    const objectId = String(childRow.object_id ?? "").trim();
+    if (!objectId) continue;
+    let li = keepById.get(objectId);
+    if (li) {
+      const fresh = buildHubChildObjectRowElement(parentEntry, childRow, {
+        fullRows: ctx.fullRows,
+        expandedRows: ctx.expandedRows,
+      });
+      li.replaceWith(fresh);
+      li = fresh;
+      keepById.set(objectId, li);
+    } else {
+      li = buildHubChildObjectRowElement(parentEntry, childRow, {
+        fullRows: ctx.fullRows,
+        expandedRows: ctx.expandedRows,
+      });
+    }
+    insertAfter.insertAdjacentElement("afterend", li);
+    insertAfter = li;
+  }
+
+  hubChildObjectSigByProfile.set(profileId, nextSig);
+  return true;
+}
+
+/**
+ * @param {string[]} profileIds
+ * @param {{ fullRows: boolean, expandedRows: boolean, previewRows: boolean }} ctx
+ */
+function patchHubChildObjectRowsForProfiles(profileIds, ctx) {
+  if (!shouldRenderHubChildObjectRows(ctx.fullRows, ctx.previewRows)) return true;
+  let allOk = true;
+  for (const profileId of profileIds) {
+    const entry = findWalletEntryByProfileId(profileId);
+    if (!entry || !isGeneralRootWalletEntry(entry)) continue;
+    if (!patchHubChildObjectRowsForProfile(entry, ctx)) allOk = false;
+  }
+  if (allOk) {
+    bindHubChildObjectRowHandlers();
+    applySearchFilter();
+  }
+  return allOk;
+}
+
+/**
  * @param {Array<Record<string, unknown>>} entries
- * @param {{ childReconciled?: boolean, fullRows: boolean, previewRows: boolean }} opts
+ */
+function syncHubChildObjectRowSignatures(entries) {
+  for (const entry of entries) {
+    if (!isGeneralRootWalletEntry(entry)) continue;
+    const profileId =
+      typeof entry.profile_id === "string" ? entry.profile_id : "";
+    if (!profileId) continue;
+    hubChildObjectSigByProfile.set(
+      profileId,
+      childObjectRowSignature(listHubChildObjectsForDisplay(localStorage, profileId))
+    );
+  }
+}
+
+/**
+ * @param {Array<Record<string, unknown>>} entries
+ * @param {{ childReconciled?: boolean, fullRows: boolean, previewRows: boolean, expandedRows?: boolean }} opts
  */
 function scheduleHubChildObjectReconcile(entries, opts) {
   if (opts.childReconciled || opts.previewRows) return;
@@ -1460,9 +1586,15 @@ function scheduleHubChildObjectReconcile(entries, opts) {
     .map((entry) => entry.profile_id)
     .filter((pid) => typeof pid === "string" && pid);
   if (!profileIds.length) return;
+  const ctx = {
+    fullRows: opts.fullRows,
+    expandedRows: opts.expandedRows ?? hubIsExpanded(),
+    previewRows: opts.previewRows,
+  };
   const gen = ++hubChildObjectReconcileGen;
   void reconcileChildObjectsForProfileIds(localStorage, profileIds).then(() => {
     if (gen !== hubChildObjectReconcileGen) return;
+    if (patchHubChildObjectRowsForProfiles(profileIds, ctx)) return;
     renderSavedRows({ childReconciled: true, fullRows: opts.fullRows, previewRows: opts.previewRows });
   });
 }
@@ -1542,6 +1674,7 @@ function renderSavedRows(opts = {}) {
   }
   if (!savedList || !savedGroup) return;
   savedList.dataset.walletRowsMode = fullRows ? "full" : "summary";
+  if (!opts.childReconciled) hubChildObjectSigByProfile.clear();
 
   const labelEl =
     savedGroup.querySelector(".device-hub-subgroup-label") ||
@@ -1725,10 +1858,12 @@ function renderSavedRows(opts = {}) {
   bindRevokedAlertHandlers();
   bindHubChildObjectRowHandlers();
 
+  syncHubChildObjectRowSignatures(allEntries);
   scheduleHubChildObjectReconcile(allEntries, {
     childReconciled: opts.childReconciled === true,
     fullRows,
     previewRows,
+    expandedRows,
   });
 
   if (previewRows) {
