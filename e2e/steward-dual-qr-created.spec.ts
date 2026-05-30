@@ -1,7 +1,9 @@
 /**
  * S7 dual-QR on /created/ — steward handoff canvas render + Print & share discovery (RC-2).
+ * Setup wizard Print step (`?fresh=1#setup-qr`) per CARD_WORKSPACE_UX.md.
  * @see docs/STEWARD_HANDOFF_QR_NOT_DISPLAYING_INVESTIGATION.md
  * @see docs/STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md § S7
+ * @see docs/CARD_WORKSPACE_UX.md § Mode gate (fresh=1)
  */
 import { test, expect } from "@playwright/test";
 
@@ -101,6 +103,41 @@ async function seedCreatedControlSession(page: import("@playwright/test").Page) 
   }, SAMPLE);
 }
 
+/** Post-create setup wizard (`?fresh=1`) with wallet already saved — `#setup-qr` Print step. */
+async function seedCreatedSetupFreshSession(page: import("@playwright/test").Page) {
+  await page.addInitScript((sample) => {
+    localStorage.removeItem("hc_setup_done");
+    localStorage.setItem(
+      "hc_wallet",
+      JSON.stringify([
+        {
+          id: "e2e_steward_dual_qr_setup",
+          label: "E2E Dual QR Setup",
+          profile_id: sample.profile_id,
+          qr_id: sample.qr_id,
+          handle: sample.handle,
+          manifesto_line: sample.manifesto_line,
+          scan_url: sample.scan_url,
+          owner_public_key_b58: sample.owner_public_key_b58,
+          owner_private_key_b58: sample.owner_private_key_b58,
+        },
+      ])
+    );
+    sessionStorage.setItem(
+      "hc_created",
+      JSON.stringify({
+        profile_id: sample.profile_id,
+        qr_id: sample.qr_id,
+        handle: sample.handle,
+        manifesto_line: sample.manifesto_line,
+        scan_url: sample.scan_url,
+        owner_public_key_b58: sample.owner_public_key_b58,
+        owner_private_key_b58: sample.owner_private_key_b58,
+      })
+    );
+  }, SAMPLE);
+}
+
 test.describe("/created/ steward dual-QR (S7)", () => {
   test.beforeEach(async ({ page }) => {
     await seedCreatedControlSession(page);
@@ -143,5 +180,39 @@ test.describe("/created/ steward dual-QR (S7)", () => {
     await page.locator("#created-print-steward-cta").click();
     await expect(page.locator("#created-deploy-full-qr")).toHaveAttribute("open", "");
     await expect(page.locator("#qr-img-steward")).toBeVisible();
+  });
+});
+
+test.describe("/created/ setup wizard steward dual-QR (S7 · fresh=1)", () => {
+  test.beforeEach(async ({ page }) => {
+    await seedCreatedSetupFreshSession(page);
+    await stubResolver(page);
+  });
+
+  test("Get your QR step renders steward handoff preview img with data URL", async ({ page }) => {
+    const url = `/created/?profile_id=${SAMPLE.profile_id}&qr_id=${SAMPLE.qr_id}&fresh=1#setup-qr`;
+    await page.goto(url);
+
+    await expect(page.locator("body")).toHaveAttribute("data-created-mode", "setup", {
+      timeout: 15_000,
+    });
+    await expect(page.locator("#created-setup-root")).toBeVisible();
+    await expect(page.locator("#created-control-root")).toBeHidden();
+    await expect(page.locator("#created-setup-panel-qr")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Get your QR" })).toBeVisible();
+
+    const publicPreview = page.locator("#created-setup-qr-preview");
+    const stewardPreview = page.locator("#created-setup-steward-qr-preview");
+    const publicImg = page.locator("#created-setup-qr-img");
+    const stewardImg = page.locator("#created-setup-steward-qr-img");
+
+    await expect(publicImg).toHaveAttribute("src", /^data:image\//, { timeout: 15_000 });
+    await expect(publicPreview).toBeVisible();
+    await expect(stewardImg).toHaveAttribute("src", /^data:image\//, { timeout: 15_000 });
+    await expect(stewardImg).not.toHaveAttribute("alt", /Could not generate/i);
+    await expect(stewardPreview).toBeVisible();
+    await expect(stewardPreview.locator(".created-setup-steward-qr-hint")).toContainText(
+      /Steward handoff/i
+    );
   });
 });

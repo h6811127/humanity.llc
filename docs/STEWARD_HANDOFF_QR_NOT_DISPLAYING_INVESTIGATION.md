@@ -33,7 +33,7 @@ Commit `8c2bde89` (scan URL normalization + setup preview markup) **does not fix
 | Live tab → **Full-size QR** (`#created-deploy-full-qr`) | **Yes** — `#created-steward-qr-col`, `#qr-img-steward` | Collapsed `<details>` by default; subtitle says “Public + steward QRs…” |
 | Live tab → **Print & share QR** | **No** | Public download only; no steward column in markup |
 | Live tab → **Download QR image** | **No** (public only) | “View full-size QR” scrolls to Full-size QR |
-| Setup wizard → **Get your QR** | **Yes** (after `8c2bde89`) | `#created-setup-steward-qr-preview` — same RC-1 render failure |
+| Setup wizard → **Get your QR** | **Yes** (after `8c2bde89`) | `#created-setup-steward-qr-preview` — E2E: `e2e:steward-dual-qr` · `#setup-qr` |
 | Live object card hero QR (`#created-live-qr-img`) | **No** | Public scan only by design |
 
 Returning stewards (**Open workspace** / **Open controls**) land in **control** mode on the **Live** tab ([`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) P0-4) — not setup step 2. They must expand **Full-size QR** to see steward materials; **Print & share QR** will never show steward handoff.
@@ -170,7 +170,7 @@ Expected today: **throws** (RC-1). After fix: exits 0 with data URL length logge
 |------|---------|--------|
 | `steward-dual-qr-core.test.ts` | URL material builders | Keep |
 | `qr-render-contract.test.ts` | Source grep for handoff guard | **Shipped** — integration in `qr-encode-url-core.test.ts` |
-| E2E | **`e2e/steward-dual-qr-created.spec.ts`** | `/created/` Full-size QR steward `img[src]` non-empty |
+| E2E | **`e2e/steward-dual-qr-created.spec.ts`** | Control Full-size QR + setup `#setup-qr` steward `img[src]` |
 
 ---
 
@@ -194,6 +194,7 @@ Expected today: **throws** (RC-1). After fix: exits 0 with data URL length logge
 | 2026-05-30 | S7 shipped (`2bdac7de`) — dual-QR UI + `qr-render` entry guard |
 | 2026-05-30 | Follow-up (`8c2bde89`) — `resolveDualQrScanUrl`, setup steward preview; **RC-1 still open** |
 | 2026-05-30 | **RC-1 fixed** — shared `qr-encode-url-core.mjs`; `renderHumanityQrFrameToCanvas` uses same guard as `qr-render.mjs` |
+| 2026-05-30 | **Post-close E2E** — setup wizard `#setup-qr` steward preview in `e2e/steward-dual-qr-created.spec.ts` |
 | 2026-05-30 | **Investigation closed** — `steward-scan-handoff:verify` exit gate |
 | 2026-05-30 | **P2 E2E shipped** — `e2e/steward-dual-qr-created.spec.ts` steward `img[src]` + Print & share CTA |
 | 2026-05-30 | **P2 RC-2 shipped** — Print & share cross-link to Full-size QR steward materials |
