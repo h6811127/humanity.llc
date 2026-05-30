@@ -1081,7 +1081,7 @@ function vouchIssuanceGroupRows(vm: ScanViewModel): string {
 function renderVouchIssuanceScript(vm: ScanViewModel, origin: string): string {
   if (vm.kind !== "active" || !vm.profileId) return "";
   const assetOrigin = pagesJsOrigin(origin);
-  const mod = JSON.stringify(`${assetOrigin}/js/vouch-issue.mjs?v=13`);
+  const mod = JSON.stringify(`${assetOrigin}/js/vouch-issue.mjs?v=15`);
   return `<script type="module" src=${mod}></script>`;
 }
 
@@ -1115,9 +1115,10 @@ function renderScanActorBand(vm: ScanViewModel, origin: string): string {
   if (vm.kind !== "active" || !vm.profileId || !vm.qrId) return "";
   const walletUrl = `${escapeHtml(origin)}/wallet/`;
   return `<section id="scan-actor-band" class="scan-actor-band scan-actor-band--hidden" hidden aria-label="Your device on this scan">
-  <h2 class="scan-actor-band-title">Keys on this device</h2>
+  <h2 class="scan-actor-band-title">Ownership on this device</h2>
   <p class="scan-actor-band-lead">You can vouch or open your cards from here.</p>
   <div class="scan-actor-band-actions">
+    <button type="button" class="scan-actor-band-primary" id="scan-actor-band-restore" hidden>Restore control here</button>
     <button type="button" class="scan-actor-band-primary" id="scan-actor-band-vouch">Go to vouch</button>
     <a class="scan-actor-band-secondary" href="${walletUrl}">My objects</a>
   </div>
@@ -1127,7 +1128,7 @@ function renderScanActorBand(vm: ScanViewModel, origin: string): string {
 function renderScanActorBandScript(vm: ScanViewModel, origin: string): string {
   if (vm.kind !== "active" || !vm.profileId) return "";
   const assetOrigin = pagesJsOrigin(origin);
-  const mod = JSON.stringify(`${assetOrigin}/js/scan-actor-band.mjs?v=1`);
+  const mod = JSON.stringify(`${assetOrigin}/js/scan-actor-band.mjs?v=2`);
   return `<script type="module" src=${mod}></script>`;
 }
 

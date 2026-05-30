@@ -1,7 +1,6 @@
 /**
  * Show setup wizard vs control tabs on /created/
  * @see docs/CARD_WORKSPACE_UX.md
- * @see docs/OWNERSHIP_RESTORE_UX_PLAN.md
  */
 
 import { createdControlRootVisibleForMode } from "./created-view-mode-core.mjs";

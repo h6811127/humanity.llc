@@ -8,9 +8,13 @@ import {
   emphasisCardShellHtml,
 } from "./device-emphasis-card-html.mjs";
 import { logDeviceActivity } from "./device-activity.mjs";
-import { activateWalletEntry, clearTabSessionKeys } from "./device-keys.mjs";
+import { clearTabSessionKeys } from "./device-keys.mjs";
 import { activateWalletEntryGated } from "./device-control-activation.mjs";
 import { controlActivationRequiresUnlock } from "./device-control-activation-core.mjs";
+import {
+  applyQuietRehydrateCrossTabDemotion,
+  trySoleSigningRowRehydrateForScan,
+} from "./device-quiet-tab-rehydrate.mjs";
 import {
   DEFAULT_VOUCH_STATEMENT,
   getCardStatusUrl,
@@ -28,6 +32,7 @@ import {
   isDefaultVouchProfile,
   isVouchAutoActivateEnabled,
 } from "./vouch-ready-keys.mjs";
+import { soleSigningVouchActivateEntry } from "./vouch-scan-sole-signing-activate-core.mjs";
 import {
   clearSignUnlock,
   getSignLock,
@@ -401,7 +406,7 @@ function mountUseKeysHereButtons(eligible) {
         btn.disabled = false;
         return;
       }
-      await runVouchFlow();
+      await runVouchFlow({ manualActivate: true });
     });
     explainerActions.appendChild(btn);
   }
@@ -478,6 +483,57 @@ function userSkippedAutoActivateOnThisScan() {
   }
 }
 
+/**
+ * @param {Record<string, unknown>} entry
+ * @returns {Promise<boolean>}
+ */
+async function walletEntryPassesVouchActivationGate(entry) {
+  if (!entry?.owner_private_key_b58 || !entry?.owner_public_key_b58) return false;
+  try {
+    const res = await fetch(
+      getCardStatusUrl(String(entry.profile_id), walletEntryQrId(entry)),
+      { cache: "no-store" }
+    );
+    if (!res.ok) return false;
+    const body = await res.json();
+    if (!isEligibleVoucherState(body?.scan?.verification?.state)) return false;
+    if (body?.scan?.card?.status !== "active") return false;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * @param {Record<string, unknown>} entry
+ * @param {string} activityKind
+ * @returns {Promise<boolean>}
+ */
+async function activateWalletEntryForVouchScan(entry, activityKind) {
+  const profileId = String(entry.profile_id || "");
+  if (!profileId) return false;
+  if (!(await walletEntryPassesVouchActivationGate(entry))) return false;
+
+  if (controlActivationRequiresUnlock(profileId)) {
+    const lock = getSignLock(profileId);
+    if (lock?.mode === "pin") return false;
+    const unlock = await unlockSignLock(profileId);
+    if (!unlock.ok) return false;
+  }
+
+  const result = await activateWalletEntryGated(entry);
+  if (!result.ok) return false;
+
+  applyQuietRehydrateCrossTabDemotion(profileId);
+
+  logDeviceActivity(
+    activityKind,
+    entry.label || entry.handle || profileId.slice(0, 12),
+    { profile_id: profileId, qr_id: walletEntryQrId(entry) }
+  );
+  return true;
+}
+
 async function tryAutoActivateDefaultVouchKeys(voucheeProfileId, opts = {}) {
   if (opts.skipAutoActivate || userSkippedAutoActivateOnThisScan()) return false;
   if (!isVouchAutoActivateEnabled()) return false;
@@ -486,40 +542,38 @@ async function tryAutoActivateDefaultVouchKeys(voucheeProfileId, opts = {}) {
   if (!defaultId || defaultId === voucheeProfileId) return false;
 
   const entry = loadWallet().find((e) => e.profile_id === defaultId);
-  if (!entry?.owner_private_key_b58 || !entry?.owner_public_key_b58) {
+  if (!entry) return false;
+
+  return activateWalletEntryForVouchScan(entry, "auto_activate_vouch_keys");
+}
+
+/** P0b-3: sole signing row on device — no default-vouch opt-in required. */
+async function tryAutoActivateSoleSigningWalletForVouch(voucheeProfileId, opts = {}) {
+  if (opts.skipAutoActivate || userSkippedAutoActivateOnThisScan()) return false;
+
+  const entry = soleSigningVouchActivateEntry(loadWallet(), voucheeProfileId);
+  if (!entry) return false;
+
+  return activateWalletEntryForVouchScan(entry, "auto_activate_vouch_keys_sole");
+}
+
+/** P0b-3: scan-tab-keys may rehydrate sole row before vouch-issue runs. */
+function vouchLoadedFromSoleSigningRow(voucherProfileId, voucheeProfileId) {
+  if (!voucherProfileId || isDefaultVouchProfile(voucherProfileId)) return false;
+  const sole = soleSigningVouchActivateEntry(loadWallet(), voucheeProfileId);
+  return sole?.profile_id === voucherProfileId;
+}
+
+function inferSoleSigningAutoLoad(voucherProfileId, voucheeProfileId, opts) {
+  if (opts.manualActivate || opts.skipAutoActivate) return false;
+  if (
+    opts.soleSigningActivated === true ||
+    opts.soleRowRehydrated === true ||
+    opts.quietRehydrateActivated === true
+  ) {
     return false;
   }
-
-  try {
-    const res = await fetch(
-      getCardStatusUrl(String(entry.profile_id), walletEntryQrId(entry)),
-      { cache: "no-store" }
-    );
-    if (!res.ok) return false;
-    const body = await res.json();
-    const state = body?.scan?.verification?.state;
-    if (!isEligibleVoucherState(state)) return false;
-    if (body?.scan?.card?.status !== "active") return false;
-  } catch {
-    return false;
-  }
-
-  if (controlActivationRequiresUnlock(defaultId)) {
-    const lock = getSignLock(defaultId);
-    if (lock?.mode === "pin") {
-      return false;
-    }
-    const unlock = await unlockSignLock(defaultId);
-    if (!unlock.ok) return false;
-  }
-
-  activateWalletEntry(entry);
-  logDeviceActivity(
-    "auto_activate_vouch_keys",
-    entry.label || entry.handle || String(entry.profile_id).slice(0, 12),
-    { profile_id: entry.profile_id, qr_id: walletEntryQrId(entry) }
-  );
-  return true;
+  return vouchLoadedFromSoleSigningRow(voucherProfileId, voucheeProfileId);
 }
 
 /**
@@ -768,6 +822,25 @@ async function runVouchFlow(opts = {}) {
     if (activated) {
       return runVouchFlow({ autoActivateAttempted: true });
     }
+    const soleActivated = await tryAutoActivateSoleSigningWalletForVouch(
+      voucheeProfileId,
+      opts
+    );
+    if (soleActivated) {
+      return runVouchFlow({ autoActivateAttempted: true, soleSigningActivated: true });
+    }
+    const rehydrated = await trySoleSigningRowRehydrateForScan();
+    if (
+      rehydrated.ok &&
+      typeof rehydrated.profileId === "string" &&
+      rehydrated.profileId !== voucheeProfileId
+    ) {
+      return runVouchFlow({
+        autoActivateAttempted: true,
+        quietRehydrateActivated: true,
+        soleRowRehydrated: true,
+      });
+    }
     await showNoKeysExplainer(voucheeProfileId);
     return;
   }
@@ -827,15 +900,22 @@ async function runVouchFlow(opts = {}) {
   });
   const toneHint =
     voucherState === "steward" ? "Steward on the network" : "Vouched Human on the network";
-  const autoLoaded =
+  const autoLoadedDefault =
     opts.autoActivateAttempted && isDefaultVouchProfile(voucherProfileId);
+  const autoLoadedSole =
+    opts.soleSigningActivated === true ||
+    opts.soleRowRehydrated === true ||
+    opts.quietRehydrateActivated === true ||
+    inferSoleSigningAutoLoad(voucherProfileId, voucheeProfileId, opts);
   const voucherDisplay =
     session.handle ? `@${session.handle}` : session.wallet_label || toneHint;
-  mountVouchStopButton(
-    autoLoaded
-      ? `Attesting as ${voucherDisplay} (default, auto-loaded)`
-      : `Attesting as ${voucherDisplay} · ${toneHint}`
-  );
+  let attestLabel = `Attesting as ${voucherDisplay} · ${toneHint}`;
+  if (autoLoadedDefault) {
+    attestLabel = `Attesting as ${voucherDisplay} (default, auto-loaded)`;
+  } else if (autoLoadedSole) {
+    attestLabel = `Attesting as ${voucherDisplay} (loaded from this device)`;
+  }
+  mountVouchStopButton(attestLabel);
   mountVouchSignLockUi(voucherProfileId);
 
   await mountVouchSwitchDefault(session);

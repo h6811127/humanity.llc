@@ -116,6 +116,8 @@ export function networkStatusChip(status, scanKind) {
  * After a fresh resolver fetch, update device baselines.
  * Skips only during active→revoked transition (alert visible until Got it).
  * Self-heal: a non-revoked fetch always updates baseline (recovers from stale cache).
+ * P0b-1: never seed baseline on in-visit poll when this device has no prior baseline
+ * for the profile (fresh create / first sight). Exit snapshot seeds baseline instead.
  * @param {Record<string, string>} statusMap
  * @param {Record<string, string>} lastSeenMap
  */
@@ -123,8 +125,10 @@ export function mergeLastSeenFromNetworkMap(statusMap, lastSeenMap) {
   const next = { ...lastSeenMap };
   for (const [profileId, status] of Object.entries(statusMap)) {
     if (!profileId || !status) continue;
+    const prior = lastSeenMap[profileId];
+    if (prior == null || prior === "") continue;
     const normalized = String(status).toLowerCase();
-    if (isRevokedSinceLastVisitFromBaseline(lastSeenMap[profileId], normalized)) {
+    if (isRevokedSinceLastVisitFromBaseline(prior, normalized)) {
       continue;
     }
     next[profileId] = normalized;

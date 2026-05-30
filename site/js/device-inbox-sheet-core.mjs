@@ -31,7 +31,12 @@ export function inboxSheetMountAllowed(doc) {
  * @returns {'close_sheet' | 'hide_backdrop' | 'none'}
  */
 export function inboxSheetReconcileAction(input) {
-  if (!input.sheetCollapsed) return "none";
+  if (!input.sheetCollapsed) {
+    if (!input.bodySheetOpen && !input.chromeInboxLocked && !input.sheetOpenFlag) {
+      return "close_sheet";
+    }
+    return "none";
+  }
   if (input.bodySheetOpen || input.chromeInboxLocked || input.sheetOpenFlag) {
     return "close_sheet";
   }

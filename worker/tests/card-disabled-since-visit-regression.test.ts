@@ -17,6 +17,7 @@ import {
 import {
   CARD_REVOKED_ALERT_STATE,
   cardDisabledSinceVisitVisible,
+  isRevokedSinceLastVisitFromBaseline,
   listCardDisabledSinceVisit,
   shouldShowCardDisabledSinceVisitAlert,
 } from "../../site/js/wallet-network-baseline.mjs";
@@ -104,5 +105,33 @@ describe("card-disabled since-visit regression gates (Slice 8)", () => {
     );
     const walletRow = plan.find((r) => r.type === "wallet");
     expect(walletRow?.type === "wallet" && walletRow.revokedHint).toBe(false);
+  });
+});
+
+describe("P0b-1 fresh create hub row (R10)", () => {
+  it("never treats missing baseline as a since-visit transition", () => {
+    expect(isRevokedSinceLastVisitFromBaseline(null, CARD_REVOKED_ALERT_STATE)).toBe(false);
+    expect(isRevokedSinceLastVisitFromBaseline("", CARD_REVOKED_ALERT_STATE)).toBe(false);
+    expect(
+      shouldShowCardDisabledSinceVisitAlert(CARD_REVOKED_ALERT_STATE, null, {
+        resolverConfirmed: true,
+      })
+    ).toBe(false);
+    expect(
+      cardDisabledSinceVisitVisible(CARD_REVOKED_ALERT_STATE, null, CARD_REVOKED_ALERT_STATE, true)
+    ).toBe(false);
+  });
+
+  it("does not list fresh-create rows when resolver confirms active", () => {
+    const wallet = [{ profile_id: PROFILE, label: "Fresh create" }];
+    expect(
+      listCardDisabledSinceVisit(
+        wallet,
+        { [PROFILE]: "active" },
+        { [PROFILE]: "active" },
+        { [PROFILE]: "active" },
+        { [PROFILE]: true }
+      )
+    ).toEqual([]);
   });
 });

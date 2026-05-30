@@ -2,11 +2,12 @@
  * Bottom sheet host for #device-hub on shell pages.
  */
 import { prefersReducedMotion } from "./device-shell-motion.mjs";
-import { hubSheetReconcileAction } from "./device-hub-sheet-core.mjs?v=63";
+import { hubSheetReconcileAction } from "./device-hub-sheet-core.mjs?v=70";
 import {
   bindSheetLifecycleReconcile,
+  syncInboxBackdropForOpenHub,
   syncSheetBackdropClosed,
-} from "./device-sheet-backdrop-sync.mjs?v=63";
+} from "./device-sheet-backdrop-sync.mjs?v=70";
 import { LIVE_CONTROL_POLL_SCOPE_CHANGED } from "./device-live-control-inbox.mjs";
 
 const HUB_OPEN_KEY = "hc_hub_open";
@@ -68,6 +69,7 @@ export function setHubSheetOpen(open) {
 
 /** Clear body/backdrop when hub DOM is collapsed but sheet-open classes stuck (bfcache, etc.). */
 export function reconcileHubSheetState() {
+  syncInboxBackdropForOpenHub();
   if (!isHubSheet() || !hub) return;
 
   ensureBackdrop();

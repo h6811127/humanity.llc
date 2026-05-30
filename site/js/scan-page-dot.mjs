@@ -14,11 +14,10 @@ import {
 } from "./device-dot-state-core.mjs?v=56";
 import { fetchResolverHealth } from "./device-network-health.mjs";
 import { getTabSession } from "./device-keys.mjs";
-import { activateWalletEntryGated } from "./device-control-activation.mjs";
-import { isWalletSaved, loadWallet, loadWalletSummary } from "./device-wallet.mjs";
+import { activateRestoreControlInThisTab } from "./device-ownership-restore-in-tab.mjs";
+import { isWalletSaved, loadWalletSummary } from "./device-wallet.mjs";
 import { getInboxOverlayCounts } from "./device-inbox.mjs?v=56";
 import { resolverApiOrigin } from "./hc-sign.mjs";
-import { getDefaultVouchProfileId } from "./vouch-ready-keys.mjs";
 import {
   scanCrossTabOverlayCount,
   scanDotMarkFirstDevice,
@@ -31,7 +30,7 @@ import {
   syncScanOperatorFamiliarFromWallet,
 } from "./scan-operator-familiar.mjs";
 import { getCrossTabScanSnapshot } from "./device-cross-tab-state.mjs";
-import { actOnOtherTabKeys, walletEntryForProfile } from "./device-notice-nav.mjs";
+import { actOnOtherTabKeys } from "./device-notice-nav.mjs";
 import {
   renderScanDotExplainerHtml,
   scanGlancePrimaryAction,
@@ -111,10 +110,6 @@ function hasStewardReadyKeys() {
     return true;
   }
   return loadWalletSummary().stewardReady;
-}
-
-function savedCardsWithSigningKeys() {
-  return loadWallet().filter((entry) => Boolean(entry?.owner_private_key_b58));
 }
 
 function hasCreatedKeys() {
@@ -225,38 +220,13 @@ function scrollToVouchOrLiveProof() {
   scrollScanTarget("live-control-row");
 }
 
-function walletEntryForUseKeysHere() {
-  const defaultId = getDefaultVouchProfileId();
-  if (defaultId) {
-    const preferred = walletEntryForProfile(defaultId);
-    if (preferred?.owner_private_key_b58) return preferred;
-  }
-  return savedCardsWithSigningKeys()[0] ?? null;
-}
-
 function useKeysOnScan() {
-  const existing =
-    document.querySelector(".vouch-use-keys-here") ||
-    document.querySelector("[data-cross-tab-use-keys]");
-  if (existing instanceof HTMLElement) {
-    existing.click();
-    return;
-  }
-  const entry = walletEntryForUseKeysHere();
-  if (!entry) return;
-  void (async () => {
-    let result = await activateWalletEntryGated(entry);
-    if (!result.ok && result.needsPin) {
-      const pin = window.prompt("Enter PIN to take control in this tab:");
-      if (pin != null && pin.trim()) {
-        result = await activateWalletEntryGated(entry, { pin });
-      }
-    }
-    if (!result.ok) return;
-    window.dispatchEvent(new Event("hc-device-hub-changed"));
-    refreshScanPageDot();
-    scrollToVouchOrLiveProof();
-  })();
+  void activateRestoreControlInThisTab({
+    afterActivate: () => {
+      refreshScanPageDot();
+      scrollToVouchOrLiveProof();
+    },
+  });
 }
 
 function focusOtherTabFromScan() {

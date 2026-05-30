@@ -10,6 +10,16 @@ import {
   shouldHandoffToCustomize,
 } from "./merch-funnel-core.mjs";
 import { setLastActiveProfileId } from "./device-quiet-tab-rehydrate-prefs.mjs";
+import {
+  clearAutoSaveFailed,
+  isAutoSaveEnabled,
+  markAutoSaveFailed,
+} from "./device-auto-save.mjs";
+import {
+  applySyncAutoSaveResult,
+  shouldSyncAutoSaveBeforeCreateNavigate,
+} from "./created-device-save-core.mjs";
+import { defaultWalletLabel, saveSessionToWallet } from "./device-wallet.mjs";
 import { buildObjectStreamsFromFormRows } from "./object-streams-core.mjs";
 import {
   qrExpiryFromIssued,
@@ -295,39 +305,46 @@ export async function runCreateCard(input) {
 
   if (attributionRef) handoffMerchRefAfterCreate(attributionRef);
 
-  sessionStorage.setItem(
-    "hc_created",
-    JSON.stringify({
-      ...data,
-      manifesto_line: manifesto,
-      pilot_template: pilotTemplate,
-      qr_expires_at: expiresAt,
-      qr_validity_days: qrValidityDays,
-      has_organizer_revoke: !!organizerPublicKeyBase58,
-      ...(organizerPrivateKey
-        ? {
-            organizer_private_key_b58: encodePrivateKeyBase58(organizerPrivateKey),
-            organizer_public_key_b58: organizerPublicKeyBase58,
-          }
-        : organizerPublicKeyBase58
-          ? { organizer_public_key_b58: organizerPublicKeyBase58 }
-          : {}),
-      owner_public_key_b58: publicKeyBase58,
-      owner_private_key_b58: encodePrivateKeyBase58(privateKey),
-      ...(recoveryPublicKeyBase58
-        ? {
-            recovery_public_key_b58: recoveryPublicKeyBase58,
-            recovery_private_key_b58: encodePrivateKeyBase58(recoveryPrivateKey),
-          }
+  const session = {
+    ...data,
+    manifesto_line: manifesto,
+    pilot_template: pilotTemplate,
+    qr_expires_at: expiresAt,
+    qr_validity_days: qrValidityDays,
+    has_organizer_revoke: !!organizerPublicKeyBase58,
+    ...(organizerPrivateKey
+      ? {
+          organizer_private_key_b58: encodePrivateKeyBase58(organizerPrivateKey),
+          organizer_public_key_b58: organizerPublicKeyBase58,
+        }
+      : organizerPublicKeyBase58
+        ? { organizer_public_key_b58: organizerPublicKeyBase58 }
         : {}),
-      private_key_warning: true,
-      created_at: now,
-      handle,
-      ...(objectStreams.length ? { object_streams: objectStreams } : {}),
-      ...(sampleCard ? { sample_card: true } : {}),
-    })
-  );
+    owner_public_key_b58: publicKeyBase58,
+    owner_private_key_b58: encodePrivateKeyBase58(privateKey),
+    ...(recoveryPublicKeyBase58
+      ? {
+          recovery_public_key_b58: recoveryPublicKeyBase58,
+          recovery_private_key_b58: encodePrivateKeyBase58(recoveryPrivateKey),
+        }
+      : {}),
+    private_key_warning: true,
+    created_at: now,
+    handle,
+    ...(objectStreams.length ? { object_streams: objectStreams } : {}),
+    ...(sampleCard ? { sample_card: true } : {}),
+  };
+
+  sessionStorage.setItem("hc_created", JSON.stringify(session));
   setLastActiveProfileId(profileId);
+
+  if (shouldSyncAutoSaveBeforeCreateNavigate({ autoSaveEnabled: isAutoSaveEnabled(), session })) {
+    const saveResult = saveSessionToWallet(session, defaultWalletLabel(session));
+    applySyncAutoSaveResult(session, saveResult, {
+      markFailed: markAutoSaveFailed,
+      clearFailed: clearAutoSaveFailed,
+    });
+  }
 
   const created = new URL("/created/", location.origin);
   created.searchParams.set("profile_id", profileId);

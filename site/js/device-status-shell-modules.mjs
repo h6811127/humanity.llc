@@ -10,7 +10,7 @@
  * Bump on all shell HTML (`device-status-bootstrap.mjs?v=N`) and on every
  * `./peer.mjs?v=N` import between files in DEVICE_STATUS_SHELL_JS_FILES.
  */
-export const DEVICE_SHELL_ASSET_VERSION = 63;
+export const DEVICE_SHELL_ASSET_VERSION = 70;
 
 /** @deprecated Use DEVICE_SHELL_ASSET_VERSION */
 export const DEVICE_STATUS_BOOTSTRAP_CACHE_BUST = DEVICE_SHELL_ASSET_VERSION;
@@ -24,12 +24,16 @@ export const DEVICE_STATUS_SHELL_JS_FILES = [
   "device-status-bootstrap-inner.mjs",
   "device-status-load-error.mjs",
   "build-meta-browser.mjs",
+  "device-status-core.mjs",
   "device-status.mjs",
   "device-hub-intro-coachmark.mjs",
   "device-dot-state-core.mjs",
+  "device-ownership-not-in-tab-core.mjs",
   "device-chrome-refresh-core.mjs",
   "device-chrome-refresh.mjs",
   "device-inbox-sheet-loader.mjs",
+  "device-hub-sheet-loader.mjs",
+  "device-inbox-loader.mjs",
   "device-browser-notifications-loader.mjs",
   "device-inbox-sheet.mjs",
   "device-inbox-sheet-core.mjs",
@@ -51,6 +55,9 @@ export const DEVICE_STATUS_SHELL_JS_FILES = [
   "device-tab-presence.mjs",
   "device-wallet-removed-profiles-core.mjs",
   "device-wallet-removed-profiles.mjs",
+  "device-wallet-corrupt-core.mjs",
+  "device-pwa-session-mismatch-core.mjs",
+  "device-pwa-session-mismatch.mjs",
   "wallet-page-chrome.mjs",
   "device-resolver-sync-core.mjs",
   "device-resolver-sync.mjs",

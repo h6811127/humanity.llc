@@ -70,8 +70,28 @@ describe("resolveCreatedMode", () => {
     expect(stewardFocusKeyFromHash("#setup-qr")).toBe(null);
   });
 
-  it("syncSetupDoneForSavedProfile backfills hc_setup_done when wallet has a row", () => {
+  it("syncSetupDoneForSavedProfile backfills hc_setup_done when wallet has seatbelt", () => {
     const profileId = "profile-backfill-test";
+    storage.set(
+      "hc_wallet",
+      JSON.stringify([
+        {
+          id: "w1",
+          profile_id: profileId,
+          owner_private_key_b58: "priv",
+          owner_public_key_b58: "pub",
+          recovery_key_acknowledged: true,
+        },
+      ])
+    );
+    expect(isSetupDone(profileId)).toBe(false);
+    syncSetupDoneForSavedProfile(profileId);
+    expect(isSetupDone(profileId)).toBe(true);
+    expect(JSON.parse(storage.get(SETUP_DONE_KEY) || "{}")[profileId]).toBe(true);
+  });
+
+  it("syncSetupDoneForSavedProfile skips backfill without seatbelt", () => {
+    const profileId = "profile-no-seatbelt";
     storage.set(
       "hc_wallet",
       JSON.stringify([
@@ -83,10 +103,8 @@ describe("resolveCreatedMode", () => {
         },
       ])
     );
-    expect(isSetupDone(profileId)).toBe(false);
     syncSetupDoneForSavedProfile(profileId);
-    expect(isSetupDone(profileId)).toBe(true);
-    expect(JSON.parse(storage.get(SETUP_DONE_KEY) || "{}")[profileId]).toBe(true);
+    expect(isSetupDone(profileId)).toBe(false);
   });
 
   it("modeFromPage skips setup backfill during fresh post-create flow (P4)", () => {
@@ -109,7 +127,7 @@ describe("resolveCreatedMode", () => {
     expect(isSetupDone(profileId)).toBe(false);
   });
 
-  it("returns control for returning steward (saved on device, not fresh)", () => {
+  it("returns setup for saved steward without setup done or seatbelt (P0-4)", () => {
     expect(
       resolveCreatedMode({
         profileId: "abc",
@@ -117,6 +135,17 @@ describe("resolveCreatedMode", () => {
         freshParam: false,
         setupDone: false,
         walletSaved: true,
+        seatbeltSatisfied: false,
+      })
+    ).toBe("setup");
+    expect(
+      resolveCreatedMode({
+        profileId: "abc",
+        hasSigningKeys: true,
+        freshParam: false,
+        setupDone: false,
+        walletSaved: true,
+        seatbeltSatisfied: true,
       })
     ).toBe("control");
     expect(
@@ -126,6 +155,7 @@ describe("resolveCreatedMode", () => {
         freshParam: false,
         setupDone: true,
         walletSaved: true,
+        seatbeltSatisfied: false,
       })
     ).toBe("control");
   });

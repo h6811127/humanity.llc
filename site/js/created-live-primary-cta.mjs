@@ -62,13 +62,23 @@ export function initCreatedLivePrimaryCta(opts) {
   }
 
   function sync() {
-    if (document.body.dataset.createdMode !== "control") {
+    const mode = document.body.dataset.createdMode;
+    if (mode !== "control" && mode !== "view") {
       btn.hidden = true;
       if (subEl) subEl.hidden = true;
       return;
     }
 
-    const cta = resolveCreatedLivePrimaryCta(collectInput());
+    const input = collectInput();
+    const cta = resolveCreatedLivePrimaryCta(
+      mode === "view"
+        ? {
+            ...input,
+            hasSigningKeys: false,
+            liveProofPending: false,
+          }
+        : input
+    );
     btn.hidden = false;
     btn.textContent = cta.label;
     btn.dataset.livePrimaryMode = cta.mode;

@@ -82,3 +82,16 @@ export async function maybeQuietTabRehydrate() {
   applyQuietRehydrateCrossTabDemotion(profileId);
   return { ok: true, profileId };
 }
+
+/**
+ * P0b-3 / P1-1: sole saved signing row on scan when default-vouch auto-activate did not run.
+ * Mirrors D10 gates via {@link maybeQuietTabRehydrate} — no default profile or vouch opt-in required.
+ * @returns {Promise<{ ok: true, profileId: string } | { skipped: string }>}
+ */
+export async function trySoleSigningRowRehydrateForScan() {
+  const signingEntries = walletEntriesWithSigningKeys(loadWallet());
+  if (signingEntries.length !== 1) {
+    return { skipped: "not_sole_signing_row" };
+  }
+  return maybeQuietTabRehydrate();
+}

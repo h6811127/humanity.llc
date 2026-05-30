@@ -7,10 +7,19 @@ import { markScanOperatorFamiliar } from "./scan-operator-familiar.mjs";
 import { verificationRecordFromLabelState } from "./device-wallet-network-core.mjs";
 import { reconcileRemovedProfilesAfterWalletSave } from "./device-wallet-removed-profiles.mjs";
 import { setLastActiveProfileId } from "./device-quiet-tab-rehydrate-prefs.mjs";
+import { scheduleStoragePersistRequest } from "./device-storage-persist.mjs";
+import { walletSaveErrorMessage } from "./device-wallet-save-core.mjs";
+import { mergeOwnershipSeatbeltFields } from "./created-first-session-gate-core.mjs";
+import { classifyWalletStorageRaw } from "./device-wallet-parse-core.mjs";
+import {
+  WALLET_SUMMARY_VERSION,
+  buildWalletSummary,
+  serializeWalletSummaryForStorage,
+} from "./device-wallet-summary-core.mjs";
 
 export const WALLET_STORAGE_KEY = "hc_wallet";
 export const WALLET_SUMMARY_STORAGE_KEY = "hc_wallet_summary";
-const WALLET_SUMMARY_VERSION = 3;
+export { WALLET_SUMMARY_VERSION };
 
 /** @type {string | null} */
 let walletCacheRaw = null;
@@ -20,6 +29,9 @@ let walletCache = null;
 let walletSummaryCacheRaw = null;
 /** @type {WalletSummary | null} */
 let walletSummaryCache = null;
+
+/** @type {"empty" | "ok" | "corrupt"} */
+let walletLoadKind = "empty";
 
 /** Matches resolver / pin parsing (`device-pins.mjs`). */
 const QR_ID_RE = /^qr_[1-9A-HJ-NP-Za-km-z_]{8,64}$/;
@@ -106,13 +118,6 @@ function walletRawFingerprint(raw) {
   return `${raw.length}:${hash.toString(36)}`;
 }
 
-/** @param {Record<string, unknown> | null | undefined} entry */
-function entryHasStewardVerification(entry) {
-  const state = String(entry?.verification?.state || "").toLowerCase();
-  const label = String(entry?.verification?.label || "").toLowerCase();
-  return state === "steward" || label === "steward";
-}
-
 /**
  * @param {unknown} value
  * @returns {value is WalletSummary}
@@ -133,70 +138,12 @@ function isWalletSummary(value) {
 }
 
 /**
- * @param {unknown} value
- * @returns {string | undefined}
- */
-function optionalString(value) {
-  return typeof value === "string" && value ? value : undefined;
-}
-
-/**
- * @param {Array<Record<string, unknown>>} entries
- * @param {string} walletFingerprint
- * @returns {WalletSummary}
- */
-function buildWalletSummary(entries, walletFingerprint) {
-  const profileIds = [];
-  /** @type {WalletSummaryRow[]} */
-  const rows = [];
-  let count = 0;
-  let signingKeyCount = 0;
-  let pollableCount = 0;
-  let stewardReady = false;
-
-  for (const entry of entries) {
-    if (!entry || typeof entry !== "object") continue;
-    count += 1;
-    if (typeof entry.profile_id === "string" && entry.profile_id) {
-      profileIds.push(entry.profile_id);
-      rows.push({
-        id: optionalString(entry.id),
-        profile_id: entry.profile_id,
-        label: optionalString(entry.label),
-        handle: optionalString(entry.handle),
-        qr_id: optionalString(walletEntryQrId(entry)),
-        scan_url: optionalString(entry.scan_url),
-        qr_scope: optionalString(entry.qr_scope),
-      });
-    }
-    if (entry.owner_private_key_b58) {
-      signingKeyCount += 1;
-      if (entryHasStewardVerification(entry)) stewardReady = true;
-    }
-    if (typeof entry.profile_id === "string" && entry.profile_id && walletEntryQrId(entry)) {
-      pollableCount += 1;
-    }
-  }
-
-  return {
-    version: WALLET_SUMMARY_VERSION,
-    walletFingerprint,
-    count,
-    profileIds,
-    signingKeyCount,
-    pollableCount,
-    stewardReady,
-    rows,
-  };
-}
-
-/**
  * @param {Array<Record<string, unknown>>} entries
  * @param {string | null} raw
  */
 function cacheWalletSummary(entries, raw) {
   walletSummaryCacheRaw = raw;
-  walletSummaryCache = buildWalletSummary(entries, walletRawFingerprint(raw));
+  walletSummaryCache = buildWalletSummary(entries, walletRawFingerprint(raw), walletEntryQrId);
   return walletSummaryCache;
 }
 
@@ -209,23 +156,48 @@ function cloneWalletSummary(summary) {
   };
 }
 
+/** @returns {"empty" | "ok" | "corrupt"} */
+export function getWalletLoadKind() {
+  return walletLoadKind;
+}
+
+export function isWalletStorageCorrupt() {
+  return walletLoadKind === "corrupt";
+}
+
+/**
+ * @param {ReturnType<typeof classifyWalletStorageRaw>} classified
+ * @param {string | null} raw
+ */
+function materializeWalletLoad(classified, raw) {
+  walletLoadKind = classified.kind;
+  if (classified.kind === "corrupt") {
+    walletCacheRaw = raw;
+    walletCache = [];
+    walletSummaryCacheRaw = raw;
+    walletSummaryCache = buildWalletSummary([], walletRawFingerprint(raw), walletEntryQrId);
+    return [];
+  }
+  const entries = classified.kind === "empty" ? [] : classified.entries;
+  walletCacheRaw = raw;
+  walletCache = entries;
+  cacheWalletSummary(entries, raw);
+  return entries.slice();
+}
+
 export function loadWallet() {
   try {
     const raw = localStorage.getItem(WALLET_STORAGE_KEY);
-    if (raw === walletCacheRaw && walletCache) {
-      return walletCache.slice();
+    if (raw === walletCacheRaw && walletCache !== null) {
+      return walletLoadKind === "corrupt" ? [] : walletCache.slice();
     }
-    const parsed = raw ? JSON.parse(raw) : [];
-    const entries = Array.isArray(parsed) ? parsed : [];
-    walletCacheRaw = raw;
-    walletCache = entries;
-    cacheWalletSummary(entries, raw);
-    return entries.slice();
+    return materializeWalletLoad(classifyWalletStorageRaw(raw), raw);
   } catch {
+    walletLoadKind = "corrupt";
     walletCacheRaw = null;
     walletCache = [];
     walletSummaryCacheRaw = null;
-    walletSummaryCache = buildWalletSummary([], "0:0");
+    walletSummaryCache = buildWalletSummary([], "0:0", walletEntryQrId);
     return [];
   }
 }
@@ -255,32 +227,53 @@ export function loadWalletSummary() {
     const entries = loadWallet();
     const summary = cacheWalletSummary(entries, raw);
     try {
-      localStorage.setItem(WALLET_SUMMARY_STORAGE_KEY, JSON.stringify(summary));
+      localStorage.setItem(
+        WALLET_SUMMARY_STORAGE_KEY,
+        serializeWalletSummaryForStorage(summary)
+      );
     } catch {
       /* private mode */
     }
     return cloneWalletSummary(summary);
   } catch {
     walletSummaryCacheRaw = null;
-    walletSummaryCache = buildWalletSummary([], "0:0");
+    walletSummaryCache = buildWalletSummary([], "0:0", walletEntryQrId);
     return cloneWalletSummary(walletSummaryCache);
   }
 }
 
 export function saveWallet(entries) {
+  if (isWalletStorageCorrupt()) {
+    return {
+      error:
+        "Saved ownership on this device could not be read. Import a backup before saving again.",
+    };
+  }
   const serialized = JSON.stringify(entries);
+  const summary = buildWalletSummary(
+    entries,
+    walletRawFingerprint(serialized),
+    walletEntryQrId
+  );
+  try {
+    localStorage.setItem(WALLET_STORAGE_KEY, serialized);
+  } catch (err) {
+    return { error: walletSaveErrorMessage(err) };
+  }
+  try {
+    localStorage.setItem(WALLET_SUMMARY_STORAGE_KEY, serializeWalletSummaryForStorage(summary));
+  } catch {
+    /* private mode — wallet row still persisted */
+  }
+  walletLoadKind = entries.length > 0 ? "ok" : "empty";
   walletCacheRaw = serialized;
   walletCache = entries;
-  const summary = cacheWalletSummary(entries, serialized);
-  localStorage.setItem(WALLET_STORAGE_KEY, serialized);
-  try {
-    localStorage.setItem(WALLET_SUMMARY_STORAGE_KEY, JSON.stringify(summary));
-  } catch {
-    /* private mode */
-  }
+  walletSummaryCacheRaw = serialized;
+  walletSummaryCache = summary;
   if (entries.length > 0) markScanOperatorFamiliar();
   reconcileRemovedProfilesAfterWalletSave(entries);
   window.dispatchEvent(new Event("hc-device-hub-changed"));
+  return { ok: true };
 }
 
 /** @returns {Array<Record<string, unknown>>} */
@@ -417,7 +410,7 @@ export function walletSome(predicate) {
 }
 
 export function walletEntryFromSession(session, label) {
-  return {
+  const entry = {
     id: `${session.profile_id}_${Date.now()}`,
     label: label.trim() || `@${session.handle || session.profile_id.slice(0, 8)}`,
     saved_at: new Date().toISOString(),
@@ -440,6 +433,7 @@ export function walletEntryFromSession(session, label) {
       ) ?? session.verification,
     issued_vouches: session.issued_vouches,
   };
+  return mergeOwnershipSeatbeltFields(entry, session);
 }
 
 export function isWalletSaved(profileId) {
@@ -531,7 +525,7 @@ function walletEntrySyncSignature(entry) {
 export function mergeWalletEntryFromSession(existing, session, label = "") {
   const trimmed = label.trim();
   const qrId = session.qr_id ?? walletEntryQrId(session) ?? existing.qr_id;
-  return {
+  const merged = {
     ...existing,
     label: trimmed || existing.label,
     handle: session.handle ?? existing.handle,
@@ -557,6 +551,7 @@ export function mergeWalletEntryFromSession(existing, session, label = "") {
     issued_vouches: session.issued_vouches ?? existing.issued_vouches,
     saved_at: new Date().toISOString(),
   };
+  return mergeOwnershipSeatbeltFields(merged, session);
 }
 
 /**
@@ -574,18 +569,23 @@ export function saveSessionToWallet(session, label = "") {
     const before = walletEntrySyncSignature(entries[idx]);
     const merged = mergeWalletEntryFromSession(entries[idx], session, label);
     if (walletEntrySyncSignature(merged) === before) {
+      scheduleStoragePersistRequest({ reason: "ownership_save" });
       return { ok: true, already: true };
     }
     entries[idx] = merged;
-    saveWallet(entries);
+    const saved = saveWallet(entries);
+    if ("error" in saved) return saved;
     setLastActiveProfileId(session.profile_id);
     notifyWalletProfileSaved(session.profile_id);
+    scheduleStoragePersistRequest({ reason: "ownership_save" });
     return { ok: true, updated: true };
   }
   entries.unshift(walletEntryFromSession(session, label));
-  saveWallet(entries);
+  const saved = saveWallet(entries);
+  if ("error" in saved) return saved;
   setLastActiveProfileId(session.profile_id);
   notifyWalletProfileSaved(session.profile_id);
+  scheduleStoragePersistRequest({ reason: "ownership_save" });
   return { ok: true };
 }
 

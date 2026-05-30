@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   bindSheetLifecycleReconcile,
+  syncInboxBackdropForOpenHub,
   syncSheetBackdropClosed,
 } from "../../site/js/device-sheet-backdrop-sync.mjs";
 
@@ -30,6 +31,76 @@ describe("syncSheetBackdropClosed", () => {
 
   it("no-ops when backdrop is missing", () => {
     expect(() => syncSheetBackdropClosed(null)).not.toThrow();
+  });
+});
+
+describe("syncInboxBackdropForOpenHub", () => {
+  function mockBackdrop() {
+    return {
+      hidden: false,
+      classList: {
+        removed: /** @type {string[]} */ ([]),
+        remove(cls) {
+          this.removed.push(cls);
+        },
+      },
+      attributes: /** @type {Record<string, string>} */ ({}),
+      setAttribute(name, value) {
+        this.attributes[name] = value;
+      },
+    };
+  }
+
+  it("clears stuck inbox backdrop when inbox is closed", () => {
+    const inboxBackdrop = mockBackdrop();
+    const doc = {
+      getElementById(id) {
+        if (id === "device-inbox-backdrop") return inboxBackdrop;
+        if (id === "device-inbox-sheet") {
+          return { classList: { contains: (c) => c === "device-inbox-sheet--collapsed" } };
+        }
+        return null;
+      },
+      body: { classList: { contains: () => false } },
+    };
+
+    syncInboxBackdropForOpenHub(/** @type {Document} */ (doc));
+
+    expect(inboxBackdrop.hidden).toBe(true);
+    expect(inboxBackdrop.classList.removed).toContain("is-visible");
+  });
+
+  it("leaves inbox backdrop alone when inbox sheet is open", () => {
+    const inboxBackdrop = mockBackdrop();
+    const doc = {
+      getElementById(id) {
+        if (id === "device-inbox-backdrop") return inboxBackdrop;
+        return null;
+      },
+      body: { classList: { contains: (c) => c === "device-inbox-sheet-open" } },
+    };
+
+    syncInboxBackdropForOpenHub(/** @type {Document} */ (doc));
+
+    expect(inboxBackdrop.hidden).toBe(false);
+  });
+
+  it("leaves inbox backdrop alone when inbox sheet DOM is expanded", () => {
+    const inboxBackdrop = mockBackdrop();
+    const doc = {
+      getElementById(id) {
+        if (id === "device-inbox-backdrop") return inboxBackdrop;
+        if (id === "device-inbox-sheet") {
+          return { classList: { contains: (c) => c !== "device-inbox-sheet--collapsed" } };
+        }
+        return null;
+      },
+      body: { classList: { contains: () => false } },
+    };
+
+    syncInboxBackdropForOpenHub(/** @type {Document} */ (doc));
+
+    expect(inboxBackdrop.hidden).toBe(false);
   });
 });
 

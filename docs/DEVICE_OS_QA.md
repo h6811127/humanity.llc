@@ -221,7 +221,21 @@ Spec: [`HC_EMPHASIS_CARD_IMPORT_REGRESSION.md`](HC_EMPHASIS_CARD_IMPORT_REGRESSI
 
 **Fail signals:** Emphasis cards render as plain text (no shadow/dot/pill); `@import` or `<link>` for `hc-emphasis-card.css` missing on shell pages.
 
-### P1-KC · Keys custody emphasis card (compact layout)
+## P1-RESTORE — View-only restore and Live QR tasks
+
+**When:** After deploy touching `/created/` view mode or setup **Protect** step.
+
+| Step | Action | Pass |
+|------|--------|------|
+| 1 | Open `/created/?profile_id=&qr_id=` in a tab **without** `hc_created` keys | Hero **View this card**; **Live · Manage** tabs visible |
+| 2 | **Live** tab | **QR and signage** section visible; **What scanners see** publish form hidden |
+| 3 | Open scan / copy link | Works when scan URL resolves (no signing) |
+| 4 | **Manage** tab | **Restore ownership** at top; recovery import + backup link |
+| 5 | Restore with valid recovery or `.hcbackup` | Enters control mode; signing UI returns |
+
+Automated: `npm run e2e:key-loss-sad-path` (K1/K5) · `npm run worker:test -- worker/tests/created-view-live-readonly-core.test.ts worker/tests/created-view-mode-core.test.ts`
+
+## P1-KC · Keys custody emphasis card (compact layout)
 
 Spec: [`KEYS_CUSTODY_EMPHASIS_CARD_SPACING_INVESTIGATION.md`](KEYS_CUSTODY_EMPHASIS_CARD_SPACING_INVESTIGATION.md) · [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md) § Compact density.
 
@@ -320,7 +334,7 @@ See [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md).
 
 ### P1-LCP · Live control printed QR camera QA (M7 Step 2)
 
-**Runbook:** [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md) · desk check: `npm run worker:test:live-control-printed-qa` · `npm run e2e:live-control-loop`.
+**Runbook:** [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md) · desk gate: `live-control:printed-qa:desk-gate` · sign-off: `live-control:printed-qa:sign-off -- --pass --apply`.
 
 | Step | Action | Expected |
 |------|--------|----------|
@@ -366,6 +380,19 @@ Automated: `npm run e2e:wallet-scale-guardrail` (W1–W3).
 
 Automated: `npm run e2e:key-loss-sad-path` · `npm run worker:test:key-loss-copy`.
 
+### P1-RESTORE · View-only Live tab + restore (OWNERSHIP_RESTORE Phase 3)
+
+**Refs:** [`OWNERSHIP_RESTORE_UX_PLAN.md`](OWNERSHIP_RESTORE_UX_PLAN.md) · [`KEY_LOSS_SAD_PATH_MATRIX.md`](KEY_LOSS_SAD_PATH_MATRIX.md) (K1/K5).
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Open `/created/?profile_id=…&qr_id=…` with no signing keys in tab | **Live** tab active; `#created-view-live-banner` visible; deploy disclosures (print / test / download) usable |
+| 2 | Same visit | **What scanners see** / publish form hidden; live-proof strip hidden |
+| 3 | Tap **Restore ownership** on Live banner | **Manage** tab; restore panel + import visible |
+| 4 | Deep link `#recovery` or `#backup` | Lands **Manage** with restore panel in view |
+
+Automated: `npm run e2e:key-loss-sad-path` (K1) · `npm run worker:test -- worker/tests/created-view-live-core.test.ts`
+
 ### P1-HOSTED-BR · Billing checkout return (O1–O2)
 
 **Refs:** [`HOSTED_OPS_SAD_PATH_MATRIX.md`](HOSTED_OPS_SAD_PATH_MATRIX.md) · [`HOSTED_TIER_G0_READINESS.md`](HOSTED_TIER_G0_READINESS.md).
@@ -400,12 +427,12 @@ Automated: `e2e/device-status-dot.spec.ts` § hub sheet header chrome (steps 4�
 
 | Step | Action | Expected |
 |------|--------|----------|
-| 1 | Fresh browser (no `hc_wallet` / pins) → `/` → open hub | Empty hint: **No cards saved yet** + Create + import backup links; **no** Monitoring block, backup form, shortcuts, activity log, or status-dot legend |
+| 1 | Fresh browser (no `hc_wallet` / pins) → `/` → open hub | Empty hint: **No cards saved yet** + Create + import backup links; **Backup import** form visible (`data-hub-restore-always`); **no** Monitoring block, shortcuts, activity log, or status-dot legend |
 | 2 | Pinned scans subgroup | **Bookmarks only — cannot manage objects** |
 | 3 | Create + save a card (or import backup) | Hub shows full steward chrome; `device-hub--stranger-empty` removed |
 | 4 | Repeat on `/wallet/` empty | Same hide rules; wallet page hint matches landing |
 
-Automated: `npm run worker:test -- worker/tests/device-hub-stranger-empty-core.test.ts`
+Automated: `npm run worker:test:hub-restore-always` · `npm run worker:test -- worker/tests/device-hub-stranger-empty-core.test.ts`
 
 ### P2-SLC · Hub stranger landing chrome
 
@@ -532,23 +559,7 @@ Automated (when shipped): `npm run worker:test -- worker/tests/pwa-standalone-re
 
 **Fail signals:** Safari opens automatically; wizard advances to done before user previews scan; cross-tab keys notice during fresh setup.
 
-Automated: `npm run worker:test:pwa-install` (includes `pwa-scan-handoff-core.test.ts`) · `npm run e2e:pwa-install` (`e2e/device-pwa-scan-handoff.spec.ts` — setup test scan, history back, hub Open scan, wallet pin, browser popup + P0b-2 Continue regressions).
-
-**Manual sign-off (HTTPS, real installed PWA — required for close-out):**
-
-| Step | Requires | Status |
-|------|----------|--------|
-| 1 | Create flow entirely inside installed PWA | Pending |
-| 3 | System swipe-back (not return banner link) | Pending |
-
-Record platform + date when signed off (mirror **P1-PWA** iOS Safari 2026-05-28 pattern).
-
-**P5 support playbook (if steward is stuck):**
-
-1. Complete first create and setup in **Safari** (not Home Screen app) when scan preview or install timing is confusing.
-2. After setup, use **Share → Add to Home Screen** when install card appears ([**P1-PWA-P4**](DEVICE_OS_QA.md#p1-pwa-p4--install-deferral-until-setup-complete-p4-shipped)).
-3. If scan opened in Safari while the PWA was running, use the **app switcher** to return — or tap **← Back to setup** / **← Back** on the scan page when shown.
-4. Do not rely on browser tabs inside the installed PWA — there is no tab bar; use **Back** or in-app return links.
+Automated: `npm run worker:test:pwa-install` (includes `pwa-scan-handoff-core.test.ts`) · `npm run e2e:pwa-install` (`e2e/device-pwa-scan-handoff.spec.ts` — setup test scan, hub Open scan, wallet pin, browser popup regressions).
 
 ### P1-PWA-P4 · Install deferral until setup complete (P4 shipped)
 
@@ -696,6 +707,16 @@ See [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md).
 | 3 | bfcache: open inbox → browser back → forward | Inbox not stuck open; backdrop not `.is-visible` when sheet collapsed |
 
 Vitest: `worker/tests/device-inbox-sheet-core.test.ts`, `worker/tests/device-inbox.test.ts` (`inboxDotOverlayFromItems`). Playwright: `e2e/device-inbox.spec.ts` § card disabled since visit; § sheet reconcile (P5e — opens sheet via `setInboxSheetOpen`, phase 16).
+
+## P5f — Stuck inbox backdrop vs Check network (Step 1 extension)
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | `/wallet/` with saved card; open inbox from badge; close via backdrop | **Check network** still tappable; status line updates on tap |
+| 2 | Leave tab ~6 min (network cache stale) or refocus tab | **Check network** still tappable; stale “checked X ago” OK |
+| 3 | Simulate stuck `#device-inbox-backdrop.is-visible` with inbox closed (devtools) | Taps pass through to wallet/hub controls; reconcile clears backdrop on tab focus |
+
+Vitest: `worker/tests/device-sheet-backdrop-sync.test.ts`, `worker/tests/device-safe-rebuild-tripwires.test.ts`. Playwright: `e2e/device-hub-check-network-backdrop.spec.ts`.
 
 ## P5 — Inbox diagnostics (dev — phase 7)
 

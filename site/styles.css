@@ -1205,9 +1205,11 @@ body.page-flow.has-shell-chrome .page > main.screen {
 .device-system-banner[hidden],
 .device-cross-tab-banner[hidden],
 .device-pwa-install-card[hidden],
+.device-safari-itp-notice-card[hidden],
 .device-system-banner:empty,
 .device-cross-tab-banner:empty,
-.device-pwa-install-card:empty {
+.device-pwa-install-card:empty,
+.device-safari-itp-notice-card:empty {
   display: none !important;
   margin: 0;
   padding: 0;

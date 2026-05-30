@@ -16,7 +16,7 @@
 | **Is data actually deleted?** | Sometimes **yes** (Safari ITP, storage pressure, user site-data clear). Often **no** — keys still sit in `localStorage.hc_wallet` but **this tab’s** `sessionStorage.hc_created` is empty and recovery failed silently. |
 | **Is Safari uniquely bad here?** | **Yes, materially.** iOS tab discard, memory-pressure sessionStorage purge, 7-day ITP script-storage deletion, and Camera → new-tab navigation hit this product harder than Chromium desktop. |
 | **Is the architecture fixable without server key custody?** | **Yes**, but not with copy tweaks alone. Needs **scan-page rehydrate**, **durable save guarantees**, **visible failure when save fails**, and **passkey-like “always my object on this device”** behavior on every entry surface. |
-| **Current mitigation shipped?** | Quiet tab rehydrate (D10) on **shell + scan pages (P0-1)**; vouch auto-activate **opt-in** on scan; auto-save to wallet **default on** but **async** and **uncaught on quota errors**. |
+| **Current mitigation shipped?** | Quiet tab rehydrate (D10) on **shell + scan pages (P0-1)**; vouch auto-activate **opt-in** on scan; auto-save **sync on create (P0-2)** with **quota-safe save errors (P0-3)**. |
 | **Will the original P0 stack alone fix it?** | **No.** P0 closes the biggest scan-tab gap and create-save races, but prod walkthrough found **misleading “saved” chrome**, **keyless session pollution**, and **card-disabled false positives** that feel identical to “keys wiped.” See [§ Will P0 fixes actually fix this?](#will-p0-fixes-actually-fix-this). |
 
 ---
@@ -36,7 +36,7 @@ The original P0 stack (scan rehydrate, sync save, save error surfacing, backup g
 | “Card disabled since visit” on fresh card | **No** | Separate trust killer — [R10](#r10--card-disabled-since-visit-false-positive-prod) |
 | Safari 7-day / clear website data | **No** | Platform wipe — backup/recovery only |
 | PWA created, scan opened in Safari | **Partial** | P1 handoff; session split remains |
-| Keys gone from wallet too | **No** | ITP / quota / corrupt parse — P0-3 + corrupt-wallet UX |
+| Keys gone from wallet too | **Partial** | ITP / quota — P0-3 surfaces save failure; corrupt parse shows P1-4 coach (not empty hub) |
 
 **Honest ship bar:** Treat P0 **plus** R9/R11/R12 (below) as the minimum credible fix for Safari stewards. P0 alone reduces incidence; it does not restore trust while chrome lies.
 
@@ -297,7 +297,7 @@ Cross-tab presence (`hc_tab_keys_presence`) does **not** delete keys, but stale 
 
 **User impact:** Reads as “network killed my card / keys” — same emotional bucket as key loss. Documented historically in [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md); **still observed on prod** 2026-05-29.
 
-**Fix:** Not a custody store bug — still blocks trust in the keys product. Must stay on the same release train as key fixes.
+**Fix:** Not a custody store bug — still blocks trust in the keys product. **Shipped (P0b-1):** in-visit network polls no longer seed `hc_wallet_last_seen_network` for profiles without a prior baseline; first baseline is written on exit snapshot (`snapshotNetworkSeenOnExit`) so fresh create cannot false-trigger “since your last visit” in the same session.
 
 ---
 
@@ -323,7 +323,7 @@ Cross-tab presence (`hc_tab_keys_presence`) does **not** delete keys, but stale 
 
 **User impact:** iPhone setup flow trains users that scan “just works” in another tab, then Safari discards that context — keys feel like they vanish mid-setup.
 
-**Fix:** Do not auto-advance test step when scan opens in new tab; or same-tab scan in browser until standalone; block “done” until wallet save confirmed.
+**Fix:** **Shipped (P0b-2):** `shouldAutoAdvanceSetupTestScan` returns false in browser; setup wizard stays on test step until steward taps **Continue** again; standalone PWA still auto-advances after same-tab preview.
 
 ---
 
@@ -377,7 +377,7 @@ flowchart TD
 | **S7** | Low storage iOS → many tabs | Session storage may clear | **Yes** |
 | **S8** | Hub remove card → confirm clear other tabs | Intentional key clear | Yes (expected) |
 
-Automated partial coverage: `e2e/key-loss-sad-path.spec.ts` (K1, K5), `e2e/device-cross-tab-keys.spec.ts` (K4). **No WebKit E2E for S2, S3, S6.**
+Automated partial coverage: `e2e/key-loss-sad-path.spec.ts` (K1, K5), `e2e/device-cross-tab-keys.spec.ts` (K4), `e2e:safari-keys-persistence` (S2, S3 WebKit). **No automated S6 (ITP 7-day).**
 
 ---
 
@@ -406,37 +406,37 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 | # | Change | Rationale | Prod validated? |
 |---|--------|-----------|-----------------|
 | **P0-1** | **Wire `maybeQuietTabRehydrate()` on scan pages** before vouch/live-proof UI | R1 Camera QR path | **Shipped** — `scan-tab-keys.mjs?v=8` awaits rehydrate; script loads before `vouch-issue` |
-| **P0-2** | **Synchronous save** before leaving create success path | R3 race (less common on prod than assumed) | Flow A: microtask save succeeded |
-| **P0-3** | **try/catch on `saveWallet` / `saveSessionToWallet`** — visible error, `hc_auto_save_failed` | R3 quota | Not repro’d live |
-| **P0-4** | **First-session backup gate** before “done” | R4 true wipe | N/A |
+| **P0-2** | **Synchronous save** before leaving create success path | R3 race (less common on prod than assumed) | **Shipped** — `create-card.mjs` sync `saveSessionToWallet` before navigate; `created-device-save.mjs` no microtask |
+| **P0-3** | **try/catch on `saveWallet` / `saveSessionToWallet`** — visible error, `hc_auto_save_failed` | R3 quota | **Shipped** — `device-wallet-save-core.mjs`; `saveWallet` returns `{ error }`; save UI surfaces copy |
+| **P0-4** | **First-session backup gate** before “done” | R4 true wipe | **Shipped** — `created-first-session-gate-core.mjs`; setup required until seatbelt or `hc_setup_done` |
 | **P0-5** | **Scan dot / “Keys on this device” = tab signing state**, not wallet count; **Restore control here** CTA | R9 — **prod** | Flow B — **Shipped** (`scan-page-dot.mjs?v=8`, actor band lead sync) |
-| **P0-6** | **Never persist `hc_created` without `owner_private_key_b58`**; strip keyless session on view-only | R11 — **prod** | Flow C — **Shipped** |
+| **P0-6** | **Never persist `hc_created` without `owner_private_key_b58`**; strip keyless session on view-only | R11 — **prod** | Flow C — **Shipped** (`device-keys.mjs` `setTabSession`, `created.mjs`) |
 | **P0-7** | **View-only copy** branches on wallet: empty → backup/import; saved → restore in this tab | R13 — **prod** | Flow C — **Shipped** |
 
 ### P0b — Same release train (trust killers)
 
 | # | Change | Rationale |
 |---|--------|-----------|
-| **P0b-1** | Re-verify **card disabled since visit** on fresh create (hub row) | R10 — **prod** false positive |
-| **P0b-2** | Setup wizard: **no auto-advance** on test scan when `window.open` new tab | R12 |
-| **P0b-3** | On scan, **auto-activate wallet row for signing** when exactly one signing row (mirror D10), not only default-vouch path | Stranger vouch without prior “Default for vouching” setup |
+| **P0b-1** | Re-verify **card disabled since visit** on fresh create (hub row) | R10 — **prod** false positive; no in-visit baseline seed; first baseline on exit snapshot | **Step 1 shipped** — automated R10 guard on `/` hub; step 2: prod re-verify on WebKit after deploy |
+| **P0b-2** | Setup wizard: **no auto-advance** on test scan when `window.open` new tab | R12 | **Shipped** — `created-setup.mjs` · `shouldAutoAdvanceSetupTestScan`; browser needs second Continue |
+| **P0b-3** | On scan, **auto-activate wallet row for signing** when exactly one signing row (mirror D10), not only default-vouch path | Stranger vouch without prior “Default for vouching” setup | **Shipped** — `vouch-scan-sole-signing-activate-core.mjs` · `e2e:vouch-scan-sole-signing` |
 
 ### P1 — Safari-native UX
 
 | # | Change | Rationale |
 |---|--------|-----------|
-| **P1-1** | Scan: if exactly one wallet signing row, auto-activate like quiet rehydrate (same gates as D10) | Passkey-like scan flow |
-| **P1-2** | Prominent **Keys not in this tab — tap to restore** when wallet has keys but session empty (all surfaces) | Replace protocol jargon |
+| **P1-1** | Scan: if exactly one wallet signing row, auto-activate like quiet rehydrate (same gates as D10) | Passkey-like scan flow | **Shipped** — P0-1 `scan-tab-keys.mjs` + P0b-3 vouch sole-row path |
+| **P1-2** | Prominent **Ownership not in this tab — tap to restore** when wallet has keys but session empty (all surfaces) | **Shipped** — hub · landing dot · `/wallet/` tab hint · view-only `/created/` Live banner · scan actor band |
 | **P1-3** | PWA scan handoff: ensure all scan entry points use same-tab in standalone ([`PWA_STANDALONE_EXTERNAL_NAVIGATION.md`](PWA_STANDALONE_EXTERNAL_NAVIGATION.md) P1) | Fixes R5 |
-| **P1-4** | On `loadWallet` parse failure, show **corrupt wallet** coach card with export/import links — not empty hub | Fixes R7 |
+| **P1-4** | On `loadWallet` parse failure, show **corrupt wallet** coach card with export/import links — not empty hub | Fixes R7 · **Shipped** — hub urgent card · `/wallet/` tab hint · import + backup help CTAs |
 
 ### P2 — Platform honesty
 
 | # | Change | Rationale |
 |---|--------|-----------|
-| **P2-1** | Safari / iOS in-product notice: 7-day inactivity eviction + “Add to Home Screen resets timer” | Sets expectations for R4 |
-| **P2-2** | Detect standalone vs browser wallet/session mismatch; one-tap **Restore control in this app** | R5 |
-| **P2-3** | WebKit E2E: `e2e/safari-keys-persistence.spec.ts` for S2, S3 on WebKit project | Regression |
+| **P2-1** | Safari / iOS in-product notice: 7-day inactivity eviction + “Add to Home Screen resets timer” | Sets expectations for R4 · **Shipped** — `safari-itp-storage-notice.mjs` on shell pages |
+| **P2-2** | Detect standalone vs browser wallet/session mismatch; one-tap **Restore control in this app** | R5 · **Shipped** — `device-pwa-session-mismatch-core.mjs` · hub · `/wallet/` · scan actor band |
+| **P2-3** | WebKit E2E: `e2e/safari-keys-persistence.spec.ts` for S2, S3 on WebKit project | Regression · **Shipped** — `e2e:safari-keys-persistence` (webkit + iphone-13-pro) |
 
 ### P3 — Architectural (longer term)
 
@@ -444,7 +444,7 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 |---|--------|-----------|
 | **P3-1** | Evaluate **Secure Enclave / WebAuthn** wrapping of wallet keys (unlock to sign, not raw keys in session) | Reduce sessionStorage dependence |
 | **P3-2** | Optional encrypted persistence outside ITP window (only with user consent) | Controversial — document threat model |
-| **P3-3** | Never store raw private keys in hub summary paths; audit accidental strip | Defense in depth |
+| **P3-3** | Never store raw private keys in hub summary paths; audit accidental strip | Defense in depth · **Shipped** — `device-wallet-summary-core.mjs` allowlist rows + persist tripwire |
 
 **Explicit non-fix:** Server-side key custody — contradicts product trust model ([`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md)).
 
@@ -482,14 +482,21 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 |------|------|--------|-------|
 | 1 | **P0-1** Scan quiet rehydrate + script order | **Shipped** | `scan-tab-keys.mjs` top-level `await maybeQuietTabRehydrate()`; `scan-html.ts` loads scan-tab-keys **before** live-control and vouch-issue |
 | 2 | P0-5 Scan dot honesty | **Shipped** | `scanDeviceStateFromContext` (tab keys only); glance + aria `walletKeysNotInTab`; actor band lead; `scan-page-dot.mjs?v=8` |
-| 3 | P0-6 Keyless session fix | **Shipped** | R11 — `created-session-core.mjs` + `saveSession` / hydrate guards |
-| 4 | P0-7 View-only copy branches | **Shipped** | R13 — `viewOnly*` copy in `device-ownership-copy-core.mjs` |
-| 5 | P0-2 Sync save on create | Pending | R3 |
-| 6 | P0-3 saveWallet try/catch | Pending | R3 |
-| 7 | P0-4 Backup gate | Pending | R4 |
-| 8 | P0b-1 Card disabled FP | Pending | R10 |
-| 9 | P0b-2 Setup wizard scan tab | **Shipped** | R12 — `shouldAutoAdvanceSetupTestScan` always false; E2E Continue on test step |
-| 10 | P0b-3 Scan single-row auto-activate (stranger vouch) | Pending | Overlaps P1-1 |
+| 3 | P0-6 Keyless session fix | **Shipped** | `setTabSession` / `getTabSession` guard; `created.mjs` hydrate + gate merge use `applyCreatedSessionState`; view-mode strip |
+| 4 | P0-7 View-only copy branches | **Shipped** | `created-view-only-copy-core.mjs`; wallet-empty vs wallet-saved copy on `#no-session-detail` + view restore panel |
+| 5 | P0-2 Sync save on create | **Shipped** | `created-device-save-core.mjs`; sync save in `create-card.mjs` before `location.replace`; `/created/` auto-save runs inline |
+| 6 | P0-3 saveWallet try/catch | **Shipped** | `device-wallet-save-core.mjs`; quota-safe `saveWallet`; `hc_auto_save_failed` + visible save errors |
+| 7 | P0-4 Backup gate | **Shipped** | `created-first-session-gate-core.mjs`; setup required until seatbelt; wallet persists recovery markers; steward `#revoke` bypass gated |
+| 8 | P0b-1 Card disabled FP | **Step 1 shipped** | R10 — `mergeLastSeenFromNetworkMap` skips in-visit baseline seed; `card-disabled-fresh-create.test.ts` · E2E `device-os-wallet.spec.ts` |
+| 9 | P0b-2 Setup wizard scan tab | **Shipped** | R12 — `created-setup.mjs` · `pwa-scan-handoff-core.mjs` · `e2e/device-pwa-scan-handoff.spec.ts` |
+| 10 | P0b-3 Scan single-row auto-activate (stranger vouch) | **Shipped** | `vouch-scan-sole-signing-activate-core.mjs` · `e2e:vouch-scan-sole-signing` |
+| 11 | P1-2 Ownership not in this tab — restore CTA (all surfaces) | **Shipped** | Hub custody · landing dot · `/wallet/` tab hint · view-only Live banner · scan actor band · `device-ownership-restore-in-tab.mjs` |
+| 12 | P1-3 PWA scan handoff (standalone same-tab) | **Shipped** | `pwa-scan-handoff-core.mjs` · `e2e/device-pwa-scan-handoff.spec.ts` |
+| 13 | P1-4 Corrupt wallet coach card | **Shipped** | `device-wallet-corrupt-core.mjs` · hub `#device-hub-wallet-corrupt` · `/wallet/` `#wallet-tab-hint` · `e2e:key-loss-sad-path` R7 |
+| 14 | P2-1 Safari ITP storage notice | **Shipped** | `safari-itp-storage-notice-core.mjs` · lazy bootstrap on `/` · `/wallet/` · `/created/` |
+| 15 | P2-2 PWA vs browser session mismatch | **Shipped** | `hc_last_signing_shell_mode` · hub custody · wallet tab hint · scan actor band |
+| 16 | P2-3 WebKit keys persistence E2E | **Shipped** | `e2e/safari-keys-persistence.spec.ts` · S2 scan rehydrate · S3 wallet mismatch |
+| 17 | P3-3 Hub summary key-material guard | **Shipped** | `device-wallet-summary-core.mjs` · `serializeWalletSummaryForStorage` · Vitest `device-wallet-summary-core.test.ts` |
 
 **P0-1 spec (reference for reviewers):**
 
@@ -559,7 +566,7 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 | `hc_inbox_diag_log` | `sessionStorage` | Debug log buffer | Session |
 | `hc_resolver_sync_tabs` | `localStorage` | Tab sync opt-out | User |
 
-**Critical invariant (P0-6 shipped):** `hc_created` should only exist when `owner_private_key_b58` or `recovery_private_key_b58` is present. Enforced in `created.mjs` → `saveSession` / `loadSession` via `created-session-core.mjs`.
+**Critical invariant (P0-6 shipped):** `hc_created` is only persisted when `owner_private_key_b58` or `recovery_private_key_b58` is present (`setTabSession` / `getTabSession` in `device-keys.mjs`). View-only `/created/` strips keyless pollution on entry.
 
 ---
 
@@ -570,7 +577,7 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 | Create flow | `create-card.mjs` | **Yes** | After Ed25519 keygen, before navigate to `/created/` |
 | Activate wallet row | `device-keys.mjs` → `activateWalletEntry` | **Yes** | Open controls, quiet rehydrate success, `/created/` deep link |
 | Gated activate | `device-control-activation.mjs` | **Yes** | PIN/unlock wrapper around activate |
-| Session save helper | `created.mjs` → `saveSession` | **Yes when persisted** | Revoke/update flows; hydrate/gate merge only when tab has signing key (P0-6) |
+| Session save helper | `created.mjs` → `saveSession` | **Sometimes no** | Revoke/update flows yes; **hydrateSessionFromNetwork / gate merge — metadata only (R11)** |
 | Clear | `device-keys.mjs` → `clearTabSessionKeys` | N/A | Stop managing in tab; removes item |
 | Vouch stop | `vouch-issue.mjs` | N/A | Calls `clearTabSessionKeys` |
 
@@ -612,22 +619,22 @@ These surfaces can simultaneously show “saved / OK” and block signing — us
 | Scan vouch block | “Open controls in My objects” | Correct | — |
 | Hub on `/` | “Card disabled since visit” on **new** active card | False positive | P0b-1 |
 | `/created/` view-only banner | Visible correctly | — | — |
-| `/created/` `#no-session-detail` | Wallet-aware restore guidance | Branches on signing wallet count (P0-7) | — |
-| `sessionStorage.hc_created` after Flow C | Absent or has private key | Keyless metadata stripped on read/write (P0-6) | — |
+| `/created/` `#no-session-detail` | “Finish create in other tab…” | Wrong when wallet empty (Flow C) | P0-7 |
+| `sessionStorage.hc_created` after Flow C | Populated JSON | **No private key** | P0-6 |
 | Status dot first paint | Brief “not saved” → “saved” | Chrome race | Low priority |
 
 ---
 
 ## Auto-save mechanics (detail)
 
-**Path:** `created-device-save.mjs` → `initCreatedDeviceSave` → `queueMicrotask(() => runSave({ quiet: true }))`.
+**Path:** `create-card.mjs` sync `saveSessionToWallet` before `/created/` navigation (P0-2); `created-device-save.mjs` → `initCreatedDeviceSave` → inline `runSave({ quiet: true })` when auto-save is on (no microtask).
 
 **Success criteria (Flow A prod):** Within ~2s, `localStorage.hc_wallet` contains row with `owner_private_key_b58`; `sessionStorage` still has tab copy.
 
 **Failure modes (R3):**
 
-1. Navigation away before microtask (P0-2: sync save before leave).
-2. `saveWallet()` → `localStorage.setItem` throws `QuotaExceededError` — **no try/catch** (P0-3).
+1. Navigation away before microtask — **fixed (P0-2)** via sync save on create + inline auto-save on `/created/`.
+2. `saveWallet()` → `localStorage.setItem` throws `QuotaExceededError` — **fixed (P0-3)** via try/catch, `{ error }` return, and visible save UI.
 3. Private mode / storage disabled.
 
 **Detection:** `sessionStorage.hc_auto_save_failed` JSON array of profile IDs; hub/inbox may surface.
@@ -643,11 +650,11 @@ These surfaces can simultaneously show “saved / OK” and block signing — us
 | K5 wallet empty | `e2e/key-loss-sad-path.spec.ts` | — |
 | Shell quiet rehydrate wiring | `worker/tests/device-quiet-tab-rehydrate.test.ts` | — |
 | **Scan quiet rehydrate wiring** | `worker/tests/device-quiet-tab-rehydrate.test.ts` (P0-1) | **No runtime E2E** |
-| S2 Camera new tab → scan vouch | — | **WebKit E2E missing** (P2-3) |
-| S3 PWA → Safari scan | — | **WebKit E2E missing** |
+| S2 Camera new tab → scan vouch | `e2e/safari-keys-persistence.spec.ts` (webkit) | — |
+| S3 PWA → Safari scan | Same E2E S3 (`/wallet/` tab hint) | Full scan actor band needs fixture regen for restore btn |
 | S6 ITP 7-day | — | Manual / platform |
 | Scan dot honesty (R9) | Partial `scan-page-dot-contract` | Behavior E2E after P0-5 |
-| R11 keyless session | `worker/tests/created-session-core.test.ts` | E2E K1/K5 in `e2e/key-loss-sad-path.spec.ts` |
+| R11 keyless session | `worker/tests/device-tab-session.test.ts` | K1 asserts no keyless `hc_created` |
 
 ---
 
@@ -675,5 +682,11 @@ Sources: WebKit ITP blog; [`PWA_INSTALL.md`](PWA_INSTALL.md); [`SAFARI_PERFORMAN
 | 2026-05-29 | **Appendix:** storage inventory, write paths, scan script order, gate table, UI catalog, test matrix, rollout tracker |
 | 2026-05-29 | **P0-1 shipped:** scan-tab-keys awaits `maybeQuietTabRehydrate()`; scan-html script order fixed |
 | 2026-05-29 | **P0-5 shipped:** scan dot uses tab signing state; wallet-only keys → hollow `none` + Restore control here |
-| 2026-05-29 | **P0-6 shipped:** never persist keyless `hc_created`; strip on read via `created-session-core.mjs` |
-| 2026-05-29 | **P0-7 shipped:** view-only copy branches on wallet signing count (`viewOnlyNoSessionDetail`, restore lead) |
+| 2026-05-29 | **P0-6 shipped:** `setTabSession` rejects keyless writes; `/created/` hydrate/gate no longer pollute `hc_created` |
+| 2026-05-29 | **P0-7 shipped:** view-only copy branches on wallet signing rows; `#no-session-detail` + restore panel leads |
+| 2026-05-29 | **P0-2 shipped:** sync wallet save before `/created/` navigation; inline auto-save on `/created/` (no microtask) |
+| 2026-05-29 | **P0b-3 shipped:** sole signing row scan vouch auto-activate |
+| 2026-05-29 | **P1-2 shipped:** hub · landing dot · `/wallet/` tab hint · view-only Live banner · scan actor band restore CTA |
+| 2026-05-29 | **P1-2 step 1 shipped:** shell tab-honest dot + hub `wallet_not_in_tab` restore row |
+| 2026-05-29 | **P2-2 shipped:** PWA vs Safari session mismatch — `hc_last_signing_shell_mode` · hub · wallet · scan actor band |
+| 2026-05-29 | **P2-3 shipped:** WebKit E2E `e2e/safari-keys-persistence.spec.ts` — matrix S2 scan rehydrate · S3 wallet mismatch |

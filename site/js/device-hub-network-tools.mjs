@@ -13,6 +13,13 @@ const CHECK_NETWORK_ID = "device-hub-check-network-btn";
 const CHECK_LIVE_PROOF_ID = "device-hub-check-live-proof-btn";
 const WATCH_INPUT_ID = "device-hub-watch-live-proof";
 
+/** @type {(() => void | Promise<void>) | null} */
+let onCheckNetworkHandler = null;
+/** @type {(() => void | Promise<void>) | null} */
+let onCheckLiveProofHandler = null;
+/** @type {((enabled: boolean) => void) | null} */
+let onWatchChangeHandler = null;
+
 /** @typedef {{
  *   hubRoot: ParentNode,
  *   showNetwork: boolean,
@@ -32,6 +39,10 @@ const WATCH_INPUT_ID = "device-hub-watch-live-proof";
 /** @param {MountHubNetworkToolsConfig} config */
 export function mountHubNetworkTools(config) {
   if (!config.showNetwork && !config.showLiveProof) return;
+
+  onCheckNetworkHandler = config.onCheckNetwork;
+  onCheckLiveProofHandler = config.onCheckLiveProof;
+  onWatchChangeHandler = config.onWatchChange;
 
   const section = config.hubRoot.querySelector("#device-hub-saved-items-section");
   if (!section) return;
@@ -76,22 +87,27 @@ export function mountHubNetworkTools(config) {
 
   if (checkNetworkBtn instanceof HTMLButtonElement) {
     checkNetworkBtn.hidden = !config.showNetwork;
-    if (checkNetworkBtn.dataset.hcBound !== "1") {
-      checkNetworkBtn.dataset.hcBound = "1";
-      checkNetworkBtn.addEventListener("click", () => {
-        void config.onCheckNetwork();
-      });
-    }
   }
 
   if (checkLiveProofBtn instanceof HTMLButtonElement) {
     checkLiveProofBtn.hidden = !config.showLiveProof;
-    if (checkLiveProofBtn.dataset.hcBound !== "1") {
-      checkLiveProofBtn.dataset.hcBound = "1";
-      checkLiveProofBtn.addEventListener("click", () => {
-        void config.onCheckLiveProof();
-      });
-    }
+  }
+
+  if (toolbar.dataset.hcClickBound !== "1") {
+    toolbar.dataset.hcClickBound = "1";
+    toolbar.addEventListener("click", (e) => {
+      const target = e.target;
+      if (!(target instanceof Element)) return;
+      if (target.closest(`#${CHECK_NETWORK_ID}`)) {
+        e.preventDefault();
+        void onCheckNetworkHandler?.();
+        return;
+      }
+      if (target.closest(`#${CHECK_LIVE_PROOF_ID}`)) {
+        e.preventDefault();
+        void onCheckLiveProofHandler?.();
+      }
+    });
   }
 
   if (watchInput instanceof HTMLInputElement && watchLabel instanceof HTMLLabelElement) {
@@ -108,7 +124,7 @@ export function mountHubNetworkTools(config) {
           /* ignore */
         }
         syncLiveProofManualButton(checkLiveProofBtn, enabled);
-        config.onWatchChange(enabled);
+        onWatchChangeHandler?.(enabled);
       });
     }
   }

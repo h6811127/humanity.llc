@@ -61,6 +61,8 @@ npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts e2e/device
   - On close: call `reconcile*SheetState()` (hub/inbox) to clear stuck body classes.
 - [x] In `reconcile*SheetState` `hide_backdrop` branch: use `syncSheetBackdropClosed`.
 - [x] Call `bindSheetLifecycleReconcile(reconcile*SheetState)` at module init; remove duplicate `pageshow` listener if it only duplicated reconcile.
+- [x] **`syncInboxBackdropForOpenHub`** — when inbox is closed, force-hide stuck `#device-inbox-backdrop` (z-index 56 above hub/wallet; blocks **Check network**). Call from sheet reconcile, hub expand (`setHubExpanded`), and network refresh (`device-hub-ui.mjs`).
+- [x] CSS **`body:not(.device-inbox-sheet-open) .device-inbox-backdrop.is-visible { pointer-events: none }`** — taps pass through while JS reconcile clears stuck classes.
 - [x] Add CSS after `.device-hub-backdrop.is-visible` / `.device-inbox-backdrop.is-visible`:
 
 ```css
