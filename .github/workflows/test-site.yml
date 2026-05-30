@@ -60,6 +60,10 @@ jobs:
           npm run merch-funnel:rollout:step6 -- --preflight
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium webkit
+      - name: Ownership restore E2E (key-loss sad paths)
+        run: npm run e2e:key-loss-sad-path
+        env:
+          CI: "true"
       - name: Device shell E2E
         run: npm run device-shell:e2e
         env:

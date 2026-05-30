@@ -36,25 +36,26 @@ async function openHubStrangerEmpty(page: import("@playwright/test").Page) {
   await expect(page.locator("#device-hub")).toHaveClass(/device-hub--stranger-empty/);
 }
 
-function mockHealth(route: Route) {
-  return route.fulfill({
-    status: 200,
-    contentType: "application/json",
-    body: JSON.stringify({ status: "ok", database: "ok" }),
+async function expectNoKeylessHcCreated(page: import("@playwright/test").Page) {
+  const session = await page.evaluate(() => {
+    const raw = sessionStorage.getItem("hc_created");
+    if (!raw) return { ok: true };
+    try {
+      const parsed = JSON.parse(raw) as Record<string, unknown>;
+      const owner =
+        typeof parsed.owner_private_key_b58 === "string"
+          ? parsed.owner_private_key_b58.trim()
+          : "";
+      const recovery =
+        typeof parsed.recovery_private_key_b58 === "string"
+          ? parsed.recovery_private_key_b58.trim()
+          : "";
+      return { ok: Boolean(owner || recovery) };
+    } catch {
+      return { ok: true };
+    }
   });
-}
-
-async function waitForStatusDotReady(page: import("@playwright/test").Page) {
-  await expect(page.locator("#brand-status-dot")).toHaveAttribute("data-dot-state", /.+/, {
-    timeout: 15_000,
-  });
-}
-
-async function openHubStrangerEmpty(page: import("@playwright/test").Page) {
-  await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route));
-  await page.locator("#brand-status-dot-btn").click();
-  await expect(page.locator("body")).toHaveClass(/device-hub-sheet-open/, { timeout: 15_000 });
-  await expect(page.locator("#device-hub")).toHaveClass(/device-hub--stranger-empty/);
+  expect(session.ok).toBe(true);
 }
 
 async function stubCardRoutes(page: import("@playwright/test").Page) {
