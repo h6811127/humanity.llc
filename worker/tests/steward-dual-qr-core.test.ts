@@ -2,9 +2,12 @@ import { describe, expect, it } from "vitest";
 
 import {
   buildStewardDualQrMaterials,
+  dualQrHandoffOrigin,
   isAllowedStewardHandoffEncodeUrl,
+  resolveDualQrScanUrl,
   stewardDualQrDownloadFilenames,
 } from "../../site/js/steward-dual-qr-core.mjs";
+import { buildOfficialScanUrl } from "../../site/js/qr-scan-url-lock.mjs";
 import { buildStewardHandoffShortUrl } from "../../site/js/steward-handoff-code-core.mjs";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
@@ -24,6 +27,22 @@ describe("buildStewardDualQrMaterials (S7)", () => {
     const materials = buildStewardDualQrMaterials("https://example.com/c/x?q=qr_y");
     expect(materials.hasStewardHandoff).toBe(false);
     expect(materials.stewardHandoffUrl).toBeNull();
+  });
+
+  it("resolveDualQrScanUrl rebuilds when session scan_url has extra query params", () => {
+    const canonical = buildOfficialScanUrl(PROFILE, QR);
+    const messy = `${canonical}&hc_ref=scan_customize`;
+    expect(resolveDualQrScanUrl(messy, PROFILE, QR)).toBe(canonical);
+    const materials = buildStewardDualQrMaterials(
+      resolveDualQrScanUrl(messy, PROFILE, QR)!,
+      "https://humanity.llc"
+    );
+    expect(materials.hasStewardHandoff).toBe(true);
+  });
+
+  it("dualQrHandoffOrigin follows the public scan URL host", () => {
+    const scan = buildOfficialScanUrl(PROFILE, QR);
+    expect(dualQrHandoffOrigin(scan, "https://www.humanity.llc")).toBe("https://humanity.llc");
   });
 });
 
@@ -52,6 +71,7 @@ describe("/created/ dual-QR HTML guards (S7)", () => {
     expect(html).toContain('id="download-steward-qr"');
     expect(html).toContain('id="copy-steward-handoff"');
     expect(html).toContain('id="created-steward-qr-col"');
+    expect(html).toContain('id="created-setup-steward-qr-img"');
     expect(html).toContain("Download public QR");
   });
 

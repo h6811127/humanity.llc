@@ -4,12 +4,57 @@
  * @see docs/MERCH_QR_LIFECYCLE_POLICY.md (public HTTPS payload unchanged)
  */
 
-import { isAllowedScanHost } from "./qr-scan-url-lock.mjs";
+import {
+  buildOfficialScanUrl,
+  isAllowedScanHost,
+  isOfficialScanUrl,
+} from "./qr-scan-url-lock.mjs";
 import {
   buildStewardHandoffShortUrl,
   decodeStewardHandoffCode,
   parseStewardHandoffScanParts,
 } from "./steward-handoff-code-core.mjs";
+
+/**
+ * Canonical scan URL for dual-QR materials — prefers a valid official URL, then
+ * rebuilds from profile + qr when session/wallet `scan_url` has extra params or
+ * is missing `?q=`.
+ *
+ * @param {string | null | undefined} scanUrl
+ * @param {string | null | undefined} profileId
+ * @param {string | null | undefined} qrId
+ * @param {string} [origin]
+ * @returns {string | null}
+ */
+export function resolveDualQrScanUrl(scanUrl, profileId, qrId, origin = "https://humanity.llc") {
+  const raw = String(scanUrl ?? "").trim();
+  if (raw && isOfficialScanUrl(raw)) return raw;
+  const pid = String(profileId ?? "").trim();
+  const qid = String(qrId ?? "").trim();
+  if (pid && qid) {
+    try {
+      return buildOfficialScanUrl(pid, qid, origin);
+    } catch {
+      /* fall through */
+    }
+  }
+  return raw || null;
+}
+
+/**
+ * Origin for `/v/{code}` handoff links — match the public scan URL host when known.
+ *
+ * @param {string | null | undefined} scanUrl
+ * @param {string} [fallbackOrigin]
+ */
+export function dualQrHandoffOrigin(scanUrl, fallbackOrigin = "https://humanity.llc") {
+  const raw = String(scanUrl ?? "").trim();
+  try {
+    return new URL(raw).origin.replace(/\/$/, "");
+  } catch {
+    return String(fallbackOrigin).replace(/\/$/, "");
+  }
+}
 
 /**
  * @param {string | null | undefined} urlString
@@ -35,8 +80,11 @@ export function isAllowedStewardHandoffEncodeUrl(urlString) {
  */
 export function buildStewardDualQrMaterials(scanUrl, origin = "https://humanity.llc") {
   const publicScanUrl = String(scanUrl ?? "").trim();
-  const parts = parseStewardHandoffScanParts(publicScanUrl, origin);
-  const stewardHandoffUrl = parts ? buildStewardHandoffShortUrl(publicScanUrl, origin) : null;
+  const handoffOrigin = dualQrHandoffOrigin(publicScanUrl, origin);
+  const parts = parseStewardHandoffScanParts(publicScanUrl, handoffOrigin);
+  const stewardHandoffUrl = parts
+    ? buildStewardHandoffShortUrl(publicScanUrl, handoffOrigin)
+    : null;
   return {
     publicScanUrl,
     stewardHandoffUrl,

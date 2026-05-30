@@ -47,6 +47,8 @@ import { initCreatedSetup } from "./created-setup.mjs";
 import { applyStewardScanLinkElement } from "./pwa-scan-handoff-core.mjs";
 import {
   buildStewardDualQrMaterials,
+  dualQrHandoffOrigin,
+  resolveDualQrScanUrl,
   stewardDualQrDownloadFilenames,
 } from "./steward-dual-qr-core.mjs";
 import { openStewardScanPreviewFromWindow } from "./pwa-scan-handoff.mjs";
@@ -236,9 +238,12 @@ const scanOrigin =
 
 const profileId = gate.profileId;
 let activeQrId = gate.qrId;
-let activeScanUrl =
-  data?.scan_url ||
-  (profileId && activeQrId ? qrScanUrl(profileId, activeQrId, scanOrigin) : null);
+let activeScanUrl = resolveDualQrScanUrl(
+  data?.scan_url,
+  profileId,
+  activeQrId,
+  scanOrigin
+);
 
 const handleEl = document.getElementById("created-handle");
 const manifestoEl = document.getElementById("created-manifesto");
@@ -1092,9 +1097,12 @@ if (workspaceMode === "setup" && profileId && activeQrId) {
 }
 
 function syncStewardDualQrMaterials(scanUrl) {
-  const materials = buildStewardDualQrMaterials(scanUrl, location.origin);
+  const resolved =
+    resolveDualQrScanUrl(scanUrl, profileId, activeQrId, scanOrigin) ?? String(scanUrl ?? "");
+  const handoffOrigin = dualQrHandoffOrigin(resolved, location.origin);
+  const materials = buildStewardDualQrMaterials(resolved, handoffOrigin);
   const slug = data?.handle ? String(data.handle) : activeQrId?.slice(0, 8) || "scan";
-  const filenames = stewardDualQrDownloadFilenames(scanUrl, slug, location.origin);
+  const filenames = stewardDualQrDownloadFilenames(resolved, slug, handoffOrigin);
 
   if (dualQrLeadEl) {
     dualQrLeadEl.textContent = DUAL_QR_SECTION_LEAD;
@@ -1148,11 +1156,17 @@ function syncStewardDualQrMaterials(scanUrl) {
     stewardHandoffUrlEl.hidden = false;
   }
 
-  return import("./qr-render.mjs").then(({ renderBrandedQrToImage, downloadBrandedQrPng }) => {
+  return import("./qr-render.mjs").then(async ({ renderBrandedQrToImage, downloadBrandedQrPng }) => {
     if (stewardQrImg) {
-      void renderBrandedQrToImage(stewardQrImg, materials.stewardHandoffUrl, {
-        alt: "Steward handoff QR code",
-      });
+      try {
+        await renderBrandedQrToImage(stewardQrImg, materials.stewardHandoffUrl, {
+          alt: "Steward handoff QR code",
+        });
+      } catch (err) {
+        console.error(err);
+        stewardQrImg.removeAttribute("src");
+        stewardQrImg.alt = "Could not generate steward handoff QR";
+      }
     }
     if (downloadStewardQrBtn && filenames.stewardFilename) {
       downloadStewardQrBtn.hidden = false;
@@ -1356,9 +1370,9 @@ async function bootstrapOwnerTools() {
     setSession: saveSession,
     showError,
     getSigningKeys: currentSigningKeys,
-    async onRotated({ qrId: newQrId, scanUrl: newScanUrl, expiresAt }) {
+    async     onRotated({ qrId: newQrId, scanUrl: newScanUrl, expiresAt }) {
       activeQrId = newQrId;
-      activeScanUrl = newScanUrl;
+      activeScanUrl = resolveDualQrScanUrl(newScanUrl, profileId, newQrId, scanOrigin) ?? newScanUrl;
       data = loadSession();
       if (profileIdEl) profileIdEl.textContent = profileId;
       if (scanUrlEl) scanUrlEl.textContent = newScanUrl;
