@@ -7,6 +7,12 @@ import { openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=56";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
 import { actOnOrphanRemovedTabKeys } from "./device-orphan-keys-nav.mjs";
 import { actOnOtherTabKeys, openSaveKeysForThisTab } from "./device-notice-nav.mjs";
+import { shouldShowHubQrScanner } from "./device-hub-qr-scanner-core.mjs";
+import { openHubQrScanner } from "./device-hub-qr-scanner.mjs";
+import {
+  HUB_GLANCE_SCAN_QR_SUB,
+  HUB_GLANCE_SCAN_QR_TITLE,
+} from "./device-ownership-copy-core.mjs";
 import {
   getLatestResolvedAlertState,
   getLatestResolvedScanKind,
@@ -23,6 +29,7 @@ import {
 import {
   findWalletEntryById,
   getWalletEntrySummaries,
+  getWalletCount,
   walletEntrySubtitle,
 } from "./device-wallet.mjs";
 
@@ -218,6 +225,21 @@ function appendWalletGlanceRow(entry, revokedHint, list) {
   list.appendChild(li);
 }
 
+function appendScanGlanceRow(list) {
+  const li = document.createElement("li");
+  li.className = "device-hub-glance-row device-hub-glance-row--scan";
+  li.innerHTML = `
+    <button type="button" class="device-hub-glance-btn">
+      <span class="device-hub-glance-title">${escapeHtml(HUB_GLANCE_SCAN_QR_TITLE)}</span>
+      <span class="device-hub-glance-sub">${escapeHtml(HUB_GLANCE_SCAN_QR_SUB)}</span>
+    </button>`;
+  li.querySelector("button")?.addEventListener("click", () => {
+    closeGlancePopoverEvent();
+    void openHubQrScanner();
+  });
+  list.appendChild(li);
+}
+
 /**
  * @param {number} remaining
  * @param {HTMLElement} list
@@ -254,13 +276,19 @@ function refreshGlanceTarget(target) {
     orphanRemovedEntries: inboxCtx.orphanRemovedEntries,
   });
 
-  if (plan.length === 0) {
+  const showScanRow = shouldShowHubQrScanner(getWalletCount());
+
+  if (plan.length === 0 && !showScanRow) {
     root.hidden = true;
     return;
   }
 
   glanceHasRenderableContent = true;
   list.innerHTML = "";
+
+  if (showScanRow) {
+    appendScanGlanceRow(list);
+  }
 
   for (const row of plan) {
     if (row.type === "inbox") {

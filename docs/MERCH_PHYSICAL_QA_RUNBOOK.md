@@ -2,6 +2,7 @@
 
 **Status:** Operator checklist — complete before first paid personalized drop ships  
 **Parent:** [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) exit checklist · [`V1_ASSUMPTION_REGISTER.md`](V1_ASSUMPTION_REGISTER.md) A-004 · A-009  
+**Visual choreography:** [`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) § Beat 1 (physical recognition) — digital wow must not replace reliable ink scan  
 **Automated regression:** `npm run worker:test:merch-print-qa`
 
 ---

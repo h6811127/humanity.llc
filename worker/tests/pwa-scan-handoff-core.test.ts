@@ -72,6 +72,12 @@ describe("pwa-scan-handoff-core", () => {
         "https://humanity.llc"
       )
     ).toBe(true);
+    expect(
+      isAllowedStewardPreviewReturnUrl(
+        "https://humanity.llc/shop/customize/?hc_ref=customize_shop",
+        "https://humanity.llc"
+      )
+    ).toBe(true);
   });
 
   it("appends hc_return to scan URL", () => {
@@ -92,6 +98,9 @@ describe("pwa-scan-handoff-core", () => {
     expect(stewardPreviewReturnBannerLabel("https://humanity.llc/wallet/")).toBe(
       "Back to My objects"
     );
+    expect(
+      stewardPreviewReturnBannerLabel("https://humanity.llc/shop/customize/?hc_ref=customize_shop")
+    ).toBe("Back to customize");
   });
 
   it("maps standalone to link attrs and feedback", () => {

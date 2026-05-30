@@ -2,7 +2,7 @@
 
 **Status:** Product + UX contract (resolver and recognition)  
 **Audience:** Design, product, and implementation for anything a stranger sees after scanning a Humanity QR  
-**Related:** [`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) (Worker HTML layout), [`docs/QR_BRANDING.md`](QR_BRANDING.md) (optical QR modules), [`docs/V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md) (what scans prove), [`docs/VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md) (tone and hierarchy), [`docs/M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) (validation), [`docs/PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) (stranger-facing language)
+**Related:** [`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) (Worker HTML layout), [`docs/QR_BRANDING.md`](QR_BRANDING.md) (optical QR modules), [`docs/V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md) (what scans prove), [`docs/VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md) (tone and hierarchy), [`docs/MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) (merch funnel beats 1–2: physical → stranger notary), [`docs/M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) (validation), [`docs/PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) (stranger-facing language)
 
 ---
 
@@ -53,7 +53,7 @@ Scanners are not stewards and not engineers. Default scan copy follows [`PRODUCT
 - *“Only treat pink Humanity codes on `humanity.llc` as Humanity objects. Street QRs can copy colors; always read the page.”*
 - *“This scan checks live status. It does not prove the person holding the sticker owns the card.”* (Level 0 — canonical in trust model.)
 
-Movement/marketing surfaces may be louder; the **scan page stays calm, precise, and utility-first** ([`docs/VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md)).
+Movement/marketing surfaces may be louder; the **scan page stays calm, precise, and utility-first** ([`docs/VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md)). Merch **wow** (customize preview, created live object card) lives on owner surfaces — not by forking scan HTML per product ([`docs/MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md)).
 
 ---
 

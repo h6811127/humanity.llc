@@ -15,4 +15,8 @@ describe("wrangler production routes (merch)", () => {
   it("routes humanity.llc/v1/* to the resolver Worker", () => {
     expect(toml).toMatch(/pattern\s*=\s*"humanity\.llc\/v1\/\*"/);
   });
+
+  it("routes humanity.llc/v/* for steward handoff interstitial (S6)", () => {
+    expect(toml).toMatch(/pattern\s*=\s*"humanity\.llc\/v\/\*"/);
+  });
 });

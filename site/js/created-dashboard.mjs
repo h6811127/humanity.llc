@@ -266,6 +266,7 @@ export function initCreatedDashboard({
 
   initCreatedLivePrimaryCta({
     getProfileId: profileId,
+    getSession: opts.getSession,
     hasSigningKeys: () => hasSigningKeys?.() ?? false,
     resolverReachable: () =>
       document.body.dataset.createdResolverReachable !== "offline",

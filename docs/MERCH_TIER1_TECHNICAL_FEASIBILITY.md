@@ -4,7 +4,8 @@
 **Question:** Can a buyer preview a customized hoodie on humanity.llc, pay through a Shopify checkout that feels native, and receive a Printify garment printed with **their** unique QR?  
 **Short answer:** **Yes — but only with the three-system architecture already documented.** Printify is **not** the storefront or checkout. Shopify variant URLs are **required for payment**, not a mistake. Several steps are **shipped in code**; fulfillment after payment is **partially manual** by design (mint + Printify submit gates). “Native-looking” checkout does **not** mean checkout runs on `humanity.llc` or that Printify hosts the cart.
 
-**Canonical stack:** [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) · [`V1_DECISION_LOCK.md`](V1_DECISION_LOCK.md) · [`features/Storefront v1.0.md`](features/Storefront%20v1.0.md)
+**Canonical stack:** [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) · [`V1_DECISION_LOCK.md`](V1_DECISION_LOCK.md) · [`features/Storefront v1.0.md`](features/Storefront%20v1.0.md)  
+**Visual choreography:** [`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) — preview mock is CSS/HTML today; planned Settle on QR land (Beat 3)
 
 ---
 
@@ -69,7 +70,7 @@ This matches [`V1_DECISION_LOCK.md`](V1_DECISION_LOCK.md): headless Shopify for 
 | **Requirement** | Show branded LIVE OBJECT QR on a product mockup before pay. |
 | **Feasible?** | **Yes, with caveats.** |
 | **Shipped** | `POST /v1/store/artifact-intents` allocates **planned** `qr_id`s (not minted). Preview renders scan URL via `buildPlannedItemScanUrl` + `renderQrToImage` (`shop-customize.mjs`). Mockup is **CSS/HTML** (`data-preview=hoodie|sticker`), not Printify’s live mockup API. |
-| **Caveats** | (1) Preview is **approximate garment art**, not Printify’s production mockup. (2) Physical ink QA is required ([`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md), A-004). (3) If intent API fails, UI can fall back to **card QR** preview — checkout is blocked in `card_fallback` mode until planned intent works. |
+| **Caveats** | (1) Preview is **approximate garment art**, not Printify’s production mockup. (2) Physical ink QA is required ([`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md), A-004). (3) If intent API fails, UI can fall back to **card QR** preview — checkout is blocked in `card_fallback` mode until planned intent works. (4) **Preview Settle (V1):** one-shot vessel animation when QR lands — **✅ shipped** ([`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) Beat 3); scan notary unchanged. |
 
 ### Step 3 — Reserve customization metadata (artifact intent + attach)
 

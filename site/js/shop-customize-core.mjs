@@ -73,6 +73,25 @@ export function loadCardSessionForCustomize(storage = globalThis) {
 }
 
 /**
+ * Public manifesto line from hc_created when present (preview vessel teaser).
+ * @param {typeof globalThis} [storage]
+ * @returns {string | null}
+ */
+export function readManifestoLineForCustomize(storage = globalThis) {
+  const sessionStorage = storage.sessionStorage;
+  if (!sessionStorage) return null;
+  try {
+    const raw = sessionStorage.getItem("hc_created");
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    const line = parsed?.manifesto_line;
+    return typeof line === "string" && line.trim() ? line.trim() : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Card session with signing keys for pre-checkout print_artifact mint credentials.
  * @returns {{
  *   profile_id: string;

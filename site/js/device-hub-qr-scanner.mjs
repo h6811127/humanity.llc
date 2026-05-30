@@ -2,6 +2,7 @@
  * Hub in-app QR scanner — scan printed QRs without leaving the PWA (S3).
  */
 import {
+  HUB_CHROME_SCAN_QR_ARIA,
   HUB_SCAN_QR_BTN,
   HUB_SCAN_QR_DIALOG_LEAD,
   HUB_SCAN_QR_DIALOG_TITLE,
@@ -9,11 +10,14 @@ import {
   HUB_SCAN_QR_UNSUPPORTED,
 } from "./device-ownership-copy-core.mjs";
 import {
-  barcodeDetectorSupported,
+  pickQrScanBackend,
   resolveScannedQrToScanUrl,
   shouldShowHubQrScanner,
+  shouldShowHubScanQrChrome,
 } from "./device-hub-qr-scanner-core.mjs";
+import { startJsQrDetectLoop } from "./device-hub-qr-scanner-decode.mjs";
 import { getWalletCount } from "./device-wallet.mjs";
+import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
 
 /** @type {MediaStream | null} */
 let activeStream = null;
@@ -33,12 +37,23 @@ function scannerStatus() {
   return document.getElementById("device-hub-qr-scanner-status");
 }
 
+function scannerVideoWrap() {
+  return document.querySelector(".device-hub-qr-scanner-video-wrap");
+}
+
 function setScannerStatus(msg, isError = false) {
   const el = scannerStatus();
   if (!el) return;
   el.hidden = !msg;
   el.textContent = msg;
   el.className = isError ? "form-status error" : "form-status";
+}
+
+function setScannerCameraUi(active) {
+  const dialog = scannerDialog();
+  const wrap = scannerVideoWrap();
+  if (dialog) dialog.classList.toggle("device-hub-qr-scanner--no-camera", !active);
+  if (wrap) wrap.hidden = !active;
 }
 
 async function stopCamera() {
@@ -58,6 +73,8 @@ function closeScannerDialog() {
   const dialog = scannerDialog();
   void stopCamera();
   setScannerStatus("");
+  setScannerCameraUi(true);
+  dialog?.classList.remove("device-hub-qr-scanner--no-camera");
   dialog?.close();
 }
 
@@ -66,7 +83,7 @@ function closeScannerDialog() {
  * @param {HTMLVideoElement} video
  * @param {(url: string) => void} onFound
  */
-function startDetectLoop(detector, video, onFound) {
+function startNativeDetectLoop(detector, video, onFound) {
   let stopped = false;
   const tick = async () => {
     if (stopped || video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
@@ -94,12 +111,23 @@ function startDetectLoop(detector, video, onFound) {
   };
 }
 
+function onScanUrlFound(url) {
+  const dialog = scannerDialog();
+  void stopCamera();
+  setScannerStatus("Scan found — opening…");
+  window.dispatchEvent(new CustomEvent("hc-hub-sheet-close"));
+  dialog?.close();
+  window.location.assign(url);
+}
+
 async function openScannerDialog() {
   const dialog = scannerDialog();
   const video = scannerVideo();
   if (!dialog || !video) return;
 
-  if (!barcodeDetectorSupported()) {
+  const backend = pickQrScanBackend();
+  if (!backend) {
+    setScannerCameraUi(false);
     setScannerStatus(HUB_SCAN_QR_UNSUPPORTED, true);
     dialog.showModal();
     return;
@@ -109,6 +137,7 @@ async function openScannerDialog() {
   const lead = dialog.querySelector("#device-hub-qr-scanner-lead");
   if (title) title.textContent = HUB_SCAN_QR_DIALOG_TITLE;
   if (lead) lead.textContent = HUB_SCAN_QR_DIALOG_LEAD;
+  setScannerCameraUi(true);
   setScannerStatus("Starting camera…");
   dialog.showModal();
 
@@ -119,16 +148,21 @@ async function openScannerDialog() {
     });
     video.srcObject = activeStream;
     await video.play();
-    const detector = new globalThis.BarcodeDetector({ formats: ["qr_code"] });
-    stopScanLoop = startDetectLoop(detector, video, (url) => {
-      void stopCamera();
-      setScannerStatus("Scan found — opening…");
-      window.dispatchEvent(new CustomEvent("hc-hub-sheet-close"));
-      dialog.close();
-      window.location.assign(url);
-    });
+
+    const onRaw = (raw) => {
+      const url = resolveScannedQrToScanUrl(raw, location.origin);
+      if (url) onScanUrlFound(url);
+    };
+
+    if (backend === "native") {
+      const detector = new globalThis.BarcodeDetector({ formats: ["qr_code"] });
+      stopScanLoop = startNativeDetectLoop(detector, video, onScanUrlFound);
+    } else {
+      stopScanLoop = await startJsQrDetectLoop(video, onRaw);
+    }
     setScannerStatus("Point at a humanity.llc scan QR");
   } catch (err) {
+    setScannerCameraUi(false);
     const denied =
       err instanceof DOMException &&
       (err.name === "NotAllowedError" || err.name === "PermissionDeniedError");
@@ -136,11 +170,25 @@ async function openScannerDialog() {
   }
 }
 
-function syncScanQrButtonVisibility() {
+function syncHubScanQrSurfaces() {
+  const walletCount = getWalletCount();
+  const showHub = shouldShowHubQrScanner(walletCount);
+  const showChrome = shouldShowHubScanQrChrome({
+    walletCount,
+    standalone: readStandaloneModeFromWindow(window),
+  });
   const btn = document.getElementById("hub-scan-qr-btn");
-  if (!btn) return;
-  btn.textContent = HUB_SCAN_QR_BTN;
-  btn.hidden = !shouldShowHubQrScanner(getWalletCount());
+  const strip = document.getElementById("device-hub-steward-tools");
+  const chromeBtn = document.getElementById("shell-scan-qr-btn");
+  if (btn) {
+    btn.textContent = HUB_SCAN_QR_BTN;
+    btn.hidden = !showHub;
+  }
+  if (strip) strip.hidden = !showHub;
+  if (chromeBtn) {
+    chromeBtn.hidden = !showChrome;
+    chromeBtn.setAttribute("aria-label", HUB_CHROME_SCAN_QR_ARIA);
+  }
 }
 
 function bindScannerChrome() {
@@ -155,6 +203,7 @@ function bindScannerChrome() {
   dialog?.addEventListener("close", () => {
     void stopCamera();
     setScannerStatus("");
+    setScannerCameraUi(true);
   });
   dialog?.addEventListener("cancel", () => {
     void stopCamera();
@@ -165,9 +214,15 @@ function bindScannerChrome() {
     void openScannerDialog();
   });
 
-  document.addEventListener("hc-device-hub-changed", syncScanQrButtonVisibility);
-  window.addEventListener("hc-device-os-refreshed", syncScanQrButtonVisibility);
-  syncScanQrButtonVisibility();
+  document.getElementById("shell-scan-qr-btn")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    void openScannerDialog();
+  });
+
+  document.addEventListener("hc-device-hub-changed", syncHubScanQrSurfaces);
+  window.addEventListener("hc-device-os-refreshed", syncHubScanQrSurfaces);
+  window.matchMedia("(display-mode: standalone)")?.addEventListener("change", syncHubScanQrSurfaces);
+  syncHubScanQrSurfaces();
 }
 
 /**
@@ -176,10 +231,14 @@ function bindScannerChrome() {
 export function initHubQrScanner(root) {
   bindScannerChrome();
   if (root && root !== document) {
-    syncScanQrButtonVisibility();
+    syncHubScanQrSurfaces();
   }
 }
 
 bindScannerChrome();
 
-export { syncScanQrButtonVisibility as syncHubQrScannerButtonForTests, closeScannerDialog };
+export {
+  syncHubScanQrSurfaces as syncHubQrScannerButtonForTests,
+  closeScannerDialog,
+  openScannerDialog as openHubQrScanner,
+};

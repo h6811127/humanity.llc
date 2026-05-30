@@ -2,7 +2,8 @@
 
 **Status:** Canonical operator + engineering reference (2026-05-27)  
 **Parent:** [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) · [`MERCH_LED_V1.md`](MERCH_LED_V1.md)  
-**Specs:** [`features/Storefront v1.0.md`](features/Storefront%20v1.0.md) · [`features/Printify Fulfillment Middleware v1.0.md`](features/Printify%20Fulfillment%20Middleware%20v1.0.md) · [`V1_DECISION_LOCK.md`](V1_DECISION_LOCK.md) § Commerce stack
+**Specs:** [`features/Storefront v1.0.md`](features/Storefront%20v1.0.md) · [`features/Printify Fulfillment Middleware v1.0.md`](features/Printify%20Fulfillment%20Middleware%20v1.0.md) · [`V1_DECISION_LOCK.md`](V1_DECISION_LOCK.md) § Commerce stack  
+**Visual choreography:** [`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) — customize preview (Beat 3) is the storefront delight moment; scan stays shared notary
 
 ---
 

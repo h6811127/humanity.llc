@@ -397,10 +397,18 @@ export const HUB_SCAN_QR_DIALOG_LEAD =
   "Point at a printed or on-screen scan QR. The scan page opens in this app with your saved card.";
 
 export const HUB_SCAN_QR_UNSUPPORTED =
-  "Camera scan is not available here. Use Open scan link below and paste the URL from Safari.";
+  "Camera scan is not available in this browser. In the hub, open Restore & scan → Open scan link and paste the URL.";
 
 export const HUB_SCAN_QR_PERMISSION_DENIED =
   "Camera access was denied. Allow camera in Settings, or use Open scan link below.";
+
+/** Glance popover fast path to in-app scanner (Phase A). */
+export const HUB_GLANCE_SCAN_QR_TITLE = "Scan a Humanity QR";
+
+export const HUB_GLANCE_SCAN_QR_SUB = "Vouch from a printed code";
+
+/** Top chrome scan icon (Phase B · standalone PWA). */
+export const HUB_CHROME_SCAN_QR_ARIA = "Scan to vouch";
 
 /** Hub intro coachmark — strangers with nothing saved yet (P2). */
 export const HUB_INTRO_BODY_STRANGER =

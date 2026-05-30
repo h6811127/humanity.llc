@@ -4,6 +4,11 @@
 import { loadCardSigningSessionForCustomize } from "./shop-customize-core.mjs";
 import { signPlannedPrintArtifactCredentials } from "./shop-artifact-pre-mint.mjs";
 import {
+  hideThanksActivationCard,
+  showThanksActivationCard,
+} from "./shop-thanks-activation.mjs";
+import { shouldShowThanksActivation } from "./shop-thanks-activation-core.mjs";
+import {
   postBuyerOrderMint,
   shouldOfferThanksMint,
   thanksMintButtonLabel,
@@ -76,6 +81,17 @@ function syncMintChrome() {
  */
 export function reconcileThanksMintPanel(orderStatus, tier1Thanks, order, email) {
   const mint = orderStatus?.mint;
+
+  if (shouldShowThanksActivation(mint, tier1Thanks)) {
+    activeMintContext = null;
+    setMintVisible(false);
+    setResult("");
+    showThanksActivationCard();
+    return;
+  }
+
+  hideThanksActivationCard();
+
   const offer = shouldOfferThanksMint(mint, tier1Thanks);
   if (!offer) {
     activeMintContext = null;
@@ -91,17 +107,9 @@ export function reconcileThanksMintPanel(orderStatus, tier1Thanks, order, email)
   };
   setMintVisible(true);
   syncMintChrome();
-  if (mint?.status === "complete") {
-    setResult("Your print QR is already active.");
-    if (btn instanceof HTMLButtonElement) {
-      btn.disabled = true;
-      btn.textContent = thanksMintButtonLabel("complete");
-    }
-  } else {
-    setResult("");
-    if (btn instanceof HTMLButtonElement) {
-      btn.textContent = thanksMintButtonLabel("idle");
-    }
+  setResult("");
+  if (btn instanceof HTMLButtonElement) {
+    btn.textContent = thanksMintButtonLabel("idle");
   }
 }
 
@@ -135,13 +143,19 @@ async function onMintClick() {
       email: ctx.email,
       qr_credentials: credentials,
     });
-    const message = thanksMintResultMessage(payload);
     const complete = payload.mint_status === "complete" || payload.all_planned_minted === true;
-    setResult(message, !complete);
-    btn.textContent = thanksMintButtonLabel(complete ? "complete" : "error");
-    btn.disabled = complete;
-    if (complete && ctx.mint) {
-      ctx.mint.status = "complete";
+    if (complete) {
+      if (ctx.mint) ctx.mint.status = "complete";
+      setMintVisible(false);
+      setResult("");
+      showThanksActivationCard();
+      btn.textContent = thanksMintButtonLabel("complete");
+      btn.disabled = true;
+    } else {
+      const message = thanksMintResultMessage(payload);
+      setResult(message, true);
+      btn.textContent = thanksMintButtonLabel("error");
+      btn.disabled = false;
     }
   } catch (err) {
     setResult(err instanceof Error ? err.message : "Could not activate print QR.", true);

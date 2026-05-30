@@ -4,6 +4,11 @@
  */
 
 import { validateOfficialScanUrl } from "./qr-scan-url-lock.mjs";
+export {
+  barcodeDetectorSupported,
+  hubCameraScanSupported,
+  pickQrScanBackend,
+} from "./device-hub-qr-scanner-decode-core.mjs";
 
 /**
  * @param {number} [walletCount]
@@ -12,8 +17,13 @@ export function shouldShowHubQrScanner(walletCount = 0) {
   return walletCount >= 1;
 }
 
-export function barcodeDetectorSupported() {
-  return typeof globalThis.BarcodeDetector === "function";
+/**
+ * Phase B — muted top-chrome scan icon (standalone PWA stewards only).
+ * @param {{ walletCount?: number; standalone?: boolean }} [input]
+ */
+export function shouldShowHubScanQrChrome(input = {}) {
+  const walletCount = input.walletCount ?? 0;
+  return shouldShowHubQrScanner(walletCount) && input.standalone === true;
 }
 
 /**

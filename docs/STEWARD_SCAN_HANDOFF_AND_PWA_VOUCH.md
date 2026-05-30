@@ -64,9 +64,11 @@ Primary cross-context path when steward saved recovery code but not encrypted ba
 
 ### S3 — In-app QR scanner (shipped)
 
-**Hub:** **Scan QR to vouch** — `getUserMedia` + `BarcodeDetector` → validate official scan URL → `location.assign` in PWA.
+**Hub:** **Scan QR to vouch** — `getUserMedia` + **BarcodeDetector** on Chromium, **jsQR canvas fallback** on Safari / iOS (WebKit has no native `BarcodeDetector`) → validate official scan URL → `location.assign` in PWA.
 
 Steward never leaves PWA; printed QR scanned from inside app. Modules: `device-hub-qr-scanner-core.mjs`, `device-hub-qr-scanner.mjs`.
+
+**Placement (Phase A — May 2026):** Scan affordance lives in the **Steward tools** strip under saved items (not buried in Restore & scan) and as a **glance popover** row when the hub is collapsed. **Phase B:** muted `#shell-scan-qr-btn` in top chrome when standalone PWA + saved cards. Full spec: [`HUB_SCAN_QR_PLACEMENT.md`](HUB_SCAN_QR_PLACEMENT.md).
 
 **Fallback when camera API unavailable:** link to **Open scan link** (S1).
 
@@ -162,6 +164,9 @@ flowchart TB
 | `device-hub-open-scan-core.mjs` | Parse pasted scan URLs |
 | `device-hub-open-scan.mjs` | Hub open scan link form |
 | `device-hub-import-recovery.mjs` | Hub recovery code import |
+| `device-hub-qr-scanner-decode-core.mjs` | Backend pick + jsQR frame decode |
+| `device-hub-qr-scanner-decode.mjs` | Lazy jsQR load + Safari detect loop |
+| `site/js/vendor/jsqr.js` | jsQR library (Safari fallback) |
 | `device-hub-qr-scanner-core.mjs` | Decode + validate scanned QR text |
 | `device-hub-qr-scanner.mjs` | In-app camera scanner UI |
 | `device-hub-steward-vouch-guidance.mjs` | S4 hub iPhone vouch guidance card |
@@ -199,5 +204,7 @@ Add to [`ownership-restore:verify`](package.json) or new `steward-scan-handoff:v
 | 2026-05-30 | **S6 shipped** — `/v/{code}` steward handoff interstitial + code encoder |
 | 2026-05-30 | **S5 shipped** — `?hc_steward=1` Safari handoff-first landing |
 | 2026-05-30 | **S4 shipped** — hub Restore & scan label, iPhone vouch guidance card, PWA install + setup copy |
+| 2026-05-30 | **Phase B scan placement** — standalone chrome icon `#shell-scan-qr-btn` · [`HUB_SCAN_QR_PLACEMENT.md`](HUB_SCAN_QR_PLACEMENT.md) |
+| 2026-05-30 | **Phase A scan placement** — glance row + steward tools strip · [`HUB_SCAN_QR_PLACEMENT.md`](HUB_SCAN_QR_PLACEMENT.md) |
 | 2026-05-30 | **S3 shipped** — in-app hub QR scanner (`device-hub-qr-scanner.mjs`) |
 | 2026-05-30 | Initial roadmap; S1–S2 shipped |

@@ -3,7 +3,7 @@
 **Status:** **Complete** (T0-T5 shipped May 2026).  
 **Audience:** Product, design, frontend  
 **Scope:** `/created/` **control mode**, **Live** tab (renamed from Tasks) and **Manage** tab (renamed from Advanced). Canonical UX: [`CREATED_TASK_DASHBOARD.md`](CREATED_TASK_DASHBOARD.md).  
-**Related:** [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) · [`CREATED_TASK_DASHBOARD.md`](CREATED_TASK_DASHBOARD.md) · [`VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md) · [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md) · setup wizard in [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md)
+**Related:** [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) · [`CREATED_TASK_DASHBOARD.md`](CREATED_TASK_DASHBOARD.md) · [`VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md) · [`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) § Beat 4–5 · [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md) · setup wizard in [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md)
 
 ---
 
@@ -226,6 +226,8 @@ A bordered surface (shell fill, subtle radius) containing:
 - Tap QR → lightbox or scroll to expand (not a third QR)
 
 **Reference mood:** Landing "One use" flow + scan pass card - physical object made software.
+
+**Choreography (planned):** Owner **Register A** mirror of stranger scan hierarchy — message → status → limit teaser; one-shot Settle on publish; secondary **Open scan page** teaches Register B notary. Full spec: [`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) § Beat 4–5.
 
 ---
 

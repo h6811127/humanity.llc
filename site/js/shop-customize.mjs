@@ -27,7 +27,20 @@ import {
   loadCardSigningSessionForCustomize,
   personalizeProductDisplay,
   personalizeProducts,
+  readManifestoLineForCustomize,
 } from "./shop-customize-core.mjs";
+import {
+  CUSTOMIZE_PREVIEW_FORMING_LABEL,
+  customizePreviewManifestoTeaser,
+} from "./shop-customize-preview-arrive-core.mjs";
+import {
+  resetCustomizePreviewArrive,
+  runCustomizePreviewArrive,
+} from "./shop-customize-preview-arrive.mjs";
+import {
+  resetCustomizeStrangerPreview,
+  syncCustomizeStrangerPreview,
+} from "./shop-customize-stranger-preview.mjs";
 import {
   canProceedToCheckout,
   proofConsentRequiredIds,
@@ -48,6 +61,9 @@ const previewImg = document.getElementById("shop-customize-qr-preview");
 const previewPlaceholder = document.getElementById("shop-customize-qr-placeholder");
 const previewNote = document.getElementById("shop-customize-preview-note");
 const mockEl = document.getElementById("shop-customize-mock");
+const previewVessel = document.getElementById("shop-customize-vessel");
+const previewHandleEl = document.getElementById("shop-customize-preview-handle");
+const previewManifestoEl = document.getElementById("shop-customize-preview-manifesto");
 const priceEl = document.getElementById("shop-customize-price");
 const shippingForm = document.getElementById("shop-customize-shipping-form");
 const shippingCountryInput = document.getElementById("shop-customize-shipping-country");
@@ -69,6 +85,8 @@ let selectedProductId = null;
 let activeIntent = null;
 /** @type {"planned" | "card_fallback" | null} */
 let previewMode = null;
+/** @type {string | null} */
+let currentPreviewScanUrl = null;
 
 function setStatus(message, isError = false) {
   if (!statusEl) return;
@@ -81,7 +99,36 @@ function setPreviewLoading(loading) {
   mockEl?.classList.toggle("is-loading", loading);
   if (previewPlaceholder) {
     previewPlaceholder.hidden = !loading;
-    previewPlaceholder.textContent = loading ? "Generating preview…" : "";
+    previewPlaceholder.textContent = loading ? CUSTOMIZE_PREVIEW_FORMING_LABEL : "";
+  }
+  if (loading && previewVessel) {
+    previewVessel.hidden = true;
+  }
+}
+
+function hidePreviewArriveItems() {
+  const scope = mockEl?.closest(".shop-customize-preview-wrap");
+  for (const el of scope?.querySelectorAll(".shop-customize-arrive-item") ?? []) {
+    el.hidden = true;
+    el.classList.remove("shop-customize-arrive-item--visible");
+  }
+}
+
+function syncPreviewVesselMeta(session) {
+  const handle =
+    session?.handle && String(session.handle).trim()
+      ? `@${String(session.handle).trim()}`
+      : session?.profile_id
+        ? session.profile_id.slice(0, 12)
+        : null;
+  if (previewHandleEl) {
+    previewHandleEl.textContent = handle || "";
+    previewHandleEl.hidden = !handle;
+  }
+  const teaser = customizePreviewManifestoTeaser(readManifestoLineForCustomize());
+  if (previewManifestoEl) {
+    previewManifestoEl.textContent = teaser || "";
+    previewManifestoEl.hidden = !teaser;
   }
 }
 
@@ -339,10 +386,14 @@ async function refreshPreview() {
   const product = selectedProduct();
   if (!product || !previewImg || !signingSession) return;
   syncMockPreviewKind();
+  resetCustomizePreviewArrive(mockEl);
+  resetCustomizeStrangerPreview();
+  hidePreviewArriveItems();
   const display = personalizeProductDisplay(product);
   if (priceEl) {
     priceEl.textContent = display.priceDisplay || "Price at checkout";
   }
+  syncPreviewVesselMeta(signingSession);
   setPreviewLoading(true);
   showPreviewImage(false);
   setStatus("");
@@ -359,6 +410,7 @@ async function refreshPreview() {
     if (!plannedQrId) throw new Error("Missing planned QR for preview.");
     const scanUrl = buildPlannedItemScanUrl(signingSession.profile_id, plannedQrId, origin);
     await renderPreviewScanUrl(scanUrl);
+    currentPreviewScanUrl = scanUrl;
     previewMode = "planned";
     if (previewNote) {
       previewNote.textContent =
@@ -368,6 +420,7 @@ async function refreshPreview() {
     const fallbackUrl = cardFallbackScanUrl();
     if (!fallbackUrl) throw new Error("Create a card first.");
     await renderPreviewScanUrl(fallbackUrl);
+    currentPreviewScanUrl = fallbackUrl;
     previewMode = "card_fallback";
     if (previewNote) {
       previewNote.textContent =
@@ -375,9 +428,13 @@ async function refreshPreview() {
     }
   }
 
+  setPreviewLoading(false);
+  if (previewVessel) previewVessel.hidden = false;
+  syncCustomizeStrangerPreview({ scanUrl: currentPreviewScanUrl });
+  await runCustomizePreviewArrive(mockEl);
+
   syncCheckoutUi(product);
   setStatus(previewStatusMessage(product));
-  setPreviewLoading(false);
 }
 
 async function onCheckoutClick() {

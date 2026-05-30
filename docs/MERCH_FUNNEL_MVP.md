@@ -2,7 +2,8 @@
 
 **Status:** Active — customizer UI shipped; operator enables products in `shop-config.json`  
 **Parent:** [`MERCH_LED_V1.md`](MERCH_LED_V1.md) · [`V1_FLOW_AUDIT.md`](V1_FLOW_AUDIT.md) · [`features/Storefront v1.0.md`](features/Storefront%20v1.0.md)  
-**Implementation:** [`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md) · `site/shop/customize/` · honesty copy [`MERCH_PRODUCT_COPY.md`](MERCH_PRODUCT_COPY.md) (**shipped** on PDP + customizer)
+**Implementation:** [`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md) · `site/shop/customize/` · honesty copy [`MERCH_PRODUCT_COPY.md`](MERCH_PRODUCT_COPY.md) (**shipped** on PDP + customizer)  
+**Visual choreography:** [`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) — physical → scan notary → customize/created delight (two registers, five beats)
 
 ---
 
@@ -18,8 +19,9 @@ Ordered work after repo review. Update row status as steps complete. Cross-links
 | **4** | **AI P1 product decision** — keep / rename / deterministic-only / remove scan reader (no new L3 user features until Phase A) | Product | ☐ |
 | **5** | **Large-wallet shell performance** — bound `hc_wallet_network_cache`, avoid full-wallet parse on hub/inbox hot paths | Engineering debt | **✅ Shipped** — S6–S12 + `hc_wallet_summary` (see `DEVICE_OS_REQUEST_BUDGET.md`) |
 | **6** | **Ephemeral state UX (Tier 1 WEAR)** — unlock owner update without revoke-first gate; Tier 1 `/shop/thanks/` → `/created/#update-status` | Engineering | **✅ Shipped** — [`EPHEMERAL_STATE_AND_MERCH.md`](EPHEMERAL_STATE_AND_MERCH.md) |
+| **7** | **Merch visual choreography (V1–V4)** — customize preview Settle, created live object card, thanks activation, preview-as-stranger handoff; scan notary unchanged | Product + design | **✅ V1–V4 shipped** — [`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) |
 
-**Rule:** Do not start new L3 user-facing AI surfaces until priority **2** passes. Commerce never grants vouch.
+**Rule:** Do not start new L3 user-facing AI surfaces until priority **2** passes. Commerce never grants vouch. Owner-surface motion (priority **7**) must not regress stranger scan Settle or 5-second comprehension.
 
 ### Operator close-out (after engineering + M5)
 
@@ -68,6 +70,8 @@ A stranger **scans live wear**, sees the wearer’s **signed profile** (optional
 8. FULFILL Paid webhook → Printify middleware → unique print_artifact QR minted
 9. WEAR    Update ephemeral state from /created/ — same ink, new meaning
 ```
+
+**How each step should feel** (owner delight vs stranger notary): [`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) § Five beats.
 
 Canonical architecture diagram: [`V1_FLOW_AUDIT.md`](V1_FLOW_AUDIT.md) § Canonical V1 Flow.
 
@@ -257,5 +261,6 @@ npm run merch-funnel:verify-config -- --require-checkout   # CI when Tier 1 goes
 | [`MERCH_CHECKOUT_SAD_PATH_MATRIX.md`](MERCH_CHECKOUT_SAD_PATH_MATRIX.md) | Sad-path inventory before live Tier 1 checkout |
 | [`AI_FEATURE_DEVELOPMENT.md`](AI_FEATURE_DEVELOPMENT.md) | Optional scan reader only |
 | [`EPHEMERAL_STATE_AND_MERCH.md`](EPHEMERAL_STATE_AND_MERCH.md) | Same ink / new meaning — Tier 1 owner UX |
+| [`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) | Two registers, five beats, motion budget by surface |
 | [`V1_IMPLEMENTATION_BACKLOG.md`](V1_IMPLEMENTATION_BACKLOG.md) | O-002 Printify adapter |
 | [`features/Printify Fulfillment Middleware v1.0.md`](features/Printify%20Fulfillment%20Middleware%20v1.0.md) | Server-side fulfillment |

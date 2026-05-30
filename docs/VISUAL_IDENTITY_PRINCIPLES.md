@@ -4,6 +4,7 @@
 **Purpose:** Define the visual direction for Humanity Commons v1.0, especially the mobile web card and scan experience.  
 **Scanner product contract (safety header, external links, recognition):** [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md)  
 **Scan trust UI (layers, arrive sequence, dot sync):** [`docs/SCAN_PAGE_TRUST_UI.md`](SCAN_PAGE_TRUST_UI.md)  
+**Merch funnel visual choreography (owner delight vs scan notary):** [`docs/MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md)  
 **Product language (plain default, precise on purpose):** [`docs/PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md)
 
 ---
@@ -37,7 +38,7 @@ It should not feel:
 
 The mobile card page is a trust surface first.
 
-Movement energy can live in the homepage, artifacts, launch materials, and community rituals. The public scan page should be fast, clear, and calm.
+Movement energy can live in the homepage, artifacts, launch materials, community rituals, and **merch owner surfaces** (`/shop/customize/`, `/created/`, thanks — Register A in [`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md)). The public scan page should be fast, clear, and calm (Register B — notary only).
 
 The mobile card page should answer:
 
@@ -263,6 +264,8 @@ Explain limits thoroughly.
 Tone: meaningful artifact, not merch spam.
 
 Every QR-bearing product must say buying does not verify.
+
+**Customizer preview** is the primary **belonging / imagination** beat — soft round vessel, one-shot Settle when QR lands on mock; not a looping social bubble. Spec: [`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) § Beat 3.
 
 ### Founding Cohort Page
 

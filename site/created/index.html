@@ -31,8 +31,8 @@
       })();
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=5" />
-    <link rel="stylesheet" href="/styles.css?v=129" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=69" />
+    <link rel="stylesheet" href="/styles.css?v=131" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=70" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=29" />
   </head>
   <body class="has-device-hub-search device-shell-created" data-created-route="pending">
@@ -58,6 +58,7 @@
     <div class="page">
       <div class="top-chrome top-chrome--float" id="top-chrome">
         <div class="top-chrome-bar top-chrome-bar--minimal" id="top-status">
+          <div class="shell-chrome-primary-row">
           <div class="shell-status-cluster">
             <button
               type="button"
@@ -79,6 +80,16 @@
               <span class="shell-notif-badge-ring" aria-hidden="true"></span>
               <span class="shell-notif-badge-count" id="shell-notif-badge-count">0</span>
             </button>
+          </div>
+          <button
+            type="button"
+            class="shell-scan-qr-btn"
+            id="shell-scan-qr-btn"
+            hidden
+            aria-label="Scan to vouch"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3a3 3 0 0 1 3 3v3"/><path d="M17 14v4h4"/></svg>
+          </button>
           </div>
           <p class="shell-status-line" id="shell-status-line" role="status" hidden></p>
         </div>
@@ -544,9 +555,34 @@
             </div>
 
             <article class="created-live-object-card" id="created-live-object-card">
+              <div class="created-live-object-head">
+                <span
+                  class="created-live-object-status-chip created-live-arrive-item"
+                  id="created-live-object-status-chip"
+                  hidden
+                  >Active</span
+                >
+                <p
+                  class="created-live-object-message created-live-arrive-item"
+                  id="created-live-manifesto-teaser"
+                  hidden
+                ></p>
+                <p
+                  class="created-live-object-limit created-live-arrive-item"
+                  id="created-live-object-limit"
+                  hidden
+                >
+                  Scanners see your live line — not who holds the object.
+                </p>
+              </div>
+              <p
+                class="created-live-object-meta created-live-arrive-item"
+                id="created-live-object-meta"
+                hidden
+              ></p>
               <button
                 type="button"
-                class="created-live-object-qr-hit"
+                class="created-live-object-qr-hit created-live-arrive-item"
                 data-created-action="scroll-qr"
                 id="created-live-qr-hit"
                 aria-label="View full QR"
@@ -554,8 +590,17 @@
               >
                 <img id="created-live-qr-img" width="160" height="160" alt="" />
               </button>
-              <p class="created-live-object-quote" id="created-live-manifesto-teaser" hidden></p>
-              <p class="created-live-object-meta" id="created-live-object-meta"></p>
+              <p
+                class="created-live-object-handle created-live-arrive-item"
+                id="created-live-object-handle"
+                hidden
+              ></p>
+              <p
+                class="created-live-publish-confirm"
+                id="created-live-publish-confirm"
+                role="status"
+                hidden
+              ></p>
               <div class="created-live-object-actions">
                 <div class="created-live-primary-block">
                   <button
@@ -568,6 +613,15 @@
                   </button>
                   <p class="created-live-primary-sub" id="created-live-primary-sub" hidden></p>
                 </div>
+                <button
+                  type="button"
+                  class="btn-secondary"
+                  id="created-live-open-scan-secondary"
+                  data-created-action="open-scan"
+                  hidden
+                >
+                  Open scan page
+                </button>
                 <button type="button" class="btn-secondary" id="created-live-copy-scan" disabled>
                   Copy scan link
                 </button>
@@ -1786,8 +1840,32 @@
         </div>
       </main>
     </div>
+    <dialog
+      id="device-hub-qr-scanner"
+      class="device-hub-qr-scanner"
+      aria-labelledby="device-hub-qr-scanner-title"
+    >
+      <div class="device-hub-qr-scanner-inner">
+        <header class="device-hub-qr-scanner-head">
+          <h2 id="device-hub-qr-scanner-title">Scan a Humanity QR</h2>
+          <button
+            type="button"
+            class="device-hub-qr-scanner-close"
+            data-hub-qr-scanner-close
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </header>
+        <p class="device-hub-qr-scanner-lead" id="device-hub-qr-scanner-lead"></p>
+        <div class="device-hub-qr-scanner-video-wrap">
+          <video id="device-hub-qr-scanner-video" playsinline muted></video>
+        </div>
+        <p class="form-status" id="device-hub-qr-scanner-status" role="status" hidden></p>
+      </div>
+    </dialog>
     <script src="/js/device-status-bootstrap.mjs?v=71" type="module"></script>
     <script src="/js/created-hub.mjs?v=3" type="module"></script>
-    <script type="module" src="/js/created.mjs?v=66"></script>
+    <script type="module" src="/js/created.mjs?v=68"></script>
   </body>
 </html>

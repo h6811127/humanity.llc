@@ -39,10 +39,6 @@ import { handlePostRotateQr } from "./resolver/rotate-qr";
 import { handlePostExtendQr } from "./resolver/extend-qr";
 import { handleGetScan } from "./resolver/scan";
 import { handleGetScanOut } from "./resolver/scan-out";
-import {
-  handleGetStewardVouchHandoff,
-  handleGetStewardVouchHandoffIssue,
-} from "./resolver/steward-vouch-handoff";
 import { handleGetStewardHandoff } from "./resolver/steward-handoff";
 import { handleGetQrMetadata } from "./resolver/qr-metadata";
 import { handleGetScanStatus } from "./resolver/scan-status";
@@ -414,25 +410,6 @@ export default {
         );
       }
       return handlePostAiDraftManifesto(request, env);
-    }
-
-    const stewardHandoffIssueMatch = path.match(
-      /^\/\.well-known\/hc\/v1\/cards\/([^/]+)\/steward-vouch-handoff$/
-    );
-    if (stewardHandoffIssueMatch && request.method === "GET") {
-      if (!env.DB) {
-        return withCors(
-          request,
-          jsonResponse({ error: "database_unconfigured" }, 503)
-        );
-      }
-      const res = await handleGetStewardVouchHandoffIssue(
-        request,
-        env.DB,
-        stewardHandoffIssueMatch[1]!,
-        env
-      );
-      return withCors(request, res);
     }
 
     const statusMatch = path.match(
@@ -868,23 +845,6 @@ export default {
       }
       const res = await handleGetCard(env.DB, cardMatch[1]!, request);
       return withCors(request, res);
-    }
-
-    const stewardVouchHandoffMatch = path.match(/^\/v\/([^/]+)$/);
-    if (stewardVouchHandoffMatch && request.method === "GET") {
-      if (!env.DB) {
-        return htmlResponse(
-          "<!DOCTYPE html><html><body><p>Resolver database unavailable.</p></body></html>",
-          503,
-          { "Cache-Control": "no-store" }
-        );
-      }
-      return handleGetStewardVouchHandoff(
-        request,
-        env.DB,
-        stewardVouchHandoffMatch[1]!,
-        env
-      );
     }
 
     const scanOutMatch = path.match(/^\/c\/([^/]+)\/out$/);

@@ -168,6 +168,64 @@ body.device-hub-sheet-open .shell-status-cluster,
   gap: 10px;
 }
 
+.shell-chrome-primary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 12px;
+  pointer-events: auto;
+}
+
+.shell-chrome-trailing {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.shell-scan-qr-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(120, 120, 128, 0.08);
+  color: var(--surface-popover-fg-muted, rgba(60, 60, 67, 0.6));
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  flex-shrink: 0;
+}
+
+.shell-scan-qr-btn[hidden] {
+  display: none !important;
+}
+
+.shell-scan-qr-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.shell-scan-qr-btn:active {
+  transform: scale(0.94);
+}
+
+body.device-hub-sheet-open .shell-scan-qr-btn:not([hidden]),
+.top-chrome--float.top-chrome--hub-locked .shell-scan-qr-btn:not([hidden]),
+.top-chrome--float.top-chrome--edge-hidden .shell-scan-qr-btn:not([hidden]) {
+  pointer-events: auto;
+  opacity: 1;
+  position: fixed;
+  top: calc(8px + env(safe-area-inset-top, 0px));
+  right: var(--pad, 20px);
+  z-index: 65;
+}
+
 #top-chrome[data-device-status-error] .shell-status-dot-btn {
   outline: 2px solid var(--red, #db1b43);
   outline-offset: 2px;

@@ -2,7 +2,7 @@
 
 **Status:** Implementation contract for Worker HTML  
 **Product spec (scanner safety, recognition, external-link policy, hero IA):** [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md)  
-**Visual direction:** [`docs/VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md) § Scan page visual spec · **Hero card styling:** [`SCAN_HERO_CARD_VISUAL_SPEC.md`](SCAN_HERO_CARD_VISUAL_SPEC.md)  
+**Visual direction:** [`docs/VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md) § Scan page visual spec · **Hero card styling:** [`SCAN_HERO_CARD_VISUAL_SPEC.md`](SCAN_HERO_CARD_VISUAL_SPEC.md) · **Merch funnel (stranger notary only):** [`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) § Beat 2  
 **Design reference (target):** `assets/Nerd Mobile Post Scan Render.png`  
 **Route map (scan vs card JSON vs status vs qr metadata):** [`docs/FLOW_2_QR_SCAN_REPAIR_SPEC.md`](FLOW_2_QR_SCAN_REPAIR_SPEC.md) § Public scan surfaces  
 **Related:** `docs/V1_PRODUCT_TRUST_MODEL.md`, `docs/V1_0_ARCHITECTURE_ROADMAP.md` §7, `docs/V1_IMPLEMENTATION_CONTRACTS.md` (QR payload + § Reference network - Flow 2 routes)

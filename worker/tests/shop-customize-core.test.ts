@@ -8,6 +8,7 @@ import {
   isPersonalizeCheckoutReady,
   loadCardSessionForCustomize,
   personalizeProducts,
+  readManifestoLineForCustomize,
   STICKER_MOCK_CARD_WIDTH_IN,
   STICKER_MOCK_SHEET_IN,
 } from "../../site/js/shop-customize-core.mjs";
@@ -41,6 +42,20 @@ describe("customizeStickerMockLayout", () => {
     expect(layout.cardWidthPct).toBe(
       (STICKER_MOCK_CARD_WIDTH_IN / STICKER_MOCK_SHEET_IN) * 100
     );
+  });
+});
+
+describe("readManifestoLineForCustomize", () => {
+  it("reads manifesto_line from hc_created", () => {
+    const storage = {
+      sessionStorage: {
+        getItem: (key) =>
+          key === "hc_created"
+            ? JSON.stringify({ manifesto_line: "  Back soon  " })
+            : null,
+      },
+    };
+    expect(readManifestoLineForCustomize(storage)).toBe("Back soon");
   });
 });
 

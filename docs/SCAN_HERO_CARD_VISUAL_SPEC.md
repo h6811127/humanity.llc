@@ -3,7 +3,7 @@
 **Status:** Active — **v2 depth complete** (`pass-v33`): tier-4 hero plate, dark mode, Vitest + Playwright (Chromium + WebKit). Optional: spot-check on physical iPhone if WebKit CI green — [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) P1-SD steps 8–9.  
 **Audience:** Product, design, frontend  
 **Component name:** **Live check hero** (resolver plate)  
-**Related:** [`SCAN_PAGE_TRUST_UI.md`](SCAN_PAGE_TRUST_UI.md) (motion) · [`M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) (layout) · [`SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) (copy IA) · [`VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md) · [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § Emphasis notice cards · [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md)
+**Related:** [`SCAN_PAGE_TRUST_UI.md`](SCAN_PAGE_TRUST_UI.md) (motion) · [`M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) (layout) · [`SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) (copy IA) · [`VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md) · [`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) (Beat 2 notary — no hoodie fork, no loop bubble) · [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § Emphasis notice cards · [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md)
 
 ---
 
@@ -215,6 +215,7 @@ Canonical timeline: [`SCAN_PAGE_TRUST_UI.md`](SCAN_PAGE_TRUST_UI.md). Implementa
 - Passport / government ID styling (embossed seal, flip affordance, tilt drag on hero).
 - QR larger than the H1 message on narrow viewports.
 - Looping animation on hero or corner dot for strangers.
+- Hoodie-only scan template or floating profile bubble on resolver ([`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) § Anti-patterns).
 - Painting the **whole hero** green/amber/red — state belongs in the **strip** and copy, not the plate fill.
 - Reusing `.hc-emphasis-card` markup for the hero (wrong IA and CTA pattern).
 

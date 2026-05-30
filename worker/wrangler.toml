@@ -79,6 +79,11 @@ zone_id = "180ee38ceea795d281fb5a3bd51af533"
 pattern = "humanity.llc/c/*"
 zone_id = "180ee38ceea795d281fb5a3bd51af533"
 
+# S6 steward vouch handoff interstitial (/v/{token})
+[[routes]]
+pattern = "humanity.llc/v/*"
+zone_id = "180ee38ceea795d281fb5a3bd51af533"
+
 # Commerce + print middleware (artifact intents, Shopify webhooks, Printify)
 [[routes]]
 pattern = "humanity.llc/v1/*"

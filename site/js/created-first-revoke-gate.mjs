@@ -73,11 +73,18 @@ export function isEphemeralStateUpdateUnlocked(profileId, session = null) {
  * @param {string | null | undefined} profileId
  * @param {Record<string, unknown> | null | undefined} session
  */
+export function isScannersSeeUnlocked(profileId, session = null) {
+  return hasFirstRevokeDone(profileId) || isEphemeralStateUpdateUnlocked(profileId, session);
+}
+
+/**
+ * @param {string | null | undefined} profileId
+ * @param {Record<string, unknown> | null | undefined} session
+ */
 export function syncUpdateStatusTaskGate(profileId, session = null) {
   const scannersSee = document.getElementById("created-live-scanners-see");
   const hint = document.getElementById("created-scanners-see-gate-hint");
-  const unlocked =
-    hasFirstRevokeDone(profileId) || isEphemeralStateUpdateUnlocked(profileId, session);
+  const unlocked = isScannersSeeUnlocked(profileId, session);
   if (scannersSee) scannersSee.hidden = !unlocked;
   if (hint) hint.hidden = unlocked;
 }

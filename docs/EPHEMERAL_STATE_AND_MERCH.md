@@ -2,7 +2,8 @@
 
 **Status:** Active — L0–L2 shipped; Tier 1 mint + owner update UX shipped (2026-05-28)  
 **Parent:** [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) · [`AI_FEATURE_DEVELOPMENT.md`](AI_FEATURE_DEVELOPMENT.md) · [`MANIFESTO_STATUS_UPDATE.md`](MANIFESTO_STATUS_UPDATE.md)  
-**Policy:** [`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md) · [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md)
+**Policy:** [`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md) · [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md)  
+**Visual choreography:** [`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) — Beat 5 (WEAR) closes the loop back to physical ink
 
 ---
 
@@ -39,7 +40,7 @@ WEAR → Owner updates signed state from /created/ (or hub → Update status)
 |-------|---------|------|
 | **Owner** | `/created/#update-status` · hub **Update status** | Signs L0–L1 updates with root keys |
 | **Stranger** | Scan page signed snapshot + optional **Plain language** button | Read-only; never writes state |
-| **Customizer** | `/shop/customize/` | Deterministic QR preview — **no AI** |
+| **Customizer** | `/shop/customize/` | Deterministic QR preview — **no AI**; primary **belonging / imagination** surface ([`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) Beat 3) |
 
 ---
 
@@ -88,6 +89,7 @@ Code: [`site/js/merch-funnel-core.mjs`](../site/js/merch-funnel-core.mjs) · [`s
 | 3 | AI P1 decision — keep / deterministic-only / remove | Product |
 | 4 | Guided live-object template at create (optional `object_streams` without AI) | Engineering |
 | 5 | Gift mode · adopt batch QR · Commons Pass ephemeral scopes | Phase C / D |
+| 6 | Owner-surface visual choreography (customize Settle, created live object card, publish pulse, thanks activation, stranger preview) | Product + design | **✅ V1–V4 shipped** — [`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) |
 
 ---
 
@@ -118,5 +120,6 @@ npm run worker:test -- worker/tests/object-snapshot.test.ts worker/tests/update-
 | Path | Role |
 |------|------|
 | [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) | Checkout → mint → Printify |
+| [`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) | Two registers, five beats, owner vs stranger motion |
 | [`LAUNCH_LANGUAGE_KIT.md`](LAUNCH_LANGUAGE_KIT.md) | Tier 1 post-purchase copy |
 | [`PHYSICAL_WORLD_MULTIPLAYER_RESEARCH_SPEC.md`](PHYSICAL_WORLD_MULTIPLAYER_RESEARCH_SPEC.md) | Research — city-scale ephemeral object state (not Phase A) |

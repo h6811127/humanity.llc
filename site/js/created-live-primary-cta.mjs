@@ -4,6 +4,7 @@
 
 import { isWalletSaved } from "./device-wallet.mjs";
 import { isAutoSaveEnabled, isAutoSaveFailed } from "./device-auto-save.mjs";
+import { isScannersSeeUnlocked } from "./created-first-revoke-gate.mjs?v=2";
 import { resolveCreatedLivePrimaryCta } from "./created-live-primary-cta-core.mjs";
 
 const DONE_STORAGE_KEY = "hc_created_task_done";
@@ -32,10 +33,12 @@ function testScanDone(profileId) {
 export function initCreatedLivePrimaryCta(opts) {
   const btn = document.getElementById("created-live-primary-btn");
   const subEl = document.getElementById("created-live-primary-sub");
+  const secondaryOpenScan = document.getElementById("created-live-open-scan-secondary");
   if (!btn) return { sync: () => {} };
 
   function collectInput() {
     const profileId = opts.getProfileId?.() ?? null;
+    const session = opts.getSession?.() ?? null;
     const panel = document.getElementById("live-control-proof");
     const liveProofPending = !!(
       panel &&
@@ -58,6 +61,7 @@ export function initCreatedLivePrimaryCta(opts) {
       scanUrlReady,
       autoSaveEnabled: isAutoSaveEnabled(),
       autoSaveFailed: !!(profileId && isAutoSaveFailed(profileId)),
+      scannersSeeUnlocked: isScannersSeeUnlocked(profileId, session),
     };
   }
 
@@ -66,6 +70,7 @@ export function initCreatedLivePrimaryCta(opts) {
     if (mode !== "control" && mode !== "view") {
       btn.hidden = true;
       if (subEl) subEl.hidden = true;
+      if (secondaryOpenScan) secondaryOpenScan.hidden = true;
       return;
     }
 
@@ -76,6 +81,7 @@ export function initCreatedLivePrimaryCta(opts) {
             ...input,
             hasSigningKeys: false,
             liveProofPending: false,
+            scannersSeeUnlocked: false,
           }
         : input
     );
@@ -85,6 +91,9 @@ export function initCreatedLivePrimaryCta(opts) {
     if (subEl) {
       subEl.textContent = cta.subtitle;
       subEl.hidden = !cta.subtitle;
+    }
+    if (secondaryOpenScan) {
+      secondaryOpenScan.hidden = !(cta.mode === "update-status" && input.scanUrlReady);
     }
   }
 

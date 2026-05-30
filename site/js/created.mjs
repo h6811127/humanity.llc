@@ -40,6 +40,7 @@ import { markSetupDone, modeFromPage, isSetupDone } from "./created-mode.mjs";
 import { ownershipBackupSeatbeltSatisfied } from "./created-first-session-gate-core.mjs";
 import { findWalletEntryByProfileId } from "./device-wallet.mjs";
 import { initCreatedMerchFunnel } from "./created-merch-funnel.mjs";
+import { initCreatedLiveObjectCard } from "./created-live-object-card.mjs";
 import { initCreatedChildObject } from "./created-child-object.mjs";
 import { initCreatedLostItemRelay } from "./created-child-object-lost-item.mjs";
 import { initCreatedSetup } from "./created-setup.mjs";
@@ -344,25 +345,14 @@ function updateHeroMeta() {
 
 function syncLiveCockpit() {
   const vouchSub = humanTrustSubEl?.textContent?.trim();
-  if (liveObjectMetaEl) {
-    const vouch =
-      vouchSub && vouchSub !== "No accepted vouches yet."
-        ? vouchSub
-        : data?.verification?.vouch_count > 0
-          ? `${data.verification.vouch_count} accepted vouch${data.verification.vouch_count === 1 ? "" : "es"}`
-          : "Registered on the network";
-    liveObjectMetaEl.textContent = vouch;
-  }
+  const vouchMeta =
+    vouchSub && vouchSub !== "No accepted vouches yet."
+      ? vouchSub
+      : data?.verification?.vouch_count > 0
+        ? `${data.verification.vouch_count} accepted vouch${data.verification.vouch_count === 1 ? "" : "es"}`
+        : "Registered on the network";
 
-  const teaser = formatManifestoTeaser(data?.manifesto_line);
-  if (liveManifestoTeaserEl) {
-    if (teaser) {
-      liveManifestoTeaserEl.textContent = teaser;
-      liveManifestoTeaserEl.hidden = false;
-    } else {
-      liveManifestoTeaserEl.hidden = true;
-    }
-  }
+  liveObjectCardCtl?.syncContent();
 
   if (liveCopyScanEl && copyBtn) {
     liveCopyScanEl.disabled = copyBtn.disabled;
@@ -398,6 +388,8 @@ let createdTabs;
 let workspaceMode = "view";
 let dashboardWired = false;
 let downloadQrClick = null;
+/** @type {ReturnType<typeof initCreatedLiveObjectCard> | null} */
+let liveObjectCardCtl = null;
 
 function getWorkspaceMode() {
   return modeFromPage(profileId, freshParam, loadSession);
@@ -424,6 +416,7 @@ function enterControlWorkspace() {
     setupCreatedDashboard();
     dashboardWired = true;
   }
+  void liveObjectCardCtl?.maybeRunArrive();
 }
 
 function revealOwnerActions() {
@@ -997,6 +990,23 @@ if (networkQrExpiresEl) {
 }
 updateHeroMeta();
 
+liveObjectCardCtl = initCreatedLiveObjectCard({
+  getCardStatusText: () => networkCardStatusEl?.textContent?.trim() ?? "",
+  getHandle: () => data?.handle ?? loadSession()?.handle ?? null,
+  getManifestoLine: () => data?.manifesto_line ?? loadSession()?.manifesto_line ?? null,
+  formatManifestoTeaser,
+  getMetaLine: () => {
+    const vouchSub = humanTrustSubEl?.textContent?.trim();
+    if (vouchSub && vouchSub !== "No accepted vouches yet.") return vouchSub;
+    const session = data ?? loadSession();
+    if (session?.verification?.vouch_count > 0) {
+      const n = session.verification.vouch_count;
+      return `${n} accepted vouch${n === 1 ? "" : "es"}`;
+    }
+    return "Registered on the network";
+  },
+});
+
 function setupCreatedDashboard() {
   initCreatedDashboard({
     selectTab: (id) => createdTabs?.select(id),
@@ -1033,6 +1043,7 @@ if (workspaceMode === "view" && profileId && activeQrId) {
   }
   setupCreatedDashboard();
   dashboardWired = true;
+  void liveObjectCardCtl?.maybeRunArrive();
   initCreatedViewLiveReadonly({
     getScanUrl: () => {
       const href = openScanBtn?.getAttribute("href");
@@ -1333,6 +1344,7 @@ async function bootstrapOwnerTools() {
         syncLostItemScorecard(profileId, row);
       }
       syncLiveCockpit();
+      liveObjectCardCtl?.onPublished();
       void refreshNetworkStatus();
     },
   });

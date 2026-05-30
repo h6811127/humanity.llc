@@ -417,7 +417,7 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 
 | # | Change | Rationale |
 |---|--------|-----------|
-| **P0b-1** | Re-verify **card disabled since visit** on fresh create (hub row) | R10 — **prod** false positive; no in-visit baseline seed; first baseline on exit snapshot | **Step 1 shipped** — automated R10 guard on `/` hub; **step 2 desk proxy shipped** — `e2e:card-disabled-since-visit:webkit`; prod WebKit sign-off on humanity.llc still required |
+| **P0b-1** | Re-verify **card disabled since visit** on fresh create (hub row) | R10 — **prod** false positive; no in-visit baseline seed; first baseline on exit snapshot | **Step 1 shipped** — automated R10 guard on `/` hub; **step 2 desk proxy shipped** — `e2e:card-disabled-since-visit:webkit`; prod WebKit sign-off **passed** (2026-05-30 · iPhone Safari) |
 | **P0b-2** | Setup wizard: **no auto-advance** on test scan when `window.open` new tab | R12 | **Shipped** — `created-setup.mjs` · `shouldAutoAdvanceSetupTestScan`; browser needs second Continue |
 | **P0b-3** | On scan, **auto-activate wallet row for signing** when exactly one signing row (mirror D10), not only default-vouch path | Stranger vouch without prior “Default for vouching” setup | **Shipped** — `vouch-scan-sole-signing-activate-core.mjs` · `e2e:vouch-scan-sole-signing` |
 

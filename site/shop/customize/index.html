@@ -12,7 +12,7 @@
       content="Preview your LIVE OBJECT QR on a hoodie or sticker, then checkout through humanity.llc. Buying merch does not verify you."
     />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=121" />
+    <link rel="stylesheet" href="/styles.css?v=133" />
   </head>
   <body class="screen-shop-body">
     <div class="page">
@@ -118,25 +118,68 @@
               <div class="shop-customize-mock__garment" aria-hidden="true">
                 <span class="shop-customize-mock__hoodie-neck" aria-hidden="true"></span>
               </div>
-              <div class="shop-customize-mock__qr-slot">
-                <img
-                  class="shop-customize-qr-preview"
-                  id="shop-customize-qr-preview"
-                  alt=""
-                  width="220"
-                  height="280"
-                  hidden
-                />
-                <p class="shop-customize-qr-placeholder" id="shop-customize-qr-placeholder">
-                  Generating preview…
-                </p>
+              <div
+                class="shop-customize-mock__vessel"
+                id="shop-customize-vessel"
+                aria-label="Live object preview"
+                hidden
+              >
+                <div class="shop-customize-mock__qr-slot">
+                  <img
+                    class="shop-customize-qr-preview"
+                    id="shop-customize-qr-preview"
+                    alt=""
+                    width="220"
+                    height="280"
+                    hidden
+                  />
+                  <p class="shop-customize-qr-placeholder" id="shop-customize-qr-placeholder">
+                    Forming your live object…
+                  </p>
+                </div>
+                <div class="shop-customize-mock__meta">
+                  <p
+                    class="shop-customize-mock__handle shop-customize-arrive-item"
+                    id="shop-customize-preview-handle"
+                    hidden
+                  ></p>
+                  <p
+                    class="shop-customize-mock__manifesto shop-customize-arrive-item"
+                    id="shop-customize-preview-manifesto"
+                    hidden
+                  ></p>
+                  <p class="shop-customize-mock__ink-hint shop-customize-arrive-item" hidden>
+                    Updates from your phone
+                  </p>
+                </div>
               </div>
             </div>
-            <p class="shop-lead shop-customize-preview-note" id="shop-customize-preview-note">
+            <p
+              class="shop-lead shop-customize-preview-note shop-customize-arrive-item"
+              id="shop-customize-preview-note"
+              hidden
+            >
               Preview uses your item&apos;s planned QR. It activates after payment and fulfillment.
               Strangers still see honest limits — holding the garment does not prove you own the
               card.
             </p>
+            <div
+              class="shop-customize-stranger-preview-wrap"
+              id="shop-customize-stranger-preview-wrap"
+              hidden
+            >
+              <button
+                type="button"
+                class="btn-secondary shop-customize-stranger-preview-btn"
+                id="shop-customize-stranger-preview"
+              >
+                Preview as stranger
+              </button>
+              <p
+                class="shop-lead shop-lead-muted shop-customize-stranger-preview-hint"
+                id="shop-customize-stranger-preview-hint"
+              ></p>
+            </div>
           </div>
 
           <p class="shop-product-price" id="shop-customize-price">Price at checkout</p>
@@ -264,6 +307,6 @@
         </section>
       </main>
     </div>
-    <script src="/js/shop-customize.mjs?v=6" type="module"></script>
+    <script src="/js/shop-customize.mjs?v=8" type="module"></script>
   </body>
 </html>

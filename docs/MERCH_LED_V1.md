@@ -7,7 +7,8 @@
 **Implementation tracker:** `docs/SHOP_TIER0_IMPLEMENTATION.md` (Pages UI, waitlist interest, Shopify handoff checklist).  
 **Merch funnel MVP:** `docs/MERCH_FUNNEL_MVP.md` (scan → profile → `/shop/customize/` → Printify).  
 **Headless commerce (Shopify + Printify wiring):** `docs/MERCH_HEADLESS_COMMERCE.md` — factory vs cash register vs storefront; Tier 1 customizeability.  
-**Merch QR lifecycle:** `docs/MERCH_QR_LIFECYCLE_POLICY.md` (no calendar expiry on printed artifacts, revoke/reprint, optional experiments).
+**Merch QR lifecycle:** `docs/MERCH_QR_LIFECYCLE_POLICY.md` (no calendar expiry on printed artifacts, revoke/reprint, optional experiments).  
+**Visual choreography:** `docs/MERCH_VISUAL_CHOREOGRAPHY.md` — curiosity (stranger notary scan) vs belonging (customize / created delight); one scan URL pattern.
 
 **Architecture and launch gate:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`  -  public card creation when Phase A ships; federated networks long-term; founding cohort is optional feedback only.
 
@@ -206,6 +207,8 @@ Required blocks, visually separated:
 
 Curiosity and belonging share one URL pattern; content adapts by network status, not by separate products.
 
+**Visual register split:** Stranger scan = calm **notary** (Settle only). Owner/buyer surfaces (`/shop/customize/`, `/created/`, thanks) = **belonging and imagination** — see [`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md). Do not fork hoodie-only scan templates.
+
 ---
 
 ## Metrics (Merch-Led)
@@ -243,6 +246,7 @@ Curiosity and belonging share one URL pattern; content adapts by network status,
 |---|---|
 | **Implementation order and architecture** | `docs/V1_0_ARCHITECTURE_ROADMAP.md` |
 | Trust limits, labels | `docs/V1_PRODUCT_TRUST_MODEL.md` |
+| Merch visual choreography (scan vs customize) | `docs/MERCH_VISUAL_CHOREOGRAPHY.md` |
 | Shopify / Printify, spikes | `docs/V1_ASSUMPTION_REGISTER.md`, `docs/V1_DECISION_LOCK.md` |
 | Implementation shapes | `docs/V1_IMPLEMENTATION_CONTRACTS.md`, `docs/V1_IMPLEMENTATION_BACKLOG.md` (reorder phases to match this doc) |
 | Copy and slogans | `docs/LAUNCH_LANGUAGE_KIT.md`, `docs/SKEPTIC_FAQ.md` |

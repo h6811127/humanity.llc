@@ -18,6 +18,7 @@ export const STEWARD_PREVIEW_RETURN_ALLOWED_PATH_PREFIXES = [
   "/created",
   "/wallet",
   "/create",
+  "/shop/customize",
   "/",
 ];
 
@@ -176,6 +177,7 @@ export function stewardPreviewReturnBannerLabel(returnUrl) {
     const parsed = new URL(returnUrl);
     const hash = parsed.hash.replace(/^#/, "");
     if (hash === "setup" || hash.startsWith("setup-")) return "Back to setup";
+    if (parsed.pathname.startsWith("/shop/customize")) return "Back to customize";
     if (parsed.pathname.startsWith("/wallet")) return "Back to My objects";
     if (parsed.pathname.startsWith("/created")) return "Back to card controls";
     if (parsed.pathname.startsWith("/create")) return "Back to create";
