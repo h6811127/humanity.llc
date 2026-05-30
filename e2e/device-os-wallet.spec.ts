@@ -206,7 +206,7 @@ test.describe("device OS wallet flow", () => {
     await expect(page.locator("#revoke-details")).toHaveAttribute("open");
   });
 
-  test("Open controls opens setup wizard when hc_setup_done unset (not control tabs)", async ({
+  test("Open controls opens card controls when hc_setup_done unset (not setup Print)", async ({
     page,
   }) => {
     await page.addInitScript((profileId) => {
@@ -219,14 +219,33 @@ test.describe("device OS wallet flow", () => {
 
     await expect(page).toHaveURL(/\/created\/\?.*profile_id=7Xk9mP2nQ4rT6vW8yZ1aB3cD5/);
     await waitForCreatedSigningKeys(page);
-    await expect(page.locator("body")).toHaveAttribute("data-created-mode", "setup", {
+    await expect(page.locator("body")).toHaveAttribute("data-created-mode", "control", {
       timeout: 15_000,
     });
-    await expect(page.locator("#created-setup-root")).toBeVisible();
-    await expect(page.locator("#created-control-root")).toBeHidden();
-    await expect(page.locator("#created-setup-root .created-setup-kicker")).toHaveText(
-      /steps · ownership stays on this device/
-    );
+    await expect(page.locator("#created-setup-root")).toBeHidden();
+    await expect(page.locator("#created-control-root")).toBeVisible();
+    await expect(page.getByRole("tab", { name: "Live", selected: true })).toBeVisible();
+  });
+
+  test("Open workspace banner opens card controls when hc_setup_done unset", async ({
+    page,
+  }) => {
+    await seedStewardReadySession(page);
+    await page.addInitScript((profileId) => {
+      localStorage.removeItem("hc_setup_done");
+    }, SAMPLE_WALLET_ENTRY.profile_id);
+    await stubCreatedResolver(page);
+
+    await page.goto("/wallet/");
+    await expect(page.locator("#wallet-active-banner")).toBeVisible();
+    await page.locator("#wallet-active-link").click();
+
+    await expect(page).toHaveURL(/\/created\/\?.*profile_id=7Xk9mP2nQ4rT6vW8yZ1aB3cD5/);
+    await expect(page.locator("body")).toHaveAttribute("data-created-mode", "control", {
+      timeout: 15_000,
+    });
+    await expect(page.locator("#created-setup-root")).toBeHidden();
+    await expect(page.getByRole("tab", { name: "Live", selected: true })).toBeVisible();
   });
 
   test("control mode shows Live tab, setup memory chips, and primary CTA", async ({

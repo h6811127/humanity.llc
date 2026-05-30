@@ -40,7 +40,7 @@ These map to the #1 documented confusion: **keys in one tab vs saved on device**
 | Step | Action | Expected |
 |------|--------|----------|
 | 1 | Save a card on `/wallet/` | Row visible |
-| 2 | Tap **Open controls** | Navigates to `/created/?profile_id=…` |
+| 2 | Tap **Open controls** | Navigates to `/created/?profile_id=…`; **Live · Manage** tabs (card controls), not setup Download QR |
 | 3 | DevTools → Application → sessionStorage `hc_created` | Contains `owner_private_key_b58` |
 
 **Fail signals:** `/created/` without signing keys; revoke panel stuck on “Checking…” (see [`REVOKE_UI_INVESTIGATION.md`](REVOKE_UI_INVESTIGATION.md)).
@@ -86,9 +86,9 @@ Spec: [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) · Path 2 arrive [`SC
 |---------|-------|----------|
 | Status dot explainer **Open controls** | Floating dot on `/`, `/create/`, `/created/` | Opens the **hub sheet**, not `/created/` directly |
 | Row **Open controls** | Hub or `/wallet/` saved card row | `openCardNowPage()` → `/created/?profile_id=…` with `hc_created` keys |
-| Wallet banner **Open controls** | `/wallet/` when this tab holds keys | Same as row (`activateWalletEntry` when a saved row exists) |
+| Wallet banner **Open workspace** | `/wallet/` when this tab holds keys | Same as row — `openCardNowPage()` → card controls (not setup Print) |
 
-**Fail signals:** Dot jumps to `/created/` without opening hub; banner link opens `/created/` with empty `hc_created`.
+**Fail signals:** Dot jumps to `/created/` without opening hub; banner opens setup Download QR instead of Live · Manage; banner opens `/created/` with empty `hc_created`.
 
 ### P0-3 · Status dot opens hub (not dead)
 

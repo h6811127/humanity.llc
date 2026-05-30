@@ -133,7 +133,7 @@ describe("resolveCreatedMode", () => {
     expect(isSetupDone(profileId)).toBe(false);
   });
 
-  it("returns setup for saved steward without setup done or seatbelt (P0-4)", () => {
+  it("returns control for returning steward when wallet saved (P0-4)", () => {
     expect(
       resolveCreatedMode({
         profileId: "abc",
@@ -143,7 +143,7 @@ describe("resolveCreatedMode", () => {
         walletSaved: true,
         seatbeltSatisfied: false,
       })
-    ).toBe("setup");
+    ).toBe("control");
     expect(
       resolveCreatedMode({
         profileId: "abc",

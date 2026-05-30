@@ -14,7 +14,7 @@
 |---------------|-------------|
 | Lands on “print page” | `/created/` is in **setup** mode (post-create wizard), not **control** mode. Saved cards skip step 1 and open **step 2 - Print** (`#setup-qr`). That is the setup QR panel, not the Advanced revoke UI. |
 | Card stays active | Hub **Revoke QR** only **navigates** to `/created/#revoke`. It does **not** POST a revocation. If setup mode blocks the revoke panel, the user never reaches confirm + submit. |
-| **Open controls** same destination | `openCardNowPage()` uses the same URL builder and the same mode gate; without `hc_setup_done[profile_id]`, setup mode wins again (usually Print step when the card is already saved). |
+| **Open controls** / wallet **Open workspace** (fixed) | `openCardNowPage()` → **control** when the card is saved and `fresh` is absent; setup Print only for `?fresh=1` or unsaved session. |
 
 **Primary defect:** Card workspace **setup vs control** resolution is out of sync with hub steward navigation and default auto-save. Steward deep-links assume **control** mode and `initCreatedTabs()` hash handling; setup wizard overwrites the hash and never mounts revoke UI.
 
@@ -124,7 +124,7 @@ Hub **Revoke QR** is intentionally **navigation + focus**, not a one-tap network
 | Tasks **Print instructions** | Scroll/open print tip on **Now** tab (`created-dashboard.mjs`) | Only in **control** mode; not the same as setup step 2, but similar copy |
 | Status dot **Open controls** | Explainer CTA (`device-dot-state-core.mjs`) | Opens **hub sheet**, not `/created/` (`device-status.mjs` `open_controls` → `openHubFromChrome()`) |
 
-Wallet banner link `#wallet-active-link` is a plain `<a href="/created/?profile_id&qr_id">` without `activateWalletEntry`; keys already in tab are assumed.
+Wallet **Open workspace** (`#wallet-active-link`): `wallet-page.mjs` intercepts click → `openCardNowPage()` (activate saved row when needed, then `/created/` in **control** mode). Plain `href` is fallback only.
 
 ---
 
@@ -186,14 +186,14 @@ sequenceDiagram
 
 **Principle:** First-time post-create keeps the setup wizard; **returning stewards** with saved keys should land in **control** mode and honor steward hashes. Do not move revoke signing into the hub (keeps confirm-before-submit and `created-revoke.mjs` single owner).
 
-### Recommended (P0) - “Returning steward” mode gate
+### Shipped (P0) - “Returning steward” mode gate
 
-**Change `resolveCreatedMode()`** (and document in `CARD_WORKSPACE_UX.md`):
+**`firstSessionSetupRequired()`** in `created-first-session-gate-core.mjs` (documented in `CARD_WORKSPACE_UX.md`):
 
-- If `hasSigningKeys && walletSaved && !freshParam` → **control**, even when `setupDone` is false.
+- If `walletSaved && !freshParam` → **control** (skip setup), even when `setupDone` is false.
 - Keep **setup** for `freshParam` or missing wallet save or missing keys.
 
-**Rationale:** Setup step 1 (“Save on this device”) is satisfied by auto-save / hub save. Forcing setup again on every hub return contradicts `DEVICE_HUB_AND_LOCAL_SEARCH.md` (“Open controls loads keys… steward actions call `openCardControlPage`”).
+**Rationale:** Setup step 1 (“Save on this device”) is satisfied by auto-save / hub save. Forcing setup again on every hub return contradicted `DEVICE_HUB_AND_LOCAL_SEARCH.md` (“Open controls loads keys… steward actions call `openCardControlPage`”).
 
 **Optional belt:** call `markSetupDone(profileId)` inside `saveSessionToWallet` success (or `created-device-save` `runSave`) so `hc_setup_done` matches reality.
 
@@ -217,7 +217,7 @@ Per `REVOKE_UI_INVESTIGATION.md`: try/catch around `hydrateSessionFromNetwork`; 
 |-------|-----------|
 | Hub **Revoke QR** sounds like instant revoke | Subtitle in menu or first visit toast: “Opens card page to confirm” |
 | Status dot **Open controls** vs row **Open controls** | Dot → hub only; row → `/created/`. Document in `DEVICE_OS_QA.md`; optional dot CTA `open_card_controls` when one saved card with keys |
-| Wallet `#wallet-active-link` | Use `openCardNowPage` pattern (activate + navigate) for consistency |
+| Wallet `#wallet-active-link` | **Shipped** — `openCardNowPage` in `wallet-page.mjs` |
 
 ### Explicit non-goals (bad fit for architecture)
 

@@ -15,15 +15,10 @@ import { rootHasChildObjectBackupSeatbelt } from "./child-object-backup-gate-cor
  * }} input
  */
 export function firstSessionSetupRequired(input) {
-  const {
-    freshParam = false,
-    walletSaved = false,
-    setupDone = false,
-    seatbeltSatisfied = false,
-  } = input;
+  const { freshParam = false, walletSaved = false } = input;
   if (freshParam || !walletSaved) return true;
-  if (setupDone || seatbeltSatisfied) return false;
-  return true;
+  // Returning steward: saved on device, not post-create — open card controls, not setup Print.
+  return false;
 }
 
 /**

@@ -29,23 +29,12 @@ describe("firstSessionSetupRequired (P0-4)", () => {
     ).toBe(true);
   });
 
-  it("requires setup when saved but no setup done and no seatbelt", () => {
+  it("skips setup for returning steward when wallet saved (not fresh)", () => {
     expect(
       firstSessionSetupRequired({
         freshParam: false,
         walletSaved: true,
         setupDone: false,
-        seatbeltSatisfied: false,
-      })
-    ).toBe(true);
-  });
-
-  it("skips setup when setup done or seatbelt satisfied", () => {
-    expect(
-      firstSessionSetupRequired({
-        freshParam: false,
-        walletSaved: true,
-        setupDone: true,
         seatbeltSatisfied: false,
       })
     ).toBe(false);
@@ -53,8 +42,8 @@ describe("firstSessionSetupRequired (P0-4)", () => {
       firstSessionSetupRequired({
         freshParam: false,
         walletSaved: true,
-        setupDone: false,
-        seatbeltSatisfied: true,
+        setupDone: true,
+        seatbeltSatisfied: false,
       })
     ).toBe(false);
   });

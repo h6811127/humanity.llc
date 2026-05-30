@@ -16,7 +16,7 @@
 
 Resolver: `site/js/created-mode.mjs` · `modeFromPage()`.
 
-**Mode gate (P0-4):** **control** when this tab has signing keys, the card is **saved on this device**, and either the setup wizard finished (`hc_setup_done`) or a recovery seatbelt is present (recovery ack, encrypted backup export, or import). `?fresh=1` always stays in **setup** until Protect completes. `syncSetupDoneForSavedProfile` backfills `hc_setup_done` only when the wallet row already has seatbelt markers. Hub **Open controls** / `#revoke` deep-links require control mode - see `docs/HUB_REVOKE_AND_CONTROLS_NAVIGATION.md`.
+**Mode gate (P0-4):** **control** when this tab has signing keys and the card is **saved on this device**, unless `?fresh=1` (post-create wizard, including Protect). Returning stewards skip setup even when `hc_setup_done` is unset — hub/wallet **Open controls** and wallet **Open workspace** land on Live · Manage, not setup step 2 (Download QR). First-time `?fresh=1` still requires the full wizard and seatbelt before **Open card controls**. `syncSetupDoneForSavedProfile` backfills `hc_setup_done` when the wallet row already has seatbelt markers. Steward `#revoke` hashes — see `docs/HUB_REVOKE_AND_CONTROLS_NAVIGATION.md`.
 
 Storage: `localStorage.hc_setup_done` - map of `profile_id → true` after wizard finish (with seatbelt) or legacy backfill with seatbelt on wallet row.
 
@@ -79,7 +79,7 @@ See `docs/CARD_WORKSPACE_PHASE0.md` - Open card loads keys, auto-save default on
 - Landing **My cards** entry → `/wallet/` (homepage four-step progress strip retired — [`LANDING_PROGRESS_STRIP.md`](LANDING_PROGRESS_STRIP.md))
 - Landing shortcut **My cards** (was “All saved cards”)
 - Cross-links from `/created/` hub and error copy use **My cards** for `/wallet/`
-- Active-session banner on wallet: **Open controls** (not “Open card page”); `.hc-emphasis-card--active` on `#wallet-active-banner` — [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md) Phase 0
+- Active-session banner on wallet: **Open workspace** → card controls (Live · Manage), not setup Download QR; uses `openCardNowPage()` like row **Open controls** — `.hc-emphasis-card--active` on `#wallet-active-banner` — [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md) Phase 0
 
 ---
 
