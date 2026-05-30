@@ -36,6 +36,13 @@ describe("qr-render.mjs /created/ contract", () => {
     expect(src).toContain('./qr-render.mjs');
     expect(src).toContain("renderQrToImage");
     expect(src).toContain("downloadQrPng");
+    expect(src).toContain("renderBrandedQrToImage");
+  });
+
+  it("qr-render allows steward handoff URLs for branded encoding", () => {
+    const src = readFileSync(join(root, "site/js/qr-render.mjs"), "utf8");
+    expect(src).toContain("isAllowedStewardHandoffEncodeUrl");
+    expect(src).toContain("assertQrEncodeUrl");
   });
 
   it("scan fallback loads versioned qr-render bundle", () => {

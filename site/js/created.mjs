@@ -44,7 +44,21 @@ import { initCreatedChildObject } from "./created-child-object.mjs";
 import { initCreatedLostItemRelay } from "./created-child-object-lost-item.mjs";
 import { initCreatedSetup } from "./created-setup.mjs";
 import { applyStewardScanLinkElement } from "./pwa-scan-handoff-core.mjs";
+import {
+  buildStewardDualQrMaterials,
+  stewardDualQrDownloadFilenames,
+} from "./steward-dual-qr-core.mjs";
 import { openStewardScanPreviewFromWindow } from "./pwa-scan-handoff.mjs";
+import {
+  COPY_STEWARD_HANDOFF_LINK,
+  DOWNLOAD_PUBLIC_QR,
+  DOWNLOAD_STEWARD_QR,
+  DUAL_QR_PUBLIC_HINT,
+  DUAL_QR_PUBLIC_LABEL,
+  DUAL_QR_SECTION_LEAD,
+  DUAL_QR_STEWARD_HINT,
+  DUAL_QR_STEWARD_LABEL,
+} from "./device-ownership-copy-core.mjs";
 import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
 import {
   applyCreatedWorkspaceMode,
@@ -230,7 +244,17 @@ const manifestoEl = document.getElementById("created-manifesto");
 const scanUrlEl = document.getElementById("scan-url");
 const qrImg = document.getElementById("qr-img");
 const copyBtn = document.getElementById("copy-scan");
+const copyStewardHandoffBtn = document.getElementById("copy-steward-handoff");
 const downloadQrBtn = document.getElementById("download-qr");
+const downloadStewardQrBtn = document.getElementById("download-steward-qr");
+const stewardQrCol = document.getElementById("created-steward-qr-col");
+const stewardQrImg = document.getElementById("qr-img-steward");
+const stewardHandoffUrlEl = document.getElementById("steward-handoff-url");
+const dualQrLeadEl = document.getElementById("created-dual-qr-lead");
+const dualQrPublicLabelEl = document.getElementById("created-dual-qr-public-label");
+const dualQrPublicHintEl = document.getElementById("created-dual-qr-public-hint");
+const dualQrStewardLabelEl = document.getElementById("created-dual-qr-steward-label");
+const dualQrStewardHintEl = document.getElementById("created-dual-qr-steward-hint");
 const openScanBtn = document.getElementById("open-scan");
 const profileIdEl = document.getElementById("profile-id");
 const humanTrustLabelEl = document.getElementById("human-trust-label");
@@ -1056,10 +1080,84 @@ if (workspaceMode === "setup" && profileId && activeQrId) {
   syncUpdateStatusTaskGate(profileId, session);
 }
 
+function syncStewardDualQrMaterials(scanUrl) {
+  const materials = buildStewardDualQrMaterials(scanUrl, location.origin);
+  const slug = data?.handle ? String(data.handle) : activeQrId?.slice(0, 8) || "scan";
+  const filenames = stewardDualQrDownloadFilenames(scanUrl, slug, location.origin);
+
+  if (dualQrLeadEl) {
+    dualQrLeadEl.textContent = DUAL_QR_SECTION_LEAD;
+    dualQrLeadEl.hidden = !materials.hasStewardHandoff;
+  }
+  if (dualQrPublicLabelEl) dualQrPublicLabelEl.textContent = DUAL_QR_PUBLIC_LABEL;
+  if (dualQrPublicHintEl) dualQrPublicHintEl.textContent = DUAL_QR_PUBLIC_HINT;
+  if (dualQrStewardLabelEl) dualQrStewardLabelEl.textContent = DUAL_QR_STEWARD_LABEL;
+  if (dualQrStewardHintEl) dualQrStewardHintEl.textContent = DUAL_QR_STEWARD_HINT;
+  if (downloadQrBtn) downloadQrBtn.textContent = DOWNLOAD_PUBLIC_QR;
+
+  if (copyStewardHandoffBtn) {
+    if (!materials.stewardHandoffUrl) {
+      copyStewardHandoffBtn.hidden = true;
+      copyStewardHandoffBtn.disabled = true;
+    } else {
+      copyStewardHandoffBtn.hidden = false;
+      copyStewardHandoffBtn.disabled = false;
+      copyStewardHandoffBtn.textContent = COPY_STEWARD_HANDOFF_LINK;
+      copyStewardHandoffBtn.onclick = async () => {
+        copyStewardHandoffBtn.disabled = true;
+        const prev = copyStewardHandoffBtn.textContent;
+        try {
+          await navigator.clipboard.writeText(materials.stewardHandoffUrl);
+          copyStewardHandoffBtn.textContent = "Link copied";
+        } catch {
+          copyStewardHandoffBtn.textContent = "Copy failed";
+        } finally {
+          setTimeout(() => {
+            copyStewardHandoffBtn.disabled = false;
+            copyStewardHandoffBtn.textContent = prev;
+          }, 2500);
+        }
+      };
+    }
+  }
+
+  if (!materials.hasStewardHandoff || !materials.stewardHandoffUrl) {
+    if (stewardQrCol) stewardQrCol.hidden = true;
+    if (downloadStewardQrBtn) {
+      downloadStewardQrBtn.hidden = true;
+      downloadStewardQrBtn.disabled = true;
+    }
+    if (stewardHandoffUrlEl) stewardHandoffUrlEl.hidden = true;
+    return Promise.resolve();
+  }
+
+  if (stewardQrCol) stewardQrCol.hidden = false;
+  if (stewardHandoffUrlEl) {
+    stewardHandoffUrlEl.textContent = materials.stewardHandoffUrl;
+    stewardHandoffUrlEl.hidden = false;
+  }
+
+  return import("./qr-render.mjs").then(({ renderBrandedQrToImage, downloadBrandedQrPng }) => {
+    if (stewardQrImg) {
+      void renderBrandedQrToImage(stewardQrImg, materials.stewardHandoffUrl, {
+        alt: "Steward handoff QR code",
+      });
+    }
+    if (downloadStewardQrBtn && filenames.stewardFilename) {
+      downloadStewardQrBtn.hidden = false;
+      downloadStewardQrBtn.disabled = false;
+      downloadStewardQrBtn.textContent = DOWNLOAD_STEWARD_QR;
+      downloadStewardQrBtn.onclick = () =>
+        void downloadBrandedQrPng(materials.stewardHandoffUrl, filenames.stewardFilename);
+    }
+  });
+}
+
 if (activeScanUrl) {
   scanUrlEl.textContent = activeScanUrl;
   copyBtn.disabled = false;
   copyBtn.onclick = () => navigator.clipboard.writeText(activeScanUrl);
+  syncStewardDualQrMaterials(activeScanUrl);
   if (liveCopyScanEl) {
     liveCopyScanEl.disabled = false;
     liveCopyScanEl.addEventListener("click", () => {
@@ -1096,11 +1194,12 @@ if (activeScanUrl) {
     if (downloadQrBtn) {
       downloadQrBtn.disabled = false;
       const slug = data?.handle ? String(data.handle) : activeQrId?.slice(0, 8) || "scan";
+      const filenames = stewardDualQrDownloadFilenames(activeScanUrl, slug, location.origin);
       const runDownload = async () => {
         const prev = downloadQrBtn.textContent;
         downloadQrBtn.disabled = true;
         try {
-          await downloadQrPng(activeScanUrl, `humanity-${slug}-qr.png`);
+          await downloadQrPng(activeScanUrl, filenames.publicFilename);
           downloadQrBtn.textContent = "Downloaded";
           if (resolvePilotTemplate(loadSession()) === "status_plate") {
             const row = setStatusPlateLoopMilestone(profileId, "printed", true);
@@ -1256,6 +1355,7 @@ async function bootstrapOwnerTools() {
           copyBtn.disabled = false;
           copyBtn.onclick = () => navigator.clipboard.writeText(newScanUrl);
         }
+        syncStewardDualQrMaterials(newScanUrl);
         if (openScanBtn) openScanBtn.href = newScanUrl;
         if (liveCopyScanEl) {
           liveCopyScanEl.disabled = false;

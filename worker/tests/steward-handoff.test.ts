@@ -48,6 +48,7 @@ describe("handleGetStewardHandoff", () => {
     const html = await res.text();
     expect(html).toContain("Open this scan in your Home Screen app");
     expect(html).toContain(appendStewardScanQueryParam(SCAN_URL));
+    expect(html).toContain("?go=1");
   });
 
   it("redirects with go=1", async () => {

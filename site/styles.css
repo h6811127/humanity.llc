@@ -8807,6 +8807,43 @@ body.device-shell-created .flow-keys-group .list-row {
   margin: 8px 0 16px;
 }
 
+.created-dual-qr-lead {
+  margin: 0 0 12px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text-secondary, #5c5c5c);
+}
+
+.created-dual-qr-grid {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 560px) {
+  .created-dual-qr-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.created-dual-qr-label {
+  margin: 0 0 4px;
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+}
+
+.created-dual-qr-hint {
+  margin: 0 0 8px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text-secondary, #5c5c5c);
+}
+
+.created-dual-qr-col .mono-link-compact {
+  margin-top: 8px;
+  word-break: break-all;
+}
+
 .created-scan-actions {
   display: flex;
   flex-direction: column;

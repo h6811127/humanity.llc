@@ -595,8 +595,9 @@ Automated: `npm run worker:test:pwa-install` (includes `pwa-scan-handoff-core.te
 | 4 | **Fallback:** Camera app → Safari scan → **Copy scan link** | Explainer mentions Home Screen app |
 | 5 | PWA → **Open scan link** → paste → Open | Same scan in PWA; vouch works |
 | 6 | Safari: open scan with `?hc_steward=1` (e.g. from workspace **Open scan** in browser tab) | Handoff explainer before actor band; vouch section scrolls into view; copied link keeps `hc_steward=1` |
+| 7 | `/created/` → **Copy steward handoff link** → open in Safari (or Camera) | Lands on `humanity.llc/v/…` interstitial; **Copy scan link** + **Continue** reach scan with `hc_steward=1` |
 
-**Fail signals:** Camera scan stays in Safari with empty wallet and no handoff copy; in-app scanner opens Safari; vouch blocked despite keys in PWA after in-app scan; steward param shows wallet “Attest as…” instead of handoff on iOS Safari.
+**Fail signals:** Camera scan stays in Safari with empty wallet and no handoff copy; in-app scanner opens Safari; vouch blocked despite keys in PWA after in-app scan; steward param shows wallet “Attest as…” instead of handoff on iOS Safari; `/v/` returns 404 on production Worker.
 
 Automated: `npm run worker:test:steward-scan-handoff`
 

@@ -917,14 +917,29 @@
               </span>
               <span class="settings-summary-text">
                 <span class="settings-summary-title">Full-size QR</span>
-                <span class="settings-summary-sub">Poster view, download, and scan link</span>
+                <span class="settings-summary-sub">Public + steward QRs, download, and scan links</span>
               </span>
               <span class="list-chevron" aria-hidden="true">›</span>
             </summary>
             <div class="settings-panel settings-panel-action">
               <section class="group created-qr-hero" id="created-qr-section">
-                <div class="qr-box qr-box-hero">
-                  <img id="qr-img" width="220" height="220" alt="" />
+                <p class="created-dual-qr-lead" id="created-dual-qr-lead" hidden></p>
+                <div class="created-dual-qr-grid">
+                  <div class="created-dual-qr-col">
+                    <p class="created-dual-qr-label" id="created-dual-qr-public-label">Public scan</p>
+                    <p class="created-dual-qr-hint" id="created-dual-qr-public-hint"></p>
+                    <div class="qr-box qr-box-hero">
+                      <img id="qr-img" width="220" height="220" alt="" />
+                    </div>
+                  </div>
+                  <div class="created-dual-qr-col" id="created-steward-qr-col" hidden>
+                    <p class="created-dual-qr-label" id="created-dual-qr-steward-label">Steward handoff</p>
+                    <p class="created-dual-qr-hint" id="created-dual-qr-steward-hint"></p>
+                    <div class="qr-box qr-box-hero">
+                      <img id="qr-img-steward" width="220" height="220" alt="" />
+                    </div>
+                    <p class="mono-link mono-link-compact" id="steward-handoff-url" hidden></p>
+                  </div>
                 </div>
                 <div class="created-scan-actions">
                   <a
@@ -938,9 +953,21 @@
                     Open scan page
                   </a>
                   <button type="button" class="btn-secondary" id="download-qr" disabled>
-                    Download QR image
+                    Download public QR
+                  </button>
+                  <button type="button" class="btn-secondary" id="download-steward-qr" disabled hidden>
+                    Download steward QR
                   </button>
                   <button type="button" class="btn-secondary" id="copy-scan">Copy scan link</button>
+                  <button
+                    type="button"
+                    class="btn-secondary"
+                    id="copy-steward-handoff"
+                    disabled
+                    hidden
+                  >
+                    Copy steward handoff link
+                  </button>
                 </div>
                 <p class="mono-link mono-link-compact" id="scan-url" hidden></p>
               </section>

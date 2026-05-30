@@ -368,6 +368,26 @@ export const STEWARD_HANDOFF_INTERSTITIAL_CONTINUE = "Continue to scan page";
 
 export const STEWARD_HANDOFF_INTERSTITIAL_COPY = "Copy scan link";
 
+/** Dual-QR print materials on /created/ (S7). */
+export const DUAL_QR_SECTION_LEAD =
+  "Print the public QR for strangers. Optionally add a steward handoff QR on internal collateral only — never replace the public code.";
+
+export const DUAL_QR_PUBLIC_LABEL = "Public scan";
+
+export const DUAL_QR_PUBLIC_HINT =
+  "For strangers — outward-facing print. Encodes the standard https scan link.";
+
+export const DUAL_QR_STEWARD_LABEL = "Steward handoff";
+
+export const DUAL_QR_STEWARD_HINT =
+  "Internal only — shorter link for stewards who vouch from a Home Screen app. Opens a Safari handoff page.";
+
+export const COPY_STEWARD_HANDOFF_LINK = "Copy steward handoff link";
+
+export const DOWNLOAD_STEWARD_QR = "Download steward QR";
+
+export const DOWNLOAD_PUBLIC_QR = "Download public QR";
+
 /** Hub in-app QR scanner (S3). */
 export const HUB_SCAN_QR_BTN = "Scan QR to vouch";
 

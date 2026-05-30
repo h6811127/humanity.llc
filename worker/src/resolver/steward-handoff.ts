@@ -46,13 +46,14 @@ export async function handleGetStewardHandoff(
   const scanUrl = appendStewardScanQueryParam(
     buildStewardHandoffScanUrl(parts, origin)
   );
-  const continueUrl = scanUrl;
+  const base = origin.replace(/\/$/, "");
+  const continueUrl = `${base}/v/${encodeURIComponent(code)}?go=1`;
 
   if (go) {
     return new Response(null, {
       status: 302,
       headers: {
-        Location: continueUrl,
+        Location: scanUrl,
         "Cache-Control": "no-store",
         "X-HC-Steward-Handoff": "redirect",
       },

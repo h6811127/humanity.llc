@@ -1,6 +1,6 @@
 # Steward scan handoff — camera, Safari, PWA, and vouch
 
-**Status:** Active — **S1 shipped** · **S2 shipped** · **S3 shipped** · **S4 shipped** · **S5 shipped** · **S6 shipped** (short handoff URL)  
+**Status:** Active — **S1–S7 shipped** · **S8** future (native app / Universal Links)  
 **Date:** 2026-05-30  
 **Audience:** Product, design, engineering, QA  
 **Related:** [`PWA_STANDALONE_EXTERNAL_NAVIGATION.md`](PWA_STANDALONE_EXTERNAL_NAVIGATION.md) · [`PWA_INSTALL.md`](PWA_INSTALL.md) · [`V1_DECISION_LOCK.md`](V1_DECISION_LOCK.md) (HTTPS print QR) · [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`OWNERSHIP_RESTORE_UX_PLAN.md`](OWNERSHIP_RESTORE_UX_PLAN.md) · [`KEY_LOSS_SAD_PATH_MATRIX.md`](KEY_LOSS_SAD_PATH_MATRIX.md)
@@ -45,7 +45,7 @@ This is distinct from **P1 shipped** steward scan preview (PWA → scan same-tab
 | **S4** | Product guidance | **Shipped** | Hub Restore & scan label + iPhone vouch guidance; PWA install + setup copy |
 | **S5** | Scan-page steward param | **Shipped** | `?hc_steward=1` → handoff UI first on Safari |
 | **S6** | Short handoff URL | **Shipped** | `humanity.llc/v/{code}` interstitial for camera landings |
-| **S7** | Dual-QR print materials | Planned | Public QR + steward handoff QR on internal collateral |
+| **S7** | Dual-QR print materials | **Shipped** | `/created/` public + steward QRs, download, handoff link |
 | **S8** | Native app / Universal Links | Future | Camera opens app when installed |
 
 ### S1 — Clipboard handoff (shipped)
@@ -108,14 +108,16 @@ Modules: [`scan-pwa-camera-handoff-core.mjs`](../site/js/scan-pwa-camera-handoff
 
 Modules: [`steward-handoff.ts`](../worker/src/resolver/steward-handoff.ts), [`steward-handoff-html.ts`](../worker/src/resolver/steward-handoff-html.ts).
 
-### S7 — Dual-QR materials (planned)
+### S7 — Dual-QR materials (shipped)
 
 | QR | Audience | Payload |
 |----|----------|---------|
 | Public | Strangers | `https://humanity.llc/c/…?q=…` (unchanged) |
-| Steward (optional on internal print) | Stewards at events | Handoff or in-app deep link |
+| Steward (optional on internal print) | Stewards at events | `https://humanity.llc/v/{code}` handoff interstitial (S6) |
 
-Public print contract unchanged ([`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md)).
+**UI:** `/created/` → **Full-size QR** shows side-by-side public + steward previews, **Download public QR**, **Download steward QR**, and **Copy steward handoff link**. Public print contract unchanged ([`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md)).
+
+Modules: [`steward-dual-qr-core.mjs`](../site/js/steward-dual-qr-core.mjs), [`created.mjs`](../site/js/created.mjs), [`qr-render.mjs`](../site/js/qr-render.mjs) (handoff URL encoding).
 
 ### S8 — Native shell (future)
 
@@ -154,6 +156,9 @@ flowchart TB
 | Module | Role |
 |--------|------|
 | `scan-pwa-camera-handoff-core.mjs` | iOS Safari handoff detection + `hc_steward` param (S5) |
+| `steward-dual-qr-core.mjs` | Dual-QR material builder + handoff encode guard (S7) |
+| `steward-handoff-code-core.mjs` | Compact `/v/{code}` encode/decode + short URL builder (S6) |
+| `steward-handoff.ts` | GET `/v/{code}` interstitial handler (S6) |
 | `device-hub-open-scan-core.mjs` | Parse pasted scan URLs |
 | `device-hub-open-scan.mjs` | Hub open scan link form |
 | `device-hub-import-recovery.mjs` | Hub recovery code import |
@@ -162,8 +167,6 @@ flowchart TB
 | `device-hub-steward-vouch-guidance.mjs` | S4 hub iPhone vouch guidance card |
 | `device-hub-steward-vouch-guidance-core.mjs` | S4 guidance gating |
 | `vouch-issue.mjs` | Vouch flow + S1 Safari explainer |
-| `steward-handoff-code-core.mjs` | Encode/decode `/v/{code}` + short URL builder (S6) |
-| `steward-handoff.ts` | Worker `/v/{code}` interstitial handler (S6) |
 | `pwa-scan-handoff-core.mjs` | PWA → scan (outbound, P1 shipped) |
 
 ### Tests
@@ -192,6 +195,7 @@ Add to [`ownership-restore:verify`](package.json) or new `steward-scan-handoff:v
 
 | Date | Change |
 |------|--------|
+| 2026-05-30 | **S7 shipped** — `/created/` dual-QR public + steward handoff download/copy |
 | 2026-05-30 | **S6 shipped** — `/v/{code}` steward handoff interstitial + code encoder |
 | 2026-05-30 | **S5 shipped** — `?hc_steward=1` Safari handoff-first landing |
 | 2026-05-30 | **S4 shipped** — hub Restore & scan label, iPhone vouch guidance card, PWA install + setup copy |
