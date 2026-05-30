@@ -24,11 +24,13 @@ import { loadInboxSheetModule } from "./device-inbox-sheet-loader.mjs";
 import {
   loadInboxModule,
   resetPresenceInboxGatherCache,
-} from "./device-inbox-loader.mjs?v=73";
+} from "./device-inbox-loader.mjs?v=74";
 import { getOrphanRemovedTabsWithKeys, getOtherTabsWithKeys } from "./device-tab-presence.mjs";
 import { primeCrossTabNotificationState } from "./device-cross-tab-state.mjs";
 import { refreshWalletContextFromChrome } from "./wallet-page-chrome.mjs";
 import { markDeviceBootReadyIfShellPage } from "./device-shell-boot.mjs";
+import { isDeviceBootReadyState } from "./device-shell-boot-core.mjs";
+import { shouldSuppressCrossTabChromeUntilShellBoot } from "./device-cross-tab-boot-core.mjs";
 
 /** @type {(() => void) | null} */
 let refreshStatusSurfaces = null;
@@ -60,6 +62,9 @@ export function setRefreshStatusSurfaces(fn) {
 
 /** Raw presence before fingerprint streak - used for immediate hide. */
 export function crossTabPresenceActiveRaw() {
+  const bootState = document.body?.dataset?.boot;
+  if (shouldSuppressCrossTabChromeUntilShellBoot(bootState)) return false;
+
   const tabNotice = tabNoticeCount();
   const generic = getOtherTabsWithKeys().length;
   const orphan = getOrphanRemovedTabsWithKeys().length;
@@ -127,7 +132,16 @@ async function runChromeRefreshAsync() {
       sheetMod.renderInboxSheet();
     }
     refreshWalletContextFromChrome();
+    const bootBefore = document.body?.dataset?.boot;
     markDeviceBootReadyIfShellPage();
+    const bootJustReady =
+      !isDeviceBootReadyState(bootBefore) &&
+      isDeviceBootReadyState(document.body?.dataset?.boot);
+    if (bootJustReady) {
+      refreshStatusSurfaces?.();
+      renderCrossTabKeysBanner();
+      refreshHubInboxAlertsFromChrome();
+    }
   } finally {
     lastPresenceChromeFingerprint = readPresenceChromeFingerprint();
     inbox.endDeviceChromeRefreshTick();

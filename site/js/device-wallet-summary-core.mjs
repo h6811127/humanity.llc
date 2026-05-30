@@ -1,6 +1,6 @@
 /**
  * Denormalized `hc_wallet_summary` — display-safe rows only (Safari P3-3).
- * @see docs/SAFARI_KEYS_WIPE_INVESTIGATION.md P3-3
+ * @see docs/SAFARI_KEYS_CUSTODY.md P3-3
  */
 
 export const WALLET_SUMMARY_VERSION = 3;
@@ -164,4 +164,12 @@ export function buildWalletSummary(entries, walletFingerprint, resolveQrId) {
   };
   serializeWalletSummaryForStorage(summary);
   return summary;
+}
+
+/**
+ * RC-5: persisted `hc_wallet_summary` must not display until `hc_wallet` is materialized once.
+ * @param {boolean} reconciledThisVisit
+ */
+export function shouldUsePersistedWalletSummaryFastPath(reconciledThisVisit) {
+  return reconciledThisVisit === true;
 }

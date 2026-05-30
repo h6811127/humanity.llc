@@ -1,9 +1,9 @@
 # Shell page load content flash — investigation
 
-**Status:** RC-1–RC-4 **shipped** (2026-05-30) · RC-5–RC-14 open for follow-up  
+**Status:** RC-1–RC-6 **shipped** (2026-05-30) · RC-7–RC-14 open for follow-up  
 **Date:** 2026-05-30  
 **Reported symptom:** Opening any shell or device page shows wrong or “random” data for a brief moment, then content disappears or is replaced with local device truth. Distracting and ugly.  
-**Related:** [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md) · [`CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md`](CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md) · [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH_QA_2026-05-26.md) · [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) · [`REVOKE_UI_INVESTIGATION.md`](REVOKE_UI_INVESTIGATION.md) · [`CREATED_QR_BOOTSTRAP_FIX.md`](CREATED_QR_BOOTSTRAP_FIX.md)
+**Related:** [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md) (stub → archive) · [`HUB_CARD_SAFARI_RELIABILITY.md`](HUB_CARD_SAFARI_RELIABILITY.md) · [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH_QA_2026-05-26.md) · [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) · [`CREATED_QR_BOOTSTRAP_FIX.md`](CREATED_QR_BOOTSTRAP_FIX.md)
 
 ---
 
@@ -171,13 +171,17 @@ Any step that paints before the next step completes can flash “wrong” data.
 
 ### RC-6 · Cross-tab presence churn (badge / banner / inbox)
 
+**Status:** Fixed (2026-05-30) — cross-tab inbox/dot/banner/scan surfaces suppressed until `data-boot=ready`; `primeCrossTabNotificationState()` skipped during boot; boot-ready chrome refresh re-paints status surfaces once.
+
 **Surfaces:** Status dot overlay, hub cross-tab group, wallet tab hint, inbox badge.
 
-**Mechanism:** `device-tab-presence.mjs` heartbeats in `localStorage.hc_tab_keys_presence`. On load, `getOtherTabsWithKeys()` may briefly report tabs that are closing or stale. Coordinator debounces some paths but not all; mutual exclusion with “keys in this tab” can **appear then disappear**.
+**Mechanism (historical):** `device-tab-presence.mjs` heartbeats in `localStorage.hc_tab_keys_presence`. On load, `getOtherTabsWithKeys()` may briefly report tabs that are closing or stale. Coordinator debounces some paths but not all; mutual exclusion with “keys in this tab” can **appear then disappear**. Boot `refreshDeviceChrome({ immediate: true })` plus `primeCrossTabNotificationState()` could advance the stability streak to 2 before the first visible paint, showing stale “Keys in another tab” for 1–2s.
 
 **User-visible effect:** 1–2 second flash of “Keys in another tab” or wrong card name in banner (user report: “random notification”).
 
-**Evidence:** [`CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md`](CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md); [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md).
+**Fix:** `device-cross-tab-boot-core.mjs` — `shouldSuppressCrossTabChromeUntilShellBoot()` gates `getCrossTabNotificationState()`, `getCrossTabScanSnapshot()`, `crossTabPresenceActiveRaw()`, and priming until shell boot ready. After `markDeviceBootReadyIfShellPage()`, one follow-up status/banner refresh applies stabilized presence only when still valid.
+
+**Evidence:** [`CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md`](CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md); [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md). Tests: `worker/tests/device-cross-tab-boot.test.ts`.
 
 ---
 
@@ -232,7 +236,7 @@ Any step that paints before the next step completes can flash “wrong” data.
 
 **Mechanism:** `maybeQuietTabRehydrate()` in `device-status.mjs` boot may **activate a wallet row** into `hc_created` after first paint. Components that read session once at module init see empty keys; components that listen for events see keys appear — UI shifts (save banners, vouch readiness, custody cards).
 
-**Evidence:** [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md); [`SAFARI_KEYS_WIPE_INVESTIGATION.md`](SAFARI_KEYS_WIPE_INVESTIGATION.md) scan module order.
+**Evidence:** [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md); [`SAFARI_KEYS_CUSTODY.md`](SAFARI_KEYS_CUSTODY.md) scan module order.
 
 ---
 
@@ -314,7 +318,7 @@ After status-graph or hub network changes, also run dot/inbox E2E per [`DEVICE_O
 
 - Does not replace feature-specific postmortems (card-disabled, cross-tab, status-dot load failure).
 - Does not propose splitting the device shell into a separate app — only documents why the current **HTML + deferred JS** architecture produces the reported flashes.
-- RC-5+ fixes remain future work unless noted **Shipped** in § Suggested doc cross-links.
+- RC-7+ fixes remain future work unless noted **Shipped** in § Suggested doc cross-links.
 
 ---
 
@@ -327,6 +331,7 @@ After status-graph or hub network changes, also run dot/inbox E2E per [`DEVICE_O
 | Cache discipline | **Shipped (RC-4)** — per-profile checking until `isResolverConfirmedProfile`; cache ignored pre-poll |
 | Wallet summary reconcile | **Shipped (RC-5)** — first `loadWalletSummary()` rebuilds from `hc_wallet`; no summary fast path pre-materialize |
 | `/created/` shell race | **Shipped (RC-2)** — workspace mode before unhide; route shell never reveals roots |
+| Cross-tab boot flash | **Shipped (RC-6)** — suppress cross-tab chrome until `data-boot=ready`; skip prime during boot |
 | Copy alignment | Rename Manage → Advanced or update all docs to say **Manage** |
 | Scan arrive animation | Skip pending when SSR and client agree; or reduce `SCAN_ARRIVE_MIN_CHECKING_MS` |
 
@@ -341,5 +346,7 @@ After status-graph or hub network changes, also run dot/inbox E2E per [`DEVICE_O
 | 2026-05-30 | RC-1 fix: `data-boot` gate + `.device-boot-gated` CSS; boot ready from page/chrome refresh |
 | 2026-05-30 | RC-3 fix: defer status dot paint until health fetch + quiet rehydrate settle |
 | 2026-05-30 | RC-4 fix: hub network chips checking until per-profile resolver poll confirms |
+| 2026-05-30 | RC-5 verification — `worker:test:shell-boot` includes wallet summary tests |
 | 2026-05-30 | RC-5 fix: wallet summary rebuild from hc_wallet on first load; skip summary fast path |
 | 2026-05-30 | Verification gate — `npm run worker:test:shell-boot` |
+| 2026-05-30 | RC-6 fix: defer cross-tab chrome until shell boot ready; skip prime during boot |

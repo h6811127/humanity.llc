@@ -21,6 +21,7 @@ import {
   WALLET_SUMMARY_VERSION,
   buildWalletSummary,
   serializeWalletSummaryForStorage,
+  shouldUsePersistedWalletSummaryFastPath,
 } from "./device-wallet-summary-core.mjs";
 import { walletSummaryIntegrityNeedsRepair } from "./device-wallet-summary-integrity-core.mjs";
 import {
@@ -39,6 +40,9 @@ let walletCache = null;
 let walletSummaryCacheRaw = null;
 /** @type {WalletSummary | null} */
 let walletSummaryCache = null;
+
+/** RC-5: skip hc_wallet_summary fast path until hc_wallet materializes once this visit. */
+let walletSummaryReconciledThisVisit = false;
 
 /** @type {"empty" | "ok" | "corrupt"} */
 let walletLoadKind = "empty";
@@ -215,6 +219,28 @@ export function loadWallet() {
 export function loadWalletSummary() {
   try {
     const raw = localStorage.getItem(WALLET_STORAGE_KEY);
+
+    if (!shouldUsePersistedWalletSummaryFastPath(walletSummaryReconciledThisVisit)) {
+      walletSummaryReconciledThisVisit = true;
+      loadWallet();
+      const summary =
+        walletSummaryCache ??
+        buildWalletSummary(
+          walletCache ?? [],
+          walletRawFingerprint(raw),
+          walletEntryQrId
+        );
+      try {
+        localStorage.setItem(
+          WALLET_SUMMARY_STORAGE_KEY,
+          serializeWalletSummaryForStorage(summary)
+        );
+      } catch {
+        /* private mode */
+      }
+      return cloneWalletSummary(summary);
+    }
+
     if (raw === walletSummaryCacheRaw && walletSummaryCache) {
       if (walletSummaryCache.walletFingerprint === walletRawFingerprint(raw)) {
         return cloneWalletSummary(walletSummaryCache);
@@ -537,9 +563,21 @@ export function resetWalletCachesForTests() {
   walletCache = null;
   walletSummaryCacheRaw = null;
   walletSummaryCache = null;
+  walletSummaryReconciledThisVisit = false;
+}
+
+export function isWalletSummaryReconciledThisVisit() {
+  return walletSummaryReconciledThisVisit;
 }
 
 if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+  window.addEventListener("pageshow", (event) => {
+    /** @type {{ persisted?: boolean } | undefined} */
+    const detail = event;
+    if (!detail?.persisted) return;
+    walletSummaryReconciledThisVisit = false;
+  });
+
   window.addEventListener("storage", (event) => {
     if (event.key === WALLET_STORAGE_KEY || event.key === WALLET_SUMMARY_STORAGE_KEY) {
       invalidateWalletCache();

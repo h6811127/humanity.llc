@@ -6,6 +6,7 @@ import {
   assertWalletSummaryRowKeys,
   buildWalletSummary,
   serializeWalletSummaryForStorage,
+  shouldUsePersistedWalletSummaryFastPath,
   walletSummaryRowFromEntry,
 } from "../../site/js/device-wallet-summary-core.mjs";
 
@@ -17,6 +18,11 @@ function resolveQrId(entry: { qr_id?: string | null; scan_url?: string | null } 
 }
 
 describe("device-wallet-summary-core (P3-3)", () => {
+  it("skips persisted summary fast path until wallet reconciled (RC-5)", () => {
+    expect(shouldUsePersistedWalletSummaryFastPath(false)).toBe(false);
+    expect(shouldUsePersistedWalletSummaryFastPath(true)).toBe(true);
+  });
+
   it("allows only display-safe row keys", () => {
     expect([...WALLET_SUMMARY_ROW_ALLOWED_KEYS].sort()).toEqual([
       "handle",

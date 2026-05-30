@@ -19,9 +19,10 @@ The floating **status dot** (`#brand-status-dot-btn`) opens the hub on `/`, `/cr
 | Lazy subgraphs | Do not static-import full inbox/hub-sheet/notifications from `device-status.mjs` or `device-chrome-refresh.mjs`. Use `device-inbox-sheet-loader.mjs`, `device-hub-sheet-loader.mjs`, `device-inbox-loader.mjs`, `device-browser-notifications-loader.mjs`. |
 | Hub open state | Open/close only through `setHubSheetOpen()` / `setHubExpanded()`. `hubSheetOpen()` treats a collapsed `#device-hub` as closed even if `body.device-hub-sheet-open` is stuck. |
 | Clickability CSS | `.top-chrome--float { pointer-events: none }` with `.shell-status-cluster` (and dot/badge) at `pointer-events: auto` when `top-chrome--edge-hidden` or hub/inbox locked. |
-| Boot gate | Shell bodies use `data-boot="pending"` until `markDeviceBootReady()`. Personalized rows stay hidden via `.device-boot-gated` until boot ready. |
+| Boot gate | Shell bodies use `data-boot="pending"` until `markDeviceBootReady()`. Personalized rows stay hidden via `.device-boot-gated` until boot ready. Cross-tab inbox/dot/banner suppressed until `data-boot=ready`. |
 | Dot boot | Dot hidden until first settled `applyDot()` after health fetch + quiet rehydrate — no flash of wrong steward/offline state from core-only boot. |
 | Hub network chips | Per-profile chips show **checking** until `isResolverConfirmedProfile(profileId)`; cache ignored for identity/icon/scan-kind until poll confirms. |
+| Wallet summary boot | First `loadWalletSummary()` each visit materializes `hc_wallet` and rebuilds summary; persisted fast path skipped until reconciled (`pageshow` bfcache resets reconcile). |
 
 **Regression (status graph):**
 
@@ -30,7 +31,7 @@ npm run worker:test -- worker/tests/device-status-shell-modules.test.ts worker/t
 npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts e2e/device-cross-tab-keys.spec.ts e2e/scan-page-dot.spec.ts
 ```
 
-Canonical UX spec: [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md). Load failure postmortem: [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md). Open boot follow-ups: [`SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md`](SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md) (RC-5–RC-14, including wallet-summary reconcile and cross-tab boot suppress).
+Canonical UX spec: [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md). Load failure postmortem: [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md). Open boot follow-ups: [`SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md`](SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md) (RC-7–RC-14).
 
 ---
 
@@ -75,10 +76,11 @@ Canonical inbox taxonomy: [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
 |-----------|--------|
 | Not OS push | Cross-tab keys use in-app chrome (`cross_tab_keys` / `orphan_keys_removed` inbox kinds), never browser `Notification`. |
 | Coordinator | `device-chrome-refresh.mjs` + fingerprint snapshot; avoid duplicate refresh paths that flash wrong labels. |
+| Boot suppress | Cross-tab notification state, scan snapshot, and `crossTabPresenceActiveRaw()` return empty/hidden until `data-boot=ready`; skip `primeCrossTabNotificationState()` during boot. |
 | Presence churn | Laggy scroll on landing often traces to cross-tab presence heartbeats fanning `applyDot()` / `refreshSummary()` — see [`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md). |
 | Banner layout | Scan + landing `#device-cross-tab-banner` and `#wallet-tab-hint` use stacked F3 layout in `site/styles.css`. |
 
-**Regression:** `npm run worker:test -- worker/tests/device-cross-tab-state.test.ts worker/tests/device-cross-tab.test.ts` · `npm run e2e -- e2e/device-cross-tab-keys.spec.ts`
+**Regression:** `npm run worker:test -- worker/tests/device-cross-tab-state.test.ts worker/tests/device-cross-tab.test.ts worker/tests/device-cross-tab-boot.test.ts` · `npm run e2e -- e2e/device-cross-tab-keys.spec.ts`
 
 ---
 

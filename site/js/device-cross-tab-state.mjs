@@ -6,6 +6,11 @@ import {
   computeCrossTabNotificationState,
   stableCrossTabLaneAfterRead,
 } from "./device-cross-tab-state-core.mjs";
+import {
+  suppressCrossTabNotificationStateUntilBoot,
+  suppressCrossTabScanSnapshotUntilBoot,
+  shouldSuppressCrossTabChromeUntilShellBoot,
+} from "./device-cross-tab-boot-core.mjs";
 import { tabNoticeCount } from "./device-counts.mjs";
 import {
   shouldShowCrossTabKeysNotice,
@@ -54,7 +59,8 @@ export function getCrossTabNotificationState() {
   orphanStreak = state.orphanStreak;
   orphanPreviousFingerprint = state.orphanFingerprint;
 
-  return state;
+  const bootState = typeof document !== "undefined" ? document.body?.dataset?.boot : undefined;
+  return suppressCrossTabNotificationStateUntilBoot(state, bootState);
 }
 
 /** Invalidate streak when wallet/session custody changes (Phase 1 partial - full list in rebuild Phase 4). */
@@ -89,7 +95,11 @@ export function getCrossTabScanSnapshot() {
 
   scanStreak = lane.streak;
   scanPreviousFingerprint = lane.fingerprint;
-  return { show: lane.show, entries: lane.entries };
+  const bootState = typeof document !== "undefined" ? document.body?.dataset?.boot : undefined;
+  return suppressCrossTabScanSnapshotUntilBoot(
+    { show: lane.show, entries: lane.entries },
+    bootState
+  );
 }
 
 /**
@@ -98,6 +108,8 @@ export function getCrossTabScanSnapshot() {
  * the second read required by the stability gate.
  */
 export function primeCrossTabNotificationState() {
+  const bootState = typeof document !== "undefined" ? document.body?.dataset?.boot : undefined;
+  if (shouldSuppressCrossTabChromeUntilShellBoot(bootState)) return;
   getCrossTabNotificationState();
   getCrossTabScanSnapshot();
 }

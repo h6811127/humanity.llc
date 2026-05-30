@@ -16,6 +16,7 @@ import {
   loadWalletSummary,
   reconcileWalletSummaryIntegrity,
   resetWalletCachesForTests,
+  isWalletSummaryReconciledThisVisit,
   saveWallet,
   syncWalletCacheFromDisk,
   WALLET_STORAGE_KEY,
@@ -192,6 +193,31 @@ describe("device wallet metadata hot paths", () => {
       { profile_id: "profile-print", qr_scope: "print_artifact" },
     ]);
     expect(summary.rows[0]).not.toHaveProperty("owner_private_key_b58");
+  });
+
+  it("loadWalletSummary rebuilds from hc_wallet before persisted summary fast path (RC-5)", () => {
+    const wallet = JSON.stringify([entry("a", "profile-a", QR_A, true)]);
+    const fp = walletStorageFingerprint(wallet);
+    localStore.set(WALLET_STORAGE_KEY, wallet);
+    localStore.set(
+      WALLET_SUMMARY_STORAGE_KEY,
+      JSON.stringify({
+        version: 3,
+        walletFingerprint: fp,
+        count: 1,
+        profileIds: ["profile-a"],
+        signingKeyCount: 1,
+        pollableCount: 1,
+        stewardReady: true,
+        rows: [{ id: "a", profile_id: "profile-a", label: "Old label", handle: "old" }],
+      })
+    );
+    resetWalletCachesForTests();
+
+    const summary = loadWalletSummary();
+    expect(summary.stewardReady).toBe(false);
+    expect(summary.rows[0]?.label).toBe("Card a");
+    expect(isWalletSummaryReconciledThisVisit()).toBe(true);
   });
 
   it("reconcileWalletSummaryIntegrity rebuilds desynced hc_wallet_summary (RC-15)", () => {
