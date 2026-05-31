@@ -123,11 +123,22 @@ export const SHOP_CUSTOMIZE_HERO_DEFAULT = {
   lead: "Your unique QR on the garment. Change what strangers read from your phone; the ink stays the same.",
 };
 
+export const SHOP_GLITCH_PRINT_ARTIFACT_CALLOUT = {
+  title: "Chromatic glitch units",
+  lead:
+    "Some founding hoodies arrive with a production artifact we still see on Printify runs: part of the QR modules print in blue or purple on fabric instead of red. We treat these as limited variance in the batch, not misprints to hide.",
+  caption:
+    "Founding-run example. Scanning may be harder or impossible depending on camera and light. The ink is still yours; the glitch is the edition.",
+  imageSrc: "/assets/glitch-print-chromatic-artifact.png",
+  imageAlt:
+    "Example Glitch hoodie back print where the lower QR modules shifted to blue and purple on charcoal heather fabric",
+};
+
 /** @type {CustomizeHeroCopy} */
 export const SHOP_CUSTOMIZE_HERO_GLITCH = {
   eyebrow: "Founding drop · personalized",
   title: "Glitch LIVE QR hoodie",
-  lead: "Founding Glitch art on your chest — your unique QR, your live line.",
+  lead: "Founding Glitch art on your chest. Your unique QR, your live line.",
 };
 
 /**

@@ -51,7 +51,7 @@ export async function fetchStoreProduct(origin, productId) {
       typeof data.message === "string"
         ? data.message
         : errCode === "not_found"
-          ? "Store catalog API is unavailable — deploy the Worker with GET /v1/store/products routes."
+          ? "Store catalog API is unavailable. Deploy the Worker with GET /v1/store/products routes."
           : errCode === "PRODUCT_NOT_FOUND"
             ? "Unknown or unpublished product."
             : errCode || "Product unavailable.";

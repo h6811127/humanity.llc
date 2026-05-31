@@ -4916,6 +4916,23 @@ html[data-landing-focus="on"] .screen-landing {
   display: none;
 }
 
+.shop-print-glitch-figure {
+  margin: 16px 0 0;
+}
+
+.shop-print-glitch-figure img {
+  display: block;
+  width: min(100%, 20rem);
+  margin: 0 auto;
+  border-radius: var(--radius);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.shop-print-glitch-figure figcaption {
+  margin-top: 12px;
+  text-align: center;
+}
+
 .shop-hub-cta {
   display: flex;
   align-items: center;

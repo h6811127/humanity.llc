@@ -7,6 +7,7 @@ import {
   productHonestyBlockForId,
   SHOP_CUSTOMIZE_HONESTY_ROWS_GLITCH,
   SHOP_CUSTOMIZE_PROOF_PERSISTENCE,
+  SHOP_GLITCH_PRINT_ARTIFACT_CALLOUT,
   TIER1_HONESTY_SECTION_TITLE,
   tier1ThanksCopyForMerchRef,
 } from "../../site/js/shop-merch-copy-core.mjs";
@@ -38,9 +39,16 @@ describe("shop-merch-copy-core", () => {
     expect(SHOP_CUSTOMIZE_PROOF_PERSISTENCE).toMatch(/lose keys without recovery/i);
   });
 
-  it("exposes Glitch customizer hero and honesty rows", () => {
+  it("exposes Glitch print artifact callout for store and customizer", () => {
+    expect(SHOP_GLITCH_PRINT_ARTIFACT_CALLOUT.lead).toMatch(/blue or purple/i);
+    expect(SHOP_GLITCH_PRINT_ARTIFACT_CALLOUT.imageSrc).toMatch(/glitch-print-chromatic-artifact/);
+  });
+
+  it("exposes Glitch customizer hero without em dashes", () => {
     const hero = customizeHeroForProduct("glitch_hoodie_v1");
     expect(hero.title).toBe("Glitch LIVE QR hoodie");
+    expect(hero.lead).not.toMatch(/—/);
+    expect(hero.eyebrow).toMatch(/Founding drop/i);
     expect(hero.eyebrow).toMatch(/Founding drop/i);
     const rows = customizeHonestyRowsForProduct("glitch_hoodie_v1");
     expect(rows).toHaveLength(3);

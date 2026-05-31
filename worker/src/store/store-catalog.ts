@@ -83,7 +83,7 @@ const LAUNCH_PRODUCTS: StoreCatalogProduct[] = [
   {
     product_id: GLITCH_HOODIE_STORE_PRODUCT_ID,
     title: "Glitch LIVE QR hoodie",
-    meaning_line: "Founding Glitch art on your chest — your unique QR, your live line.",
+    meaning_line: "Founding Glitch art on your chest. Your unique QR, your live line.",
     story:
       "Fixed Glitch garment design with a unique revocable QR tied to your Humanity Card. Change what strangers read from your phone without reprinting. Commerce does not verify you or grant a vouch.",
     product_class: "personalized",
@@ -103,7 +103,7 @@ const LAUNCH_PRODUCTS: StoreCatalogProduct[] = [
     title: "Personalized sticker",
     meaning_line: "Square sticker with your unique LIVE OBJECT QR.",
     story:
-      "Tier 1 belonging — each physical sticker gets a unique revocable code. Update what strangers see from your phone without reprinting.",
+      "Tier 1 belonging. Each physical sticker gets a unique revocable code. Update what strangers see from your phone without reprinting.",
     product_class: "personalized",
     personalization_indicator: "Personalized QR",
     requires_card: true,
@@ -113,15 +113,15 @@ const LAUNCH_PRODUCTS: StoreCatalogProduct[] = [
     price_display: "$12 + shipping",
     detail_path: storeProductDetailPath(STICKER_PERSONALIZED_STORE_PRODUCT_ID),
     cta_label: "View product",
-    status: "published",
-    row_ids: ["row_personalize"],
+    status: "hidden",
+    row_ids: [],
   },
   {
     product_id: HOODIE_LIVE_OBJECT_STORE_PRODUCT_ID,
     title: "Live Object hoodie",
-    meaning_line: "Your unique QR on the chest — you change what strangers read; the ink stays.",
+    meaning_line: "Your unique QR on the chest. You change what strangers read; the ink stays.",
     story:
-      "Tier 1 belonging wear — each hoodie gets its own revocable print artifact tied to your Humanity Card. Update your live line from your phone without reprinting. Lose signing access without recovery and the scan can become a fixed record of the last thing you published.",
+      "Tier 1 belonging wear. Each hoodie gets its own revocable print artifact tied to your Humanity Card. Update your live line from your phone without reprinting. Lose signing access without recovery and the scan can become a fixed record of the last thing you published.",
     product_class: "personalized",
     personalization_indicator: "Personalized QR",
     requires_card: true,
@@ -131,15 +131,15 @@ const LAUNCH_PRODUCTS: StoreCatalogProduct[] = [
     price_display: "$48 + shipping",
     detail_path: storeProductDetailPath(HOODIE_LIVE_OBJECT_STORE_PRODUCT_ID),
     cta_label: "View product",
-    status: "published",
-    row_ids: ["row_personalize"],
+    status: "hidden",
+    row_ids: [],
   },
   {
     product_id: TIER0_FOUNDING_STORE_PRODUCT_ID,
     title: "Founding signal sticker",
-    meaning_line: "Batch campaign QR — curiosity, not a passport.",
+    meaning_line: "Batch campaign QR. Curiosity, not a passport.",
     story:
-      "Tier 0 founding drop — one design with a shared campaign QR. A pointer to the experiment; no card required to order.",
+      "Tier 0 founding drop. One design with a shared campaign QR. A pointer to the experiment; no card required to order.",
     product_class: "limited_drop",
     personalization_indicator: "Limited Drop",
     requires_card: false,
@@ -155,7 +155,7 @@ const LAUNCH_PRODUCTS: StoreCatalogProduct[] = [
   {
     product_id: TIER0_GLITCH_HOODIE_STORE_PRODUCT_ID,
     title: "Glitch LIVE QR hoodie (legacy shared batch)",
-    meaning_line: "Deprecated — shared campaign QR on every unit. Launch uses personalized Glitch.",
+    meaning_line: "Deprecated. Shared campaign QR on every unit. Launch uses personalized Glitch.",
     story:
       "Superseded 2026-05-30. Founding Glitch hoodie launches on Tier 1 personalize (unique QR per buyer). This legacy catalog id pointed at shared-batch Tier 0 inventory — not the launch checkout path.",
     product_class: "limited_drop",
@@ -178,12 +178,8 @@ const ROWS: StoreCatalogRow[] = [
     title: "Make it yours",
     subtitle: "Tier 1 belonging",
     story:
-      "Preview your branded LIVE OBJECT QR on wearables. Founding Glitch drop plus generic hoodies and stickers — each physical unit gets a unique revocable code; you update what strangers see from your phone without reprinting.",
-    product_ids: [
-      GLITCH_HOODIE_STORE_PRODUCT_ID,
-      HOODIE_LIVE_OBJECT_STORE_PRODUCT_ID,
-      STICKER_PERSONALIZED_STORE_PRODUCT_ID,
-    ],
+      "Preview the founding Glitch LIVE QR hoodie. Fixed art with a unique revocable QR tied to your Humanity Card. Customize on humanity.llc, then checkout on Shopify when you are ready.",
+    product_ids: [GLITCH_HOODIE_STORE_PRODUCT_ID],
     sort_order: 1,
     status: "published",
   },
@@ -192,7 +188,7 @@ const ROWS: StoreCatalogRow[] = [
     title: "Founding objects",
     subtitle: "Tier 0 curiosity",
     story:
-      "Batch artifacts with a shared campaign QR — curiosity on the street. Founding sticker only at launch; Glitch hoodie is personalized wear in Make it yours.",
+      "Batch artifacts with a shared campaign QR. Curiosity on the street. Founding sticker is preview-only at launch; Glitch hoodie is personalized wear in Make it yours.",
     product_ids: [TIER0_FOUNDING_STORE_PRODUCT_ID],
     sort_order: 2,
     status: "published",
@@ -201,7 +197,7 @@ const ROWS: StoreCatalogRow[] = [
     row_id: "row_wear",
     title: "Wear the signal",
     subtitle: null,
-    story: "Apparel and wearable signals — curated for launch after Printify QA.",
+    story: "Apparel and wearable signals. Curated for launch after Printify QA.",
     product_ids: [],
     sort_order: 10,
     status: "draft",
@@ -258,7 +254,7 @@ function buildDraftProducts(): StoreCatalogProduct[] {
       drafts.push({
         product_id: productId,
         title: `Draft artifact ${index}`,
-        meaning_line: "Placeholder product for catalog capacity — not sold yet.",
+        meaning_line: "Placeholder product for catalog capacity. Not sold yet.",
         story: "Reserved for a future story-row drop. Hidden from the public storefront.",
         product_class: DRAFT_PRODUCT_CLASSES[slot % DRAFT_PRODUCT_CLASSES.length]!,
         personalization_indicator: personalized ? "Personalized QR" : "General",

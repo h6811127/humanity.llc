@@ -51,7 +51,7 @@ import {
 } from "./shop-proof-consent-core.mjs";
 import { syncMerchBackupNudgeNotice } from "./merch-backup-nudge.mjs";
 import { loadRootSessionRecordForMerch, merchPreCheckoutRecoveryGateState } from "./merch-backup-nudge-core.mjs";
-import { SHOP_CUSTOMIZE_PROOF_PERSISTENCE, customizeHeroForProduct, customizeHonestyRowsForProduct } from "./shop-merch-copy-core.mjs";
+import { SHOP_CUSTOMIZE_PROOF_PERSISTENCE, SHOP_GLITCH_PRINT_ARTIFACT_CALLOUT, customizeHeroForProduct, customizeHonestyRowsForProduct } from "./shop-merch-copy-core.mjs";
 import {
   defaultVariantSelection,
   fetchVariantMatrix,
@@ -133,6 +133,10 @@ const heroEyebrowEl = document.getElementById("shop-customize-hero-eyebrow");
 const heroTitleEl = document.getElementById("shop-customize-hero-title");
 const heroLeadEl = document.getElementById("shop-customize-hero-lead");
 const honestyListEl = document.getElementById("shop-customize-honesty-list");
+const printGlitchSectionEl = document.getElementById("shop-customize-print-glitch");
+const printGlitchLeadEl = document.getElementById("shop-customize-print-glitch-lead");
+const printGlitchCaptionEl = document.getElementById("shop-customize-print-glitch-caption");
+const printGlitchImageEl = document.getElementById("shop-customize-print-glitch-image");
 
 /** @type {Record<string, unknown> | null} */
 let shopConfig = null;
@@ -479,6 +483,17 @@ function syncProductCopy(product) {
       content.append(title, sub);
       li.append(content);
       honestyListEl.appendChild(li);
+    }
+  }
+  const showPrintGlitch = isGlitchHoodieProduct(product);
+  if (printGlitchSectionEl) printGlitchSectionEl.hidden = !showPrintGlitch;
+  if (showPrintGlitch) {
+    const callout = SHOP_GLITCH_PRINT_ARTIFACT_CALLOUT;
+    if (printGlitchLeadEl) printGlitchLeadEl.textContent = callout.lead;
+    if (printGlitchCaptionEl) printGlitchCaptionEl.textContent = callout.caption;
+    if (printGlitchImageEl) {
+      printGlitchImageEl.src = callout.imageSrc;
+      printGlitchImageEl.alt = callout.imageAlt;
     }
   }
 }

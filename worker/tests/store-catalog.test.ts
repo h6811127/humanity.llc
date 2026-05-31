@@ -20,8 +20,6 @@ describe("store-catalog", () => {
     expect(rows.map((row) => row.row_id)).toEqual(["row_personalize", "row_founding"]);
     expect(rows[0]?.products.map((product) => product.product_id)).toEqual([
       GLITCH_HOODIE_STORE_PRODUCT_ID,
-      "hoodie_live_object_v1",
-      "sticker_personalized_v1",
     ]);
     expect(rows[1]?.products.map((product) => product.product_id)).toEqual([
       TIER0_FOUNDING_STORE_PRODUCT_ID,
@@ -51,9 +49,14 @@ describe("store-catalog", () => {
     );
   });
 
-  it("exposes published product detail", () => {
+  it("hides optional Tier 1 SKUs from published storefront rows", () => {
+    expect(getStoreProductById("sticker_personalized_v1")?.status).toBe("hidden");
+    expect(getStoreProductById("hoodie_live_object_v1")?.status).toBe("hidden");
+  });
+
+  it("exposes hidden catalog SKUs for customizer lookup", () => {
     const product = getStoreProductById("sticker_personalized_v1");
-    expect(product?.status).toBe("published");
+    expect(product?.status).toBe("hidden");
     expect(product?.supports_personalization).toBe(true);
     expect(product?.detail_path).toBe("/shop/products/sticker_personalized_v1/");
   });
