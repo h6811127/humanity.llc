@@ -15,6 +15,7 @@
     "worker:bundle-scan": "tsx worker/scripts/bundle-scan-assets.ts",
     "worker:deploy": "npm run worker:build-meta && npm run worker:bundle-scan && wrangler deploy --config worker/wrangler.toml",
     "worker:d1:create": "wrangler d1 create humanity-resolver --config worker/wrangler.toml",
+    "worker:migrate": "npm run worker:migrate:local",
     "worker:migrate:local": "wrangler d1 migrations apply humanity-resolver --local --config worker/wrangler.toml",
     "worker:migrate:remote": "wrangler d1 migrations apply humanity-resolver --remote --config worker/wrangler.toml",
     "worker:apply-child-object-qr-schema": "node worker/scripts/apply-child-object-qr-schema.mjs",
