@@ -49,6 +49,10 @@ import {
   handleGetVouchAuditFlags,
   handlePostVouchAuditFlagDismiss,
 } from "./resolver/vouch-audit-flags";
+import {
+  handleGetVouchCases,
+  handlePostVouchCase,
+} from "./resolver/vouch-cases";
 import { handleGetCreateRateMonitor } from "./resolver/create-monitoring";
 import {
   handleGetMerchFunnelMonitor,
@@ -368,6 +372,42 @@ export default {
         );
       }
       const res = await handleDeleteVouchAuditFlagDismiss(
+        request,
+        env.DB,
+        env.OPERATOR_AUDIT_TOKEN
+      );
+      return withCors(request, res);
+    }
+
+    if (
+      path === "/.well-known/hc/v1/operator/vouch-cases" &&
+      request.method === "GET"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handleGetVouchCases(
+        request,
+        env.DB,
+        env.OPERATOR_AUDIT_TOKEN
+      );
+      return withCors(request, res);
+    }
+
+    if (
+      path === "/.well-known/hc/v1/operator/vouch-cases" &&
+      request.method === "POST"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostVouchCase(
         request,
         env.DB,
         env.OPERATOR_AUDIT_TOKEN
