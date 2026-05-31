@@ -2,6 +2,7 @@
  * Shell boot gate — set body[data-boot] when personalized copy is safe to show.
  * @see docs/SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md RC-1 · RC-17
  */
+import { isResolverHealthBootSettled } from "./device-resolver-health-boot-core.mjs";
 import {
   DEVICE_BOOT_LOCAL,
   DEVICE_BOOT_LOCAL_EVENT,
@@ -84,5 +85,6 @@ export function markDeviceBootLocalIfWalletPage(doc = document) {
 export function markDeviceBootReadyIfShellPage(doc = document) {
   const path = doc?.location?.pathname ?? "";
   if (pageOwnsDeviceBootReady(path)) return;
+  if (!isResolverHealthBootSettled()) return;
   markDeviceBootReady(doc);
 }

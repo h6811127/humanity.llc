@@ -8,7 +8,6 @@ import { isAutoSaveEnabled, initAutoSaveToggle, isAutoSaveFailed } from "./devic
 import { initDeviceHub, refreshDeviceHub } from "./device-hub-ui.mjs";
 import {
   DEVICE_BOOT_READY_EVENT,
-  markDeviceBootLocalIfWalletPage,
 } from "./device-shell-boot.mjs";
 import { isDeviceBootReadyState } from "./device-shell-boot-core.mjs";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
@@ -182,8 +181,6 @@ initDeviceHub({
   showLiveControlInbox: true,
 });
 
-markDeviceBootLocalIfWalletPage();
-
 mountKeysCustody("#device-keys-custody-wallet", "wallet", {
   importHref: "#hub-import-form",
 });
@@ -191,10 +188,10 @@ mountKeysCustody("#device-keys-custody-wallet", "wallet", {
 initAutoSaveToggle();
 initTabSave();
 bindWalletActiveLink();
-refreshAutoSaveLine();
 refreshHelpVisibility();
 
 window.addEventListener(DEVICE_BOOT_READY_EVENT, () => {
+  refreshAutoSaveLine();
   updateContextBanners();
 });
 

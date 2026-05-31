@@ -157,7 +157,7 @@ import {
 import { tabNoticeCount } from "./device-counts.mjs";
 import { mountHubBuildStamp } from "./device-hub-build-stamp.mjs";
 import { mountHubNetworkTools } from "./device-hub-network-tools.mjs";
-import { syncInboxBackdropForOpenHub } from "./device-sheet-backdrop-sync.mjs?v=81";
+import { syncInboxBackdropForOpenHub } from "./device-sheet-backdrop-sync.mjs?v=82";
 import {
   HUB_STRANGER_EMPTY_CLASS,
   isHubStrangerEmptyState,
@@ -2353,6 +2353,23 @@ export function refreshDeviceHubLocalContent() {
 export function refreshDeviceHub() {
   refreshDeviceHubLocalContent();
   if (hubPersonalizedRenderDeferred()) return;
+  syncHubInboxAlertGroups();
+  syncBrowserNotifPrompts();
+  renderHubKeysCustodyPanel();
+}
+
+/**
+ * Pre-render wallet hub DOM while still boot-gated so one ready flip reveals full page.
+ * @see docs/SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md RC-17 · RC-18
+ */
+export function prepareWalletHubBootReveal() {
+  if (!document.getElementById("wallet-page")) return;
+  renderActivityRows();
+  applyHubStrangerEmptyChrome();
+  renderSavedRows();
+  renderPinRows();
+  applySearchFilter();
+  refreshEmptyHint();
   syncHubInboxAlertGroups();
   syncBrowserNotifPrompts();
   renderHubKeysCustodyPanel();

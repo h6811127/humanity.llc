@@ -2,7 +2,7 @@
  * Floating status dot, notification badge, hub sheet host.
  * @see docs/STATUS_INDICATOR_STEWARD_GREEN.md
  */
-import { closeInboxSheet, openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=81";
+import { closeInboxSheet, openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=82";
 import {
   shellSurfaceFromStandalone,
   statusKeyCrossTabLine,
@@ -35,7 +35,7 @@ import {
   getInboxDotOverlay,
   notificationCount,
   preloadInboxModule,
-} from "./device-inbox-loader.mjs?v=81";
+} from "./device-inbox-loader.mjs?v=82";
 import {
   inboxBadgeAriaLabel,
   inboxBadgeTitle,
@@ -44,29 +44,29 @@ import {
   inboxBadgeChromaKind,
   inboxBadgeCountText,
   inboxCountFromItems,
-} from "./device-inbox-core.mjs?v=81";
+} from "./device-inbox-core.mjs?v=82";
 import { closeGlancePopover, isGlancePopoverOpen } from "./device-hub-glance-popover.mjs";
 import {
   initHubIntroCoachmark,
   onHubOpenedFromIntro,
 } from "./device-hub-intro-coachmark.mjs";
 import { logDotDiagnostic } from "./device-dot-diagnostics.mjs";
-import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=81";
+import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=82";
 import {
   NETWORK_BASELINE_CHANGED,
   NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
 import "./device-shell-motion.mjs";
-import "./device-shell-chrome.mjs?v=81";
+import "./device-shell-chrome.mjs?v=82";
 import "./device-theme.mjs";
-import { initBrowserNotifications } from "./device-browser-notifications-loader.mjs?v=81";
-import { reconcileHubSheetState } from "./device-hub-sheet-loader.mjs?v=81";
+import { initBrowserNotifications } from "./device-browser-notifications-loader.mjs?v=82";
+import { reconcileHubSheetState } from "./device-hub-sheet-loader.mjs?v=82";
 import { startCrossTabNotificationState } from "./device-cross-tab-state.mjs";
 import {
   refreshDeviceChrome,
   setRefreshStatusSurfaces,
   startDeviceChromeRefresh,
-} from "./device-chrome-refresh.mjs?v=81";
+} from "./device-chrome-refresh.mjs?v=82";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
 import {
   broadcastHealthSnapshotIfEligible,
@@ -91,16 +91,20 @@ import {
   shellStatusLinePrimaryInChrome,
   shouldCelebrateStewardTransition,
   statusAriaLabel,
-} from "./device-dot-state-core.mjs?v=81";
+} from "./device-dot-state-core.mjs?v=82";
+import {
+  markResolverHealthBootSettled,
+} from "./device-resolver-health-boot-core.mjs";
 import {
   DOT_STATE_CHANGED,
   getNetworkStatus,
   hubSheetOpen,
+  isResolverHealthBootSettled,
   openHubFromChrome,
   setHubExpandedHook,
   setHubExpanded as setHubExpandedCore,
   setNetworkStatus,
-} from "./device-status-core.mjs?v=81";
+} from "./device-status-core.mjs?v=82";
 import {
   markDotBootstrapSettled,
   markDotBootReadyIfSettled,
@@ -516,6 +520,12 @@ const INBOX_HUB_TARGETS = new Set([
 
 function renderSystemBanner() {
   if (!systemBanner) return;
+  if (!isResolverHealthBootSettled()) {
+    systemBanner.hidden = true;
+    systemBanner.textContent = "";
+    systemBanner.classList.remove("hc-notice", "hc-notice--error");
+    return;
+  }
   if (hubStatusPanel) {
     systemBanner.hidden = true;
     systemBanner.textContent = "";
@@ -552,12 +562,14 @@ function refreshSummary() {
 async function refreshNetwork(opts = {}) {
   const manual = opts.manual === true;
   if (!manual && shouldFollowerSkipAutoHealthFetch()) {
+    markResolverHealthBootSettled();
     markDotBootstrapSettled();
     refreshSummary();
     return;
   }
   networkStatus = await fetchResolverHealth(resolverApiOrigin());
   setNetworkStatus(networkStatus);
+  markResolverHealthBootSettled();
   setResolverHealthStatusForSinceVisit(networkStatus);
   window.dispatchEvent(
     new CustomEvent(RESOLVER_HEALTH_CHANGED, { detail: { networkStatus } })
@@ -573,6 +585,7 @@ window.addEventListener(RESOLVER_HEALTH_PEER_SYNC, (e) => {
   if (status !== "ok" && status !== "degraded" && status !== "offline") return;
   networkStatus = status;
   setNetworkStatus(networkStatus);
+  markResolverHealthBootSettled();
   setResolverHealthStatusForSinceVisit(networkStatus);
   window.dispatchEvent(
     new CustomEvent(RESOLVER_HEALTH_CHANGED, { detail: { networkStatus } })

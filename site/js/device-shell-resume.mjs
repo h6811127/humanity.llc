@@ -5,6 +5,7 @@
 import { invalidateCrossTabNotificationState } from "./device-cross-tab-state.mjs";
 import { markDotBootPending } from "./device-status-dot-boot.mjs";
 import { resetDotBootstrapSettledForResume } from "./device-status-dot-boot-core.mjs";
+import { resetResolverHealthBootSettled } from "./device-resolver-health-boot-core.mjs";
 import { markDeviceBootPending } from "./device-shell-boot.mjs";
 import { resetSinceVisitGateOnShellResume } from "./device-wallet-since-visit-gate.mjs";
 import {
@@ -22,6 +23,7 @@ let resumeGateBound = false;
  */
 export function handleShellBfcacheRestore(doc = document) {
   markDeviceBootPending(doc);
+  resetResolverHealthBootSettled();
   markDotBootPending(doc);
   resetDotBootstrapSettledForResume();
   resetSinceVisitGateOnShellResume();
