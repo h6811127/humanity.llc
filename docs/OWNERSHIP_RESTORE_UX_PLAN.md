@@ -1,6 +1,6 @@
 # Ownership restore and view-mode UX plan
 
-**Status:** Phase 4 step 4 shipped (hub recovery import + PWA scan link handoff); Phase 4 step 3 shipped (CI regression gate + landing/create stranger-empty import E2E); Phase 4 step 2 shipped (hub import copy convergence); Phase 4 step 1 shipped (hub restore always visible); **Phase 3 shipped** (view Live read-only QR tasks + banner); Phase 2 shipped (setup wizard hard gate); Phase 1 shipped (restore panel wiring)  
+**Status:** Phase 4 step 5 shipped (scan page owner restore CTA); Phase 4 step 4 shipped (hub recovery import + PWA scan link handoff); Phase 4 step 3 shipped (CI regression gate + landing/create stranger-empty import E2E); Phase 4 step 2 shipped (hub import copy convergence); Phase 4 step 1 shipped (hub restore always visible); **Phase 3 shipped** (view Live read-only QR tasks + banner); Phase 2 shipped (setup wizard hard gate); Phase 1 shipped (restore panel wiring)  
 **Audience:** Product, design, engineering, QA  
 **Related:** [`OWNERSHIP_AND_CONTROL_MODEL.md`](OWNERSHIP_AND_CONTROL_MODEL.md) · [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) · [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) · [`KEY_LOSS_SAD_PATH_MATRIX.md`](KEY_LOSS_SAD_PATH_MATRIX.md) · [`PRODUCT_WORKSTREAM_COORDINATION.md`](PRODUCT_WORKSTREAM_COORDINATION.md)
 
@@ -68,6 +68,12 @@ Setup wizard **hard gate** before step **You're live**:
 - Copy: `HUB_RESTORE_RECOVERY_*`, `HUB_OPEN_SCAN_*`, `VOUCH_PWA_CAMERA_HANDOFF_*` in `device-ownership-copy-core.mjs`
 - Always visible under `data-hub-restore-always` import group on `/`, `/create/`, `/wallet/`
 - Tests: `npm run worker:test:hub-restore-always` · `e2e/device-pwa-scan-handoff.spec.ts` (Open scan link form)
+
+## Phase 4 (step 5 shipped)
+
+- **Scan page owner restore CTA** — active `print_artifact` scans show **Restore control** → `/created/?profile_id=…#restore` for empty-wallet owners (hoodie / sticker on new phone PWA) — [`SCAN_PAGE_OWNER_RESTORE_CTA.md`](SCAN_PAGE_OWNER_RESTORE_CTA.md)
+- Modules: `scan-owner-restore-cta-core.mjs` · `scan-owner-restore-cta.mjs` · `scan-html.ts` · `SCAN_OWNER_RESTORE_CTA_*` copy
+- Tests: `worker/tests/scan-owner-restore-cta-core.test.ts` · `worker/tests/scan.test.ts`
 
 ## Phase 4 (step 2 shipped)
 

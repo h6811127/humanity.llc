@@ -37,7 +37,13 @@ import {
   VOUCH_EXPLAINER_EYEBROW,
   VOUCH_EXPLAINER_INITIAL_COPY,
   VOUCH_EXPLAINER_TITLE,
+  SCAN_OWNER_RESTORE_CTA_LABEL,
+  SCAN_OWNER_RESTORE_CTA_HINT,
 } from "../../../site/js/device-ownership-copy-core.mjs";
+import {
+  buildScanOwnerRestoreCreatedUrl,
+  isScanOwnerRestoreCtaEligible,
+} from "../../../site/js/scan-owner-restore-cta-core.mjs";
 import { renderScanQrMarkup } from "./scan-qr";
 import {
   EMPTY_SCAN_SAFETY,
@@ -63,7 +69,7 @@ import {
 } from "./scan-malformed-hint";
 
 /** Response header  -  confirms pass-card scan UI (not legacy .block layout). */
-export const SCAN_UI_VERSION = "pass-v37";
+export const SCAN_UI_VERSION = "pass-v38";
 
 /**
  * Public scan UI  -  flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
@@ -124,6 +130,7 @@ export async function renderScanPage(
   ${renderScanActorBandScript(vm, origin)}
   ${renderScanAiExplainScript(vm, origin)}
   ${renderScanMerchFunnelScript(origin)}
+  ${renderScanOwnerRestoreCtaScript(vm, origin)}
   ${renderScanStewardPreviewReturnScript(origin)}
 </body>
 </html>`;
@@ -228,6 +235,7 @@ function renderScanHeroSection(
       ? renderLostItemCreateHint(origin)
       : "";
   const merchFunnelHint = isMerchFunnelScan(vm) ? renderMerchFunnelHint(origin) : "";
+  const ownerRestoreCta = renderScanOwnerRestoreCta(vm, origin);
   const qrBlock = scanHeroQrBlock(vm, qrMarkup);
   const qrSection = qrBlock
     ? `<details class="scan-hero-qr-details">
@@ -252,6 +260,7 @@ function renderScanHeroSection(
   ${footBlock}
   ${lostItemCreateHint}
   ${merchFunnelHint}
+  ${ownerRestoreCta}
   ${qrSection}
 </article>
 </div>`;
@@ -402,6 +411,43 @@ function renderMerchFunnelHint(origin: string): string {
   const createHref = `${base}${MERCH_SCAN_CREATE_PATH}`;
   const customizeHref = `${base}${MERCH_SCAN_CUSTOMIZE_PATH}`;
   return `<p class="scan-create-hint scan-merch-hint" role="note"><a href="${escapeHtml(createHref)}">Create your live object</a> · <a href="${escapeHtml(customizeHref)}">Get yours on wear</a> — ${escapeHtml(MERCH_SCAN_FUNNEL_HINT)}</p>`;
+}
+
+/** print_artifact scans — owner path to /created/#restore (docs/SCAN_PAGE_OWNER_RESTORE_CTA.md). */
+function renderScanOwnerRestoreCta(vm: ScanViewModel, origin: string): string {
+  if (
+    !isScanOwnerRestoreCtaEligible({
+      kind: vm.kind,
+      qrScope: vm.qrScope,
+      profileId: vm.profileId,
+    })
+  ) {
+    return "";
+  }
+  const href = buildScanOwnerRestoreCreatedUrl(
+    origin,
+    vm.profileId!,
+    vm.qrId ?? undefined
+  );
+  return `<p class="scan-owner-restore-cta" id="scan-owner-restore-cta" role="note" data-scan-owner-restore="1">
+  <a href="${escapeHtml(href)}">${escapeHtml(SCAN_OWNER_RESTORE_CTA_LABEL)}</a>
+  — ${escapeHtml(SCAN_OWNER_RESTORE_CTA_HINT)}
+</p>`;
+}
+
+function renderScanOwnerRestoreCtaScript(vm: ScanViewModel, origin: string): string {
+  if (
+    !isScanOwnerRestoreCtaEligible({
+      kind: vm.kind,
+      qrScope: vm.qrScope,
+      profileId: vm.profileId,
+    })
+  ) {
+    return "";
+  }
+  const assetOrigin = pagesJsOrigin(origin);
+  const mod = JSON.stringify(`${assetOrigin}/js/scan-owner-restore-cta.mjs?v=1`);
+  return `<script type="module" src=${mod}></script>`;
 }
 
 function buildScanHeroMain(

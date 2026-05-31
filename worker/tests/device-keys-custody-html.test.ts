@@ -62,6 +62,13 @@ describe("device-keys-custody-html", () => {
     expect(html).toContain("Advanced · for developers");
     expect(html).toContain("Signing keys &amp; storage");
     expect(html).not.toContain("Keys &amp; custody");
+    expect(html).toContain('id="restore-on-another-device"');
+    expect(html).toContain('id="lose-access"');
+    expect(html).toContain("Recovery code");
+    expect(html).toContain("scan link or profile ID");
+    expect(html).toContain("global lookup by handle");
+    expect(html).toContain('id="restore-from-scan"');
+    expect(html).toContain("Restore control");
   });
 
   it("landing uses ownership trust chip not keys in browser", () => {

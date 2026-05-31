@@ -68,6 +68,15 @@ Full animation rules: [`VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPL
 
 Strangers and non-active scans: no band markup.
 
+### Owner restore (print_artifact · shipped)
+
+| Phase | CTA |
+|-------|-----|
+| Hero (print_artifact) | **Restore control** → `/created/?profile_id=…#restore` |
+| Keys already in tab | Hidden client-side |
+
+See [`SCAN_PAGE_OWNER_RESTORE_CTA.md`](SCAN_PAGE_OWNER_RESTORE_CTA.md).
+
 ### Modules
 
 | Path | Role |

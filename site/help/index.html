@@ -60,6 +60,42 @@
               </a>
             </li>
             <li class="list-row list-action">
+              <a href="/help/#restore-on-another-device">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true"
+                  ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span
+                >
+                <span class="list-content">
+                  <span class="list-title">Restore on another device</span>
+                  <span class="list-sub">What you need for each backup path</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/help/#lose-access">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true"
+                  ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span
+                >
+                <span class="list-content">
+                  <span class="list-title">Ways you can lose access</span>
+                  <span class="list-sub">Common mistakes — and what we cannot fix</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/help/#restore-from-scan">
+                <span class="list-icon list-icon-tone-green" aria-hidden="true"
+                  ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span
+                >
+                <span class="list-content">
+                  <span class="list-title">Restore from your scan</span>
+                  <span class="list-sub">Printed hoodie or sticker on a new phone</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
               <a href="/help/#safari-keys">
                 <span class="list-icon list-icon-tone-orange" aria-hidden="true"
                   ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg></span
@@ -109,6 +145,97 @@
               <strong>Saved on this device</strong> keeps ownership in this browser after you close tabs.
               Use <strong>Open controls</strong> on <a href="/wallet/">My objects</a> to manage again.
               Auto-save is on by default after create.
+            </p>
+            <p class="settings-panel-lead">
+              Pick at least one cross-device path before you rely on a card —
+              <a href="/help/#restore-on-another-device">restore on another device</a> ·
+              <a href="/help/#lose-access">ways you can lose access</a>.
+            </p>
+          </div>
+          <div class="help-restore settings-panel settings-panel-info" id="restore-on-another-device">
+            <p class="settings-panel-lead">
+              <strong>You do not need every backup type.</strong> Choose one path and save what that path
+              requires. humanity.llc never holds your keys and cannot look cards up by handle — there is
+              no password reset.
+            </p>
+            <ul class="wallet-help-list">
+              <li>
+                <strong>Same browser only</strong> — if you saved ownership on this device, reopen the site
+                here and tap <strong>Open controls</strong>. Works after tab close; does not move to a new
+                phone or browser.
+              </li>
+              <li>
+                <strong>Encrypted backup</strong> — you need the <code>.hcbackup.json</code> file <em>and</em>
+                the passphrase you chose at export. The file already contains your card ID, so you do not
+                need a scan link separately. Import in the hub under <strong>Restore &amp; scan</strong> or
+                on <a href="/created/">/created/</a> Manage.
+              </li>
+              <li>
+                <strong>Recovery code</strong> — you need <em>two things</em>: the recovery code you saved at
+                create, <strong>and</strong> your scan link or profile ID (<code>https://humanity.llc/c/…</code>).
+                The code alone is not enough — it proves you own a card, but the app must know <em>which</em>
+                card to check. Save the scan URL, profile ID, a bookmark, or a photo of your printed QR
+                alongside the code. Import both in the hub under <strong>Import recovery code</strong>.
+              </li>
+            </ul>
+            <p class="settings-panel-lead">
+              Hub search only filters cards already saved on this device — it is not a global lookup by handle.
+              Scanning your own printed hoodie or sticker? Use <strong>Restore control</strong> on the scan page →
+              <a href="/help/#restore-from-scan">restore from scan</a>.
+              More detail: <a href="/features/encrypted-backups.html">backups &amp; recovery methods</a>.
+            </p>
+          </div>
+          <div class="help-restore-from-scan settings-panel settings-panel-info" id="restore-from-scan">
+            <p class="settings-panel-lead">
+              <strong>Printed object (hoodie, sticker).</strong> When you scan your own QR on a new phone or PWA,
+              the scan page shows <strong>Restore control</strong>. That opens your card page with the restore panel —
+              paste a recovery code or import an encrypted backup there. You must have saved one of those on the device
+              where you created or purchased.
+            </p>
+          </div>
+          <div class="help-lose-access settings-panel settings-panel-info" id="lose-access">
+            <p class="settings-panel-lead">
+              <strong>By design, we cannot restore lost keys for you.</strong> If every path below applies
+              to you, the card may still scan publicly but you cannot revoke, update, or prove live control.
+            </p>
+            <ul class="wallet-help-list">
+              <li>
+                <strong>Close the create tab</strong> without saving on this device and without a recovery
+                code or encrypted backup.
+              </li>
+              <li>
+                <strong>Clear site data</strong> for humanity.llc, use Private Browsing, or switch to a
+                different browser profile — saved ownership lives only in the browser where you saved it.
+              </li>
+              <li>
+                <strong>iOS storage eviction</strong> — Safari may delete saved cards after about seven days
+                without a visit, or when storage is low. Add to Home Screen and visit regularly; keep a backup
+                if you rely on this phone.
+              </li>
+              <li>
+                <strong>Safari vs Home Screen app</strong> — on iPhone they are separate storage. Keys saved
+                in one may be invisible in the other until you import a backup or recovery code.
+              </li>
+              <li>
+                <strong>Recovery code without scan link</strong> — the code cannot identify your card.
+                You still need the scan URL, profile ID, or something that points at your card.
+              </li>
+              <li>
+                <strong>Encrypted backup without both parts</strong> — the file alone is useless without
+                the passphrase; the passphrase alone is useless without the file.
+              </li>
+              <li>
+                <strong>Wrong backup passphrase</strong> — import fails with a plain error; there is no
+                forgot-password flow.
+              </li>
+              <li>
+                <strong>Never set up recovery at create</strong> — if you skipped Protect and never exported
+                a backup, only the original browser session can sign.
+              </li>
+            </ul>
+            <p class="settings-panel-lead">
+              iPhone-specific storage behavior:
+              <a href="/help/#safari-keys">Safari &amp; iOS keys</a>.
             </p>
           </div>
           <div class="help-safari-keys settings-panel settings-panel-info" id="safari-keys">

@@ -961,6 +961,27 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain("Printed item — revoke one artifact without killing the card");
     expect(html).toContain('data-merch-funnel="1"');
     expect(html).toContain(MERCH_SCAN_CUSTOMIZE_PATH);
+    expect(html).toContain('id="scan-owner-restore-cta"');
+    expect(html).toContain("/created/?");
+    expect(html).toContain("profile_id=");
+    expect(html).toContain("#restore");
+    expect(html).toContain("scan-owner-restore-cta.mjs");
+  });
+
+  it("generic card scan does not show owner restore CTA", async () => {
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: card(),
+        qr: qr({ scope: "card" }),
+        verification: summary(),
+        revocationDisplay: null,
+      },
+      "https://humanity.llc"
+    );
+    const html = await renderScanPage(vm, "https://humanity.llc");
+    expect(html).not.toContain('id="scan-owner-restore-cta"');
   });
 
   it("renders Vouched Human with vouch recency on scan (V-001)", async () => {

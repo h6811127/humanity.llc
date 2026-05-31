@@ -1706,21 +1706,33 @@ a {
 }
 
 .scan-create-hint,
-.scan-merch-hint {
+.scan-merch-hint,
+.scan-owner-restore-cta {
   margin: 10px 0 0;
   font-size: 12px;
   line-height: 1.45;
   color: rgba(60, 60, 67, 0.55);
 }
 
+.scan-owner-restore-cta {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(255, 149, 0, 0.08);
+  border: 1px solid rgba(255, 149, 0, 0.22);
+  color: rgba(60, 60, 67, 0.78);
+}
+
 .scan-create-hint a,
-.scan-merch-hint a {
+.scan-merch-hint a,
+.scan-owner-restore-cta a {
   color: rgba(0, 122, 255, 0.92);
   text-decoration: none;
+  font-weight: 600;
 }
 
 .scan-create-hint a:hover,
-.scan-merch-hint a:hover {
+.scan-merch-hint a:hover,
+.scan-owner-restore-cta a:hover {
   text-decoration: underline;
 }
 
@@ -3198,11 +3210,17 @@ html[data-theme="dark"] .scan-hero .scan-hero-limit,
 html[data-theme="dark"] .scan-hero .scan-hero-foot,
 html[data-theme="dark"] .scan-hero .scan-create-hint,
 html[data-theme="dark"] .scan-hero .scan-merch-hint,
+html[data-theme="dark"] .scan-hero .scan-owner-restore-cta,
 html[data-theme="dark"] .scan-hero .scan-safety-first-seen,
 html[data-theme="dark"] .scan-hero .scan-hero-meta,
 html[data-theme="dark"] .scan-hero .scan-hero-sub,
 html[data-theme="dark"] .scan-hero .scan-hero-qr-summary {
   color: var(--hc-emphasis-card-detail-fg);
+}
+
+html[data-theme="dark"] .scan-hero .scan-owner-restore-cta {
+  background: rgba(255, 159, 10, 0.12);
+  border-color: rgba(255, 159, 10, 0.28);
 }
 
 html[data-theme="dark"] .scan-hero .scan-hero-eyebrow {

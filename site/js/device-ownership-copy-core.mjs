@@ -356,6 +356,12 @@ export const HUB_RESTORE_RECOVERY_SUMMARY = "Recovery code (no file)";
 export const HUB_RESTORE_RECOVERY_HINT =
   "Paste your scan link (or profile ID) and the recovery code you saved at create. Works across Safari and your Home Screen app — no file transfer.";
 
+/** Scan page — print_artifact owner path to /created/#restore. */
+export const SCAN_OWNER_RESTORE_CTA_LABEL = "Restore control";
+
+export const SCAN_OWNER_RESTORE_CTA_HINT =
+  "Is this your printed object? Open your card page to import a recovery code or encrypted backup. Control stays on this device — humanity.llc cannot restore keys for you.";
+
 /** Hub open scan link — after iPhone camera opens Safari (PWA handoff). */
 export const HUB_OPEN_SCAN_SUMMARY = "Open a scan in this app";
 

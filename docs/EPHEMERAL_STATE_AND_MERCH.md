@@ -41,6 +41,7 @@ WEAR → Owner updates signed state from /created/ (or hub → Update status)
 | Actor | Surface | Role |
 |-------|---------|------|
 | **Owner** | `/created/#update-status` · hub **Update status** | Signs L0–L1 updates with root keys |
+| **Owner (new device)** | Scan page **Restore control** on `print_artifact` → `/created/#restore` | Import recovery or backup — [`SCAN_PAGE_OWNER_RESTORE_CTA.md`](SCAN_PAGE_OWNER_RESTORE_CTA.md) |
 | **Stranger** | Scan page signed snapshot + optional **Plain language** button | Read-only; never writes state |
 | **Customizer** | `/shop/customize/` | Deterministic QR preview — **no AI**; primary **belonging / imagination** surface ([`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) Beat 3) |
 
@@ -78,6 +79,7 @@ Tier 1 hoodie buyers typically use the **general** template. The revoke-first ga
 | `markTier1EphemeralOwner(profileId)` | Set in `localStorage` when Tier 1 checkout handoff starts (`shop-customize.mjs`) |
 | `isEphemeralStateUpdateUnlocked()` | Unlocks `/created/` update UI for Tier 1 merch refs + persisted flag |
 | `/shop/thanks/` | Tier 0 vs Tier 1 copy from `hc_ref`; Tier 1 links to `/created/#update-status`; **Activate print QR** when mint still pending |
+| Scan owner restore CTA | `print_artifact` scans → **Restore control** → `/created/#restore` | [`SCAN_PAGE_OWNER_RESTORE_CTA.md`](SCAN_PAGE_OWNER_RESTORE_CTA.md) |
 | Operator | Set Shopify post-purchase URL to `https://humanity.llc/shop/thanks/?hc_ref=customize_hoodie` (or `customize_shop`) |
 
 Code: [`site/js/merch-funnel-core.mjs`](../site/js/merch-funnel-core.mjs) · [`site/js/created-first-revoke-gate.mjs`](../site/js/created-first-revoke-gate.mjs) · [`site/js/shop-thanks.mjs`](../site/js/shop-thanks.mjs) · [`site/js/shop-thanks-mint.mjs`](../site/js/shop-thanks-mint.mjs) · [`site/js/merch-backup-nudge.mjs`](../site/js/merch-backup-nudge.mjs) · [`worker/src/resolver/store-order-mint.ts`](../worker/src/resolver/store-order-mint.ts)
