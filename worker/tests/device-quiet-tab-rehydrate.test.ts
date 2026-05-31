@@ -50,6 +50,15 @@ describe("device-quiet-tab-rehydrate wiring", () => {
     expect(src).toContain("filterCrossTabEntriesAfterQuietRehydrate");
   });
 
+  it("created.mjs passes urlProfileId so deep links stay view-only (K1b)", () => {
+    const src = fs.readFileSync(
+      path.join(process.cwd(), "site/js/created.mjs"),
+      "utf8"
+    );
+    expect(src).toContain("urlProfileId: profileIdParam");
+    expect(src).toContain("ensureQuietTabRehydrateBootstrap(");
+  });
+
   it("exports sole-signing-row scan fallback for vouch (P0b-3)", () => {
     const rehydrateSrc = fs.readFileSync(
       path.join(process.cwd(), "site/js/device-quiet-tab-rehydrate.mjs"),

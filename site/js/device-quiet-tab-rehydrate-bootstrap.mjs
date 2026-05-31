@@ -8,7 +8,7 @@ import { bindQuietTabRehydrateBootstrap } from "./device-quiet-tab-rehydrate-boo
 import { maybeQuietTabRehydrate } from "./device-quiet-tab-rehydrate.mjs";
 
 /**
- * @param {{ excludeProfileId?: string | null }} [opts]
+ * @param {{ excludeProfileId?: string | null, urlProfileId?: string | null }} [opts]
  */
 export function ensureQuietTabRehydrateBootstrap(opts = {}) {
   return bindQuietTabRehydrateBootstrap(() => maybeQuietTabRehydrate(opts));

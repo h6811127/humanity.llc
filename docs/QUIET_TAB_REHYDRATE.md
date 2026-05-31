@@ -71,6 +71,7 @@ Once per **shell or scan** page load, **before** first chrome refresh (`device-s
 | Tab already has control | Skip |
 | Zero saved cards | Skip |
 | Two or more saved signing rows | Skip — no guess |
+| `/created/?profile_id=` URL ≠ sole saved card | Skip — keep view-only restore UX (K1b); pass `urlProfileId` into `ensureQuietTabRehydrateBootstrap()` |
 | Sign lock enabled and locked | Skip — user unlocks via existing take-control flow |
 | Activation error | Skip — no retry loop on bootstrap |
 

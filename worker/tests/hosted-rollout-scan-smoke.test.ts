@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   buildCanonicalPrintScanUrl,
+  isCloudflareBotChallengeBody,
   liveControlChallengeResponseIssues,
   liveControlChallengeSmokeFailure,
   resolveLiveControlSmokeIds,
@@ -67,6 +68,11 @@ describe("hosted-rollout-scan-smoke", () => {
     const urls = resolvePrintedQaOperatorUrls("https://humanity.llc");
     expect(urls.scanUrl).toContain("/c/r4YyNEWJvVwWNMETzXfGjFyL");
     expect(urls.createdUrl).toContain("/created/?profile_id=r4YyNEWJvVwWNMETzXfGjFyL");
+  });
+
+  it("isCloudflareBotChallengeBody detects WAF interstitial HTML", () => {
+    expect(isCloudflareBotChallengeBody("<title>Just a moment...</title>")).toBe(true);
+    expect(isCloudflareBotChallengeBody('{"challenge_id":"lc_x"}')).toBe(false);
   });
 
   it("liveControlChallengeSmokeFailure detects 500 and Error 1101 bodies", () => {

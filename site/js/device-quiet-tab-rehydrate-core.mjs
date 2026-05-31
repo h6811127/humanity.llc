@@ -47,12 +47,26 @@ export function resolveQuietTabRehydrateTarget(
 }
 
 /**
+ * Block silent rehydrate when the user opened a specific card URL (view-only / restore UX).
+ * @param {Record<string, unknown> | null | undefined} targetEntry
+ * @param {string | null | undefined} urlProfileId profile_id from location.search
+ */
+export function quietRehydrateBlockedForUrlProfile(targetEntry, urlProfileId) {
+  const url = typeof urlProfileId === "string" ? urlProfileId.trim() : "";
+  if (!url || !targetEntry) return false;
+  const entryProfile =
+    typeof targetEntry.profile_id === "string" ? targetEntry.profile_id.trim() : "";
+  return entryProfile !== url;
+}
+
+/**
  * @param {{
  *   hasTabControl?: boolean,
  *   signingWalletCount?: number,
  *   targetEntry?: Record<string, unknown> | null,
  *   requiresUnlock?: boolean,
  *   quietRehydrateEnabled?: boolean,
+ *   urlProfileId?: string | null,
  * }} input
  */
 export function shouldQuietTabRehydrate(input) {
@@ -62,8 +76,10 @@ export function shouldQuietTabRehydrate(input) {
     targetEntry = null,
     requiresUnlock = false,
     quietRehydrateEnabled = true,
+    urlProfileId = null,
   } = input;
   if (hasTabControl || !targetEntry || requiresUnlock) return false;
+  if (quietRehydrateBlockedForUrlProfile(targetEntry, urlProfileId)) return false;
   if (signingWalletCount === 1) return true;
   if (signingWalletCount > 1) return quietRehydrateEnabled;
   return false;

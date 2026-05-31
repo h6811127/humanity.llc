@@ -187,7 +187,9 @@ function initVouchReturnBanner() {
   });
 }
 
-await ensureQuietTabRehydrateBootstrap();
+await ensureQuietTabRehydrateBootstrap(
+  profileIdParam ? { urlProfileId: profileIdParam } : {}
+);
 
 let data = loadSession();
 

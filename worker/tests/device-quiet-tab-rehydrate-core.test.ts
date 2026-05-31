@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   filterCrossTabEntriesAfterQuietRehydrate,
+  quietRehydrateBlockedForUrlProfile,
   resolveQuietTabRehydrateTarget,
   shouldQuietTabRehydrate,
   soleSigningWalletEntry,
@@ -143,6 +144,22 @@ describe("device-quiet-tab-rehydrate-core", () => {
         signingWalletCount: 1,
         targetEntry: { profile_id: "only" },
         requiresUnlock: true,
+      })
+    ).toBe(false);
+  });
+
+  it("blocks rehydrate when /created/ URL profile differs from sole saved card", () => {
+    const entry = { profile_id: "saved_other", owner_private_key_b58: "k" };
+    expect(quietRehydrateBlockedForUrlProfile(entry, "url_card")).toBe(true);
+    expect(quietRehydrateBlockedForUrlProfile(entry, "saved_other")).toBe(false);
+    expect(quietRehydrateBlockedForUrlProfile(entry, null)).toBe(false);
+    expect(
+      shouldQuietTabRehydrate({
+        hasTabControl: false,
+        signingWalletCount: 1,
+        targetEntry: entry,
+        requiresUnlock: false,
+        urlProfileId: "url_card",
       })
     ).toBe(false);
   });

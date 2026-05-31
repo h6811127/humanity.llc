@@ -7,6 +7,7 @@ import { controlActivationRequiresUnlock } from "./device-control-activation-cor
 import { getTabSession } from "./device-keys.mjs";
 import { loadWallet } from "./device-wallet.mjs";
 import {
+  quietRehydrateBlockedForUrlProfile,
   resolveQuietTabRehydrateTarget,
   shouldQuietTabRehydrate,
   walletEntriesWithSigningKeys,
@@ -41,7 +42,7 @@ export function applyQuietRehydrateCrossTabDemotion(profileId) {
 }
 
 /**
- * @param {{ excludeProfileId?: string | null }} [opts]
+ * @param {{ excludeProfileId?: string | null, urlProfileId?: string | null }} [opts]
  * @returns {Promise<{ ok: true, profileId: string } | { skipped: string }>}
  */
 export async function maybeQuietTabRehydrate(opts = {}) {
@@ -52,6 +53,7 @@ export async function maybeQuietTabRehydrate(opts = {}) {
   const quietRehydrateEnabled = isQuietTabRehydrateEnabled();
   const lastActiveProfileId = getLastActiveProfileId();
   const excludeProfileId = opts.excludeProfileId ?? null;
+  const urlProfileId = opts.urlProfileId ?? null;
   const entry = resolveQuietTabRehydrateTarget(
     wallet,
     lastActiveProfileId,
@@ -66,6 +68,7 @@ export async function maybeQuietTabRehydrate(opts = {}) {
       targetEntry: entry,
       requiresUnlock: controlActivationRequiresUnlock(profileId),
       quietRehydrateEnabled,
+      urlProfileId,
     })
   ) {
     if (hasTabControl) return { skipped: "has_tab_control" };
@@ -75,6 +78,9 @@ export async function maybeQuietTabRehydrate(opts = {}) {
     }
     if (signingEntries.length > 1 && !entry) return { skipped: "no_last_active" };
     if (controlActivationRequiresUnlock(profileId)) return { skipped: "requires_unlock" };
+    if (quietRehydrateBlockedForUrlProfile(entry, urlProfileId)) {
+      return { skipped: "url_profile_mismatch" };
+    }
     return { skipped: "ineligible" };
   }
 
