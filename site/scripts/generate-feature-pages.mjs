@@ -151,7 +151,7 @@ const FEATURES = [
     aspects: {
       why: "Trust products fail when limits are buried. Scan separates card status, human trust, QR credential scope, live control, and vouch issuance  -  plus one “what this does not prove” panel.",
       design: "Flat status panel + iOS-style grouped lists; bearer warning on scan hero; revoked/suspended overrides hide positive verification badges. Machine-readable twin at <code>GET …/cards/{id}/status</code> matches HTML truth.",
-      safety: "<strong>No scan analytics</strong> on the public page  -  resolver returns object state, not who scanned. Cache-Control: no-store on live scans.",
+      safety: "<strong>No scan analytics or passive scan alerts</strong> on the public page  -  resolver returns object state, not who scanned. Future interaction signals must stay coarse and log-free. Cache-Control: no-store on live scans.",
       limits: "Scan UI is server-rendered; artifact-specific layouts are minimal in v1. Holding a printed QR still does not prove ownership. Optional <strong>Plain language</strong> reader (L3 P1): opt-in on scans with <code>public_snapshot</code> via <code>POST …/ai/explain-snapshot</code> — summary is not signed resolver truth.",
       future: "Activity stream merge rules on scan, offline/stale banners, role-specific templates for maintainers vs game operators.",
     },
@@ -253,7 +253,7 @@ const FEATURES = [
     aspects: {
       why: "After create, stewards need a control center for what they own on this device—not a lecture on key storage. The hub surfaces the next action (save ownership, attest, revoke, live proof).",
       design: "<strong>Status dot</strong>  -  floating trust indicator; tap opens <strong>On this device</strong> hub sheet. <strong>Inbox</strong>  -  action rows, badge, live-proof overlays when the tab is visible. <strong>Saved objects</strong>  -  Open controls, Open scan, relabel/remove. <strong>Pinned scans</strong>  -  public bookmarks only (<code>hc_device_pins</code>). <strong>Search</strong>  -  inline in hub; filters local rows only. <strong>Backup import</strong>  -  decrypt <code>.hcbackup.json</code> into <code>hc_wallet</code>. <strong>Focus mode</strong>  -  hide intro sections.<br><br><strong>Shell micro-features</strong> (compact list on <a href=\"/features-available-now.html\">features hub</a>): cross-tab managing banner, resolver tab sync toggle, opt-in browser alerts + <code>sw-live-proof.mjs</code> (live proof only), PWA install on steward pages, ownership custody notices, child-object backup gate on <a href=\"/created/\">/created/</a>, ephemeral manifesto update at <code>#update-status</code>. User guides: <a href=\"/help/#device-shell\">/help/#device-shell</a>.",
-      safety: "Control stays in browser storage; pins never hold signing material. Search is client-side over data you already saved. Cross-tab managing and card-disabled alerts use <strong>resolver-confirmed</strong> polls — never wallet cache alone. Browser alerts and OS push (hosted tier) are <strong>live proof only</strong> — never for cross-tab custody nudges.",
+      safety: "Control stays in browser storage; pins never hold signing material. Search is client-side over data you already saved. Cross-tab managing and card-disabled alerts use <strong>resolver-confirmed</strong> polls — never wallet cache alone. Browser alerts and OS push (hosted tier) are <strong>live proof only</strong> — never for passive scan alerts, cross-tab custody nudges, or scan histories.",
       limits: "Not cloud sync or multi-device accounts. Browser profile sync (Safari/Chrome) may copy saved ownership incompletely  -  prefer explicit save per machine. No directory search for other people’s cards. Status dot is shell chrome, not the live-control protocol — see <a href=\"/features/live-control.html\">live control</a> for in-person control proof.",
       advanced:
         "Signing material per tab lives in <code>sessionStorage</code> (<code>hc_created</code>). <strong>Save ownership on this device</strong> copies control to <code>localStorage</code> (<code>hc_wallet</code>). Cross-tab presence stores public metadata only—never private keys.",
@@ -287,11 +287,11 @@ const FEATURES = [
     subHtml: `<span class="ship-badge ship-badge-partial">Partial</span> <a href="/shop/">/shop/</a> Tier 0 + <a href="/shop/customize/">/shop/customize/</a> Tier 1; operator gates live checkout`,
     badge: "partial",
     aspects: {
-      why: "Physical merch is distribution for the live QR primitive — curiosity on a hoodie leads to create, customize, and wear your own signed object. Users never touch Printify; checkout stays branded on humanity.llc.",
+      why: "Physical merch is distribution for the live QR primitive — curiosity on a hoodie leads to create, customize, and wear your own programmable object. The value is changing resolver state over time, not scan analytics. Users never touch Printify; checkout stays branded on humanity.llc.",
       design: "Funnel: scan live wear → signed profile → create card → <a href=\"/shop/customize/\">/shop/customize/</a> preview (<code>LIVE OBJECT</code> QR band) → <code>POST /v1/store/artifact-intents</code> → Shopify cart metadata → paid webhook → Printify middleware mints unique <code>print_artifact</code> QR. Tier 0 founding stickers at <a href=\"/shop/\">/shop/</a> skip the customizer. Scan CTA uses <code>hc_ref=scan_customize</code>.",
       safety: "Commerce <strong>never</strong> grants vouch or human verification. Scan bearer warning + product copy stay honest: holding printed wear does not prove ownership. Artifact intent holds no private keys.",
       limits: "Engineering rollout ships in repo (<code>merch-funnel:rollout:step1</code>–<code>step6</code>). Live Tier 1 checkout requires operator <code>shop-config.json</code>, one paid order proof, and physical ink QA (<code>docs/MERCH_FUNNEL_MVP.md</code>).",
-      future: "Full story-row catalog (~50 SKUs), stranger wear funnel QA, order timeline UI for stewards.",
+      future: "Full story-row catalog (~50 SKUs), stranger wear funnel QA, order timeline UI for stewards, seasonal resolver states for wearable objects.",
     },
   },
   {

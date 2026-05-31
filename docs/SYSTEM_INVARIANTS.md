@@ -116,6 +116,8 @@ Read [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) before adding 
 
 Resolver tab sync: `hc-resolver-sync` BroadcastChannel (network 60s, health 30s); opt out via homepage **Share network checks** or `hc_resolver_sync_tabs=0`.
 
+Passive scans must not create steward notifications, OS alerts, emails, webhooks, scan histories, or engagement dashboards. `live_proof` is the narrow alert exception because the scanner explicitly requests a short-lived signature. Future awareness features must be coarse object state only, with no timestamps, locations, IPs, scanner identity, or per-scan rows.
+
 ---
 
 ## Print artwork frame (merch fulfillment)

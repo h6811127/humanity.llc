@@ -32,6 +32,7 @@
 | Fulfillment timing | Printify fulfillment order is created only after Shopify payment confirmation and internal artifact/order validation. | Storefront, Printify Fulfillment Middleware | Webhook handling and idempotency are core launch work. |
 | Production approval | Printify orders use manual production approval by default unless a later operational policy explicitly enables auto-approval. | Printify Fulfillment Middleware | First implementation should keep a human/operator gate before production. |
 | Scan analytics | Resolver and artifact scans collect no analytics by default. | QR Public Profile, Humanity Card, Technical Standards | Do not add analytics SDKs, scan counters, or location tracking to scan flows. |
+| Scan notifications | Passive scans do not notify stewards by default. Live-control proof alerts are the narrow exception because the scanner explicitly requests a short-lived signature. | QR Public Profile, Device inbox, Reference operator data policy | Do not add inbox kinds, OS alerts, webhooks, email, or dashboards for "someone scanned your QR." Future signals must be coarse object state, not event logs. |
 | Trust architecture | Federated resolvers + open standards (`hc/v1`); humanity.llc is reference operator, not permanent sole host. | PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY, Technical Standards §9.6 | Publish spec; plan second operator; include `X-Resolver-Operator` on responses. |
 | Public launch | Card creation opens to anyone when Phase A is stable - no founding cohort as product gate. | PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY, MERCH_LED_V1 | Optional early testers only; no email/invite required for create. |
 | Resolver data | Reference operator follows data-minimization table (no legal ID, no private keys, no scan analytics, commerce firewalled). | PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY §5, Technical Standards §9.7 | Publish operator retention policy at launch. |
@@ -51,6 +52,7 @@
 | Marketplace | Third-party seller marketplace. | Distracts from proof objects and first-party artifacts. | Storefront operations are stable. |
 | Blockchain / NFT / ledger identity | Tokenized ownership, public-chain identity core, or “verify on chain.” | Conflicts with democratic infrastructure, pseudonymity, data minimization, and federation; not a differentiator for live revoke at scan. | **Out of scope** unless governance approves a narrow, published non-identity use (see `PROTOCOL_FEDERATION` §7). |
 | Scan analytics | Any scan logging or analytics. | Violates trust unless consent model is explicit. | Governance-approved consent model. |
+| Passive scan alerts | "Someone scanned your hoodie/card" alerts, per-scan histories, engagement dashboards, and timestamped scan digests. | Turns physical trust objects into surveillance/social analytics. | Governance-approved consent model plus a separate privacy spec; coarse interaction signals only if they remain log-free. |
 | Apparel/bags | Apparel and bags for personalized QR artifacts. | Print area and QR scan reliability must be tested. | Template QA passes. |
 | Strong public identity claims | Legal identity, KYC, age verification, bot-proof, fraud-proof, background-checked, or guaranteed-unique claims. | V1 cannot honestly prove these. | Separate legal/privacy/security review and new product scope. |
 
@@ -96,6 +98,6 @@
 8. Every paid Printify order is idempotent and traceable to a Shopify paid order plus Humanity artifact intent.
 9. Live control proof proves only recent control of the card key.
 10. Vouch-based launch copy should say `Vouched Human` unless stronger language passes comprehension testing.
-11. The reference resolver is a minimal signed bulletin board - not a legal identity or scan surveillance system.
+11. The reference resolver is a minimal signed bulletin board - not a legal identity, scan notification service, or scan surveillance system.
 12. Institutional growth targets federation (second operator) and open standards - not permanent single-operator capture.
 13. Founding physical artifact QRs (`scope: print_artifact`, Tier 0 batch) do not calendar-expire; HTTPS URLs always resolve; owners change live meaning through revoke, replace, or disable - not link death ([`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md)).

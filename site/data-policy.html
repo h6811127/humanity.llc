@@ -30,7 +30,7 @@
           <p class="hero-eyebrow">Reference operator</p>
           <h1>Data policy</h1>
           <p class="hero-line">
-            Minimize retention. Publish what we store. No scan analytics by default.
+            Minimize retention. Publish what we store. No scan analytics or scan notifications by default.
           </p>
         </section>
 
@@ -115,7 +115,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3v18h18"/><path d="M7 16v-4"/><path d="M11 16V8"/><path d="M15 16v-6"/><path d="m4 4 16 16"/></svg>
               </span>
               <span class="list-content">
-                <span class="list-title">Scan analytics or fingerprinting</span>
+                <span class="list-title">Scan analytics, alerts, histories, or fingerprinting</span>
               </span>
             </li>
             <li class="list-row">
@@ -188,6 +188,20 @@
             <strong>checked … ago</strong>. That timestamp is only when <strong>this browser</strong>
             last successfully polled resolver status for a saved card — stored locally in session
             storage, not sent to or retained by the operator. It is not a log of who scanned the QR.
+          </p>
+        </section>
+
+        <section class="group">
+          <h2 class="group-label">Scan notifications</h2>
+          <p class="group-intro">
+            Passive scans do not trigger steward notifications, browser alerts, emails, webhooks, or
+            scan dashboards. Live control is the narrow exception: a scanner explicitly asks the
+            steward to sign a short-lived challenge.
+          </p>
+          <p class="group-intro">
+            Future interaction signals may be coarse object state, such as <strong>discovered
+            recently</strong> or <strong>active this week</strong>. They must not expose timestamps,
+            locations, IPs, scanner identity, or per-scan history.
           </p>
         </section>
 

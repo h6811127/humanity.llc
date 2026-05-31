@@ -25,6 +25,8 @@
 
 **Origin alignment:** The founding Glitch prototype was a **personal card QR on fabric** ([`COMPANY_MERCH_AND_COMMUNITY_CAMPAIGN.md`](COMPANY_MERCH_AND_COMMUNITY_CAMPAIGN.md) § Key custody model A). Launch product matches that physics: fixed visual design, **your** live destination.
 
+**Privacy alignment:** Do **not** sell the hoodie as scan analytics. Default experience: no scan notifications, no timestamps, no locations, no "37 scans." Optional future awareness must be coarse interaction state only. The cooler promise is a programmable object: same garment, changing resolver truth.
+
 ---
 
 ## One-line split (customer-facing)
@@ -68,6 +70,20 @@
 
 Luxury drop positioning — art + myth + limited founding run. Converts on **desire** and **agency** (live object on your body), not on shared campaign witness.
 
+### What changes over time (preferred feature frame)
+
+- New artwork or messages unlock on the resolver.
+- Pseudonyms, status lines, event access, and seasonal copy can rotate without reprinting.
+- Authenticity, revoke, replace, and limited-time status remain inspectable at scan.
+- Interaction awareness, if introduced, stays log-free: **active recently**, not **who scanned at 2:14 PM**.
+
+### What this is not
+
+- Not a scan dashboard.
+- Not hoodie engagement metrics.
+- Not alerts whenever someone scans.
+- Not a social-media analytics product on fabric.
+
 ### Post-purchase
 
 - **Thanks URL (target):** `https://humanity.llc/shop/thanks/?hc_ref=customize_glitch`  
@@ -101,6 +117,7 @@ Generic Tier 1 belonging wear — same honesty register as Glitch, without found
 
 - **Commerce ≠ verification:** Buying merch does not verify you or grant a vouch.  
 - **Bearer:** Printed QR is a pointer — holding the object does not prove you own the Humanity Card.
+- **No scan analytics:** Merch copy must emphasize programmable resolver state, not scan notifications, scan counts, scanner identity, or scan history.
 
 ---
 
