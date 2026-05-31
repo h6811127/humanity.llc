@@ -150,7 +150,7 @@ export const SHOP_CUSTOMIZE_HERO_DEFAULT = {
 
 /** Founding-run chromatic glitch unit (red/blue QR modules on white card). */
 export const GLITCH_PRINT_CHROMATIC_UNIT_EXAMPLE_SRC =
-  "/assets/glitch-print-chromatic-unit-example.png";
+  "/assets/glitch-print-chromatic-artifact.png?v=3";
 
 export const SHOP_GLITCH_PRINT_ARTIFACT_CALLOUT = {
   title: "Chromatic glitch units",
