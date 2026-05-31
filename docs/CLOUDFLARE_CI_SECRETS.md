@@ -31,6 +31,8 @@ Create or edit the token at [Cloudflare dashboard → My Profile → API Tokens]
 
 Error `Authentication error [code: 10000]` on `/memberships` usually means the token lacks **User Details Read** or account scope is wrong.
 
+Error `Authentication failed (status: 400) [code: 9106]` means the token value in GitHub Actions is invalid, expired, or not saved under the secret name **`CLOUDFLARE_API_TOKEN`** (re-create the repo secret after rotating in Cloudflare; workflow_dispatch does not pick up dashboard-only changes).
+
 ---
 
 ## Verification

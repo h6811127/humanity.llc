@@ -925,7 +925,9 @@ async function runVouchFlow(opts = {}) {
     if (soleActivated) {
       return runVouchFlow({ autoActivateAttempted: true, soleSigningActivated: true });
     }
-    const rehydrated = await trySoleSigningRowRehydrateForScan();
+    const rehydrated = await trySoleSigningRowRehydrateForScan({
+      excludeProfileId: voucheeProfileId,
+    });
     if (
       rehydrated.ok &&
       typeof rehydrated.profileId === "string" &&

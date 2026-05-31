@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import {
   filterCrossTabEntriesAfterQuietRehydrate,
+  quietRehydrateBlockedByOtherTabPresence,
+  quietRehydrateBlockedOnScanForDifferentCard,
   quietRehydrateBlockedForUrlProfile,
   resolveQuietTabRehydrateTarget,
   shouldQuietTabRehydrate,
@@ -146,6 +148,29 @@ describe("device-quiet-tab-rehydrate-core", () => {
         requiresUnlock: true,
       })
     ).toBe(false);
+  });
+
+  it("blocks scan rehydrate when vouchee profile differs from sole saved card", () => {
+    const entry = { profile_id: "saved_card", owner_private_key_b58: "k" };
+    expect(
+      quietRehydrateBlockedOnScanForDifferentCard(entry, "scanned_card")
+    ).toBe(true);
+    expect(quietRehydrateBlockedOnScanForDifferentCard(entry, "saved_card")).toBe(
+      false
+    );
+  });
+
+  it("blocks rehydrate when another tab already heartbeats the target profile", () => {
+    const map = {
+      "tab-a": { profile_id: "card_a", updatedAt: Date.now() },
+      "tab-b": { profile_id: "card_a", updatedAt: Date.now() },
+    };
+    expect(
+      quietRehydrateBlockedByOtherTabPresence(map, "card_a", "tab-a")
+    ).toBe(true);
+    expect(
+      quietRehydrateBlockedByOtherTabPresence(map, "card_a", "tab-b")
+    ).toBe(true);
   });
 
   it("blocks rehydrate when /created/ URL profile differs from sole saved card", () => {

@@ -13,7 +13,9 @@ import {
   startDeviceChromeRefresh,
 } from "./device-chrome-refresh.mjs?v=56";
 import { startCrossTabNotificationState } from "./device-cross-tab-state.mjs";
-import { maybeQuietTabRehydrate } from "./device-quiet-tab-rehydrate.mjs";
+import { maybeQuietTabRehydrateForScan } from "./device-quiet-tab-rehydrate.mjs";
+import { markResolverHealthBootSettled } from "./device-resolver-health-boot-core.mjs";
+import { markDeviceBootReady } from "./device-shell-boot.mjs";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
 
 /** Scan vouchee profile — never quiet-rehydrate the card being scanned (multi-wallet vouch). */
@@ -28,9 +30,11 @@ function readScanVoucheeProfileId() {
   return fromVouch || null;
 }
 
-await maybeQuietTabRehydrate({ excludeProfileId: readScanVoucheeProfileId() });
-
 startTabKeysPresence();
 startCrossTabNotificationState();
+await maybeQuietTabRehydrateForScan({ excludeProfileId: readScanVoucheeProfileId() });
+// Scan HTML has no data-boot=pending; unlock cross-tab chrome for presence reads (RC-6).
+markResolverHealthBootSettled();
+markDeviceBootReady();
 startDeviceChromeRefresh();
 refreshDeviceChrome({ immediate: true });

@@ -7,11 +7,14 @@ import { controlActivationRequiresUnlock } from "./device-control-activation-cor
 import { getTabSession } from "./device-keys.mjs";
 import { loadWallet } from "./device-wallet.mjs";
 import {
+  quietRehydrateBlockedByOtherTabPresence,
+  quietRehydrateBlockedOnScanForDifferentCard,
   quietRehydrateBlockedForUrlProfile,
   resolveQuietTabRehydrateTarget,
   shouldQuietTabRehydrate,
   walletEntriesWithSigningKeys,
 } from "./device-quiet-tab-rehydrate-core.mjs";
+import { PRESENCE_CHANGE_COALESCE_MS } from "./device-tab-presence-core.mjs";
 import {
   getLastActiveProfileId,
   isQuietTabRehydrateEnabled,
@@ -95,15 +98,102 @@ export async function maybeQuietTabRehydrate(opts = {}) {
   return { ok: true, profileId };
 }
 
+function readTabKeysPresenceMap() {
+  try {
+    const raw = localStorage.getItem("hc_tab_keys_presence");
+    const parsed = raw ? JSON.parse(raw) : {};
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function getThisTabId() {
+  let id = sessionStorage.getItem("hc_tab_id");
+  if (!id) {
+    id = crypto.randomUUID();
+    sessionStorage.setItem("hc_tab_id", id);
+  }
+  return id;
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+/**
+ * Scan bootstrap: wait briefly for other tabs to heartbeat before sole-card rehydrate.
+ * Prevents stealing cross-tab banner UX when keys live in another tab (E2E + real multi-tab).
+ *
+ * @param {{ excludeProfileId?: string | null, graceMs?: number }} [opts]
+ */
+export async function maybeQuietTabRehydrateForScan(opts = {}) {
+  const excludeProfileId = opts.excludeProfileId ?? null;
+  const graceMs = opts.graceMs ?? PRESENCE_CHANGE_COALESCE_MS * 2;
+  const wallet = loadWallet();
+  const signingEntries = walletEntriesWithSigningKeys(wallet);
+  const entry = resolveQuietTabRehydrateTarget(
+    wallet,
+    getLastActiveProfileId(),
+    excludeProfileId
+  );
+  const targetProfileId =
+    typeof entry?.profile_id === "string" ? entry.profile_id.trim() : "";
+  if (
+    entry &&
+    quietRehydrateBlockedOnScanForDifferentCard(entry, excludeProfileId)
+  ) {
+    return { skipped: "scanning_other_card" };
+  }
+  if (!targetProfileId || signingEntries.length === 0) {
+    return maybeQuietTabRehydrate({ excludeProfileId });
+  }
+
+  const tabId = getThisTabId();
+  const deadline = Date.now() + graceMs;
+  while (Date.now() < deadline) {
+    if (
+      quietRehydrateBlockedByOtherTabPresence(
+        readTabKeysPresenceMap(),
+        targetProfileId,
+        tabId
+      )
+    ) {
+      return { skipped: "other_tab_holds_keys" };
+    }
+    await sleep(100);
+  }
+
+  if (
+    quietRehydrateBlockedByOtherTabPresence(
+      readTabKeysPresenceMap(),
+      targetProfileId,
+      tabId
+    )
+  ) {
+    return { skipped: "other_tab_holds_keys" };
+  }
+
+  return maybeQuietTabRehydrate({ excludeProfileId });
+}
+
 /**
  * P0b-3 / P1-1: sole saved signing row on scan when default-vouch auto-activate did not run.
- * Mirrors D10 gates via {@link maybeQuietTabRehydrate} — no default profile or vouch opt-in required.
+ * Uses {@link maybeQuietTabRehydrateForScan} so vouchee / cross-tab gates match scan-tab-keys.
+ *
+ * @param {{ excludeProfileId?: string | null }} [opts] scan vouchee profile_id
  * @returns {Promise<{ ok: true, profileId: string } | { skipped: string }>}
  */
-export async function trySoleSigningRowRehydrateForScan() {
+export async function trySoleSigningRowRehydrateForScan(opts = {}) {
   const signingEntries = walletEntriesWithSigningKeys(loadWallet());
   if (signingEntries.length !== 1) {
     return { skipped: "not_sole_signing_row" };
   }
-  return maybeQuietTabRehydrate();
+  let excludeProfileId = opts.excludeProfileId ?? null;
+  if (!excludeProfileId && typeof document !== "undefined") {
+    const header = document.getElementById("scan-safety-header");
+    excludeProfileId =
+      header instanceof HTMLElement ? header.dataset.profileId?.trim() || null : null;
+  }
+  return maybeQuietTabRehydrateForScan({ excludeProfileId });
 }

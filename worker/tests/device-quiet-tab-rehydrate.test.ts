@@ -3,16 +3,30 @@ import fs from "node:fs";
 import path from "node:path";
 
 describe("device-quiet-tab-rehydrate wiring", () => {
-  it("scan-tab-keys awaits quiet rehydrate before presence and chrome", () => {
+  it("scan-tab-keys marks boot ready before chrome refresh (cross-tab E2E)", () => {
     const src = fs.readFileSync(
       path.join(process.cwd(), "site/js/scan-tab-keys.mjs"),
       "utf8"
     );
-    expect(src).toContain("maybeQuietTabRehydrate");
-    expect(src).toContain("await maybeQuietTabRehydrate(");
-    const awaitIdx = src.indexOf("await maybeQuietTabRehydrate()");
+    expect(src).toContain("markDeviceBootReady");
+    expect(src).toContain("markResolverHealthBootSettled");
+    const bootIdx = src.indexOf("markDeviceBootReady()");
+    const chromeIdx = src.indexOf("refreshDeviceChrome({ immediate: true })");
+    expect(bootIdx).toBeGreaterThan(-1);
+    expect(chromeIdx).toBeGreaterThan(bootIdx);
+  });
+
+  it("scan-tab-keys registers presence before scan quiet rehydrate", () => {
+    const src = fs.readFileSync(
+      path.join(process.cwd(), "site/js/scan-tab-keys.mjs"),
+      "utf8"
+    );
+    expect(src).toContain("maybeQuietTabRehydrateForScan");
+    expect(src).toContain("await maybeQuietTabRehydrateForScan(");
     const presenceIdx = src.indexOf("startTabKeysPresence()");
-    expect(presenceIdx).toBeGreaterThan(awaitIdx);
+    const rehydrateIdx = src.indexOf("await maybeQuietTabRehydrateForScan(");
+    expect(presenceIdx).toBeGreaterThan(-1);
+    expect(rehydrateIdx).toBeGreaterThan(presenceIdx);
   });
 
   it("device-status wires quiet rehydrate bootstrap before chrome refresh", () => {
@@ -69,6 +83,8 @@ describe("device-quiet-tab-rehydrate wiring", () => {
       "utf8"
     );
     expect(rehydrateSrc).toContain("trySoleSigningRowRehydrateForScan");
+    expect(rehydrateSrc).toContain("maybeQuietTabRehydrateForScan");
+    expect(vouchSrc).toContain("trySoleSigningRowRehydrateForScan({");
     expect(rehydrateSrc).toContain("walletEntriesWithSigningKeys(loadWallet())");
     expect(vouchSrc).toContain("trySoleSigningRowRehydrateForScan");
     expect(vouchSrc).toContain("tryAutoActivateSoleSigningWalletForVouch");

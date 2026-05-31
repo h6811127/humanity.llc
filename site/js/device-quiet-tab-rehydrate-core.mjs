@@ -47,10 +47,45 @@ export function resolveQuietTabRehydrateTarget(
 }
 
 /**
- * Block silent rehydrate when the user opened a specific card URL (view-only / restore UX).
- * @param {Record<string, unknown> | null | undefined} targetEntry
- * @param {string | null | undefined} urlProfileId profile_id from location.search
+ * @param {Record<string, { profile_id?: string, updatedAt?: number }>} presenceMap
+ * @param {string | null | undefined} targetProfileId
+ * @param {string | null | undefined} thisTabId
+ * @param {number} [now]
  */
+export function quietRehydrateBlockedByOtherTabPresence(
+  presenceMap,
+  targetProfileId,
+  thisTabId,
+  now = Date.now()
+) {
+  const pid = typeof targetProfileId === "string" ? targetProfileId.trim() : "";
+  const tabId = typeof thisTabId === "string" ? thisTabId.trim() : "";
+  if (!pid || !presenceMap || typeof presenceMap !== "object") return false;
+  for (const [id, entry] of Object.entries(presenceMap)) {
+    if (tabId && id === tabId) continue;
+    const rowProfile =
+      typeof entry?.profile_id === "string" ? entry.profile_id.trim() : "";
+    if (!rowProfile || rowProfile !== pid) continue;
+    const updatedAt = typeof entry?.updatedAt === "number" ? entry.updatedAt : now;
+    if (now - updatedAt > 10_000) continue;
+    return true;
+  }
+  return false;
+}
+
+/**
+ * On scan, only auto-rehydrate when the page is for the same card as the wallet row.
+ * @param {Record<string, unknown> | null | undefined} targetEntry
+ * @param {string | null | undefined} scanProfileId vouchee / scan-safety-header profile
+ */
+export function quietRehydrateBlockedOnScanForDifferentCard(targetEntry, scanProfileId) {
+  const scanPid = typeof scanProfileId === "string" ? scanProfileId.trim() : "";
+  if (!scanPid || !targetEntry) return false;
+  const entryProfile =
+    typeof targetEntry.profile_id === "string" ? targetEntry.profile_id.trim() : "";
+  return entryProfile !== scanPid;
+}
+
 export function quietRehydrateBlockedForUrlProfile(targetEntry, urlProfileId) {
   const url = typeof urlProfileId === "string" ? urlProfileId.trim() : "";
   if (!url || !targetEntry) return false;

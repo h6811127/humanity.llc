@@ -67,11 +67,14 @@ async function wireShellRoutes(page: Page) {
 async function stabilizeCrossTabChrome(page: Page) {
   await page.evaluate(() => {
     window.dispatchEvent(new Event("hc-tab-presence-changed"));
+    window.dispatchEvent(new Event("hc-device-hub-changed"));
   });
-  await page.waitForTimeout(350);
+  await page.waitForTimeout(450);
   await page.evaluate(() => {
     window.dispatchEvent(new Event("hc-tab-presence-changed"));
+    window.dispatchEvent(new Event("hc-device-hub-changed"));
   });
+  await page.waitForTimeout(450);
 }
 
 async function waitForCrossTabBadge(page: Page) {
