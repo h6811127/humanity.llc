@@ -8,7 +8,7 @@ export interface PrintCatalogVariant {
 
 export interface PrintCatalogProduct {
   template_id: string;
-  type: "sticker" | "card" | "hoodie";
+  type: "sticker" | "card" | "hoodie" | "bag";
   title: string;
   description: string;
   product_id: string;
@@ -28,18 +28,24 @@ export const HOODIE_LIVE_OBJECT_TEMPLATE_ID = "hc-hoodie-live-object-v1";
 /** Tier 1 Glitch founding hoodie — fixed Glitch art, unique QR per buyer. */
 export const GLITCH_HOODIE_TEMPLATE_ID = "hc-glitch-hoodie-v1";
 
+/** Tier 1 founding LIVE OBJECT purse — original 2023 design, unique QR per buyer. */
+export const FOUNDING_PURSE_TEMPLATE_ID = "hc-founding-purse-v1";
+
 /** Storefront product ids (shop-config / artifact intent). */
 export const STICKER_PERSONALIZED_STORE_PRODUCT_ID = "sticker_personalized_v1";
 export const HOODIE_LIVE_OBJECT_STORE_PRODUCT_ID = "hoodie_live_object_v1";
 export const GLITCH_HOODIE_STORE_PRODUCT_ID = "glitch_hoodie_v1";
+export const FOUNDING_PURSE_STORE_PRODUCT_ID = "founding_purse_v1";
 
 const STORE_PRODUCT_TEMPLATE: Record<string, string> = {
   [STICKER_PERSONALIZED_STORE_PRODUCT_ID]: DEFAULT_PRINT_TEMPLATE_ID,
   [HOODIE_LIVE_OBJECT_STORE_PRODUCT_ID]: HOODIE_LIVE_OBJECT_TEMPLATE_ID,
   [GLITCH_HOODIE_STORE_PRODUCT_ID]: GLITCH_HOODIE_TEMPLATE_ID,
+  [FOUNDING_PURSE_STORE_PRODUCT_ID]: FOUNDING_PURSE_TEMPLATE_ID,
   prod_sticker_square: DEFAULT_PRINT_TEMPLATE_ID,
   prod_hoodie_live_object: HOODIE_LIVE_OBJECT_TEMPLATE_ID,
   prod_glitch_hoodie: GLITCH_HOODIE_TEMPLATE_ID,
+  prod_founding_purse: FOUNDING_PURSE_TEMPLATE_ID,
 };
 
 import { GLITCH_HOODIE_VARIANT_MATRIX } from "./glitch-hoodie-variant-matrix";
@@ -93,6 +99,21 @@ const CATALOG: PrintCatalogProduct[] = [
       label: entry.label,
       enabled: true,
     })),
+  },
+  {
+    template_id: FOUNDING_PURSE_TEMPLATE_ID,
+    type: "bag",
+    title: "Founding LIVE OBJECT purse",
+    description:
+      "Original founding satchel design — front-panel LIVE OBJECT QR, unique revocable code per buyer.",
+    product_id: "prod_founding_purse",
+    variants: [
+      {
+        variant_id: "black-onesize",
+        label: "Black / One size",
+        enabled: true,
+      },
+    ],
   },
   {
     template_id: DEFAULT_PRINT_TEMPLATE_ID,

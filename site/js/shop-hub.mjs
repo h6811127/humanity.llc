@@ -11,6 +11,7 @@ import { fetchPrintCatalog } from "./shop-print-catalog-core.mjs";
 import { resolverApiOrigin } from "./hc-sign.mjs";
 import {
   enrichStoreRows,
+  ensureFoundingPurseInStoreRows,
   fetchStoreRows,
   renderStoreRowsHtml,
 } from "./shop-store-rows-core.mjs";
@@ -57,7 +58,11 @@ async function initHub() {
       fetchPrintCatalog(origin).catch(() => ({ products: [] })),
       fetchStoreRows(origin),
     ]);
-    const rows = enrichStoreRows(config, catalogPayload, rowsPayload?.rows ?? []);
+    const rows = ensureFoundingPurseInStoreRows(
+      config,
+      catalogPayload,
+      enrichStoreRows(config, catalogPayload, rowsPayload?.rows ?? [])
+    );
     renderRows(rows);
   } catch {
     showFallbackRows();

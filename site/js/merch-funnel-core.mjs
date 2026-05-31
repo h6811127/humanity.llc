@@ -3,6 +3,7 @@
  * No PII; aggregate server counters only.
  */
 import {
+  FOUNDING_PURSE_STORE_PRODUCT_ID,
   GLITCH_HOODIE_STORE_PRODUCT_ID,
   HOODIE_LIVE_OBJECT_STORE_PRODUCT_ID,
 } from "./shop-store-catalog-ids.mjs";
@@ -18,6 +19,7 @@ export const ALLOWED_MERCH_REFS = new Set([
   "customize_shop",
   "customize_hoodie",
   "customize_glitch",
+  "customize_purse",
   "scan_customize",
 ]);
 
@@ -27,6 +29,7 @@ export const CUSTOMIZE_HANDOFF_REFS = new Set([
   "customize_shop",
   "customize_hoodie",
   "customize_glitch",
+  "customize_purse",
 ]);
 
 /** localStorage map profile_id → true for Tier 1 ephemeral-state owners. */
@@ -126,6 +129,7 @@ export function isGlitchCustomizeMerchRef(ref) {
 export function merchRefForPersonalizeProductId(productId) {
   const id = typeof productId === "string" ? productId.trim() : "";
   if (id === GLITCH_HOODIE_STORE_PRODUCT_ID) return "customize_glitch";
+  if (id === FOUNDING_PURSE_STORE_PRODUCT_ID) return "customize_purse";
   if (id === HOODIE_LIVE_OBJECT_STORE_PRODUCT_ID) return "customize_hoodie";
   return "customize_shop";
 }

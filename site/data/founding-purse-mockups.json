@@ -1,0 +1,29 @@
+{
+  "product_id": "founding_purse_v1",
+  "generated_at": "2026-05-31T00:00:00.000Z",
+  "default_view": "front",
+  "mockups": [
+    {
+      "view_id": "front",
+      "label": "Front",
+      "src": "/images/merch/founding-purse/front-blank.png",
+      "composites_qr": true,
+      "is_default": true
+    },
+    {
+      "view_id": "styled",
+      "label": "Front styled",
+      "src": "/images/merch/founding-purse/front-styled.png"
+    },
+    {
+      "view_id": "on-person",
+      "label": "On model",
+      "src": "/images/merch/founding-purse/on-person.png"
+    },
+    {
+      "view_id": "context",
+      "label": "Flat lay",
+      "src": "/images/merch/founding-purse/context.png"
+    }
+  ]
+}

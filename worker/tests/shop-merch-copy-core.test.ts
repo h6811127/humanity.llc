@@ -41,7 +41,9 @@ describe("shop-merch-copy-core", () => {
 
   it("exposes Glitch print artifact callout for store and customizer", () => {
     expect(SHOP_GLITCH_PRINT_ARTIFACT_CALLOUT.lead).toMatch(/blue or purple/i);
-    expect(SHOP_GLITCH_PRINT_ARTIFACT_CALLOUT.imageSrc).toMatch(/glitch-print-chromatic-artifact/);
+    expect(SHOP_GLITCH_PRINT_ARTIFACT_CALLOUT.imageSrc).toMatch(
+      /glitch-hoodie-live-object-white-card/
+    );
   });
 
   it("exposes Glitch customizer hero without em dashes", () => {
@@ -59,6 +61,14 @@ describe("shop-merch-copy-core", () => {
   it("uses Live Object honesty rows for generic hoodie customizer", () => {
     const rows = customizeHonestyRowsForProduct("hoodie_live_object_v1");
     expect(rows[0]?.sub).toMatch(/each unit/i);
+  });
+
+  it("exposes founding purse customizer hero and honesty rows", () => {
+    const hero = customizeHeroForProduct("founding_purse_v1");
+    expect(hero.title).toBe("Founding LIVE OBJECT purse");
+    expect(hero.lead).toMatch(/2023 prototype/i);
+    const rows = customizeHonestyRowsForProduct("founding_purse_v1");
+    expect(rows[0]?.sub).toMatch(/purse QR/i);
   });
 
   it("exposes Glitch Tier 1 thanks copy for customize_glitch ref", () => {

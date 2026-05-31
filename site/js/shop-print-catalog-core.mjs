@@ -10,10 +10,12 @@ export const TIER0_BATCH_PRINT_TEMPLATE_ID = "hc-tier0-sticker-batch-v1";
 export const DEFAULT_PRINT_TEMPLATE_ID = "hc-sticker-square-v1";
 export const HOODIE_LIVE_OBJECT_TEMPLATE_ID = "hc-hoodie-live-object-v1";
 export const GLITCH_HOODIE_TEMPLATE_ID = "hc-glitch-hoodie-v1";
+export const FOUNDING_PURSE_TEMPLATE_ID = "hc-founding-purse-v1";
 
 /** @type {Record<string, string>} */
 export const DEFAULT_PRINT_TEMPLATE_BY_PRODUCT_ID = {
   glitch_hoodie_v1: GLITCH_HOODIE_TEMPLATE_ID,
+  founding_purse_v1: FOUNDING_PURSE_TEMPLATE_ID,
   hoodie_live_object_v1: HOODIE_LIVE_OBJECT_TEMPLATE_ID,
   sticker_personalized_v1: DEFAULT_PRINT_TEMPLATE_ID,
 };
@@ -40,6 +42,7 @@ export function personalizableCatalogProducts(payload) {
  */
 export function previewKindFromCatalogType(type) {
   if (type === "sticker" || type === "card") return "sticker";
+  if (type === "bag") return "founding_purse";
   if (type === "hoodie") return "hoodie";
   return "hoodie";
 }
@@ -107,7 +110,8 @@ export function mergePersonalizeWithCatalog(config, catalogProducts) {
       preview:
         configProduct.preview === "sticker" ||
         configProduct.preview === "hoodie" ||
-        configProduct.preview === "glitch_hoodie"
+        configProduct.preview === "glitch_hoodie" ||
+        configProduct.preview === "founding_purse"
           ? configProduct.preview
           : previewKindFromCatalogType(catalogEntry.type),
       catalog_title: catalogEntry.title,
@@ -166,6 +170,12 @@ export function readInitialPersonalizeProductId(products, url = globalThis.locat
   if (normalized === "glitch") {
     const match = products.find(
       (product) => product.preview === "glitch_hoodie" || product.product_id === "glitch_hoodie_v1"
+    );
+    if (match?.product_id) return String(match.product_id);
+  }
+  if (normalized === "purse" || normalized === "founding_purse") {
+    const match = products.find(
+      (product) => product.preview === "founding_purse" || product.product_id === "founding_purse_v1"
     );
     if (match?.product_id) return String(match.product_id);
   }

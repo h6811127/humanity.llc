@@ -43,6 +43,16 @@
         ]
       },
       {
+        "product_id": "founding_purse_v1",
+        "print_template_id": "hc-founding-purse-v1",
+        "print_variant_id": "black-onesize",
+        "title": "Founding LIVE OBJECT purse",
+        "preview": "founding_purse",
+        "price_display": "$XXX + shipping",
+        "shopify_variant_id": "YOUR_PURSE_VARIANT_ID",
+        "checkout_url": "https://YOUR-STORE.myshopify.com/cart/YOUR_PURSE_VARIANT_ID:1"
+      },
+      {
         "product_id": "hoodie_live_object_v1",
         "print_template_id": "hc-hoodie-live-object-v1",
         "print_variant_id": "black-m",

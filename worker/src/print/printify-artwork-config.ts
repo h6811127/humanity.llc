@@ -1,5 +1,6 @@
 import {
   DEFAULT_PRINT_TEMPLATE_ID,
+  FOUNDING_PURSE_TEMPLATE_ID,
   GLITCH_HOODIE_TEMPLATE_ID,
   HOODIE_PRINT_TEMPLATE_ID,
   TIER0_BATCH_PRINT_TEMPLATE_ID,
@@ -98,6 +99,21 @@ export function resolvePrintifyArtworkConfig(
     );
   }
 
+  if (templateId === FOUNDING_PURSE_TEMPLATE_ID) {
+    return resolveArtworkFromEnv(
+      env,
+      "PERSONALIZE_FOUNDING_PURSE_PRINTIFY_BLUEPRINT_ID",
+      "PERSONALIZE_FOUNDING_PURSE_PRINTIFY_PRINT_PROVIDER_ID",
+      "PERSONALIZE_FOUNDING_PURSE_PRINTIFY_VARIANT_ID",
+      "PERSONALIZE_FOUNDING_PURSE_PRINTIFY_PLACEHOLDER",
+      "PERSONALIZE_FOUNDING_PURSE_PRINTIFY_IMAGE_X",
+      "PERSONALIZE_FOUNDING_PURSE_PRINTIFY_IMAGE_Y",
+      "PERSONALIZE_FOUNDING_PURSE_PRINTIFY_IMAGE_SCALE",
+      "PERSONALIZE_FOUNDING_PURSE_PRINTIFY_IMAGE_ANGLE",
+      "front"
+    );
+  }
+
   if (templateId === DEFAULT_PRINT_TEMPLATE_ID) {
     return resolveArtworkFromEnv(
       env,
@@ -120,6 +136,7 @@ export function templateRequiresArtworkUpload(templateId: string): boolean {
   return (
     templateId === DEFAULT_PRINT_TEMPLATE_ID ||
     templateId === HOODIE_PRINT_TEMPLATE_ID ||
-    templateId === GLITCH_HOODIE_TEMPLATE_ID
+    templateId === GLITCH_HOODIE_TEMPLATE_ID ||
+    templateId === FOUNDING_PURSE_TEMPLATE_ID
   );
 }

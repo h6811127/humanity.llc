@@ -7,6 +7,8 @@
 import {
   GLITCH_HOODIE_STORE_PRODUCT_ID,
   GLITCH_HOODIE_TEMPLATE_ID,
+  FOUNDING_PURSE_STORE_PRODUCT_ID,
+  FOUNDING_PURSE_TEMPLATE_ID,
   HOODIE_LIVE_OBJECT_STORE_PRODUCT_ID,
   HOODIE_LIVE_OBJECT_TEMPLATE_ID,
   STICKER_PERSONALIZED_STORE_PRODUCT_ID,
@@ -51,7 +53,7 @@ export interface StoreCatalogRow {
 export const TIER0_FOUNDING_STORE_PRODUCT_ID = "tier0_founding_sticker_v1";
 export const TIER0_GLITCH_HOODIE_STORE_PRODUCT_ID = "tier0_glitch_hoodie_v1";
 
-export { GLITCH_HOODIE_STORE_PRODUCT_ID };
+export { GLITCH_HOODIE_STORE_PRODUCT_ID, FOUNDING_PURSE_STORE_PRODUCT_ID };
 
 /** Legacy shared-batch Glitch PDP → Tier 1 personalize launch SKU. */
 const LEGACY_STORE_PRODUCT_REDIRECTS: Record<string, string> = {
@@ -95,6 +97,24 @@ const LAUNCH_PRODUCTS: StoreCatalogProduct[] = [
     price_display: "$98 + shipping",
     detail_path: storeProductDetailPath(GLITCH_HOODIE_STORE_PRODUCT_ID),
     cta_label: "Customize your QR",
+    status: "published",
+    row_ids: ["row_personalize"],
+  },
+  {
+    product_id: FOUNDING_PURSE_STORE_PRODUCT_ID,
+    title: "Founding LIVE OBJECT purse",
+    meaning_line: "The 2023 prototype, carried forward. Your unique QR on the front panel.",
+    story:
+      "Original founding satchel design with a unique revocable QR tied to your Humanity Card. Fixed LIVE OBJECT art language; you update what strangers read from your phone without reprinting.",
+    product_class: "personalized",
+    personalization_indicator: "Personalized QR",
+    requires_card: true,
+    supports_personalization: true,
+    fulfillment_provider: "printify",
+    print_template_id: FOUNDING_PURSE_TEMPLATE_ID,
+    price_display: "Preview · price at launch",
+    detail_path: storeProductDetailPath(FOUNDING_PURSE_STORE_PRODUCT_ID),
+    cta_label: "Preview your QR",
     status: "published",
     row_ids: ["row_personalize"],
   },
@@ -178,8 +198,8 @@ const ROWS: StoreCatalogRow[] = [
     title: "Make it yours",
     subtitle: "Tier 1 belonging",
     story:
-      "Preview the founding Glitch LIVE QR hoodie. Fixed art with a unique revocable QR tied to your Humanity Card. Customize on humanity.llc, then checkout on Shopify when you are ready.",
-    product_ids: [GLITCH_HOODIE_STORE_PRODUCT_ID],
+      "Preview the founding Glitch LIVE QR hoodie and the original LIVE OBJECT purse. Fixed art with a unique revocable QR tied to your Humanity Card.",
+    product_ids: [GLITCH_HOODIE_STORE_PRODUCT_ID, FOUNDING_PURSE_STORE_PRODUCT_ID],
     sort_order: 1,
     status: "published",
   },

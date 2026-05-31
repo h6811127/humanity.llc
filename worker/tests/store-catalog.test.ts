@@ -20,6 +20,7 @@ describe("store-catalog", () => {
     expect(rows.map((row) => row.row_id)).toEqual(["row_personalize", "row_founding"]);
     expect(rows[0]?.products.map((product) => product.product_id)).toEqual([
       GLITCH_HOODIE_STORE_PRODUCT_ID,
+      "founding_purse_v1",
     ]);
     expect(rows[1]?.products.map((product) => product.product_id)).toEqual([
       TIER0_FOUNDING_STORE_PRODUCT_ID,

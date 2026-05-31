@@ -1,11 +1,12 @@
 /**
  * Merch PDP / customizer honesty copy — canonical text in docs/MERCH_PRODUCT_COPY.md
  */
-import { TIER0_GLITCH_HOODIE_STORE_PRODUCT_ID, GLITCH_HOODIE_STORE_PRODUCT_ID } from "./shop-store-catalog-ids.mjs";
+import { TIER0_GLITCH_HOODIE_STORE_PRODUCT_ID, GLITCH_HOODIE_STORE_PRODUCT_ID, FOUNDING_PURSE_STORE_PRODUCT_ID } from "./shop-store-catalog-ids.mjs";
 
 /** Product ids mirrored from worker store-catalog (avoid import churn). */
 export const HOODIE_LIVE_OBJECT_STORE_PRODUCT_ID = "hoodie_live_object_v1";
 export const STICKER_PERSONALIZED_STORE_PRODUCT_ID = "sticker_personalized_v1";
+export { FOUNDING_PURSE_STORE_PRODUCT_ID };
 
 /** @typedef {{ title: string, lines: string[] }} ProductHonestyBlock */
 /** @typedef {{ title: string, sub: string }} CustomizeHonestyRow */
@@ -72,9 +73,33 @@ export function pdpHonestyBlockFromRows(rows, title = TIER1_HONESTY_SECTION_TITL
   };
 }
 
+/** @type {CustomizeHonestyRow[]} */
+export const SHOP_CUSTOMIZE_HONESTY_ROWS_FOUNDING_PURSE = [
+  {
+    title: "Live",
+    sub: "After fulfillment, your purse QR resolves to your card. Update status from /created/ (or hub → Update status). Same ink, new meaning.",
+  },
+  {
+    title: "Fossil",
+    sub: "If you lose signing access without recovery or backup, you may not be able to edit again; scans can still show the last thing you published until you revoke the item.",
+  },
+  {
+    title: "Keys",
+    sub: "Keys stay in your browser; save ownership on this device and set recovery before you carry this in public.",
+  },
+];
+
+/** @type {CustomizeHeroCopy} */
+export const SHOP_CUSTOMIZE_HERO_FOUNDING_PURSE = {
+  eyebrow: "Next founding drop · preview",
+  title: "Founding LIVE OBJECT purse",
+  lead: "The 2023 prototype, carried forward. Fixed founding art on the front panel. Your unique QR, your live line.",
+};
+
 /** @type {Record<string, ProductHonestyBlock>} */
 export const SHOP_PRODUCT_HONESTY_BLOCKS = {
   [GLITCH_HOODIE_STORE_PRODUCT_ID]: pdpHonestyBlockFromRows(SHOP_CUSTOMIZE_HONESTY_ROWS_GLITCH),
+  [FOUNDING_PURSE_STORE_PRODUCT_ID]: pdpHonestyBlockFromRows(SHOP_CUSTOMIZE_HONESTY_ROWS_FOUNDING_PURSE),
   [HOODIE_LIVE_OBJECT_STORE_PRODUCT_ID]: pdpHonestyBlockFromRows(
     SHOP_CUSTOMIZE_HONESTY_ROWS_LIVE_OBJECT
   ),
@@ -123,15 +148,18 @@ export const SHOP_CUSTOMIZE_HERO_DEFAULT = {
   lead: "Your unique QR on the garment. Change what strangers read from your phone; the ink stays the same.",
 };
 
+/** White-card LIVE OBJECT QR art (same frame as customize / Printify fulfillment). */
+export const GLITCH_HOODIE_WHITE_CARD_ART_SRC =
+  "/images/merch/printify-art/glitch-hoodie-live-object-white-card.png";
+
 export const SHOP_GLITCH_PRINT_ARTIFACT_CALLOUT = {
   title: "Chromatic glitch units",
   lead:
     "Some founding hoodies arrive with a production artifact we still see on Printify runs: part of the QR modules print in blue or purple on fabric instead of red. We treat these as limited variance in the batch, not misprints to hide.",
   caption:
-    "Founding-run example. Scanning may be harder or impossible depending on camera and light. The ink is still yours; the glitch is the edition.",
-  imageSrc: "/assets/glitch-print-chromatic-artifact.png?v=2",
-  imageAlt:
-    "Example Glitch hoodie back print where the lower QR modules shifted to blue and purple on charcoal heather fabric",
+    "White card print reference. On fabric, chromatic units may shift blue or purple and scan less reliably.",
+  imageSrc: GLITCH_HOODIE_WHITE_CARD_ART_SRC,
+  imageAlt: "Humanity LIVE OBJECT QR on a white card with red border",
 };
 
 /** @type {CustomizeHeroCopy} */
@@ -148,6 +176,7 @@ export const SHOP_CUSTOMIZE_HERO_GLITCH = {
 export function customizeHeroForProduct(productId) {
   const id = typeof productId === "string" ? productId.trim() : "";
   if (id === GLITCH_HOODIE_STORE_PRODUCT_ID) return SHOP_CUSTOMIZE_HERO_GLITCH;
+  if (id === FOUNDING_PURSE_STORE_PRODUCT_ID) return SHOP_CUSTOMIZE_HERO_FOUNDING_PURSE;
   return SHOP_CUSTOMIZE_HERO_DEFAULT;
 }
 
@@ -158,6 +187,7 @@ export function customizeHeroForProduct(productId) {
 export function customizeHonestyRowsForProduct(productId) {
   const id = typeof productId === "string" ? productId.trim() : "";
   if (id === GLITCH_HOODIE_STORE_PRODUCT_ID) return SHOP_CUSTOMIZE_HONESTY_ROWS_GLITCH;
+  if (id === FOUNDING_PURSE_STORE_PRODUCT_ID) return SHOP_CUSTOMIZE_HONESTY_ROWS_FOUNDING_PURSE;
   if (id === HOODIE_LIVE_OBJECT_STORE_PRODUCT_ID) return SHOP_CUSTOMIZE_HONESTY_ROWS_LIVE_OBJECT;
   return SHOP_CUSTOMIZE_HONESTY_ROWS_DEFAULT;
 }

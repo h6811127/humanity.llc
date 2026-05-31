@@ -191,6 +191,48 @@ export function isPersonalizeCheckoutReady(config, product) {
   return isPersonalizeProductCheckoutOpen(product);
 }
 
+const SHOPIFY_CART_LINE_PROPERTY_MAX = 25;
+const SHOPIFY_CART_LINE_PROPERTY_VALUE_MAX = 255;
+
+/**
+ * Shopify cart permalinks require line properties as one Base64 URL-encoded JSON
+ * object (?properties=…), not legacy properties[key]=value query pairs.
+ *
+ * @param {{ key: string, value: string }[]} lineAttributes
+ * @returns {string | null}
+ */
+export function encodeShopifyCartLineProperties(lineAttributes = []) {
+  /** @type {Record<string, string>} */
+  const properties = {};
+  for (const attr of lineAttributes) {
+    if (!attr?.key || attr.value == null || attr.value === "") continue;
+    const key = String(attr.key).trim();
+    if (!key) continue;
+    const value = String(attr.value).trim().slice(0, SHOPIFY_CART_LINE_PROPERTY_VALUE_MAX);
+    if (!value) continue;
+    properties[key] = value;
+    if (Object.keys(properties).length >= SHOPIFY_CART_LINE_PROPERTY_MAX) break;
+  }
+  if (!Object.keys(properties).length) return null;
+
+  const json = JSON.stringify(properties);
+  const base64 = btoa(unescape(encodeURIComponent(json)));
+  return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+/**
+ * @param {string} encoded
+ * @returns {Record<string, string>}
+ */
+export function decodeShopifyCartLineProperties(encoded) {
+  if (!encoded) return {};
+  let base64 = encoded.replace(/-/g, "+").replace(/_/g, "/");
+  while (base64.length % 4) base64 += "=";
+  const json = decodeURIComponent(escape(atob(base64)));
+  const parsed = JSON.parse(json);
+  return parsed && typeof parsed === "object" ? parsed : {};
+}
+
 /**
  * @param {string} checkoutUrl
  * @param {number} quantity
@@ -203,9 +245,9 @@ export function buildShopifyCartUrl(checkoutUrl, quantity, lineAttributes = []) 
   if (cartMatch) {
     url.pathname = `/cart/${cartMatch[1]}:${qty}`;
   }
-  for (const attr of lineAttributes) {
-    if (!attr?.key || attr.value == null || attr.value === "") continue;
-    url.searchParams.set(`properties[${attr.key}]`, String(attr.value));
+  const encodedProperties = encodeShopifyCartLineProperties(lineAttributes);
+  if (encodedProperties) {
+    url.searchParams.set("properties", encodedProperties);
   }
   return url.href;
 }
@@ -235,13 +277,16 @@ export function customizeStickerMockLayout(qrModuleSize = 220) {
 
 /**
  * @param {Record<string, unknown>} product
- * @returns {"sticker" | "hoodie" | "glitch_hoodie"}
+ * @returns {"sticker" | "hoodie" | "glitch_hoodie" | "founding_purse"}
  */
 export function resolveCustomizePreviewKind(product) {
   const preview = typeof product?.preview === "string" ? product.preview.trim() : "";
-  if (preview === "sticker" || preview === "glitch_hoodie") return preview;
+  if (preview === "sticker" || preview === "glitch_hoodie" || preview === "founding_purse") {
+    return preview;
+  }
   const productId = String(product?.product_id ?? "").trim();
   if (productId === "glitch_hoodie_v1") return "glitch_hoodie";
+  if (productId === "founding_purse_v1") return "founding_purse";
   return "hoodie";
 }
 

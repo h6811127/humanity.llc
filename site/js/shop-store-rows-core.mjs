@@ -3,6 +3,7 @@
  * See docs/MERCH_FUNNEL_MVP.md · GET /v1/store/rows.
  */
 
+import { FOUNDING_PURSE_STORE_PRODUCT_ID } from "./shop-store-catalog-ids.mjs";
 import { isPersonalizeCheckoutOpen } from "./shop-config.mjs";
 import {
   isTier0StoreProductCheckoutOpen,
@@ -139,6 +140,52 @@ export function enrichStoreRows(config, catalogPayload, rows) {
         availability: resolveProductAvailability(config, catalogPayload, product),
       })),
     };
+  });
+}
+
+/** Hub card for founding purse when API rows predate worker catalog publish. */
+const FOUNDING_PURSE_HUB_PRODUCT_SEED = {
+  product_id: FOUNDING_PURSE_STORE_PRODUCT_ID,
+  title: "Founding LIVE OBJECT purse",
+  personalization_indicator: "Personalized QR",
+  meaning_line: "The 2023 prototype, carried forward. Your unique QR on the front panel.",
+  price_display: "Preview · price at launch",
+  action_path: `/shop/customize/?product=${encodeURIComponent(FOUNDING_PURSE_STORE_PRODUCT_ID)}`,
+  cta_label: "Preview your QR",
+};
+
+/**
+ * Ensure founding purse appears in Make it yours when shop-config has it but
+ * GET /v1/store/rows is still on an older worker deploy.
+ * @param {Record<string, unknown>} config
+ * @param {unknown} catalogPayload
+ * @param {Array<Record<string, unknown>>} rows
+ */
+export function ensureFoundingPurseInStoreRows(config, catalogPayload, rows) {
+  if (!Array.isArray(rows)) return [];
+  const inConfig = personalizeProducts(config).some(
+    (entry) => String(entry.product_id) === FOUNDING_PURSE_STORE_PRODUCT_ID
+  );
+  if (!inConfig) return rows;
+
+  return rows.map((row) => {
+    if (row.row_id !== "row_personalize") return row;
+    const products = Array.isArray(row.products) ? [...row.products] : [];
+    if (products.some((p) => String(p.product_id) === FOUNDING_PURSE_STORE_PRODUCT_ID)) {
+      return row;
+    }
+    const merged = {
+      ...FOUNDING_PURSE_HUB_PRODUCT_SEED,
+      price_display:
+        resolveProductPriceDisplay(config, FOUNDING_PURSE_HUB_PRODUCT_SEED) ??
+        FOUNDING_PURSE_HUB_PRODUCT_SEED.price_display,
+      availability: resolveProductAvailability(
+        config,
+        catalogPayload,
+        FOUNDING_PURSE_HUB_PRODUCT_SEED
+      ),
+    };
+    return { ...row, products: [...products, merged] };
   });
 }
 
