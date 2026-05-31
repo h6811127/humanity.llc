@@ -196,6 +196,8 @@ Today `site/js/scan-tab-keys.mjs` starts `device-chrome-refresh.mjs` but **does 
 | Piece | Role |
 |-------|------|
 | `site/js/scan-page-dot.mjs` | Eligibility gate, gather context, apply `dotClassList`, update `aria-label`, wire glance |
+| `site/js/scan-live-proof-owner-watch.mjs` | Step 1 owner discovery: poll pending challenge for scanned card; merge into inbox overlay counts |
+| `site/js/scan-live-proof-owner-watch-core.mjs` | Pure poll-scope helpers (Vitest) |
 | `device-dot-state-core.mjs` | Pure state + copy (extend `pageKind: "scan"`) |
 | `device-chrome-refresh.mjs` | `setRefreshStatusSurfaces(refreshScanPageDot)` from scan module |
 | `worker/src/resolver/scan-html.ts` | Markup: button + `#scan-page-dot` inner span + `#scan-page-dot-glance` container; keep static HTML fallback before module loads |
@@ -216,6 +218,7 @@ Today `site/js/scan-tab-keys.mjs` starts `device-chrome-refresh.mjs` but **does 
 | **5** | Playwright E2E (stranger static, steward glance, cross-tab overlay) | **Shipped** — `e2e/scan-page-dot.spec.ts`, `site/e2e-fixtures/scan-active.html`; `npm run e2e:scan-page-dot` |
 | **6** | Operator-familiar privacy gate (`hc_scan_operator_familiar`) | **Shipped** — `scan-operator-familiar.mjs`, `scanPageDotEligible` + wallet save hook |
 | **7** | `card_disabled_since_visit` overlay inbox-only on scan | **Shipped** — `scanDotOverlayFromCounts()` drops since-visit; shell/inbox unchanged |
+| **9** | Owner live-proof discovery on own scan (step 1) | **Shipped** — `scan-live-proof-owner-watch.mjs` polls **this profile + qr_id** only when wallet row matches and operator-familiar; feeds scan dot `proof_waiting` via `setScanPageLiveProofPending()`; upgrades `#live-control-owner-view` CTA; signing stays on `/created/` |
 
 Worker/API: **no change** — all state is client-side.
 
@@ -264,6 +267,7 @@ Worker/API: **no change** — all state is client-side.
 2. **Home default** — **Resolved (Phase 8.2):** glance-first for eligible viewers; **humanity.llc home** link inside glance.
 3. **Hero host dot** — **Resolved (`pass-v31`):** text-only `<p class="scan-hero-wordmark">` in card; brand dot in page chrome only.
 4. **`card_disabled_since_visit` on scan** — **Resolved (Phase 8.7):** inbox-only on shell pages; scan dot uses `proof_waiting` + `cross_tab_keys` overlays only.
+5. **Owner live-proof while viewing own scan** — **Resolved (Phase 9, step 1):** targeted poll for matching wallet row (~3s, same cadence as `/created/` view mode); no wallet round-robin or inbox sheet on scan. Step 2 (deeplink from glance/owner CTA) may follow.
 
 ---
 
@@ -278,6 +282,7 @@ Worker/API: **no change** — all state is client-side.
 | 2026-05-26 | Phase 8.5: Playwright E2E + generated scan fixture for Pages-only CI |
 | 2026-05-26 | Phase 8.6: operator-familiar privacy gate before progressive dot |
 | 2026-05-26 | Phase 8.7: since-visit overlay suppressed on scan (shell/inbox only) |
+| 2026-05-30 | Phase 9 step 1: owner live-proof poll on own scan page; scan dot + owner-view CTA; no hub/inbox sheet |
 
 ---
 
@@ -285,6 +290,7 @@ Worker/API: **no change** — all state is client-side.
 
 - `worker/src/resolver/scan-html.ts` — `renderScanPageChrome()`
 - `site/js/scan-tab-keys.mjs` — chrome refresh entry on scan
+- `site/js/scan-live-proof-owner-watch.mjs` — owner pending poll (Phase 9)
 - `site/js/device-cross-tab-banner.mjs` — `#scan-cross-tab-banner` (Safari layout: [`SCAN_CROSS_TAB_BANNER_SAFARI_LAYOUT_INVESTIGATION.md`](SCAN_CROSS_TAB_BANNER_SAFARI_LAYOUT_INVESTIGATION.md))
 - `site/js/vouch-issue.mjs` — vouch gate and “Use keys here”
 - `site/js/device-dot-state-core.mjs` — canonical dot semantics

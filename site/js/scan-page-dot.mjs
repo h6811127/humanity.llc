@@ -496,6 +496,7 @@ window.addEventListener("hc-scan-live-check-settled", (event) => {
 });
 window.addEventListener("hc-vouch-ready-changed", refreshScanPageDot);
 window.addEventListener("hc-device-hub-changed", refreshScanPageDot);
+window.addEventListener("hc-live-control-inbox-changed", refreshScanPageDot);
 window.addEventListener("storage", (e) => {
   if (
     e.key === "hc_created" ||

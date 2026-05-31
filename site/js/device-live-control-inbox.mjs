@@ -117,6 +117,10 @@ export function isStewardServerQuotaPaused() {
 /** @type {import("./device-live-control-inbox-core.mjs").LiveControlPendingItem[]} */
 let pending = [];
 
+/** Pending challenge discovered on scan page for the scanned profile (Phase 9). */
+/** @type {import("./device-live-control-inbox-core.mjs").LiveControlPendingItem | null} */
+let scanPageLiveProofPending = null;
+
 /** @type {ReturnType<typeof setTimeout> | null} */
 let pollTimer = null;
 let pollFeatureEnabled = false;
@@ -171,11 +175,29 @@ export function getLastLiveProofCheckAt() {
 }
 
 export function getLiveControlPending() {
-  return [...pending];
+  if (!scanPageLiveProofPending) return [...pending];
+  const profileId = scanPageLiveProofPending.entry?.profile_id;
+  const withoutScanDup = pending.filter(
+    (item) => item.entry?.profile_id !== profileId
+  );
+  return [...withoutScanDup, scanPageLiveProofPending];
+}
+
+/**
+ * Scan-page owner watch (one profile, one GET per tick) — Phase 9.
+ * @param {import("./device-live-control-inbox-core.mjs").LiveControlPendingItem | null} item
+ */
+export function setScanPageLiveProofPending(item) {
+  const prevId = scanPageLiveProofPending?.challenge_id ?? null;
+  const nextId = item?.challenge_id ?? null;
+  scanPageLiveProofPending = item;
+  if (prevId !== nextId) {
+    window.dispatchEvent(new Event("hc-live-control-inbox-changed"));
+  }
 }
 
 export function getLiveControlPendingCount() {
-  return pending.length;
+  return getLiveControlPending().length;
 }
 
 export function isLiveControlInboxPollingActive() {

@@ -20,7 +20,7 @@ Three layers, one story:
 
 Do **not** collapse dot and badge into one control-they answer different questions.
 
-**Request budget (how inbox should feel):** Inbox items like `live_proof` may require Worker polls, but the product is **not** a 24/7 monitoring dashboard. Automatic live-proof discovery runs only when the steward **opts in** (**Watch for live proof**) and hub/inbox scope is active; otherwise use manual **Check for live proof** or open `/created/`. Strangers waiting on a scan page poll **their** session; stewards get OS alerts only when background alerts are on. Full policy: [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) (north star: *stranger pays urgency, steward pays intent*).
+**Request budget (how inbox should feel):** Inbox items like `live_proof` may require Worker polls, but the product is **not** a 24/7 monitoring dashboard. Automatic live-proof discovery runs only when the steward **opts in** (**Watch for live proof**) and hub/inbox scope is active; otherwise use manual **Check for live proof** or open `/created/`. **Exception (Phase 9):** when an operator-familiar viewer has the **own-card scan page** open (`profile_id` + `qr_id` match a saved wallet row), the scan module polls **that card only** (~3s) so the chrome dot and `#live-control-owner-view` can surface a pending request without opening hub or Watch. Strangers waiting on a scan page poll **their** session; stewards get OS alerts only when background alerts are on. Full policy: [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) (north star: *stranger pays urgency, steward pays intent*).
 
 ---
 
@@ -293,7 +293,7 @@ Since phase 3 (`device-inbox-sheet.mjs`), `device-status.mjs` imports the inbox 
 | `worker/tests/device-live-control-sw-core.test.ts` | Vitest for SW poll core |
 | `worker/tests/device-browser-notifications.test.ts` | Vitest for alert core |
 | `site/js/device-counts.mjs` / `device-counts-core.mjs` | `tabNoticeCount`, status segments |
-| `site/js/device-live-control-inbox.mjs` | Live proof poll + hub list |
+| `site/js/device-live-control-inbox.mjs` | Live proof poll + hub list; `setScanPageLiveProofPending()` for scan overlay merge |
 | `site/js/device-hub-glance.mjs` | Collapsed peek rows |
 | `site/js/device-hub-ui.mjs` | Hub saved rows, search, coordinates inbox alert sync |
 | `site/js/device-hub-inbox-alerts.mjs` | Hub live-proof + tab-keys groups from `getInboxItems()` |

@@ -7,6 +7,7 @@
  * @see docs/SCAN_PAGE_DEVICE_DOT.md Phase 8
  */
 import "./scan-page-dot.mjs?v=8";
+import "./scan-live-proof-owner-watch.mjs?v=1";
 import {
   refreshDeviceChrome,
   startDeviceChromeRefresh,

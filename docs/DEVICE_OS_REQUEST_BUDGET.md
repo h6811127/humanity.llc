@@ -72,6 +72,7 @@ Target behavior stewards should understand (shipped pieces noted).
 | **Attending** | Hub expanded, inbox sheet open, or `/wallet/` with Watch on | Round-robin if **Watch** on (`hc_watch_live_proof === "1"`); else manual **Check for live proof** only | Fetch on expand / manual **Check network**; `/wallet/` in network scope | Yes (Phases 1–5) |
 | **Urgent** | Pending live proof known | **5s** tick interval (still one card per tick) | Unchanged | Yes (`liveControlPollIntervalMs`) |
 | **Signing** | `/created/` with keys | **~3s** for **this card only** | Row chips from wallet cache | Yes (`created.mjs`) |
+| **Attending (own scan)** | Operator-familiar viewer on `/c/…` where `profile_id` + `qr_id` match a saved wallet row | **~3s** for **this card only** (`scan-live-proof-owner-watch.mjs`) | Feeds scan dot overlay + owner-view CTA via `setScanPageLiveProofPending()`; **no** wallet round-robin, hub sheet, or Watch required | Yes (Phase 9 step 1) |
 | **Background** | Tab hidden + browser alerts on | SW round-robin, **15 min** minimum periodic sync | N/A | Yes (Phase 4) |
 
 **Watch for live proof** is **off by default**. Enabling it is consent to automatic Worker use while hub, inbox, or `/wallet/` scope is active — not a requirement to use Humanity Cards.
@@ -432,7 +433,7 @@ Use this table when prioritizing work. **Shipped** items have modules named; **P
 | L7 | **Leader tab** + follower snapshot | Yes (`device-live-control-poll-leader.mjs`) | Leader heartbeat for lock renewal | 7 ✅ |
 | L8 | **Per-tab/day auto-poll budget** | Yes (400/UTC day); hub message when paused | Configurable cap; ops dashboard | 7 ✅ |
 | L9 | Large wallet: poll **active + pending** only | Yes (`selectLiveControlPollEntries`, ≥10 cards) | Per-card “watch this card” flag | 8 ✅ |
-| L10 | **Stranger pays urgency** | Scan page polls one QR while waiting | Steward inbox optional; OS alert path | Scan + SW |
+| L10 | **Stranger pays urgency** | Scan page polls one QR while waiting | Steward inbox optional; OS alert path; **owner on own scan** polls one matching card (Phase 9) | Scan + SW |
 | L11 | `/created/` polls **active card only** | ~3s while proving | Stop when hidden (shipped in `created-live-proof-poll-core`) | Created ✅ |
 | L12 | Server push for live proof | — | SSE P1 then DO P2; steward notified without wallet round-robin | 10 — [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) |
 | L13 | **Entitlement-driven poll cap** | Fixed 400/day in client | Resolve `poll.live_proof.auto_daily_cap` from `GET …/steward/entitlements` | 10 — M7 § E2/E3 |
