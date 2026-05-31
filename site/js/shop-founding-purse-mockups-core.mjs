@@ -5,21 +5,9 @@
 
 export const FOUNDING_PURSE_MOCKUPS_URL = "/data/founding-purse-mockups.json";
 
-export const FOUNDING_PURSE_DEFAULT_MOCKUP_VIEW = "front";
+export const FOUNDING_PURSE_DEFAULT_MOCKUP_VIEW = "styled";
 
-export const FOUNDING_PURSE_MOCKUP_VIEW_ORDER = ["front", "styled", "on-person", "context"];
-
-/** Planned QR block below the mock (matches print file, not wallet card QR). */
-export const FOUNDING_PURSE_PLANNED_QR_LABEL = "Will print with this QR";
-
-export const FOUNDING_PURSE_PLANNED_QR_HINT =
-  "Separate code under your card. Live after checkout — not while previewing.";
-
-/** Render width for purse planned-QR preview (smaller than hoodie block). */
-export const FOUNDING_PURSE_PLANNED_QR_WIDTH = 140;
-
-/** Overlay on front-blank mock (placement only). */
-export const FOUNDING_PURSE_QR_OVERLAY_WIDTH = 112;
+export const FOUNDING_PURSE_MOCKUP_VIEW_ORDER = ["styled", "back", "on-person", "context"];
 
 /**
  * @param {string} a
@@ -39,7 +27,6 @@ export function compareFoundingPurseMockupViewOrder(a, b) {
  *   view_id: string;
  *   label: string;
  *   src: string;
- *   composites_qr?: boolean;
  *   is_default?: boolean;
  * }} FoundingPurseMockupEntry
  */
@@ -57,7 +44,6 @@ export function listFoundingPurseMockups(payload) {
       view_id: String(entry.view_id ?? entry.label ?? "view").trim(),
       label: typeof entry.label === "string" ? entry.label.trim() : "View",
       src: String(entry.src).trim(),
-      composites_qr: entry.composites_qr === true,
       is_default: entry.is_default === true,
     }))
     .sort((a, b) => compareFoundingPurseMockupViewOrder(a.view_id, b.view_id));
@@ -100,8 +86,11 @@ export async function fetchFoundingPurseMockups(url = FOUNDING_PURSE_MOCKUPS_URL
  * @returns {string}
  */
 export function foundingPurseMockupViewCaption(entry) {
-  if (entry?.composites_qr) {
-    return "Front view — your planned LIVE OBJECT QR on the bag panel.";
+  if (entry?.view_id === "styled") {
+    return "Front styled — founding LIVE OBJECT panel (sample art, not your unique code).";
+  }
+  if (entry?.view_id === "back") {
+    return "Back — blank panel on this angle.";
   }
   return "Sample styling — fixed founding art, not your unique code.";
 }

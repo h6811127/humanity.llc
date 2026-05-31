@@ -4957,17 +4957,6 @@ html[data-landing-focus="on"] .screen-landing {
   text-align: center;
 }
 
-.shop-customize-mock__purse-qr {
-  position: absolute;
-  left: 50%;
-  top: 54%;
-  width: 28%;
-  max-width: 6.75rem;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  border-radius: 2px;
-}
-
 .shop-customize-mock[data-preview="founding_purse"] .shop-customize-mock__photo {
   display: block;
   width: 100%;
@@ -5624,10 +5613,6 @@ html[data-landing-focus="on"] .screen-landing {
 
 .shop-customize-planned-qr__img[hidden] {
   display: none;
-}
-
-.shop-customize-planned-qr--purse .shop-customize-planned-qr__img {
-  width: min(56vw, 140px);
 }
 
 .shop-customize-mock__photo {

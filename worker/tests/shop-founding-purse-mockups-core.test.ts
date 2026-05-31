@@ -5,34 +5,37 @@ import {
   resolveDefaultFoundingPurseMockup,
   findFoundingPurseMockupByView,
   foundingPurseMockupViewCaption,
+  FOUNDING_PURSE_DEFAULT_MOCKUP_VIEW,
 } from "../../site/js/shop-founding-purse-mockups-core.mjs";
 
 describe("shop-founding-purse-mockups-core", () => {
-  it("lists mockups from payload with front first", () => {
+  it("lists mockups from payload with styled first", () => {
     const mockups = listFoundingPurseMockups({
       mockups: [
         { view_id: "context", label: "Flat lay", src: "/a.png" },
-        { view_id: "front", label: "Front", src: "/b.png", composites_qr: true },
+        { view_id: "styled", label: "Front styled", src: "/b.png", is_default: true },
+        { view_id: "back", label: "Back", src: "/c.png" },
       ],
     });
-    expect(mockups[0]?.view_id).toBe("front");
-    expect(mockups[0]?.composites_qr).toBe(true);
+    expect(mockups[0]?.view_id).toBe("styled");
+    expect(mockups[1]?.view_id).toBe("back");
   });
 
-  it("resolves default front mockup", () => {
+  it("resolves default styled mockup", () => {
     const mockups = listFoundingPurseMockups({
-      mockups: [{ view_id: "front", label: "Front", src: "/b.png", is_default: true }],
+      mockups: [{ view_id: "styled", label: "Front styled", src: "/b.png", is_default: true }],
     });
-    expect(resolveDefaultFoundingPurseMockup(mockups)?.view_id).toBe("front");
-    expect(findFoundingPurseMockupByView(mockups, "front")?.src).toBe("/b.png");
+    expect(FOUNDING_PURSE_DEFAULT_MOCKUP_VIEW).toBe("styled");
+    expect(resolveDefaultFoundingPurseMockup(mockups)?.view_id).toBe("styled");
+    expect(findFoundingPurseMockupByView(mockups, "styled")?.src).toBe("/b.png");
   });
 
-  it("returns view captions for composite vs static angles", () => {
+  it("returns view captions for styled and back angles", () => {
     expect(
-      foundingPurseMockupViewCaption({ view_id: "front", label: "Front", src: "/b.png", composites_qr: true })
-    ).toMatch(/your planned LIVE OBJECT QR/i);
+      foundingPurseMockupViewCaption({ view_id: "styled", label: "Front styled", src: "/b.png" })
+    ).toMatch(/front styled/i);
     expect(
-      foundingPurseMockupViewCaption({ view_id: "styled", label: "Styled", src: "/c.png" })
-    ).toMatch(/sample styling/i);
+      foundingPurseMockupViewCaption({ view_id: "back", label: "Back", src: "/c.png" })
+    ).toMatch(/back/i);
   });
 });

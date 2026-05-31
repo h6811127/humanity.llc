@@ -16,7 +16,7 @@
 | Config skeleton | `site/data/shop-config.json` — no `checkout_url` yet |
 | Merch ref | `customize_purse` → thanks `?hc_ref=customize_purse` |
 
-**Preview behavior:** Front view composites the buyer's planned LIVE OBJECT QR onto `front-blank.png`. Styled, on-model, and flat-lay views are static marketing angles.
+**Preview behavior:** Static product mockups only — **Front styled** default, **Back**, on-model, and flat-lay angles. No QR composited on bag photos; unique QR is reserved at checkout (see [`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) Beat 3 — belonging register without faking ink on mock photos).
 
 ---
 
@@ -130,8 +130,8 @@ npm run pages:dev                                     # terminal 2
 Open: `http://localhost:8788/shop/customize/?product=founding_purse_v1`
 
 - Product picker shows **Founding LIVE OBJECT purse**
-- **Front** view: blank bag + your planned QR overlay (after card + intent)
-- View tabs: Front · Front styled · On model · Flat lay
+- Default tab: **Front styled** · then **Back**, On model, Flat lay
+- Mock photos only — no QR overlay on the bag image
 
 ---
 

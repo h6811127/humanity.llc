@@ -85,10 +85,6 @@ import {
   listFoundingPurseMockups,
   resolveDefaultFoundingPurseMockup,
   FOUNDING_PURSE_DEFAULT_MOCKUP_VIEW,
-  FOUNDING_PURSE_PLANNED_QR_HINT,
-  FOUNDING_PURSE_PLANNED_QR_LABEL,
-  FOUNDING_PURSE_PLANNED_QR_WIDTH,
-  FOUNDING_PURSE_QR_OVERLAY_WIDTH,
 } from "./shop-founding-purse-mockups-core.mjs";
 import {
   artifactIntentSelectionKey,
@@ -121,7 +117,6 @@ const mockEl = document.getElementById("shop-customize-mock");
 const mockPrintifyEl = document.getElementById("shop-customize-mock-printify");
 const mockGarmentEl = document.getElementById("shop-customize-mock-garment");
 const mockPhotoEl = document.getElementById("shop-customize-mock-photo");
-const purseQrOverlayEl = document.getElementById("shop-customize-purse-qr-overlay");
 const plannedQrSectionEl = document.getElementById("shop-customize-planned-qr");
 const plannedQrImgEl = document.getElementById("shop-customize-planned-qr-img");
 const plannedQrLabelEl = document.querySelector(".shop-customize-planned-qr__label");
@@ -228,16 +223,14 @@ function clearProductMockPhotoWrapChrome() {
   mockPhotoWrapEl.style.removeProperty("--hc-glitch-garment-swatch");
 }
 
-function syncPlannedQrPreviewLabels(kind) {
+function syncPlannedQrPreviewLabels() {
   if (plannedQrLabelEl instanceof HTMLElement) {
-    plannedQrLabelEl.textContent =
-      kind === "founding_purse" ? FOUNDING_PURSE_PLANNED_QR_LABEL : GLITCH_PLANNED_QR_LABEL;
+    plannedQrLabelEl.textContent = GLITCH_PLANNED_QR_LABEL;
   }
   if (plannedQrHintEl instanceof HTMLElement) {
-    plannedQrHintEl.textContent =
-      kind === "founding_purse" ? FOUNDING_PURSE_PLANNED_QR_HINT : GLITCH_PLANNED_QR_HINT;
+    plannedQrHintEl.textContent = GLITCH_PLANNED_QR_HINT;
   }
-  plannedQrSectionEl?.classList.toggle("shop-customize-planned-qr--purse", kind === "founding_purse");
+  plannedQrSectionEl?.classList.remove("shop-customize-planned-qr--purse");
 }
 
 function setStatus(message, isError = false) {
@@ -707,7 +700,6 @@ async function refreshGlitchPrintPreviews() {
   const product = selectedProduct();
   if (isFoundingPurseProduct(product)) {
     syncProductMockGallery();
-    void syncFoundingPursePlannedQrPreview(currentPreviewScanUrl);
     return;
   }
   if (!isGlitchHoodieProduct(product)) return;
@@ -738,41 +730,11 @@ function syncMockPreviewKind() {
 }
 
 function clearFoundingPurseGallery() {
-  hideFoundingPurseQrOverlay();
-  if (mockEl) {
-    delete mockEl.dataset.purseCompositesQr;
-  }
   if (mockViewCaptionEl instanceof HTMLElement) {
     mockViewCaptionEl.hidden = true;
     mockViewCaptionEl.textContent = "";
   }
   clearProductMockPhotoWrapChrome();
-}
-
-function hideFoundingPurseQrOverlay() {
-  if (purseQrOverlayEl instanceof HTMLImageElement) {
-    purseQrOverlayEl.hidden = true;
-    purseQrOverlayEl.removeAttribute("src");
-  }
-}
-
-async function syncFoundingPurseQrOverlay(scanUrl) {
-  if (!(purseQrOverlayEl instanceof HTMLImageElement)) return;
-  if (!scanUrl?.trim()) {
-    hideFoundingPurseQrOverlay();
-    return;
-  }
-  try {
-    await renderBrandedQrToImage(purseQrOverlayEl, scanUrl, {
-      width: FOUNDING_PURSE_QR_OVERLAY_WIDTH,
-      framePadding: "tight",
-      frameBackground: "full",
-      alt: "Your planned LIVE OBJECT QR on the founding purse",
-    });
-    purseQrOverlayEl.hidden = false;
-  } catch {
-    hideFoundingPurseQrOverlay();
-  }
 }
 
 function syncFoundingPurseMockViewCaption(active) {
@@ -835,22 +797,13 @@ function syncFoundingPurseGallery() {
   if (previewVessel) previewVessel.hidden = true;
 
   clearProductMockPhotoWrapChrome();
-  if (!active.composites_qr) {
-    mockPhotoWrapEl?.classList.add("shop-customize-mock__photo-wrap--purse-static");
-  }
-  mockEl.dataset.purseCompositesQr = active.composites_qr ? "true" : "false";
+  mockPhotoWrapEl?.classList.add("shop-customize-mock__photo-wrap--purse-static");
 
   renderFoundingPurseMockupViewButtons(mockups, active.view_id);
   syncFoundingPurseMockViewCaption(active);
   mockPhotoEl.src = active.src;
   mockPhotoEl.alt = `Founding LIVE OBJECT purse — ${active.label}`;
   mockPrintifyEl?.classList.remove("is-loading-photo");
-
-  if (active.composites_qr && previewMode === "planned" && currentPreviewScanUrl) {
-    void syncFoundingPurseQrOverlay(currentPreviewScanUrl);
-  } else {
-    hideFoundingPurseQrOverlay();
-  }
 }
 
 function syncProductMockGallery() {
@@ -898,37 +851,13 @@ function hideGlitchPlannedQrPreview() {
   hidePlannedQrPreview();
 }
 
-async function syncFoundingPursePlannedQrPreview(scanUrl) {
-  const product = selectedProduct();
-  if (!isFoundingPurseProduct(product) || previewMode !== "planned" || !scanUrl?.trim()) {
-    return;
-  }
-  if (!(plannedQrImgEl instanceof HTMLImageElement)) return;
-  syncPlannedQrPreviewLabels("founding_purse");
-  if (plannedQrSectionEl) plannedQrSectionEl.hidden = false;
-  plannedQrImgEl.classList.add("is-loading");
-  try {
-    await renderBrandedQrToImage(plannedQrImgEl, scanUrl, {
-      width: FOUNDING_PURSE_PLANNED_QR_WIDTH,
-      framePadding: "tight",
-      frameBackground: "full",
-      alt: "Your planned LIVE OBJECT QR — print preview for the founding purse",
-    });
-    plannedQrImgEl.hidden = false;
-  } catch {
-    hidePlannedQrPreview();
-  } finally {
-    plannedQrImgEl.classList.remove("is-loading");
-  }
-}
-
 async function syncGlitchPlannedQrPreview(scanUrl) {
   if (!usesGlitchPrintifyGallery() || previewMode !== "planned" || !scanUrl?.trim()) {
     hideGlitchPlannedQrPreview();
     return;
   }
   if (!(plannedQrImgEl instanceof HTMLImageElement)) return;
-  syncPlannedQrPreviewLabels("glitch_hoodie");
+  syncPlannedQrPreviewLabels();
   if (plannedQrSectionEl) plannedQrSectionEl.hidden = false;
   plannedQrImgEl.classList.add("is-loading");
   try {
@@ -1191,10 +1120,10 @@ async function prepareCheckoutIntent(product) {
 async function renderPreviewScanUrl(scanUrl) {
   if (!previewImg || !scanUrl) throw new Error("Preview unavailable.");
   const product = selectedProduct();
-  if (isGlitchHoodieProduct(product) || isFoundingPurseProduct(product)) {
+  if (isGlitchHoodieProduct(product)) {
     await renderBrandedQrToImage(previewImg, scanUrl, {
       width: QR_PREVIEW_RENDER_WIDTH,
-      ...(isGlitchHoodieProduct(product) ? glitchPrintFrameRenderOpts() : { framePadding: "tight", frameBackground: "full" }),
+      ...glitchPrintFrameRenderOpts(),
       alt: "Branded QR preview for your print item",
     });
   } else {
@@ -1202,9 +1131,6 @@ async function renderPreviewScanUrl(scanUrl) {
   }
   previewImg.alt = "Branded QR preview for your print item";
   showPreviewImage(true);
-  if (isFoundingPurseProduct(product)) {
-    syncProductMockGallery();
-  }
 }
 
 function personalizeProofConsentComplete(product) {
@@ -1359,7 +1285,7 @@ async function refreshPreview() {
       previewNote.hidden = false;
       if (isFoundingPurseProduct(product)) {
         previewNote.textContent =
-          "Front view shows your planned LIVE OBJECT QR on the founding purse. Other views are styled mockups. The code goes live after checkout and fulfillment.";
+          "Photo angles only — founding purse mockups. Your unique QR is reserved at checkout and goes live after fulfillment.";
       } else {
         previewNote.textContent = printifyGallery
           ? `${glitchPrintFramePreviewHint(glitchPrintPreviewContext())} Sample art on the garment photo is not your code. The QR below is a separate id reserved for this hoodie (not your wallet card QR). It will not scan as live until after checkout; scanning early may show “unknown QR” for the same @handle.`
@@ -1397,11 +1323,7 @@ async function refreshPreview() {
     syncCustomizeStrangerPreview({ scanUrl: currentPreviewScanUrl });
     if (isFoundingPurseProduct(product)) {
       syncProductMockGallery();
-      if (previewMode === "planned") {
-        void syncFoundingPursePlannedQrPreview(currentPreviewScanUrl);
-      } else {
-        hidePlannedQrPreview();
-      }
+      hidePlannedQrPreview();
     } else {
       void syncGlitchPlannedQrPreview(currentPreviewScanUrl);
     }
