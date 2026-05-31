@@ -24,7 +24,7 @@ const ROWS = [
         detail_path: "/shop/products/glitch_hoodie_v1/",
         action_path: "/shop/customize/?product=glitch_hoodie_v1",
         cta_label: "Customize your QR",
-        price_display: "$88 + shipping",
+        price_display: "$98 + shipping",
       },
       {
         product_id: "sticker_personalized_v1",
@@ -81,7 +81,7 @@ const CONFIG = {
         product_id: "tier0_glitch_hoodie_v1",
         checkout_open: false,
         checkout_url: "",
-        price_display: "$88 + shipping",
+        price_display: "$98 + shipping",
       },
     ],
   },
@@ -92,7 +92,7 @@ const CONFIG = {
       {
         product_id: "glitch_hoodie_v1",
         print_template_id: "hc-glitch-hoodie-v1",
-        price_display: "$88 + shipping",
+        price_display: "$98 + shipping",
       },
       {
         product_id: "sticker_personalized_v1",
@@ -141,9 +141,9 @@ describe("shop-store-rows-core", () => {
     expect(
       resolveProductPriceDisplay(CONFIG, {
         product_id: "glitch_hoodie_v1",
-        price_display: "$88 + shipping",
+        price_display: "$98 + shipping",
       })
-    ).toBe("$88 + shipping");
+    ).toBe("$98 + shipping");
   });
 
   it("marks founding product checkout from tier0 config", () => {

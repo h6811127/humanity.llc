@@ -16,7 +16,7 @@
       {
         "product_id": "tier0_glitch_hoodie_v1",
         "title": "Glitch LIVE QR hoodie",
-        "price_display": "$88 + shipping",
+        "price_display": "$98 + shipping",
         "checkout_url": "",
         "checkout_open": false,
         "shopify_variant_id": "",
@@ -35,7 +35,7 @@
         "variant_matrix": "glitch_hoodie_v1",
         "title": "Glitch LIVE QR hoodie",
         "preview": "glitch_hoodie",
-        "price_display": "$88 + shipping",
+        "price_display": "$98 + shipping",
         "shopify_variant_id": "52932579459381",
         "checkout_url": "https://humanity-llc.myshopify.com/cart/52932579459381:1",
         "variants": [
