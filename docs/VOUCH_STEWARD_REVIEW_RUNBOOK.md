@@ -3,13 +3,14 @@
 **Status:** Alpha (operator API + manual triage)  
 **Audience:** Bootstrap stewards and operators  
 **Threat context:** [`VOUCH_THREAT_MODEL.md`](VOUCH_THREAT_MODEL.md)  
+**Next build spec:** [`VOUCH_TRUST_AND_SAFETY_OPERATOR_WORKFLOW.md`](VOUCH_TRUST_AND_SAFETY_OPERATOR_WORKFLOW.md)
 **Flag implementation:** `worker/src/db/vouch-audit.ts`
 
 ---
 
 ## Purpose
 
-Vouch abuse is mitigated by **cryptographic rules** (quota, threshold, signatures) and **human triage** of operator-only graph heuristics. This runbook covers the shipped M6 Step 4 controls: operator review queue plus steward-specific issuance guardrails.
+Vouch abuse is mitigated by **cryptographic rules** (quota, threshold, signatures) and **human triage** of operator-only graph heuristics. This runbook covers the shipped M6 Step 4 controls: operator review queue plus steward-specific issuance guardrails. The durable case/report/suspension/appeal workflow is specified in [`VOUCH_TRUST_AND_SAFETY_OPERATOR_WORKFLOW.md`](VOUCH_TRUST_AND_SAFETY_OPERATOR_WORKFLOW.md).
 
 **Still manual in v1:** automated suspension. Review actions remain manual (DB, support, operator workflow).
 

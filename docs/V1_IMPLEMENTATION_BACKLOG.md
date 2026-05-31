@@ -405,6 +405,26 @@ Goal: make the card meaningful without overclaiming.
 - Revoked vouches stop counting.
 - Private vouch notes never appear publicly.
 
+### V-004: Vouch Trust And Safety Operator Workflow
+
+**Design:** `docs/VOUCH_TRUST_AND_SAFETY_OPERATOR_WORKFLOW.md` · **Threat model:** `docs/VOUCH_THREAT_MODEL.md` · **Runbook:** `docs/VOUCH_STEWARD_REVIEW_RUNBOOK.md`
+
+**Build:**
+
+- Durable operator cases created from audit flags and manual reports.
+- Public report intake for false vouches, coerced vouches, statement abuse, impersonation, stolen QR/artifact, harassment, and integrator misuse.
+- Case decisions and append-only notes.
+- Governance suspension records with public notice, cause category, appeal deadline, and scan/status override.
+- Appeal intake and decision workflow.
+- Aggregate transparency counters without raw graph exports.
+
+**Exit criteria:**
+
+- Audit flags dedupe into review cases.
+- Operator can dismiss, watch, request revoke, suspend, restore, and close cases with logged reasons.
+- Suspended profiles stop showing positive trust labels and show an appeal path.
+- Reports and transparency counters do not expose private graph details.
+
 ### V-003: Founding Badges
 
 **Build:**
