@@ -96,7 +96,7 @@ describe("child-object backup gate UI", () => {
     const html = readFileSync(join(root, "site/created/index.html"), "utf8");
     expect(html).toContain('id="child-object-status-plate-backup-gate"');
     expect(html).toContain('id="child-object-lost-item-backup-gate"');
-    expect(html).toContain('href="/styles.css?v=132"');
+    expect(html).toContain('href="/styles.css?v=138"');
     expect(html).toMatch(
       /id="child-object-status-plate-backup-gate"[\s\S]*class="hc-notice child-object-backup-gate"[\s\S]*hidden/
     );

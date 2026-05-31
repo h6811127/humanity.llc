@@ -167,18 +167,34 @@ function createDb(state: DbState): D1Database {
         },
         run: async () => {
           if (sql.includes("INSERT INTO artifact_intents")) {
+            const input = args as unknown as [
+              string,
+              string,
+              string,
+              string | null,
+              string | null,
+              number,
+              string,
+              string,
+              string,
+              string,
+              string,
+              string,
+            ];
             const row: ArtifactIntentRow = {
-              artifact_intent_id: args[0] as string,
-              profile_id: args[1] as string,
-              source_qr_id: args[2] as string,
-              product_id: args[3] as string | null,
-              quantity: args[4] as number,
-              planned_item_qr_ids_json: args[5] as string,
-              planned_print_artifact_ids_json: args[6] as string,
-              status: args[7] as ArtifactIntentRow["status"],
-              expires_at: args[8] as string,
-              created_at: args[9] as string,
-              updated_at: args[10] as string,
+              artifact_intent_id: input[0],
+              profile_id: input[1],
+              source_qr_id: input[2],
+              product_id: input[3],
+              print_variant_id: input[4],
+              quantity: input[5],
+              planned_item_qr_ids_json: input[6],
+              planned_print_artifact_ids_json: input[7],
+              pending_mint_credentials_json: null,
+              status: input[8] as ArtifactIntentRow["status"],
+              expires_at: input[9],
+              created_at: input[10],
+              updated_at: input[11],
             };
             state.intents.set(row.artifact_intent_id, row);
           }
@@ -247,10 +263,15 @@ function createDb(state: DbState): D1Database {
               printify_order_id: null,
               printify_shop_id: null,
               template_id: args[6] as string,
-              status: args[7] as PrintOrderRow["status"],
-              shipping_method: args[8] as string,
-              created_at: args[9] as string,
-              updated_at: args[10] as string,
+              print_variant_id: (args[7] as string | null) ?? null,
+              status: args[8] as PrintOrderRow["status"],
+              shipping_method: args[9] as string,
+              tracking_carrier: null,
+              tracking_number: null,
+              tracking_url: null,
+              last_reconciled_at: null,
+              created_at: args[10] as string,
+              updated_at: args[11] as string,
             };
             state.printOrders.set(row.order_id, row);
             state.printOrdersByCommerce.set(row.commerce_order_id, row);

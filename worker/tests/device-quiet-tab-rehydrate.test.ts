@@ -15,14 +15,20 @@ describe("device-quiet-tab-rehydrate wiring", () => {
     expect(presenceIdx).toBeGreaterThan(awaitIdx);
   });
 
-  it("device-status awaits quiet rehydrate before chrome refresh", () => {
-    const src = fs.readFileSync(
+  it("device-status wires quiet rehydrate bootstrap before chrome refresh", () => {
+    const statusSrc = fs.readFileSync(
       path.join(process.cwd(), "site/js/device-status.mjs"),
       "utf8"
     );
-    expect(src).toContain("maybeQuietTabRehydrate");
-    expect(src).toContain("bootDeviceStatusShell");
-    expect(src).toContain("await maybeQuietTabRehydrate(");
+    const bootstrapSrc = fs.readFileSync(
+      path.join(process.cwd(), "site/js/device-quiet-tab-rehydrate-bootstrap.mjs"),
+      "utf8"
+    );
+    expect(statusSrc).toContain("ensureQuietTabRehydrateBootstrap");
+    expect(statusSrc).toContain("bootDeviceStatusShell");
+    expect(bootstrapSrc).toContain("maybeQuietTabRehydrate");
+    expect(bootstrapSrc).toContain("bindQuietTabRehydrateBootstrap");
+    expect(statusSrc).toContain("await ensureQuietTabRehydrateBootstrap(");
   });
 
   it("quiet rehydrate applies Tier 3 cross-tab demotion on success", () => {

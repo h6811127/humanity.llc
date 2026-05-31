@@ -2,6 +2,7 @@ import QRCode from "qrcode";
 import {
   brandedQrRenderColors,
   overlayCenterLogoOnSvg,
+  QR_BRAND_RED,
   QR_BRANDED_RENDER_OPTIONS,
   renderHumanityQrFrameSvg,
 } from "../../../site/js/qr-branding.mjs";
