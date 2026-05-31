@@ -9,6 +9,18 @@ export const FOUNDING_PURSE_DEFAULT_MOCKUP_VIEW = "front";
 
 export const FOUNDING_PURSE_MOCKUP_VIEW_ORDER = ["front", "styled", "on-person", "context"];
 
+/** Planned QR block below the mock (matches print file, not wallet card QR). */
+export const FOUNDING_PURSE_PLANNED_QR_LABEL = "Will print with this QR";
+
+export const FOUNDING_PURSE_PLANNED_QR_HINT =
+  "Separate code under your card. Live after checkout — not while previewing.";
+
+/** Render width for purse planned-QR preview (smaller than hoodie block). */
+export const FOUNDING_PURSE_PLANNED_QR_WIDTH = 140;
+
+/** Overlay on front-blank mock (placement only). */
+export const FOUNDING_PURSE_QR_OVERLAY_WIDTH = 112;
+
 /**
  * @param {string} a
  * @param {string} b
@@ -81,4 +93,15 @@ export async function fetchFoundingPurseMockups(url = FOUNDING_PURSE_MOCKUPS_URL
   const res = await fetch(url, { headers: { Accept: "application/json" }, cache: "no-store" });
   if (!res.ok) throw new Error("Founding purse mockups unavailable.");
   return res.json();
+}
+
+/**
+ * @param {FoundingPurseMockupEntry | null | undefined} entry
+ * @returns {string}
+ */
+export function foundingPurseMockupViewCaption(entry) {
+  if (entry?.composites_qr) {
+    return "Front view — your planned LIVE OBJECT QR on the bag panel.";
+  }
+  return "Sample styling — fixed founding art, not your unique code.";
 }

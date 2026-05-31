@@ -29,8 +29,10 @@ import {
   customizeMerchCheckoutStatusMessage,
   personalizeProductDisplay,
   personalizeProducts,
+  readCustomizeProductIdFromSearch,
   readManifestoLineForCustomize,
   resolveCustomizePreviewKind,
+  resolveInitialCustomizeProductId,
 } from "./shop-customize-core.mjs";
 import {
   CUSTOMIZE_PREVIEW_FORMING_LABEL,
@@ -79,9 +81,14 @@ import {
 import {
   fetchFoundingPurseMockups,
   findFoundingPurseMockupByView,
+  foundingPurseMockupViewCaption,
   listFoundingPurseMockups,
   resolveDefaultFoundingPurseMockup,
   FOUNDING_PURSE_DEFAULT_MOCKUP_VIEW,
+  FOUNDING_PURSE_PLANNED_QR_HINT,
+  FOUNDING_PURSE_PLANNED_QR_LABEL,
+  FOUNDING_PURSE_PLANNED_QR_WIDTH,
+  FOUNDING_PURSE_QR_OVERLAY_WIDTH,
 } from "./shop-founding-purse-mockups-core.mjs";
 import {
   artifactIntentSelectionKey,
@@ -117,8 +124,11 @@ const mockPhotoEl = document.getElementById("shop-customize-mock-photo");
 const purseQrOverlayEl = document.getElementById("shop-customize-purse-qr-overlay");
 const plannedQrSectionEl = document.getElementById("shop-customize-planned-qr");
 const plannedQrImgEl = document.getElementById("shop-customize-planned-qr-img");
+const plannedQrLabelEl = document.querySelector(".shop-customize-planned-qr__label");
+const plannedQrHintEl = document.querySelector(".shop-customize-planned-qr__hint");
 const mockPhotoWrapEl = document.getElementById("shop-customize-mock-photo-wrap");
 const mockViewsEl = document.getElementById("shop-customize-mock-views");
+const mockViewCaptionEl = document.getElementById("shop-customize-mock-view-caption");
 const printFrameSectionEl = document.getElementById("shop-customize-print-frame-section");
 const printFrameRowEl = document.getElementById("shop-customize-print-frame-row");
 const printFrameWarningEl = document.getElementById("shop-customize-print-frame-warning");
@@ -180,6 +190,55 @@ let selectedGlitchPrintFrameBackground = readStoredGlitchPrintFrameBackground();
 let activeIntentVariantKey = null;
 /** @type {ReturnType<typeof setTimeout> | null} */
 let variantIntentSyncTimer = null;
+/** Scroll preview into view once after deep-link ?product= load. */
+let shouldScrollToPreview = false;
+
+const GLITCH_PLANNED_QR_LABEL = "QR for this hoodie (not your card QR)";
+const GLITCH_PLANNED_QR_HINT =
+  "Separate code under your card. Scans as live only after checkout — not while customizing.";
+
+function scrollCustomizePreviewIntoView() {
+  const target =
+    document.getElementById("shop-customize-mock") ??
+    document.querySelector(".shop-customize-preview-wrap");
+  target?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function maybeScrollToPreviewAfterDeepLink() {
+  if (!shouldScrollToPreview) return;
+  shouldScrollToPreview = false;
+  requestAnimationFrame(() => scrollCustomizePreviewIntoView());
+}
+
+function resetMockupViewForProduct(product) {
+  const kind = product ? resolveCustomizePreviewKind(product) : "hoodie";
+  selectedMockupView =
+    kind === "founding_purse"
+      ? FOUNDING_PURSE_DEFAULT_MOCKUP_VIEW
+      : GLITCH_HOODIE_DEFAULT_MOCKUP_VIEW;
+}
+
+function clearProductMockPhotoWrapChrome() {
+  if (!(mockPhotoWrapEl instanceof HTMLElement)) return;
+  mockPhotoWrapEl.classList.remove(
+    "shop-customize-mock__photo-wrap--garment-swatch",
+    "shop-customize-mock__photo-wrap--qr-transparent",
+    "shop-customize-mock__photo-wrap--purse-static"
+  );
+  mockPhotoWrapEl.style.removeProperty("--hc-glitch-garment-swatch");
+}
+
+function syncPlannedQrPreviewLabels(kind) {
+  if (plannedQrLabelEl instanceof HTMLElement) {
+    plannedQrLabelEl.textContent =
+      kind === "founding_purse" ? FOUNDING_PURSE_PLANNED_QR_LABEL : GLITCH_PLANNED_QR_LABEL;
+  }
+  if (plannedQrHintEl instanceof HTMLElement) {
+    plannedQrHintEl.textContent =
+      kind === "founding_purse" ? FOUNDING_PURSE_PLANNED_QR_HINT : GLITCH_PLANNED_QR_HINT;
+  }
+  plannedQrSectionEl?.classList.toggle("shop-customize-planned-qr--purse", kind === "founding_purse");
+}
 
 function setStatus(message, isError = false) {
   if (!statusEl) return;
@@ -440,7 +499,10 @@ function renderProductPicker() {
   }
   productRow.hidden = false;
   if (!selectedProductId) {
-    selectedProductId = String(products[0].product_id);
+    selectedProductId = resolveInitialCustomizeProductId(
+      products,
+      readCustomizeProductIdFromSearch(window.location.search)
+    );
   }
   for (const product of products) {
     const display = personalizeProductDisplay(product);
@@ -458,6 +520,7 @@ function renderProductPicker() {
       activeIntent = null;
       previewMode = null;
       clearShippingEstimate();
+      resetMockupViewForProduct(product);
       persistMerchCreateRef(merchRefForPersonalizeProductId(display.productId));
       syncProductCopy(product);
       void loadVariantsForProduct(product);
@@ -644,6 +707,7 @@ async function refreshGlitchPrintPreviews() {
   const product = selectedProduct();
   if (isFoundingPurseProduct(product)) {
     syncProductMockGallery();
+    void syncFoundingPursePlannedQrPreview(currentPreviewScanUrl);
     return;
   }
   if (!isGlitchHoodieProduct(product)) return;
@@ -675,6 +739,14 @@ function syncMockPreviewKind() {
 
 function clearFoundingPurseGallery() {
   hideFoundingPurseQrOverlay();
+  if (mockEl) {
+    delete mockEl.dataset.purseCompositesQr;
+  }
+  if (mockViewCaptionEl instanceof HTMLElement) {
+    mockViewCaptionEl.hidden = true;
+    mockViewCaptionEl.textContent = "";
+  }
+  clearProductMockPhotoWrapChrome();
 }
 
 function hideFoundingPurseQrOverlay() {
@@ -692,7 +764,7 @@ async function syncFoundingPurseQrOverlay(scanUrl) {
   }
   try {
     await renderBrandedQrToImage(purseQrOverlayEl, scanUrl, {
-      width: 220,
+      width: FOUNDING_PURSE_QR_OVERLAY_WIDTH,
       framePadding: "tight",
       frameBackground: "full",
       alt: "Your planned LIVE OBJECT QR on the founding purse",
@@ -701,6 +773,13 @@ async function syncFoundingPurseQrOverlay(scanUrl) {
   } catch {
     hideFoundingPurseQrOverlay();
   }
+}
+
+function syncFoundingPurseMockViewCaption(active) {
+  if (!(mockViewCaptionEl instanceof HTMLElement)) return;
+  const caption = foundingPurseMockupViewCaption(active);
+  mockViewCaptionEl.textContent = caption;
+  mockViewCaptionEl.hidden = !caption;
 }
 
 function renderFoundingPurseMockupViewButtons(mockups, activeViewId) {
@@ -755,7 +834,14 @@ function syncFoundingPurseGallery() {
   mockGarmentEl?.setAttribute("hidden", "");
   if (previewVessel) previewVessel.hidden = true;
 
+  clearProductMockPhotoWrapChrome();
+  if (!active.composites_qr) {
+    mockPhotoWrapEl?.classList.add("shop-customize-mock__photo-wrap--purse-static");
+  }
+  mockEl.dataset.purseCompositesQr = active.composites_qr ? "true" : "false";
+
   renderFoundingPurseMockupViewButtons(mockups, active.view_id);
+  syncFoundingPurseMockViewCaption(active);
   mockPhotoEl.src = active.src;
   mockPhotoEl.alt = `Founding LIVE OBJECT purse — ${active.label}`;
   mockPrintifyEl?.classList.remove("is-loading-photo");
@@ -796,11 +882,42 @@ function clearGlitchPrintifyGallery() {
   hideGlitchPlannedQrPreview();
 }
 
-function hideGlitchPlannedQrPreview() {
-  if (plannedQrSectionEl) plannedQrSectionEl.hidden = true;
+function hidePlannedQrPreview() {
+  if (plannedQrSectionEl) {
+    plannedQrSectionEl.hidden = true;
+    plannedQrSectionEl.classList.remove("shop-customize-planned-qr--purse");
+  }
   if (plannedQrImgEl instanceof HTMLImageElement) {
     plannedQrImgEl.hidden = true;
     plannedQrImgEl.removeAttribute("src");
+    plannedQrImgEl.classList.remove("is-loading");
+  }
+}
+
+function hideGlitchPlannedQrPreview() {
+  hidePlannedQrPreview();
+}
+
+async function syncFoundingPursePlannedQrPreview(scanUrl) {
+  const product = selectedProduct();
+  if (!isFoundingPurseProduct(product) || previewMode !== "planned" || !scanUrl?.trim()) {
+    return;
+  }
+  if (!(plannedQrImgEl instanceof HTMLImageElement)) return;
+  syncPlannedQrPreviewLabels("founding_purse");
+  if (plannedQrSectionEl) plannedQrSectionEl.hidden = false;
+  plannedQrImgEl.classList.add("is-loading");
+  try {
+    await renderBrandedQrToImage(plannedQrImgEl, scanUrl, {
+      width: FOUNDING_PURSE_PLANNED_QR_WIDTH,
+      framePadding: "tight",
+      frameBackground: "full",
+      alt: "Your planned LIVE OBJECT QR — print preview for the founding purse",
+    });
+    plannedQrImgEl.hidden = false;
+  } catch {
+    hidePlannedQrPreview();
+  } finally {
     plannedQrImgEl.classList.remove("is-loading");
   }
 }
@@ -811,6 +928,7 @@ async function syncGlitchPlannedQrPreview(scanUrl) {
     return;
   }
   if (!(plannedQrImgEl instanceof HTMLImageElement)) return;
+  syncPlannedQrPreviewLabels("glitch_hoodie");
   if (plannedQrSectionEl) plannedQrSectionEl.hidden = false;
   plannedQrImgEl.classList.add("is-loading");
   try {
@@ -988,6 +1106,9 @@ async function loadVariantsForProduct(product) {
   const defaults = defaultVariantSelection(productVariants);
   selectedColor = defaults.color;
   selectedSize = defaults.size;
+  if (isPurse) {
+    resetMockupViewForProduct(product);
+  }
   ensureGlitchPrintFrameAllowedForColor();
   renderVariantPickers();
   syncProductMockGallery();
@@ -1271,10 +1392,16 @@ async function refreshPreview() {
     if (previewVessel) previewVessel.hidden = false;
     syncCustomizeStrangerPreview({ scanUrl: currentPreviewScanUrl });
     await runCustomizePreviewArrive(mockEl);
+    hidePlannedQrPreview();
   } else {
     syncCustomizeStrangerPreview({ scanUrl: currentPreviewScanUrl });
     if (isFoundingPurseProduct(product)) {
       syncProductMockGallery();
+      if (previewMode === "planned") {
+        void syncFoundingPursePlannedQrPreview(currentPreviewScanUrl);
+      } else {
+        hidePlannedQrPreview();
+      }
     } else {
       void syncGlitchPlannedQrPreview(currentPreviewScanUrl);
     }
@@ -1282,6 +1409,7 @@ async function refreshPreview() {
 
   syncCheckoutUi(product);
   setStatus(previewStatusMessage(product));
+  maybeScrollToPreviewAfterDeepLink();
 }
 
 async function onCheckoutClick() {
@@ -1428,6 +1556,19 @@ async function init() {
     shopConfig = await loadShopConfig();
   } catch {
     shopConfig = {};
+  }
+
+  const urlProductId = readCustomizeProductIdFromSearch(window.location.search);
+  const products = personalizeProducts(shopConfig);
+  const resolvedProductId = resolveInitialCustomizeProductId(products, urlProductId);
+  if (resolvedProductId) {
+    selectedProductId = resolvedProductId;
+  }
+  if (urlProductId && resolvedProductId === urlProductId) {
+    shouldScrollToPreview = true;
+    if (resolvedProductId === "founding_purse_v1") {
+      selectedMockupView = FOUNDING_PURSE_DEFAULT_MOCKUP_VIEW;
+    }
   }
 
   const session = loadCardSigningSessionForCustomize();

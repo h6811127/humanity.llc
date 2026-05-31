@@ -276,6 +276,33 @@ export function customizeStickerMockLayout(qrModuleSize = 220) {
 }
 
 /**
+ * @param {string | URLSearchParams | null | undefined} [search]
+ * @returns {string | null}
+ */
+export function readCustomizeProductIdFromSearch(search) {
+  const raw =
+    search instanceof URLSearchParams
+      ? search
+      : new URLSearchParams(typeof search === "string" ? search : "");
+  const productId = raw.get("product")?.trim() ?? "";
+  return productId || null;
+}
+
+/**
+ * @param {Record<string, unknown>[]} products
+ * @param {string | null | undefined} preferredProductId
+ * @returns {string | null}
+ */
+export function resolveInitialCustomizeProductId(products, preferredProductId) {
+  const preferred = preferredProductId?.trim() ?? "";
+  if (preferred && products.some((p) => String(p.product_id) === preferred)) {
+    return preferred;
+  }
+  const first = products[0];
+  return first?.product_id ? String(first.product_id) : null;
+}
+
+/**
  * @param {Record<string, unknown>} product
  * @returns {"sticker" | "hoodie" | "glitch_hoodie" | "founding_purse"}
  */

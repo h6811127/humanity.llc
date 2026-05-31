@@ -4,20 +4,38 @@ import { qrFrameMetrics } from "../../site/js/qr-branding.mjs";
 import {
   buildPlannedItemScanUrl,
   buildShopifyCartUrl,
+  decodeShopifyCartLineProperties,
+  encodeShopifyCartLineProperties,
   customizeMerchCheckoutStatusMessage,
   customizeStickerMockLayout,
   isPersonalizeCheckoutReady,
   loadCardSessionForCustomize,
   personalizeProductDisplay,
   personalizeProducts,
+  readCustomizeProductIdFromSearch,
   readManifestoLineForCustomize,
   resolveCustomizePreviewKind,
+  resolveInitialCustomizeProductId,
   STICKER_MOCK_CARD_WIDTH_IN,
   STICKER_MOCK_SHEET_IN,
 } from "../../site/js/shop-customize-core.mjs";
 
+describe("encodeShopifyCartLineProperties", () => {
+  it("round-trips line attributes as Base64 URL JSON", () => {
+    const encoded = encodeShopifyCartLineProperties([
+      { key: "engraving", value: "Hello world" },
+      { key: "color", value: "red" },
+    ]);
+    expect(encoded).toBeTruthy();
+    expect(decodeShopifyCartLineProperties(encoded)).toEqual({
+      engraving: "Hello world",
+      color: "red",
+    });
+  });
+});
+
 describe("buildShopifyCartUrl", () => {
-  it("updates cart quantity and appends line properties", () => {
+  it("updates cart quantity and appends Base64-encoded line properties", () => {
     const url = buildShopifyCartUrl(
       "https://store.example/cart/123456:1",
       2,
@@ -28,8 +46,9 @@ describe("buildShopifyCartUrl", () => {
     );
     const parsed = new URL(url);
     expect(parsed.pathname).toBe("/cart/123456:2");
-    expect(parsed.searchParams.get("properties[artifact_intent_id]")).toBe("ai_test123");
-    expect(parsed.searchParams.get("properties[profile_id]")).toBe("7Xk9mP2nQ4rT6vW8yZ1aB3cD5");
+    const properties = decodeShopifyCartLineProperties(parsed.searchParams.get("properties"));
+    expect(properties.artifact_intent_id).toBe("ai_test123");
+    expect(properties.profile_id).toBe("7Xk9mP2nQ4rT6vW8yZ1aB3cD5");
   });
 });
 
@@ -117,9 +136,36 @@ describe("resolveCustomizePreviewKind", () => {
       resolveCustomizePreviewKind({ product_id: "glitch_hoodie_v1", preview: "glitch_hoodie" })
     ).toBe("glitch_hoodie");
     expect(resolveCustomizePreviewKind({ product_id: "hoodie_live_object_v1" })).toBe("hoodie");
+    expect(
+      resolveCustomizePreviewKind({ product_id: "founding_purse_v1", preview: "founding_purse" })
+    ).toBe("founding_purse");
     expect(resolveCustomizePreviewKind({ product_id: "sticker_personalized_v1", preview: "sticker" })).toBe(
       "sticker"
     );
+  });
+});
+
+describe("readCustomizeProductIdFromSearch", () => {
+  it("reads product query param", () => {
+    expect(readCustomizeProductIdFromSearch("?product=founding_purse_v1")).toBe("founding_purse_v1");
+    expect(readCustomizeProductIdFromSearch("?product=")).toBeNull();
+    expect(readCustomizeProductIdFromSearch("")).toBeNull();
+  });
+});
+
+describe("resolveInitialCustomizeProductId", () => {
+  const products = [
+    { product_id: "glitch_hoodie_v1" },
+    { product_id: "founding_purse_v1" },
+  ];
+
+  it("prefers URL product when configured", () => {
+    expect(resolveInitialCustomizeProductId(products, "founding_purse_v1")).toBe("founding_purse_v1");
+  });
+
+  it("falls back to first product when URL product is unknown", () => {
+    expect(resolveInitialCustomizeProductId(products, "missing_sku")).toBe("glitch_hoodie_v1");
+    expect(resolveInitialCustomizeProductId(products, null)).toBe("glitch_hoodie_v1");
   });
 });
 

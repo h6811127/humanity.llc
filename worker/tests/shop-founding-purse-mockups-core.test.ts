@@ -4,6 +4,7 @@ import {
   listFoundingPurseMockups,
   resolveDefaultFoundingPurseMockup,
   findFoundingPurseMockupByView,
+  foundingPurseMockupViewCaption,
 } from "../../site/js/shop-founding-purse-mockups-core.mjs";
 
 describe("shop-founding-purse-mockups-core", () => {
@@ -24,5 +25,14 @@ describe("shop-founding-purse-mockups-core", () => {
     });
     expect(resolveDefaultFoundingPurseMockup(mockups)?.view_id).toBe("front");
     expect(findFoundingPurseMockupByView(mockups, "front")?.src).toBe("/b.png");
+  });
+
+  it("returns view captions for composite vs static angles", () => {
+    expect(
+      foundingPurseMockupViewCaption({ view_id: "front", label: "Front", src: "/b.png", composites_qr: true })
+    ).toMatch(/your planned LIVE OBJECT QR/i);
+    expect(
+      foundingPurseMockupViewCaption({ view_id: "styled", label: "Styled", src: "/c.png" })
+    ).toMatch(/sample styling/i);
   });
 });

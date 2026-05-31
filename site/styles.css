@@ -4944,12 +4944,25 @@ html[data-landing-focus="on"] .screen-landing {
   margin: 0 auto;
 }
 
+.shop-customize-mock__photo-wrap--purse-static .shop-customize-mock__photo {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  border-radius: var(--radius);
+}
+
+.shop-customize-mock-view-caption {
+  margin: 0;
+  font-size: 13px;
+  text-align: center;
+}
+
 .shop-customize-mock__purse-qr {
   position: absolute;
   left: 50%;
   top: 54%;
-  width: 31%;
-  max-width: 7.5rem;
+  width: 28%;
+  max-width: 6.75rem;
   transform: translate(-50%, -50%);
   pointer-events: none;
   border-radius: 2px;
@@ -5611,6 +5624,10 @@ html[data-landing-focus="on"] .screen-landing {
 
 .shop-customize-planned-qr__img[hidden] {
   display: none;
+}
+
+.shop-customize-planned-qr--purse .shop-customize-planned-qr__img {
+  width: min(56vw, 140px);
 }
 
 .shop-customize-mock__photo {
