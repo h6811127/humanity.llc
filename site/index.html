@@ -35,6 +35,36 @@
         }
       })();
       (function () {
+        try {
+          var stored = localStorage.getItem("hc_landing_focus");
+          var focusOn = false;
+          if (stored === "0") {
+            focusOn = false;
+          } else if (stored === "1") {
+            focusOn = true;
+          } else {
+            var walletRaw = localStorage.getItem("hc_wallet");
+            if (walletRaw) {
+              var wallet = JSON.parse(walletRaw);
+              if (Array.isArray(wallet) && wallet.length > 0) focusOn = true;
+            }
+            if (!focusOn) {
+              var pinsRaw = localStorage.getItem("hc_device_pins");
+              if (pinsRaw) {
+                var pins = JSON.parse(pinsRaw);
+                if (Array.isArray(pins) && pins.length > 0) focusOn = true;
+              }
+            }
+          }
+          document.documentElement.setAttribute(
+            "data-landing-focus",
+            focusOn ? "on" : "off"
+          );
+        } catch (e) {
+          document.documentElement.setAttribute("data-landing-focus", "off");
+        }
+      })();
+      (function () {
         if (location.hostname === "www.humanity.llc") {
           location.replace(
             "https://humanity.llc" +
@@ -46,7 +76,7 @@
       })();
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=5" />
-    <link rel="stylesheet" href="/styles.css?v=133" />
+    <link rel="stylesheet" href="/styles.css?v=134" />
     <link rel="stylesheet" href="/css/device-shell.css?v=82" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=30" />
     <meta property="og:title" content="humanity.llc · Live objects on physical tags" />
@@ -1185,7 +1215,7 @@
           </div>
         </details>
 
-        <section class="group landing-essentials landing-docs-footer" id="landing-docs-footer" hidden>
+        <section class="group landing-essentials landing-docs-footer" id="landing-docs-footer">
           <h2 class="group-label">Help &amp; protocol</h2>
           <ul class="list list-compact">
             <li class="list-row list-action">
@@ -1304,7 +1334,7 @@
         <p class="form-status" id="device-hub-qr-scanner-status" role="status" hidden></p>
       </div>
     </dialog>
-    <script src="/js/landing-focus.mjs?v=3" type="module"></script>
+    <script src="/js/landing-focus.mjs?v=4" type="module"></script>
     <script src="/js/device-status-bootstrap.mjs?v=82" type="module"></script>
     <script src="/js/landing-device-hub.mjs?v=14" type="module"></script>
     <script src="/js/landing-showcase.mjs?v=2" type="module"></script>

@@ -3819,7 +3819,8 @@ a.hub-card-menu-item {
   padding-top: 6px;
 }
 
-body.landing-focus-mode .screen-landing > .hero.hero-tight {
+body.landing-focus-mode .screen-landing > .hero.hero-tight,
+html[data-landing-focus="on"] .screen-landing > .hero.hero-tight {
   margin-top: 18px;
 }
 
@@ -4108,11 +4109,13 @@ body.landing-focus-mode .screen-landing > .hero.hero-tight {
 }
 
 /* Landing focus mode */
-body.landing-focus-mode [data-landing-tutorial] {
+body.landing-focus-mode [data-landing-tutorial],
+html[data-landing-focus="on"] [data-landing-tutorial] {
   display: none !important;
 }
 
-body.landing-focus-mode .landing-docs-full {
+body.landing-focus-mode .landing-docs-full,
+html[data-landing-focus="on"] .landing-docs-full {
   display: none !important;
 }
 
@@ -4120,7 +4123,13 @@ body.landing-focus-mode .landing-docs-full {
   display: none;
 }
 
-body.landing-focus-mode .screen-landing {
+body.landing-focus-mode .landing-docs-footer,
+html[data-landing-focus="on"] .landing-docs-footer {
+  display: block;
+}
+
+body.landing-focus-mode .screen-landing,
+html[data-landing-focus="on"] .screen-landing {
   padding-top: 4px;
   gap: 18px;
 }

@@ -3,8 +3,11 @@
  */
 import { getWalletCount } from "./device-wallet.mjs";
 import { loadPins } from "./device-pins.mjs";
-
-const FOCUS_KEY = "hc_landing_focus";
+import {
+  isLandingFocusModeFromStorage,
+  landingFocusDatasetValue,
+  LANDING_FOCUS_KEY,
+} from "./landing-focus-boot-core.mjs";
 
 const toggle = document.getElementById("landing-focus-toggle");
 const docsFull = document.getElementById("landing-docs-full");
@@ -15,14 +18,16 @@ function hasDeviceData() {
 }
 
 function isFocusMode() {
-  const stored = localStorage.getItem(FOCUS_KEY);
-  if (stored === "0") return false;
-  if (stored === "1") return true;
-  return hasDeviceData();
+  try {
+    return isLandingFocusModeFromStorage((key) => localStorage.getItem(key));
+  } catch {
+    return hasDeviceData();
+  }
 }
 
 function applyFocus() {
   const on = isFocusMode();
+  document.documentElement.dataset.landingFocus = landingFocusDatasetValue(on);
   document.body.classList.toggle("landing-focus-mode", on);
   if (docsFull) docsFull.hidden = on;
   if (docsFooter) docsFooter.hidden = !on;
@@ -41,16 +46,15 @@ function applyFocus() {
 
 toggle?.addEventListener("click", () => {
   const on = !document.body.classList.contains("landing-focus-mode");
-  localStorage.setItem(FOCUS_KEY, on ? "1" : "0");
+  localStorage.setItem(LANDING_FOCUS_KEY, on ? "1" : "0");
   applyFocus();
 });
 
 window.addEventListener("hc-device-hub-changed", () => {
-  if (localStorage.getItem(FOCUS_KEY) === null && hasDeviceData()) {
-    localStorage.setItem(FOCUS_KEY, "1");
+  if (localStorage.getItem(LANDING_FOCUS_KEY) === null && hasDeviceData()) {
+    localStorage.setItem(LANDING_FOCUS_KEY, "1");
   }
   applyFocus();
 });
 
-// Strangers stay in intro mode until they save a card or pin (P2).
 applyFocus();
