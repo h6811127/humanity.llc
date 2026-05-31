@@ -150,6 +150,9 @@ const printGlitchSectionEl = document.getElementById("shop-customize-print-glitc
 const printGlitchLeadEl = document.getElementById("shop-customize-print-glitch-lead");
 const printGlitchCaptionEl = document.getElementById("shop-customize-print-glitch-caption");
 const printGlitchImageEl = document.getElementById("shop-customize-print-glitch-image");
+const printGlitchExampleSummaryEl = document.getElementById(
+  "shop-customize-print-glitch-example-summary"
+);
 
 /** @type {Record<string, unknown> | null} */
 let shopConfig = null;
@@ -558,6 +561,9 @@ function syncProductCopy(product) {
   if (showPrintGlitch) {
     const callout = SHOP_GLITCH_PRINT_ARTIFACT_CALLOUT;
     if (printGlitchLeadEl) printGlitchLeadEl.textContent = callout.lead;
+    if (printGlitchExampleSummaryEl) {
+      printGlitchExampleSummaryEl.textContent = callout.exampleSummary ?? "See example";
+    }
     if (printGlitchCaptionEl) printGlitchCaptionEl.textContent = callout.caption;
     if (printGlitchImageEl) {
       printGlitchImageEl.src = callout.imageSrc;

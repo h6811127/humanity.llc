@@ -20,6 +20,9 @@ describe("shop-copy-core", () => {
     expect(hubHtml).not.toMatch(/Ready to order/i);
     expect(hubHtml).not.toMatch(/—/);
     expect(hubHtml).toContain("Chromatic glitch units");
+    expect(hubHtml).toContain("See example");
+    expect(hubHtml).toContain("glitch-print-chromatic-unit-example");
+    expect(hubHtml).not.toContain("glitch-hoodie-live-object-white-card");
     expect(foundingHtml).not.toMatch(/Ready to order/i);
     expect(foundingHtml).toContain('id="shop-checkout-lead"');
     expect(foundingHtml).toContain("restore root card and");

@@ -148,18 +148,20 @@ export const SHOP_CUSTOMIZE_HERO_DEFAULT = {
   lead: "Your unique QR on the garment. Change what strangers read from your phone; the ink stays the same.",
 };
 
-/** White-card LIVE OBJECT QR art (same frame as customize / Printify fulfillment). */
-export const GLITCH_HOODIE_WHITE_CARD_ART_SRC =
-  "/images/merch/printify-art/glitch-hoodie-live-object-white-card.png";
+/** Founding-run chromatic glitch unit (red/blue QR modules on white card). */
+export const GLITCH_PRINT_CHROMATIC_UNIT_EXAMPLE_SRC =
+  "/assets/glitch-print-chromatic-unit-example.png";
 
 export const SHOP_GLITCH_PRINT_ARTIFACT_CALLOUT = {
   title: "Chromatic glitch units",
   lead:
     "Some founding hoodies arrive with a production artifact we still see on Printify runs: part of the QR modules print in blue or purple on fabric instead of red. We treat these as limited variance in the batch, not misprints to hide.",
+  exampleSummary: "See example",
   caption:
-    "White card print reference. On fabric, chromatic units may shift blue or purple and scan less reliably.",
-  imageSrc: GLITCH_HOODIE_WHITE_CARD_ART_SRC,
-  imageAlt: "Humanity LIVE OBJECT QR on a white card with red border",
+    "Founding-run example. Scanning may be harder or impossible depending on camera and light. The ink is still yours; the glitch is the edition.",
+  imageSrc: GLITCH_PRINT_CHROMATIC_UNIT_EXAMPLE_SRC,
+  imageAlt:
+    "LIVE OBJECT QR with chromatic glitch: red and blue modules on a white card with red border",
 };
 
 /** @type {CustomizeHeroCopy} */

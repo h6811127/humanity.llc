@@ -41,8 +41,9 @@ describe("shop-merch-copy-core", () => {
 
   it("exposes Glitch print artifact callout for store and customizer", () => {
     expect(SHOP_GLITCH_PRINT_ARTIFACT_CALLOUT.lead).toMatch(/blue or purple/i);
+    expect(SHOP_GLITCH_PRINT_ARTIFACT_CALLOUT.exampleSummary).toBe("See example");
     expect(SHOP_GLITCH_PRINT_ARTIFACT_CALLOUT.imageSrc).toMatch(
-      /glitch-hoodie-live-object-white-card/
+      /glitch-print-chromatic-unit-example/
     );
   });
 
