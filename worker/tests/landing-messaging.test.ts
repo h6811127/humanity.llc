@@ -42,10 +42,10 @@ describe("landing messaging (Step 3)", () => {
     expect(html).toContain("One primitive, many uses");
     expect(html).toContain("hoodie displaying today's mood");
     expect(html).toContain("trust you can check (what the scan shows right now)");
-    expect(html).toContain("shared trust layer for the internet");
-    expect(html).toContain("portable belonging and vouching at internet scale");
-    expect(html).toContain("rules they can inspect");
+    expect(html).toContain("an experiment in portable trust and revocable public identity");
+    expect(html).toContain("belonging and vouching you can inspect");
     expect(html).toContain("one network, many networks, or both");
+    expect(html).not.toContain("shared trust layer for the internet");
     expect(html).not.toContain("online social democracy");
     expect(html).not.toContain("one company's feed");
     expect(html).toContain("See what's live");
