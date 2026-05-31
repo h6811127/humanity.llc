@@ -3,7 +3,7 @@
  * @see docs/EPHEMERAL_STATE_AND_MERCH.md § Next step 2
  * @see docs/ROOT_CARD_AND_CHILD_OBJECTS.md § Custody and recovery
  */
-import { rootHasChildObjectBackupSeatbelt } from "./child-object-backup-gate-core.mjs";
+import { ownershipBackupSeatbeltSatisfied } from "./created-first-session-gate-core.mjs";
 
 /**
  * @param {Record<string, unknown>} entry
@@ -50,19 +50,40 @@ export function loadRootSessionRecordForMerch(storage = globalThis) {
 }
 
 /**
- * @param {Record<string, unknown> | null | undefined} session
+ * Wallet row for the active merch session (tab session may omit seatbelt markers).
+ * @param {string} profileId
+ * @param {Pick<Window, "localStorage">} [storage]
+ * @returns {Record<string, unknown> | null}
  */
-export function shouldShowMerchBackupNudge(session) {
+function findWalletEntryForMerchSession(profileId, storage = globalThis) {
+  const localStorage = storage.localStorage;
+  if (!profileId || !localStorage) return null;
+  try {
+    const wallet = JSON.parse(localStorage.getItem("hc_wallet") || "[]");
+    if (!Array.isArray(wallet)) return null;
+    return wallet.find((entry) => entry?.profile_id === profileId) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * @param {Record<string, unknown> | null | undefined} session
+ * @param {Pick<Window, "localStorage">} [storage]
+ */
+export function shouldShowMerchBackupNudge(session, storage = globalThis) {
   if (!session?.profile_id) return false;
-  return !rootHasChildObjectBackupSeatbelt(session);
+  const walletEntry = findWalletEntryForMerchSession(String(session.profile_id), storage);
+  return !ownershipBackupSeatbeltSatisfied(session, walletEntry);
 }
 
 /**
  * Pre-checkout recovery gate — blocks Tier 1 checkout until seatbelt is satisfied.
  * @param {Record<string, unknown> | null | undefined} session
+ * @param {Pick<Window, "localStorage">} [storage]
  */
-export function merchPreCheckoutRecoveryGateState(session) {
-  const blocked = shouldShowMerchBackupNudge(session);
+export function merchPreCheckoutRecoveryGateState(session, storage = globalThis) {
+  const blocked = shouldShowMerchBackupNudge(session, storage);
   return { blocked, shown: blocked };
 }
 

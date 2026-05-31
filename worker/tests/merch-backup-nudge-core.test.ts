@@ -68,4 +68,30 @@ describe("merch-backup-nudge-core", () => {
     };
     expect(loadRootSessionRecordForMerch(storage)?.profile_id).toBe("fromCreated");
   });
+
+  it("does not block when wallet row has seatbelt but tab session does not", () => {
+    const storage = {
+      localStorage: {
+        getItem(key: string) {
+          if (key !== "hc_wallet") return null;
+          return JSON.stringify([
+            {
+              profile_id: "fromCreated",
+              owner_private_key_b58: "k",
+              recovery_key_acknowledged: true,
+            },
+          ]);
+        },
+      },
+    };
+    const session = {
+      profile_id: "fromCreated",
+      owner_private_key_b58: "k",
+    };
+    expect(shouldShowMerchBackupNudge(session, storage)).toBe(false);
+    expect(merchPreCheckoutRecoveryGateState(session, storage)).toEqual({
+      blocked: false,
+      shown: false,
+    });
+  });
 });

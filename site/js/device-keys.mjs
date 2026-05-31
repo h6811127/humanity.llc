@@ -1,3 +1,4 @@
+import { mergeOwnershipSeatbeltFields } from "./created-first-session-gate-core.mjs";
 import { logDeviceActivity, walletEntryForActivity } from "./device-activity.mjs";
 import { navigateTo } from "./device-shell-motion.mjs";
 import { setLastActiveProfileId } from "./device-quiet-tab-rehydrate-prefs.mjs";
@@ -87,22 +88,27 @@ export function clearTabSessionKeys() {
 /** @param {Record<string, unknown>} entry */
 export function activateWalletEntry(entry) {
   const qrId = walletEntryQrId(entry);
-  setTabSession({
-    profile_id: entry.profile_id,
-    qr_id: qrId,
-    handle: entry.handle,
-    manifesto_line: entry.manifesto_line,
-    scan_url: entry.scan_url,
-    owner_public_key_b58: entry.owner_public_key_b58,
-    owner_private_key_b58: entry.owner_private_key_b58,
-    recovery_public_key_b58: entry.recovery_public_key_b58,
-    recovery_private_key_b58: entry.recovery_private_key_b58,
-    qr_expires_at: entry.qr_expires_at,
-    status: entry.status || "active",
-    verification: entry.verification,
-    issued_vouches: entry.issued_vouches || [],
-    wallet_label: entry.label,
-  });
+  setTabSession(
+    mergeOwnershipSeatbeltFields(
+      {
+        profile_id: entry.profile_id,
+        qr_id: qrId,
+        handle: entry.handle,
+        manifesto_line: entry.manifesto_line,
+        scan_url: entry.scan_url,
+        owner_public_key_b58: entry.owner_public_key_b58,
+        owner_private_key_b58: entry.owner_private_key_b58,
+        recovery_public_key_b58: entry.recovery_public_key_b58,
+        recovery_private_key_b58: entry.recovery_private_key_b58,
+        qr_expires_at: entry.qr_expires_at,
+        status: entry.status || "active",
+        verification: entry.verification,
+        issued_vouches: entry.issued_vouches || [],
+        wallet_label: entry.label,
+      },
+      entry
+    )
+  );
   setLastActiveProfileId(String(entry.profile_id || ""));
   logDeviceActivity("use_keys", entry.label || entry.handle || String(entry.profile_id).slice(0, 12), {
     profile_id: entry.profile_id,
