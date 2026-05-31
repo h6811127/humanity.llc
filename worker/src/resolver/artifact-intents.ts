@@ -28,6 +28,7 @@ interface ArtifactIntentRequest {
   print_template_id?: unknown;
   quantity?: unknown;
   shopify_variant_id?: unknown;
+  print_variant_id?: unknown;
   proof_acknowledged?: unknown;
 }
 
@@ -96,6 +97,7 @@ function artifactIntentResponse(
     planned_item_qr_ids: plannedItemQrIds,
     planned_print_artifact_ids: plannedPrintArtifactIds,
     product_id: row.product_id,
+    print_variant_id: row.print_variant_id,
     shopify_variant_id: shopifyVariantId,
     quantity: row.quantity,
     preview_url: `${origin}/print/previews/${row.artifact_intent_id}`,
@@ -124,6 +126,9 @@ function shopifyCartMetadata(row: ArtifactIntentRow, printTemplateId: string | n
         value: plannedPrintArtifactIds.join(","),
       },
       ...(row.product_id ? [{ key: "product_id", value: row.product_id }] : []),
+      ...(row.print_variant_id
+        ? [{ key: "print_variant_id", value: row.print_variant_id }]
+        : []),
       ...(templateId ? [{ key: "print_template_id", value: templateId }] : []),
     ],
     order_note_attributes: [
@@ -236,6 +241,10 @@ export async function handlePostArtifactIntent(
     typeof body.shopify_variant_id === "string" && body.shopify_variant_id.trim()
       ? body.shopify_variant_id.trim()
       : null;
+  const printVariantId =
+    typeof body.print_variant_id === "string" && body.print_variant_id.trim()
+      ? body.print_variant_id.trim()
+      : null;
 
   if (!PROFILE_ID_REGEX.test(profileId)) {
     return errorResponse("INVALID_PROFILE_ID", "Invalid profile_id.", 422);
@@ -290,6 +299,7 @@ export async function handlePostArtifactIntent(
     profile_id: profileId,
     source_qr_id: sourceQrId,
     product_id: productId,
+    print_variant_id: printVariantId,
     quantity,
     planned_item_qr_ids: plannedItemQrIds,
     planned_print_artifact_ids: plannedPrintArtifactIds,
@@ -303,6 +313,7 @@ export async function handlePostArtifactIntent(
     profile_id: profileId,
     source_qr_id: sourceQrId,
     product_id: productId,
+    print_variant_id: printVariantId,
     quantity,
     planned_item_qr_ids_json: JSON.stringify(plannedItemQrIds),
     planned_print_artifact_ids_json: JSON.stringify(plannedPrintArtifactIds),

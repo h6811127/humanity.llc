@@ -12,9 +12,11 @@ const PRINTIFY_API_BASE = "https://api.printify.com/v1";
 export interface PrintifySubmitInput {
   print_order_id: string;
   template_id: string;
+  profile_id: string;
   planned_item_qr_ids: string[];
   shipping_address: PrintifyShippingAddress;
   quantity: number;
+  print_variant_id?: string | null;
 }
 
 export interface PrintifySubmitResult {
@@ -135,6 +137,7 @@ export async function submitPrintifyOrder(
       profile_id: input.profile_id,
       planned_item_qr_ids: input.planned_item_qr_ids,
       quantity: input.quantity,
+      print_variant_id: input.print_variant_id,
     },
     shopId,
     fetchImpl

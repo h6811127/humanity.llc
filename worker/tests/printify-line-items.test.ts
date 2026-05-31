@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { DEFAULT_PRINT_TEMPLATE_ID } from "../src/print/print-catalog";
+import { DEFAULT_PRINT_TEMPLATE_ID, GLITCH_HOODIE_TEMPLATE_ID } from "../src/print/print-catalog";
 import { preparePrintifyLineItems } from "../src/print/printify-line-items";
 
 const SCAN_URL =
@@ -134,5 +134,61 @@ describe("preparePrintifyLineItems", () => {
     const decoded = atob(uploadBody.contents ?? "");
     expect(decoded).toContain("svg");
     expect(SCAN_URL).toContain("qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5");
+  });
+
+  it("uses print_variant_id matrix for Glitch hoodie Printify variant", async () => {
+    const calls: { url: string; body: unknown }[] = [];
+    const fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
+      const body = init?.body ? JSON.parse(String(init.body)) : null;
+      calls.push({ url, body });
+      if (url.endsWith("/uploads/images.json")) {
+        return new Response(JSON.stringify({ id: "upload_glitch" }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      if (url.includes("/products.json")) {
+        return new Response(JSON.stringify({ id: "prod_glitch_ephemeral" }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      return new Response("unexpected", { status: 500 });
+    });
+
+    const result = await preparePrintifyLineItems(
+      {
+        PRINTIFY_API_TOKEN: "token",
+        PERSONALIZE_GLITCH_HOODIE_PRINTIFY_PRODUCT_ID: "6a18a4d17f274f4c3e04f646",
+        PERSONALIZE_GLITCH_HOODIE_PRINTIFY_VARIANT_ID: "68861",
+        PERSONALIZE_GLITCH_HOODIE_PRINTIFY_BLUEPRINT_ID: "528",
+        PERSONALIZE_GLITCH_HOODIE_PRINTIFY_PRINT_PROVIDER_ID: "99",
+        PERSONALIZE_GLITCH_HOODIE_PRINTIFY_PLACEHOLDER: "front",
+      },
+      {
+        print_order_id: "po_test123456789012345",
+        template_id: GLITCH_HOODIE_TEMPLATE_ID,
+        profile_id: "nSVXWPqgRFEhGPjxyRzidF6s",
+        planned_item_qr_ids: ["qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5"],
+        quantity: 1,
+        print_variant_id: "white-xl",
+      },
+      99,
+      fetchMock
+    );
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.line_items[0]?.variant_id).toBe(68884);
+    }
+
+    const productCall = calls.find((c) => c.url.includes("/products.json"))!;
+    expect(productCall.body).toMatchObject({
+      print_areas: [
+        {
+          placeholders: [{ position: "back" }],
+        },
+      ],
+    });
   });
 });

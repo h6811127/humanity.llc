@@ -5371,7 +5371,11 @@ html[data-landing-focus="on"] .screen-landing {
 }
 
 .shop-customize-preview-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   margin-bottom: 18px;
+  width: 100%;
 }
 
 .shop-customize-mock {
@@ -5417,6 +5421,157 @@ html[data-landing-focus="on"] .screen-landing {
   box-shadow:
     0 20px 44px rgba(0, 0, 0, 0.28),
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.shop-customize-mock--printify-gallery {
+  max-width: min(100%, 360px);
+}
+
+.shop-customize-mock__printify {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.shop-customize-print-frame {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.shop-customize-print-frame-label {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(60, 60, 67, 0.72);
+}
+
+.shop-customize-print-frame-row .create-template-btn.is-active {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.shop-customize-print-frame-warning {
+  margin: 0;
+}
+
+.shop-customize-print-frame-hint {
+  margin: 0;
+  font-size: 13px;
+}
+
+.shop-customize-mock__photo-wrap {
+  position: relative;
+  display: block;
+}
+
+.shop-customize-mock__photo-wrap--qr-transparent {
+  background-color: var(--hc-glitch-garment-swatch, #3a3a3c);
+  border-radius: 16px;
+}
+
+.shop-customize-mock__photo-wrap--garment-swatch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: min(56vw, 240px);
+  aspect-ratio: 4 / 5;
+  background-color: var(--hc-glitch-garment-swatch, #3a3a3c);
+  border-radius: 16px;
+}
+
+.shop-customize-mock__photo-wrap--garment-swatch .shop-customize-mock__photo {
+  display: none;
+}
+
+.shop-customize-planned-qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 360px;
+  margin: 16px auto 0;
+  padding: 0 12px;
+  box-sizing: border-box;
+}
+
+.shop-customize-planned-qr[hidden] {
+  display: none !important;
+}
+
+.shop-customize-planned-qr__label {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(60, 60, 67, 0.72);
+  text-align: center;
+}
+
+.shop-customize-planned-qr__hint {
+  margin: 0;
+  max-width: 28rem;
+  font-size: 13px;
+  text-align: center;
+}
+
+.shop-customize-planned-qr__img {
+  display: block;
+  width: min(72vw, 200px);
+  height: auto;
+  margin: 0 auto;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+  transition: opacity 140ms ease-out;
+}
+
+.shop-customize-planned-qr__img.is-loading {
+  opacity: 0.45;
+}
+
+.shop-customize-planned-qr__img[hidden] {
+  display: none;
+}
+
+.shop-customize-mock__photo {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+  background: #101010;
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.12);
+  transition: opacity 160ms ease-out;
+}
+
+.shop-customize-mock__printify.is-loading-photo .shop-customize-mock__photo {
+  opacity: 0.72;
+}
+
+.shop-customize-mock__view-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+
+.shop-customize-mock-view-btn {
+  font-size: 12px;
+  padding: 6px 10px;
+  min-height: 0;
+}
+
+.shop-customize-mock--printify-gallery .shop-customize-mock__garment {
+  display: none;
+}
+
+.shop-customize-mock--printify-gallery .shop-customize-mock__vessel {
+  display: none !important;
 }
 
 .shop-customize-mock[data-preview="glitch_hoodie"] .shop-customize-mock__hoodie-neck {

@@ -1,0 +1,311 @@
+{
+  "product_id": "glitch_hoodie_v1",
+  "printify_product_id": "6a18a4d17f274f4c3e04f646",
+  "printify_transparent_product_id": "6a1c4fc1efb0c6a8580cdd93",
+  "generated_at": "2026-05-31T15:55:13.330Z",
+  "representative_size": "M",
+  "default_view": "back",
+  "by_color": {
+    "Black": {
+      "printify_variant_id": 68861,
+      "default_view": "back",
+      "mockups": [
+        {
+          "view_id": "back",
+          "camera_label": "back",
+          "position": "back",
+          "label": "Back",
+          "src": "https://images-api.printify.com/mockup/6a18a4d17f274f4c3e04f646/68869/109445/champion-hoodie.jpg?camera_label=back",
+          "is_default": false,
+          "src_transparent": "https://images-api.printify.com/mockup/6a1c4fc1efb0c6a8580cdd93/68869/109445/copy-of-champion-hoodie.jpg?camera_label=back",
+          "local_src_blank": "/images/glitch-mockups/black-blank-back.png"
+        },
+        {
+          "view_id": "front",
+          "camera_label": "front",
+          "position": "front",
+          "label": "Front",
+          "src": "https://images-api.printify.com/mockup/6a18a4d17f274f4c3e04f646/68869/109444/champion-hoodie.jpg?camera_label=front",
+          "is_default": true,
+          "src_transparent": "https://images-api.printify.com/mockup/6a1c4fc1efb0c6a8580cdd93/68869/109444/copy-of-champion-hoodie.jpg?camera_label=front"
+        },
+        {
+          "view_id": "person-1-lifestyle",
+          "camera_label": "person-1-lifestyle",
+          "position": "other",
+          "label": "On model",
+          "src": "https://images-api.printify.com/mockup/6a18a4d17f274f4c3e04f646/68869/109446/champion-hoodie.jpg?camera_label=person-1-lifestyle",
+          "is_default": false,
+          "src_transparent": "https://images-api.printify.com/mockup/6a1c4fc1efb0c6a8580cdd93/68869/109446/copy-of-champion-hoodie.jpg?camera_label=person-1-lifestyle"
+        },
+        {
+          "view_id": "person-2-lifestyle",
+          "camera_label": "person-2-lifestyle",
+          "position": "other",
+          "label": "On model 2",
+          "src": "https://images-api.printify.com/mockup/6a18a4d17f274f4c3e04f646/68869/109447/champion-hoodie.jpg?camera_label=person-2-lifestyle",
+          "is_default": false,
+          "src_transparent": "https://images-api.printify.com/mockup/6a1c4fc1efb0c6a8580cdd93/68869/109447/copy-of-champion-hoodie.jpg?camera_label=person-2-lifestyle"
+        }
+      ]
+    },
+    "Charcoal Heather": {
+      "printify_variant_id": 68862,
+      "default_view": "back",
+      "mockups": [
+        {
+          "view_id": "back",
+          "camera_label": "back",
+          "position": "back",
+          "label": "Back",
+          "src": "https://images-api.printify.com/mockup/6a18a4d17f274f4c3e04f646/68870/109445/champion-hoodie.jpg?camera_label=back",
+          "is_default": false,
+          "src_transparent": "https://images-api.printify.com/mockup/6a1c4fc1efb0c6a8580cdd93/68870/109445/copy-of-champion-hoodie.jpg?camera_label=back",
+          "local_src_blank": "/images/glitch-mockups/charcoal-heather-blank-back.png"
+        },
+        {
+          "view_id": "front",
+          "camera_label": "front",
+          "position": "front",
+          "label": "Front",
+          "src": "https://images-api.printify.com/mockup/6a18a4d17f274f4c3e04f646/68870/109444/champion-hoodie.jpg?camera_label=front",
+          "is_default": true,
+          "src_transparent": "https://images-api.printify.com/mockup/6a1c4fc1efb0c6a8580cdd93/68870/109444/copy-of-champion-hoodie.jpg?camera_label=front"
+        },
+        {
+          "view_id": "person-1-lifestyle",
+          "camera_label": "person-1-lifestyle",
+          "position": "other",
+          "label": "On model",
+          "src": "https://images-api.printify.com/mockup/6a18a4d17f274f4c3e04f646/68870/109446/champion-hoodie.jpg?camera_label=person-1-lifestyle",
+          "is_default": false,
+          "src_transparent": "https://images-api.printify.com/mockup/6a1c4fc1efb0c6a8580cdd93/68870/109446/copy-of-champion-hoodie.jpg?camera_label=person-1-lifestyle"
+        },
+        {
+          "view_id": "person-2-lifestyle",
+          "camera_label": "person-2-lifestyle",
+          "position": "other",
+          "label": "On model 2",
+          "src": "https://images-api.printify.com/mockup/6a18a4d17f274f4c3e04f646/68870/109447/champion-hoodie.jpg?camera_label=person-2-lifestyle",
+          "is_default": false,
+          "src_transparent": "https://images-api.printify.com/mockup/6a1c4fc1efb0c6a8580cdd93/68870/109447/copy-of-champion-hoodie.jpg?camera_label=person-2-lifestyle"
+        }
+      ]
+    },
+    "Light Steel": {
+      "printify_variant_id": 68863,
+      "default_view": "back",
+      "mockups": [
+        {
+          "view_id": "back",
+          "camera_label": "back",
+          "position": "back",
+          "label": "Back",
+          "src": "https://images-api.printify.com/mockup/6a18a4d17f274f4c3e04f646/68871/109445/champion-hoodie.jpg?camera_label=back",
+          "is_default": false,
+          "src_transparent": "https://images-api.printify.com/mockup/6a1c4fc1efb0c6a8580cdd93/68871/109445/copy-of-champion-hoodie.jpg?camera_label=back",
+          "local_src_blank": "/images/glitch-mockups/light-steel-blank-back.png"
+        },
+        {
+          "view_id": "front",
+          "camera_label": "front",
+          "position": "front",
+          "label": "Front",
+          "src": "https://images-api.printify.com/mockup/6a18a4d17f274f4c3e04f646/68871/109444/champion-hoodie.jpg?camera_label=front",
+          "is_default": true,
+          "src_transparent": "https://images-api.printify.com/mockup/6a1c4fc1efb0c6a8580cdd93/68871/109444/copy-of-champion-hoodie.jpg?camera_label=front"
+        },
+        {
+          "view_id": "person-1-lifestyle",
+          "camera_label": "person-1-lifestyle",
+          "position": "other",
+          "label": "On model",
+          "src": "https://images-api.printify.com/mockup/6a18a4d17f274f4c3e04f646/68871/109446/champion-hoodie.jpg?camera_label=person-1-lifestyle",
+          "is_default": false,
+          "src_transparent": "https://images-api.printify.com/mockup/6a1c4fc1efb0c6a8580cdd93/68871/109446/copy-of-champion-hoodie.jpg?camera_label=person-1-lifestyle"
+        },
+        {
+          "view_id": "person-2-lifestyle",
+          "camera_label": "person-2-lifestyle",
+          "position": "other",
+          "label": "On model 2",
+          "src": "https://images-api.printify.com/mockup/6a18a4d17f274f4c3e04f646/68871/109447/champion-hoodie.jpg?camera_label=person-2-lifestyle",
+          "is_default": false,
+          "src_transparent": "https://images-api.printify.com/mockup/6a1c4fc1efb0c6a8580cdd93/68871/109447/copy-of-champion-hoodie.jpg?camera_label=person-2-lifestyle"
+        }
+      ]
+    },
+    "Navy": {
+      "printify_variant_id": 68865,
+      "default_view": "back",
+      "mockups": [
+        {
+          "view_id": "back",
+          "camera_label": "back",
+          "position": "back",
+          "label": "Back",
+          "src": "https://images-api.printify.com/mockup/6a18a4d17f274f4c3e04f646/68873/109445/champion-hoodie.jpg?camera_label=back",
+          "is_default": false,
+          "src_transparent": "https://images-api.printify.com/mockup/6a1c4fc1efb0c6a8580cdd93/68873/109445/copy-of-champion-hoodie.jpg?camera_label=back",
+          "local_src_blank": "/images/glitch-mockups/navy-blank-back.png"
+        },
+        {
+          "view_id": "front",
+          "camera_label": "front",
+          "position": "front",
+          "label": "Front",
+          "src": "https://images-api.printify.com/mockup/6a18a4d17f274f4c3e04f646/68873/109444/champion-hoodie.jpg?camera_label=front",
+          "is_default": true,
+          "src_transparent": "https://images-api.printify.com/mockup/6a1c4fc1efb0c6a8580cdd93/68873/109444/copy-of-champion-hoodie.jpg?camera_label=front"
+        },
+        {
+          "view_id": "person-1-lifestyle",
+          "camera_label": "person-1-lifestyle",
+          "position": "other",
+          "label": "On model",
+          "src": "https://images-api.printify.com/mockup/6a18a4d17f274f4c3e04f646/68873/109446/champion-hoodie.jpg?camera_label=person-1-lifestyle",
+          "is_default": false,
+          "src_transparent": "https://images-api.printify.com/mockup/6a1c4fc1efb0c6a8580cdd93/68873/109446/copy-of-champion-hoodie.jpg?camera_label=person-1-lifestyle"
+        },
+        {
+          "view_id": "person-2-lifestyle",
+          "camera_label": "person-2-lifestyle",
+          "position": "other",
+          "label": "On model 2",
+          "src": "https://images-api.printify.com/mockup/6a18a4d17f274f4c3e04f646/68873/109447/champion-hoodie.jpg?camera_label=person-2-lifestyle",
+          "is_default": false,
+          "src_transparent": "https://images-api.printify.com/mockup/6a1c4fc1efb0c6a8580cdd93/68873/109447/copy-of-champion-hoodie.jpg?camera_label=person-2-lifestyle"
+        }
+      ]
+    },
+    "Royal Blue": {
+      "printify_variant_id": 68867,
+      "default_view": "back",
+      "mockups": [
+        {
+          "view_id": "back",
+          "camera_label": "back",
+          "position": "back",
+          "label": "Back",
+          "src": "https://images-api.printify.com/mockup/6a18a4d17f274f4c3e04f646/68875/109445/champion-hoodie.jpg?camera_label=back",
+          "is_default": false,
+          "src_transparent": "https://images-api.printify.com/mockup/6a1c4fc1efb0c6a8580cdd93/68875/109445/copy-of-champion-hoodie.jpg?camera_label=back",
+          "local_src_blank": "/images/glitch-mockups/royal-blue-blank-back.png"
+        },
+        {
+          "view_id": "front",
+          "camera_label": "front",
+          "position": "front",
+          "label": "Front",
+          "src": "https://images-api.printify.com/mockup/6a18a4d17f274f4c3e04f646/68875/109444/champion-hoodie.jpg?camera_label=front",
+          "is_default": true,
+          "src_transparent": "https://images-api.printify.com/mockup/6a1c4fc1efb0c6a8580cdd93/68875/109444/copy-of-champion-hoodie.jpg?camera_label=front"
+        },
+        {
+          "view_id": "person-1-lifestyle",
+          "camera_label": "person-1-lifestyle",
+          "position": "other",
+          "label": "On model",
+          "src": "https://images-api.printify.com/mockup/6a18a4d17f274f4c3e04f646/68875/109446/champion-hoodie.jpg?camera_label=person-1-lifestyle",
+          "is_default": false,
+          "src_transparent": "https://images-api.printify.com/mockup/6a1c4fc1efb0c6a8580cdd93/68875/109446/copy-of-champion-hoodie.jpg?camera_label=person-1-lifestyle"
+        },
+        {
+          "view_id": "person-2-lifestyle",
+          "camera_label": "person-2-lifestyle",
+          "position": "other",
+          "label": "On model 2",
+          "src": "https://images-api.printify.com/mockup/6a18a4d17f274f4c3e04f646/68875/109447/champion-hoodie.jpg?camera_label=person-2-lifestyle",
+          "is_default": false,
+          "src_transparent": "https://images-api.printify.com/mockup/6a1c4fc1efb0c6a8580cdd93/68875/109447/copy-of-champion-hoodie.jpg?camera_label=person-2-lifestyle"
+        }
+      ]
+    },
+    "Stone Grey": {
+      "printify_variant_id": 117855,
+      "default_view": "back",
+      "mockups": [
+        {
+          "view_id": "back",
+          "camera_label": "back",
+          "position": "back",
+          "label": "Back",
+          "src": "https://images-api.printify.com/mockup/6a18a4d17f274f4c3e04f646/117856/109445/champion-hoodie.jpg?camera_label=back",
+          "is_default": false,
+          "src_transparent": "https://images-api.printify.com/mockup/6a1c4fc1efb0c6a8580cdd93/117856/109445/copy-of-champion-hoodie.jpg?camera_label=back",
+          "local_src_blank": "/images/glitch-mockups/stone-grey-blank-back.png"
+        },
+        {
+          "view_id": "front",
+          "camera_label": "front",
+          "position": "front",
+          "label": "Front",
+          "src": "https://images-api.printify.com/mockup/6a18a4d17f274f4c3e04f646/117856/109444/champion-hoodie.jpg?camera_label=front",
+          "is_default": true,
+          "src_transparent": "https://images-api.printify.com/mockup/6a1c4fc1efb0c6a8580cdd93/117856/109444/copy-of-champion-hoodie.jpg?camera_label=front"
+        },
+        {
+          "view_id": "person-1-lifestyle",
+          "camera_label": "person-1-lifestyle",
+          "position": "other",
+          "label": "On model",
+          "src": "https://images-api.printify.com/mockup/6a18a4d17f274f4c3e04f646/117856/109446/champion-hoodie.jpg?camera_label=person-1-lifestyle",
+          "is_default": false,
+          "src_transparent": "https://images-api.printify.com/mockup/6a1c4fc1efb0c6a8580cdd93/117856/109446/copy-of-champion-hoodie.jpg?camera_label=person-1-lifestyle"
+        },
+        {
+          "view_id": "person-2-lifestyle",
+          "camera_label": "person-2-lifestyle",
+          "position": "other",
+          "label": "On model 2",
+          "src": "https://images-api.printify.com/mockup/6a18a4d17f274f4c3e04f646/117856/109447/champion-hoodie.jpg?camera_label=person-2-lifestyle",
+          "is_default": false,
+          "src_transparent": "https://images-api.printify.com/mockup/6a1c4fc1efb0c6a8580cdd93/117856/109447/copy-of-champion-hoodie.jpg?camera_label=person-2-lifestyle"
+        }
+      ]
+    },
+    "White": {
+      "printify_variant_id": 68868,
+      "default_view": "back",
+      "mockups": [
+        {
+          "view_id": "back",
+          "camera_label": "back",
+          "position": "back",
+          "label": "Back",
+          "src": "https://images-api.printify.com/mockup/6a18a4d17f274f4c3e04f646/68876/109445/champion-hoodie.jpg?camera_label=back",
+          "is_default": false,
+          "src_transparent": "https://images-api.printify.com/mockup/6a1c4fc1efb0c6a8580cdd93/68876/109445/copy-of-champion-hoodie.jpg?camera_label=back",
+          "local_src_blank": "/images/glitch-mockups/white-blank-back.png"
+        },
+        {
+          "view_id": "front",
+          "camera_label": "front",
+          "position": "front",
+          "label": "Front",
+          "src": "https://images-api.printify.com/mockup/6a18a4d17f274f4c3e04f646/68876/109444/champion-hoodie.jpg?camera_label=front",
+          "is_default": true,
+          "src_transparent": "https://images-api.printify.com/mockup/6a1c4fc1efb0c6a8580cdd93/68876/109444/copy-of-champion-hoodie.jpg?camera_label=front"
+        },
+        {
+          "view_id": "person-1-lifestyle",
+          "camera_label": "person-1-lifestyle",
+          "position": "other",
+          "label": "On model",
+          "src": "https://images-api.printify.com/mockup/6a18a4d17f274f4c3e04f646/68876/109446/champion-hoodie.jpg?camera_label=person-1-lifestyle",
+          "is_default": false,
+          "src_transparent": "https://images-api.printify.com/mockup/6a1c4fc1efb0c6a8580cdd93/68876/109446/copy-of-champion-hoodie.jpg?camera_label=person-1-lifestyle"
+        },
+        {
+          "view_id": "person-2-lifestyle",
+          "camera_label": "person-2-lifestyle",
+          "position": "other",
+          "label": "On model 2",
+          "src": "https://images-api.printify.com/mockup/6a18a4d17f274f4c3e04f646/68876/109447/champion-hoodie.jpg?camera_label=person-2-lifestyle",
+          "is_default": false,
+          "src_transparent": "https://images-api.printify.com/mockup/6a1c4fc1efb0c6a8580cdd93/68876/109447/copy-of-champion-hoodie.jpg?camera_label=person-2-lifestyle"
+        }
+      ]
+    }
+  }
+}

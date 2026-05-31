@@ -12,7 +12,7 @@
       content="Preview your LIVE OBJECT QR on a hoodie or sticker, then checkout through humanity.llc. Buying merch does not verify you."
     />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=134" />
+    <link rel="stylesheet" href="/styles.css?v=137" />
   </head>
   <body class="screen-shop-body">
     <div class="page">
@@ -112,10 +112,64 @@
             hidden
           ></div>
 
+          <div id="shop-customize-variant-section" hidden>
+            <h2 class="group-label">Color</h2>
+            <div
+              class="create-template-row shop-customize-variant-row"
+              id="shop-customize-color-row"
+              role="group"
+              aria-label="Color"
+            ></div>
+            <h2 class="group-label">Size</h2>
+            <div
+              class="create-template-row shop-customize-variant-row"
+              id="shop-customize-size-row"
+              role="group"
+              aria-label="Size"
+            ></div>
+            <p class="shop-lead shop-lead-muted" id="shop-customize-variant-note" hidden></p>
+          </div>
+
           <h2 class="group-label">Preview</h2>
           <div class="shop-customize-preview-wrap">
             <div class="shop-customize-mock is-loading" id="shop-customize-mock" data-preview="hoodie">
-              <div class="shop-customize-mock__garment" aria-hidden="true">
+              <div class="shop-customize-mock__printify" id="shop-customize-mock-printify" hidden>
+                <div class="shop-customize-mock__photo-wrap" id="shop-customize-mock-photo-wrap">
+                  <img
+                    class="shop-customize-mock__photo"
+                    id="shop-customize-mock-photo"
+                    alt="Glitch hoodie print preview"
+                    decoding="async"
+                  />
+                </div>
+                <div
+                  class="shop-customize-mock__view-row"
+                  id="shop-customize-mock-views"
+                  role="tablist"
+                  aria-label="Mockup views"
+                ></div>
+              </div>
+              <div class="shop-customize-print-frame" id="shop-customize-print-frame-section" hidden>
+                <p class="shop-customize-print-frame-label">Printed QR background</p>
+                <div
+                  class="create-template-row shop-customize-print-frame-row"
+                  id="shop-customize-print-frame-row"
+                  role="group"
+                  aria-label="Printed QR background"
+                ></div>
+                <div
+                  class="hc-notice hc-notice--warning shop-customize-print-frame-warning"
+                  id="shop-customize-print-frame-warning"
+                  role="alert"
+                  hidden
+                >
+                  <p class="hc-notice-content" id="shop-customize-print-frame-warning-text"></p>
+                </div>
+                <p class="shop-lead shop-lead-muted shop-customize-print-frame-hint" id="shop-customize-print-frame-hint">
+                  Garment mockup above; your planned QR is shown below.
+                </p>
+              </div>
+              <div class="shop-customize-mock__garment" id="shop-customize-mock-garment" aria-hidden="true">
                 <span class="shop-customize-mock__hoodie-neck" aria-hidden="true"></span>
                 <span class="shop-customize-mock__glitch-art" aria-hidden="true">
                   <span class="shop-customize-mock__glitch-word">GLITCH</span>
@@ -157,6 +211,20 @@
                   </p>
                 </div>
               </div>
+            </div>
+            <div class="shop-customize-planned-qr" id="shop-customize-planned-qr" hidden>
+              <p class="shop-customize-planned-qr__label">QR for this hoodie (not your card QR)</p>
+              <p class="shop-lead shop-lead-muted shop-customize-planned-qr__hint">
+                Separate code under your card. Scans as live only after checkout — not while customizing.
+              </p>
+              <img
+                class="shop-customize-planned-qr__img"
+                id="shop-customize-planned-qr-img"
+                alt=""
+                width="168"
+                height="210"
+                decoding="async"
+              />
             </div>
             <p
               class="shop-lead shop-customize-preview-note shop-customize-arrive-item"
@@ -311,6 +379,6 @@
         </section>
       </main>
     </div>
-    <script src="/js/shop-customize.mjs?v=10" type="module"></script>
+    <script src="/js/shop-customize.mjs?v=16" type="module"></script>
   </body>
 </html>

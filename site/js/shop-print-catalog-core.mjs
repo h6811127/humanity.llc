@@ -79,16 +79,20 @@ export function mergePersonalizeWithCatalog(config, catalogProducts) {
     if (!catalogEntry) continue;
 
     const catalogVariants = Array.isArray(catalogEntry.variants) ? catalogEntry.variants : [];
-    const enabledVariant = catalogVariants.find((variant) => variant && variant.enabled !== false);
+    const hasVariantMatrix =
+      configProduct.variant_matrix === "glitch_hoodie_v1" ||
+      configProduct.product_id === "glitch_hoodie_v1";
     const configuredVariant =
       typeof configProduct.print_variant_id === "string"
         ? configProduct.print_variant_id.trim()
         : "";
-    const printVariantId =
-      configuredVariant ||
-      (enabledVariant && typeof enabledVariant.variant_id === "string"
-        ? enabledVariant.variant_id
-        : "");
+    const enabledVariant = catalogVariants.find((variant) => variant && variant.enabled !== false);
+    const printVariantId = hasVariantMatrix
+      ? ""
+      : configuredVariant ||
+        (enabledVariant && typeof enabledVariant.variant_id === "string"
+          ? enabledVariant.variant_id
+          : "");
 
     merged.push({
       ...configProduct,

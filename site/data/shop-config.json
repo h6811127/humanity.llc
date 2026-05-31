@@ -26,18 +26,230 @@
   },
   "thanks_path": "/shop/thanks/",
   "personalize": {
-    "checkout_open": false,
+    "checkout_open": true,
     "checkout_product_id": "glitch_hoodie_v1",
     "products": [
       {
         "product_id": "glitch_hoodie_v1",
         "print_template_id": "hc-glitch-hoodie-v1",
-        "print_variant_id": "black-m",
+        "variant_matrix": "glitch_hoodie_v1",
         "title": "Glitch LIVE QR hoodie",
         "preview": "glitch_hoodie",
         "price_display": "$88 + shipping",
-        "shopify_variant_id": "",
-        "checkout_url": ""
+        "shopify_variant_id": "52932579459381",
+        "checkout_url": "https://humanity-llc.myshopify.com/cart/52932579459381:1",
+        "variants": [
+          {
+            "print_variant_id": "black-s",
+            "shopify_variant_id": "52932579426613",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932579426613:1"
+          },
+          {
+            "print_variant_id": "black-m",
+            "shopify_variant_id": "52932579459381",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932579459381:1"
+          },
+          {
+            "print_variant_id": "black-l",
+            "shopify_variant_id": "52932579492149",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932579492149:1"
+          },
+          {
+            "print_variant_id": "black-xl",
+            "shopify_variant_id": "52932579524917",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932579524917:1"
+          },
+          {
+            "print_variant_id": "black-2xl",
+            "shopify_variant_id": "52932579557685",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932579557685:1"
+          },
+          {
+            "print_variant_id": "black-3xl",
+            "shopify_variant_id": "52932579590453",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932579590453:1"
+          },
+          {
+            "print_variant_id": "charcoal-heather-s",
+            "shopify_variant_id": "52932579721525",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932579721525:1"
+          },
+          {
+            "print_variant_id": "charcoal-heather-m",
+            "shopify_variant_id": "52932579754293",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932579754293:1"
+          },
+          {
+            "print_variant_id": "charcoal-heather-l",
+            "shopify_variant_id": "52932579787061",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932579787061:1"
+          },
+          {
+            "print_variant_id": "charcoal-heather-xl",
+            "shopify_variant_id": "52932579819829",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932579819829:1"
+          },
+          {
+            "print_variant_id": "charcoal-heather-2xl",
+            "shopify_variant_id": "52932579852597",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932579852597:1"
+          },
+          {
+            "print_variant_id": "charcoal-heather-3xl",
+            "shopify_variant_id": "52932579885365",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932579885365:1"
+          },
+          {
+            "print_variant_id": "light-steel-s",
+            "shopify_variant_id": "52932580311349",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932580311349:1"
+          },
+          {
+            "print_variant_id": "light-steel-m",
+            "shopify_variant_id": "52932580344117",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932580344117:1"
+          },
+          {
+            "print_variant_id": "light-steel-l",
+            "shopify_variant_id": "52932580376885",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932580376885:1"
+          },
+          {
+            "print_variant_id": "light-steel-xl",
+            "shopify_variant_id": "52932580409653",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932580409653:1"
+          },
+          {
+            "print_variant_id": "light-steel-2xl",
+            "shopify_variant_id": "52932580442421",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932580442421:1"
+          },
+          {
+            "print_variant_id": "light-steel-3xl",
+            "shopify_variant_id": "52932580475189",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932580475189:1"
+          },
+          {
+            "print_variant_id": "navy-s",
+            "shopify_variant_id": "52932580606261",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932580606261:1"
+          },
+          {
+            "print_variant_id": "navy-m",
+            "shopify_variant_id": "52932580639029",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932580639029:1"
+          },
+          {
+            "print_variant_id": "navy-l",
+            "shopify_variant_id": "52932580671797",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932580671797:1"
+          },
+          {
+            "print_variant_id": "navy-xl",
+            "shopify_variant_id": "52932580704565",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932580704565:1"
+          },
+          {
+            "print_variant_id": "navy-2xl",
+            "shopify_variant_id": "52932580737333",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932580737333:1"
+          },
+          {
+            "print_variant_id": "navy-3xl",
+            "shopify_variant_id": "52932580770101",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932580770101:1"
+          },
+          {
+            "print_variant_id": "royal-blue-s",
+            "shopify_variant_id": "",
+            "checkout_url": ""
+          },
+          {
+            "print_variant_id": "royal-blue-m",
+            "shopify_variant_id": "",
+            "checkout_url": ""
+          },
+          {
+            "print_variant_id": "royal-blue-l",
+            "shopify_variant_id": "",
+            "checkout_url": ""
+          },
+          {
+            "print_variant_id": "royal-blue-xl",
+            "shopify_variant_id": "",
+            "checkout_url": ""
+          },
+          {
+            "print_variant_id": "royal-blue-2xl",
+            "shopify_variant_id": "",
+            "checkout_url": ""
+          },
+          {
+            "print_variant_id": "royal-blue-3xl",
+            "shopify_variant_id": "",
+            "checkout_url": ""
+          },
+          {
+            "print_variant_id": "stone-grey-s",
+            "shopify_variant_id": "52932580016437",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932580016437:1"
+          },
+          {
+            "print_variant_id": "stone-grey-m",
+            "shopify_variant_id": "52932580049205",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932580049205:1"
+          },
+          {
+            "print_variant_id": "stone-grey-l",
+            "shopify_variant_id": "52932580081973",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932580081973:1"
+          },
+          {
+            "print_variant_id": "stone-grey-xl",
+            "shopify_variant_id": "52932580114741",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932580114741:1"
+          },
+          {
+            "print_variant_id": "stone-grey-2xl",
+            "shopify_variant_id": "52932580147509",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932580147509:1"
+          },
+          {
+            "print_variant_id": "stone-grey-3xl",
+            "shopify_variant_id": "52932580180277",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932580180277:1"
+          },
+          {
+            "print_variant_id": "white-s",
+            "shopify_variant_id": "52932580901173",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932580901173:1"
+          },
+          {
+            "print_variant_id": "white-m",
+            "shopify_variant_id": "52932580933941",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932580933941:1"
+          },
+          {
+            "print_variant_id": "white-l",
+            "shopify_variant_id": "52932580966709",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932580966709:1"
+          },
+          {
+            "print_variant_id": "white-xl",
+            "shopify_variant_id": "52932580999477",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932580999477:1"
+          },
+          {
+            "print_variant_id": "white-2xl",
+            "shopify_variant_id": "52932581032245",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932581032245:1"
+          },
+          {
+            "print_variant_id": "white-3xl",
+            "shopify_variant_id": "52932581065013",
+            "checkout_url": "https://humanity-llc.myshopify.com/cart/52932581065013:1"
+          }
+        ]
       },
       {
         "product_id": "hoodie_live_object_v1",

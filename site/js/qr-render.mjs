@@ -14,26 +14,28 @@ export const QR_DOWNLOAD_RENDER_WIDTH = 512;
 /**
  * @param {string} text
  * @param {number} width module square size in px passed to branded frame renderer
+ * @param {{ framePadding?: import("./qr-branding.mjs").QrFramePadding, frameBackground?: import("./qr-branding.mjs").QrFrameBackground }} [frameOpts]
  */
-async function qrToBrandedCanvas(text, width) {
-  return renderHumanityQrFrameToCanvas(text, width);
+async function qrToBrandedCanvas(text, width, frameOpts = {}) {
+  return renderHumanityQrFrameToCanvas(text, width, frameOpts);
 }
 
 /**
  * @param {string} text
  * @param {number} [width]
+ * @param {{ framePadding?: import("./qr-branding.mjs").QrFramePadding, frameBackground?: import("./qr-branding.mjs").QrFrameBackground }} [frameOpts]
  */
-export async function qrToDataUrl(text, width = QR_PREVIEW_RENDER_WIDTH) {
+export async function qrToDataUrl(text, width = QR_PREVIEW_RENDER_WIDTH, frameOpts = {}) {
   if (!text?.trim()) throw new Error("No scan URL");
   assertQrEncodeUrl(text);
-  const canvas = await qrToBrandedCanvas(text, width);
+  const canvas = await qrToBrandedCanvas(text, width, frameOpts);
   return canvas.toDataURL("image/png");
 }
 
 /**
  * @param {HTMLImageElement} img
  * @param {string} text
- * @param {{ alt?: string }} [opts]
+ * @param {{ alt?: string, width?: number, framePadding?: import("./qr-branding.mjs").QrFramePadding, frameBackground?: import("./qr-branding.mjs").QrFrameBackground }} [opts]
  */
 export async function renderBrandedQrToImage(img, text, opts = {}) {
   if (!text?.trim()) {
@@ -41,7 +43,9 @@ export async function renderBrandedQrToImage(img, text, opts = {}) {
     img.alt = opts.alt ?? "QR code unavailable";
     return;
   }
-  img.src = await qrToDataUrl(text, QR_PREVIEW_RENDER_WIDTH);
+  const width = opts.width ?? QR_PREVIEW_RENDER_WIDTH;
+  const { alt, width: _w, ...frameOpts } = opts;
+  img.src = await qrToDataUrl(text, width, frameOpts);
   img.alt = opts.alt ?? "QR code";
 }
 

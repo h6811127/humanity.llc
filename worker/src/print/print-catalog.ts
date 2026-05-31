@@ -42,6 +42,8 @@ const STORE_PRODUCT_TEMPLATE: Record<string, string> = {
   prod_glitch_hoodie: GLITCH_HOODIE_TEMPLATE_ID,
 };
 
+import { GLITCH_HOODIE_VARIANT_MATRIX } from "./glitch-hoodie-variant-matrix";
+
 const CATALOG: PrintCatalogProduct[] = [
   {
     template_id: TIER0_BATCH_PRINT_TEMPLATE_ID,
@@ -86,18 +88,11 @@ const CATALOG: PrintCatalogProduct[] = [
     description:
       "Champion S700 (Printify blueprint 528) — fixed Glitch founding art with unique LIVE QR per buyer.",
     product_id: "prod_glitch_hoodie",
-    variants: [
-      {
-        variant_id: "black-m",
-        label: "Black / M",
-        enabled: true,
-      },
-      {
-        variant_id: "black-l",
-        label: "Black / L",
-        enabled: true,
-      },
-    ],
+    variants: GLITCH_HOODIE_VARIANT_MATRIX.map((entry) => ({
+      variant_id: entry.print_variant_id,
+      label: entry.label,
+      enabled: true,
+    })),
   },
   {
     template_id: DEFAULT_PRINT_TEMPLATE_ID,

@@ -1,7 +1,7 @@
 import { PROFILE_ID_REGEX } from "../crypto";
 import { errorResponse, jsonResponse, requestOrigin } from "../http/resolver";
 import { getApprovedPrintCatalog, getPrintCatalogProduct } from "./print-catalog";
-import { renderPrintStickerFromScanUrl } from "../resolver/scan-qr";
+import { renderPrintArtworkFromScanUrl } from "../resolver/scan-qr";
 import { QR_ID_REGEX } from "../resolver/scan-state";
 
 interface PrintArtifactRequest {
@@ -49,7 +49,7 @@ export async function handlePostPrintArtifacts(request: Request): Promise<Respon
   const url = scanUrl(requestOrigin(request), profileId, qrId);
   let svg: string;
   try {
-    svg = await renderPrintStickerFromScanUrl(url);
+    svg = await renderPrintArtworkFromScanUrl(url, templateId);
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Artwork generation failed.";
     return errorResponse("PRINT_QR_SCAN_FAILED", msg, 422);

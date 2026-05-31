@@ -28,7 +28,8 @@ The mark is drawn as **vector circles** only — no raster plate, no white JPEG 
 |------|------|----------------|
 | 1 | `site/js/qr-branding.mjs` | Colors, center logo, **`renderHumanityQrFrameSvg` / `renderHumanityQrFrameMarkup` / `renderHumanityQrFrameToCanvas`** |
 | 2 | `site/js/qr-render.mjs` | Browser PNG via `renderHumanityQrFrameToCanvas` (preview **220** px, download **512** px) |
-| 3 | `worker/src/resolver/scan-qr.ts` | SVG QR + finder mark + frame markup |
+| 3 | `worker/src/resolver/scan-qr.ts` | SVG QR + finder mark; print path uses template render profile |
+| 3b | `worker/src/print/print-template-render.ts` | Per-template `frameBackground` / `framePadding` / `output` |
 | 4 | `site/assets/qr-center-logo.svg` | Optional reference for designers (not loaded at runtime) |
 
 Both generators import the same opacity, size ratio, colors, and correction level so `/created/` and `/c/…` stay aligned.
@@ -159,6 +160,55 @@ Official outputs must not bypass the frame helpers in `qr-branding.mjs`.
 
 ---
 
+## Two registers: digital vs print fulfillment
+
+Official generators share one encode path (red modules, EC **Q**, finder mark, host lock). **Frame chrome** splits by surface:
+
+| Register | Surfaces | Frame background | Padding | Entry |
+|----------|----------|------------------|---------|--------|
+| **Digital (notary)** | Scan pass, `/created/` preview + download, customize QR preview | `full` white card | `default` | `renderFramedScanQrSvg(scanUrl)` — no frame opts |
+| **Print fulfillment** | Printify upload, `POST /v1/print/artifacts` | Per approved template | Per template | `renderPrintArtworkFromScanUrl(scanUrl, templateId)` |
+
+**Launch defaults** (`worker/src/print/print-template-render.ts`):
+
+| Template | `frameBackground` | `framePadding` | `output` |
+|----------|---------------------|----------------|----------|
+| `hc-sticker-square-v1` | `full` | `default` | `sticker_sheet` (mm trim + bleed) |
+| `hc-hoodie-live-object-v1` | `full` | `tight` | `frame_svg` (hoodie placeholder only) |
+| `hc-glitch-hoodie-v1` | `full` | `tight` | `frame_svg` · Printify placeholder **`back`** |
+
+`tight` scales outer pad by `QR_FRAME_PADDING_TIGHT_RATIO` (~0.62) in `qrFrameMetrics()` — smaller white island on fabric, same scan quiet zone under modules.
+
+**Printify placeholder:** `print-template-render.ts` sets `printifyPlaceholder` per template (`back` for Glitch, `front` for Live Object hoodie). Env `PERSONALIZE_GLITCH_HOODIE_PRINTIFY_PLACEHOLDER` in `wrangler.toml` must stay aligned.
+
+**Customizer:** Glitch `/shop/customize/` exposes **White card** vs **Transparent** (`shop-customize-printify-qr-core.mjs`). Gallery loads two Printify mock sets from `glitch-hoodie-mockups.json`: `src` (white-card product) and `src_transparent` (transparent-art product). Toggle swaps the garment mock photo only; the buyer’s **planned QR** renders in a separate block below the mockup (not composited on the Printify JPEG), using `transparentQrQuietZone` + `skipFinderLogo` when transparent is selected. If `src_transparent` is missing for a color, transparent mode falls back to a garment swatch. **Charcoal Heather, Royal Blue:** transparent option disabled (white card only). Preview choice is `sessionStorage` until fulfillment reads it at checkout.
+
+**Export dual mockups:** `PRINTIFY_GLITCH_TRANSPARENT_PRODUCT_ID=<id> npm run printify:export-glitch-mockups` merges transparent product `images[]` into `src_transparent` per view (white-card product remains `printify_product_id`). Shop catalog: transparent art is on **Copy of Champion Hoodie** (`6a1c4fc1efb0c6a8580cdd93`); white card stays **Champion Hoodie** (`6a18a4d17f274f4c3e04f646`).
+
+**Operator proof SVG:** `npm run print:glitch-hoodie-proof` → `site/data/fixtures/glitch-hoodie-print-proof.svg` (same renderer as fulfillment upload).
+
+**Printify mockup art:** `npm run print:glitch-hoodie-printify-pngs` → `site/images/merch/printify-art/`:
+
+| File | Meaning |
+|------|---------|
+| `glitch-hoodie-live-object-white-card.png` | White card behind full object; white QR quiet zone |
+| `glitch-hoodie-live-object-transparent-card.png` | No outer card; **white still behind QR modules** |
+| `glitch-hoodie-live-object-transparent-qr.png` | No outer card; **transparent QR quiet zone** (garment shows through the code background) |
+
+Default scan URL links to humanity.llc (`--url` to override). Upload each PNG to a separate Printify product for mockup export. **transparent-qr** is mock/preview only — not launch fulfillment default (scan reliability).
+
+**Future (QA-gated, not launch default):** `frameBackground: "qr_only"` (white behind modules only) or `"transparent"` (no card fill; stroke + type on garment). Requires [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md) A1–A5 on Charcoal before changing catalog profile.
+
+**Glitch composition:** Founding hoodie may use static Glitch art in Printify (`composition: "printify_layer"`) while middleware uploads a QR layer — today profiles use `standalone` (full framed SVG to print area). Align Printify placeholder with profile before production.
+
+Choreography: digital surfaces echo the white island ([`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) Beat 1); print may tighten island without changing scan HTML.
+
+```bash
+npm run worker:test -- worker/tests/print-template-render.test.ts worker/tests/qr-print-sticker.test.ts
+```
+
+---
+
 ## Print sticker template (Phase D)
 
 Fulfillment and DIY print use `renderPrintStickerSvg()` in `site/js/qr-print-sticker.mjs`, wrapping the signed frame in a mm-based sheet:
@@ -169,7 +219,7 @@ Fulfillment and DIY print use `renderPrintStickerSvg()` in `site/js/qr-print-sti
 | Bleed | **1.5 mm** per edge |
 | Safe inset | **2 mm** from trim |
 | Guides | Trim/safe dashed rects + corner crop marks (omit with `showGuides: false` for production RIP) |
-| Worker entry | `renderPrintStickerFromScanUrl(scanUrl)` in `worker/src/resolver/scan-qr.ts` |
+| Worker entry | `renderPrintArtworkFromScanUrl(scanUrl, templateId)` — stickers use `hc-sticker-square-v1`; legacy alias `renderPrintStickerFromScanUrl(scanUrl)` |
 
 **PDF:** Export SVG via browser Print → PDF or vendor RIP; no separate PDF generator in v1.
 

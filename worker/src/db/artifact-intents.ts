@@ -14,6 +14,7 @@ export interface ArtifactIntentRow {
   profile_id: string;
   source_qr_id: string;
   product_id: string | null;
+  print_variant_id: string | null;
   quantity: number;
   planned_item_qr_ids_json: string;
   planned_print_artifact_ids_json: string;
@@ -29,6 +30,7 @@ export interface InsertArtifactIntentInput {
   profile_id: string;
   source_qr_id: string;
   product_id: string | null;
+  print_variant_id?: string | null;
   quantity: number;
   planned_item_qr_ids: string[];
   planned_print_artifact_ids: string[];
@@ -44,16 +46,17 @@ export async function insertArtifactIntent(
   await db
     .prepare(
       `INSERT INTO artifact_intents (
-        artifact_intent_id, profile_id, source_qr_id, product_id, quantity,
+        artifact_intent_id, profile_id, source_qr_id, product_id, print_variant_id, quantity,
         planned_item_qr_ids_json, planned_print_artifact_ids_json,
         status, expires_at, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .bind(
       input.artifact_intent_id,
       input.profile_id,
       input.source_qr_id,
       input.product_id,
+      input.print_variant_id?.trim() || null,
       input.quantity,
       JSON.stringify(input.planned_item_qr_ids),
       JSON.stringify(input.planned_print_artifact_ids),
@@ -71,7 +74,7 @@ export async function getArtifactIntent(
 ): Promise<ArtifactIntentRow | null> {
   return db
     .prepare(
-      `SELECT artifact_intent_id, profile_id, source_qr_id, product_id, quantity,
+      `SELECT artifact_intent_id, profile_id, source_qr_id, product_id, print_variant_id, quantity,
               planned_item_qr_ids_json, planned_print_artifact_ids_json,
               pending_mint_credentials_json,
               status, expires_at, created_at, updated_at

@@ -102,11 +102,15 @@ export async function ensurePrintOrderForCommerceOrder(
   }
 
   let templateId = resolvePrintTemplateIdForProduct(null);
+  let printVariantId: string | null = null;
   for (const intentId of intentIds) {
     const intent = await getArtifactIntent(db, intentId);
     if (!intent) continue;
     if (intent.product_id) {
       templateId = resolvePrintTemplateIdForProduct(intent.product_id);
+    }
+    if (intent.print_variant_id?.trim()) {
+      printVariantId = intent.print_variant_id.trim();
     }
     printArtifactIds.push(
       ...(JSON.parse(intent.planned_print_artifact_ids_json) as string[])
@@ -127,6 +131,7 @@ export async function ensurePrintOrderForCommerceOrder(
     commerce_order_id: commerceOrder.commerce_order_id,
     shopify_order_id: commerceOrder.shopify_order_id,
     template_id: templateId,
+    print_variant_id: printVariantId,
     status: "awaiting_production_approval",
     shipping_method: "standard",
     created_at: nowIso,
@@ -149,6 +154,7 @@ export async function ensurePrintOrderForCommerceOrder(
     printify_order_id: null,
     printify_shop_id: null,
     template_id: templateId,
+    print_variant_id: printVariantId,
     status: "awaiting_production_approval",
     shipping_method: "standard",
     created_at: nowIso,

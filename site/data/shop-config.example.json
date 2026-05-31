@@ -23,12 +23,24 @@
       {
         "product_id": "glitch_hoodie_v1",
         "print_template_id": "hc-glitch-hoodie-v1",
-        "print_variant_id": "black-m",
+        "variant_matrix": "glitch_hoodie_v1",
         "title": "Glitch LIVE QR hoodie",
         "preview": "glitch_hoodie",
         "price_display": "$88 + shipping",
-        "shopify_variant_id": "YOUR_GLITCH_HOODIE_VARIANT_ID",
-        "checkout_url": "https://humanity-llc.myshopify.com/cart/YOUR_GLITCH_HOODIE_VARIANT_ID:1"
+        "shopify_variant_id": "",
+        "checkout_url": "",
+        "variants": [
+          {
+            "print_variant_id": "black-m",
+            "shopify_variant_id": "YOUR_BLACK_M_SHOPIFY_VARIANT_ID",
+            "checkout_url": "https://YOUR-STORE.myshopify.com/cart/YOUR_BLACK_M_SHOPIFY_VARIANT_ID:1"
+          },
+          {
+            "print_variant_id": "white-xl",
+            "shopify_variant_id": "YOUR_WHITE_XL_SHOPIFY_VARIANT_ID",
+            "checkout_url": "https://YOUR-STORE.myshopify.com/cart/YOUR_WHITE_XL_SHOPIFY_VARIANT_ID:1"
+          }
+        ]
       },
       {
         "product_id": "hoodie_live_object_v1",

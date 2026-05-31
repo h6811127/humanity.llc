@@ -45,6 +45,19 @@ export const QR_BRANDED_RENDER_OPTIONS = {
   color: { dark: QR_BRAND_RED, light: QR_BRAND_LIGHT },
 };
 
+/** QR “light” modules — transparent so garment/mock color shows through the code area. */
+export const QR_QUIET_ZONE_TRANSPARENT = "#00000000";
+
+/**
+ * @param {{ transparentQuietZone?: boolean }} [opts]
+ */
+export function brandedQrRenderColors(opts = {}) {
+  return {
+    dark: QR_BRAND_RED,
+    light: opts.transparentQuietZone ? QR_QUIET_ZONE_TRANSPARENT : QR_BRAND_LIGHT,
+  };
+}
+
 /** Footer host mark (docs/SCANNER_EXPERIENCE.md § Optical layer). */
 export const QR_FRAME_FOOTER_TEXT = "humanity.llc";
 
@@ -60,13 +73,22 @@ export const QR_FRAME_BRAND_MARK_OPACITY = 0.34;
 /** Do not paint on the card border margin. */
 export const QR_FRAME_BRAND_MARK_ENABLED = false;
 
+/** Multiply default outer pad for apparel print (smaller white island). */
+export const QR_FRAME_PADDING_TIGHT_RATIO = 0.62;
+
+/**
+ * @typedef {"full" | "qr_only" | "transparent"} QrFrameBackground
+ * @typedef {"default" | "tight"} QrFramePadding
+ */
+
 /**
  * Layout around the QR modules (not including outer canvas margin).
  * @param {number} qrSize
- * @param {{ credentialCode?: string | null }} [opts]
+ * @param {{ credentialCode?: string | null, framePadding?: QrFramePadding }} [opts]
  */
 export function qrFrameMetrics(qrSize, opts = {}) {
-  const pad = Math.max(4, Math.round(qrSize * 0.045));
+  const padScale = opts.framePadding === "tight" ? QR_FRAME_PADDING_TIGHT_RATIO : 1;
+  const pad = Math.max(opts.framePadding === "tight" ? 3 : 4, Math.round(qrSize * 0.045 * padScale));
   const border = Math.max(1.5, qrSize * 0.011);
   const gap = Math.max(2, Math.round(qrSize * 0.022));
   const pillH = Math.max(9, Math.round(qrSize * 0.068));
@@ -159,12 +181,16 @@ export function networkGlyphSvgFragment(size, cx, cy, opacity = QR_FRAME_BRAND_M
 /**
  * Wrap branded QR SVG in the signed visual frame (border, glyph, LIVE OBJECT, footer).
  * @param {string} brandedQrSvg QR SVG with center logo already applied
- * @param {{ showLiveObject?: boolean, credentialCode?: string | null }} [opts]
+ * @param {{ showLiveObject?: boolean, credentialCode?: string | null, frameBackground?: QrFrameBackground, framePadding?: QrFramePadding }} [opts]
  */
 export function renderHumanityQrFrameSvg(brandedQrSvg, opts = {}) {
   const qrSize = extractQrSvgViewBoxSize(brandedQrSvg);
   if (!qrSize || !brandedQrSvg?.includes("</svg>")) return brandedQrSvg;
-  const m = qrFrameMetrics(qrSize, { credentialCode: opts.credentialCode });
+  const frameBackground = opts.frameBackground ?? "full";
+  const m = qrFrameMetrics(qrSize, {
+    credentialCode: opts.credentialCode,
+    framePadding: opts.framePadding,
+  });
   const inner = extractSvgInner(brandedQrSvg);
   const showLiveObject = opts.showLiveObject !== false;
   const glyph = QR_FRAME_BRAND_MARK_ENABLED
@@ -185,7 +211,17 @@ export function renderHumanityQrFrameSvg(brandedQrSvg, opts = {}) {
   const strokeH = m.totalHeight - m.border - 2 * strokeInset;
   const strokeR = Math.max(0, m.cornerR - strokeInset);
 
-  return `<svg class="hc-qr-frame-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${m.totalWidth} ${m.totalHeight}" role="presentation" aria-hidden="true"><rect width="${m.totalWidth}" height="${m.totalHeight}" rx="${m.cornerR}" fill="${QR_BRAND_LIGHT}"/><rect x="${strokeX}" y="${strokeY}" width="${strokeW}" height="${strokeH}" rx="${strokeR}" fill="none" stroke="${QR_BRAND_RED}" stroke-width="${m.border}"/>${glyph}<g transform="translate(${m.qrX} ${m.qrY})">${inner}</g>${pillText}${footerText}${codeText}</svg>`;
+  const islandPad = Math.max(1, Math.round(m.border));
+  const qrIsland =
+    frameBackground === "qr_only"
+      ? `<rect x="${m.qrX - islandPad}" y="${m.qrY - islandPad}" width="${m.qrSize + 2 * islandPad}" height="${m.qrSize + 2 * islandPad}" rx="${Math.max(2, m.cornerR * 0.5)}" fill="${QR_BRAND_LIGHT}"/>`
+      : "";
+  const cardFill =
+    frameBackground === "full"
+      ? `<rect width="${m.totalWidth}" height="${m.totalHeight}" rx="${m.cornerR}" fill="${QR_BRAND_LIGHT}"/>`
+      : qrIsland;
+
+  return `<svg class="hc-qr-frame-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${m.totalWidth} ${m.totalHeight}" role="presentation" aria-hidden="true">${cardFill}<rect x="${strokeX}" y="${strokeY}" width="${strokeW}" height="${strokeH}" rx="${strokeR}" fill="none" stroke="${QR_BRAND_RED}" stroke-width="${m.border}"/>${glyph}<g transform="translate(${m.qrX} ${m.qrY})">${inner}</g>${pillText}${footerText}${codeText}</svg>`;
 }
 
 /**
@@ -229,12 +265,24 @@ export function drawNetworkGlyphOnCanvas(ctx, cx, cy, size, opacity = QR_FRAME_B
  * @param {CanvasRenderingContext2D} ctx
  * @param {ReturnType<typeof qrFrameMetrics>} m
  * @param {() => void} drawQr
+ * @param {QrFrameBackground} [frameBackground]
  */
-export function drawHumanityQrFrameCanvas(ctx, m, drawQr) {
-  const { totalWidth, totalHeight, cornerR, border } = m;
-  ctx.fillStyle = QR_BRAND_LIGHT;
-  roundRect(ctx, 0, 0, totalWidth, totalHeight, cornerR);
-  ctx.fill();
+export function drawHumanityQrFrameCanvas(ctx, m, drawQr, frameBackground = "full") {
+  const { totalWidth, totalHeight, cornerR, border, qrX, qrY, qrSize } = m;
+  const islandPad = Math.max(1, Math.round(border));
+  if (frameBackground === "full") {
+    ctx.fillStyle = QR_BRAND_LIGHT;
+    roundRect(ctx, 0, 0, totalWidth, totalHeight, cornerR);
+    ctx.fill();
+  } else if (frameBackground === "qr_only") {
+    const x = qrX - islandPad;
+    const y = qrY - islandPad;
+    const w = qrSize + 2 * islandPad;
+    const h = qrSize + 2 * islandPad;
+    ctx.fillStyle = QR_BRAND_LIGHT;
+    roundRect(ctx, x, y, w, h, Math.max(2, cornerR * 0.5));
+    ctx.fill();
+  }
   ctx.strokeStyle = QR_BRAND_RED;
   ctx.lineWidth = border;
 
@@ -448,7 +496,7 @@ export function overlayFinderLogoOnSvg(svg, opts = {}) {
  */
 export function overlayCenterLogoOnSvg(svg, opts = {}) {
   if (!svg?.includes("</svg>")) return svg;
-  let out = overlayFinderLogoOnSvg(svg, opts);
+  let out = opts.skipFinderLogo === true ? svg : overlayFinderLogoOnSvg(svg, opts);
   if (!QR_CENTER_LOGO_ENABLED) return out;
 
   const outerOpacity = opts.outerOpacity ?? opts.opacity ?? QR_CENTER_LOGO_OUTER_OPACITY;
@@ -630,26 +678,37 @@ function hexToRgb(hex) {
  * @param {string} text
  * @param {number} qrWidth module square size in px
  */
-export async function renderHumanityQrFrameToCanvas(text, qrWidth) {
+/**
+ * @param {string} text
+ * @param {number} qrWidth
+ * @param {{ framePadding?: QrFramePadding, frameBackground?: QrFrameBackground, transparentQrQuietZone?: boolean }} [frameOpts]
+ */
+export async function renderHumanityQrFrameToCanvas(text, qrWidth, frameOpts = {}) {
   const { assertQrEncodeUrl, credentialCodeForEncodeUrl } = await import(
     "./qr-encode-url-core.mjs"
   );
   assertQrEncodeUrl(text);
   const qrCanvas = document.createElement("canvas");
   const QRCode = (await import("./vendor/qrcode.mjs")).default;
-  await QRCode.toCanvas(qrCanvas, text, { ...QR_BRANDED_RENDER_OPTIONS, width: qrWidth });
-  // Ensure we never render transparent "quiet zone" pixels through the network glyph.
-  // (qrcode's light background behavior can differ across renderers, and we want opacity.)
-  const qrCtx = qrCanvas.getContext("2d");
-  if (qrCtx) {
-    qrCtx.save();
-    qrCtx.globalCompositeOperation = "destination-over";
-    qrCtx.fillStyle = QR_BRAND_LIGHT;
-    qrCtx.fillRect(0, 0, qrWidth, qrWidth);
-    qrCtx.restore();
+  const transparentQuietZone = frameOpts.transparentQrQuietZone === true;
+  await QRCode.toCanvas(qrCanvas, text, {
+    ...QR_BRANDED_RENDER_OPTIONS,
+    width: qrWidth,
+    color: brandedQrRenderColors({ transparentQuietZone }),
+  });
+  if (!transparentQuietZone) {
+    const qrCtx = qrCanvas.getContext("2d");
+    if (qrCtx) {
+      qrCtx.save();
+      qrCtx.globalCompositeOperation = "destination-over";
+      qrCtx.fillStyle = QR_BRAND_LIGHT;
+      qrCtx.fillRect(0, 0, qrWidth, qrWidth);
+      qrCtx.restore();
+    }
   }
   const m = qrFrameMetrics(qrWidth, {
     credentialCode: credentialCodeForEncodeUrl(text),
+    framePadding: frameOpts.framePadding,
   });
   // The created-page preview rounds the `<img>` element with a fixed border-radius,
   // which can clip artwork that touches the canvas edges. Add "quiet padding"
@@ -660,17 +719,29 @@ export async function renderHumanityQrFrameToCanvas(text, qrWidth) {
   out.height = m.totalHeight + 2 * outerPadding;
   const ctx = out.getContext("2d");
   if (!ctx) throw new Error("Canvas not available");
+  const frameBackground = frameOpts.frameBackground ?? "full";
   ctx.save();
-  ctx.fillStyle = QR_BRAND_LIGHT;
-  ctx.fillRect(0, 0, out.width, out.height);
+  if (frameBackground === "full") {
+    ctx.fillStyle = QR_BRAND_LIGHT;
+    ctx.fillRect(0, 0, out.width, out.height);
+  } else {
+    ctx.clearRect(0, 0, out.width, out.height);
+  }
   ctx.translate(outerPadding, outerPadding);
   const viewBoxSize = extractQrSvgViewBoxSize(
-    await QRCode.toString(text, { type: "svg", ...QR_BRANDED_RENDER_OPTIONS, width: qrWidth })
+    await QRCode.toString(text, {
+      type: "svg",
+      ...QR_BRANDED_RENDER_OPTIONS,
+      width: qrWidth,
+      color: brandedQrRenderColors({ transparentQuietZone }),
+    })
   );
 
   drawHumanityQrFrameCanvas(ctx, m, () => {
     ctx.drawImage(qrCanvas, m.qrX, m.qrY);
-    drawMaskedFinderLogoOnCanvas(ctx, qrCanvas, m.qrX, m.qrY, viewBoxSize || qrWidth);
+    if (frameOpts.skipFinderLogo !== true) {
+      drawMaskedFinderLogoOnCanvas(ctx, qrCanvas, m.qrX, m.qrY, viewBoxSize || qrWidth);
+    }
     if (QR_CENTER_LOGO_ENABLED) {
       const { cx, cy, outerR, innerR } = centerLogoMetrics(qrWidth);
       drawMaskedTwoToneLogoOnCanvas(ctx, qrCanvas, m.qrX, m.qrY, {
@@ -680,7 +751,7 @@ export async function renderHumanityQrFrameToCanvas(text, qrWidth) {
         innerR,
       });
     }
-  });
+  }, frameBackground);
   ctx.restore();
   return out;
 }

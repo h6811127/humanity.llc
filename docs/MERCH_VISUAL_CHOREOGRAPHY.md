@@ -85,8 +85,9 @@ Cross-ref funnel steps: [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) § Funnel (
 
 **Hoodie-specific (print-safe):**
 
-- Chest placement per print template `hc-hoodie-live-object-v1`
-- QA: flat chest scan, wash — runbook § A4, A6
+- Back/chest placement per approved print template (`hc-glitch-hoodie-v1`, `hc-hoodie-live-object-v1`)
+- Fulfillment artwork: **tight** white island on hoodies (`print-template-render.ts`); digital previews stay **default** full card ([`QR_BRANDING.md`](QR_BRANDING.md) § Two registers)
+- QA: flat chest/back scan, wash — runbook § A4, A6
 - Garment context in **marketing copy only** — never mutable trust claims on fabric ([`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md) Level 0)
 
 **Shipped:** Print templates, QR branding, physical QA runbook.  

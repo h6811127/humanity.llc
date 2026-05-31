@@ -236,8 +236,19 @@ export function resolveCustomizePreviewKind(product) {
 
 /**
  * @param {Record<string, unknown>} product
+ * @param {import("./shop-product-variants-core.mjs").ProductVariant | null | undefined} [variant]
  */
-export function personalizeProductDisplay(product) {
+export function personalizeProductDisplay(product, variant = null) {
+  const checkoutUrl =
+    variant?.checkout_url?.trim() ||
+    (typeof product.checkout_url === "string" ? product.checkout_url.trim() : "");
+  const shopifyVariantId =
+    variant?.shopify_variant_id?.trim() ||
+    (typeof product.shopify_variant_id === "string" ? product.shopify_variant_id.trim() : "");
+  const printVariantId =
+    variant?.print_variant_id?.trim() ||
+    (typeof product.print_variant_id === "string" ? product.print_variant_id.trim() : "");
+
   return {
     productId: String(product.product_id),
     title: typeof product.title === "string" ? product.title : "Personalized item",
@@ -246,17 +257,13 @@ export function personalizeProductDisplay(product) {
       typeof product.price_display === "string" && product.price_display.trim()
         ? product.price_display.trim()
         : null,
-    checkoutUrl:
-      typeof product.checkout_url === "string" ? product.checkout_url.trim() : "",
-    shopifyVariantId:
-      typeof product.shopify_variant_id === "string"
-        ? product.shopify_variant_id.trim()
-        : "",
+    checkoutUrl,
+    shopifyVariantId,
     printTemplateId:
       typeof product.print_template_id === "string" ? product.print_template_id.trim() : "",
-    printVariantId:
-      typeof product.print_variant_id === "string" ? product.print_variant_id.trim() : "",
+    printVariantId,
     catalogDescription:
       typeof product.catalog_description === "string" ? product.catalog_description.trim() : "",
+    variantLabel: variant?.label ?? null,
   };
 }

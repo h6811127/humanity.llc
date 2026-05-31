@@ -1,28 +1,44 @@
 import QRCode from "qrcode";
 import {
+  brandedQrRenderColors,
   overlayCenterLogoOnSvg,
   QR_BRANDED_RENDER_OPTIONS,
-  QR_BRAND_RED,
   renderHumanityQrFrameSvg,
 } from "../../../site/js/qr-branding.mjs";
 import { renderPrintStickerSvg as buildPrintStickerSheetSvg } from "../../../site/js/qr-print-sticker.mjs";
 import { credentialCodeFromScanUrl } from "../../../site/js/qr-credential-code.mjs";
 import { assertOfficialScanUrl } from "../../../site/js/qr-scan-url-lock.mjs";
+import { DEFAULT_PRINT_TEMPLATE_ID } from "../print/print-catalog";
+import {
+  qrFrameRenderOptionsFromProfile,
+  resolvePrintTemplateRenderProfile,
+} from "../print/print-template-render";
+import type { QrFrameRenderOptions } from "../print/print-template-render";
 
 /**
  * Branded QR with signed frame (SVG only).
+ * Digital surfaces omit frameOpts — full card + default padding (docs/QR_BRANDING.md).
  */
-export async function renderFramedScanQrSvg(scanUrl: string): Promise<string> {
+export async function renderFramedScanQrSvg(
+  scanUrl: string,
+  frameOpts?: QrFrameRenderOptions
+): Promise<string> {
   assertOfficialScanUrl(scanUrl);
   let svg = await QRCode.toString(scanUrl, {
     type: "svg",
     margin: 1,
     ...QR_BRANDED_RENDER_OPTIONS,
-    color: { dark: QR_BRAND_RED, light: QR_BRANDED_RENDER_OPTIONS.color.light },
+    color: brandedQrRenderColors({
+      transparentQuietZone: frameOpts?.transparentQrQuietZone === true,
+    }),
   });
-  svg = overlayCenterLogoOnSvg(svg);
+  svg = overlayCenterLogoOnSvg(svg, {
+    skipFinderLogo: frameOpts?.skipFinderLogo === true,
+  });
   return renderHumanityQrFrameSvg(svg, {
     credentialCode: credentialCodeFromScanUrl(scanUrl),
+    frameBackground: frameOpts?.frameBackground,
+    framePadding: frameOpts?.framePadding,
   });
 }
 
@@ -37,14 +53,28 @@ export async function renderScanQrMarkup(scanUrl: string): Promise<string> {
 }
 
 /**
+ * Print-ready artwork for fulfillment — template selects frame profile and output shape.
+ */
+export async function renderPrintArtworkFromScanUrl(
+  scanUrl: string,
+  templateId: string
+): Promise<string> {
+  const profile = resolvePrintTemplateRenderProfile(templateId);
+  const framed = await renderFramedScanQrSvg(scanUrl, qrFrameRenderOptionsFromProfile(profile));
+  const credentialCode = credentialCodeFromScanUrl(scanUrl);
+  if (profile.output === "sticker_sheet") {
+    return buildPrintStickerSheetSvg(framed, {
+      credentialCode: credentialCode ?? undefined,
+    });
+  }
+  return framed;
+}
+
+/**
  * Print-ready sticker SVG (50.8 mm trim + bleed) for fulfillment / download.
  */
 export async function renderPrintStickerFromScanUrl(scanUrl: string): Promise<string> {
-  const framed = await renderFramedScanQrSvg(scanUrl);
-  const credentialCode = credentialCodeFromScanUrl(scanUrl);
-  return buildPrintStickerSheetSvg(framed, {
-    credentialCode: credentialCode ?? undefined,
-  });
+  return renderPrintArtworkFromScanUrl(scanUrl, DEFAULT_PRINT_TEMPLATE_ID);
 }
 
 /**

@@ -118,6 +118,22 @@ Resolver tab sync: `hc-resolver-sync` BroadcastChannel (network 60s, health 30s)
 
 ---
 
+## Print artwork frame (merch fulfillment)
+
+| Invariant | Detail |
+|-----------|--------|
+| Digital frame | Scan pass, `/created/`, and customize QR preview use **full** white card + **default** padding — `renderFramedScanQrSvg(scanUrl)` with no frame opts. |
+| Print frame | Printify upload and `POST /v1/print/artifacts` use `renderPrintArtworkFromScanUrl(scanUrl, templateId)` and `resolvePrintTemplateRenderProfile()` in `worker/src/print/print-template-render.ts`. |
+| Launch hoodies | `hc-glitch-hoodie-v1` and `hc-hoodie-live-object-v1`: `full` + `tight` + `frame_svg`. Glitch Printify placeholder **`back`**; Live Object **`front`**. Stickers: `full` + `default` + `sticker_sheet`. |
+| Customize Glitch back | Printify **Back** view overlays buyer planned QR with **tight** frame — not sample mock QR. |
+| Background experiments | `qr_only` / `transparent` only after physical QA sign-off — do not change digital defaults. |
+
+**Regression:** `npm run worker:test -- worker/tests/print-template-render.test.ts worker/tests/scan-qr-branding.test.ts worker/tests/printify-line-items.test.ts`
+
+Canonical: [`QR_BRANDING.md`](QR_BRANDING.md) § Two registers · [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md)
+
+---
+
 ## Product language
 
 Default UI uses Layer 2 outcome copy; protocol terms stay in Advanced, Help, and engineer docs. Before changing user-visible strings: [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) · [`OWNERSHIP_AND_CONTROL_MODEL.md`](OWNERSHIP_AND_CONTROL_MODEL.md) · `site/js/device-ownership-copy-core.mjs`. Run `npm run worker:test:comprehension` when copy changes.

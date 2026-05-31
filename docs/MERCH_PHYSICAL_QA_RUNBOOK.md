@@ -19,6 +19,7 @@ Code regression covers scan copy and layout. This runbook covers **ink, material
 
 - [ ] Fulfillment mint completed: planned `print_artifact` QRs active in D1
 - [ ] Printify sample received (or internal proof print using production artwork pipeline)
+- [ ] Artwork path uses `renderPrintArtworkFromScanUrl` + template profile ([`QR_BRANDING.md`](QR_BRANDING.md) § Two registers) — record `template_id` and profile on sign-off
 - [ ] At least **3 phones**: iOS Safari, Android Chrome, one older/slower device if available
 - [ ] Staging or production scan URL from minted item: `https://humanity.llc/c/{profile_id}?q={qr_id}`
 
@@ -37,7 +38,7 @@ Test each phone at **normal arm's length** and at **~2 m** (poster / across-room
 | A5 | Sticker: scan works at **220 px display size** and on physical 2×2 in trim | ☐ |
 | A6 | After light crease / edge lift (sticker) or one wash (hoodie if applicable), scan still works or failure is documented | ☐ |
 
-**Fail action:** Adjust print template size/contrast (`docs/QR_BRANDING.md`) or Printify product; do not enable `personalize.checkout_open` until A1–A5 pass.
+**Fail action:** Adjust print template size/contrast (`docs/QR_BRANDING.md`) or Printify product; do not enable `personalize.checkout_open` until A1–A5 pass. If testing `qr_only` / `transparent` frame backgrounds, update `print-template-render.ts` only after a Charcoal (or target color) proof passes — do not change digital scan/created frame defaults.
 
 ---
 
@@ -85,7 +86,11 @@ Owner revokes **one** print_artifact QR; sibling item QRs (if any) stay active.
 
 | Field | Value |
 |-------|--------|
-| Product tested | `[hoodie_live_object_v1 \| sticker_personalized_v1]` |
+| Product tested | `[hoodie_live_object_v1 \| glitch_hoodie_v1 \| sticker_personalized_v1]` |
+| Print template id | `[hc-glitch-hoodie-v1 \| …]` |
+| Frame profile | `[full + tight \| full + default \| …]` |
+| Printify placeholder | `[back for Glitch \| front for Live Object]` |
+| Proof SVG | `npm run print:glitch-hoodie-proof` (optional reference file) |
 | Print order id | `[po_…]` |
 | Sample QR id | `[qr_…]` |
 | Phones used | `[e.g. iPhone 15 Safari, Pixel 8 Chrome, …]` |

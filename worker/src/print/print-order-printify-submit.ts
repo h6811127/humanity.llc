@@ -112,7 +112,7 @@ export async function submitPrintOrderToPrintify(
     planned_item_qr_ids: JSON.parse(printOrder.planned_item_qr_ids_json) as string[],
     shipping_address: resolvedShipping.address,
     quantity,
-    scan_origin: new URL(request.url).origin,
+    print_variant_id: printOrder.print_variant_id,
   });
 
   if (!submit.ok) {

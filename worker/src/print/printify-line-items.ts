@@ -2,7 +2,7 @@
  * Generate + upload per-item QR artwork and resolve Printify line items for submit.
  */
 
-import { renderPrintStickerFromScanUrl } from "../resolver/scan-qr";
+import { renderPrintArtworkFromScanUrl } from "../resolver/scan-qr";
 import { buildPlannedItemScanUrl } from "./print-scan-url";
 import {
   resolvePrintifyArtworkConfig,
@@ -14,6 +14,9 @@ import {
   createPrintifyEphemeralProduct,
   uploadPrintifyArtworkSvg,
 } from "./printify-upload";
+import { GLITCH_HOODIE_TEMPLATE_ID } from "./print-catalog";
+import { resolveGlitchHoodiePrintifyVariantId } from "./glitch-hoodie-variant-matrix";
+import { applyPrintTemplateToArtworkConfig } from "./print-template-render";
 import { resolvePrintifyLineItem } from "./printify-template-config";
 
 export interface PreparedPrintifyLineItem {
@@ -51,6 +54,7 @@ export async function preparePrintifyLineItems(
     planned_item_qr_ids: string[];
     quantity: number;
     scan_origin?: string;
+    print_variant_id?: string | null;
   },
   shopId: number,
   fetchImpl: typeof fetch = fetch
@@ -86,6 +90,14 @@ export async function preparePrintifyLineItems(
     };
   }
 
+  let resolvedArtwork = applyPrintTemplateToArtworkConfig(artworkConfig, input.template_id);
+  if (input.template_id === GLITCH_HOODIE_TEMPLATE_ID && input.print_variant_id?.trim()) {
+    const printifyVariantId = resolveGlitchHoodiePrintifyVariantId(input.print_variant_id);
+    if (printifyVariantId) {
+      resolvedArtwork = { ...resolvedArtwork, variant_id: printifyVariantId };
+    }
+  }
+
   const qrIds = input.planned_item_qr_ids.filter((id) => typeof id === "string" && id.trim());
   if (qrIds.length === 0) {
     return {
@@ -111,7 +123,7 @@ export async function preparePrintifyLineItems(
     let svg: string;
     try {
       const scanUrl = buildPlannedItemScanUrl(input.profile_id, qrId, scanOrigin);
-      svg = await renderPrintStickerFromScanUrl(scanUrl);
+      svg = await renderPrintArtworkFromScanUrl(scanUrl, input.template_id);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Artwork generation failed.";
       return {
@@ -143,7 +155,7 @@ export async function preparePrintifyLineItems(
       shopId,
       {
         title: `Humanity ${input.print_order_id} · ${qrId}`,
-        artwork: artworkConfig,
+        artwork: resolvedArtwork,
         upload_id: upload.upload_id,
       },
       fetchImpl
@@ -159,7 +171,7 @@ export async function preparePrintifyLineItems(
 
     lineItems.push({
       product_id: product.product_id,
-      variant_id: artworkConfig.variant_id,
+      variant_id: resolvedArtwork.variant_id,
       quantity: 1,
       upload_id: upload.upload_id,
     });
