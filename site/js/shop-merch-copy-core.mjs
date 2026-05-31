@@ -129,7 +129,7 @@ export const SHOP_GLITCH_PRINT_ARTIFACT_CALLOUT = {
     "Some founding hoodies arrive with a production artifact we still see on Printify runs: part of the QR modules print in blue or purple on fabric instead of red. We treat these as limited variance in the batch, not misprints to hide.",
   caption:
     "Founding-run example. Scanning may be harder or impossible depending on camera and light. The ink is still yours; the glitch is the edition.",
-  imageSrc: "/assets/glitch-print-chromatic-artifact.png",
+  imageSrc: "/assets/glitch-print-chromatic-artifact.png?v=2",
   imageAlt:
     "Example Glitch hoodie back print where the lower QR modules shifted to blue and purple on charcoal heather fabric",
 };

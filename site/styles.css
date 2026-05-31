@@ -4925,7 +4925,6 @@ html[data-landing-focus="on"] .screen-landing {
   width: min(100%, 20rem);
   margin: 0 auto;
   border-radius: var(--radius);
-  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .shop-print-glitch-figure figcaption {
