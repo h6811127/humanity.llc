@@ -7684,6 +7684,78 @@ a.wallet-pin-open {
   color: var(--grey);
 }
 
+/* Landing merch preview — compact Register A row after How it works */
+.landing-merch-preview {
+  margin: 28px 0 0;
+}
+
+.landing-merch-preview .section-kicker {
+  margin-bottom: 4px;
+}
+
+.landing-merch-preview .group-label {
+  margin-bottom: 8px;
+}
+
+.landing-merch-preview .group-intro.short {
+  margin-bottom: 14px;
+}
+
+.landing-merch-preview__figure {
+  margin: 0 0 12px;
+}
+
+.landing-merch-preview__link {
+  display: block;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.12);
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
+}
+
+.landing-merch-preview__link:focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 2px;
+}
+
+.landing-merch-preview__img {
+  display: block;
+  width: 100%;
+  max-width: 20rem;
+  height: auto;
+  margin: 0 auto;
+  background: #1e2a44;
+}
+
+.landing-merch-preview__caption {
+  margin: 10px 2px 0;
+  font-size: 13px;
+  line-height: 1.4;
+  text-align: center;
+  color: var(--grey);
+}
+
+.landing-merch-preview__actions {
+  margin: 4px 0 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: #f2f2f7;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.landing-merch-preview__actions .list-row {
+  background: transparent;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.landing-merch-preview__actions .list-row:last-child {
+  border-bottom: none;
+}
+
+.screen-landing > .landing-how-it-works + .landing-merch-preview {
+  margin-top: 24px;
+}
+
 /* Landing final CTA — hc-emphasis-card (docs/LANDING_FINAL_CTA_EMPHASIS_CARD.md) */
 .landing-final-cta.hc-emphasis-card {
   margin: 0;
