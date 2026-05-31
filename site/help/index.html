@@ -60,6 +60,18 @@
               </a>
             </li>
             <li class="list-row list-action">
+              <a href="/help/#safari-keys">
+                <span class="list-icon list-icon-tone-orange" aria-hidden="true"
+                  ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg></span
+                >
+                <span class="list-content">
+                  <span class="list-title">Safari &amp; iOS keys</span>
+                  <span class="list-sub">Tab session, saved wallet, Camera QR, PWA</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
               <a href="/features/encrypted-backups.html">
                 <span class="list-icon list-icon-tone-blue" aria-hidden="true"
                   ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4"/><path d="m21 2-9.6 9.6"/><circle cx="7.5" cy="15.5" r="5.5"/></svg></span
@@ -97,6 +109,32 @@
               <strong>Saved on this device</strong> keeps ownership in this browser after you close tabs.
               Use <strong>Open controls</strong> on <a href="/wallet/">My objects</a> to manage again.
               Auto-save is on by default after create.
+            </p>
+          </div>
+          <div class="help-safari-keys settings-panel settings-panel-info" id="safari-keys">
+            <p class="settings-panel-lead">
+              <strong>Two stores — do not conflate them.</strong>
+              <strong>Tab session</strong> (<code>hc_created</code>) can sign revoke and live proof.
+              <strong>Saved on this device</strong> (<code>hc_wallet</code>) survives tab close but
+              cannot sign until keys are restored into the active tab.
+            </p>
+            <p class="settings-panel-lead">
+              <strong>iPhone Camera QR</strong> opens a fresh Safari tab with an empty session.
+              Use <strong>Open controls</strong> on saved cards, quiet restore on scan pages, or
+              scan from the Home Screen PWA when possible.
+            </p>
+            <p class="settings-panel-lead">
+              <strong>PWA vs Safari</strong> — Add to Home Screen shares saved wallet but not tab
+              session. Camera and links from other apps open Safari, not your installed app.
+            </p>
+            <p class="settings-panel-lead">
+              <strong>Private browsing</strong> — create and save are blocked; storage may be cleared
+              when the session ends. Use a normal browser profile and save an encrypted backup.
+            </p>
+            <p class="settings-panel-lead">
+              <strong>Storage pressure / ITP</strong> — Safari may evict local data after extended
+              disuse. If the hub shows empty but you had cards, try import backup or recovery key —
+              the operator cannot restore lost keys.
             </p>
           </div>
         </section>

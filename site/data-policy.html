@@ -131,63 +131,23 @@
 
         <section class="group">
           <h2 class="group-label">Key custody</h2>
-          <ul class="list">
-            <li class="list-row">
-              <span class="list-icon list-icon-tone-green" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2l7 4v6c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-4z"/><path d="m9 12 2 2 4-4"/></svg>
-              </span>
-              <span class="list-content">
-                <span class="list-title">Owner key stays on your device</span>
-                <span class="list-sub"
-                  >The browser can sign revoke or live proof only while this tab still has the key,
-                  or after you unlock a saved backup or recovery key locally.</span
-                >
-              </span>
-            </li>
-            <li class="list-row">
-              <span class="list-icon list-icon-tone-purple" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
-              </span>
-              <span class="list-content">
-                <span class="list-title">Backups download locally</span>
-                <span class="list-sub"
-                  >Encrypted backup files and passphrases stay with you unless you choose to store
-                  them elsewhere.</span
-                >
-              </span>
-            </li>
-            <li class="list-row">
-              <span class="list-icon list-icon-tone-red" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m4 4 16 16"/><path d="M9.17 9.17A3 3 0 0 0 15 10"/><path d="M9.9 4.24A10.94 10.94 0 0 1 12 4c5 0 9.27 3.11 11 7.5a11.8 11.8 0 0 1-2.16 3.19"/><path d="M6.71 6.72C3.73 8.23 1.45 10.62 1 12c.62 1.53 1.67 2.94 3.05 4.1"/><path d="M14.12 14.12A3 3 0 0 1 9.88 9.88"/></svg>
-              </span>
-              <span class="list-content">
-                <span class="list-title">No operator backdoor</span>
-                <span class="list-sub"
-                  >humanity.llc can verify signed actions. It cannot recover your passphrase, load
-                  your private key, or revoke on your behalf.</span
-                >
-              </span>
-            </li>
-          </ul>
-        </section>
-
-        <section class="group">
-          <h2 class="group-label">Access logs</h2>
-          <p class="group-intro">
-            Default: no scan logging. Any future minimal logs require governance approval
-            and published retention, not a silent product change.
-          </p>
-        </section>
-
-        <section class="group">
-          <h2 class="group-label">Key custody</h2>
           <ul class="list list-compact">
             <li class="list-row">
               <span class="list-content">
                 <span class="list-title">Session-only key</span>
                 <span class="list-sub"
                   >The owner key is generated in your browser and kept only while the create tab or
-                  owner session still has it.</span
+                  owner session still has it. Revoke and live proof require signing material in
+                  this tab, or unlocking a saved backup or recovery key locally.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Saved on this device</span>
+                <span class="list-sub"
+                  ><strong>Save ownership on this device</strong> copies control to browser storage
+                  so other tabs can restore signing. The operator never receives private keys.</span
                 >
               </span>
             </li>
@@ -195,7 +155,7 @@
               <span class="list-content">
                 <span class="list-title">Encrypted backup</span>
                 <span class="list-sub"
-                  >A backup file stays client-side. The passphrase is never sent to humanity.llc;
+                  >Backup files download client-side. The passphrase is never sent to humanity.llc;
                   lose it and the backup cannot be reset.</span
                 >
               </span>
@@ -213,7 +173,83 @@
               <span class="list-content">
                 <span class="list-title">No operator backdoor</span>
                 <span class="list-sub"
-                  >humanity.llc cannot recover lost keys, decrypt backups, or revoke on your behalf.</span
+                  >humanity.llc can verify signed actions. It cannot recover lost passphrases,
+                  decrypt backups, load your private key, or revoke on your behalf.</span
+                >
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <section class="group">
+          <h2 class="group-label">Client UI (not operator storage)</h2>
+          <p class="group-intro">
+            Saved card rows on <a href="/wallet/">My objects</a> and the device hub may show
+            <strong>checked … ago</strong>. That timestamp is only when <strong>this browser</strong>
+            last successfully polled resolver status for a saved card — stored locally in session
+            storage, not sent to or retained by the operator. It is not a log of who scanned the QR.
+          </p>
+        </section>
+
+        <section class="group">
+          <h2 class="group-label">Commerce firewall</h2>
+          <ul class="list list-compact">
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">QR payloads stay clean</span>
+                <span class="list-sub"
+                  >Printed URLs must not embed order IDs, emails, or shipping fields.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Shop stays separate</span>
+                <span class="list-sub"
+                  >Payment and shipping PII live in Shopify / Printify — not in the resolver database.
+                  Buying merch does not upgrade verification or vouch state.</span
+                >
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <section class="group">
+          <h2 class="group-label">Access logs</h2>
+          <p class="group-intro">
+            Default: no scan logging. On the reference network,
+            <code>GET /c/…</code>, status JSON, and QR credential lookups are not access-logged.
+            Status JSON exposes <code>scan.limits.scan_analytics: false</code>. Any future minimal
+            logs require governance approval and published retention — not a silent product change.
+          </p>
+        </section>
+
+        <section class="group">
+          <h2 class="group-label">Retention</h2>
+          <ul class="list list-compact">
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Active cards</span>
+                <span class="list-sub"
+                  >Public card and credential state stays until owner revoke, disable, or operator
+                  suspension.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Orphan registrations</span>
+                <span class="list-sub"
+                  >Cards that stay active but are never updated, have no vouches, and have no live QR
+                  may be purged automatically after 90 days.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Live-control challenges</span>
+                <span class="list-sub"
+                  >Short TTL in minutes — not kept as long-term history.</span
                 >
               </span>
             </li>

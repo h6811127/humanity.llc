@@ -11,7 +11,7 @@ const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const outDir = path.join(root, "features");
 
 /** Recruiter-facing round number — see docs/FEATURE_MAP_MAINTENANCE.md; exact: npm run worker:test */
-const WORKER_TEST_COUNT_LABEL = "1,400+";
+const WORKER_TEST_COUNT_LABEL = "2,000+";
 
 const ICONS = {
   status: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>`,
@@ -67,7 +67,7 @@ const FEATURES = [
       limits:
         "Control stays in this tab until you <strong>save ownership on this device</strong> on <a href=\"/created/\">/created/</a> (auto-save is on by default). Operator cannot restore lost ownership. Printed URL exposes <code>profile_id</code> and <code>qr_id</code>.",
       advanced:
-        "Owner signing material starts in <code>sessionStorage</code> (<code>hc_created</code>) per tab. <strong>Save ownership on this device</strong> copies control to <code>localStorage</code> (<code>hc_wallet</code>) for other tabs on this browser.",
+        "Owner signing material starts in <code>sessionStorage</code> (<code>hc_created</code>) per tab. <strong>Save ownership on this device</strong> copies control to <code>localStorage</code> (<code>hc_wallet</code>) for other tabs on this browser. On iOS Safari, Camera QR opens a fresh tab — see <a href=\"/help/#safari-keys\">Safari keys</a> on the help guide.",
       future: "Federated resolvers implementing the same <code>hc/v1</code> API; NFC/mesh carriers pointing at the same truth; optional multi-device sync without central key custody.",
     },
   },
@@ -367,8 +367,9 @@ function esc(s) {
   return s;
 }
 
-function aspectBlock(aspect, body, open) {
-  return `<details class="settings-disclosure settings-disclosure-info feature-aspect"${open ? " open" : ""}>
+function aspectBlock(aspect, body, open, anchorId) {
+  const idAttr = anchorId ? ` id="${anchorId}"` : "";
+  return `<details class="settings-disclosure settings-disclosure-info feature-aspect"${idAttr}${open ? " open" : ""}>
   <summary class="settings-summary">
     <span class="list-icon list-icon-tone-${aspect.tone}" aria-hidden="true">${ICONS[aspect.icon]}</span>
     <span class="settings-summary-text">
@@ -386,7 +387,14 @@ function renderFeaturePage(f, i) {
   const prev = FEATURES[i - 1];
   const next = FEATURES[i + 1];
   const aspectsHtml = ASPECT_META.filter((a) => a.key !== "advanced" || f.aspects.advanced)
-    .map((a, j) => aspectBlock(a, esc(f.aspects[a.key]), j === 0))
+    .map((a, j) =>
+      aspectBlock(
+        a,
+        esc(f.aspects[a.key]),
+        j === 0,
+        f.slug === "card-creation" && a.key === "advanced" ? "keys-custody" : null
+      )
+    )
     .join("\n");
 
   const nav = `<section class="group">

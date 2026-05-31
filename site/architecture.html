@@ -186,6 +186,55 @@
         </section>
 
         <section class="group">
+          <h2 class="group-label">Browser custody (on this device)</h2>
+          <p class="group-intro short">
+            The resolver stores public state. <strong>Signing ability</strong> lives in the steward&rsquo;s
+            browser — not on humanity.llc servers. See
+            <a href="/help/#safari-keys">Safari keys</a> for iOS-specific limits.
+          </p>
+          <ul class="list list-compact">
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Tab session vs saved wallet</span>
+                <span class="list-sub"
+                  ><code>sessionStorage</code> (<code>hc_created</code>) holds signing keys for this tab.
+                  <code>localStorage</code> (<code>hc_wallet</code>) survives tab close after
+                  <strong>Save ownership on this device</strong> — but other tabs must restore keys
+                  before signing.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Device shell</span>
+                <span class="list-sub"
+                  >Hub, wallet, status dot, and inbox on <code>/</code>, <code>/wallet/</code>, and
+                  <code>/created/</code>. No accounts — everything is local to this browser.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">PWA vs Safari browser</span>
+                <span class="list-sub"
+                  >Add to Home Screen shares saved wallet but not tab session. iPhone Camera QR opens
+                  Safari, not the Home Screen app — plan for restore or same-tab scan.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Hosted steward tier</span>
+                <span class="list-sub"
+                  >Optional push for live proof when the tab is hidden — partial, production-gated.
+                  Keys still never leave the device.</span
+                >
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <section class="group">
           <h2 class="group-label">Decisions &amp; tradeoffs</h2>
           <ul class="list list-compact">
             <li class="list-row">
