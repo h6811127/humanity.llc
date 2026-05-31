@@ -17,6 +17,11 @@ describe("store-rows-handler", () => {
       detail_path: "/shop/products/glitch_hoodie_v1/",
       cta_label: "Customize your QR",
     });
+    expect(body.rows[0].products[1]).toMatchObject({
+      product_id: "founding_purse_v1",
+      cta_label: "Preview your QR",
+      action_path: "/shop/customize/?product=founding_purse_v1",
+    });
   });
 
   it("GET /v1/store/products/{id} returns published product", async () => {
