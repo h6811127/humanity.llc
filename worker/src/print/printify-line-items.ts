@@ -14,6 +14,7 @@ import {
   createPrintifyEphemeralProduct,
   uploadPrintifyArtworkSvg,
 } from "./printify-upload";
+import type { BuyerPrintFrameBackground } from "./print-frame-background";
 import { GLITCH_HOODIE_TEMPLATE_ID } from "./print-catalog";
 import { resolveGlitchHoodiePrintifyVariantId } from "./glitch-hoodie-variant-matrix";
 import { applyPrintTemplateToArtworkConfig } from "./print-template-render";
@@ -55,6 +56,7 @@ export async function preparePrintifyLineItems(
     quantity: number;
     scan_origin?: string;
     print_variant_id?: string | null;
+    print_frame_background?: BuyerPrintFrameBackground | null;
   },
   shopId: number,
   fetchImpl: typeof fetch = fetch
@@ -123,7 +125,11 @@ export async function preparePrintifyLineItems(
     let svg: string;
     try {
       const scanUrl = buildPlannedItemScanUrl(input.profile_id, qrId, scanOrigin);
-      svg = await renderPrintArtworkFromScanUrl(scanUrl, input.template_id);
+      svg = await renderPrintArtworkFromScanUrl(
+        scanUrl,
+        input.template_id,
+        input.print_frame_background
+      );
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Artwork generation failed.";
       return {

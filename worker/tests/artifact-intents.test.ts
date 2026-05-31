@@ -95,6 +95,7 @@ function dbFor(
               string,
               string | null,
               string | null,
+              string,
               number,
               string,
               string,
@@ -109,18 +110,33 @@ function dbFor(
               source_qr_id: input[2],
               product_id: input[3],
               print_variant_id: input[4],
-              quantity: input[5],
-              planned_item_qr_ids_json: input[6],
-              planned_print_artifact_ids_json: input[7],
+              print_frame_background: input[5] as ArtifactIntentRow["print_frame_background"],
+              quantity: input[6],
+              planned_item_qr_ids_json: input[7],
+              planned_print_artifact_ids_json: input[8],
               pending_mint_credentials_json: null,
-              status: input[8] as ArtifactIntentRow["status"],
-              expires_at: input[9],
-              created_at: input[10],
-              updated_at: input[11],
+              status: input[9] as ArtifactIntentRow["status"],
+              expires_at: input[10],
+              created_at: input[11],
+              updated_at: input[12],
             };
             intents.set(row.artifact_intent_id, row);
           }
-          if (sql.includes("UPDATE artifact_intents")) {
+          if (sql.includes("UPDATE artifact_intents") && sql.includes("print_frame_background")) {
+            const printVariantId = args[0] as string | null;
+            const printFrameBackground = args[1] as ArtifactIntentRow["print_frame_background"];
+            const updatedAt = args[2] as string;
+            const id = args[3] as string;
+            const existing = intents.get(id);
+            if (existing) {
+              intents.set(id, {
+                ...existing,
+                print_variant_id: printVariantId,
+                print_frame_background: printFrameBackground,
+                updated_at: updatedAt,
+              });
+            }
+          } else if (sql.includes("UPDATE artifact_intents")) {
             const status = args[0] as ArtifactIntentRow["status"];
             const updatedAt = args[1] as string;
             const id = args[2] as string;
@@ -218,6 +234,26 @@ describe("artifact intent pre-commerce guard (M4.4)", () => {
     expect(intents.size).toBe(1);
   });
 
+  it("persists transparent print_frame_background for Glitch navy on create", async () => {
+    const intents = new Map<string, ArtifactIntentRow>();
+    const res = await handlePostArtifactIntent(
+      request({
+        profile_id: PROFILE,
+        source_qr_id: QR,
+        product_id: "glitch_hoodie_v1",
+        print_variant_id: "navy-m",
+        print_frame_background: "transparent",
+        quantity: 1,
+      }),
+      dbFor({ card: card(), qr: qr(), verification: summary() }, intents)
+    );
+    expect(res.status).toBe(201);
+    const json = (await res.json()) as { print_frame_background: string };
+    expect(json.print_frame_background).toBe("transparent");
+    const stored = [...intents.values()][0];
+    expect(stored?.print_frame_background).toBe("transparent");
+  });
+
   it("rejects invalid quantity", async () => {
     const res = await handlePostArtifactIntent(
       request({ profile_id: PROFILE, source_qr_id: QR, quantity: 11 }),
@@ -236,10 +272,13 @@ describe("artifact intent pre-commerce guard (M4.4)", () => {
       artifact_intent_id: intentId,
       profile_id: PROFILE,
       source_qr_id: QR,
-      product_id: "prod_sticker_square",
+      product_id: "glitch_hoodie_v1",
+      print_variant_id: "navy-m",
+      print_frame_background: "full",
       quantity: 1,
       planned_item_qr_ids_json: JSON.stringify(["qr_planned1"]),
       planned_print_artifact_ids_json: JSON.stringify(["pa_planned1"]),
+      pending_mint_credentials_json: null,
       status: "proofed",
       expires_at: future,
       created_at: "2026-05-16T17:00:00Z",
@@ -249,7 +288,12 @@ describe("artifact intent pre-commerce guard (M4.4)", () => {
 
     const res = await handlePostArtifactIntentAttach(
       request(
-        { shopify_variant_id: "gid://shopify/ProductVariant/123", proof_acknowledged: true },
+        {
+          shopify_variant_id: "gid://shopify/ProductVariant/123",
+          print_variant_id: "navy-l",
+          print_frame_background: "transparent",
+          proof_acknowledged: true,
+        },
         `/v1/store/artifact-intents/${intentId}/attach`
       ),
       dbFor({ card: card(), qr: qr(), verification: summary() }, intents),
@@ -258,18 +302,24 @@ describe("artifact intent pre-commerce guard (M4.4)", () => {
 
     const json = (await res.json()) as {
       status: string;
+      print_frame_background: string;
       shopify: { cart_line_attributes: { key: string; value: string }[] };
     };
     expect(res.status).toBe(200);
     expect(json.status).toBe("attached_to_cart");
+    expect(json.print_frame_background).toBe("transparent");
     expect(json.shopify.cart_line_attributes).toEqual(
       expect.arrayContaining([
         { key: "artifact_intent_id", value: intentId },
         { key: "planned_item_qr_ids", value: "qr_planned1" },
-        { key: "print_template_id", value: "hc-sticker-square-v1" },
+        { key: "print_variant_id", value: "navy-l" },
+        { key: "print_frame_background", value: "transparent" },
+        { key: "print_template_id", value: "hc-glitch-hoodie-v1" },
       ])
     );
     expect(intents.get(intentId)?.status).toBe("attached_to_cart");
+    expect(intents.get(intentId)?.print_frame_background).toBe("transparent");
+    expect(intents.get(intentId)?.print_variant_id).toBe("navy-l");
   });
 
   it("attach rejects missing proof acknowledgment", async () => {
@@ -280,9 +330,12 @@ describe("artifact intent pre-commerce guard (M4.4)", () => {
       profile_id: PROFILE,
       source_qr_id: QR,
       product_id: "prod_sticker_square",
+      print_variant_id: null,
+      print_frame_background: "full",
       quantity: 1,
       planned_item_qr_ids_json: JSON.stringify(["qr_planned1"]),
       planned_print_artifact_ids_json: JSON.stringify(["pa_planned1"]),
+      pending_mint_credentials_json: null,
       status: "proofed",
       expires_at: future,
       created_at: "2026-05-16T17:00:00Z",
@@ -309,9 +362,12 @@ describe("artifact intent pre-commerce guard (M4.4)", () => {
       profile_id: PROFILE,
       source_qr_id: QR,
       product_id: null,
+      print_variant_id: null,
+      print_frame_background: "full",
       quantity: 1,
       planned_item_qr_ids_json: "[]",
       planned_print_artifact_ids_json: "[]",
+      pending_mint_credentials_json: null,
       status: "proofed",
       expires_at: "2020-01-01T00:00:00Z",
       created_at: "2020-01-01T00:00:00Z",

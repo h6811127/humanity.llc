@@ -3,6 +3,17 @@
  * See docs/MERCH_FUNNEL_MVP.md · sticker mockup uses qrFrameMetrics portrait card on 3×3″ sheet.
  */
 import { qrFrameMetrics } from "./qr-branding.mjs";
+import {
+  isProofConsentComplete,
+  proofConsentRequiredIds,
+  proofConsentStatusMessage,
+} from "./shop-proof-consent-core.mjs";
+import {
+  loadRootSessionRecordForMerch,
+  merchPreCheckoutRecoveryGateState,
+} from "./merch-backup-nudge-core.mjs";
+
+const PERSONALIZE_MERCH_CONSENT_IDS = proofConsentRequiredIds("personalized");
 
 /** Printify kiss-cut billing tier (inches). */
 export const STICKER_MOCK_SHEET_IN = 3;
@@ -266,4 +277,35 @@ export function personalizeProductDisplay(product, variant = null) {
       typeof product.catalog_description === "string" ? product.catalog_description.trim() : "",
     variantLabel: variant?.label ?? null,
   };
+}
+
+/**
+ * Status line under proof consent — includes recovery gate when consent is complete (M13).
+ * @param {{
+ *   checkoutOpen: boolean;
+ *   previewModeCardFallback?: boolean;
+ *   consentCheckedIds: Set<string> | Iterable<string>;
+ *   storage?: Pick<Window, "sessionStorage" | "localStorage">;
+ * }} input
+ */
+export function customizeMerchCheckoutStatusMessage(input) {
+  const { checkoutOpen, previewModeCardFallback = false, consentCheckedIds, storage } =
+    input;
+  if (previewModeCardFallback) {
+    return checkoutOpen
+      ? "Showing your card QR while print setup finishes. Confirm limits below to continue."
+      : "Showing your card QR. A unique print code is reserved when personalized checkout opens.";
+  }
+  const consentComplete = isProofConsentComplete(
+    PERSONALIZE_MERCH_CONSENT_IDS,
+    consentCheckedIds
+  );
+  const recoveryGate = merchPreCheckoutRecoveryGateState(
+    loadRootSessionRecordForMerch(storage ?? globalThis),
+    storage ?? globalThis
+  );
+  if (checkoutOpen && consentComplete && recoveryGate.blocked) {
+    return "Proof approved. Save a recovery method below to unlock checkout.";
+  }
+  return proofConsentStatusMessage("personalized", checkoutOpen, consentCheckedIds);
 }

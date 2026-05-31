@@ -3,6 +3,7 @@ import { PROFILE_ID_REGEX } from "../crypto";
 import {
   getArtifactIntent,
   insertArtifactIntent,
+  updateArtifactIntentAttachFields,
   updateArtifactIntentPendingMint,
   updateArtifactIntentStatus,
   type ArtifactIntentRow,
@@ -20,6 +21,7 @@ import {
   isKnownStoreProductId,
   resolvePrintTemplateForStoreProductId,
 } from "../print/print-catalog";
+import { resolveArtifactIntentPrintFrameBackground } from "../print/print-frame-background";
 
 interface ArtifactIntentRequest {
   profile_id?: unknown;
@@ -29,6 +31,7 @@ interface ArtifactIntentRequest {
   quantity?: unknown;
   shopify_variant_id?: unknown;
   print_variant_id?: unknown;
+  print_frame_background?: unknown;
   proof_acknowledged?: unknown;
 }
 
@@ -98,6 +101,7 @@ function artifactIntentResponse(
     planned_print_artifact_ids: plannedPrintArtifactIds,
     product_id: row.product_id,
     print_variant_id: row.print_variant_id,
+    print_frame_background: row.print_frame_background,
     shopify_variant_id: shopifyVariantId,
     quantity: row.quantity,
     preview_url: `${origin}/print/previews/${row.artifact_intent_id}`,
@@ -129,11 +133,13 @@ function shopifyCartMetadata(row: ArtifactIntentRow, printTemplateId: string | n
       ...(row.print_variant_id
         ? [{ key: "print_variant_id", value: row.print_variant_id }]
         : []),
+      { key: "print_frame_background", value: row.print_frame_background },
       ...(templateId ? [{ key: "print_template_id", value: templateId }] : []),
     ],
     order_note_attributes: [
       { name: "artifact_intent_id", value: row.artifact_intent_id },
       { name: "profile_id", value: row.profile_id },
+      { name: "print_frame_background", value: row.print_frame_background },
       ...(templateId ? [{ name: "print_template_id", value: templateId }] : []),
     ],
   };
@@ -294,12 +300,19 @@ export async function handlePostArtifactIntent(
     plannedPrintArtifactIds.push(generatePrintArtifactId());
   }
 
+  const printFrameBackground = resolveArtifactIntentPrintFrameBackground({
+    product_id: productId,
+    print_variant_id: printVariantId,
+    print_frame_background: body.print_frame_background,
+  });
+
   await insertArtifactIntent(db, {
     artifact_intent_id: artifactIntentId,
     profile_id: profileId,
     source_qr_id: sourceQrId,
     product_id: productId,
     print_variant_id: printVariantId,
+    print_frame_background: printFrameBackground,
     quantity,
     planned_item_qr_ids: plannedItemQrIds,
     planned_print_artifact_ids: plannedPrintArtifactIds,
@@ -314,6 +327,7 @@ export async function handlePostArtifactIntent(
     source_qr_id: sourceQrId,
     product_id: productId,
     print_variant_id: printVariantId,
+    print_frame_background: printFrameBackground,
     quantity,
     planned_item_qr_ids_json: JSON.stringify(plannedItemQrIds),
     planned_print_artifact_ids_json: JSON.stringify(plannedPrintArtifactIds),
@@ -383,11 +397,30 @@ export async function handlePostArtifactIntentAttach(
       ? body.shopify_variant_id.trim()
       : null;
 
+  const printVariantId =
+    typeof body.print_variant_id === "string" && body.print_variant_id.trim()
+      ? body.print_variant_id.trim()
+      : row.print_variant_id;
+
+  const printFrameBackground = resolveArtifactIntentPrintFrameBackground({
+    product_id: row.product_id,
+    print_variant_id: printVariantId,
+    print_frame_background: body.print_frame_background ?? row.print_frame_background,
+  });
+
   const updatedAt = new Date().toISOString();
+  await updateArtifactIntentAttachFields(db, artifactIntentId, {
+    print_variant_id: printVariantId,
+    print_frame_background: printFrameBackground,
+    updatedAt,
+  });
+  row.print_variant_id = printVariantId;
+  row.print_frame_background = printFrameBackground;
+  row.updated_at = updatedAt;
+
   if (row.status === "proofed" || row.status === "draft") {
     await updateArtifactIntentStatus(db, artifactIntentId, "attached_to_cart", updatedAt);
     row.status = "attached_to_cart";
-    row.updated_at = updatedAt;
   }
 
   return jsonResponse({

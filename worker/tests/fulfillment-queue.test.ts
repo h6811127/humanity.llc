@@ -9,6 +9,7 @@ import {
   HOODIE_LIVE_OBJECT_PRODUCT_ID,
   HOODIE_PRINT_TEMPLATE_ID,
 } from "../src/print/print-catalog";
+import { normalizeBuyerPrintFrameBackground } from "../src/print/print-frame-background";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const INTENT = "ai_FulfillQueueTest01";
@@ -21,6 +22,7 @@ function intentRow(overrides: Partial<ArtifactIntentRow> = {}): ArtifactIntentRo
     source_qr_id: "qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
     product_id: "sticker_personalized_v1",
     print_variant_id: null,
+    print_frame_background: "full",
     quantity: 1,
     planned_item_qr_ids_json: JSON.stringify(["qr_plannedFulfill1"]),
     planned_print_artifact_ids_json: JSON.stringify(["pa_plannedFulfill1"]),
@@ -83,14 +85,15 @@ function dbFor(state: State): D1Database {
               printify_shop_id: null,
               template_id: args[6] as string,
               print_variant_id: (args[7] as string | null) ?? null,
-              status: args[8] as PrintOrderRow["status"],
-              shipping_method: args[9] as string,
+              print_frame_background: normalizeBuyerPrintFrameBackground(args[8]),
+              status: args[9] as PrintOrderRow["status"],
+              shipping_method: args[10] as string,
               tracking_carrier: null,
               tracking_number: null,
               tracking_url: null,
               last_reconciled_at: null,
-              created_at: args[10] as string,
-              updated_at: args[11] as string,
+              created_at: args[11] as string,
+              updated_at: args[12] as string,
             };
             state.printOrders.set(row.commerce_order_id, row);
           }
@@ -169,6 +172,30 @@ describe("ensurePrintOrderForCommerceOrder", () => {
     expect(result?.print_order.print_variant_id).toBe("white-xl");
   });
 
+  it("copies print_frame_background from artifact intent onto print order", async () => {
+    const state: State = {
+      intents: new Map([
+        [
+          INTENT,
+          intentRow({
+            product_id: "glitch_hoodie_v1",
+            print_frame_background: "transparent",
+          }),
+        ],
+      ]),
+      printOrders: new Map(),
+      commercePrintOrderIds: new Map(),
+    };
+
+    const result = await ensurePrintOrderForCommerceOrder(
+      dbFor(state),
+      commerceOrder(),
+      "2026-05-16T18:00:00Z"
+    );
+
+    expect(result?.print_order.print_frame_background).toBe("transparent");
+  });
+
   it("returns existing print order idempotently", async () => {
     const existing: PrintOrderRow = {
       order_id: "po_existing12345678",
@@ -181,6 +208,7 @@ describe("ensurePrintOrderForCommerceOrder", () => {
       printify_shop_id: null,
       template_id: "hc-sticker-square-v1",
       print_variant_id: null,
+      print_frame_background: "full",
       status: "awaiting_production_approval",
       shipping_method: "standard",
       tracking_carrier: null,

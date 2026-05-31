@@ -10,8 +10,9 @@ import { renderPrintStickerSvg as buildPrintStickerSheetSvg } from "../../../sit
 import { credentialCodeFromScanUrl } from "../../../site/js/qr-credential-code.mjs";
 import { assertOfficialScanUrl } from "../../../site/js/qr-scan-url-lock.mjs";
 import { DEFAULT_PRINT_TEMPLATE_ID } from "../print/print-catalog";
+import type { BuyerPrintFrameBackground } from "../print/print-frame-background";
 import {
-  qrFrameRenderOptionsFromProfile,
+  qrFrameRenderOptionsForFulfillment,
   resolvePrintTemplateRenderProfile,
 } from "../print/print-template-render";
 import type { QrFrameRenderOptions } from "../print/print-template-render";
@@ -58,10 +59,14 @@ export async function renderScanQrMarkup(scanUrl: string): Promise<string> {
  */
 export async function renderPrintArtworkFromScanUrl(
   scanUrl: string,
-  templateId: string
+  templateId: string,
+  printFrameBackground?: BuyerPrintFrameBackground | null
 ): Promise<string> {
   const profile = resolvePrintTemplateRenderProfile(templateId);
-  const framed = await renderFramedScanQrSvg(scanUrl, qrFrameRenderOptionsFromProfile(profile));
+  const framed = await renderFramedScanQrSvg(
+    scanUrl,
+    qrFrameRenderOptionsForFulfillment(profile, printFrameBackground)
+  );
   const credentialCode = credentialCodeFromScanUrl(scanUrl);
   if (profile.output === "sticker_sheet") {
     return buildPrintStickerSheetSvg(framed, {

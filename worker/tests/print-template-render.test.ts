@@ -14,6 +14,7 @@ import {
 } from "../src/print/print-catalog";
 import {
   applyPrintTemplateToArtworkConfig,
+  qrFrameRenderOptionsForFulfillment,
   resolvePrintTemplateRenderProfile,
 } from "../src/print/print-template-render";
 import {
@@ -99,6 +100,22 @@ describe("renderHumanityQrFrameSvg framePadding", () => {
   });
 });
 
+describe("qrFrameRenderOptionsForFulfillment", () => {
+  it("maps buyer transparent to garment-through render opts", () => {
+    const profile = resolvePrintTemplateRenderProfile(GLITCH_HOODIE_TEMPLATE_ID);
+    expect(qrFrameRenderOptionsForFulfillment(profile, "transparent")).toEqual({
+      frameBackground: "transparent",
+      framePadding: "tight",
+      transparentQrQuietZone: true,
+      skipFinderLogo: true,
+    });
+    expect(qrFrameRenderOptionsForFulfillment(profile, "full")).toEqual({
+      frameBackground: "full",
+      framePadding: "tight",
+    });
+  });
+});
+
 describe("renderPrintArtworkFromScanUrl", () => {
   it("hoodie output is framed SVG without sticker trim sheet", async () => {
     const svg = await renderPrintArtworkFromScanUrl(SCAN_URL, GLITCH_HOODIE_TEMPLATE_ID);
@@ -110,6 +127,30 @@ describe("renderPrintArtworkFromScanUrl", () => {
   it("sticker output includes trim sheet wrapper", async () => {
     const svg = await renderPrintArtworkFromScanUrl(SCAN_URL, DEFAULT_PRINT_TEMPLATE_ID);
     expect(svg).toContain("hc-print-sticker-svg");
+  });
+
+  it("uses print_frame_background transparent for Glitch fulfillment upload SVG", async () => {
+    const full = await renderPrintArtworkFromScanUrl(
+      SCAN_URL,
+      GLITCH_HOODIE_TEMPLATE_ID,
+      "full"
+    );
+    const transparent = await renderPrintArtworkFromScanUrl(
+      SCAN_URL,
+      GLITCH_HOODIE_TEMPLATE_ID,
+      "transparent"
+    );
+    expect(full).toMatch(
+      /<rect width="[\d.]+" height="[\d.]+" rx="[\d.]+" fill="#ffffff"\/>/
+    );
+    expect(transparent).not.toMatch(
+      /<rect width="[\d.]+" height="[\d.]+" rx="[\d.]+" fill="#ffffff"\/>/
+    );
+    const extractQrInner = (framed: string) => {
+      const gMatch = framed.match(/<g transform="translate\([^)]+\)">([\s\S]*?)<\/g>\s*<text/);
+      return gMatch?.[1] ?? "";
+    };
+    expect(extractQrInner(transparent)).not.toMatch(/fill="#ffffff"|fill="#fff"/i);
   });
 
   it("transparentQrQuietZone omits white fills in QR module SVG", async () => {

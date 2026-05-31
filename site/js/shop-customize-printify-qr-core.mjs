@@ -83,6 +83,32 @@ export function readStoredGlitchPrintFrameBackground() {
 }
 
 /**
+ * Frame value for artifact-intent API (matches server color policy).
+ * @param {string} [color]
+ * @param {string} [frameBackground]
+ * @returns {GlitchPrintFrameBackgroundPreview}
+ */
+export function glitchArtifactIntentPrintFrameBackground(color, frameBackground) {
+  const frame = normalizeGlitchPrintFrameBackground(frameBackground);
+  if (frame === "transparent" && !glitchPrintTransparentOfferedForColor(color)) {
+    return "full";
+  }
+  return frame;
+}
+
+/**
+ * Cache key for reusing artifact intents when variant + print frame are unchanged.
+ * @param {{ print_variant_id?: string, shopify_variant_id?: string }} variant
+ * @param {GlitchPrintFrameBackgroundPreview} printFrameBackground
+ */
+export function artifactIntentSelectionKey(variant, printFrameBackground) {
+  const printVariantId = variant?.print_variant_id ?? "";
+  const shopifyVariantId = variant?.shopify_variant_id ?? "";
+  const frame = normalizeGlitchPrintFrameBackground(printFrameBackground);
+  return `${printVariantId}|${shopifyVariantId}|${frame}`;
+}
+
+/**
  * @param {string} color
  * @returns {boolean}
  */
@@ -168,23 +194,23 @@ export function glitchPrintFramePreviewHint(input = {}) {
   if (frameBackground === "transparent" && !onBack) {
     return (
       "Transparent garment mockups update on the Back view — use the view buttons above. " +
-      "Your planned QR below reflects the background option. Fulfillment still prints the white card until checkout stores your choice."
+      "Your planned QR below matches what we print after checkout."
     );
   }
   if (frameBackground === "transparent" && hasTransparentMock) {
     return (
       "Transparent: Printify mockup for this color (fabric shows through the QR). " +
-      "Your planned QR is below. Fulfillment still uses the white card until checkout stores your choice."
+      "Your planned QR below matches what we print after checkout."
     );
   }
   if (frameBackground === "transparent") {
     return (
       "Transparent: no Printify mock for this color yet — garment area shows a color swatch on Back. " +
-      "Your planned QR is below. Run printify:export-glitch-mockups with PRINTIFY_GLITCH_TRANSPARENT_PRODUCT_ID after upload."
+      "Your planned QR below matches what we print after checkout."
     );
   }
   return (
     "White card: Printify mockup above; your planned QR below uses the white card. " +
-    "Fulfillment still prints the white card until your choice is saved at checkout."
+    "That is what we print after checkout."
   );
 }

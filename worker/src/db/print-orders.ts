@@ -1,3 +1,6 @@
+import type { BuyerPrintFrameBackground } from "../print/print-frame-background";
+import { normalizeBuyerPrintFrameBackground } from "../print/print-frame-background";
+
 export const PRINT_ORDER_STATUSES = [
   "draft",
   "awaiting_payment",
@@ -27,6 +30,7 @@ export interface PrintOrderRow {
   printify_shop_id: number | null;
   template_id: string;
   print_variant_id: string | null;
+  print_frame_background: BuyerPrintFrameBackground;
   status: PrintOrderStatus;
   shipping_method: string;
   tracking_carrier: string | null;
@@ -46,6 +50,7 @@ export interface InsertPrintOrderInput {
   shopify_order_id: string;
   template_id: string;
   print_variant_id?: string | null;
+  print_frame_background?: BuyerPrintFrameBackground;
   status: PrintOrderStatus;
   shipping_method: string;
   created_at: string;
@@ -53,7 +58,7 @@ export interface InsertPrintOrderInput {
 
 const PRINT_ORDER_COLUMNS = `order_id, profile_id, print_artifact_ids_json, planned_item_qr_ids_json,
               commerce_order_id, shopify_order_id, printify_order_id, printify_shop_id,
-              template_id, print_variant_id, status, shipping_method,
+              template_id, print_variant_id, print_frame_background, status, shipping_method,
               tracking_carrier, tracking_number, tracking_url, last_reconciled_at,
               created_at, updated_at`;
 
@@ -133,9 +138,9 @@ export async function insertPrintOrder(
     .prepare(
       `INSERT INTO print_orders (
         order_id, profile_id, print_artifact_ids_json, planned_item_qr_ids_json,
-        commerce_order_id, shopify_order_id, template_id, print_variant_id, status, shipping_method,
-        created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        commerce_order_id, shopify_order_id, template_id, print_variant_id, print_frame_background,
+        status, shipping_method, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .bind(
       input.order_id,
@@ -146,6 +151,7 @@ export async function insertPrintOrder(
       input.shopify_order_id,
       input.template_id,
       input.print_variant_id?.trim() || null,
+      normalizeBuyerPrintFrameBackground(input.print_frame_background),
       input.status,
       input.shipping_method,
       input.created_at,

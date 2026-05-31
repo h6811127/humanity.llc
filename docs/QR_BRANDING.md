@@ -181,7 +181,9 @@ Official generators share one encode path (red modules, EC **Q**, finder mark, h
 
 **Printify placeholder:** `print-template-render.ts` sets `printifyPlaceholder` per template (`back` for Glitch, `front` for Live Object hoodie). Env `PERSONALIZE_GLITCH_HOODIE_PRINTIFY_PLACEHOLDER` in `wrangler.toml` must stay aligned.
 
-**Customizer:** Glitch `/shop/customize/` exposes **White card** vs **Transparent** (`shop-customize-printify-qr-core.mjs`). Gallery loads two Printify mock sets from `glitch-hoodie-mockups.json`: `src` (white-card product) and `src_transparent` (transparent-art product). Toggle swaps the garment mock photo only; the buyer’s **planned QR** renders in a separate block below the mockup (not composited on the Printify JPEG), using `transparentQrQuietZone` + `skipFinderLogo` when transparent is selected. If `src_transparent` is missing for a color, transparent mode falls back to a garment swatch. **Charcoal Heather, Royal Blue:** transparent option disabled (white card only). Preview choice is `sessionStorage` until fulfillment reads it at checkout.
+**Customizer:** Glitch `/shop/customize/` exposes **White card** vs **Transparent** (`shop-customize-printify-qr-core.mjs`). Gallery loads two Printify mock sets from `glitch-hoodie-mockups.json`: `src` (white-card product) and `src_transparent` (transparent-art product). Toggle swaps the garment mock photo; the buyer’s **planned QR** renders in a separate block below the mockup (not composited on the Printify JPEG), using `transparentQrQuietZone` + `skipFinderLogo` when transparent is selected. If `src_transparent` is missing for a color, transparent mode falls back to a garment swatch. **Charcoal Heather, Royal Blue:** transparent option disabled (white card only).
+
+**Buyer → fulfillment (not preview-only):** Architecture and rollout steps are canonical in [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) § Glitch print frame background. D1 + API + customize + Printify upload (`qrFrameRenderOptionsForFulfillment`) honor stored `print_frame_background`. Physical QA sign-off (step 5) still required before treating transparent-on-fabric as the catalog default.
 
 **Export dual mockups:** `PRINTIFY_GLITCH_TRANSPARENT_PRODUCT_ID=<id> npm run printify:export-glitch-mockups` merges transparent product `images[]` into `src_transparent` per view (white-card product remains `printify_product_id`). Shop catalog: transparent art is on **Copy of Champion Hoodie** (`6a1c4fc1efb0c6a8580cdd93`); white card stays **Champion Hoodie** (`6a18a4d17f274f4c3e04f646`).
 
@@ -197,7 +199,7 @@ Official generators share one encode path (red modules, EC **Q**, finder mark, h
 
 Default scan URL links to humanity.llc (`--url` to override). Upload each PNG to a separate Printify product for mockup export. **transparent-qr** is mock/preview only — not launch fulfillment default (scan reliability).
 
-**Future (QA-gated, not launch default):** `frameBackground: "qr_only"` (white behind modules only) or `"transparent"` (no card fill; stroke + type on garment). Requires [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md) A1–A5 on Charcoal before changing catalog profile.
+**`qr_only` (future):** White island behind modules only — not a buyer toggle today. **`transparent` on fabric:** buyer-selectable for Glitch when persisted per [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md); requires physical QA sign-off before treating as the catalog default ([`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md) A1–A5).
 
 **Glitch composition:** Founding hoodie may use static Glitch art in Printify (`composition: "printify_layer"`) while middleware uploads a QR layer — today profiles use `standalone` (full framed SVG to print area). Align Printify placeholder with profile before production.
 

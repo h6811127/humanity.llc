@@ -1,6 +1,6 @@
 # Merch headless commerce — humanity.llc + Shopify + Printify
 
-**Status:** Canonical operator + engineering reference (2026-05-27)  
+**Status:** Canonical operator + engineering reference (2026-05-31)  
 **Parent:** [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) · [`MERCH_LED_V1.md`](MERCH_LED_V1.md)  
 **Specs:** [`features/Storefront v1.0.md`](features/Storefront%20v1.0.md) · [`features/Printify Fulfillment Middleware v1.0.md`](features/Printify%20Fulfillment%20Middleware%20v1.0.md) · [`V1_DECISION_LOCK.md`](V1_DECISION_LOCK.md) § Commerce stack  
 **Visual choreography:** [`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) — customize preview (Beat 3) is the storefront delight moment; scan stays shared notary
@@ -93,6 +93,46 @@ Personalization **is**:
 5. After **paid webhook** — mint `print_artifact` QRs, generate print artwork, submit Printify order
 
 The browser **never** calls Printify. See [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) § What “QR customizer” means.
+
+---
+
+## Glitch print frame background (buyer → fulfillment)
+
+Glitch `/shop/customize/` lets the buyer choose **White card** (`full`) or **Transparent** (`transparent`) for the **printed** LIVE OBJECT QR — not only the on-page preview. Today the UI can show transparent mockups and a planned-QR block below the garment; **fulfillment must read the same choice** from durable storage, not `sessionStorage` alone.
+
+**Registers** ([`QR_BRANDING.md`](QR_BRANDING.md) § Two registers): digital scan/created surfaces stay on the default full card. Print/upload uses `renderPrintArtworkFromScanUrl` with per-template profile **overridden** by the stored buyer value when `template_id` is `hc-glitch-hoodie-v1`.
+
+| Layer | Field / artifact | Values | Notes |
+|-------|------------------|--------|-------|
+| **Customizer (browser)** | `sessionStorage` `hc_glitch_print_frame_background` | `full` \| `transparent` | Restored on load; sent on intent create/attach (step 3). Cache key includes frame so variant/frame changes mint a new planned QR. |
+| **D1 `artifact_intents`** | `print_frame_background` | `full` \| `transparent` | Set at intent create/attach; source of truth at checkout. Migration `0026_artifact_intent_print_frame_background.sql`. |
+| **D1 `print_orders`** | `print_frame_background` | `full` \| `transparent` | Copied from intent when the paid webhook creates the print order. |
+| **Shopify cart/order** | line attribute `print_frame_background` | same | Operator visibility; attach step (step 2). |
+| **Printify SVG** | render opts | `frameBackground`, `transparentQrQuietZone`, `skipFinderLogo` when `transparent` | `preparePrintifyLineItems` / `renderPrintArtworkFromScanUrl` (steps 4–5). |
+
+**Color policy (customizer only):** Charcoal Heather and Royal Blue force **white card** in the UI. Navy and other colors may select transparent; physical scan QA on fabric is still required before treating transparent as the catalog default ([`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md)).
+
+**Implementation sequence (do not skip order):**
+
+| Step | Work | Status |
+|------|------|--------|
+| **1** | D1 columns + `worker/src/db/*` + copy intent → print order on webhook | **Shipped** — migration `0026`, `print-frame-background.ts`, `artifact-intents` / `print-orders` / `fulfillment-queue` |
+| **2** | `POST /v1/store/artifact-intents` + attach: accept `print_frame_background`, Shopify attributes | **Shipped** — `resolveArtifactIntentPrintFrameBackground`, attach field update, cart/order attributes |
+| **3** | Customize: send field on create/attach; refresh intent when frame or variant changes | **Shipped** — `shop-customize.mjs` + `shop-customize-printify-qr-core.mjs` |
+| **4** | Fulfillment: `renderPrintArtworkFromScanUrl` uses stored value (not static `full` profile) | **Shipped** — `qrFrameRenderOptionsForFulfillment`, Printify submit path |
+| **5** | Docs/hints + operator QA sign-off for transparent-on-fabric production | **Hints shipped** — customize copy + [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md) § A.7; **operator sign-off open** until A7.1–A7.4 pass on target color |
+
+**API (step 2):** Optional body field `print_frame_background`: `"full"` \| `"transparent"`. Resolved in `resolveArtifactIntentPrintFrameBackground()` — transparent only stored for `glitch_hoodie_v1` when `print_variant_id` color is not Charcoal Heather or Royal Blue. Responses and Shopify `cart_line_attributes` / `order_note_attributes` include `print_frame_background`. Attach always updates `print_variant_id` + `print_frame_background` before returning cart metadata.
+
+**Customize (step 3):** `createArtifactIntent` / `attachArtifactIntent` send `print_frame_background` for Glitch (`glitchArtifactIntentPrintFrameBackground`). Intent cache key is `artifactIntentSelectionKey` (variant + frame); changing Navy size or white card ↔ transparent allocates a new planned QR after debounced sync.
+
+**Fulfillment (step 4):** `preparePrintifyLineItems` → `renderPrintArtworkFromScanUrl(scanUrl, templateId, printOrder.print_frame_background)` via `qrFrameRenderOptionsForFulfillment`. Buyer `transparent` sets `frameBackground: "transparent"`, `transparentQrQuietZone: true`, `skipFinderLogo: true` (matches customize preview). Default / `full` uses template profile white card.
+
+**Regression (steps 1–4):**
+
+```bash
+npm run worker:test -- worker/tests/print-frame-background.test.ts worker/tests/artifact-intents.test.ts worker/tests/fulfillment-queue.test.ts worker/tests/print-template-render.test.ts worker/tests/printify-line-items.test.ts
+```
 
 ---
 

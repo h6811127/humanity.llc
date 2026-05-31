@@ -4,6 +4,7 @@ import { qrFrameMetrics } from "../../site/js/qr-branding.mjs";
 import {
   buildPlannedItemScanUrl,
   buildShopifyCartUrl,
+  customizeMerchCheckoutStatusMessage,
   customizeStickerMockLayout,
   isPersonalizeCheckoutReady,
   loadCardSessionForCustomize,
@@ -193,5 +194,58 @@ describe("loadCardSessionForCustomize", () => {
       },
     };
     expect(loadCardSessionForCustomize(storage)?.profile_id).toBe("p2");
+  });
+});
+
+describe("customizeMerchCheckoutStatusMessage", () => {
+  const consentComplete = new Set([
+    "commerce_not_verification",
+    "bearer_not_ownership",
+    "persistence_revocable",
+  ]);
+
+  it("prompts recovery when consent is complete but seatbelt is missing", () => {
+    const storage = {
+      sessionStorage: {
+        getItem(key: string) {
+          if (key !== "hc_created") return null;
+          return JSON.stringify({
+            profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+            owner_private_key_b58: "k",
+          });
+        },
+      },
+      localStorage: { getItem: () => null },
+    };
+    expect(
+      customizeMerchCheckoutStatusMessage({
+        checkoutOpen: true,
+        consentCheckedIds: consentComplete,
+        storage,
+      })
+    ).toContain("Save a recovery method below");
+  });
+
+  it("shows proof approved when seatbelt is satisfied", () => {
+    const storage = {
+      sessionStorage: {
+        getItem(key: string) {
+          if (key !== "hc_created") return null;
+          return JSON.stringify({
+            profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+            owner_private_key_b58: "k",
+            recovery_key_acknowledged: true,
+          });
+        },
+      },
+      localStorage: { getItem: () => null },
+    };
+    expect(
+      customizeMerchCheckoutStatusMessage({
+        checkoutOpen: true,
+        consentCheckedIds: consentComplete,
+        storage,
+      })
+    ).toContain("Proof approved");
   });
 });

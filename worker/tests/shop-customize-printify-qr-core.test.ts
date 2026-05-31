@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  artifactIntentSelectionKey,
+  glitchArtifactIntentPrintFrameBackground,
   glitchHoodieGarmentSwatchHex,
   glitchPrintFramePreviewHint,
   glitchPrintPreviewUsesGarmentSwatchOnly,
@@ -131,5 +133,36 @@ describe("isWhiteGarmentColor", () => {
 describe("readStoredGlitchPrintFrameBackground", () => {
   it("returns a valid default when storage is empty", () => {
     expect(readStoredGlitchPrintFrameBackground()).toMatch(/^(full|transparent)$/);
+  });
+});
+
+describe("artifactIntentSelectionKey", () => {
+  it("includes print frame in cache key", () => {
+    expect(
+      artifactIntentSelectionKey(
+        { print_variant_id: "navy-m", shopify_variant_id: "529" },
+        "transparent"
+      )
+    ).toBe("navy-m|529|transparent");
+    expect(
+      artifactIntentSelectionKey(
+        { print_variant_id: "navy-m", shopify_variant_id: "529" },
+        "full"
+      )
+    ).toBe("navy-m|529|full");
+  });
+});
+
+describe("glitchArtifactIntentPrintFrameBackground", () => {
+  it("coerces transparent to full for charcoal", () => {
+    expect(
+      glitchArtifactIntentPrintFrameBackground("Charcoal Heather", "transparent")
+    ).toBe("full");
+  });
+
+  it("keeps transparent for navy", () => {
+    expect(glitchArtifactIntentPrintFrameBackground("Navy", "transparent")).toBe(
+      "transparent"
+    );
   });
 });

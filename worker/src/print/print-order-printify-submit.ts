@@ -113,6 +113,7 @@ export async function submitPrintOrderToPrintify(
     shipping_address: resolvedShipping.address,
     quantity,
     print_variant_id: printOrder.print_variant_id,
+    print_frame_background: printOrder.print_frame_background,
   });
 
   if (!submit.ok) {

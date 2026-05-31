@@ -67,6 +67,14 @@ export function resolveGlitchHoodiePrintifyVariantId(
   return BY_KEY.get(key)?.printify_variant_id ?? null;
 }
 
+export function resolveGlitchHoodieVariantColor(
+  printVariantId: string | null | undefined
+): string | null {
+  const key = printVariantId?.trim() ?? "";
+  if (!key) return null;
+  return BY_KEY.get(key)?.color ?? null;
+}
+
 export function glitchHoodieVariantColors(): string[] {
   return [...new Set(GLITCH_HOODIE_VARIANT_MATRIX.map((e) => e.color))];
 }

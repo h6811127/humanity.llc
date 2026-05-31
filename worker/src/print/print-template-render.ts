@@ -8,6 +8,7 @@ import {
   GLITCH_HOODIE_TEMPLATE_ID,
   HOODIE_LIVE_OBJECT_TEMPLATE_ID,
 } from "./print-catalog";
+import type { BuyerPrintFrameBackground } from "./print-frame-background";
 import type { PrintifyArtworkConfig } from "./printify-artwork-config";
 
 /** White card behind full frame, QR island only, or no card fill (modules stay on white quiet zone). */
@@ -87,6 +88,25 @@ export function qrFrameRenderOptionsFromProfile(
     frameBackground: profile.frameBackground,
     framePadding: profile.framePadding,
   };
+}
+
+/**
+ * Merge template profile with buyer-persisted frame choice (artifact intent / print order).
+ * @see docs/MERCH_HEADLESS_COMMERCE.md § Glitch print frame background
+ */
+export function qrFrameRenderOptionsForFulfillment(
+  profile: PrintTemplateRenderProfile,
+  printFrameBackground?: BuyerPrintFrameBackground | null
+): QrFrameRenderOptions {
+  if (printFrameBackground === "transparent") {
+    return {
+      frameBackground: "transparent",
+      framePadding: profile.framePadding,
+      transparentQrQuietZone: true,
+      skipFinderLogo: true,
+    };
+  }
+  return qrFrameRenderOptionsFromProfile(profile);
 }
 
 /** Apply approved-template placeholder (e.g. Glitch → back) on top of env defaults. */

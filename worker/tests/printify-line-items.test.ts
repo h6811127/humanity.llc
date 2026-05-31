@@ -191,4 +191,54 @@ describe("preparePrintifyLineItems", () => {
       ],
     });
   });
+
+  it("renders transparent print_frame_background in uploaded Glitch artwork", async () => {
+    const calls: { url: string; body: unknown }[] = [];
+    const fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
+      const body = init?.body ? JSON.parse(String(init.body)) : null;
+      calls.push({ url, body });
+      if (url.endsWith("/uploads/images.json")) {
+        return new Response(JSON.stringify({ id: "upload_glitch_transparent" }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      if (url.includes("/products.json")) {
+        return new Response(JSON.stringify({ id: "prod_glitch_transparent" }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      return new Response("unexpected", { status: 500 });
+    });
+
+    const result = await preparePrintifyLineItems(
+      {
+        PRINTIFY_API_TOKEN: "token",
+        PERSONALIZE_GLITCH_HOODIE_PRINTIFY_PRODUCT_ID: "6a18a4d17f274f4c3e04f646",
+        PERSONALIZE_GLITCH_HOODIE_PRINTIFY_VARIANT_ID: "68861",
+        PERSONALIZE_GLITCH_HOODIE_PRINTIFY_BLUEPRINT_ID: "528",
+        PERSONALIZE_GLITCH_HOODIE_PRINTIFY_PRINT_PROVIDER_ID: "99",
+      },
+      {
+        print_order_id: "po_test123456789012345",
+        template_id: GLITCH_HOODIE_TEMPLATE_ID,
+        profile_id: "nSVXWPqgRFEhGPjxyRzidF6s",
+        planned_item_qr_ids: ["qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5"],
+        quantity: 1,
+        print_variant_id: "navy-m",
+        print_frame_background: "transparent",
+      },
+      99,
+      fetchMock
+    );
+
+    expect(result.ok).toBe(true);
+    const uploadCall = calls.find((c) => c.url.endsWith("/uploads/images.json"))!;
+    const uploadBody = uploadCall.body as { contents?: string };
+    const decoded = atob(uploadBody.contents ?? "");
+    expect(decoded).not.toMatch(
+      /<rect width="[\d.]+" height="[\d.]+" rx="[\d.]+" fill="#ffffff"\/>/
+    );
+  });
 });

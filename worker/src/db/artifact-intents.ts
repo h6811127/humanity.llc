@@ -1,3 +1,8 @@
+import {
+  resolveArtifactIntentPrintFrameBackground,
+  type BuyerPrintFrameBackground,
+} from "../print/print-frame-background";
+
 export const ARTIFACT_INTENT_STATUSES = [
   "draft",
   "proofed",
@@ -15,6 +20,7 @@ export interface ArtifactIntentRow {
   source_qr_id: string;
   product_id: string | null;
   print_variant_id: string | null;
+  print_frame_background: BuyerPrintFrameBackground;
   quantity: number;
   planned_item_qr_ids_json: string;
   planned_print_artifact_ids_json: string;
@@ -31,6 +37,7 @@ export interface InsertArtifactIntentInput {
   source_qr_id: string;
   product_id: string | null;
   print_variant_id?: string | null;
+  print_frame_background?: BuyerPrintFrameBackground;
   quantity: number;
   planned_item_qr_ids: string[];
   planned_print_artifact_ids: string[];
@@ -46,10 +53,11 @@ export async function insertArtifactIntent(
   await db
     .prepare(
       `INSERT INTO artifact_intents (
-        artifact_intent_id, profile_id, source_qr_id, product_id, print_variant_id, quantity,
+        artifact_intent_id, profile_id, source_qr_id, product_id, print_variant_id,
+        print_frame_background, quantity,
         planned_item_qr_ids_json, planned_print_artifact_ids_json,
         status, expires_at, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .bind(
       input.artifact_intent_id,
@@ -57,6 +65,11 @@ export async function insertArtifactIntent(
       input.source_qr_id,
       input.product_id,
       input.print_variant_id?.trim() || null,
+      resolveArtifactIntentPrintFrameBackground({
+        product_id: input.product_id,
+        print_variant_id: input.print_variant_id?.trim() || null,
+        print_frame_background: input.print_frame_background,
+      }),
       input.quantity,
       JSON.stringify(input.planned_item_qr_ids),
       JSON.stringify(input.planned_print_artifact_ids),
@@ -74,7 +87,8 @@ export async function getArtifactIntent(
 ): Promise<ArtifactIntentRow | null> {
   return db
     .prepare(
-      `SELECT artifact_intent_id, profile_id, source_qr_id, product_id, print_variant_id, quantity,
+      `SELECT artifact_intent_id, profile_id, source_qr_id, product_id, print_variant_id,
+              print_frame_background, quantity,
               planned_item_qr_ids_json, planned_print_artifact_ids_json,
               pending_mint_credentials_json,
               status, expires_at, created_at, updated_at
@@ -111,5 +125,29 @@ export async function updateArtifactIntentStatus(
       `UPDATE artifact_intents SET status = ?, updated_at = ? WHERE artifact_intent_id = ?`
     )
     .bind(status, updatedAt, artifactIntentId)
+    .run();
+}
+
+export async function updateArtifactIntentAttachFields(
+  db: D1Database,
+  artifactIntentId: string,
+  fields: {
+    print_variant_id: string | null;
+    print_frame_background: BuyerPrintFrameBackground;
+    updatedAt: string;
+  }
+): Promise<void> {
+  await db
+    .prepare(
+      `UPDATE artifact_intents
+       SET print_variant_id = ?, print_frame_background = ?, updated_at = ?
+       WHERE artifact_intent_id = ?`
+    )
+    .bind(
+      fields.print_variant_id,
+      fields.print_frame_background,
+      fields.updatedAt,
+      artifactIntentId
+    )
     .run();
 }

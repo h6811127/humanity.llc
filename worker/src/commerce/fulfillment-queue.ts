@@ -7,6 +7,8 @@ import {
   updateCommerceOrderPrintOrderIds,
   type CommerceOrderRow,
 } from "../db/commerce-orders";
+import { DEFAULT_BUYER_PRINT_FRAME_BACKGROUND } from "../print/print-frame-background";
+import type { BuyerPrintFrameBackground } from "../print/print-frame-background";
 import {
   getPrintOrderByCommerceOrderId,
   insertPrintOrder,
@@ -92,6 +94,8 @@ export async function ensurePrintOrderForCommerceOrder(
       printify_order_id: null,
       printify_shop_id: null,
       template_id: templateId,
+      print_variant_id: null,
+      print_frame_background: DEFAULT_BUYER_PRINT_FRAME_BACKGROUND,
       status: "awaiting_production_approval",
       shipping_method: "standard",
       created_at: nowIso,
@@ -103,6 +107,7 @@ export async function ensurePrintOrderForCommerceOrder(
 
   let templateId = resolvePrintTemplateIdForProduct(null);
   let printVariantId: string | null = null;
+  let printFrameBackground: BuyerPrintFrameBackground = DEFAULT_BUYER_PRINT_FRAME_BACKGROUND;
   for (const intentId of intentIds) {
     const intent = await getArtifactIntent(db, intentId);
     if (!intent) continue;
@@ -112,6 +117,7 @@ export async function ensurePrintOrderForCommerceOrder(
     if (intent.print_variant_id?.trim()) {
       printVariantId = intent.print_variant_id.trim();
     }
+    printFrameBackground = intent.print_frame_background;
     printArtifactIds.push(
       ...(JSON.parse(intent.planned_print_artifact_ids_json) as string[])
     );
@@ -132,6 +138,7 @@ export async function ensurePrintOrderForCommerceOrder(
     shopify_order_id: commerceOrder.shopify_order_id,
     template_id: templateId,
     print_variant_id: printVariantId,
+    print_frame_background: printFrameBackground,
     status: "awaiting_production_approval",
     shipping_method: "standard",
     created_at: nowIso,
@@ -155,6 +162,7 @@ export async function ensurePrintOrderForCommerceOrder(
     printify_shop_id: null,
     template_id: templateId,
     print_variant_id: printVariantId,
+    print_frame_background: printFrameBackground,
     status: "awaiting_production_approval",
     shipping_method: "standard",
     created_at: nowIso,

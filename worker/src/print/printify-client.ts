@@ -3,6 +3,7 @@
  * Does not call send_to_production — operator approval gate remains on Printify side.
  */
 
+import type { BuyerPrintFrameBackground } from "./print-frame-background";
 import { resolvePrintifyLineItem } from "./printify-template-config";
 import { preparePrintifyLineItems } from "./printify-line-items";
 import type { PrintifyShippingAddress } from "./printify-shipping";
@@ -17,6 +18,7 @@ export interface PrintifySubmitInput {
   shipping_address: PrintifyShippingAddress;
   quantity: number;
   print_variant_id?: string | null;
+  print_frame_background?: BuyerPrintFrameBackground | null;
 }
 
 export interface PrintifySubmitResult {
@@ -138,6 +140,7 @@ export async function submitPrintifyOrder(
       planned_item_qr_ids: input.planned_item_qr_ids,
       quantity: input.quantity,
       print_variant_id: input.print_variant_id,
+      print_frame_background: input.print_frame_background,
     },
     shopId,
     fetchImpl

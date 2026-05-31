@@ -124,13 +124,14 @@ Resolver tab sync: `hc-resolver-sync` BroadcastChannel (network 60s, health 30s)
 |-----------|--------|
 | Digital frame | Scan pass, `/created/`, and customize QR preview use **full** white card + **default** padding — `renderFramedScanQrSvg(scanUrl)` with no frame opts. |
 | Print frame | Printify upload and `POST /v1/print/artifacts` use `renderPrintArtworkFromScanUrl(scanUrl, templateId)` and `resolvePrintTemplateRenderProfile()` in `worker/src/print/print-template-render.ts`. |
-| Launch hoodies | `hc-glitch-hoodie-v1` and `hc-hoodie-live-object-v1`: `full` + `tight` + `frame_svg`. Glitch Printify placeholder **`back`**; Live Object **`front`**. Stickers: `full` + `default` + `sticker_sheet`. |
-| Customize Glitch back | Printify **Back** view overlays buyer planned QR with **tight** frame — not sample mock QR. |
-| Background experiments | `qr_only` / `transparent` only after physical QA sign-off — do not change digital defaults. |
+| Launch hoodies | `hc-glitch-hoodie-v1` and `hc-hoodie-live-object-v1`: default profile `full` + `tight` + `frame_svg`. Glitch Printify placeholder **`back`**; Live Object **`front`**. Stickers: `full` + `default` + `sticker_sheet`. |
+| Customize Glitch | Planned QR block below mockup; mock toggle does not replace fulfillment artwork alone. |
+| Buyer print frame | Glitch buyer choice `full` \| `transparent` must persist on `artifact_intents.print_frame_background` and `print_orders.print_frame_background` and drive Printify SVG render — not `sessionStorage` only. See [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) § Glitch print frame background. |
+| Transparent on fabric | Allowed in UI for approved colors (not Charcoal Heather / Royal Blue); Printify SVG uses stored `transparent` when persisted; physical QA sign-off still required ([`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md)). |
 
-**Regression:** `npm run worker:test -- worker/tests/print-template-render.test.ts worker/tests/scan-qr-branding.test.ts worker/tests/printify-line-items.test.ts`
+**Regression:** `npm run worker:test -- worker/tests/print-frame-background.test.ts worker/tests/print-template-render.test.ts worker/tests/artifact-intents.test.ts worker/tests/fulfillment-queue.test.ts worker/tests/printify-line-items.test.ts`
 
-Canonical: [`QR_BRANDING.md`](QR_BRANDING.md) § Two registers · [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md)
+Canonical: [`QR_BRANDING.md`](QR_BRANDING.md) § Two registers · [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) · [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md)
 
 ---
 

@@ -40,6 +40,19 @@ Test each phone at **normal arm's length** and at **~2 m** (poster / across-room
 
 **Fail action:** Adjust print template size/contrast (`docs/QR_BRANDING.md`) or Printify product; do not enable `personalize.checkout_open` until A1–A5 pass. If testing `qr_only` / `transparent` frame backgrounds, update `print-template-render.ts` only after a Charcoal (or target color) proof passes — do not change digital scan/created frame defaults.
 
+### A.7 Glitch transparent frame on fabric (optional until Navy + transparent is catalog-default)
+
+Complete when any launch SKU allows **Transparent** on customize ([`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) § Glitch print frame background). Fulfillment already renders stored `print_frame_background` via `qrFrameRenderOptionsForFulfillment`; this section is **ink proof**, not pipeline wiring.
+
+| # | Check | Pass? |
+|---|--------|-------|
+| A7.1 | Proof order or sample with `print_frame_background=transparent` on target color (e.g. **Navy** `navy-m`) | ☐ |
+| A7.2 | Printed QR has **no white card rect** behind modules (fabric color visible in quiet zone) | ☐ |
+| A7.3 | A1–A4 pass on that sample (arm's length + ~2 m, flat back print) | ☐ |
+| A7.4 | Charcoal Heather / Royal Blue samples still use **white card** only (UI blocked; spot-check fulfillment SVG if forced) | ☐ |
+
+**Fail action:** Block transparent for that color in customize (`GLITCH_PRINT_WHITE_CARD_ONLY_COLORS`) or revert catalog default to white card; do not change digital scan/created frame defaults.
+
 ---
 
 ## B. Stranger comprehension (A-009)
@@ -88,7 +101,8 @@ Owner revokes **one** print_artifact QR; sibling item QRs (if any) stay active.
 |-------|--------|
 | Product tested | `[hoodie_live_object_v1 \| glitch_hoodie_v1 \| sticker_personalized_v1]` |
 | Print template id | `[hc-glitch-hoodie-v1 \| …]` |
-| Frame profile | `[full + tight \| full + default \| …]` |
+| Frame profile | `[full + tight \| full + default \| transparent + Navy \| …]` |
+| `print_frame_background` | `[full \| transparent]` (D1 `print_orders`; Shopify line attr) |
 | Printify placeholder | `[back for Glitch \| front for Live Object]` |
 | Proof SVG | `npm run print:glitch-hoodie-proof` (optional reference file) |
 | Print order id | `[po_…]` |

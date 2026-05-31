@@ -26,6 +26,7 @@ import {
   isPersonalizeCheckoutReady,
   loadCardSessionForCustomize,
   loadCardSigningSessionForCustomize,
+  customizeMerchCheckoutStatusMessage,
   personalizeProductDisplay,
   personalizeProducts,
   readManifestoLineForCustomize,
@@ -46,7 +47,6 @@ import {
 import {
   canProceedToCheckout,
   proofConsentRequiredIds,
-  proofConsentStatusMessage,
   readProofConsentState,
 } from "./shop-proof-consent-core.mjs";
 import { syncMerchBackupNudgeNotice } from "./merch-backup-nudge.mjs";
@@ -77,8 +77,10 @@ import {
   warmGlitchHoodieMockupCache,
 } from "./shop-glitch-hoodie-mockups-core.mjs";
 import {
+  artifactIntentSelectionKey,
   GLITCH_PRINT_FRAME_BACKGROUND_OPTIONS,
   GLITCH_PRINT_QR_OVERLAY_WIDTH,
+  glitchArtifactIntentPrintFrameBackground,
   glitchHoodieGarmentSwatchHex,
   glitchPrintFramePreviewHint,
   glitchPrintPreviewUsesGarmentSwatchOnly,
@@ -86,7 +88,7 @@ import {
   glitchPrintTransparentOfferedForColor,
   persistGlitchPrintFrameBackground,
   readStoredGlitchPrintFrameBackground,
-} from "./shop-customize-printify-qr-core.mjs?v=3";
+} from "./shop-customize-printify-qr-core.mjs?v=5";
 
 const PERSONALIZE_PROOF_CONSENT_IDS = proofConsentRequiredIds("personalized");
 
@@ -230,7 +232,23 @@ function productDisplay() {
 function variantSelectionKey() {
   const variant = selectedVariant();
   if (!variant) return "";
-  return `${variant.print_variant_id}|${variant.shopify_variant_id ?? ""}`;
+  const base = `${variant.print_variant_id}|${variant.shopify_variant_id ?? ""}`;
+  const product = selectedProduct();
+  if (!isGlitchHoodieProduct(product)) return base;
+  return artifactIntentSelectionKey(
+    variant,
+    glitchArtifactIntentPrintFrameBackground(selectedColor, selectedGlitchPrintFrameBackground)
+  );
+}
+
+function glitchArtifactIntentBodyFields() {
+  if (!isGlitchHoodieProduct(selectedProduct())) return {};
+  return {
+    print_frame_background: glitchArtifactIntentPrintFrameBackground(
+      selectedColor,
+      selectedGlitchPrintFrameBackground
+    ),
+  };
 }
 
 function ensureGlitchPrintFrameAllowedForColor() {
@@ -518,6 +536,7 @@ function syncGlitchPrintFrameSection() {
         selectedGlitchPrintFrameBackground = option.id;
         persistGlitchPrintFrameBackground(option.id);
         syncGlitchPrintFrameSection();
+        scheduleVariantIntentSync();
         void refreshGlitchPrintPreviews();
       });
       printFrameRowEl.appendChild(btn);
@@ -811,6 +830,7 @@ async function createArtifactIntent(product) {
       quantity: 1,
       shopify_variant_id: display.shopifyVariantId || undefined,
       print_variant_id: display.printVariantId || undefined,
+      ...glitchArtifactIntentBodyFields(),
     }),
   });
   const data = await res.json().catch(() => ({}));
@@ -837,6 +857,7 @@ async function attachArtifactIntent(intentId, product, proofAcknowledged) {
       body: JSON.stringify({
         shopify_variant_id: display.shopifyVariantId || undefined,
         print_variant_id: display.printVariantId || undefined,
+        ...glitchArtifactIntentBodyFields(),
         proof_acknowledged: proofAcknowledged === true,
       }),
     }
@@ -983,16 +1004,11 @@ function previewStatusMessage(product) {
     productVariants.length > 1
       ? isPersonalizeVariantCheckoutReady(shopConfig, product, variant)
       : isPersonalizeCheckoutReady(shopConfig, product);
-  if (previewMode === "card_fallback") {
-    return checkoutOpen
-      ? "Showing your card QR while print setup finishes. Confirm limits below to continue."
-      : "Showing your card QR. A unique print code is reserved when personalized checkout opens.";
-  }
-  return proofConsentStatusMessage(
-    "personalized",
+  return customizeMerchCheckoutStatusMessage({
     checkoutOpen,
-    readProofConsentState(proofConsentEl, PERSONALIZE_PROOF_CONSENT_IDS)
-  );
+    previewModeCardFallback: previewMode === "card_fallback",
+    consentCheckedIds: readProofConsentState(proofConsentEl, PERSONALIZE_PROOF_CONSENT_IDS),
+  });
 }
 
 async function refreshPreview() {
@@ -1183,13 +1199,22 @@ async function init() {
   checkoutBtn?.addEventListener("click", () => {
     void onCheckoutClick();
   });
-  window.addEventListener("hc-key-backup-exported", () => {
+  function resyncCheckoutFromStorage() {
     const product = selectedProduct();
-    if (product) syncCheckoutUi(product);
+    if (!product) return;
+    syncCheckoutUi(product);
+    setStatus(previewStatusMessage(product));
+  }
+
+  window.addEventListener("hc-key-backup-exported", resyncCheckoutFromStorage);
+  window.addEventListener("hc-recovery-acknowledged", resyncCheckoutFromStorage);
+  window.addEventListener("hc-device-hub-changed", resyncCheckoutFromStorage);
+  window.addEventListener("pageshow", resyncCheckoutFromStorage);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") resyncCheckoutFromStorage();
   });
-  window.addEventListener("hc-recovery-acknowledged", () => {
-    const product = selectedProduct();
-    if (product) syncCheckoutUi(product);
+  window.addEventListener("storage", (event) => {
+    if (event.key === "hc_wallet") resyncCheckoutFromStorage();
   });
   shippingForm?.addEventListener("submit", (event) => {
     event.preventDefault();
