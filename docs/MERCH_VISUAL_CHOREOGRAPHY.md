@@ -32,6 +32,8 @@ This doc is that map.
 
 **Rule:** Curiosity and belonging share **one scan URL pattern** ([`MERCH_LED_V1.md`](MERCH_LED_V1.md)). Do **not** fork a hoodie-only scan template or a looping “profile bubble” on the resolver.
 
+**Privacy rule:** Do **not** choreograph delight around scan counts or passive scan alerts. Hoodie awareness may be coarse object state, but the emotional engine is programmable resolution — same ink, new meaning.
+
 ---
 
 ## Five beats (choreography)
@@ -207,6 +209,8 @@ Optional owner copy on publish: *Same ink. New meaning.*
 
 **Shipped:** Resolver update API, Tier 1 ephemeral unlock, hub **Update status** deep link, **publish pulse** on live object card (V2).
 
+**Glitch hoodie feature frame:** prioritize resolver changes over scan analytics: new artwork unlocks, rotating pseudonyms, event access, seasonal messages, limited-time status, authenticity, revoke, and replace.
+
 ---
 
 ## Motion budget by surface
@@ -287,6 +291,7 @@ npm run worker:test -- worker/tests/shop-customize-preview-arrive-core.test.ts w
 | Commerce visuals implying vouch | [`MERCH_PRODUCT_COPY.md`](MERCH_PRODUCT_COPY.md) · [`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md) |
 | Forking `scan-pass.css` for merch delight | Owner motion belongs on Pages (`styles.css` / shop modules) |
 | Print mutable “Verified Human” on garment | Level 0 — state on resolver only |
+| Scan-count dashboards or "someone scanned your hoodie" alerts | Violates the no-scan-surveillance product identity |
 
 ---
 

@@ -22,6 +22,8 @@ Do **not** collapse dot and badge into one control-they answer different questio
 
 **Request budget (how inbox should feel):** Inbox items like `live_proof` may require Worker polls, but the product is **not** a 24/7 monitoring dashboard. Automatic live-proof discovery runs only when the steward **opts in** (**Watch for live proof**) and hub/inbox scope is active; otherwise use manual **Check for live proof** or open `/created/`. **Exception (Phase 9):** when an operator-familiar viewer has the **own-card scan page** open (`profile_id` + `qr_id` match a saved wallet row), the scan module polls **that card only** (~3s) so the chrome dot and `#live-control-owner-view` can surface a pending request without opening hub or Watch. Strangers waiting on a scan page poll **their** session; stewards get OS alerts only when background alerts are on. Full policy: [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) (north star: *stranger pays urgency, steward pays intent*).
 
+**Privacy boundary:** Passive scans are not inbox items. Do not add a `scan_seen`, `hoodie_scanned`, browser alert, email, webhook, or badge count for "someone scanned your QR." Coarse future interaction signals may appear only as log-free object state (for example, **discovered recently**), never as per-scan history.
+
 ---
 
 ## Mental model (own the category)
@@ -79,6 +81,7 @@ Canonical `kind` values (target: one module `device-inbox-core.mjs`, Vitest-cove
 | `orphan_keys_removed` | Medium | Yes when tab notice = 0 | `cross_tab_keys` (same notch) | No | Open other tab / clear keys on device |
 | `card_disabled_since_visit` | Medium | **Yes** (resolver-confirmed since-visit cards) | `card_disabled_since_visit` (soft notch; below proof/cross-tab) | No | Open card from inbox sheet |
 | `resolver_degraded` | Low | **No** | Via network color on dot | No | System banner only |
+| `passive_scan` | **Not a kind** | No | No | No | Do not build; see privacy boundary |
 
 **Counting rules (codify in inbox core):**
 
@@ -182,6 +185,7 @@ See [Background alerts roadmap](#background-alerts-roadmap) (v2 phases A–B shi
 | Event | OS alert | Rationale |
 |-------|----------|-----------|
 | Live proof pending | Yes (opt-in) | Stranger waiting; time-sensitive |
+| Passive scan / hoodie discovered | No | Avoid scan surveillance; optional coarse state only |
 | Tab keys unsaved | No | User usually in create flow |
 | Cross-tab keys | No | Multi-tab confusion |
 | Card disabled since visit | No (defer digest) | Batch/digest, not instant |

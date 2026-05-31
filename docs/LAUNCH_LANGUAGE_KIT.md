@@ -67,6 +67,9 @@ Do not use:
 - A social credit alternative.
 - Verified forever.
 - Upgrade to see who scanned you.
+- Get alerts when someone scans your hoodie.
+- See exactly when and where your QR was scanned.
+- Scan history / scan dashboard / engagement metrics for your object.
 - Premium verification / Pro human / Verified+.
 - Always-on monitoring included.
 - Pay to get vouched faster or look more verified.
@@ -291,6 +294,7 @@ Use for **card holders** ready to personalize (time-limited drop OK) - not for g
 - Worn by people who vouch for each other under public rules.
 - Founding humans  -  not platform inventory.
 - Belonging is signed, revocable, and inspectable.
+- Same ink, new meaning  -  a programmable object, not scan analytics.
 
 ### Storefront hero (personalized drop)
 
@@ -386,6 +390,8 @@ Use for **card holders** ready to personalize (time-limited drop OK) - not for g
 - "Inner circle gets legal-level trust"
 - Printing `Vouched Human` or `Founding Human` on the artifact surface
 - Implying cohort invite can be purchased
+- "Get notified whenever someone scans your hoodie"
+- "Track engagement on your QR"
 
 ---
 

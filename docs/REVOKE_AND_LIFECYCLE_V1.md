@@ -14,7 +14,7 @@ A Humanity **QR credential** (`qr_id`) is a **signed capability pointer**: it re
 
 **Owning the object** means owning its **lifecycle**  -  not only “delete this QR.” In the target model, the root Humanity Card key owns the lifecycle of its child objects by default. The interesting product is **programmable state transitions** for physical software objects. **Revoke is one transition** (pointer off). **Expiry** is another (time). Future transitions (claimed, recovered, after-next-scan, replaced) use the same primitive: **object state on the resolver**, not scan surveillance.
 
-**Design rule (privacy):** Store **minimal object state** (`status`, `expires_at`, optional counters/reasons)  -  not **who scanned, when, or where**. No default scan logs. See §State transitions.
+**Design rule (privacy):** Store **minimal object state** (`status`, `expires_at`, optional counters/reasons)  -  not **who scanned, when, or where**. No default scan logs or passive scan notifications. See §State transitions.
 
 ---
 
@@ -28,6 +28,7 @@ A Humanity **QR credential** (`qr_id`) is a **signed capability pointer**: it re
 | **Disable child object** | One nested object offline; root stays active | Target | No |
 | **Disable card** | Whole root profile offline; child trust cascades off | ✓ | No |
 | **Organizer revoke** | Coalition key, `organizer_revoked` | ✓ (pilot) | No |
+| **Coarse interaction signal** | "Discovered recently" / "active in the network" | Research | Aggregate flag only |
 | **After next scan** | One-time reveal then off | Research | Counter only, not identity |
 | **After N scans** | Limited tickets / clues | Research | Count only, not who |
 | **Claimed / recovered** | Lost-item story states | Research | Object flags, not scanner ID |
@@ -37,6 +38,24 @@ A Humanity **QR credential** (`qr_id`) is a **signed capability pointer**: it re
 **UI vocabulary:** Prefer **lifecycle**, **state**, **transition** in explainers. Keep button labels **Revoke this QR** and **Disable card** (precise actions). Avoid implying the sticker is “deleted”  -  **the rules for this object changed**.
 
 **Not Humanity:** scan analytics, device trails, “recent scans,” or crisis-resource **collection** on the operator. Saving a resource belongs on the **scanner’s device** (future wallet / saved resources  -  see crisis research page).
+
+### Interaction signals (research guardrail)
+
+Interaction signals may make a physical software object feel alive, but they are **not** a scan history feature.
+
+Allowed examples:
+
+- **Your hoodie was discovered recently.**
+- **Your hoodie has been scanned this week.**
+- **A new person interacted with your object.**
+- **Your hoodie is currently active in the network.**
+
+Required constraints:
+
+- No timestamps, locations, IPs, user agents, scanner identifiers, or per-scan rows.
+- No "37 scans," engagement charts, follower-style analytics, or "who scanned you" upsells.
+- No OS/browser notification for passive scans; live-control proof remains the only scan-adjacent alert because the scanner explicitly requests a signature.
+- For Glitch and other wearable artifacts, the product value is programmable resolution over time: new artwork, rotating pseudonyms, event access, seasonal messages, limited-time status, authenticity, revoke/replace.
 
 ---
 

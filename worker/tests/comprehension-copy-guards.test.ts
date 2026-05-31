@@ -197,6 +197,19 @@ describe("D9 V1 launch gate copy (static surfaces)", () => {
     expect(html.toLowerCase()).not.toContain("purchase verifies");
   });
 
+  it("public policy keeps passive scan notifications out of the product promise", () => {
+    const policy = readFileSync(join(root, "site/data-policy.html"), "utf8");
+    const launchKit = readFileSync(join(root, "docs/LAUNCH_LANGUAGE_KIT.md"), "utf8");
+
+    expect(policy).toContain("No scan analytics or scan notifications by default");
+    expect(policy).toContain("Passive scans do not trigger steward notifications");
+    expect(policy).toContain("timestamps");
+    expect(policy).toContain("locations");
+    expect(policy).toContain("per-scan history");
+    expect(launchKit).toContain("Get alerts when someone scans your hoodie.");
+    expect(launchKit).toContain("Track engagement on your QR");
+  });
+
   it("scan limits disclosure covers identity and employment overclaims", async () => {
     const html = await activeScanHtml();
     expect(html).toContain("Legal identity, government ID, KYC");

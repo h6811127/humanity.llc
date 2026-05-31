@@ -20,7 +20,7 @@ Minimize stored data so the network is not a surveillance honeypot. Publish what
 - Private keys, recovery secrets, or seed phrases.
 - Government ID images, numbers, or KYC artifacts.
 - Phone numbers or emails **required** to create a card.
-- Scan analytics: per-scan trails, location history, device fingerprinting, or ad profiles.
+- Scan analytics: per-scan trails, scan notifications, location history, device fingerprinting, or ad profiles.
 - Payment or shipping PII in the network database (commerce stays in Shopify / Printify).
 
 ## Access logs
@@ -28,6 +28,13 @@ Minimize stored data so the network is not a surveillance honeypot. Publish what
 - **Default:** no logging of scan requests.
 - **Reference network v1:** `GET /c/…`, `GET …/status?q=…`, and `GET …/qr/{qr_id}` are **not** access-logged. Status JSON exposes `scan.limits.scan_analytics: false`.
 - If minimal access logs are ever required for abuse response, that MUST be a **governance-approved** policy with published retention - not a silent product default.
+
+## Scan notifications and interaction signals
+
+- **Default:** no steward notifications, inbox rows, browser alerts, webhooks, emails, or dashboards are triggered by a passive scan.
+- **Allowed notification exception:** live-control proof, where a scanner explicitly asks the steward to sign a short-lived challenge. That alert is about the challenge lifecycle, not a scan log.
+- **Optional future interaction signals** may summarize object state only: "discovered recently," "scanned this week," "new person interacted," or "active in the network." They MUST NOT expose timestamps, locations, IPs, user agents, scanner identity, or per-scan history.
+- Product copy MUST NOT position scan counts, "who scanned you," engagement dashboards, or hoodie scan alerts as the value of Humanity artifacts. Programmable resolver state is the product surface.
 
 ## Client UI (not operator storage)
 
