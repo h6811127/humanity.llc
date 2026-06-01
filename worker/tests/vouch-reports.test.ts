@@ -151,18 +151,21 @@ describe("POST vouch-reports", () => {
 
     expect(res.status).toBe(201);
     const body = (await res.json()) as {
+      ok: boolean;
       report_id: string;
       reference_code: string | null;
-      case_created: boolean;
-      case: { source: string; kind: string; subject_profile_ids: string[] };
     };
+    expect(body.ok).toBe(true);
     expect(body.report_id).toMatch(/^report_/);
     expect(body.reference_code).toMatch(/^vrr_/);
-    expect(body.case_created).toBe(true);
-    expect(body.case.source).toBe("public_report");
-    expect(body.case.kind).toBe("false_vouch");
-    expect(body.case.subject_profile_ids).toEqual([PROFILE]);
+    expect(Object.keys(body).sort()).toEqual(["ok", "reference_code", "report_id"]);
     expect(fake.reports).toHaveLength(1);
+    expect(fake.cases).toHaveLength(1);
+    expect(fake.cases[0]?.source).toBe("public_report");
+    expect(fake.cases[0]?.kind).toBe("false_vouch");
+    expect(JSON.parse(fake.cases[0]?.subject_profile_ids_json ?? "[]")).toEqual([
+      PROFILE,
+    ]);
   });
 
   it("attaches a second report to an open case for the same profile and kind", async () => {
@@ -185,8 +188,9 @@ describe("POST vouch-reports", () => {
       fake as unknown as D1Database
     );
     expect(first.status).toBe(201);
-    const firstBody = (await first.json()) as { case: { case_id: string }; case_created: boolean };
-    expect(firstBody.case_created).toBe(true);
+    const firstBody = (await first.json()) as { report_id: string };
+    const firstCaseId = fake.cases[0]?.case_id;
+    expect(firstCaseId).toMatch(/^case_/);
 
     const second = await handlePostVouchReport(
       new Request(URL, {
@@ -205,14 +209,65 @@ describe("POST vouch-reports", () => {
     );
     expect(second.status).toBe(201);
     const secondBody = (await second.json()) as {
-      case: { case_id: string };
-      case_created: boolean;
+      ok: boolean;
+      report_id: string;
       reference_code: string | null;
     };
-    expect(secondBody.case_created).toBe(false);
-    expect(secondBody.case.case_id).toBe(firstBody.case.case_id);
+    expect(secondBody.ok).toBe(true);
+    expect(secondBody.report_id).not.toBe(firstBody.report_id);
     expect(secondBody.reference_code).toBeNull();
+    expect(Object.keys(secondBody).sort()).toEqual(["ok", "reference_code", "report_id"]);
+    expect(fake.cases).toHaveLength(1);
+    expect(fake.cases[0]?.case_id).toBe(firstCaseId);
     expect(fake.reports).toHaveLength(2);
+    expect(fake.reports[0]?.case_id).toBe(firstCaseId);
+    expect(fake.reports[1]?.case_id).toBe(firstCaseId);
+  });
+
+  it("does not expose case metadata in the response", async () => {
+    const fake = new FakeVouchReportDb();
+    fake.addCard(PROFILE);
+
+    const first = await handlePostVouchReport(
+      new Request(URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "CF-Connecting-IP": "203.0.113.20",
+        },
+        body: JSON.stringify({
+          kind: "harassment",
+          target: PROFILE,
+          statement: "Existing case probe.",
+        }),
+      }),
+      fake as unknown as D1Database
+    );
+    expect(first.status).toBe(201);
+
+    const second = await handlePostVouchReport(
+      new Request(URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "CF-Connecting-IP": "203.0.113.21",
+        },
+        body: JSON.stringify({
+          kind: "harassment",
+          target: PROFILE,
+          statement: "Second report — same dedupe key.",
+        }),
+      }),
+      fake as unknown as D1Database
+    );
+    expect(second.status).toBe(201);
+    const body = (await second.json()) as Record<string, unknown>;
+    expect(Object.keys(body).sort()).toEqual(["ok", "reference_code", "report_id"]);
+    expect(body).not.toHaveProperty("case");
+    expect(body).not.toHaveProperty("case_created");
+    expect(body).not.toHaveProperty("case_id");
+    expect(body).not.toHaveProperty("status");
+    expect(body).not.toHaveProperty("subject_profile_ids");
   });
 
   it("resolves vouch id targets to both profiles", async () => {
@@ -238,13 +293,13 @@ describe("POST vouch-reports", () => {
     );
 
     expect(res.status).toBe(201);
-    const body = (await res.json()) as {
-      case: { subject_profile_ids: string[]; subject_vouch_ids: string[] };
-    };
-    expect(body.case.subject_vouch_ids).toEqual([VOUCH_ID]);
-    expect(body.case.subject_profile_ids.sort()).toEqual(
-      [PROFILE, "8Ym8nQ3pR5sU7wX9zA2bC4dE6"].sort()
-    );
+    const body = (await res.json()) as Record<string, unknown>;
+    expect(Object.keys(body).sort()).toEqual(["ok", "reference_code", "report_id"]);
+    expect(fake.cases).toHaveLength(1);
+    expect(JSON.parse(fake.cases[0]?.subject_vouch_ids_json ?? "[]")).toEqual([VOUCH_ID]);
+    expect(
+      (JSON.parse(fake.cases[0]?.subject_profile_ids_json ?? "[]") as string[]).sort()
+    ).toEqual([PROFILE, "8Ym8nQ3pR5sU7wX9zA2bC4dE6"].sort());
   });
 
   it("returns 429 when rate limited", async () => {

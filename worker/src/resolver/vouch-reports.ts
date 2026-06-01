@@ -50,18 +50,6 @@ function generateReferenceCode(): string {
   return `vrr_${random.slice(0, 12)}`;
 }
 
-function serializeCase(row: Awaited<ReturnType<typeof createVouchCase>>) {
-  return {
-    case_id: row.case_id,
-    kind: row.kind,
-    source: row.source,
-    status: row.status,
-    priority: row.priority,
-    subject_profile_ids: JSON.parse(row.subject_profile_ids_json),
-    subject_vouch_ids: JSON.parse(row.subject_vouch_ids_json),
-  };
-}
-
 /**
  * POST /.well-known/hc/v1/vouch-reports
  * Public trust-and-safety report intake (no auth).
@@ -158,7 +146,6 @@ export async function handlePostVouchReport(
   const referenceCode = contactMethod ? generateReferenceCode() : null;
 
   let existingCase = await getOpenVouchCaseBySource(db, "public_report", sourceKey);
-  let caseCreated = false;
   let caseRow = existingCase;
 
   if (!caseRow) {
@@ -175,7 +162,6 @@ export async function handlePostVouchReport(
       createdBy: "public_report",
       now,
     });
-    caseCreated = true;
   }
 
   const reportRow = await insertVouchReport(db, {
@@ -197,8 +183,6 @@ export async function handlePostVouchReport(
       ok: true,
       report_id: reportRow.report_id,
       reference_code: reportRow.reference_code,
-      case: serializeCase(caseRow),
-      case_created: caseCreated,
     },
     201
   );
