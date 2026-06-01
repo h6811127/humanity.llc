@@ -24,6 +24,9 @@ describe("shop-copy-core", () => {
     expect(hubHtml).toContain("glitch-print-chromatic-artifact.png?v=3");
     expect(hubHtml).not.toContain("glitch-hoodie-live-object-white-card");
     expect(hubHtml).not.toContain("glitch-print-chromatic-unit-example");
+    expect(hubHtml).toContain('id="shop-sticker-gallery"');
+    expect(hubHtml).toContain("/images/merch/founding-sticker/flat-kiss-cut.png");
+    expect(foundingHtml).toContain("/images/merch/founding-sticker/on-laptop.jpg");
     expect(foundingHtml).not.toMatch(/Ready to order/i);
     expect(foundingHtml).toContain('id="shop-checkout-lead"');
     expect(foundingHtml).toContain("restore root card and");

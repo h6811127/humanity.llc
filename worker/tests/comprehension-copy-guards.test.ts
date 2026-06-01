@@ -227,6 +227,8 @@ describe("D9 founding copy guards (FOUNDING_DROP_BRIEF)", () => {
     expect(html).toContain("Will my sticker stop working after a year?");
     expect(html).toContain("Does the QR prove I own the card?");
     expect(html).toContain(FOUNDING_QR_NOT_OWNER_PROOF);
+    expect(html).toContain("shop-sticker-gallery-grid");
+    expect(html).toContain("/images/merch/founding-sticker/flat-kiss-cut.png");
   });
 
   it("D9i: founding FAQ includes LAUNCH_LANGUAGE_KIT sticker gap items", () => {

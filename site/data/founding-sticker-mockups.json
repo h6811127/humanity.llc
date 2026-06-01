@@ -1,0 +1,23 @@
+{
+  "product_id": "tier0_founding_sticker_v1",
+  "generated_at": "2026-06-01T00:00:00.000Z",
+  "default_view": "flat",
+  "mockups": [
+    {
+      "view_id": "flat",
+      "label": "Kiss cut",
+      "src": "/images/merch/founding-sticker/flat-kiss-cut.png",
+      "is_default": true
+    },
+    {
+      "view_id": "on-laptop",
+      "label": "On laptop",
+      "src": "/images/merch/founding-sticker/on-laptop.jpg"
+    },
+    {
+      "view_id": "on-gift",
+      "label": "On gift",
+      "src": "/images/merch/founding-sticker/on-gift.jpg"
+    }
+  ]
+}
