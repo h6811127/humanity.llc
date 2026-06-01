@@ -21,6 +21,9 @@ const AI_EXPLAIN_BUCKET_PREFIX = "ai_explain:";
 /** 20 steward AI draft requests per IP per hour (AI L3 P2). */
 export const AI_DRAFT_LIMIT_PER_HOUR = 20;
 const AI_DRAFT_BUCKET_PREFIX = "ai_draft:";
+/** 10 public vouch reports per IP per hour (trust-and-safety intake). */
+export const VOUCH_REPORT_LIMIT_PER_HOUR = 10;
+const VOUCH_REPORT_BUCKET_PREFIX = "vouch_report:";
 /** 5 public suspension appeals per IP per hour (trust-and-safety intake). */
 export const VOUCH_APPEAL_LIMIT_PER_HOUR = 5;
 const VOUCH_APPEAL_BUCKET_PREFIX = "vouch_appeal:";
@@ -337,6 +340,20 @@ export async function checkVouchAppealRateLimit(
     ipHash,
     VOUCH_APPEAL_BUCKET_PREFIX,
     VOUCH_APPEAL_LIMIT_PER_HOUR,
+    now
+  );
+}
+
+export async function checkVouchReportRateLimit(
+  db: D1Database,
+  ipHash: string,
+  now: Date = new Date()
+): Promise<{ allowed: boolean; retryAfterSec?: number }> {
+  return checkPerHourIpRateLimit(
+    db,
+    ipHash,
+    VOUCH_REPORT_BUCKET_PREFIX,
+    VOUCH_REPORT_LIMIT_PER_HOUR,
     now
   );
 }
