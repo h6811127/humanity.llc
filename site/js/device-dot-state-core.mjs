@@ -195,7 +195,7 @@ function stewardNextLine({ overlayText, queueUrl, pageKind }) {
     return "Scroll to Issue vouch on this scan when attesting for someone else.";
   }
   const vouchLead =
-    "Scan someone else's QR to vouch, or use Scan QR to vouch in the device hub.";
+    "Scan someone else's QR to vouch, or tap the scan icon when the hub is closed.";
   if (queueUrl) {
     return `${vouchLead} ${STEWARD_REVIEW_QUEUE_MANAGE_HINT}`;
   }

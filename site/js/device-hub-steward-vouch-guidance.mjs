@@ -29,6 +29,18 @@ function guidanceSlot(root) {
   );
 }
 
+function stewardToolsStrip(root) {
+  return (
+    root.querySelector("#device-hub-steward-tools") ||
+    document.getElementById("device-hub-steward-tools")
+  );
+}
+
+function syncStewardToolsStripVisibility(root, show) {
+  const strip = stewardToolsStrip(root);
+  if (strip) strip.hidden = !show;
+}
+
 function applyRestoreGroupLabel(root) {
   const label = restoreGroupLabelEl(root);
   if (label) label.textContent = HUB_RESTORE_GROUP_LABEL;
@@ -60,6 +72,7 @@ function syncHubStewardVouchGuidance(root = document) {
 
   if (!shouldShowHubStewardVouchGuidance(input)) {
     hideGuidanceCard(slot);
+    syncStewardToolsStripVisibility(root, false);
     return;
   }
 
@@ -72,6 +85,7 @@ function syncHubStewardVouchGuidance(root = document) {
   slot.innerHTML = hubStewardVouchGuidanceCardBodyHtml(variant);
   slot.hidden = false;
   lastRenderedVariant = variant;
+  syncStewardToolsStripVisibility(root, true);
 }
 
 function bindGuidanceListeners() {

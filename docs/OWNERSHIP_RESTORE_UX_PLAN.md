@@ -85,7 +85,7 @@ Setup wizard **hard gate** before step **You're live**:
 
 - **S1 shipped:** Safari iOS vouch explainer + hub **Open scan link** — [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md)
 - **S2 shipped:** Hub **Import recovery code** (scan link + recovery code)
-- **S3 shipped:** Hub **Scan QR to vouch** (in-app camera · `device-hub-qr-scanner.mjs`)
+- **S3 shipped:** In-app camera via glance row / chrome icon (`device-hub-qr-scanner.mjs`)
 
 ## P0-4 first-session backup gate (shipped)
 

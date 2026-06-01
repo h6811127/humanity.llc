@@ -3,7 +3,6 @@
  */
 import {
   HUB_CHROME_SCAN_QR_ARIA,
-  HUB_SCAN_QR_BTN,
   HUB_SCAN_QR_DIALOG_LEAD,
   HUB_SCAN_QR_DIALOG_TITLE,
   HUB_SCAN_QR_PERMISSION_DENIED,
@@ -168,20 +167,12 @@ function hubQrScannerOpts() {
 function syncHubScanQrSurfaces() {
   const walletCount = getWalletCount();
   const stewardOpts = hubQrScannerOpts();
-  const showHub = shouldShowHubQrScanner(walletCount, stewardOpts);
   const showChrome = shouldShowHubScanQrChrome({
     walletCount,
     standalone: readStandaloneModeFromWindow(window),
     ...stewardOpts,
   });
-  const btn = document.getElementById("hub-scan-qr-btn");
-  const strip = document.getElementById("device-hub-steward-tools");
   const chromeBtn = document.getElementById("shell-scan-qr-btn");
-  if (btn) {
-    btn.textContent = HUB_SCAN_QR_BTN;
-    btn.hidden = !showHub;
-  }
-  if (strip) strip.hidden = !showHub;
   if (chromeBtn) {
     chromeBtn.hidden = !showChrome;
     chromeBtn.setAttribute("aria-label", HUB_CHROME_SCAN_QR_ARIA);
@@ -204,11 +195,6 @@ function bindScannerChrome() {
   });
   dialog?.addEventListener("cancel", () => {
     void stopCamera();
-  });
-
-  document.getElementById("hub-scan-qr-btn")?.addEventListener("click", (e) => {
-    e.preventDefault();
-    void openScannerDialog();
   });
 
   document.getElementById("shell-scan-qr-btn")?.addEventListener("click", (e) => {

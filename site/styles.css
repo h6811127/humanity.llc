@@ -1558,12 +1558,6 @@ a.hub-card-menu-item {
   }
 }
 
-.device-hub-scan-qr-btn {
-  width: 100%;
-  min-height: 44px;
-  margin-bottom: 10px;
-}
-
 .device-hub-steward-tools {
   display: flex;
   flex-direction: column;
@@ -1575,7 +1569,6 @@ a.hub-card-menu-item {
   display: none !important;
 }
 
-.device-hub-steward-tools .device-hub-scan-qr-btn,
 .device-hub-steward-tools .device-hub-steward-vouch-guidance {
   margin-bottom: 0;
 }

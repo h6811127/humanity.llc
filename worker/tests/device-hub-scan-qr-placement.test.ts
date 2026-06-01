@@ -28,8 +28,8 @@ describe("hub scan QR placement", () => {
       )?.[0];
       expect(savedSection, path).toBeTruthy();
       expect(savedSection).toContain("device-hub-steward-tools");
-      expect(savedSection).toContain('id="hub-scan-qr-btn"');
       expect(savedSection).toContain('id="device-hub-steward-vouch-guidance"');
+      expect(savedSection).not.toContain('id="hub-scan-qr-btn"');
 
       const restoreGroup = html.match(
         /data-hub-group="import" data-hub-restore-always[\s\S]*?(?=<div class="device-hub-group|<\/section>)/ 
@@ -53,13 +53,19 @@ describe("hub scan QR placement", () => {
     expect(glanceSrc).toContain("shouldShowHubQrScanner");
   });
 
-  it("syncs steward tools strip visibility with scanner button", () => {
+  it("syncs chrome scan icon visibility with scanner module", () => {
     const scannerSrc = readPage("site/js/device-hub-qr-scanner.mjs");
-    expect(scannerSrc).toContain('getElementById("device-hub-steward-tools")');
+    expect(scannerSrc).not.toContain('getElementById("hub-scan-qr-btn")');
     expect(scannerSrc).toContain('getElementById("shell-scan-qr-btn")');
     expect(scannerSrc).toContain("pickQrScanBackend");
     expect(scannerSrc).toContain("startJsQrDetectLoop");
     expect(scannerSrc).toContain("openHubQrScanner");
+  });
+
+  it("owns steward tools strip visibility from vouch guidance module", () => {
+    const guidanceSrc = readPage("site/js/device-hub-steward-vouch-guidance.mjs");
+    expect(guidanceSrc).toContain('getElementById("device-hub-steward-tools")');
+    expect(guidanceSrc).toContain("syncStewardToolsStripVisibility");
   });
 
   it("mounts conditional chrome scan icon on shell pages (Phase B)", () => {
