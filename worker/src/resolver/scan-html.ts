@@ -349,7 +349,7 @@ function renderStewardStrip(
 
 function renderGovernanceProcessLinks(origin: string): string {
   const links = governanceProcessUrls(origin);
-  return `<p class="scan-governance-links">Read the <a href="${escapeHtml(links.data_policy_url)}">operator data policy</a> and <a href="${escapeHtml(links.architecture_url)}">architecture overview</a> for published suspension rules and appeals.</p>`;
+  return `<p class="scan-governance-links">Read the <a href="${escapeHtml(links.data_policy_url)}">operator data policy</a> and <a href="${escapeHtml(links.architecture_url)}">architecture overview</a> for published suspension rules. If this is your card, you can <a href="${escapeHtml(links.appeal_url)}">appeal the suspension</a>.</p>`;
 }
 
 function renderObjectStreamsBlock(

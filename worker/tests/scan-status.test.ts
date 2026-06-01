@@ -224,6 +224,7 @@ describe("scan status JSON (M3.4)", () => {
     expect(body.scan.governance?.architecture_url).toBe(
       "https://humanity.llc/architecture.html"
     );
+    expect(body.scan.governance?.appeal_url).toBe("https://humanity.llc/appeal/");
   });
 
   it("card revoked returns 410", () => {

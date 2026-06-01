@@ -1071,6 +1071,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain("suspended under published rules");
     expect(html).toContain('href="https://humanity.llc/data-policy.html"');
     expect(html).toContain('href="https://humanity.llc/architecture.html"');
+    expect(html).toContain('href="https://humanity.llc/appeal/"');
     expect(html).toContain("operator data policy");
   });
 

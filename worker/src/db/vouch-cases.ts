@@ -238,7 +238,7 @@ export async function getLatestSuspensionForProfile(
       `SELECT *
        FROM vouch_case_suspensions
        WHERE profile_id = ?
-       ORDER BY created_at DESC, suspension_id DESC
+       ORDER BY suspended_at DESC, suspension_id DESC
        LIMIT 1`
     )
     .bind(profileId)
@@ -249,7 +249,7 @@ export async function updateVouchCaseStatus(
   db: D1Database,
   caseId: string,
   status: VouchCaseStatus,
-  now: string
+  updatedAt: string
 ): Promise<VouchCaseRow | null> {
   const result = await db
     .prepare(
@@ -257,11 +257,9 @@ export async function updateVouchCaseStatus(
        SET status = ?, updated_at = ?
        WHERE case_id = ?`
     )
-    .bind(status, now, caseId)
+    .bind(status, updatedAt, caseId)
     .run();
-  if (!result.success || (result.meta?.changes ?? 0) === 0) {
-    return null;
-  }
+  if (!result.success || (result.meta?.changes ?? 0) === 0) return null;
   return getVouchCaseById(db, caseId);
 }
 
