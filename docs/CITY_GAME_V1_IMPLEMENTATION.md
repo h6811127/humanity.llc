@@ -380,7 +380,7 @@ Run **in parallel** with hoodie launch prep. Do not block merch on game work.
 
 - [ ] `CITY_GAME_ENABLED=1` + season dates active
 - [ ] Remove “research demo” banner from Cedar Rapids pages; link to live rules
-- [ ] Monitor: no scan logging enabled; support macros for revoked/clue nodes
+- [ ] Monitor: no scan logging enabled; support macros — [`CITY_GAME_SUPPORT_MACROS.md`](CITY_GAME_SUPPORT_MACROS.md)
 - [ ] Post-season: objects revert to `paused` or living-infrastructure mode
 
 ---
@@ -393,7 +393,7 @@ Run **in parallel** with hoodie launch prep. Do not block merch on game work.
 - [x] Rules page states what scans prove / do not prove
 - [x] Care stream present on every node with physical safety copy where needed *(launch-gates test + node_14 template)*
 - [x] Forbidden: leaderboard, XP, player accounts, heatmaps *(scan + rules guards)*
-- [ ] Copy comprehension ≥5 testers ([`FOUNDING_COPY_COMPREHENSION_RUNBOOK.md`](FOUNDING_COPY_COMPREHENSION_RUNBOOK.md) pattern)
+- [ ] Copy comprehension ≥5 testers — [`CITY_GAME_COMPREHENSION_RUNBOOK.md`](CITY_GAME_COMPREHENSION_RUNBOOK.md)
 
 ### Engineering
 
@@ -404,9 +404,9 @@ Run **in parallel** with hoodie launch prep. Do not block merch on game work.
 
 ### Operations
 
-- [ ] Game-operator key in operator custody ([`SAFARI_KEYS_CUSTODY.md`](SAFARI_KEYS_CUSTODY.md) pattern — separate brief)
-- [ ] Node install map + steward contacts for `node_14` care loop
-- [ ] Weekend operator schedule (manual bulletin rotation)
+- [ ] Game-operator key in operator custody — [`CITY_GAME_OPERATOR_CUSTODY.md`](CITY_GAME_OPERATOR_CUSTODY.md)
+- [ ] Node install map + steward contacts for `node_14` care loop — [`CITY_GAME_NODE_INSTALL_MAP.md`](CITY_GAME_NODE_INSTALL_MAP.md)
+- [ ] Weekend operator schedule — [`CITY_GAME_WEEKEND_OPERATOR_SCHEDULE.md`](CITY_GAME_WEEKEND_OPERATOR_SCHEDULE.md)
 
 ---
 
@@ -487,3 +487,4 @@ From [`PHYSICAL_WORLD_MULTIPLAYER_RESEARCH_SPEC.md`](PHYSICAL_WORLD_MULTIPLAYER_
 | 2026-06-01 | Phase B prototype — game_node scan template, `/game-operator/` UI, test node mint templates |
 | 2026-06-01 | Phase C season pack — 15-node registry, custody doc, operator runbook, rules page draft |
 | 2026-06-01 | Launch-gates tests, install QA checklist, mobile lore enrollment helper, data policy § city game |
+| 2026-06-01 | Phase D prep — verify:city-game, comprehension runbook, launch checklist, install map, support macros |

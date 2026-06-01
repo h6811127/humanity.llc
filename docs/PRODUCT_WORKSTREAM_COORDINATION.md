@@ -3,7 +3,7 @@
 **Purpose:** Single reference for parallel agents and humans — active work, regression gates, file ownership.  
 **Also read:** [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) (rules that must stay true) · [`DOC_MAINTENANCE.md`](DOC_MAINTENANCE.md) (doc policy)
 
-**Last updated:** 2026-05-30
+**Last updated:** 2026-06-01
 
 ---
 
@@ -17,7 +17,7 @@
 | **Safari keys / ITP** | [`SAFARI_KEYS_CUSTODY.md`](SAFARI_KEYS_CUSTODY.md) | P0–P2 **shipped** (steps 1–22) | `device-quiet-tab-rehydrate*`, `scan-tab-keys`, `safari-itp-storage-notice*`, `safari-storage-persist-denied-notice*` |
 | **Ownership restore UX** | [`OWNERSHIP_RESTORE_UX_PLAN.md`](OWNERSHIP_RESTORE_UX_PLAN.md) | Phases 1–4 + Safari cross-refs | `/created/` view mode, hub import, `device-ownership-*` |
 | **H-12 printed live-control QA** | [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md) | H-09–H-13 · sad-path S10–S12 | Scan live proof, `e2e/live-control-loop.spec.ts`, operator scripts |
-| **Cedar Rapids city game** | [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) | Phase B shipped · **Phase C season pack** · `npm run worker:test -- worker/tests/city-game*.test.ts` | 15-node registry, rules draft, operator runbook; `CITY_GAME_ENABLED=0` prod |
+| **Cedar Rapids city game** | [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) | Phase C/D prep · `npm run verify:city-game` | Launch checklist, install map, comprehension runbook |
 
 ---
 
@@ -40,6 +40,7 @@ Update this table when new PRs open.
 | P0b-1 step 2 sign-off | Card disabled since visit — **prod WebKit** re-verify on humanity.llc after deploy | Human QA | Desk gate: `npm run card-disabled-since-visit:desk-gate` · manual **P1-P0b-1** · sign-off: `card-disabled-since-visit:sign-off` |
 | H-12 human § A–C | ~~Printed QR camera QA on ≥3 phones~~ **Passed 2026-05-30** | Human QA | Sign-off: `live-control:printed-qa:sign-off -- --pass --apply` |
 | P3-1 / P3-2 | WebAuthn / optional encrypted persistence | Architecture | Not scheduled |
+| **Lite shell Phase 0–1** | Parallel bootstrap graph for low-end phones | **Not claimed** | [`DEVICE_LITE_MOBILE_PLAN.md`](DEVICE_LITE_MOBILE_PLAN.md) · baseline module size · `hc_shell_tier` toggle |
 | **S3** | In-app hub QR scanner (PWA vouch from print) | **Shipped** | [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) · `npm run e2e:steward-scan-handoff` (CI) · **P1-PWA-V** prod WebKit |
 
 ---

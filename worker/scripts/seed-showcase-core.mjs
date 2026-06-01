@@ -48,15 +48,28 @@ export function withProtocolFields(payload, type) {
   return { ...payload, type, version: PROTOCOL_VERSION };
 }
 
+export function isLocalApiOrigin(origin) {
+  try {
+    const url = new URL(origin.replace(/\/$/, ""));
+    return url.hostname === "localhost" || url.hostname === "127.0.0.1";
+  } catch {
+    return false;
+  }
+}
+
 /**
  * @param {string} apiOrigin
  * @param {{ card: object; qr_credential: object }} payload
  */
 export async function postShowcaseCreate(apiOrigin, payload) {
   const origin = apiOrigin.replace(/\/$/, "");
+  const headers = { "Content-Type": "application/json" };
+  if (isLocalApiOrigin(origin)) {
+    headers.Origin = origin;
+  }
   const res = await fetch(`${origin}/.well-known/hc/v1/cards`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify(payload),
   });
   const body = await res.json().catch(() => ({}));

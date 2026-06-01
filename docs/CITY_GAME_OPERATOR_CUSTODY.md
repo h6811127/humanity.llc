@@ -33,11 +33,42 @@ One dedicated **season root** card holds all 15 `game_node` child objects for `c
 | Game-operator public key | Card document `issuer_public_key` | Paste at create or register before minting nodes |
 | Game-operator private key | **Offline only** | Password manager / hardware — session paste at `/game-operator/` |
 
-Generate a fresh keypair:
+Generate a fresh keypair, then print mint templates for all 15 nodes (two separate commands — do not paste the comma):
 
 ```bash
 npm run city-game:season-root
+npm run city-game:mint-node -- --all
 ```
+
+Or run both in one step:
+
+```bash
+npm run city-game:prep-season
+```
+
+### Local dev (automated)
+
+When the local Worker is running with `CITY_GAME_ENABLED=1`:
+
+```bash
+npm run worker:migrate:local
+npm run worker:dev   # separate terminal
+API_ORIGIN=http://127.0.0.1:8787 npm run city-game:seed-local -- --write-season --skip-flag-check
+```
+
+Creates the season root card, mints all 15 `game_node` objects, issues QRs, writes keys to `worker/.local/city-game-seed.json` (gitignored), and sets `season_root_profile_id` in the season JSON.
+
+**Note:** Local worker dev validates QR payloads as `https://humanity.llc/c/…`. The seed file includes `local_scan_url` entries (`http://127.0.0.1:8787/c/…`) for browser testing against your local D1.
+
+The `/create/` UI path below is still valid for production/staging when you want browser-held keys instead of the seed script.
+
+### Manual create (production / staging)
+
+1. Open [`/create/`](../site/create/) on local or staging resolver.
+2. Expand **Organizer / issuer** → paste the game-operator **PUBLIC** key from `npm run city-game:season-root`.
+3. Complete create; save owner + recovery keys per [`SAFARI_KEYS_CUSTODY.md`](SAFARI_KEYS_CUSTODY.md).
+4. Record `profile_id` in `site/data/city-game-cr-season-01.json` → `season_root_profile_id`.
+5. Mint nodes via `npm run city-game:seed-local` (local) or sign + POST each template from `npm run city-game:mint-node -- --all`.
 
 ---
 
@@ -59,7 +90,7 @@ npm run city-game:season-root
 | Create season root at `/create/` with issuer (game-operator) public key | ☐ |
 | Record `season_root_profile_id` in season JSON | ☐ |
 | Local: `CITY_GAME_ENABLED=1` in `worker/wrangler.toml` | ☐ |
-| Mint prototype nodes (`npm run city-game:mint-node -- --all-test`) | ☐ |
+| Mint full registry (`npm run city-game:mint-node -- --all`) | ☐ |
 | Verify scan template + `/game-operator/` flip on local resolver | ☐ |
 
 ---
