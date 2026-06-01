@@ -4,15 +4,20 @@ const TOKEN_KEY = "hc_operator_audit_token";
 const HIDE_REVIEWED_KEY = "hc_operator_audit_hide_reviewed";
 const ENDPOINT = `${location.origin}/.well-known/hc/v1/operator/vouch-audit-flags`;
 const DISMISS_ENDPOINT = `${ENDPOINT}/dismiss`;
+const CASES_ENDPOINT = `${location.origin}/.well-known/hc/v1/operator/vouch-cases`;
 
 const tokenEl = document.getElementById("audit-token");
 const refreshBtn = document.getElementById("audit-refresh");
+const caseRefreshBtn = document.getElementById("case-refresh");
 const toggleBtn = document.getElementById("audit-toggle-reviewed");
 const statusEl = document.getElementById("audit-status");
+const caseStatusEl = document.getElementById("case-status");
 const flagsEl = document.getElementById("audit-flags");
+const casesEl = document.getElementById("audit-cases");
 
 let hideReviewed = false;
 let currentFlags = [];
+let currentCases = [];
 
 function loadLocal(key, fallback) {
   try {
@@ -41,6 +46,12 @@ function setStatus(text, isError = false) {
   statusEl.dataset.tone = isError ? "error" : "neutral";
 }
 
+function setCaseStatus(text, isError = false) {
+  if (!caseStatusEl) return;
+  caseStatusEl.textContent = text;
+  caseStatusEl.dataset.tone = isError ? "error" : "neutral";
+}
+
 function setHideReviewed(next) {
   hideReviewed = !!next;
   saveLocal(HIDE_REVIEWED_KEY, hideReviewed ? "1" : "0");
@@ -55,8 +66,17 @@ function displayProfiles(flag) {
   if (flag.kind === "burst_at_quota_boundary") {
     return flag.voucher_profile_id;
   }
+  if (flag.kind === "steward_issuance_burst") {
+    return flag.voucher_profile_id;
+  }
   if (flag.kind === "shared_voucher_set") {
-    return (flag.vouchee_profile_ids || []).join(", ");
+    return [
+      ...(flag.vouchee_profile_ids || []),
+      ...(flag.shared_voucher_profile_ids || []),
+    ].join(", ");
+  }
+  if (flag.kind === "directed_cycle_cluster") {
+    return (flag.profile_ids || []).join(", ");
   }
   return "Unknown";
 }
@@ -117,6 +137,86 @@ async function clearDismiss(flag) {
       })
     );
   }
+}
+
+async function postCaseFromFlag(flag) {
+  const res = await fetch(CASES_ENDPOINT, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token()}`,
+    },
+    body: JSON.stringify({
+      source: "audit_flag",
+      flag_key: flag.flag_key,
+    }),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(
+      resolverErrorMessage(body, {
+        status: res.status,
+        requestUrl: CASES_ENDPOINT,
+        fallback: "Case creation failed.",
+      })
+    );
+  }
+  return body;
+}
+
+function formatCaseStatus(status) {
+  return String(status || "unknown").replaceAll("_", " ");
+}
+
+function renderCases() {
+  if (!casesEl) return;
+  if (currentCases.length === 0) {
+    casesEl.innerHTML = `<li class="operator-audit-empty">No cases yet.</li>`;
+    return;
+  }
+
+  casesEl.innerHTML = currentCases
+    .map((item) => {
+      const profiles = (item.subject_profile_ids || []).join(", ") || "none";
+      const threats = (item.threat_ids || []).join(", ") || "none";
+      const updated = item.updated_at ? new Date(item.updated_at).toLocaleString() : "";
+      return `
+      <li class="operator-audit-flag" data-case-id="${escapeHtml(item.case_id)}">
+        <article class="operator-audit-flag-card operator-audit-case-card">
+          <header class="operator-audit-flag-head">
+            <p class="operator-audit-flag-kind">${escapeHtml(formatFlagKind(item.kind))}</p>
+            <p class="operator-audit-flag-priority">${escapeHtml(String(item.priority || "p1"))} · ${escapeHtml(formatCaseStatus(item.status))}</p>
+          </header>
+          <dl class="operator-audit-flag-meta">
+            <div>
+              <dt>Case</dt>
+              <dd class="mono">${escapeHtml(item.case_id)}</dd>
+            </div>
+            <div>
+              <dt>Source</dt>
+              <dd>${escapeHtml(formatFlagKind(item.source))}</dd>
+            </div>
+            <div>
+              <dt>Profiles</dt>
+              <dd class="mono">${escapeHtml(profiles)}</dd>
+            </div>
+            <div>
+              <dt>Threat IDs</dt>
+              <dd>${escapeHtml(threats)}</dd>
+            </div>
+            <div class="operator-audit-flag-action">
+              <dt>Summary</dt>
+              <dd>${escapeHtml(item.summary || "Manual review case.")}</dd>
+            </div>
+            <div>
+              <dt>Updated</dt>
+              <dd>${escapeHtml(updated || "unknown")}</dd>
+            </div>
+          </dl>
+        </article>
+      </li>`;
+    })
+    .join("");
 }
 
 function renderFlags() {
@@ -190,6 +290,7 @@ function renderFlags() {
               placeholder="Your handle or initials"
             />
             <div class="operator-audit-flag-buttons">
+              <button type="button" class="btn-secondary audit-create-case">Create / open case</button>
               <button type="button" class="btn-secondary audit-dismiss">Save dismissal</button>
               <button type="button" class="btn-danger audit-clear" ${dismissal ? "" : "disabled"}>Clear</button>
             </div>
@@ -225,6 +326,28 @@ function renderFlags() {
     });
   });
 
+  flagsEl.querySelectorAll(".audit-create-case").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const item = btn.closest("[data-flag-key]");
+      if (!item) return;
+      const key = item.getAttribute("data-flag-key");
+      const flag = currentFlags.find((f) => f.flag_key === key);
+      if (!flag) return;
+      btn.disabled = true;
+      try {
+        const body = await postCaseFromFlag(flag);
+        const createdText = body.created === false ? "Opened existing case" : "Case created";
+        const caseId = body.case?.case_id ? `: ${body.case.case_id}` : ".";
+        setCaseStatus(`${createdText}${caseId}`);
+        await refreshCases();
+      } catch (err) {
+        setCaseStatus(err instanceof Error ? err.message : "Case creation failed.", true);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  });
+
   flagsEl.querySelectorAll(".audit-clear").forEach((btn) => {
     btn.addEventListener("click", async () => {
       const item = btn.closest("[data-flag-key]");
@@ -244,6 +367,33 @@ function renderFlags() {
       }
     });
   });
+}
+
+async function refreshCases() {
+  if (!token()) {
+    setCaseStatus("Enter OPERATOR_AUDIT_TOKEN to load cases.", true);
+    currentCases = [];
+    renderCases();
+    return;
+  }
+  setCaseStatus("Loading cases...");
+  const res = await fetch(`${CASES_ENDPOINT}?limit=100`, {
+    headers: { Authorization: `Bearer ${token()}` },
+    cache: "no-store",
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(
+      resolverErrorMessage(body, {
+        status: res.status,
+        requestUrl: CASES_ENDPOINT,
+        fallback: "Failed to load cases.",
+      })
+    );
+  }
+  currentCases = Array.isArray(body.cases) ? body.cases : [];
+  setCaseStatus(`Loaded ${currentCases.length} cases.`);
+  renderCases();
 }
 
 async function refreshFlags() {
@@ -277,10 +427,14 @@ async function refreshFlags() {
 }
 
 async function refreshWithErrors() {
-  try {
-    await refreshFlags();
-  } catch (err) {
+  const [flags, cases] = await Promise.allSettled([refreshFlags(), refreshCases()]);
+  if (flags.status === "rejected") {
+    const err = flags.reason;
     setStatus(err instanceof Error ? err.message : "Failed to load flags.", true);
+  }
+  if (cases.status === "rejected") {
+    const err = cases.reason;
+    setCaseStatus(err instanceof Error ? err.message : "Failed to load cases.", true);
   }
 }
 
@@ -294,6 +448,13 @@ function init() {
     refreshWithErrors();
   });
   refreshBtn?.addEventListener("click", () => refreshWithErrors());
+  caseRefreshBtn?.addEventListener("click", async () => {
+    try {
+      await refreshCases();
+    } catch (err) {
+      setCaseStatus(err instanceof Error ? err.message : "Failed to load cases.", true);
+    }
+  });
   toggleBtn?.addEventListener("click", () => setHideReviewed(!hideReviewed));
 
   refreshWithErrors();
