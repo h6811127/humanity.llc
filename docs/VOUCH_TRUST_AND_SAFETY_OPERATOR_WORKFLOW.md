@@ -226,10 +226,21 @@ All routes are operator-only unless marked public.
 | `/.well-known/hc/v1/operator/vouch-cases/{case_id}` | `GET` | Case detail |
 | `/.well-known/hc/v1/operator/vouch-cases/{case_id}/events` | `POST` | Append note/decision |
 | `/.well-known/hc/v1/operator/vouch-cases/{case_id}/suspend` | `POST` | Suspend profile with public notice |
-| `/.well-known/hc/v1/vouch-reports` | `POST` | Public report intake |
+| `/.well-known/hc/v1/vouch-reports` | `POST` | Public report intake (receipt-only response; see below) |
 | `/.well-known/hc/v1/vouch-appeals` | `POST` | Public appeal intake |
 
 Auth for operator routes follows the current `OPERATOR_AUDIT_TOKEN` pattern until governance-key signing is implemented.
+
+### Public intake responses (no auth)
+
+Public routes must **not** echo operator case rows. Reporters can file reports; case dedupe, status, subjects, and priority stay on `OPERATOR_AUDIT_TOKEN` case routes.
+
+**`POST …/vouch-reports`** (201):
+
+- Request: `kind`, `target`, `statement`, optional `contact_method`.
+- Response: `{ ok, report_id, reference_code }` only. `reference_code` is present when `contact_method` is provided (support follow-up).
+- The worker still dedupes into `public_report` cases server-side; the JSON shape is the same whether a new case was opened or an existing open case received another report.
+- Must **not** return: `case`, `case_created`, `case_id`, `status`, `priority`, `subject_profile_ids`, `subject_vouch_ids`, or any other inbox field. Probing `(kind, profile_id)` pairs must not reveal whether an investigation is already open.
 
 ---
 
@@ -258,6 +269,7 @@ Reference: Human Verification governance requires transparency reports with aggr
 - Audit flag to case dedupe.
 - Case event append-only behavior.
 - Public report rate limit.
+- Public report intake returns receipt fields only (no case metadata in JSON).
 - Suspension overrides verification summary in scan/status.
 - Appeal creates case event and changes status.
 - Transparency counter aggregation excludes raw graph data.
@@ -283,7 +295,7 @@ Reference: Human Verification governance requires transparency reports with aggr
 1. **Case schema + APIs**: durable cases from existing audit flags. **Shipped**
 2. **Case UI**: convert current audit prototype into case inbox/detail. **Partial — inbox + suspend detail shipped; case events/notes pending**
 3. **Suspension action**: public notice + scan/status override. **API shipped; operator suspend UI shipped**
-4. **Report intake**: false vouch, statement abuse, impersonation, harassment. **Next**
+4. **Report intake**: false vouch, statement abuse, impersonation, harassment. **Shipped** — `POST …/vouch-reports`, `/report/`
 5. **Appeals**: suspended profile appeal path and case status transitions.
 6. **Transparency counters**: aggregate report endpoint / operator export.
 7. **Governance-key signatures**: replace bootstrap token-only action with signed suspension records.

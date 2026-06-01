@@ -168,6 +168,7 @@ Impact: **L** low · **M** medium · **H** high (trust in network / harm to vouc
 | O-02 | **Subpoena / retention** | Legal demand for graph | M | M | Minimize PII in vouch rows | Statements may identify people in prose |
 | O-03 | **Audit flag leak** | Publish cluster flags | L | M | Operator-only API | Procedure not to expose flags on scan |
 | O-04 | **False steward triage** | Over-suspend from heuristics | M | M | Human review queue pending | Due process (HV-FR-40) |
+| O-05 | **Case state probe** | Repeat public report POSTs for target/kind | M | M | `vouch-reports` returns receipt fields only | Appeals intake still returns case fields (harden separately) |
 
 ---
 
@@ -220,6 +221,8 @@ Respond: suspend steward, rotate keys, revoke batch
 **Steward review queue:** Step 1+2 shipped - runbook + operator API + dismiss notes API + operator UI prototype with steward entry point from `/created/` Advanced. See [`VOUCH_STEWARD_REVIEW_RUNBOOK.md`](VOUCH_STEWARD_REVIEW_RUNBOOK.md).
 
 `GET /.well-known/hc/v1/operator/vouch-audit-flags` (Bearer `OPERATOR_AUDIT_TOKEN`) - **not exposed on public scan**.
+
+`POST /.well-known/hc/v1/vouch-reports` (no auth) - **receipt-only JSON**; case dedupe and status are operator-only. See [`VOUCH_TRUST_AND_SAFETY_OPERATOR_WORKFLOW.md`](VOUCH_TRUST_AND_SAFETY_OPERATOR_WORKFLOW.md) § Public intake responses.
 
 ---
 
