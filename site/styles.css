@@ -3469,6 +3469,20 @@ a.hub-card-menu-item {
   font-weight: 600;
 }
 
+.landing-vision-lead--dev {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255, 149, 0, 0.08);
+  border: 1px solid rgba(255, 149, 0, 0.18);
+}
+
+.landing-vision-lead--dev a {
+  color: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .landing-vision-list {
   margin: 0 0 16px 18px;
   font-size: 15px;
@@ -8933,6 +8947,36 @@ button.btn-danger {
 
 .research-live-banner p {
   margin: 0;
+}
+
+.research-live-banner p + p {
+  margin-top: 8px;
+}
+
+.research-dev-hint {
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: rgba(60, 60, 67, 0.92);
+  background: rgba(255, 149, 0, 0.1);
+  border: 1px solid rgba(255, 149, 0, 0.22);
+}
+
+.research-dev-hint p {
+  margin: 0;
+}
+
+.research-dev-hint p + p {
+  margin-top: 8px;
+}
+
+.research-dev-hint a {
+  color: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .recovery-reveal-card {

@@ -136,7 +136,7 @@ const FEATURES = [
       design: "<strong>Status plate (shipped pilot)</strong>  -  object name + live status line for doors and booths; homepage <strong>One use</strong> section + <a href=\"/studio/\">Studio blog</a>. <strong>Lost item relay (shipped pilot)</strong>  -  item headline + return message on scan; create at <a href=\"/create/?template=lost_item\">/create/</a>; showcase via <code>npm run site:seed-showcase-lost-item</code>. <strong>Basic card</strong>  -  handle + manifesto + verification summary. <strong>Print artifact</strong>  -  unique <code>qr_id</code> per unit via artifact intent.",
       safety: "Relay patterns must not doxx owners. Per-item QR scope limits blast radius when one sticker is stolen. Template copy stays honest about what scan proves.",
       limits: "QR customizer at <a href=\"/shop/customize/\">/shop/customize/</a> ships in repo; operator enables live checkout. Child objects register on <a href=\"/created/\">/created/</a>. Relay has no separate contact-routing API beyond signed manifesto updates.",
-      future: "Template library for organizers, commerce-backed unique QRs, city-game objects (<a href=\"/what-can-a-qr-do/physical-world-multiplayer/\">research</a>).",
+      future: "Template library for organizers, commerce-backed unique QRs, <strong>Cedar Rapids city game</strong> (<span class=\"ship-badge ship-badge-partial\">In development</span> — <a href=\"/what-can-a-qr-do/physical-world-multiplayer/\">research</a> · <a href=\"/what-can-a-qr-do/combining-ideas/cedar-rapids-city-game/\">demo</a>).",
     },
   },
   {
@@ -363,6 +363,38 @@ const PROTOCOL_PHASES = new Set(["0", "0.5", "1", "2", "3", "4", "5", "6", "7", 
 const SITE_SLUGS = ["device-hub", "studio-blog", "hosted-steward-tier"];
 const COMMERCE_SLUGS = ["merch-funnel", "artifact-intent"];
 
+/** Research surfaces with active engineering — shown on features hub */
+const RESEARCH_IN_DEV = [
+  {
+    title: "Cedar Rapids city game",
+    sub: "Game-theory-first play season — resolver work underway",
+    href: "/what-can-a-qr-do/combining-ideas/cedar-rapids-city-game/",
+    icon: "layers",
+    iconTone: "purple",
+  },
+  {
+    title: "Physical-world multiplayer",
+    sub: "City as playable season — design target for Season 1",
+    href: "/what-can-a-qr-do/physical-world-multiplayer/",
+    icon: "people",
+    iconTone: "purple",
+  },
+  {
+    title: "Living street infrastructure",
+    sub: "Addressable benches & civic objects — foundation layer",
+    href: "/what-can-a-qr-do/living-street-infrastructure/",
+    icon: "shield",
+    iconTone: "orange",
+  },
+  {
+    title: "What can a QR do?",
+    sub: "Full research index + combining demos",
+    href: "/what-can-a-qr-do.html",
+    icon: "qr",
+    iconTone: "red",
+  },
+];
+
 function esc(s) {
   return s;
 }
@@ -546,6 +578,19 @@ function renderHub() {
           <h2 class="group-label">Protocol &amp; resolver</h2>
           <ul class="list">
             ${protocol.map(hubRow).join("\n")}
+          </ul>
+        </section>
+        <section class="group">
+          <h2 class="group-label">Research · in development</h2>
+          <div class="research-dev-hint" role="note">
+            <p>
+              <strong>In development.</strong> Cedar Rapids Season 1 (city game + living street objects)
+              is being wired to the live resolver behind feature flags. These pages are the design
+              target — gameplay is not live on scan at humanity.llc yet.
+            </p>
+          </div>
+          <ul class="list list-compact">
+            ${RESEARCH_IN_DEV.map((m) => hubLinkRow(m)).join("\n")}
           </ul>
         </section>
         <section class="group">
