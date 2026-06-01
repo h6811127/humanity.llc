@@ -138,6 +138,7 @@ flowchart LR
 | **Hosted steward tier** | M8 code + **client session link** (checkout `?hc_account_id=`) | Production rollout + Stripe return URL | [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) |
 | **Server push** | — | SSE P1; DO P2; SW fallback | [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) |
 | **Native mobile app** | — | Planning only (webhook path C) | [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md) § Server push options |
+| **Smooth mode (low-end mobile)** | Standard shell + S1–S12 mitigations | **Phase 0–4 plan** — UX + quiet defaults first; smaller bootstrap only if lab gate fails | [`DEVICE_LITE_MOBILE_PLAN.md`](DEVICE_LITE_MOBILE_PLAN.md) |
 
 ---
 
@@ -188,6 +189,7 @@ Product boundaries and build order — **do not re-spec here**.
 | Link billing account to device session | `device-steward-session.mjs` · `?hc_account_id=acc_…` after checkout |
 | Build Stripe success_url + metadata | `npm run hosted:stripe-return-url -- acc_…` · `device-steward-billing-return-core.mjs` |
 | QA steward flows | [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) — P2 live proof, P3 background alerts, PWA, **P1-PWA-R** |
+| Plan Smooth mode for low-end phones | [`DEVICE_LITE_MOBILE_PLAN.md`](DEVICE_LITE_MOBILE_PLAN.md) |
 
 ---
 
