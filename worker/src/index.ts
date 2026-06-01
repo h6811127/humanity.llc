@@ -56,6 +56,7 @@ import {
 } from "./resolver/vouch-cases";
 import { handlePostVouchAppeal } from "./resolver/vouch-appeals";
 import { handlePostVouchReport } from "./resolver/vouch-reports";
+import { handleGetVouchTransparency } from "./resolver/vouch-transparency";
 import { handleGetCreateRateMonitor } from "./resolver/create-monitoring";
 import {
   handleGetMerchFunnelMonitor,
@@ -411,6 +412,24 @@ export default {
         );
       }
       const res = await handlePostVouchCase(
+        request,
+        env.DB,
+        env.OPERATOR_AUDIT_TOKEN
+      );
+      return withCors(request, res);
+    }
+
+    if (
+      path === "/.well-known/hc/v1/operator/vouch-transparency" &&
+      request.method === "GET"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handleGetVouchTransparency(
         request,
         env.DB,
         env.OPERATOR_AUDIT_TOKEN
