@@ -210,3 +210,5 @@ Always document **cause** and **appeal path** per Human Verification HV-FR-40.
   - save dismissal notes
   - clear dismissals
   - hide/show reviewed items
+  - load durable cases and create cases from flags
+  - open case detail and suspend a subject profile (`POST …/vouch-cases/{case_id}/suspend`)

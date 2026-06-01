@@ -1,6 +1,6 @@
 # Vouch trust and safety operator workflow
 
-**Status:** Build spec - unshipped beyond existing audit flag read/dismiss tools
+**Status:** Build spec — P0 case queue + suspension API shipped; operator case inbox + suspend UI in progress
 **Audience:** Operators, stewards, product, engineering
 **Primary refs:** [`VOUCH_THREAT_MODEL.md`](VOUCH_THREAT_MODEL.md) | [`M6_VOUCHING_DESIGN.md`](M6_VOUCHING_DESIGN.md) | [`VOUCH_STEWARD_REVIEW_RUNBOOK.md`](VOUCH_STEWARD_REVIEW_RUNBOOK.md) | [`PUBLIC_LAUNCH_AND_GOVERNANCE_PLAN.md`](PUBLIC_LAUNCH_AND_GOVERNANCE_PLAN.md) | [`REVOKE_AND_LIFECYCLE_V1.md`](REVOKE_AND_LIFECYCLE_V1.md)
 
@@ -208,8 +208,7 @@ Until resolved, do not pre-moderate statements; use report + case review + vouch
 
 | Surface | MVP behavior |
 |---------|--------------|
-| `/operator/vouch-audit.html` | Existing audit UI becomes case inbox entry point |
-| Case detail | Show flags, related profiles, related vouches, notes, decision actions |
+| `/operator/vouch-audit.html` | Audit flags + case inbox; open case detail to suspend subject profile |
 | `/created/` Steward Advanced | Link to review queue stays steward-only and resolver-confirmed |
 | Public scan/status | Show only final public status and appeal link; no graph flags |
 | Support page | Explain false vouch, stolen QR, impersonation, appeal |
@@ -281,10 +280,10 @@ Reference: Human Verification governance requires transparency reports with aggr
 
 ## Build order
 
-1. **Case schema + APIs**: durable cases from existing audit flags.
-2. **Case UI**: convert current audit prototype into case inbox/detail.
-3. **Suspension action**: public notice + scan/status override.
-4. **Report intake**: false vouch, statement abuse, impersonation, harassment.
+1. **Case schema + APIs**: durable cases from existing audit flags. **Shipped**
+2. **Case UI**: convert current audit prototype into case inbox/detail. **Partial — inbox + suspend detail shipped; case events/notes pending**
+3. **Suspension action**: public notice + scan/status override. **API shipped; operator suspend UI shipped**
+4. **Report intake**: false vouch, statement abuse, impersonation, harassment. **Next**
 5. **Appeals**: suspended profile appeal path and case status transitions.
 6. **Transparency counters**: aggregate report endpoint / operator export.
 7. **Governance-key signatures**: replace bootstrap token-only action with signed suspension records.

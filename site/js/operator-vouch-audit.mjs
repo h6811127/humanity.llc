@@ -6,6 +6,17 @@ const ENDPOINT = `${location.origin}/.well-known/hc/v1/operator/vouch-audit-flag
 const DISMISS_ENDPOINT = `${ENDPOINT}/dismiss`;
 const CASES_ENDPOINT = `${location.origin}/.well-known/hc/v1/operator/vouch-cases`;
 
+const SUSPENSION_CAUSE_CATEGORIES = [
+  "impersonation",
+  "vouch_abuse",
+  "harassment",
+  "illegal_content",
+  "security_compromise",
+  "other",
+];
+
+const DEFAULT_SUSPEND_NOTICE = "Suspended under public rules pending appeal.";
+
 const tokenEl = document.getElementById("audit-token");
 const refreshBtn = document.getElementById("audit-refresh");
 const caseRefreshBtn = document.getElementById("case-refresh");
@@ -18,6 +29,8 @@ const casesEl = document.getElementById("audit-cases");
 let hideReviewed = false;
 let currentFlags = [];
 let currentCases = [];
+/** @type {string | null} */
+let selectedCaseId = null;
 
 function loadLocal(key, fallback) {
   try {
@@ -164,8 +177,95 @@ async function postCaseFromFlag(flag) {
   return body;
 }
 
+async function postCaseSuspend(caseId, payload) {
+  const res = await fetch(`${CASES_ENDPOINT}/${encodeURIComponent(caseId)}/suspend`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token()}`,
+    },
+    body: JSON.stringify(payload),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(
+      resolverErrorMessage(body, {
+        status: res.status,
+        requestUrl: `${CASES_ENDPOINT}/${caseId}/suspend`,
+        fallback: "Suspension failed.",
+      })
+    );
+  }
+  return body;
+}
+
 function formatCaseStatus(status) {
   return String(status || "unknown").replaceAll("_", " ");
+}
+
+function defaultAppealDeadlineIso() {
+  const deadline = new Date();
+  deadline.setUTCDate(deadline.getUTCDate() + 30);
+  deadline.setUTCHours(0, 0, 0, 0);
+  return deadline.toISOString();
+}
+
+function appealDeadlineInputValue(iso = defaultAppealDeadlineIso()) {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "";
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())}T${pad(date.getUTCHours())}:${pad(date.getUTCMinutes())}`;
+}
+
+function appealDeadlineFromInput(value) {
+  const trimmed = String(value || "").trim();
+  if (!trimmed) return "";
+  const parsed = new Date(trimmed);
+  if (Number.isNaN(parsed.getTime())) return "";
+  return parsed.toISOString();
+}
+
+function renderCaseSuspendForm(item) {
+  if (item.status === "suspended") {
+    return `<p class="form-hint operator-audit-case-suspended-note">This case is already suspended. Scan pages show the public suspension notice.</p>`;
+  }
+  const profiles = item.subject_profile_ids || [];
+  if (profiles.length === 0) {
+    return `<p class="form-hint">No subject profiles on this case — suspension is unavailable.</p>`;
+  }
+  const profileOptions = profiles
+    .map(
+      (profileId) =>
+        `<option value="${escapeHtml(profileId)}">${escapeHtml(profileId)}</option>`
+    )
+    .join("");
+  const causeOptions = SUSPENSION_CAUSE_CATEGORIES.map(
+    (category) =>
+      `<option value="${escapeHtml(category)}">${escapeHtml(category.replaceAll("_", " "))}</option>`
+  ).join("");
+  const caseKey = escapeHtml(item.case_id);
+  return `
+    <div class="operator-audit-case-detail">
+      <h3 class="operator-audit-case-detail-title">Suspend subject profile</h3>
+      <p class="form-hint">Governance suspension — public notice on scan/status. Requires cause, notice, and appeal deadline.</p>
+      <label class="field-label" for="case-profile-${caseKey}">Profile</label>
+      <select class="input case-suspend-profile" id="case-profile-${caseKey}">
+        ${profileOptions}
+      </select>
+      <label class="field-label" for="case-cause-${caseKey}">Cause category</label>
+      <select class="input case-suspend-cause" id="case-cause-${caseKey}">
+        ${causeOptions}
+      </select>
+      <label class="field-label" for="case-notice-${caseKey}">Public notice</label>
+      <textarea class="input case-suspend-notice" id="case-notice-${caseKey}" rows="3" maxlength="500">${escapeHtml(DEFAULT_SUSPEND_NOTICE)}</textarea>
+      <label class="field-label" for="case-appeal-${caseKey}">Appeal deadline (UTC)</label>
+      <input class="input case-suspend-appeal" id="case-appeal-${caseKey}" type="datetime-local" value="${escapeHtml(appealDeadlineInputValue())}" />
+      <label class="field-label" for="case-by-${caseKey}">Suspended by (optional)</label>
+      <input class="input case-suspend-by" id="case-by-${caseKey}" type="text" maxlength="120" placeholder="Your handle or initials" />
+      <div class="operator-audit-flag-buttons">
+        <button type="button" class="btn-danger case-suspend-submit">Suspend profile</button>
+      </div>
+    </div>`;
 }
 
 function renderCases() {
@@ -180,9 +280,10 @@ function renderCases() {
       const profiles = (item.subject_profile_ids || []).join(", ") || "none";
       const threats = (item.threat_ids || []).join(", ") || "none";
       const updated = item.updated_at ? new Date(item.updated_at).toLocaleString() : "";
+      const isOpen = selectedCaseId === item.case_id;
       return `
       <li class="operator-audit-flag" data-case-id="${escapeHtml(item.case_id)}">
-        <article class="operator-audit-flag-card operator-audit-case-card">
+        <article class="operator-audit-flag-card operator-audit-case-card${isOpen ? " operator-audit-case-card--open" : ""}">
           <header class="operator-audit-flag-head">
             <p class="operator-audit-flag-kind">${escapeHtml(formatFlagKind(item.kind))}</p>
             <p class="operator-audit-flag-priority">${escapeHtml(String(item.priority || "p1"))} · ${escapeHtml(formatCaseStatus(item.status))}</p>
@@ -213,10 +314,70 @@ function renderCases() {
               <dd>${escapeHtml(updated || "unknown")}</dd>
             </div>
           </dl>
+          <div class="operator-audit-flag-buttons">
+            <button type="button" class="btn-secondary audit-case-toggle">${isOpen ? "Hide detail" : "Open detail"}</button>
+          </div>
+          ${isOpen ? renderCaseSuspendForm(item) : ""}
         </article>
       </li>`;
     })
     .join("");
+
+  casesEl.querySelectorAll(".audit-case-toggle").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const item = btn.closest("[data-case-id]");
+      if (!item) return;
+      const caseId = item.getAttribute("data-case-id");
+      selectedCaseId = selectedCaseId === caseId ? null : caseId;
+      renderCases();
+    });
+  });
+
+  casesEl.querySelectorAll(".case-suspend-submit").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const item = btn.closest("[data-case-id]");
+      if (!item) return;
+      const caseId = item.getAttribute("data-case-id");
+      const caseItem = currentCases.find((entry) => entry.case_id === caseId);
+      if (!caseId || !caseItem) return;
+
+      const profileId = item.querySelector(".case-suspend-profile")?.value?.trim() || "";
+      const causeCategory = item.querySelector(".case-suspend-cause")?.value?.trim() || "";
+      const notice = item.querySelector(".case-suspend-notice")?.value?.trim() || "";
+      const appealDeadline = appealDeadlineFromInput(
+        item.querySelector(".case-suspend-appeal")?.value
+      );
+      const suspendedBy = item.querySelector(".case-suspend-by")?.value?.trim() || "";
+
+      if (!profileId || !causeCategory || !notice || !appealDeadline) {
+        setCaseStatus("Profile, cause, notice, and appeal deadline are required.", true);
+        return;
+      }
+
+      btn.disabled = true;
+      try {
+        const body = await postCaseSuspend(caseId, {
+          profile_id: profileId,
+          cause_category: causeCategory,
+          notice,
+          appeal_deadline: appealDeadline,
+          suspended_by: suspendedBy || undefined,
+        });
+        const suspension = body.suspension;
+        const label =
+          suspension?.profile_id && suspension?.public_label
+            ? `${suspension.profile_id} · ${suspension.public_label}`
+            : profileId;
+        setCaseStatus(`Suspended ${label}.`);
+        selectedCaseId = caseId;
+        await refreshCases();
+      } catch (err) {
+        setCaseStatus(err instanceof Error ? err.message : "Suspension failed.", true);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  });
 }
 
 function renderFlags() {
