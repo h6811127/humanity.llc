@@ -49,6 +49,11 @@ import {
   handleGetVouchAuditFlags,
   handlePostVouchAuditFlagDismiss,
 } from "./resolver/vouch-audit-flags";
+import {
+  handleGetVouchCases,
+  handlePostVouchCase,
+  handlePostVouchCaseSuspend,
+} from "./resolver/vouch-cases";
 import { handleGetCreateRateMonitor } from "./resolver/create-monitoring";
 import {
   handleGetMerchFunnelMonitor,
@@ -371,6 +376,61 @@ export default {
         request,
         env.DB,
         env.OPERATOR_AUDIT_TOKEN
+      );
+      return withCors(request, res);
+    }
+
+    if (
+      path === "/.well-known/hc/v1/operator/vouch-cases" &&
+      request.method === "GET"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handleGetVouchCases(
+        request,
+        env.DB,
+        env.OPERATOR_AUDIT_TOKEN
+      );
+      return withCors(request, res);
+    }
+
+    if (
+      path === "/.well-known/hc/v1/operator/vouch-cases" &&
+      request.method === "POST"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostVouchCase(
+        request,
+        env.DB,
+        env.OPERATOR_AUDIT_TOKEN
+      );
+      return withCors(request, res);
+    }
+
+    const vouchCaseSuspendMatch = path.match(
+      /^\/\.well-known\/hc\/v1\/operator\/vouch-cases\/([^/]+)\/suspend$/
+    );
+    if (vouchCaseSuspendMatch && request.method === "POST") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostVouchCaseSuspend(
+        request,
+        env.DB,
+        env.OPERATOR_AUDIT_TOKEN,
+        decodeURIComponent(vouchCaseSuspendMatch[1] ?? "")
       );
       return withCors(request, res);
     }

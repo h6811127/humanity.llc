@@ -245,8 +245,8 @@ Respond: suspend steward, rotate keys, revoke batch
 | P1 | Per-steward vouch cap or enhanced audit for steward issuances | R-03, S-02 | **Shipped** (steward cap policy + `steward_issuance_burst`) |
 | P1 | Integrator guide: recency + live control + not KYC | I-02, I-03 | **Shipped** (`VOUCH_INTEGRATOR_POLICY_GUIDE.md`) |
 | P2 | Optional PIN / WebAuthn before `Sign and submit` | V-04, A-02 | **Shipped** (opt-in PIN or device unlock per saved card; scan gate before submit) |
-| P2 | Vouchee-initiated dispute / steward revoke | H-01 |
-| P2 | Statement report + moderation policy | V-08 |
+| P2 | Vouchee-initiated dispute / steward revoke | H-01 | **Specified** (`VOUCH_TRUST_AND_SAFETY_OPERATOR_WORKFLOW.md`) |
+| P2 | Statement report + moderation policy | V-08 | **Specified** (`VOUCH_TRUST_AND_SAFETY_OPERATOR_WORKFLOW.md`) |
 | Deferred | Ceremony path; cross-operator federation | bootstrap diversity |
 
 ---
@@ -285,6 +285,7 @@ Add to program register: `docs/V1_ASSUMPTION_REGISTER.md` (VT-* series).
 
 - [`VOUCH_TRUST_POSITIONING.md`](VOUCH_TRUST_POSITIONING.md) - product promise, what we own
 - [`M6_VOUCHING_DESIGN.md`](M6_VOUCHING_DESIGN.md) - UX, privacy, implementation map
+- [`VOUCH_TRUST_AND_SAFETY_OPERATOR_WORKFLOW.md`](VOUCH_TRUST_AND_SAFETY_OPERATOR_WORKFLOW.md) - build spec for cases, reports, suspension, appeals, and transparency
 - [`V1_ADVERSARIAL_REVIEW.md`](V1_ADVERSARIAL_REVIEW.md) § Perspective 1 - cross-cutting abuser
 - [`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md) - Level 2 boundaries
 - [`VOUCH_INTEGRATOR_POLICY_GUIDE.md`](VOUCH_INTEGRATOR_POLICY_GUIDE.md) - integrator policy object, recency, live control

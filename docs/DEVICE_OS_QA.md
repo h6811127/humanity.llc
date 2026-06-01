@@ -601,7 +601,7 @@ Automated: `npm run worker:test:pwa-install` (includes `pwa-scan-handoff-core.te
 
 | Step | Action | Expected |
 |------|--------|----------|
-| 1 | Open PWA → status dot → **Scan QR to vouch** | Camera preview; allow camera if prompted |
+| 1 | Open PWA → status dot → **Scan a Humanity QR** (glance row) or tap chrome **Scan to vouch** | Camera preview; allow camera if prompted |
 | 2 | Point at `https://humanity.llc/c/…?q=…` QR | Navigates to scan page **in PWA** |
 | 3 | Attest / vouch | Keys load; vouch form available (not “create a card”) |
 | 4 | **Fallback:** Camera app → Safari scan → **Copy scan link** | Explainer mentions Home Screen app |

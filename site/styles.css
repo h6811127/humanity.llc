@@ -1558,12 +1558,6 @@ a.hub-card-menu-item {
   }
 }
 
-.device-hub-scan-qr-btn {
-  width: 100%;
-  min-height: 44px;
-  margin-bottom: 10px;
-}
-
 .device-hub-steward-tools {
   display: flex;
   flex-direction: column;
@@ -1575,7 +1569,6 @@ a.hub-card-menu-item {
   display: none !important;
 }
 
-.device-hub-steward-tools .device-hub-scan-qr-btn,
 .device-hub-steward-tools .device-hub-steward-vouch-guidance {
   margin-bottom: 0;
 }
@@ -10120,4 +10113,33 @@ body.device-shell-created .flow-keys-group .list-row {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 13px;
   word-break: break-all;
+}
+
+.operator-audit-page .operator-audit-case-detail {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  display: grid;
+  gap: 8px;
+}
+
+.operator-audit-page .operator-audit-case-detail-title {
+  margin: 0;
+  font-size: 15px;
+}
+
+.operator-audit-page .operator-audit-case-card--open {
+  border-color: rgba(0, 0, 0, 0.14);
+}
+
+.operator-audit-page .operator-audit-flag-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.operator-audit-page textarea.input {
+  min-height: 72px;
+  resize: vertical;
 }

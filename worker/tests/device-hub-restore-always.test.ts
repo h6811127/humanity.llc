@@ -56,7 +56,7 @@ describe("hub restore always visible (Phase 4)", () => {
       expect(html, path).toContain("Import recovery code");
       expect(html, path).toContain('id="hub-open-scan-form"');
       expect(html, path).toContain("Open scan link");
-      expect(html, path).toContain('id="hub-scan-qr-btn"');
+      expect(html, path).not.toContain('id="hub-scan-qr-btn"');
       expect(html, path).toContain('id="device-hub-qr-scanner"');
       expect(html, path).toContain('id="device-hub-steward-vouch-guidance"');
       expect(html, path).toContain('id="device-hub-restore-group-label"');

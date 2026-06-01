@@ -115,7 +115,7 @@ export const SETUP_DONE_IOS_HOME_SCREEN_TITLE =
   "Add to Home Screen after you finish here";
 
 export const SETUP_DONE_IOS_HOME_SCREEN_DETAIL =
-  "Tap Share → Add to Home Screen, then manage your cards only from that icon. To vouch from a printed QR in the app, use Scan QR to vouch in Restore & scan — not your camera alone. Safari tabs keep a separate copy. Keep your recovery backup.";
+  "Tap Share → Add to Home Screen, then manage your cards only from that icon. To vouch from a printed QR in the app, tap the scan icon in the top bar — not your camera alone. Safari tabs keep a separate copy. Keep your recovery backup.";
 
 export const DEFAULT_FOR_ATTESTATION = "Default for attestation";
 
@@ -330,17 +330,17 @@ export const HUB_STEWARD_VOUCH_GUIDANCE_EYEBROW = "Printed QR on iPhone";
 export const HUB_STEWARD_VOUCH_GUIDANCE_TITLE = "Vouch from this app";
 
 export const HUB_STEWARD_VOUCH_GUIDANCE_DETAIL =
-  "Your camera opens Safari, which does not share cards with this Home Screen app. Tap Scan QR to vouch above — or Open scan link after copying the URL in Safari.";
+  "Your camera opens Safari, which does not share cards with this Home Screen app. Tap the scan icon in the top bar — or use Open scan link after copying the URL in Safari.";
 
 /** Hub steward vouch guidance — Safari browser on iPhone (S4). */
 export const HUB_STEWARD_SAFARI_VOUCH_GUIDANCE_TITLE = "Your card is here — use this browser";
 
 export const HUB_STEWARD_SAFARI_VOUCH_GUIDANCE_DETAIL =
-  "Your camera opens this Safari tab. Keep your steward card saved here before you vouch. If you use the Home Screen app instead, vouch from Scan QR to vouch there — not the Camera app alone.";
+  "Your camera opens this Safari tab. Keep your steward card saved here before you vouch. If you use the Home Screen app instead, use the scan icon in the app — not the Camera app alone.";
 
 /** PWA install card — iOS manual Add to Home Screen detail (S4). */
 export const PWA_INSTALL_IOS_DETAIL =
-  "Same keys and inbox — no account. Tap Share → Add to Home Screen. On iPhone, use only that home screen icon afterward. To vouch from prints, use Scan QR to vouch in the app — not your camera alone.";
+  "Same keys and inbox — no account. Tap Share → Add to Home Screen. On iPhone, use only that home screen icon afterward. To vouch from prints, tap the scan icon in the app — not your camera alone.";
 
 /** Hub backup import summary line (Phase 4). */
 export const HUB_RESTORE_IMPORT_SUMMARY = "Encrypted backup file";
@@ -422,8 +422,6 @@ export const PRINT_SHARE_STEWARD_DISCOVERY =
 export const PRINT_SHARE_STEWARD_FULL_SIZE_CTA = "View steward handoff QR";
 
 /** Hub in-app QR scanner (S3). */
-export const HUB_SCAN_QR_BTN = "Scan QR to vouch";
-
 export const HUB_SCAN_QR_DIALOG_TITLE = "Scan a Humanity QR";
 
 export const HUB_SCAN_QR_DIALOG_LEAD =

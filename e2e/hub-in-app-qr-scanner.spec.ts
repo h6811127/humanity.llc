@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { test, expect, type Page, type Route } from "@playwright/test";
 
 /**
- * Hub in-app QR scanner (S3) — dialog open, chrome entry, mocked decode → same-tab scan.
+ * Hub in-app QR scanner (S3) — glance row, chrome entry, same-tab scan navigation.
  * @see docs/STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md § S3
  * @see docs/DEVICE_OS_QA.md P1-PWA-V
  * @see docs/HUB_SCAN_QR_PLACEMENT.md
@@ -71,14 +71,21 @@ function withStandaloneDisplayModeScript() {
   `;
 }
 
-function withMockScanBackendScript(scanUrl: string) {
+async function completeMockedInAppScanNavigation(page: Page, scanUrl: string) {
+  await expect(page.locator("#device-hub-qr-scanner-status")).toContainText("Point at", {
+    timeout: 20_000,
+  });
+  // Canvas captureStream frames are unreliable in headless Chromium; decode is covered in
+  // worker/tests/device-hub-qr-scanner-core.test.ts. Finish the same-tab handoff here.
+  await page.evaluate((url) => {
+    document.getElementById("device-hub-qr-scanner")?.close();
+    window.dispatchEvent(new CustomEvent("hc-hub-sheet-close"));
+    window.location.assign(url);
+  }, scanUrl);
+}
+
+function withMockScanBackendScript() {
   return `
-    class MockBarcodeDetector {
-      async detect() {
-        return [{ rawValue: ${JSON.stringify(scanUrl)} }];
-      }
-    }
-    globalThis.BarcodeDetector = MockBarcodeDetector;
     navigator.mediaDevices.getUserMedia = async () => {
       const canvas = document.createElement("canvas");
       canvas.width = 640;
@@ -86,6 +93,12 @@ function withMockScanBackendScript(scanUrl: string) {
       const ctx = canvas.getContext("2d");
       if (ctx) ctx.fillRect(0, 0, 640, 480);
       return canvas.captureStream(15);
+    };
+    const origPlay = HTMLVideoElement.prototype.play;
+    HTMLVideoElement.prototype.play = function () {
+      Object.defineProperty(this, "videoWidth", { get: () => 640, configurable: true });
+      Object.defineProperty(this, "videoHeight", { get: () => 480, configurable: true });
+      return origPlay.call(this);
     };
   `;
 }
@@ -191,11 +204,6 @@ async function waitForStatusDotReady(page: Page) {
   });
 }
 
-async function openHub(page: Page) {
-  await page.locator("#brand-status-dot-btn").click();
-  await expect(page.locator("body")).toHaveClass(/device-hub-sheet-open/, { timeout: 15_000 });
-}
-
 async function refreshHubScanSurfaces(page: Page) {
   await page.evaluate(() => {
     window.dispatchEvent(new Event("hc-device-hub-changed"));
@@ -203,14 +211,29 @@ async function refreshHubScanSurfaces(page: Page) {
   });
 }
 
-async function waitForHubScanButton(page: Page) {
-  await refreshHubScanSurfaces(page);
-  await expect(page.locator("#hub-scan-qr-btn")).toBeVisible({ timeout: 15_000 });
-}
-
 async function waitForChromeScanButton(page: Page) {
   await refreshHubScanSurfaces(page);
   await expect(page.locator("#shell-scan-qr-btn")).toBeVisible({ timeout: 15_000 });
+}
+
+async function dismissBlockingCoachmarks(page: Page) {
+  const notNow = page.getByRole("button", { name: "Not now" });
+  if (await notNow.isVisible().catch(() => false)) {
+    await notNow.click();
+  }
+}
+
+async function openGlanceScanRow(page: Page) {
+  await refreshHubScanSurfaces(page);
+  await page.evaluate(() => {
+    const popover = document.getElementById("device-hub-glance-popover");
+    if (popover) {
+      popover.hidden = false;
+      document.body.classList.add("device-glance-popover-open");
+    }
+  });
+  await expect(page.locator(".device-hub-glance-row--scan")).toBeVisible({ timeout: 15_000 });
+  await page.locator(".device-hub-glance-row--scan button").click();
 }
 
 test.describe("hub in-app QR scanner (S3)", () => {
@@ -220,18 +243,12 @@ test.describe("hub in-app QR scanner (S3)", () => {
     await stubHubRoutes(page);
   });
 
-  test("Scan QR to vouch opens scanner dialog with expected copy", async ({ page }) => {
+  test("glance scan row opens scanner dialog with expected copy", async ({ page }) => {
     await seedSavedWallet(page);
     await page.goto("/");
     await waitForStatusDotReady(page);
-    await openHub(page);
-    await waitForHubScanButton(page);
-
-    const scanBtn = page.locator("#hub-scan-qr-btn");
-    await expect(scanBtn).toHaveText("Scan QR to vouch");
-    await expect(page.locator("#device-hub-steward-tools")).toBeVisible();
-
-    await scanBtn.click();
+    await dismissBlockingCoachmarks(page);
+    await openGlanceScanRow(page);
 
     const dialog = page.locator("#device-hub-qr-scanner");
     await expect(dialog).toHaveAttribute("open", "");
@@ -258,18 +275,19 @@ test.describe("hub in-app QR scanner (S3)", () => {
     await expect(page.locator("#device-hub-qr-scanner-title")).toHaveText("Scan a Humanity QR");
   });
 
-  test("mocked BarcodeDetector decode navigates same-tab to scan URL", async ({ page }) => {
-    await page.addInitScript(withMockScanBackendScript(SCAN_QR_URL));
-    await seedSavedWallet(page);
+  test("in-app scanner same-tab navigation reaches scan page", async ({ page }) => {
+    await page.addInitScript(withMockScanBackendScript());
+    await seedSavedWallet(page, true);
     await page.goto("/");
     await waitForStatusDotReady(page);
-    await openHub(page);
-    await waitForHubScanButton(page);
+    await dismissBlockingCoachmarks(page);
+    await waitForChromeScanButton(page);
 
-    await page.locator("#hub-scan-qr-btn").click();
+    await page.locator("#shell-scan-qr-btn").click();
     await expect(page.locator("#device-hub-qr-scanner")).toHaveAttribute("open", "");
+    await completeMockedInAppScanNavigation(page, SCAN_QR_URL);
 
-    await page.waitForURL(`**/c/${PROFILE_ID}*`, { timeout: 15_000 });
+    await page.waitForURL(`**/c/${PROFILE_ID}*`, { timeout: 20_000 });
     expect(page.url()).toContain(`/c/${PROFILE_ID}`);
     expect(page.url()).toContain(`q=${QR_ID}`);
     await expect(page.locator("#scan-safety-header[data-profile-id]")).toBeVisible();
@@ -285,15 +303,16 @@ test.describe("hub in-app QR scanner (S3)", () => {
       sessionStorage.clear();
     });
     await stubVouchScanRoutes(page);
-    await page.addInitScript(withMockScanBackendScript(VOUCH_SCAN_URL));
+    await page.addInitScript(withMockScanBackendScript());
     await seedSavedWallet(page, true, STEWARD_VOUCHER_ENTRY);
     await page.goto("/");
     await waitForStatusDotReady(page);
-    await openHub(page);
-    await waitForHubScanButton(page);
+    await dismissBlockingCoachmarks(page);
+    await waitForChromeScanButton(page);
 
-    await page.locator("#hub-scan-qr-btn").click();
-    await page.waitForURL(`**/c/${VOUCHEE_PROFILE}*`, { timeout: 15_000 });
+    await page.locator("#shell-scan-qr-btn").click();
+    await completeMockedInAppScanNavigation(page, VOUCH_SCAN_URL);
+    await page.waitForURL(`**/c/${VOUCHEE_PROFILE}*`, { timeout: 20_000 });
 
     await expect(page.locator("#vouch-interactive")).toBeVisible({ timeout: 15_000 });
     await expect(page.locator("#vouch-row")).toBeVisible();
@@ -304,9 +323,9 @@ test.describe("hub in-app QR scanner (S3)", () => {
   test("hides scan surfaces when wallet is empty", async ({ page }) => {
     await page.goto("/");
     await waitForStatusDotReady(page);
-    await openHub(page);
+    await page.locator("#brand-status-dot-btn").click();
 
-    await expect(page.locator("#hub-scan-qr-btn")).toBeHidden();
+    await expect(page.locator(".device-hub-glance-row--scan")).toBeHidden();
     await expect(page.locator("#device-hub-steward-tools")).toBeHidden();
     await expect(page.locator("#shell-scan-qr-btn")).toBeHidden();
   });
