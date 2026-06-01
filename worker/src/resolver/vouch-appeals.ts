@@ -35,18 +35,6 @@ function generateReferenceCode(): string {
   return `vra_${random.slice(0, 12)}`;
 }
 
-function serializeCase(row: VouchCaseRow) {
-  return {
-    case_id: row.case_id,
-    kind: row.kind,
-    source: row.source,
-    status: row.status,
-    priority: row.priority,
-    subject_profile_ids: JSON.parse(row.subject_profile_ids_json),
-    subject_vouch_ids: JSON.parse(row.subject_vouch_ids_json),
-  };
-}
-
 function profileIsCaseSubject(row: VouchCaseRow, profileId: string): boolean {
   const subjectProfileIds = normalizeProfileIds(
     JSON.parse(row.subject_profile_ids_json) as string[]
@@ -151,15 +139,12 @@ export async function handlePostVouchAppeal(
   const now = new Date().toISOString();
   const appealId = generateAppealId();
   const referenceCode = contactMethod ? generateReferenceCode() : null;
-  const wasSuspended = caseRow.status === "suspended";
 
-  let updatedCase = caseRow;
-  if (wasSuspended) {
+  if (caseRow.status === "suspended") {
     const appealed = await updateVouchCaseStatus(db, caseId, "appealed", now);
     if (!appealed) {
       return errorResponse("CASE_UPDATE_FAILED", "Could not update case status.", 500);
     }
-    updatedCase = appealed;
   }
 
   const appealRow = await insertVouchAppeal(db, {
@@ -177,8 +162,6 @@ export async function handlePostVouchAppeal(
       ok: true,
       appeal_id: appealRow.appeal_id,
       reference_code: appealRow.reference_code,
-      case: serializeCase(updatedCase),
-      case_status_changed: wasSuspended,
     },
     201
   );

@@ -8,22 +8,51 @@ import { RateLimitBucketStore } from "./rate-limit-db-mock";
 const URL = "https://humanity.llc/.well-known/hc/v1/vouch-appeals";
 const CASE_ID = "case_appealtest123456789012345";
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
+const CO_SUBJECT = "8Ym0nQ3oR5sU7wX9zA2bC4dE6";
 
 class FakeVouchAppealDb {
   private cases: VouchCaseRow[] = [];
   private suspensions: VouchCaseSuspensionRow[] = [];
   readonly appeals: VouchAppealRow[] = [];
   readonly cards = new Map<string, { profile_id: string; status: string }>();
+
+  caseStatus(caseId: string): string | undefined {
+    return this.cases.find((row) => row.case_id === caseId)?.status;
+  }
+
+  addOpenCase(caseId: string, subjectProfileIds: string[]) {
+    this.cases.push({
+      case_id: caseId,
+      kind: "harassment",
+      source: "operator_manual",
+      source_key: `manual:${caseId}`,
+      subject_profile_ids_json: JSON.stringify(subjectProfileIds),
+      subject_vouch_ids_json: "[]",
+      status: "suspended",
+      priority: "p1",
+      threat_ids_json: '["H-02"]',
+      summary: "Alternate case for mismatch test.",
+      created_by: "operator",
+      assigned_to: null,
+      created_at: "2026-05-01T00:00:00.000Z",
+      updated_at: "2026-05-01T00:00:00.000Z",
+    });
+  }
   readonly rateLimits = new RateLimitBucketStore();
 
-  addSuspendedProfile(profileId: string, caseId = CASE_ID) {
+  addSuspendedProfile(
+    profileId: string,
+    caseId = CASE_ID,
+    subjectProfileIds?: string[]
+  ) {
+    const subjects = subjectProfileIds ?? [profileId];
     this.cards.set(profileId, { profile_id: profileId, status: "suspended" });
     this.cases.push({
       case_id: caseId,
       kind: "harassment",
       source: "operator_manual",
       source_key: `manual:${profileId}`,
-      subject_profile_ids_json: JSON.stringify([profileId]),
+      subject_profile_ids_json: JSON.stringify(subjects),
       subject_vouch_ids_json: "[]",
       status: "suspended",
       priority: "p1",
@@ -146,15 +175,15 @@ describe("POST vouch-appeals", () => {
 
     expect(res.status).toBe(201);
     const body = (await res.json()) as {
+      ok: boolean;
       appeal_id: string;
       reference_code: string | null;
-      case_status_changed: boolean;
-      case: { status: string };
     };
+    expect(body.ok).toBe(true);
     expect(body.appeal_id).toMatch(/^appeal_/);
     expect(body.reference_code).toMatch(/^vra_/);
-    expect(body.case_status_changed).toBe(true);
-    expect(body.case.status).toBe("appealed");
+    expect(Object.keys(body).sort()).toEqual(["appeal_id", "ok", "reference_code"]);
+    expect(fake.caseStatus(CASE_ID)).toBe("appealed");
     expect(fake.appeals).toHaveLength(1);
   });
 
@@ -195,9 +224,70 @@ describe("POST vouch-appeals", () => {
       fake as unknown as D1Database
     );
     expect(second.status).toBe(201);
-    const secondBody = (await second.json()) as { case_status_changed: boolean };
-    expect(secondBody.case_status_changed).toBe(false);
+    const secondBody = (await second.json()) as Record<string, unknown>;
+    expect(Object.keys(secondBody).sort()).toEqual(["appeal_id", "ok", "reference_code"]);
+    expect(secondBody).not.toHaveProperty("case");
+    expect(secondBody).not.toHaveProperty("case_status_changed");
+    expect(fake.caseStatus(CASE_ID)).toBe("appealed");
     expect(fake.appeals).toHaveLength(2);
+  });
+
+  it("does not expose case metadata in the response", async () => {
+    const fake = new FakeVouchAppealDb();
+    fake.addSuspendedProfile(PROFILE);
+
+    const res = await handlePostVouchAppeal(
+      new Request(URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "CF-Connecting-IP": "203.0.113.24",
+        },
+        body: JSON.stringify({
+          case_id: CASE_ID,
+          profile_id: PROFILE,
+          statement: "Appeal without leaking case row.",
+        }),
+      }),
+      fake as unknown as D1Database
+    );
+
+    expect(res.status).toBe(201);
+    const body = (await res.json()) as Record<string, unknown>;
+    expect(Object.keys(body).sort()).toEqual(["appeal_id", "ok", "reference_code"]);
+    expect(body).not.toHaveProperty("case");
+    expect(body).not.toHaveProperty("case_status_changed");
+    expect(body).not.toHaveProperty("case_id");
+    expect(body).not.toHaveProperty("status");
+    expect(body).not.toHaveProperty("subject_profile_ids");
+    expect(body).not.toHaveProperty("subject_vouch_ids");
+  });
+
+  it("does not leak co-subjects on multi-profile cases", async () => {
+    const fake = new FakeVouchAppealDb();
+    fake.addSuspendedProfile(PROFILE, CASE_ID, [PROFILE, CO_SUBJECT]);
+
+    const res = await handlePostVouchAppeal(
+      new Request(URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "CF-Connecting-IP": "203.0.113.25",
+        },
+        body: JSON.stringify({
+          case_id: CASE_ID,
+          profile_id: PROFILE,
+          statement: "Appeal on a clustered case.",
+        }),
+      }),
+      fake as unknown as D1Database
+    );
+
+    expect(res.status).toBe(201);
+    const body = (await res.json()) as Record<string, unknown>;
+    expect(Object.keys(body).sort()).toEqual(["appeal_id", "ok", "reference_code"]);
+    expect(body).not.toHaveProperty("case");
+    expect(JSON.stringify(body)).not.toContain(CO_SUBJECT);
   });
 
   it("rejects appeals for non-suspended profiles", async () => {
@@ -223,26 +313,55 @@ describe("POST vouch-appeals", () => {
     expect(res.status).toBe(422);
   });
 
-  it("rejects appeals when the suspension record is not linked to the case", async () => {
+  it("rejects appeals when suspension case_id does not match request", async () => {
+    const otherCaseId = "case_other123456789012345";
     const fake = new FakeVouchAppealDb();
-    fake.addSuspendedProfile(PROFILE, "case_other123456789012345");
+    fake.addSuspendedProfile(PROFILE, CASE_ID);
+    fake.addOpenCase(otherCaseId, [PROFILE]);
 
     const res = await handlePostVouchAppeal(
       new Request(URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "CF-Connecting-IP": "203.0.113.24",
+          "CF-Connecting-IP": "203.0.113.26",
         },
         body: JSON.stringify({
-          case_id: "case_other123456789012345",
+          case_id: otherCaseId,
           profile_id: PROFILE,
-          statement: "Should work for matching case.",
+          statement: "Wrong case id for this suspension.",
+        }),
+      }),
+      fake as unknown as D1Database
+    );
+    expect(res.status).toBe(422);
+    const body = (await res.json()) as { error?: string };
+    expect(body.error).toBe("SUSPENSION_CASE_MISMATCH");
+  });
+
+  it("accepts appeals when suspension record matches the requested case", async () => {
+    const otherCaseId = "case_other123456789012345";
+    const fake = new FakeVouchAppealDb();
+    fake.addSuspendedProfile(PROFILE, otherCaseId);
+
+    const res = await handlePostVouchAppeal(
+      new Request(URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "CF-Connecting-IP": "203.0.113.27",
+        },
+        body: JSON.stringify({
+          case_id: otherCaseId,
+          profile_id: PROFILE,
+          statement: "Matching suspension case.",
         }),
       }),
       fake as unknown as D1Database
     );
     expect(res.status).toBe(201);
+    const body = (await res.json()) as Record<string, unknown>;
+    expect(Object.keys(body).sort()).toEqual(["appeal_id", "ok", "reference_code"]);
   });
 
   it("returns 429 when rate limited", async () => {
