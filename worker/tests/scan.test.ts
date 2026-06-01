@@ -497,7 +497,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
       new Request(
         `https://humanity.llc/c/${PROFILE}?q=${QR}&live_challenge=${LIVE_CHALLENGE}`
       ),
-      scanDbFor({
+      { DB: scanDbFor({
         challenge_id: LIVE_CHALLENGE,
         profile_id: PROFILE,
         qr_id: QR,
@@ -511,7 +511,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
         response_document_json: "{}",
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-      }),
+      }) },
       PROFILE
     );
     const html = await res.text();
@@ -555,7 +555,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
       new Request(
         `https://humanity.llc/c/${PROFILE}?q=${QR}&live_challenge=${LIVE_CHALLENGE}`
       ),
-      scanDbFor({
+      { DB: scanDbFor({
         challenge_id: LIVE_CHALLENGE,
         profile_id: PROFILE,
         qr_id: QR,
@@ -569,7 +569,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
         response_document_json: "{}",
         created_at: new Date(Date.now() - 600_000).toISOString(),
         updated_at: new Date(Date.now() - 301_000).toISOString(),
-      }),
+      }) },
       PROFILE
     );
     const html = await res.text();

@@ -17,6 +17,10 @@ import {
 import { governanceProcessUrls, originFromScanUrl } from "./scan-governance";
 import { SCAN_OFFLINE_BANNER_TEXT } from "./scan-offline";
 import {
+  GAME_NODE_SCAN_FOOT,
+  type GameNodeScanContext,
+} from "../city-game/scan-view";
+import {
   credentialCodeFromScanUrl,
   deriveCredentialCodeSync,
 } from "../../../site/js/qr-credential-code.mjs";
@@ -396,9 +400,87 @@ function renderLostItemCreateHint(origin: string): string {
   return `<p class="scan-create-hint" role="note"><a href="${escapeHtml(href)}">Create a lost-item tag</a> — ${escapeHtml(LOST_ITEM_RELAY_CREATE_HINT)}</p>`;
 }
 
+function renderGameNodeMetaChips(gameNode: GameNodeScanContext): string {
+  const chips: string[] = [];
+  const meta = gameNode.gameMeta;
+
+  if (gameNode.mode === "care_pause") {
+    chips.push("Maintenance pause — care stream wins");
+  }
+  if (gameNode.mode === "dormant") {
+    chips.push("Object dormant — window ended");
+  }
+  if (meta.compromised) {
+    chips.push("Compromised relay — rekey pending");
+  }
+  if (meta.collective_target != null && meta.collective_progress != null) {
+    chips.push(
+      `Collective ${meta.collective_progress}/${meta.collective_target}`
+    );
+  }
+  if (meta.scarcity_remaining != null) {
+    chips.push(`${meta.scarcity_remaining} passes remaining`);
+  }
+  if (meta.fragment_id) {
+    chips.push(`Fragment ${meta.fragment_id}`);
+  }
+  if (meta.unlocked_by.length) {
+    chips.push(`Unlocked by ${meta.unlocked_by.join(", ")}`);
+  }
+  if (meta.vouch_requires.length) {
+    chips.push(`Vouch required from ${meta.vouch_requires.join(", ")}`);
+  }
+  if (!chips.length) return "";
+  const items = chips
+    .map(
+      (chip) =>
+        `<li class="scan-game-chip">${escapeHtml(chip)}</li>`
+    )
+    .join("\n");
+  return `<ul class="scan-game-chips" aria-label="Game state">${items}</ul>`;
+}
+
+function buildGameNodeScanHero(vm: ScanViewModel): { main: string; foot: string } {
+  const gameNode = vm.gameNode!;
+  const display = parseManifestoDisplay(vm.manifestoLine);
+  const label =
+    display.kind === "status_plate"
+      ? display.objectLabel
+      : vm.manifestoLine?.split("\n")[0]?.trim() ?? "Game node";
+  const stateLine =
+    display.kind === "status_plate"
+      ? display.statusLine
+      : vm.manifestoLine?.split("\n").slice(1).join(" ").trim() ?? "";
+  const steward = renderStewardStrip(vm);
+  const streams = renderObjectStreamsBlock(vm.objectStreams);
+  const metaChips = renderGameNodeMetaChips(gameNode);
+  const coopHint = gameNode.coopHint
+    ? `<p class="scan-game-coop-hint" role="note">${escapeHtml(gameNode.coopHint)}</p>`
+    : "";
+  const mutedGameCopy =
+    gameNode.mode === "care_pause"
+      ? `<p class="scan-game-care-note" role="note">Game bulletins are muted while maintenance is live on the care stream.</p>`
+      : gameNode.mode === "dormant"
+        ? `<p class="scan-game-dormant-note" role="note">This temporary object is dormant. The QR still resolves — public state only.</p>`
+        : "";
+
+  return {
+    main: `<p class="scan-hero-eyebrow">${escapeHtml(gameNode.roleEyebrow)}</p>
+    <h1 class="scan-hero-title">${escapeHtml(label)}</h1>
+    ${stateLine ? `<p class="scan-hero-line">${escapeHtml(stateLine)}</p>` : ""}
+    ${mutedGameCopy}
+    ${streams}
+    ${metaChips}
+    ${coopHint}
+    ${steward}`,
+    foot: GAME_NODE_SCAN_FOOT,
+  };
+}
+
 /** Active live-object / print_artifact scans — curiosity path to create + customize (M8 merch funnel). */
 function isMerchFunnelScan(vm: ScanViewModel): boolean {
   if (vm.kind !== "active") return false;
+  if (vm.gameNode?.enabled && vm.gameNode.mode !== "fallback") return false;
   const display = parseManifestoDisplay(vm.manifestoLine);
   const template = scanHeroTemplate(display, vm.qrScope);
   if (template === "status_plate" || template === "lost_item_relay") return false;
@@ -520,6 +602,10 @@ function buildScanHeroMain(
 
   const display = parseManifestoDisplay(vm.manifestoLine);
   const template = scanHeroTemplate(display, vm.qrScope);
+
+  if (vm.gameNode?.enabled && vm.gameNode.mode !== "fallback") {
+    return buildGameNodeScanHero(vm);
+  }
 
   if (template === "status_plate" && display.kind === "status_plate") {
     const steward = renderStewardStrip(vm);

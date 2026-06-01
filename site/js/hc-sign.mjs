@@ -10,6 +10,7 @@ import {
   childObjectCreatePath,
   childObjectRevokePath,
   childObjectUpdatePath,
+  childObjectGameUpdatePath,
 } from "./child-object-api-core.mjs";
 
 const PROTOCOL_VERSION = "1.0";
@@ -208,6 +209,13 @@ export function postChildObjectCreateUrl(profileId) {
 
 export function postChildObjectUpdateUrl(profileId, objectId) {
   return childObjectApiUrl(resolverApiOrigin(), childObjectUpdatePath(profileId, objectId));
+}
+
+export function postGameUpdateUrl(profileId, objectId) {
+  return childObjectApiUrl(
+    resolverApiOrigin(),
+    childObjectGameUpdatePath(profileId, objectId)
+  );
 }
 
 export function postChildObjectRevokeUrl(profileId, objectId) {

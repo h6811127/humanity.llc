@@ -35,6 +35,7 @@ import {
 } from "./resolver/child-objects";
 import { handlePostIssuePrintArtifactQr } from "./resolver/issue-print-artifact-qr";
 import { handlePostIssueChildObjectQr } from "./resolver/issue-child-object-qr";
+import { handlePostGameUpdate } from "./resolver/game-update";
 import { handlePostRotateQr } from "./resolver/rotate-qr";
 import { handlePostExtendQr } from "./resolver/extend-qr";
 import { handleGetScan } from "./resolver/scan";
@@ -658,6 +659,26 @@ export default {
       return withCors(request, res);
     }
 
+    const childObjectGameUpdateMatch = path.match(
+      /^\/\.well-known\/hc\/v1\/cards\/([^/]+)\/objects\/([^/]+)\/game-update$/
+    );
+    if (childObjectGameUpdateMatch && request.method === "POST") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostGameUpdate(
+        request,
+        env.DB,
+        env,
+        childObjectGameUpdateMatch[1]!,
+        childObjectGameUpdateMatch[2]!
+      );
+      return withCors(request, res);
+    }
+
     const childObjectActionMatch = path.match(
       /^\/\.well-known\/hc\/v1\/cards\/([^/]+)\/objects\/([^/]+)\/(update|revoke)$/
     );
@@ -976,7 +997,7 @@ export default {
           { "Cache-Control": "no-store" }
         );
       }
-      return handleGetScan(request, env.DB, scanMatch[1]!);
+      return handleGetScan(request, env, scanMatch[1]!);
     }
 
     return jsonResponse({ error: "not_found", path }, 404);

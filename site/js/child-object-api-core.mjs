@@ -16,6 +16,10 @@ export function childObjectIssueQrPath(profileId, objectId) {
   return `/.well-known/hc/v1/cards/${encodeURIComponent(profileId)}/objects/${encodeURIComponent(objectId)}/issue-qr`;
 }
 
+export function childObjectGameUpdatePath(profileId, objectId) {
+  return `/.well-known/hc/v1/cards/${encodeURIComponent(profileId)}/objects/${encodeURIComponent(objectId)}/game-update`;
+}
+
 /**
  * @param {string} origin
  * @param {string} path

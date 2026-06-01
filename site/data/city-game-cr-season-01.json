@@ -1,0 +1,38 @@
+{
+  "season_id": "cr_season_01_wake",
+  "title": "Wake the city",
+  "city": "Cedar Rapids, Iowa",
+  "status": "planned",
+  "season_root_profile_id": null,
+  "rules_path": "/play/cedar-rapids/",
+  "window": {
+    "starts_at": null,
+    "ends_at": null
+  },
+  "districts": ["newbo", "czech_village", "greene_square", "river_spine", "downtown"],
+  "unlock_edges": [
+    { "from": "node_04", "to": "node_07", "label": "River Lantern unlocks Czech Village cabinet" },
+    { "from": "node_10", "to": "node_07", "label": "Library witness vouch opens cabinet path" },
+    { "from": "node_09", "to": "node_13", "label": "Czech Village mural fragment" },
+    { "from": "node_11", "to": "node_13", "label": "Greene Square marker fragment" },
+    { "from": "node_01", "to": "node_13", "label": "NewBo relay fragment (operator flip when lattice complete)" }
+  ],
+  "mobile_lore_enrollment": [],
+  "nodes": [
+    { "node_id": "node_01", "object_id": "obj_cr_node_01_newbo", "role": "relay_gate", "district": "newbo", "label": "NewBo relay arch" },
+    { "node_id": "node_02", "object_id": "obj_cr_node_02_cafe", "role": "sanctuary", "district": "newbo", "label": "NewBo café window" },
+    { "node_id": "node_03", "object_id": "obj_cr_node_03_mural", "role": "lore_archive", "district": "newbo", "label": "NewBo mural alley" },
+    { "node_id": "node_04", "object_id": "obj_cr_node_04_river", "role": "temp_drop", "district": "river_spine", "label": "Riverwalk River Lantern" },
+    { "node_id": "node_05", "object_id": "obj_cr_node_05_bridge", "role": "relay_gate", "district": "river_spine", "label": "16th Avenue bridge" },
+    { "node_id": "node_06", "object_id": "obj_cr_node_06_skywalk", "role": "route_splitter", "district": "downtown", "label": "Skywalk note" },
+    { "node_id": "node_07", "object_id": "obj_cr_node_07_cabinet", "role": "lore_archive", "district": "czech_village", "label": "Czech Village cabinet" },
+    { "node_id": "node_08", "object_id": "obj_cr_node_08_bench", "role": "relay_gate", "district": "czech_village", "label": "Czech Village square bench" },
+    { "node_id": "node_09", "object_id": "obj_cr_node_09_mural", "role": "lore_archive", "district": "czech_village", "label": "Czech Village mural" },
+    { "node_id": "node_10", "object_id": "obj_cr_node_10_library", "role": "witness", "district": "downtown", "label": "Library witness seal" },
+    { "node_id": "node_11", "object_id": "obj_cr_node_11_marker", "role": "route_splitter", "district": "greene_square", "label": "Greene Square marker" },
+    { "node_id": "node_12", "object_id": "obj_cr_node_12_bench", "role": "sanctuary", "district": "greene_square", "label": "Greene Square bench" },
+    { "node_id": "node_13", "object_id": "obj_cr_node_13_finale", "role": "finale", "district": "downtown", "label": "Downtown alley arch" },
+    { "node_id": "node_14", "object_id": "obj_cr_node_14_fountain", "role": "care_loop", "district": "river_spine", "label": "River fountain / rain garden" },
+    { "node_id": "node_15", "object_id": "obj_cr_node_15_steps", "role": "relay_gate", "district": "downtown", "label": "Downtown market steps" }
+  ]
+}

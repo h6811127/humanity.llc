@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Game operator · Cedar Rapids · humanity.llc</title>
+    <meta
+      name="description"
+      content="Manual flip UI for Cedar Rapids city game nodes — session-only game-operator key, public object state only."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=48" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+
+      <main class="screen">
+        <section class="hero hero-compact">
+          <p class="hero-eyebrow">Cedar Rapids · internal prototype</p>
+          <h1>Game operator</h1>
+          <p class="hero-line">
+            Flip public world state on <code>game_node</code> objects — faction holds, bulletins,
+            collective unlocks, compromise notices. Requires the
+            <strong>game-operator key</strong> registered as <code>issuer_public_key</code> on the
+            season root card.
+          </p>
+        </section>
+
+        <div class="research-dev-hint" role="note">
+          <p>
+            <strong>Local only until launch.</strong> Set <code>CITY_GAME_ENABLED=1</code> in
+            worker dev. Keys stay in this tab — never uploaded except as signatures.
+          </p>
+        </div>
+
+        <form id="game-operator-form" class="form-card" method="dialog" novalidate>
+          <label class="form-label" for="go-profile-id">Season root profile ID</label>
+          <input
+            class="form-input"
+            id="go-profile-id"
+            required
+            placeholder="From season root card"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck="false"
+          />
+
+          <label class="form-label" for="go-object-id">Game node object ID</label>
+          <input
+            class="form-input"
+            id="go-object-id"
+            required
+            placeholder="obj_cr_node_01_newbo"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck="false"
+          />
+
+          <button type="button" class="btn-secondary" id="go-load-objects">
+            Load game nodes
+          </button>
+
+          <label class="form-label" for="go-object-select">Pick a loaded node</label>
+          <select class="form-input" id="go-object-select" disabled>
+            <option value="">Load nodes first…</option>
+          </select>
+
+          <label class="form-label" for="go-private-key">Game-operator private key</label>
+          <textarea
+            class="form-input form-textarea"
+            id="go-private-key"
+            required
+            rows="3"
+            placeholder="Base58 private key — session only"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck="false"
+          ></textarea>
+
+          <label class="form-label" for="go-public-state">Public state line</label>
+          <textarea
+            class="form-input form-textarea"
+            id="go-public-state"
+            rows="2"
+            placeholder="What scanners read under the title"
+          ></textarea>
+
+          <fieldset class="form-fieldset">
+            <legend class="form-label">Quick presets</legend>
+            <div id="go-presets" class="form-row-buttons"></div>
+          </fieldset>
+
+          <label class="form-label" for="go-compromised">
+            <input type="checkbox" id="go-compromised" />
+            Compromised relay
+          </label>
+
+          <label class="form-label" for="go-collective-progress">Collective progress</label>
+          <input class="form-input" id="go-collective-progress" inputmode="numeric" placeholder="e.g. 20" />
+
+          <label class="form-label" for="go-collective-target">Collective target</label>
+          <input class="form-input" id="go-collective-target" inputmode="numeric" placeholder="e.g. 20" />
+
+          <label class="form-label" for="go-scarcity">Scarcity remaining</label>
+          <input class="form-input" id="go-scarcity" inputmode="numeric" placeholder="Optional" />
+
+          <label class="form-label" for="go-unlocked-by">Unlocked by (comma-separated node IDs)</label>
+          <input
+            class="form-input"
+            id="go-unlocked-by"
+            placeholder="node_04"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck="false"
+          />
+
+          <label class="revoke-confirm">
+            <input type="checkbox" id="go-confirm" />
+            <span>I am publishing public object state — not player rewards or scores</span>
+          </label>
+
+          <button type="button" class="btn-primary" id="go-submit" disabled>
+            Publish game update
+          </button>
+
+          <p id="go-status" class="form-status" hidden></p>
+        </form>
+
+        <p class="idea-footnote">
+          Protocol:
+          <a href="/what-can-a-qr-do/combining-ideas/cedar-rapids-city-game/">Cedar Rapids demo</a>
+          · Card owners use <a href="/created/">/created/</a> · Organizer revoke:
+          <a href="/organizer-revoke/">/organizer-revoke/</a>
+        </p>
+      </main>
+    </div>
+    <script type="module" src="/js/game-operator.mjs?v=1"></script>
+  </body>
+</html>

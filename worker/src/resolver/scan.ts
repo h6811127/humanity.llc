@@ -21,7 +21,7 @@ const CACHE_EPHEMERAL_PROOF = "no-store";
 
 export async function handleGetScan(
   request: Request,
-  env: D1Database,
+  env: { DB: D1Database; CITY_GAME_ENABLED?: string },
   profileId: string
 ): Promise<Response> {
   const origin = requestOrigin(request);
@@ -84,18 +84,20 @@ export async function handleGetScan(
     );
   }
 
-  const ctx = await loadScanContext(env, profileId, qrId);
-  const vm = buildScanViewModel(profileId, qrId, ctx, origin);
+  const ctx = await loadScanContext(env.DB, profileId, qrId);
   const now = new Date();
+  const vm = buildScanViewModel(profileId, qrId, ctx, origin, now, {
+    env: { CITY_GAME_ENABLED: env.CITY_GAME_ENABLED },
+  });
   await applyLiveControlProofIfPresent(
-    env,
+    env.DB,
     vm,
     profileId,
     qrId,
     liveChallengeId,
     now
   );
-  await applyRecentLiveControlProof(env, vm, profileId, qrId, now);
+  await applyRecentLiveControlProof(env.DB, vm, profileId, qrId, now);
 
   const safety = await buildScanSafetyModel(ctx, vm);
 

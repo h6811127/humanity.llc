@@ -14,8 +14,15 @@ import {
 } from "./scan-malformed-hint";
 import { isQrCalendarExpired } from "./merch-qr-policy";
 import { childObjectManifestoLine } from "./manifesto-display";
-import { objectStreamsFromCardDocumentJson } from "../validation/object-streams";
+import {
+  objectStreamsFromCardDocumentJson,
+  objectStreamsFromChildDocumentJson,
+} from "../validation/object-streams";
 import type { ObjectPublicStream } from "../validation/object-streams";
+import {
+  resolveGameNodeScanContext,
+  type GameNodeScanContext,
+} from "../city-game/scan-view";
 
 export const QR_ID_REGEX =
   /^qr_[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{8,40}$/;
@@ -93,6 +100,8 @@ export interface ScanViewModel {
   cacheControl: string;
   /** Set when kind === "malformed" (P2-1 differentiated copy). */
   malformedReason: ScanMalformedReason | null;
+  childObjectType: string | null;
+  gameNode: GameNodeScanContext | null;
 }
 
 /** Canonical HTTPS scan target for this request. */
@@ -128,7 +137,8 @@ export function buildScanViewModel(
   qrId: string | null,
   ctx: ScanContext,
   origin: string = "https://humanity.llc",
-  now: Date = new Date()
+  now: Date = new Date(),
+  options: { env?: { CITY_GAME_ENABLED?: string } } = {}
 ): ScanViewModel {
   if (!qrId) {
     return malformedView(profileId, null, origin, "missing_qr");
@@ -268,8 +278,19 @@ export function buildScanViewModel(
     const objectCard = {
       ...card,
       manifesto_line: childObjectManifestoLine(child),
+      card_document_json: child.child_object_document_json,
     };
-    return baseView(
+    const objectStreams = objectStreamsFromChildDocumentJson(
+      child.child_object_document_json
+    );
+    const gameNode = resolveGameNodeScanContext({
+      objectType: child.object_type,
+      documentJson: child.child_object_document_json,
+      objectStreams,
+      env: options.env ?? {},
+      now,
+    });
+    const vm = baseView(
       {
         kind: "active",
         profileId,
@@ -282,9 +303,13 @@ export function buildScanViewModel(
         showHumanTrustBlock: true,
         showArtifactBlock: true,
         showLiveControlBlock: false,
+        objectStreams,
+        childObjectType: child.object_type,
+        gameNode,
       },
       origin
     );
+    return vm;
   }
 
   return baseView(
@@ -490,6 +515,9 @@ interface BaseViewInput {
   minimalScan?: boolean;
   revocationDisplayMode?: string | null;
   publicReason?: string | null;
+  objectStreams?: ObjectPublicStream[];
+  childObjectType?: string | null;
+  gameNode?: GameNodeScanContext | null;
 }
 
 function baseView(input: BaseViewInput, origin: string): ScanViewModel {
@@ -504,7 +532,9 @@ function baseView(input: BaseViewInput, origin: string): ScanViewModel {
     qrId: input.qrId,
     handle: card?.handle ?? null,
     manifestoLine: card?.manifesto_line ?? null,
-    objectStreams: objectStreamsFromCardDocumentJson(card?.card_document_json),
+    objectStreams:
+      input.objectStreams ??
+      objectStreamsFromCardDocumentJson(card?.card_document_json),
     cardStatus: card?.status ?? null,
     qrStatus: qr?.status ?? null,
     qrScope: qr?.scope ?? null,
@@ -538,5 +568,7 @@ function baseView(input: BaseViewInput, origin: string): ScanViewModel {
         : null,
     cacheControl: isHealthy ? CACHE_ACTIVE : CACHE_INACTIVE,
     malformedReason: null,
+    childObjectType: input.childObjectType ?? null,
+    gameNode: input.gameNode ?? null,
   };
 }

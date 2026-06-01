@@ -44,3 +44,15 @@ export function objectStreamsFromCardDocumentJson(
     return [];
   }
 }
+
+export function objectStreamsFromChildDocumentJson(
+  childDocumentJson: string | null | undefined
+): ObjectPublicStream[] {
+  if (!childDocumentJson) return [];
+  try {
+    const doc = JSON.parse(childDocumentJson) as Record<string, unknown>;
+    return parseObjectStreamsFromDocument(doc) as ObjectPublicStream[];
+  } catch {
+    return [];
+  }
+}

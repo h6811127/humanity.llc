@@ -25,6 +25,8 @@ port = 8787
 [vars]
 # G0 signed (2026-05-27): production rollout step 4a — hosted routes on after deploy.
 HOSTED_STEWARD_ENABLED = "1"
+# Cedar Rapids city game (Phase A): resolver routes off until season launch.
+CITY_GAME_ENABLED = "0"
 # Tier 0 batch fulfillment (O-002): set when Shopify founding sticker SKU is live.
 # TIER0_CAMPAIGN_PROFILE_ID = ""
 # TIER0_SHOPIFY_VARIANT_IDS = ""

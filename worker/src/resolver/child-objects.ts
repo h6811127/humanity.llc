@@ -15,6 +15,9 @@ import {
 import { listActiveChildObjectQrsForParent } from "../db/child-object-qr";
 import type { ChildObjectStatus } from "../db/types";
 import { errorResponse, jsonResponse } from "../http/resolver";
+import { GAME_NODE_OBJECT_TYPE } from "../city-game/constants";
+import { parseGameNodeFields } from "../city-game/scan-view";
+import { validateGameNodeDocument } from "../city-game/game-meta";
 
 export const CHILD_OBJECT_ID_REGEX = /^obj_[A-Za-z0-9_-]{4,76}$/;
 const OBJECT_TYPE_RE = /^[a-z][a-z0-9_-]{0,39}$/;
@@ -192,6 +195,18 @@ async function verifiedChildObjectDoc(
       ok: false,
       response: errorResponse("MALFORMED_REQUEST", "updated_at must not precede created_at.", 422),
     };
+  }
+
+  if (objectType === GAME_NODE_OBJECT_TYPE) {
+    try {
+      validateGameNodeDocument(doc);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Invalid game_node document.";
+      return {
+        ok: false,
+        response: errorResponse("MALFORMED_REQUEST", msg, 422),
+      };
+    }
   }
 
   return {
@@ -377,16 +392,29 @@ export async function handleGetChildObjects(
   return jsonResponse(
     {
       profile_id: pathProfileId,
-      objects: rows.map((row) => ({
-        object_id: row.object_id,
-        object_type: row.object_type,
-        public_label: row.public_label,
-        public_state: row.public_state,
-        status: row.status,
-        created_at: row.created_at,
-        updated_at: row.updated_at,
-        active_qr_id: qrByObjectId.get(row.object_id) ?? null,
-      })),
+      objects: rows.map((row) => {
+        const base = {
+          object_id: row.object_id,
+          object_type: row.object_type,
+          public_label: row.public_label,
+          public_state: row.public_state,
+          status: row.status,
+          created_at: row.created_at,
+          updated_at: row.updated_at,
+          active_qr_id: qrByObjectId.get(row.object_id) ?? null,
+        };
+        if (row.object_type !== GAME_NODE_OBJECT_TYPE) return base;
+        const game = parseGameNodeFields(row.child_object_document_json);
+        if (!game) return base;
+        return {
+          ...base,
+          season_id: game.seasonId,
+          node_role: game.nodeRole,
+          district: game.district,
+          object_streams: game.objectStreams,
+          game_meta: game.gameMeta,
+        };
+      }),
     },
     200,
     { "Cache-Control": "no-store" }

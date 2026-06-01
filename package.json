@@ -141,6 +141,8 @@
     "worker:test:merch-print-qa": "vitest run worker/tests/merch-print-artifact-scan-qa.test.ts worker/tests/merch-qr-lifecycle.test.ts",
     "verify:merch-funnel": "npm run worker:test:merch-funnel && npm run worker:test:merch-print-qa && npm run worker:test -- worker/tests/shop-config-rollout.test.ts",
     "merch-funnel:verify-config": "node worker/scripts/verify-merch-funnel-config.mjs",
+    "city-game:mint-node": "node worker/scripts/city-game-mint-node.mjs",
+    "city-game:season-root": "node worker/scripts/city-game-season-root.mjs",
     "merch-funnel:verify-exit": "node worker/scripts/verify-merch-funnel-exit.mjs",
     "merch-funnel:verify-exit:fast": "node worker/scripts/verify-merch-funnel-exit.mjs -- --skip-e2e",
     "merch-funnel:rollout:step1": "node worker/scripts/merch-funnel-rollout-step1.mjs",
