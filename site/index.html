@@ -9,7 +9,7 @@
     <title>humanity.llc · Live objects on physical tags</title>
     <meta
       name="description"
-      content="Public programmable objects. Live, revocable status on physical tags — browser-native. No scan tracking."
+      content="Public programmable objects. Live, revocable status on physical tags — browser-native. No passive scan tracking by default."
     />
     <meta name="theme-color" content="#ffffff" />
     <meta name="color-scheme" content="light dark" />
@@ -76,13 +76,13 @@
       })();
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=5" />
-    <link rel="stylesheet" href="/styles.css?v=139" />
+    <link rel="stylesheet" href="/styles.css?v=141" />
     <link rel="stylesheet" href="/css/device-shell.css?v=82" />
-    <link rel="stylesheet" href="/css/theme-dark.css?v=30" />
+    <link rel="stylesheet" href="/css/theme-dark.css?v=32" />
     <meta property="og:title" content="humanity.llc · Live objects on physical tags" />
     <meta
       property="og:description"
-      content="Public programmable objects. Live, revocable status on physical tags — browser-native. No scan tracking."
+      content="Public programmable objects. Live, revocable status on physical tags — browser-native. No passive scan tracking by default."
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://humanity.llc" />
@@ -523,8 +523,55 @@
           <ul class="landing-trust-chips" aria-label="Trust at a glance">
             <li class="landing-trust-chip">No account</li>
             <li class="landing-trust-chip">Control on your device</li>
-            <li class="landing-trust-chip">No scan tracking</li>
+            <li class="landing-trust-chip">No scan surveillance</li>
           </ul>
+          <div class="landing-privacy-split" role="group" aria-label="Scan privacy">
+            <div class="landing-privacy-grid">
+              <article
+                class="hc-emphasis-card hc-emphasis-card--active landing-framing landing-framing--compact landing-privacy-card"
+              >
+                <div class="hc-emphasis-card__main">
+                  <span
+                    class="hc-emphasis-card__dot hc-emphasis-card__dot--success"
+                    aria-hidden="true"
+                  ></span>
+                  <div class="hc-emphasis-card__copy">
+                    <p class="hc-emphasis-card__eyebrow">Private by default</p>
+                    <h2 class="hc-emphasis-card__title landing-framing-title">No scan tracking</h2>
+                    <ul class="landing-privacy-list">
+                      <li>Opening a QR is not logged by default</li>
+                      <li>No trail of who scanned, when, or where</li>
+                      <li>No heatmaps, streaks, or player dossiers</li>
+                    </ul>
+                  </div>
+                </div>
+              </article>
+              <article
+                class="hc-emphasis-card hc-emphasis-card--info landing-framing landing-framing--compact landing-privacy-card"
+              >
+                <div class="hc-emphasis-card__main">
+                  <span
+                    class="hc-emphasis-card__dot hc-emphasis-card__dot--info"
+                    aria-hidden="true"
+                  ></span>
+                  <div class="hc-emphasis-card__copy">
+                    <p class="hc-emphasis-card__eyebrow">Visible on scan</p>
+                    <h2 class="hc-emphasis-card__title landing-framing-title">Public object state</h2>
+                    <ul class="landing-privacy-list">
+                      <li>
+                        Live signed status on the object — who holds a relay, which route is awake
+                      </li>
+                      <li>
+                        Optional game contributions update a <strong>public count</strong> on the
+                        object
+                      </li>
+                      <li>Contributions are voluntary — not your identity</li>
+                    </ul>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </div>
         </section>
 
         <section
@@ -1020,7 +1067,7 @@
             </span>
             <span class="landing-disclosure-card-text">
               <span class="landing-disclosure-card-title">Design choices</span>
-              <span class="landing-disclosure-card-sub">Optional, revocable, no scan tracking, not legal ID</span>
+              <span class="landing-disclosure-card-sub">Optional, revocable, no scan surveillance by default, not legal ID</span>
             </span>
             <span class="list-chevron" aria-hidden="true">›</span>
           </summary>
@@ -1061,8 +1108,21 @@
               <span class="list-content">
                 <span class="list-title">No scan tracking</span>
                 <span class="list-sub"
-                  >The resolver returns object state, not a trail of who scanned, when, or where. No
-                  scan analytics by default.</span
+                  >Opening a QR is not logged by default. The resolver returns object state, not a
+                  trail of who scanned, when, or where.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 20h18"/><path d="M6 20V8l6-4 6 4v12"/><path d="M10 12h4"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Public object state</span>
+                <span class="list-sub"
+                  >Live status on the object — revocable, signed, readable by any camera. On game
+                  nodes, optional contributions can update a public count on the object, not a
+                  player profile.</span
                 >
               </span>
             </li>
