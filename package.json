@@ -143,6 +143,7 @@
     "merch-funnel:verify-config": "node worker/scripts/verify-merch-funnel-config.mjs",
     "city-game:mint-node": "node worker/scripts/city-game-mint-node.mjs",
     "city-game:season-root": "node worker/scripts/city-game-season-root.mjs",
+    "city-game:enroll-mobile-lore": "node worker/scripts/city-game-enroll-mobile-lore.mjs",
     "merch-funnel:verify-exit": "node worker/scripts/verify-merch-funnel-exit.mjs",
     "merch-funnel:verify-exit:fast": "node worker/scripts/verify-merch-funnel-exit.mjs -- --skip-e2e",
     "merch-funnel:rollout:step1": "node worker/scripts/merch-funnel-rollout-step1.mjs",

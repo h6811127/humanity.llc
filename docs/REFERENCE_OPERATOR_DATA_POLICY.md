@@ -54,6 +54,16 @@ Saved card rows on `/wallet/` and the device hub may show **checked … ago**. T
 - Purchasing merch MUST NOT upgrade verification or vouch state.
 - Printify / Shopify PII MUST NOT merge into “vouched” or “verified” without a separate, explicit, governed process.
 
+## Cedar Rapids city game (Season 1 collective mechanics)
+
+Applies when the reference operator runs [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) on humanity.llc.
+
+- **Public object state only:** faction holds, bulletins, route windows, and collective unlock flags are **operator-published world truth** — not per-player scores or scan-derived rankings.
+- **Collective thresholds (v1):** “20 anonymous scans unlock clue” style beats use **operator-verified quorum flips** (`POST …/game-update`), not hidden scan counts or device trails. See implementation brief § Collective threshold — phase 2 RFC before advertising automatic thresholds.
+- **Must not store for gameplay:** player IDs, scan heatmaps, location history, streaks, or leaderboard rows tied to scans.
+- **Allowed:** aggregate flags on the object document (`collective_progress`, `unlocked_by`) when set by signed game-operator updates — still no per-scanner identity in D1.
+- **Mobile lore hoodies:** enrolled `print_artifact` QRs show owner-updated status lines; enrollment is catalog metadata in season JSON, not scan logging.
+
 ## Retention (practical v1 targets)
 
 | Data class | Retention |

@@ -371,9 +371,9 @@ Run **in parallel** with hoodie launch prep. Do not block merch on game work.
 ### Phase C — Season pack (week 3–4, post-hoodie)
 
 - [x] Mint full 15-node registry — `npm run city-game:mint-node -- --all` · object IDs in season JSON
-- [ ] Enroll 5–10 Glitch hoodie QRs as mobile lore (optional) — `mobile_lore_enrollment[]` in season JSON
+- [ ] Enroll 5–10 Glitch hoodie QRs as mobile lore (optional) — `npm run city-game:enroll-mobile-lore -- --write …`
 - [x] Public rules page draft — [`/play/cedar-rapids/`](../site/play/cedar-rapids/index.html) (noindex until launch)
-- [ ] Physical install QA: scan ≥3 phones per node
+- [ ] Physical install QA: scan ≥3 phones per node — [`CITY_GAME_INSTALL_QA.md`](CITY_GAME_INSTALL_QA.md)
 - [x] Operator runbook — [`CITY_GAME_OPERATOR_RUNBOOK.md`](CITY_GAME_OPERATOR_RUNBOOK.md)
 
 ### Phase D — Launch (~month after hoodie)
@@ -389,18 +389,18 @@ Run **in parallel** with hoodie launch prep. Do not block merch on game work.
 
 ### Product / trust
 
-- [ ] [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md) — collective mechanic v1 path documented (operator flip OK)
-- [ ] Rules page states what scans prove / do not prove
-- [ ] Care stream present on every node with physical safety copy where needed
-- [ ] Forbidden: leaderboard, XP, player accounts, heatmaps
+- [x] [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md) — collective mechanic v1 path documented (operator flip OK)
+- [x] Rules page states what scans prove / do not prove
+- [x] Care stream present on every node with physical safety copy where needed *(launch-gates test + node_14 template)*
+- [x] Forbidden: leaderboard, XP, player accounts, heatmaps *(scan + rules guards)*
 - [ ] Copy comprehension ≥5 testers ([`FOUNDING_COPY_COMPREHENSION_RUNBOOK.md`](FOUNDING_COPY_COMPREHENSION_RUNBOOK.md) pattern)
 
 ### Engineering
 
-- [ ] `npm run worker:test -- worker/tests/city-game*.test.ts` green
-- [ ] Feature flag off by default in prod until launch checklist signed
-- [ ] Compromised marker revoke tested end-to-end
-- [ ] Temp drop expiry hides game hero without 404 on QR
+- [x] `npm run worker:test -- worker/tests/city-game*.test.ts` green
+- [x] Feature flag off by default in prod until launch checklist signed
+- [x] Compromised marker revoke tested end-to-end — `city-game-launch-gates.test.ts`
+- [x] Temp drop expiry hides game hero without 404 on QR — `city-game-launch-gates.test.ts`
 
 ### Operations
 
@@ -486,3 +486,4 @@ From [`PHYSICAL_WORLD_MULTIPLAYER_RESEARCH_SPEC.md`](PHYSICAL_WORLD_MULTIPLAYER_
 | 2026-06-01 | Initial v1 implementation brief — combines PWM + Cedar Rapids + living street infrastructure |
 | 2026-06-01 | Phase B prototype — game_node scan template, `/game-operator/` UI, test node mint templates |
 | 2026-06-01 | Phase C season pack — 15-node registry, custody doc, operator runbook, rules page draft |
+| 2026-06-01 | Launch-gates tests, install QA checklist, mobile lore enrollment helper, data policy § city game |
