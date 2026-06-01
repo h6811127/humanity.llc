@@ -7,6 +7,7 @@ import type { VouchCaseRow } from "../src/db/vouch-cases";
 import {
   handleGetVouchCases,
   handlePostVouchCase,
+  handlePostVouchCaseSuspend,
 } from "../src/resolver/vouch-cases";
 
 type AuditRow = {
@@ -18,16 +19,45 @@ type AuditRow = {
 
 class FakeVouchCaseDb {
   private cases: VouchCaseRow[] = [];
+  private cards = new Map<string, { profile_id: string; status: string; updated_at: string }>();
+  private suspensions: Array<{
+    suspension_id: string;
+    case_id: string;
+    profile_id: string;
+    status: "suspended";
+    public_label: string;
+    cause_category: string;
+    notice: string;
+    appeal_deadline: string;
+    signed_document_json: string | null;
+    suspended_by: string;
+    suspended_at: string;
+    created_at: string;
+  }> = [];
 
   constructor(
     private readonly rows: AuditRow[],
     private readonly stewards: string[] = []
   ) {}
 
+  addCard(profileId: string, status = "active") {
+    this.cards.set(profileId, {
+      profile_id: profileId,
+      status,
+      updated_at: "2026-05-01T00:00:00.000Z",
+    });
+  }
+
+  cardStatus(profileId: string): string | undefined {
+    return this.cards.get(profileId)?.status;
+  }
+
   prepare(sql: string) {
     const rows = this.rows;
     const stewards = this.stewards;
     const cases = this.cases;
+    const cards = this.cards;
+    const suspensions = this.suspensions;
     return {
       bind(...args: unknown[]) {
         return {
@@ -64,6 +94,14 @@ class FakeVouchCaseDb {
             return { results: [] as T[] };
           },
           async first<T>() {
+            if (
+              sql.includes("FROM vouch_case_suspensions") &&
+              sql.includes("suspension_id = ?")
+            ) {
+              return (
+                suspensions.find((row) => row.suspension_id === args[0]) ?? null
+              ) as T | null;
+            }
             if (sql.includes("FROM vouch_cases") && sql.includes("case_id = ?")) {
               return (cases.find((row) => row.case_id === args[0]) ?? null) as T | null;
             }
@@ -85,6 +123,35 @@ class FakeVouchCaseDb {
             return null;
           },
           async run() {
+            if (sql.includes("INSERT INTO vouch_case_suspensions")) {
+              const [
+                suspension_id,
+                case_id,
+                profile_id,
+                cause_category,
+                notice,
+                appeal_deadline,
+                signed_document_json,
+                suspended_by,
+                suspended_at,
+                created_at,
+              ] = args as string[];
+              suspensions.push({
+                suspension_id,
+                case_id,
+                profile_id,
+                status: "suspended",
+                public_label: "Suspended under public rules",
+                cause_category,
+                notice,
+                appeal_deadline,
+                signed_document_json: signed_document_json ?? null,
+                suspended_by,
+                suspended_at,
+                created_at,
+              });
+              return { success: true, meta: { changes: 1 } };
+            }
             if (sql.includes("INSERT INTO vouch_cases")) {
               const [
                 case_id,
@@ -118,6 +185,22 @@ class FakeVouchCaseDb {
                 created_at,
                 updated_at,
               });
+              return { success: true, meta: { changes: 1 } };
+            }
+            if (sql.includes("UPDATE cards") && sql.includes("status = 'suspended'")) {
+              const [updated_at, profile_id] = args as string[];
+              const card = cards.get(profile_id);
+              if (!card) return { success: true, meta: { changes: 0 } };
+              card.status = "suspended";
+              card.updated_at = updated_at;
+              return { success: true, meta: { changes: 1 } };
+            }
+            if (sql.includes("UPDATE vouch_cases") && sql.includes("status = 'suspended'")) {
+              const [updated_at, case_id] = args as string[];
+              const found = cases.find((row) => row.case_id === case_id);
+              if (!found) return { success: true, meta: { changes: 0 } };
+              found.status = "suspended";
+              found.updated_at = updated_at;
               return { success: true, meta: { changes: 1 } };
             }
             return { success: true, meta: { changes: 0 } };
@@ -279,6 +362,123 @@ describe("operator vouch cases API", () => {
     expect(body.cases[0]?.source_key).toBe("manual-report-1");
     expect(body.cases[0]?.subject_profile_ids).toEqual(["profile_z"]);
     expect(body.cases[0]?.assigned_to).toBe("steward-beta");
+  });
+
+  it("suspends a case subject and marks the case suspended", async () => {
+    const fake = new FakeVouchCaseDb([]);
+    fake.addCard("profile_z");
+    const create = await handlePostVouchCase(
+      new Request(URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${TOKEN}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          source: "operator_manual",
+          source_key: "manual-suspend-1",
+          kind: "false_vouch",
+          subject_profile_ids: ["profile_z"],
+          priority: "p0",
+          threat_ids: ["H-02"],
+          summary: "Confirmed false vouch escalation.",
+        }),
+      }),
+      fake as unknown as D1Database,
+      TOKEN
+    );
+    const created = (await create.json()) as { case: { case_id: string } };
+
+    const suspend = await handlePostVouchCaseSuspend(
+      new Request(`${URL}/${created.case.case_id}/suspend`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${TOKEN}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          profile_id: "profile_z",
+          cause_category: "vouch_abuse",
+          notice: "Suspended under public rules pending appeal.",
+          appeal_deadline: "2026-06-30T00:00:00.000Z",
+          suspended_by: "steward-alpha",
+        }),
+      }),
+      fake as unknown as D1Database,
+      TOKEN,
+      created.case.case_id
+    );
+
+    expect(suspend.status).toBe(200);
+    const body = (await suspend.json()) as {
+      suspension: {
+        profile_id: string;
+        status: string;
+        public_label: string;
+        cause_category: string;
+        notice: string;
+        appeal_deadline: string;
+      };
+      case: { status: string };
+    };
+    expect(body.suspension).toMatchObject({
+      profile_id: "profile_z",
+      status: "suspended",
+      public_label: "Suspended under public rules",
+      cause_category: "vouch_abuse",
+      notice: "Suspended under public rules pending appeal.",
+      appeal_deadline: "2026-06-30T00:00:00.000Z",
+    });
+    expect(body.case.status).toBe("suspended");
+    expect(fake.cardStatus("profile_z")).toBe("suspended");
+  });
+
+  it("rejects suspension for profiles outside the case subjects", async () => {
+    const fake = new FakeVouchCaseDb([]);
+    fake.addCard("profile_z");
+    fake.addCard("profile_other");
+    const create = await handlePostVouchCase(
+      new Request(URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${TOKEN}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          source: "operator_manual",
+          source_key: "manual-suspend-2",
+          kind: "false_vouch",
+          subject_profile_ids: ["profile_z"],
+          summary: "Confirmed false vouch escalation.",
+        }),
+      }),
+      fake as unknown as D1Database,
+      TOKEN
+    );
+    const created = (await create.json()) as { case: { case_id: string } };
+
+    const suspend = await handlePostVouchCaseSuspend(
+      new Request(`${URL}/${created.case.case_id}/suspend`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${TOKEN}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          profile_id: "profile_other",
+          cause_category: "vouch_abuse",
+          notice: "Suspended under public rules pending appeal.",
+          appeal_deadline: "2026-06-30T00:00:00.000Z",
+        }),
+      }),
+      fake as unknown as D1Database,
+      TOKEN,
+      created.case.case_id
+    );
+
+    expect(suspend.status).toBe(409);
+    expect(await suspend.json()).toMatchObject({ error: "PROFILE_NOT_IN_CASE" });
+    expect(fake.cardStatus("profile_other")).toBe("active");
   });
 
   it("rejects malformed manual cases", async () => {

@@ -52,6 +52,7 @@ import {
 import {
   handleGetVouchCases,
   handlePostVouchCase,
+  handlePostVouchCaseSuspend,
 } from "./resolver/vouch-cases";
 import { handleGetCreateRateMonitor } from "./resolver/create-monitoring";
 import {
@@ -411,6 +412,25 @@ export default {
         request,
         env.DB,
         env.OPERATOR_AUDIT_TOKEN
+      );
+      return withCors(request, res);
+    }
+
+    const vouchCaseSuspendMatch = path.match(
+      /^\/\.well-known\/hc\/v1\/operator\/vouch-cases\/([^/]+)\/suspend$/
+    );
+    if (vouchCaseSuspendMatch && request.method === "POST") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostVouchCaseSuspend(
+        request,
+        env.DB,
+        env.OPERATOR_AUDIT_TOKEN,
+        decodeURIComponent(vouchCaseSuspendMatch[1] ?? "")
       );
       return withCors(request, res);
     }

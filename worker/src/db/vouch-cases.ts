@@ -50,6 +50,32 @@ export interface VouchCaseRow {
   updated_at: string;
 }
 
+export const VOUCH_SUSPENSION_CAUSE_CATEGORIES = [
+  "impersonation",
+  "vouch_abuse",
+  "harassment",
+  "illegal_content",
+  "security_compromise",
+  "other",
+] as const;
+export type VouchSuspensionCauseCategory =
+  (typeof VOUCH_SUSPENSION_CAUSE_CATEGORIES)[number];
+
+export interface VouchCaseSuspensionRow {
+  suspension_id: string;
+  case_id: string;
+  profile_id: string;
+  status: "suspended";
+  public_label: string;
+  cause_category: VouchSuspensionCauseCategory;
+  notice: string;
+  appeal_deadline: string;
+  signed_document_json: string | null;
+  suspended_by: string;
+  suspended_at: string;
+  created_at: string;
+}
+
 export interface CreateVouchCaseParams {
   caseId: string;
   kind: VouchCaseKind;
@@ -63,6 +89,18 @@ export interface CreateVouchCaseParams {
   summary: string;
   createdBy: string;
   assignedTo?: string | null;
+  now: string;
+}
+
+export interface SuspendVouchCaseProfileParams {
+  suspensionId: string;
+  caseId: string;
+  profileId: string;
+  causeCategory: VouchSuspensionCauseCategory;
+  notice: string;
+  appealDeadline: string;
+  signedDocumentJson?: string | null;
+  suspendedBy: string;
   now: string;
 }
 
@@ -85,6 +123,15 @@ export function isVouchCasePriority(value: unknown): value is VouchCasePriority 
   return (
     typeof value === "string" &&
     (VOUCH_CASE_PRIORITIES as readonly string[]).includes(value)
+  );
+}
+
+export function isVouchSuspensionCauseCategory(
+  value: unknown
+): value is VouchSuspensionCauseCategory {
+  return (
+    typeof value === "string" &&
+    (VOUCH_SUSPENSION_CAUSE_CATEGORIES as readonly string[]).includes(value)
   );
 }
 
@@ -172,6 +219,16 @@ export async function getOpenVouchCaseBySource(
     .first<VouchCaseRow>();
 }
 
+export async function getVouchCaseById(
+  db: D1Database,
+  caseId: string
+): Promise<VouchCaseRow | null> {
+  return db
+    .prepare(`SELECT * FROM vouch_cases WHERE case_id = ?`)
+    .bind(caseId)
+    .first<VouchCaseRow>();
+}
+
 export async function createVouchCase(
   db: D1Database,
   params: CreateVouchCaseParams
@@ -211,6 +268,69 @@ export async function createVouchCase(
     .bind(params.caseId)
     .first<VouchCaseRow>();
   if (!row) throw new Error("D1 inserted vouch case but could not read it back");
+  return row;
+}
+
+export async function suspendProfileForVouchCase(
+  db: D1Database,
+  params: SuspendVouchCaseProfileParams
+): Promise<VouchCaseSuspensionRow> {
+  const insert = await db
+    .prepare(
+      `INSERT INTO vouch_case_suspensions (
+         suspension_id, case_id, profile_id, status, public_label, cause_category,
+         notice, appeal_deadline, signed_document_json, suspended_by, suspended_at,
+         created_at
+       ) VALUES (?, ?, ?, 'suspended', 'Suspended under public rules', ?, ?, ?, ?, ?, ?, ?)`
+    )
+    .bind(
+      params.suspensionId,
+      params.caseId,
+      params.profileId,
+      params.causeCategory,
+      params.notice,
+      params.appealDeadline,
+      params.signedDocumentJson ?? null,
+      params.suspendedBy,
+      params.now,
+      params.now
+    )
+    .run();
+  if (!insert.success) {
+    throw new Error(insert.error ?? "D1 insert vouch suspension failed");
+  }
+
+  const cardUpdate = await db
+    .prepare(
+      `UPDATE cards
+       SET status = 'suspended', updated_at = ?
+       WHERE profile_id = ?`
+    )
+    .bind(params.now, params.profileId)
+    .run();
+  if (!cardUpdate.success || (cardUpdate.meta?.changes ?? 0) === 0) {
+    throw new Error("CARD_NOT_FOUND");
+  }
+
+  const caseUpdate = await db
+    .prepare(
+      `UPDATE vouch_cases
+       SET status = 'suspended', updated_at = ?
+       WHERE case_id = ?`
+    )
+    .bind(params.now, params.caseId)
+    .run();
+  if (!caseUpdate.success || (caseUpdate.meta?.changes ?? 0) === 0) {
+    throw new Error("CASE_NOT_FOUND");
+  }
+
+  const row = await db
+    .prepare(`SELECT * FROM vouch_case_suspensions WHERE suspension_id = ?`)
+    .bind(params.suspensionId)
+    .first<VouchCaseSuspensionRow>();
+  if (!row) {
+    throw new Error("D1 inserted vouch suspension but could not read it back");
+  }
   return row;
 }
 

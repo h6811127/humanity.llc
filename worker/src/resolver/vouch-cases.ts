@@ -2,12 +2,15 @@ import { listVouchAuditFlags } from "../db/vouch-audit";
 import { vouchAuditFlagKey } from "../db/vouch-audit-review";
 import {
   createVouchCase,
+  getVouchCaseById,
   getOpenVouchCaseBySource,
   isVouchCaseKind,
   isVouchCasePriority,
+  isVouchSuspensionCauseCategory,
   listVouchCases,
   normalizeProfileIds,
   normalizeVouchIds,
+  suspendProfileForVouchCase,
   VOUCH_CASE_SOURCES,
   VOUCH_CASE_STATUSES,
   vouchCaseInputFromAuditFlag,
@@ -15,6 +18,7 @@ import {
   type VouchCaseRow,
   type VouchCaseSource,
   type VouchCaseStatus,
+  type VouchCaseSuspensionRow,
 } from "../db/vouch-cases";
 import { errorResponse, jsonResponse } from "../http/resolver";
 import { operatorAuditAuthorized } from "../http/operator-auth";
@@ -39,12 +43,29 @@ type CreateCaseBody = {
   assigned_to?: unknown;
 };
 
+type SuspendCaseBody = {
+  profile_id?: unknown;
+  cause_category?: unknown;
+  notice?: unknown;
+  appeal_deadline?: unknown;
+  signed_document_json?: unknown;
+  suspended_by?: unknown;
+};
+
 function generateCaseId(): string {
   const random =
     typeof crypto !== "undefined" && "randomUUID" in crypto
       ? crypto.randomUUID().replace(/-/g, "")
       : `${Date.now()}${Math.random().toString(16).slice(2)}`;
   return `case_${random.slice(0, 32)}`;
+}
+
+function generateSuspensionId(): string {
+  const random =
+    typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID().replace(/-/g, "")
+      : `${Date.now()}${Math.random().toString(16).slice(2)}`;
+  return `susp_${random.slice(0, 32)}`;
 }
 
 function parseBoundedInt(
@@ -128,6 +149,23 @@ function serializeCase(row: VouchCaseRow): Record<string, unknown> {
   };
 }
 
+function serializeSuspension(row: VouchCaseSuspensionRow): Record<string, unknown> {
+  return {
+    suspension_id: row.suspension_id,
+    case_id: row.case_id,
+    profile_id: row.profile_id,
+    status: row.status,
+    public_label: row.public_label,
+    cause_category: row.cause_category,
+    notice: row.notice,
+    appeal_deadline: row.appeal_deadline,
+    signed_document_json: row.signed_document_json,
+    suspended_by: row.suspended_by,
+    suspended_at: row.suspended_at,
+    created_at: row.created_at,
+  };
+}
+
 /**
  * GET /.well-known/hc/v1/operator/vouch-cases
  * Operator-only vouch trust-and-safety case list.
@@ -206,6 +244,116 @@ export async function handlePostVouchCase(
     "source must be audit_flag or operator_manual.",
     422
   );
+}
+
+/**
+ * POST /.well-known/hc/v1/operator/vouch-cases/{case_id}/suspend
+ * Body: { profile_id, cause_category, notice, appeal_deadline, suspended_by? }
+ */
+export async function handlePostVouchCaseSuspend(
+  request: Request,
+  db: D1Database,
+  operatorAuditToken: string | undefined,
+  caseId: string
+): Promise<Response> {
+  const unauthorized = authError(request, operatorAuditToken);
+  if (unauthorized) return unauthorized;
+
+  let body: SuspendCaseBody;
+  try {
+    body = (await request.json()) as SuspendCaseBody;
+  } catch {
+    return errorResponse("MALFORMED_REQUEST", "Invalid JSON body.", 400);
+  }
+
+  const profileId = typeof body.profile_id === "string" ? body.profile_id.trim() : "";
+  if (!profileId) {
+    return errorResponse("INVALID_PROFILE_ID", "profile_id is required.", 422);
+  }
+  if (!isVouchSuspensionCauseCategory(body.cause_category)) {
+    return errorResponse(
+      "INVALID_CAUSE_CATEGORY",
+      "cause_category is invalid.",
+      422
+    );
+  }
+  const notice = typeof body.notice === "string" ? body.notice.trim() : "";
+  if (!notice || notice.length > 500) {
+    return errorResponse(
+      "INVALID_NOTICE",
+      "notice is required and must be 1-500 characters.",
+      422
+    );
+  }
+  const appealDeadline =
+    typeof body.appeal_deadline === "string" ? body.appeal_deadline.trim() : "";
+  if (!appealDeadline || Number.isNaN(Date.parse(appealDeadline))) {
+    return errorResponse(
+      "INVALID_APPEAL_DEADLINE",
+      "appeal_deadline must be an ISO timestamp.",
+      422
+    );
+  }
+  const suspendedBy = optionalText(body.suspended_by, "operator");
+  if (suspendedBy.length > 120) {
+    return errorResponse(
+      "INVALID_SUSPENDED_BY",
+      "suspended_by must be 1-120 characters when provided.",
+      422
+    );
+  }
+  const signedDocumentJson =
+    typeof body.signed_document_json === "string" && body.signed_document_json.trim()
+      ? body.signed_document_json.trim()
+      : null;
+
+  const existingCase = await getVouchCaseById(db, caseId);
+  if (!existingCase) {
+    return errorResponse("CASE_NOT_FOUND", "Vouch case not found.", 404);
+  }
+  const subjects = normalizeProfileIds(
+    JSON.parse(existingCase.subject_profile_ids_json)
+  );
+  if (!subjects.includes(profileId)) {
+    return errorResponse(
+      "PROFILE_NOT_IN_CASE",
+      "profile_id must be one of the case subject profiles.",
+      409
+    );
+  }
+
+  const now = new Date().toISOString();
+  try {
+    const suspension = await suspendProfileForVouchCase(db, {
+      suspensionId: generateSuspensionId(),
+      caseId,
+      profileId,
+      causeCategory: body.cause_category,
+      notice,
+      appealDeadline,
+      signedDocumentJson,
+      suspendedBy,
+      now,
+    });
+    const updatedCase = await getVouchCaseById(db, caseId);
+    return jsonResponse(
+      {
+        ok: true,
+        suspension: serializeSuspension(suspension),
+        case: updatedCase ? serializeCase(updatedCase) : null,
+      },
+      200
+    );
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    if (message === "CARD_NOT_FOUND") {
+      return errorResponse("CARD_NOT_FOUND", "Profile card not found.", 404);
+    }
+    if (message === "CASE_NOT_FOUND") {
+      return errorResponse("CASE_NOT_FOUND", "Vouch case not found.", 404);
+    }
+    return errorResponse("RESOLVER_ERROR", message, 500);
+  }
 }
 
 async function handlePostAuditFlagCase(
