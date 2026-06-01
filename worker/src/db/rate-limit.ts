@@ -21,6 +21,12 @@ const AI_EXPLAIN_BUCKET_PREFIX = "ai_explain:";
 /** 20 steward AI draft requests per IP per hour (AI L3 P2). */
 export const AI_DRAFT_LIMIT_PER_HOUR = 20;
 const AI_DRAFT_BUCKET_PREFIX = "ai_draft:";
+/** 10 public vouch reports per IP per hour (trust-and-safety intake). */
+export const VOUCH_REPORT_LIMIT_PER_HOUR = 10;
+const VOUCH_REPORT_BUCKET_PREFIX = "vouch_report:";
+/** 5 public suspension appeals per IP per hour (trust-and-safety intake). */
+export const VOUCH_APPEAL_LIMIT_PER_HOUR = 5;
+const VOUCH_APPEAL_BUCKET_PREFIX = "vouch_appeal:";
 
 async function incrementBucket(
   db: D1Database,
@@ -283,6 +289,73 @@ export async function checkAiDraftRateLimit(
 
   await incrementBucket(db, bucketKey, windowIso);
   return { allowed: true };
+}
+
+async function checkPerHourIpRateLimit(
+  db: D1Database,
+  ipHash: string,
+  bucketPrefix: string,
+  limit: number,
+  now: Date = new Date()
+): Promise<{ allowed: boolean; retryAfterSec?: number }> {
+  const windowStart = new Date(
+    Date.UTC(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate(),
+      now.getUTCHours()
+    )
+  );
+  const windowIso = windowStart.toISOString();
+  const bucketKey = `${bucketPrefix}${ipHash}:${windowIso}`;
+
+  const row = await db
+    .prepare(`SELECT count FROM rate_limit_buckets WHERE bucket_key = ?`)
+    .bind(bucketKey)
+    .first<{ count: number }>();
+
+  const count = row?.count ?? 0;
+  if (count >= limit) {
+    const nextHour = new Date(windowStart.getTime() + 3600_000);
+    return {
+      allowed: false,
+      retryAfterSec: Math.max(
+        1,
+        Math.ceil((nextHour.getTime() - now.getTime()) / 1000)
+      ),
+    };
+  }
+
+  await incrementBucket(db, bucketKey, windowIso);
+  return { allowed: true };
+}
+
+export async function checkVouchAppealRateLimit(
+  db: D1Database,
+  ipHash: string,
+  now: Date = new Date()
+): Promise<{ allowed: boolean; retryAfterSec?: number }> {
+  return checkPerHourIpRateLimit(
+    db,
+    ipHash,
+    VOUCH_APPEAL_BUCKET_PREFIX,
+    VOUCH_APPEAL_LIMIT_PER_HOUR,
+    now
+  );
+}
+
+export async function checkVouchReportRateLimit(
+  db: D1Database,
+  ipHash: string,
+  now: Date = new Date()
+): Promise<{ allowed: boolean; retryAfterSec?: number }> {
+  return checkPerHourIpRateLimit(
+    db,
+    ipHash,
+    VOUCH_REPORT_BUCKET_PREFIX,
+    VOUCH_REPORT_LIMIT_PER_HOUR,
+    now
+  );
 }
 
 export async function getCreateRateLimitMonitoring(

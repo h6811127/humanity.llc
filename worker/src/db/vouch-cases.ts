@@ -229,6 +229,40 @@ export async function getVouchCaseById(
     .first<VouchCaseRow>();
 }
 
+export async function getLatestSuspensionForProfile(
+  db: D1Database,
+  profileId: string
+): Promise<VouchCaseSuspensionRow | null> {
+  return db
+    .prepare(
+      `SELECT *
+       FROM vouch_case_suspensions
+       WHERE profile_id = ?
+       ORDER BY suspended_at DESC, suspension_id DESC
+       LIMIT 1`
+    )
+    .bind(profileId)
+    .first<VouchCaseSuspensionRow>();
+}
+
+export async function updateVouchCaseStatus(
+  db: D1Database,
+  caseId: string,
+  status: VouchCaseStatus,
+  updatedAt: string
+): Promise<VouchCaseRow | null> {
+  const result = await db
+    .prepare(
+      `UPDATE vouch_cases
+       SET status = ?, updated_at = ?
+       WHERE case_id = ?`
+    )
+    .bind(status, updatedAt, caseId)
+    .run();
+  if (!result.success || (result.meta?.changes ?? 0) === 0) return null;
+  return getVouchCaseById(db, caseId);
+}
+
 export async function createVouchCase(
   db: D1Database,
   params: CreateVouchCaseParams

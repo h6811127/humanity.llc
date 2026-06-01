@@ -2,6 +2,7 @@
 export interface GovernanceProcessUrls {
   data_policy_url: string;
   architecture_url: string;
+  appeal_url: string;
 }
 
 /**
@@ -12,6 +13,7 @@ export function governanceProcessUrls(origin: string): GovernanceProcessUrls {
   return {
     data_policy_url: `${base}/data-policy.html`,
     architecture_url: `${base}/architecture.html`,
+    appeal_url: `${base}/appeal/`,
   };
 }
 
