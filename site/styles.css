@@ -5001,6 +5001,47 @@ html[data-landing-focus="on"] .screen-landing {
   font-size: 13px;
 }
 
+/* Tier 0 founding sticker preview — see docs/MERCH_VISUAL_CHOREOGRAPHY.md Beat 1 */
+.shop-sticker-gallery-grid {
+  display: grid;
+  gap: 16px;
+  margin: 0 0 20px;
+}
+
+@media (min-width: 640px) {
+  .shop-sticker-gallery-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.shop-sticker-gallery-item {
+  margin: 0;
+}
+
+.shop-sticker-gallery-item img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.shop-sticker-gallery-item figcaption {
+  margin-top: 8px;
+  text-align: center;
+  font-size: 13px;
+}
+
+.shop-sticker-gallery-grid--pdp {
+  margin-top: 24px;
+}
+
+.shop-sticker-gallery-grid--pdp .shop-sticker-gallery-item figcaption {
+  text-align: left;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
 .shop-hub-cta {
   display: flex;
   align-items: center;

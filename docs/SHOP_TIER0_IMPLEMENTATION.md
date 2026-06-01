@@ -26,6 +26,8 @@ Tier 0 uses Shopify variant + optional batch Printify mapping. **Tier 1 personal
 | Piece | Path |
 |-------|------|
 | Story-row drop page | `site/shop/index.html` |
+| **Founding sticker PDP** | `site/shop/founding/index.html` |
+| **Sticker preview gallery** | `site/images/merch/founding-sticker/*` · manifest `site/data/founding-sticker-mockups.json` · `site/js/shop-founding-sticker-mockups-core.mjs` |
 | **QR customizer (Tier 1)** | `site/shop/customize/index.html` · `docs/MERCH_FUNNEL_MVP.md` |
 | Checkout config | `site/data/shop-config.json` (see `shop-config.example.json`) |
 | Shop UI | `site/js/shop.mjs` + `site/js/shop-config.mjs`  -  Buy vs interest by `checkout_open` |
