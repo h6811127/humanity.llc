@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Appeal a suspension - humanity.llc</title>
+    <meta
+      name="description"
+      content="Submit an appeal if your Humanity card was suspended under published governance rules."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=131" />
+    <link rel="stylesheet" href="/css/theme-dark.css?v=29" />
+  </head>
+  <body>
+    <div class="page feature-page vouch-appeal-page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/help/">Help</a>
+      </header>
+
+      <main class="screen">
+        <section class="hero">
+          <p class="hero-eyebrow">Trust &amp; safety</p>
+          <h1>Appeal a suspension</h1>
+          <p class="hero-sub">
+            If your card was suspended under published rules, you can ask stewards to review the
+            decision. This is not a court or identity check - provide your case id, profile id, and
+            why the suspension should be reconsidered.
+          </p>
+        </section>
+
+        <section class="group">
+          <form id="vouch-appeal-form" class="vouch-appeal-form" novalidate>
+            <label class="field-label" for="appeal-case-id">Case id</label>
+            <input
+              id="appeal-case-id"
+              class="input"
+              type="text"
+              required
+              autocomplete="off"
+              placeholder="case_... from suspension notice"
+            />
+            <p class="form-hint">Shown to operators when your profile was suspended.</p>
+
+            <label class="field-label" for="appeal-profile-id">Profile id</label>
+            <input
+              id="appeal-profile-id"
+              class="input"
+              type="text"
+              required
+              autocomplete="off"
+              placeholder="Your suspended profile id"
+            />
+
+            <label class="field-label" for="appeal-statement">Why should stewards review?</label>
+            <textarea
+              id="appeal-statement"
+              class="input"
+              rows="5"
+              maxlength="1000"
+              required
+              placeholder="Brief facts - no private keys."
+            ></textarea>
+
+            <label class="field-label" for="appeal-contact">Contact (optional)</label>
+            <input
+              id="appeal-contact"
+              class="input"
+              type="text"
+              maxlength="200"
+              autocomplete="email"
+              placeholder="Email or other way to reach you"
+            />
+            <p class="form-hint">
+              If you leave contact info, you receive a reference code to follow up.
+            </p>
+
+            <button type="submit" class="btn-primary" id="appeal-submit">Submit appeal</button>
+            <p id="appeal-status" class="form-status" role="status" aria-live="polite" hidden></p>
+          </form>
+        </section>
+      </main>
+    </div>
+    <script type="module" src="/js/vouch-appeal.mjs?v=1"></script>
+  </body>
+</html>

@@ -54,6 +54,7 @@ import {
   handlePostVouchCase,
   handlePostVouchCaseSuspend,
 } from "./resolver/vouch-cases";
+import { handlePostVouchAppeal } from "./resolver/vouch-appeals";
 import { handleGetCreateRateMonitor } from "./resolver/create-monitoring";
 import {
   handleGetMerchFunnelMonitor,
@@ -413,6 +414,17 @@ export default {
         env.DB,
         env.OPERATOR_AUDIT_TOKEN
       );
+      return withCors(request, res);
+    }
+
+    if (path === "/.well-known/hc/v1/vouch-appeals" && request.method === "POST") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostVouchAppeal(request, env.DB);
       return withCors(request, res);
     }
 
