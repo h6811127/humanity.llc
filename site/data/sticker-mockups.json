@@ -1,0 +1,16 @@
+{
+  "product_id": "sticker_personalized_v1",
+  "printify_product_id": "",
+  "printify_variant_id": null,
+  "generated_at": "2026-05-31T00:00:00.000Z",
+  "default_view": "flat",
+  "mockups": [
+    {
+      "view_id": "flat",
+      "label": "Kiss cut",
+      "src": "",
+      "local_src": "/images/merch/printify-art/sticker-live-object-updates-from-phone.png",
+      "is_default": true
+    }
+  ]
+}

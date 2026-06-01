@@ -105,9 +105,23 @@ curl -sS https://humanity.llc/data/shop-config.json | jq '.personalize.products[
 
 ## Step 4 — Worker (middleware)
 
-1. Wire `FOUNDING_PURSE_TEMPLATE_ID` in `printify-template-config.ts` and `printify-artwork-config.ts` (same pattern as Glitch hoodie env keys above).
+| Piece | Status |
+|-------|--------|
+| `printify-template-config.ts` / `printify-artwork-config.ts` env mapping | **Shipped** |
+| `print-catalog.ts` template + `black-onesize` variant | **Shipped** |
+| `print-template-render.ts` profile (`front` placeholder, `frame_svg`) | **Shipped** |
+| Operator `PERSONALIZE_FOUNDING_PURSE_*` secrets + `worker:deploy` | **Open** — paste Printify ids from Step 1 |
+| Paid-path proof order | **Open** — after Steps 1–2 + secrets |
+
+1. Set `PERSONALIZE_FOUNDING_PURSE_*` (Step 1) via `wrangler secret put` or `[vars]` in `worker/wrangler.toml` for local dev.
 2. `npm run worker:deploy`
 3. Prove one test order: customize → artifact intent → Shopify pay → webhook → mint → Printify submit.
+
+**Regression:**
+
+```bash
+npm run worker:test -- worker/tests/print-template-render.test.ts worker/tests/store-catalog.test.ts
+```
 
 ---
 

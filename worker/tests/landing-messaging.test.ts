@@ -55,6 +55,22 @@ describe("landing messaging (Step 3)", () => {
     expect(html).toContain("/studio/");
   });
 
+  it("landing intro includes navy sweatshirt transparent QR preview after How it works", () => {
+    const html = readFileSync(join(root, "site/index.html"), "utf8");
+    const howIdx = html.indexOf('id="landing-how-it-works-title"');
+    const merchIdx = html.indexOf('id="landing-merch-preview-title"');
+    const founderIdx = html.indexOf('id="founder-note-title"');
+    expect(howIdx).toBeGreaterThan(-1);
+    expect(merchIdx).toBeGreaterThan(howIdx);
+    expect(founderIdx).toBeGreaterThan(merchIdx);
+    expect(html).toContain("landing-merch-preview");
+    expect(html).toContain("One use · live object on a sweatshirt");
+    expect(html).toContain("/images/landing/navy-glitch-hoodie-transparent-back.jpg");
+    expect(html).toContain("transparent QR");
+    expect(html).toContain("https://humanity.llc/c/nSVXWPqgRFEhGPjxyRzidF6s?q=qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5");
+    expect(html).toContain("/shop/customize/?product=glitch_hoodie_v1");
+  });
+
   it("create page exposes hero ids for template copy sync", () => {
     const html = readFileSync(join(root, "site/create/index.html"), "utf8");
     expect(html).toContain('id="create-hero-title"');

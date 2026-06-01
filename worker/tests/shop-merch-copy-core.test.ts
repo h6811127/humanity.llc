@@ -43,7 +43,7 @@ describe("shop-merch-copy-core", () => {
     expect(SHOP_GLITCH_PRINT_ARTIFACT_CALLOUT.lead).toMatch(/blue or purple/i);
     expect(SHOP_GLITCH_PRINT_ARTIFACT_CALLOUT.exampleSummary).toBe("See example");
     expect(SHOP_GLITCH_PRINT_ARTIFACT_CALLOUT.imageSrc).toMatch(
-      /glitch-print-chromatic-unit-example/
+      /glitch-print-chromatic-artifact\.png\?v=3/
     );
   });
 

@@ -1,7 +1,7 @@
 # M6  -  Vouching design
 
-**Status:** Step 1 (V-001) shipped in repo  -  verify on production; Steps 2–3 shipped; Step 4 shipped (audit API, dismiss API, steward workflow entry, operator UI prototype, steward issuance cap policy)
-**Canonical refs:** [`VOUCH_TRUST_POSITIONING.md`](VOUCH_TRUST_POSITIONING.md) (product framing), [`VOUCH_THREAT_MODEL.md`](VOUCH_THREAT_MODEL.md) (adversarial catalog), `docs/V1_PRODUCT_TRUST_MODEL.md` § Level 2, `docs/V1_ADVERSARIAL_REVIEW.md` § Perspective 1, `docs/features/Human Verification v1.0.md`, `docs/V1_IMPLEMENTATION_BACKLOG.md` (V-001, V-002)  
+**Status:** Step 1 (V-001) shipped in repo  -  verify on production; Steps 2–3 shipped; Step 4 shipped (audit API, dismiss API, steward workflow entry, operator UI prototype, steward issuance cap policy); trust-and-safety case workflow specified, not built
+**Canonical refs:** [`VOUCH_TRUST_POSITIONING.md`](VOUCH_TRUST_POSITIONING.md) (product framing), [`VOUCH_THREAT_MODEL.md`](VOUCH_THREAT_MODEL.md) (adversarial catalog), [`VOUCH_TRUST_AND_SAFETY_OPERATOR_WORKFLOW.md`](VOUCH_TRUST_AND_SAFETY_OPERATOR_WORKFLOW.md) (case workflow build spec), `docs/V1_PRODUCT_TRUST_MODEL.md` § Level 2, `docs/V1_ADVERSARIAL_REVIEW.md` § Perspective 1, `docs/features/Human Verification v1.0.md`, `docs/V1_IMPLEMENTATION_BACKLOG.md` (V-001, V-002)
 **Product thesis:** Live control proves recent key possession. Vouching proves **accountable humans staked public, revocable attestations** on this card under published rules-not legal ID, not global biometric uniqueness, not liveness at every click.
 
 ---
@@ -318,6 +318,7 @@ Revoked/suspended card states must **override** positive verification on scan (a
 - [x] Internal cluster flags (no public graph UI).
 - [x] Steward review **step 1:** runbook + operator `GET …/vouch-audit-flags` ([`VOUCH_STEWARD_REVIEW_RUNBOOK.md`](VOUCH_STEWARD_REVIEW_RUNBOOK.md)).
 - [x] Steward review **step 2:** dismiss notes in D1 API (`POST/DELETE …/vouch-audit-flags/dismiss`) + operator UI prototype (`/operator/vouch-audit.html`) + steward entry point on `/created/` Advanced for `steward` cards.
+- [ ] Trust-and-safety case workflow: durable cases, public reports, suspension records, appeals, and transparency counters ([`VOUCH_TRUST_AND_SAFETY_OPERATOR_WORKFLOW.md`](VOUCH_TRUST_AND_SAFETY_OPERATOR_WORKFLOW.md)).
 
 **Deferred**
 
@@ -405,6 +406,7 @@ Scan vouch UI (shipped): if keys are missing but a saved card is Steward on the 
 
 - [`docs/VOUCH_TRUST_POSITIONING.md`](VOUCH_TRUST_POSITIONING.md)  -  AI-era framing, what we own, integrator policy
 - [`docs/VOUCH_THREAT_MODEL.md`](VOUCH_THREAT_MODEL.md)  -  deep threats, gaps, operator playbook
+- [`docs/VOUCH_TRUST_AND_SAFETY_OPERATOR_WORKFLOW.md`](VOUCH_TRUST_AND_SAFETY_OPERATOR_WORKFLOW.md)  -  case workflow, public reports, suspension, appeals, transparency
 - [`docs/KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md)  -  cards, keys, verification, multi-device
 - `docs/M7_LIVE_CONTROL_ALPHA.md`  -  ephemeral key control (build before vouch UI polish is done)
 - `docs/V1_DECISION_LOCK.md`  -  launch copy locks

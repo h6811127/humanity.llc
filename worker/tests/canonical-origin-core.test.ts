@@ -3,9 +3,11 @@ import { describe, expect, it } from "vitest";
 import {
   buildCanonicalSiteRedirectUrl,
   CANONICAL_SITE_HOST,
+  CANONICAL_SITE_ORIGIN,
   formatOriginDebugHubLine,
   isCanonicalSiteHost,
   isPagesPreviewHost,
+  resolverApiOriginForHostname,
   shouldRedirectWwwToCanonical,
   shouldShowOriginDebugInHub,
 } from "../../site/js/canonical-origin-core.mjs";
@@ -61,6 +63,37 @@ describe("canonical-origin-core (RC-13)", () => {
     expect(shouldShowOriginDebugInHub({ hostname: "humanity.llc" })).toBe(true);
     expect(shouldShowOriginDebugInHub({ hostname: "foo.pages.dev" })).toBe(true);
     expect(shouldShowOriginDebugInHub({ hostname: "localhost" })).toBe(false);
+  });
+
+  it("resolver API uses apex on www and preview (PWA RC-1)", () => {
+    expect(
+      resolverApiOriginForHostname({
+        hostname: "www.humanity.llc",
+        protocol: "https:",
+        pageOrigin: "https://www.humanity.llc",
+      })
+    ).toBe(CANONICAL_SITE_ORIGIN);
+    expect(
+      resolverApiOriginForHostname({
+        hostname: "humanity.llc",
+        protocol: "https:",
+        pageOrigin: "https://humanity.llc",
+      })
+    ).toBe("https://humanity.llc");
+    expect(
+      resolverApiOriginForHostname({
+        hostname: "foo.pages.dev",
+        protocol: "https:",
+        pageOrigin: "https://foo.pages.dev",
+      })
+    ).toBe(CANONICAL_SITE_ORIGIN);
+    expect(
+      resolverApiOriginForHostname({
+        hostname: "127.0.0.1",
+        protocol: "http:",
+        pageOrigin: "http://127.0.0.1:8788",
+      })
+    ).toBe("http://127.0.0.1:8787");
   });
 });
 

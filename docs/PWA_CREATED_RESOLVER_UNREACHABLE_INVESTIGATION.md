@@ -1,7 +1,7 @@
 # Investigation: PWA `/created/` Live tab — missing QR, “Card error”, resolver unreachable
 
 **Date:** 2026-05-30  
-**Status:** Open — investigation complete; fixes not shipped in this doc  
+**Status:** P0 client resolver apex on www **shipped** (2026-05-31) — `resolverApiOriginForHostname` · `hc-sign.mjs`; remaining stack items (created QR arrive, unreachable copy) open  
 **Reporter:** Steward on installed PWA (Home Screen shell)  
 **Symptoms:**
 
@@ -252,7 +252,7 @@ Expected: apex **200**, www **not** relied upon for API (today www returns **522
 
 | Priority | Change | Files |
 |----------|--------|-------|
-| **P0** | Force resolver API to `https://humanity.llc` when `location.hostname` is `www.humanity.llc` (mirror preview behavior) | `site/js/hc-sign.mjs`, Vitest |
+| **P0** | Force resolver API to `https://humanity.llc` when `location.hostname` is `www.humanity.llc` (mirror preview behavior) | **Shipped** — `canonical-origin-core.mjs` `resolverApiOriginForHostname` · `hc-sign.mjs` · `canonical-origin-core.test.ts` |
 | **P0** | Control-mode boot: `void liveObjectCardCtl?.maybeRunArrive()` + instant settle if `#qr-img`.src already set | `site/js/created.mjs` |
 | **P1** | When `refreshNetworkStatus` fails, set `#network-card-status` to plain “Unreachable” (not ambiguous **Error**) and sync hero meta | `site/js/created.mjs` |
 | **P1** | Hub debug line when `resolverApiOrigin() !== location.origin` (API override) | `device-hub-build-stamp.mjs` or `hc_debug` |

@@ -9,6 +9,7 @@ import {
 } from "../../site/js/qr-branding.mjs";
 import {
   DEFAULT_PRINT_TEMPLATE_ID,
+  FOUNDING_PURSE_TEMPLATE_ID,
   GLITCH_HOODIE_TEMPLATE_ID,
   HOODIE_LIVE_OBJECT_TEMPLATE_ID,
 } from "../src/print/print-catalog";
@@ -32,8 +33,12 @@ describe("resolvePrintTemplateRenderProfile", () => {
     expect(profile.output).toBe("sticker_sheet");
   });
 
-  it("uses tight full frame for hoodie templates", () => {
-    for (const id of [HOODIE_LIVE_OBJECT_TEMPLATE_ID, GLITCH_HOODIE_TEMPLATE_ID]) {
+  it("uses tight full frame for personalized apparel templates", () => {
+    for (const id of [
+      HOODIE_LIVE_OBJECT_TEMPLATE_ID,
+      GLITCH_HOODIE_TEMPLATE_ID,
+      FOUNDING_PURSE_TEMPLATE_ID,
+    ]) {
       const profile = resolvePrintTemplateRenderProfile(id);
       expect(profile.frameBackground).toBe("full");
       expect(profile.framePadding).toBe("tight");
@@ -41,13 +46,16 @@ describe("resolvePrintTemplateRenderProfile", () => {
     }
   });
 
-  it("maps Glitch to back placeholder and Live Object to front", () => {
+  it("maps Glitch to back placeholder and front-panel products to front", () => {
     expect(resolvePrintTemplateRenderProfile(GLITCH_HOODIE_TEMPLATE_ID).printifyPlaceholder).toBe(
       "back"
     );
     expect(
       resolvePrintTemplateRenderProfile(HOODIE_LIVE_OBJECT_TEMPLATE_ID).printifyPlaceholder
     ).toBe("front");
+    expect(resolvePrintTemplateRenderProfile(FOUNDING_PURSE_TEMPLATE_ID).printifyPlaceholder).toBe(
+      "front"
+    );
   });
 });
 

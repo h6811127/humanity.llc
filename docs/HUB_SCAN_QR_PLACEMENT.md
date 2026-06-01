@@ -1,7 +1,7 @@
 # Hub Scan QR placement
 
-**Status:** Phase A shipped (glance row + steward tools strip) · Phase B shipped (conditional chrome icon)  
-**Date:** 2026-05-30  
+**Status:** Phase A shipped (glance row + steward tools strip) · Phase B shipped (conditional chrome icon) · hub scan button removed 2026-05-31  
+**Date:** 2026-05-30 (updated 2026-05-31)  
 **Audience:** Product, design, frontend  
 **Related:** [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) (S3 in-app scanner) · [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md) · [`SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) · [`HUB_STRANGER_ONBOARDING.md`](HUB_STRANGER_ONBOARDING.md)
 
@@ -21,7 +21,7 @@ Do not merge these into one generic “Scan QR” affordance:
 
 | Job | Who | Entry | Copy |
 |-----|-----|-------|------|
-| Scan someone else’s Humanity QR to **vouch** | Steward with saved card | In-app scanner (S3) | **Scan QR to vouch** / **Scan a Humanity QR** |
+| Scan someone else's Humanity QR to **vouch** | Steward with saved card | In-app scanner (S3) | **Scan a Humanity QR** (glance) / **Scan to vouch** (chrome) |
 | **Preview** my live object as strangers see it | Owner | Card row **Open scan** | **Open scan page** |
 | **Paste** a link from Camera / Safari | Steward handoff (S1) | Hub **Open scan link** | **Open scan link** |
 
@@ -51,7 +51,7 @@ When the hub sheet is collapsed, tapping the status dot opens `#device-hub-glanc
 
 - **Title:** Scan a Humanity QR  
 - **Subtitle:** Vouch from a printed code  
-- **Action:** opens the existing `#device-hub-qr-scanner` dialog (same as hub button)
+- **Action:** opens the existing `#device-hub-qr-scanner` dialog
 
 Hidden when `walletCount < 1`. Keeps landing hero clean while giving returning stewards a two-tap path (dot → scan).
 
@@ -59,11 +59,11 @@ Hidden when `walletCount < 1`. Keeps landing hero clean while giving returning s
 
 ### Phase A — Steward tools strip
 
-Move **Scan QR to vouch** and the S4 iPhone vouch guidance card out of **Restore & scan** into `#device-hub-steward-tools` — directly under the saved-items section header (below section lead, above the card list).
+The S4 iPhone vouch guidance card lives in `#device-hub-steward-tools` — directly under the saved-items section header (below section lead, above the card list). The in-app scan button was removed from the expanded hub (2026-05-31); stewards use the glance row or chrome icon instead.
 
 **Restore & scan** (bottom of hub) keeps import / recovery / open-scan-link only — still `data-hub-restore-always` for strangers.
 
-**Modules:** shell HTML (`site/index.html`, `site/create/index.html`, `site/wallet/index.html`) · visibility in `device-hub-qr-scanner.mjs`.
+**Modules:** shell HTML (`site/index.html`, `site/create/index.html`, `site/wallet/index.html`) · strip visibility in `device-hub-steward-vouch-guidance.mjs`.
 
 ### Phase B — Conditional chrome icon (shipped)
 
@@ -73,7 +73,7 @@ When stewards still miss the scanner after Phase A, a muted QR icon in `#top-chr
 - Gated: `walletCount ≥ 1` **and** `display-mode: standalone` (`shouldShowHubScanQrChrome`)  
 - Label: **Scan to vouch** (`HUB_CHROME_SCAN_QR_ARIA`) — not generic “Scan QR”  
 - Hidden when no saved cards (stranger-empty unchanged)  
-- Opens the same `#device-hub-qr-scanner` dialog as hub / glance rows
+- Opens the same `#device-hub-qr-scanner` dialog as glance rows
 
 **Modules:** shell HTML on `/`, `/create/`, `/created/`, `/wallet/` · `device-hub-qr-scanner-core.mjs` · `device-hub-qr-scanner.mjs` · `site/css/device-shell.css`
 
@@ -94,9 +94,8 @@ When stewards still miss the scanner after Phase A, a muted QR icon in `#top-chr
 |---------|------------|------|
 | Glance row | `.device-hub-glance-row--scan` | Fast scan from collapsed chrome |
 | Chrome icon | `#shell-scan-qr-btn` | One-tap scan in standalone PWA |
-| Steward strip | `#device-hub-steward-tools` | Scan button + vouch guidance near cards |
+| Steward strip | `#device-hub-steward-tools` | S4 iPhone vouch guidance near cards |
 | Scanner dialog | `#device-hub-qr-scanner` | Shared camera UI |
-| Hub button | `#hub-scan-qr-btn` | Same action as glance row |
 
 ### Tests
 
@@ -112,5 +111,6 @@ npm run e2e -- e2e/device-status-dot.spec.ts
 
 | Date | Change |
 |------|--------|
+| 2026-05-31 | Removed hub **Scan QR to vouch** button; glance row + chrome icon remain |
 | 2026-05-30 | Phase B — standalone chrome scan icon (`#shell-scan-qr-btn`) |
 | 2026-05-30 | Phase A — glance scan row + steward tools strip; doc created |

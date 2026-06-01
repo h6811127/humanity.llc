@@ -1049,6 +1049,19 @@ html[data-theme="dark"] .studio-use-cases-list .studio-use-case-row {
   border-bottom-color: var(--shell-separator);
 }
 
+html[data-theme="dark"] .landing-merch-preview__actions {
+  background: var(--shell-fill);
+  border-color: var(--shell-separator);
+}
+
+html[data-theme="dark"] .landing-merch-preview__actions .list-row {
+  border-bottom-color: var(--shell-separator);
+}
+
+html[data-theme="dark"] .landing-merch-preview__caption {
+  color: var(--shell-label);
+}
+
 html[data-theme="dark"] .landing-disclosure-card {
   background: var(--shell-fill);
   border-color: var(--shell-separator);

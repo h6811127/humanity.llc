@@ -41,7 +41,7 @@ This is distinct from **P1 shipped** steward scan preview (PWA → scan same-tab
 |-------|------|--------|-----------------|
 | **S1** | Clipboard handoff | **Shipped** | Camera → Safari → copy link → PWA hub **Open scan link** → vouch |
 | **S2** | Hub recovery import | **Shipped** | Move card Safari ↔ PWA with recovery code + scan link (no file) |
-| **S3** | In-app QR scanner | **Shipped** | Open PWA → **Scan QR to vouch** → same-tab scan + keys |
+| **S3** | In-app QR scanner | **Shipped** | Glance row or chrome scan icon → same-tab scan + keys |
 | **S4** | Product guidance | **Shipped** | Hub Restore & scan label + iPhone vouch guidance; PWA install + setup copy |
 | **S5** | Scan-page steward param | **Shipped** | `?hc_steward=1` → handoff UI first on Safari |
 | **S6** | Short handoff URL | **Shipped** | `humanity.llc/v/{code}` interstitial for camera landings |
@@ -64,11 +64,11 @@ Primary cross-context path when steward saved recovery code but not encrypted ba
 
 ### S3 — In-app QR scanner (shipped)
 
-**Hub:** **Scan QR to vouch** — `getUserMedia` + **BarcodeDetector** on Chromium, **jsQR canvas fallback** on Safari / iOS (WebKit has no native `BarcodeDetector`) → validate official scan URL → `location.assign` in PWA.
+**Entry:** Glance row **Scan a Humanity QR**, standalone chrome **Scan to vouch**, or **Open scan link** — `getUserMedia` + **BarcodeDetector** on Chromium, **jsQR canvas fallback** on Safari / iOS (WebKit has no native `BarcodeDetector`) → validate official scan URL → `location.assign` in PWA.
 
 Steward never leaves PWA; printed QR scanned from inside app. Modules: `device-hub-qr-scanner-core.mjs`, `device-hub-qr-scanner.mjs`.
 
-**Placement (Phase A — May 2026):** Scan affordance lives in the **Steward tools** strip under saved items (not buried in Restore & scan) and as a **glance popover** row when the hub is collapsed. **Phase B:** muted `#shell-scan-qr-btn` in top chrome when standalone PWA + saved cards. Full spec: [`HUB_SCAN_QR_PLACEMENT.md`](HUB_SCAN_QR_PLACEMENT.md).
+**Placement (Phase A — May 2026):** Scan affordance lives as a **glance popover** row when the hub is collapsed and as a muted `#shell-scan-qr-btn` in top chrome when standalone PWA + saved cards. S4 iPhone guidance sits in the **Steward tools** strip under saved items. Full spec: [`HUB_SCAN_QR_PLACEMENT.md`](HUB_SCAN_QR_PLACEMENT.md).
 
 **Fallback when camera API unavailable:** link to **Open scan link** (S1).
 
@@ -76,7 +76,7 @@ Steward never leaves PWA; printed QR scanned from inside app. Modules: `device-h
 
 | Audience | Guidance |
 |----------|----------|
-| PWA-only stewards who vouch from prints | Use **Scan QR to vouch** (S3) or S1 handoff — not Camera app alone |
+| PWA-only stewards who vouch from prints | Use in-app scanner via glance row or chrome icon (S3) or S1 handoff — not Camera app alone |
 | Camera-first stewards | Keep card in **Safari** or import into Safari before vouching |
 | After Add to Home Screen on iPhone | Manage cards **only** from that icon ([`device-ownership-copy-core.mjs`](../site/js/device-ownership-copy-core.mjs)) |
 
@@ -137,7 +137,7 @@ flowchart TB
 
   subgraph stewards [Stewards — primary path S3]
     PWA[Home Screen PWA]
-    PWA --> ScanBtn[Scan QR to vouch]
+    PWA --> ScanBtn[Glance row or chrome scan icon]
     ScanBtn --> InApp[In-app camera decode]
     InApp --> ScanSame[Same-tab /c/ + wallet keys]
     ScanSame --> Vouch[Vouch / attest]

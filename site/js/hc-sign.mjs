@@ -11,6 +11,7 @@ import {
   childObjectRevokePath,
   childObjectUpdatePath,
 } from "./child-object-api-core.mjs";
+import { isLocalDevHost, resolverApiOriginForHostname } from "./canonical-origin-core.mjs";
 
 const PROTOCOL_VERSION = "1.0";
 const SIGNATURE_ALG = "Ed25519";
@@ -133,17 +134,6 @@ export function withProtocolFields(payload, type) {
   return { ...payload, type, version: PROTOCOL_VERSION };
 }
 
-const PRODUCTION_RESOLVER_ORIGIN = "https://humanity.llc";
-
-function isLocalDevHost(hostname) {
-  return hostname === "localhost" || hostname === "127.0.0.1";
-}
-
-/** Cloudflare Pages preview URLs serve static files only  -  API lives on humanity.llc. */
-function isPagesPreviewHost(hostname) {
-  return hostname.endsWith(".pages.dev");
-}
-
 /**
  * Resolver origin only (no path). Avoids ?api=https://humanity.llc/create
  * which would POST to /create/.well-known/... and Pages returns 405.
@@ -165,18 +155,8 @@ export function resolverApiOrigin() {
     }
   }
 
-  const { hostname, protocol } = location;
-  if (isLocalDevHost(hostname)) {
-    // Match page hostname (localhost vs 127.0.0.1) so browser private-network checks pass.
-    return `${protocol}//${hostname}:8787`;
-  }
-  if (hostname === "humanity.llc") {
-    return location.origin;
-  }
-  if (isPagesPreviewHost(hostname)) {
-    return PRODUCTION_RESOLVER_ORIGIN;
-  }
-  return location.origin;
+  const { hostname, protocol, origin } = location;
+  return resolverApiOriginForHostname({ hostname, protocol, pageOrigin: origin });
 }
 
 /** @deprecated use resolverApiOrigin  -  kept for existing imports */

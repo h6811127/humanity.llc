@@ -87,7 +87,7 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 **Hub glance (landing):** When the hub is collapsed, `#device-hub-glance` shows notice (if any) and up to three saved card labels; tap expands the hub. When `hc_wallet` count ≥ 1, glance also shows **Scan a Humanity QR** (opens in-app scanner — two taps from landing without hub scroll). Spec: [`HUB_SCAN_QR_PLACEMENT.md`](HUB_SCAN_QR_PLACEMENT.md). Quick-look popover rows use **semantic status tints** (`--surface-popover-notice-*`, `--surface-popover-crosstab-*`, `--surface-popover-warn-*` per [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md)). Glance **Card disabled since last visit** copy follows the latest resolver-confirmed alert state from the wallet network poll (not stale cache and not the persisted `hc_wallet[].status` field).
 
-**Steward tools strip (Phase A):** `#device-hub-steward-tools` sits under the saved-items section header — **Scan QR to vouch** + S4 iPhone vouch guidance. **Restore & scan** at the hub bottom keeps import / recovery / open-scan-link only.
+**Steward tools strip (Phase A):** `#device-hub-steward-tools` sits under the saved-items section header — S4 iPhone vouch guidance only (in-app scan button removed 2026-05-31). **Restore & scan** at the hub bottom keeps import / recovery / open-scan-link only.
 
 **Chrome scan icon (Phase B):** `#shell-scan-qr-btn` in top chrome when standalone PWA + saved cards — one tap to in-app scanner. Spec: [`HUB_SCAN_QR_PLACEMENT.md`](HUB_SCAN_QR_PLACEMENT.md).
 

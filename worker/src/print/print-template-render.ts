@@ -5,6 +5,7 @@
 
 import {
   DEFAULT_PRINT_TEMPLATE_ID,
+  FOUNDING_PURSE_TEMPLATE_ID,
   GLITCH_HOODIE_TEMPLATE_ID,
   HOODIE_LIVE_OBJECT_TEMPLATE_ID,
 } from "./print-catalog";
@@ -72,6 +73,13 @@ const PROFILES: Record<string, PrintTemplateRenderProfile> = {
     output: "frame_svg",
     composition: "standalone",
     printifyPlaceholder: "back",
+  },
+  [FOUNDING_PURSE_TEMPLATE_ID]: {
+    frameBackground: "full",
+    framePadding: "tight",
+    output: "frame_svg",
+    composition: "standalone",
+    printifyPlaceholder: "front",
   },
 };
 

@@ -21,15 +21,12 @@ describe("shop-copy-core", () => {
     expect(hubHtml).not.toMatch(/—/);
     expect(hubHtml).toContain("Chromatic glitch units");
     expect(hubHtml).toContain("See example");
-    expect(hubHtml).toContain("glitch-print-chromatic-unit-example");
+    expect(hubHtml).toContain("glitch-print-chromatic-artifact.png?v=3");
     expect(hubHtml).not.toContain("glitch-hoodie-live-object-white-card");
-<<<<<<< HEAD
-=======
     expect(hubHtml).not.toContain("glitch-print-chromatic-unit-example");
     expect(hubHtml).toContain('id="shop-sticker-gallery"');
     expect(hubHtml).toContain("/images/merch/founding-sticker/flat-kiss-cut.png");
     expect(foundingHtml).toContain("/images/merch/founding-sticker/on-laptop.jpg");
->>>>>>> cd32ef8e (Add founding sticker kiss-cut preview gallery to shop)
     expect(foundingHtml).not.toMatch(/Ready to order/i);
     expect(foundingHtml).toContain('id="shop-checkout-lead"');
     expect(foundingHtml).toContain("restore root card and");

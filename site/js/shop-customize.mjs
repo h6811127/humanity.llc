@@ -87,6 +87,17 @@ import {
   FOUNDING_PURSE_DEFAULT_MOCKUP_VIEW,
 } from "./shop-founding-purse-mockups-core.mjs";
 import {
+  fetchStickerMockups,
+  findStickerMockupByView,
+  listStickerMockups,
+  resolveDefaultStickerMockup,
+  resolveStickerMockupPhotoSrc,
+  stickerHasPrintifyMockups,
+  stickerMockupViewCaption,
+  STICKER_DEFAULT_MOCKUP_VIEW,
+} from "./shop-sticker-mockups-core.mjs";
+import { STICKER_PERSONALIZED_STORE_PRODUCT_ID } from "./shop-store-catalog-ids.mjs";
+import {
   artifactIntentSelectionKey,
   GLITCH_PRINT_FRAME_BACKGROUND_OPTIONS,
   GLITCH_PRINT_QR_OVERLAY_WIDTH,

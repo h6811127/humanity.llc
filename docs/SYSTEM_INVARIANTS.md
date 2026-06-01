@@ -46,7 +46,7 @@ Canonical UX spec: [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWAR
 | Session vs hub loss | Hub row visible + empty tab session = session loss (RC-8), not hub disappearance. |
 | Summary integrity | Allowlisted `hc_wallet_summary` rows + persist tripwire in `device-wallet-summary-core.mjs`. |
 | Private browsing | Create/save blocked when private browsing detected (`private-browsing-detect-core`). |
-| Canonical origin | `www.humanity.llc` → apex redirect on shell pages + Worker 301. |
+| Canonical origin | `www.humanity.llc` → apex redirect on shell pages + Worker 301; client `resolverApiOrigin()` must use apex for `/.well-known/hc/v1/*` when the tab is on www (same as Pages preview). |
 
 **Regression:** `npm run hub-card-disappeared:verify:fast` · `npm run worker:test -- worker/tests/device-wallet-summary-core.test.ts worker/tests/device-wallet-meta.test.ts worker/tests/device-wallet-save-core.test.ts`
 

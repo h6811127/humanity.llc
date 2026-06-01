@@ -73,3 +73,23 @@ export function shouldShowOriginDebugInHub(locationLike) {
   if (isCanonicalSiteHost(hostname)) return true;
   return !isLocalDevHost(hostname);
 }
+
+/**
+ * Resolver API origin for browser fetches (Worker routes), not wallet storage origin.
+ * www and Pages preview must not call /.well-known on www (522); use apex like preview.
+ *
+ * @param {{ hostname: string; protocol?: string; pageOrigin?: string }} opts
+ * @see docs/PWA_CREATED_RESOLVER_UNREACHABLE_INVESTIGATION.md — P0
+ */
+export function resolverApiOriginForHostname({ hostname, protocol = "https:", pageOrigin = "" }) {
+  if (isLocalDevHost(hostname)) {
+    return `${protocol}//${hostname}:8787`;
+  }
+  if (isCanonicalSiteHost(hostname)) {
+    return pageOrigin || CANONICAL_SITE_ORIGIN;
+  }
+  if (shouldRedirectWwwToCanonical(hostname) || isPagesPreviewHost(hostname)) {
+    return CANONICAL_SITE_ORIGIN;
+  }
+  return pageOrigin || `${protocol}//${hostname}`;
+}

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Report a vouch or profile · humanity.llc</title>
+    <meta
+      name="description"
+      content="Report a false vouch, abusive statement, impersonation, or stolen QR to humanity.llc stewards."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=131" />
+    <link rel="stylesheet" href="/css/theme-dark.css?v=29" />
+  </head>
+  <body>
+    <div class="page feature-page vouch-report-page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/help/">Help</a>
+      </header>
+
+      <main class="screen">
+        <section class="hero">
+          <p class="hero-eyebrow">Trust &amp; safety</p>
+          <h1>Report a vouch or profile</h1>
+          <p class="hero-sub">
+            For false vouches, coerced attestation, abusive statements, impersonation, stolen QRs,
+            or harassment. This is not legal adjudication or identity verification — stewards review
+            reports privately.
+          </p>
+        </section>
+
+        <section class="group">
+          <form id="vouch-report-form" class="vouch-report-form" novalidate>
+            <label class="field-label" for="report-kind">What happened?</label>
+            <select id="report-kind" class="input" required>
+              <option value="false_vouch">False vouch — they never met me / it is untrue</option>
+              <option value="coerced_vouch">Coerced vouch — pressure or force</option>
+              <option value="statement_abuse">Abusive or defamatory statement</option>
+              <option value="impersonation">Impersonation or fake profile</option>
+              <option value="stolen_qr_or_artifact">Stolen QR or printed artifact</option>
+              <option value="harassment">Harassment</option>
+              <option value="integrator_misuse">Integrator or third-party misuse</option>
+            </select>
+
+            <label class="field-label" for="report-target">Scan URL, profile id, or vouch id</label>
+            <input
+              id="report-target"
+              class="input"
+              type="text"
+              required
+              autocomplete="off"
+              placeholder="https://humanity.llc/c/… or profile / vouch id"
+            />
+            <p class="form-hint">Paste the scan link you were harmed by, or the profile / vouch id.</p>
+
+            <label class="field-label" for="report-statement">What should stewards know?</label>
+            <textarea
+              id="report-statement"
+              class="input"
+              rows="5"
+              maxlength="1000"
+              required
+              placeholder="Brief facts — no private keys or unrelated dossiers."
+            ></textarea>
+
+            <label class="field-label" for="report-contact">Contact (optional)</label>
+            <input
+              id="report-contact"
+              class="input"
+              type="text"
+              maxlength="200"
+              autocomplete="email"
+              placeholder="Email or other way to reach you"
+            />
+            <p class="form-hint">
+              If you leave contact info, you receive a reference code to follow up. Reports are not
+              shown on public scan pages.
+            </p>
+
+            <button type="submit" class="btn-primary" id="report-submit">Submit report</button>
+            <p id="report-status" class="form-status" role="status" aria-live="polite" hidden></p>
+          </form>
+        </section>
+      </main>
+    </div>
+    <script type="module" src="/js/vouch-report.mjs?v=1"></script>
+  </body>
+</html>

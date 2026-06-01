@@ -34,6 +34,16 @@ export async function getCardByProfileId(
     .first<{ card_document_json: string }>();
 }
 
+export async function getCardStatusByProfileId(
+  db: D1Database,
+  profileId: string
+): Promise<{ status: string } | null> {
+  return db
+    .prepare(`SELECT status FROM cards WHERE profile_id = ?`)
+    .bind(profileId)
+    .first<{ status: string }>();
+}
+
 export interface InsertCardParams {
   profileId: string;
   publicKey: string;

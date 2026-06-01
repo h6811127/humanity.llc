@@ -46,6 +46,7 @@
           <h2 class="group-label">Queue controls</h2>
           <div class="operator-audit-toolbar">
             <button type="button" class="btn-secondary" id="audit-refresh">Refresh</button>
+            <button type="button" class="btn-secondary" id="case-refresh">Refresh cases</button>
             <button type="button" class="btn-secondary" id="audit-toggle-reviewed">
               Hide reviewed
             </button>
@@ -54,11 +55,21 @@
         </section>
 
         <section class="group operator-audit-panel">
+          <h2 class="group-label">Cases</h2>
+          <p class="form-hint">
+            Durable operator cases created from audit flags or manual review. Open a case to suspend
+            a subject profile under public rules.
+          </p>
+          <p id="case-status" class="operator-audit-status" role="status" aria-live="polite"></p>
+          <ul id="audit-cases" class="operator-audit-flags" aria-live="polite"></ul>
+        </section>
+
+        <section class="group operator-audit-panel">
           <h2 class="group-label">Flags</h2>
           <ul id="audit-flags" class="operator-audit-flags" aria-live="polite"></ul>
         </section>
       </main>
     </div>
-    <script type="module" src="/js/operator-vouch-audit.mjs?v=3"></script>
+    <script type="module" src="/js/operator-vouch-audit.mjs?v=5"></script>
   </body>
 </html>
