@@ -54,6 +54,7 @@ import {
   handlePostVouchCase,
   handlePostVouchCaseSuspend,
 } from "./resolver/vouch-cases";
+import { handlePostVouchReport } from "./resolver/vouch-reports";
 import { handleGetCreateRateMonitor } from "./resolver/create-monitoring";
 import {
   handleGetMerchFunnelMonitor,
@@ -432,6 +433,17 @@ export default {
         env.OPERATOR_AUDIT_TOKEN,
         decodeURIComponent(vouchCaseSuspendMatch[1] ?? "")
       );
+      return withCors(request, res);
+    }
+
+    if (path === "/.well-known/hc/v1/vouch-reports" && request.method === "POST") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostVouchReport(request, env.DB);
       return withCors(request, res);
     }
 
