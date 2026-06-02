@@ -150,7 +150,9 @@ Run on **production** (or staging with full Pages deploy) after `site/` ships. M
 
 **Lab devices (minimum):** iPhone SE (2nd gen) class · **OnePlus Nord N200 5G class** (4 GB budget Android — see gate doc row) · one Android Go-class phone · one older WebKit device · iPhone 13 / Pixel 6a class for mid reference.
 
-**Recorded results:** [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md) § Lab results.
+**Recorded results:** [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md) § Lab results · **Worksheet:** same doc § Lab capture worksheet.
+
+**Low-end matrix status:** **1/3 complete** (Nord N200). **2/3** iPhone SE class · **3/3** Android Go — pending human sessions on production HTTPS.
 
 **Fail signals:** Hub unusably janky with 10 cards on all three low-end devices; boot > 2× mid median on every low-end device (record numbers — Phase 1 target is ≤50% of this baseline).
 

@@ -1,0 +1,294 @@
+{
+  "schema": "device_shell_baseline_v1",
+  "generated_at": "2026-06-02",
+  "phase": "smooth_mode_phase_0",
+  "asset_version": 82,
+  "module_count": 70,
+  "js_bytes_total": 407498,
+  "shell_css_bytes_total": 68761,
+  "landing_css_bytes_total": 305525,
+  "transfer_bytes_shell_graph": 476259,
+  "transfer_bytes_landing_first_paint": 713023,
+  "js_modules": [
+    {
+      "file": "js/device-status-bootstrap.mjs",
+      "bytes": 782
+    },
+    {
+      "file": "js/device-status-bootstrap-inner.mjs",
+      "bytes": 2348
+    },
+    {
+      "file": "js/device-status-load-error.mjs",
+      "bytes": 7860
+    },
+    {
+      "file": "js/device-status-dot-boot-core.mjs",
+      "bytes": 847
+    },
+    {
+      "file": "js/device-status-dot-boot.mjs",
+      "bytes": 1185
+    },
+    {
+      "file": "js/device-status-dot-view-transition-core.mjs",
+      "bytes": 1575
+    },
+    {
+      "file": "js/build-meta-browser.mjs",
+      "bytes": 6425
+    },
+    {
+      "file": "js/device-resolver-health-boot-core.mjs",
+      "bytes": 464
+    },
+    {
+      "file": "js/device-status-core.mjs",
+      "bytes": 7461
+    },
+    {
+      "file": "js/device-status.mjs",
+      "bytes": 22849
+    },
+    {
+      "file": "js/device-hub-intro-coachmark.mjs",
+      "bytes": 6770
+    },
+    {
+      "file": "js/device-dot-state-core.mjs",
+      "bytes": 16556
+    },
+    {
+      "file": "js/device-ownership-not-in-tab-core.mjs",
+      "bytes": 369
+    },
+    {
+      "file": "js/device-chrome-refresh-core.mjs",
+      "bytes": 3092
+    },
+    {
+      "file": "js/device-chrome-refresh.mjs",
+      "bytes": 7642
+    },
+    {
+      "file": "js/device-live-proof-banner.mjs",
+      "bytes": 2279
+    },
+    {
+      "file": "js/device-shell-boot-core.mjs",
+      "bytes": 1540
+    },
+    {
+      "file": "js/device-hub-boot-core.mjs",
+      "bytes": 1416
+    },
+    {
+      "file": "js/device-shell-boot.mjs",
+      "bytes": 2633
+    },
+    {
+      "file": "js/device-shell-resume-core.mjs",
+      "bytes": 949
+    },
+    {
+      "file": "js/device-shell-resume.mjs",
+      "bytes": 1801
+    },
+    {
+      "file": "js/device-inbox-sheet-loader.mjs",
+      "bytes": 797
+    },
+    {
+      "file": "js/device-hub-sheet-loader.mjs",
+      "bytes": 676
+    },
+    {
+      "file": "js/device-inbox-loader.mjs",
+      "bytes": 2466
+    },
+    {
+      "file": "js/device-browser-notifications-loader.mjs",
+      "bytes": 1364
+    },
+    {
+      "file": "js/device-inbox-sheet.mjs",
+      "bytes": 11641
+    },
+    {
+      "file": "js/device-inbox-sheet-core.mjs",
+      "bytes": 1654
+    },
+    {
+      "file": "js/device-inbox-card-disabled.mjs",
+      "bytes": 1667
+    },
+    {
+      "file": "js/device-inbox-diagnostics.mjs",
+      "bytes": 1313
+    },
+    {
+      "file": "js/device-inbox-diagnostics-core.mjs",
+      "bytes": 1459
+    },
+    {
+      "file": "js/device-inbox-core.mjs",
+      "bytes": 19895
+    },
+    {
+      "file": "js/device-cross-tab-state-core.mjs",
+      "bytes": 4326
+    },
+    {
+      "file": "js/device-cross-tab-boot-core.mjs",
+      "bytes": 1341
+    },
+    {
+      "file": "js/device-cross-tab-state.mjs",
+      "bytes": 4312
+    },
+    {
+      "file": "js/device-legacy-cross-tab-chrome-core.mjs",
+      "bytes": 900
+    },
+    {
+      "file": "js/device-hub-keys-custody-core.mjs",
+      "bytes": 7534
+    },
+    {
+      "file": "js/device-hub-keys-custody.mjs",
+      "bytes": 13380
+    },
+    {
+      "file": "js/device-presence-inbox-stability-core.mjs",
+      "bytes": 1923
+    },
+    {
+      "file": "js/device-quiet-tab-rehydrate-core.mjs",
+      "bytes": 5106
+    },
+    {
+      "file": "js/device-quiet-tab-rehydrate-boot-core.mjs",
+      "bytes": 994
+    },
+    {
+      "file": "js/device-quiet-tab-rehydrate-prefs.mjs",
+      "bytes": 3125
+    },
+    {
+      "file": "js/device-quiet-tab-rehydrate.mjs",
+      "bytes": 6746
+    },
+    {
+      "file": "js/device-quiet-tab-rehydrate-bootstrap.mjs",
+      "bytes": 761
+    },
+    {
+      "file": "js/device-inbox.mjs",
+      "bytes": 4417
+    },
+    {
+      "file": "js/device-tab-presence-core.mjs",
+      "bytes": 7178
+    },
+    {
+      "file": "js/device-tab-presence.mjs",
+      "bytes": 10849
+    },
+    {
+      "file": "js/device-wallet-removed-profiles-core.mjs",
+      "bytes": 1804
+    },
+    {
+      "file": "js/device-wallet-removed-profiles.mjs",
+      "bytes": 1888
+    },
+    {
+      "file": "js/device-wallet-corrupt-core.mjs",
+      "bytes": 1250
+    },
+    {
+      "file": "js/device-pwa-session-mismatch-core.mjs",
+      "bytes": 2099
+    },
+    {
+      "file": "js/device-pwa-session-mismatch.mjs",
+      "bytes": 2225
+    },
+    {
+      "file": "js/wallet-page-chrome.mjs",
+      "bytes": 12200
+    },
+    {
+      "file": "js/device-resolver-sync-core.mjs",
+      "bytes": 7786
+    },
+    {
+      "file": "js/device-resolver-sync.mjs",
+      "bytes": 9781
+    },
+    {
+      "file": "js/device-live-control-poll-leader-core.mjs",
+      "bytes": 2043
+    },
+    {
+      "file": "js/device-live-control-poll-leader.mjs",
+      "bytes": 3178
+    },
+    {
+      "file": "js/device-hub-ui.mjs",
+      "bytes": 89771
+    },
+    {
+      "file": "js/device-hub-build-stamp.mjs",
+      "bytes": 6198
+    },
+    {
+      "file": "js/device-hub-wallet-debug-core.mjs",
+      "bytes": 4249
+    },
+    {
+      "file": "js/device-steward-entitlements.mjs",
+      "bytes": 8657
+    },
+    {
+      "file": "js/device-steward-entitlements-core.mjs",
+      "bytes": 6306
+    },
+    {
+      "file": "js/device-steward-session-core.mjs",
+      "bytes": 3275
+    },
+    {
+      "file": "js/device-steward-quota-core.mjs",
+      "bytes": 1578
+    },
+    {
+      "file": "js/device-steward-push.mjs",
+      "bytes": 6796
+    },
+    {
+      "file": "js/device-steward-push-core.mjs",
+      "bytes": 4017
+    },
+    {
+      "file": "js/device-hub-sheet.mjs",
+      "bytes": 3909
+    },
+    {
+      "file": "js/device-hub-sheet-core.mjs",
+      "bytes": 830
+    },
+    {
+      "file": "js/device-sheet-backdrop-sync.mjs",
+      "bytes": 2083
+    },
+    {
+      "file": "js/device-browser-notifications.mjs",
+      "bytes": 11152
+    },
+    {
+      "file": "js/device-browser-notifications-core.mjs",
+      "bytes": 1756
+    }
+  ]
+}
