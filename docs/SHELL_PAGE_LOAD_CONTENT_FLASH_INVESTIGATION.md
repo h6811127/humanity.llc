@@ -352,11 +352,13 @@ Any step that paints before the next step completes can flash “wrong” data.
 
 **Desk fix (2026-06-02, H2):** Extend wallet **prepareShellHubBootReveal** to landing `/` — pre-render hub innerHTML while sheet collapsed before `data-boot=ready`, so first dot tap does not trigger a cold `renderSavedRows` + inbox rebuild during sheet animation. Shell **v83** · `device-chrome-refresh.mjs` + `device-hub-ui.mjs`.
 
+**Test hook (2026-06-02):** Predicate extracted to `shouldPrepareShellHubBootReveal` in `site/js/device-hub-boot-core.mjs` · covered by `worker/tests/device-hub-boot.test.ts` (RC-18 describe block). No shell asset bump — no new status-graph modules.
+
 **Verify on Nord:** cold S1 after deploy — still required to close RC-18.
 
 **Trigger:** [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md) lab matrix **3/3** (2026-06-02). **OnePlus Nord N200 5G** (4 GB RAM, Android 12, Chrome on production) is the **only** low-end device where **S1 cold first hub open** is subjectively **jumpy**. iPhone SE class and Android Go / 3 GB budget **pass cold S1–S3**. Nord **warm** reopen, 7-card scroll, PWA standalone, and `/created/` Live all **pass**.
 
-**Symptom (lab language):** After cold load `/` with cleared site data, user taps status dot → hub sheet opens with visible layout/content churn before settling. Not a steady-state scroll or signing regression. Desk Playwright proxy reports `boot-ready-ms=623` on fast hardware — **does not reproduce** this device class.
+**Symptom (lab language):** After cold load `/` with cleared site data, user taps status dot → hub sheet opens with visible layout/content churn before settling. Not a steady-state scroll or signing regression. Desk Playwright proxy (2026-06-02): `boot-ready-ms≈618`, `hub-open-ms≈72` on fast Chromium — **does not reproduce** Nord-class jank.
 
 **Why RC-7 did not close this:** RC-7 defers hub `innerHTML` rebuild until `data-boot=ready`. Nord pain persists on **first** hub open after cold boot, which suggests one or more of:
 

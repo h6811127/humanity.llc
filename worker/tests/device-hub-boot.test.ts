@@ -3,8 +3,10 @@ import { describe, expect, it } from "vitest";
 import {
   hubPersonalizedRenderDeferred,
   hubSavedListRenderDeferred,
+  isShellHubBootRevealPath,
   shouldDeferHubPersonalizedRenderUntilShellBoot,
   shouldDeferHubSavedListRenderUntilShellBoot,
+  shouldPrepareShellHubBootReveal,
 } from "../../site/js/device-hub-boot-core.mjs";
 import {
   DEVICE_BOOT_LOCAL,
@@ -46,5 +48,40 @@ describe("hub render deferred helpers", () => {
     doc.body.dataset.boot = DEVICE_BOOT_READY;
     expect(hubPersonalizedRenderDeferred(/** @type {Document} */ (doc))).toBe(false);
     expect(hubSavedListRenderDeferred(/** @type {Document} */ (doc))).toBe(false);
+  });
+});
+
+describe("RC-18 shell hub boot reveal", () => {
+  it("includes landing and wallet paths", () => {
+    expect(isShellHubBootRevealPath("/")).toBe(true);
+    expect(isShellHubBootRevealPath("/wallet/")).toBe(true);
+    expect(isShellHubBootRevealPath("/created/")).toBe(false);
+  });
+
+  it("prepares only when hub exists, health settled, boot not ready", () => {
+    expect(
+      shouldPrepareShellHubBootReveal({
+        pathname: "/",
+        hasDeviceHub: true,
+        bootBefore: DEVICE_BOOT_PENDING,
+        healthSettled: true,
+      })
+    ).toBe(true);
+    expect(
+      shouldPrepareShellHubBootReveal({
+        pathname: "/",
+        hasDeviceHub: false,
+        bootBefore: DEVICE_BOOT_PENDING,
+        healthSettled: true,
+      })
+    ).toBe(false);
+    expect(
+      shouldPrepareShellHubBootReveal({
+        pathname: "/",
+        hasDeviceHub: true,
+        bootBefore: DEVICE_BOOT_READY,
+        healthSettled: true,
+      })
+    ).toBe(false);
   });
 });

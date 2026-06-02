@@ -28,7 +28,8 @@
 |----|--------|--------|------------------|
 | **#107** | `cursor/ownership-restore-phase3-ab8a` / `pr-107-merge` | **Merged** to `main` | `/created/` view Live readonly, Protect setup memory chip, P1-RESTORE QA |
 | **#108** | `cursor/cloud-agent-1780082490008-1q2uv` | Merged — P0-6/P0-7 + PWA | Consolidated onto `main` |
-| **main** | `main` | Safari steps 1–21 shipped | Source of truth |
+| **#109** | `cursor/city-game-local-dev` (local WIP) | **In progress** — uncommitted on disk | `city-game:dev`, `local-env`, `comprehension-kit`, `launch-preflight` · **do not duplicate** |
+| **main** | `main` | Safari steps 1–21 shipped · RC-18 v83 | Source of truth |
 
 Update this table when new PRs open.
 
@@ -43,7 +44,8 @@ Update this table when new PRs open.
 | H-12 human § A–C | ~~Printed QR camera QA on ≥3 phones~~ **Passed 2026-05-30** | Human QA | Sign-off: `live-control:printed-qa:sign-off -- --pass --apply` |
 | P3-1 / P3-2 | WebAuthn / optional encrypted persistence | Architecture | Not scheduled |
 | **Smooth mode Phase 0–1** | UX + quiet defaults on same bootstrap | **Phase 0 complete 3/3** · Phase 1 **deferred** — **RC-18** Nord cold hub | [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md) · [`SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md`](SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md) § RC-18 |
-| **RC-18 boot graph** | Nord cold first hub open (Smooth Phase 0 outlier) | **Scoped** — repro + Performance trace pending | § RC-18 in shell flash doc · do not start Phase 1 / `device-shell-tier.mjs` until triage |
+| **RC-18 boot graph** | Nord cold first hub open (Smooth Phase 0 outlier) | **Desk fix shipped v83** · Nord S1 re-verify after deploy | § RC-18 · `device-smooth:phase0 -- --e2e` |
+| **Pages deploy** | Production updates blocked | Ops | Fix `CLOUDFLARE_API_TOKEN` (Pages Edit) on Deploy Pages workflow |
 | **S3** | In-app hub QR scanner (PWA vouch from print) | **Shipped** · desk ☑ 2026-06-02 | [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) · **P1-PWA-V** prod WebKit pending |
 
 ---
@@ -92,6 +94,8 @@ npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts
 
 | Date | Event |
 |------|--------|
+| 2026-06-02 | **Parallel WIP** — city-game local dev bundle (`city-game:dev`, comprehension kit, launch preflight) in flight on separate agent — do not duplicate |
+| 2026-06-02 | **RC-18 test hook** — `shouldPrepareShellHubBootReveal` in hub-boot-core; Nord verify still pending |
 | 2026-06-02 | **City game E1 local proof** — `city-game:proof-local` full spine pass; fragment idempotent fix + spine reset in proof gate |
 | 2026-06-02 | **RC-18 landing hub pre-render** — `prepareShellHubBootReveal` on `/` before boot ready; shell v83 · Nord verify pending |
 | 2026-06-02 | **City game Phase E** — self-serve game network setup on `/created/` (post-pilot); terminal mint pilot-only · [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) § Phase E |
