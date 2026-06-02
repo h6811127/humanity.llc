@@ -22,6 +22,7 @@
     "node_01": { "code": "CR-RELAY-1N", "epoch": "cr_season_01_wake" },
     "node_04": { "code": "CR-LANTERN-7K", "epoch": "cr_season_01_wake" },
     "node_09": { "code": "CR-MURAL-2F", "epoch": "cr_season_01_wake" },
+    "node_10": { "code": "CR-WITNS-4P", "epoch": "cr_season_01_wake" },
     "node_11": { "code": "CR-MARK-9P", "epoch": "cr_season_01_wake" }
   },
   "automation": {

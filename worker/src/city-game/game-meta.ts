@@ -13,6 +13,7 @@ export type GameMeta = {
   collective_target: number | null;
   unlocked_by: string[];
   vouch_requires: string[];
+  vouch_active_for: string[];
   scarcity_remaining: number | null;
   fragment_id: string | null;
 };
@@ -97,6 +98,7 @@ export function normalizeGameMeta(raw: unknown): GameMeta {
       collective_target: null,
       unlocked_by: [],
       vouch_requires: [],
+      vouch_active_for: [],
       scarcity_remaining: null,
       fragment_id: null,
     };
@@ -116,6 +118,7 @@ export function normalizeGameMeta(raw: unknown): GameMeta {
     collective_target: readOptionalInt(obj, "collective_target", 1, 1_000_000),
     unlocked_by: readStringArray(obj, "unlocked_by", 8),
     vouch_requires: readStringArray(obj, "vouch_requires", 8),
+    vouch_active_for: readStringArray(obj, "vouch_active_for", 8),
     scarcity_remaining: readOptionalInt(obj, "scarcity_remaining", 0, 10_000),
     fragment_id: readOptionalString(obj, "fragment_id", 40),
   };

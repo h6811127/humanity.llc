@@ -10,22 +10,24 @@
 | Window | Operator | Focus |
 |--------|----------|-------|
 | Fri 17:00–22:00 | Primary | Open relays · River Lantern seed · bulletin rotation |
-| Sat 10:00–14:00 | Primary | Collective quorum checks · fragment flips |
+| Sat 10:00–14:00 | Primary | Monitor spine scan copy · safety / care checks only |
 | Sat 14:00–22:00 | Backup | Compromise/rekey drill coverage · sanctuary checks |
-| Sun 10:00–18:00 | Primary | Finale lattice · cabinet dilemma beat |
+| Sun 10:00–18:00 | Primary | Monitor fragment + finale copy · cabinet dilemma beat (narrative) |
 | Sun 18:00–22:00 | Backup | Wind-down · post-season pause prep |
 
 ---
 
-## Bulletin rotation (manual v1)
+## Bulletin rotation (operator-only beats)
+
+**Autonomous spine (no scheduled flip):** River Lantern quorum, witness passes, fragment lattice, and finale open via player site-code contribute — see [`CITY_GAME_AUTONOMOUS_V1.md`](CITY_GAME_AUTONOMOUS_V1.md).
 
 | Time (local) | Nodes to touch | Action |
 |--------------|----------------|--------|
 | Fri open | node_01, node_15 | Open relays · season open copy |
-| Sat noon | node_04 | Check collective progress · quorum flip if verified physically |
+| Sat noon | node_04 | **Monitor only** — quorum unlocks when players contribute at site |
 | Sat evening | node_05 | Optional compromise drill → rekey |
-| Sun morning | node_09, node_11 | Confirm fragments live |
-| Sun afternoon | node_13 | Finale flip when 3/3 met |
+| Sun morning | node_09, node_11, node_01 | **Monitor only** — fragments register via contribute |
+| Sun afternoon | node_13 | **Monitor only** — finale opens when lattice complete |
 | Sun close | all gates | Optional pause or living-infra copy |
 
 Flips via [`/game-operator/`](../site/game-operator/index.html) — document **world state**, not player rewards.

@@ -29,7 +29,7 @@ const SPOT_NODES = new Set(["node_01", "node_04", "node_07"]);
 
 const SPOT_EXPECTATIONS = {
   node_01: { requireCoopHint: true },
-  node_04: { requireCoopHint: true },
+  node_04: { requireCoopHint: true, requireContributeBlock: true },
   node_07: { requireCoopHint: true },
 };
 
@@ -94,6 +94,7 @@ async function main() {
       nodeId: node.node_id,
       label: node.public_label,
       requireCoopHint: expect.requireCoopHint ?? false,
+      requireContributeBlock: expect.requireContributeBlock ?? false,
     });
 
     if (!result.ok) {
@@ -113,8 +114,9 @@ async function main() {
   }
 
   console.log("\n✅ Local scan smoke passed.");
-  console.log("\nNext (manual):");
-  console.log("  • /game-operator/ — load nodes, try a bulletin flip on node_04");
+  console.log("\nNext:");
+  console.log("  • npm run city-game:smoke-contribute-local — autonomous quorum → cabinet");
+  console.log("  • npm run city-game:smoke-contribute-local -- --spine — full fragment → finale");
   console.log("  • docs/CITY_GAME_INSTALL_QA.md — physical install when stickers ready");
   console.log("  • docs/CITY_GAME_COMPREHENSION_RUNBOOK.md — ≥5 testers before launch");
 }

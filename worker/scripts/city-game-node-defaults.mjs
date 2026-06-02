@@ -105,6 +105,7 @@ const EMPTY_GAME_META = {
   collective_target: null,
   unlocked_by: [],
   vouch_requires: [],
+  vouch_active_for: [],
   scarcity_remaining: null,
   fragment_id: null,
 };

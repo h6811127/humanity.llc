@@ -37,7 +37,7 @@
 
 ## Privacy / tracking concern
 
-> The reference operator does not store per-scan trails or heatmaps for gameplay. See [data policy](/data-policy.html) and the Cedar Rapids rules page. Collective unlocks in v1 are **operator-verified quorum flips**, not hidden scan counts.
+> The reference operator does not store per-scan trails or heatmaps for gameplay. See [data policy](/data-policy.html) and the Cedar Rapids rules page. Collective unlocks use **voluntary site-code contribute** — a public count on the object, not hidden scan logs or operator quorum flips.
 
 ---
 

@@ -4,10 +4,12 @@ import {
   seasonFragmentNodeIds,
   seasonObjectIdForNode,
   seasonUnlockEdgesFrom,
+  seasonVouchTargetsFrom,
+  seasonWitnessScarcityNodeId,
   type SeasonUnlockEdge,
 } from "./season-config";
 
-export type GameContributeMode = "quorum" | "fragment";
+export type GameContributeMode = "quorum" | "fragment" | "scarcity";
 
 export type GameNodeDocumentPatch = {
   objectId: string;
@@ -125,11 +127,84 @@ export function gameNodeContributeMode(
   if (nodeId && seasonFragmentNodeIds().includes(nodeId)) {
     return meta.unlocked_by.includes(nodeId) ? null : "fragment";
   }
+  if (
+    nodeId === seasonWitnessScarcityNodeId() &&
+    meta.scarcity_remaining != null &&
+    meta.scarcity_remaining > 0
+  ) {
+    return "scarcity";
+  }
   if (nodeRole === "temp_drop" && meta.collective_target != null) {
     const progress = meta.collective_progress ?? 0;
     return progress < meta.collective_target ? "quorum" : null;
   }
   return null;
+}
+
+export function isWitnessScarcityDepleted(meta: GameMeta, nodeRole: string): boolean {
+  return nodeRole === "witness" && meta.scarcity_remaining === 0;
+}
+
+export function issueWitnessSunsetPass(
+  doc: Record<string, unknown>,
+  witnessNodeId: string
+): { doc: Record<string, unknown>; meta: GameMeta; depleted: boolean } {
+  const meta = normalizeGameMeta(doc.game_meta);
+  if (meta.scarcity_remaining == null || meta.scarcity_remaining <= 0) {
+    throw new Error("scarcity_remaining must be positive to issue a pass.");
+  }
+
+  const nextRemaining = meta.scarcity_remaining - 1;
+  const vouchTargets = seasonVouchTargetsFrom(witnessNodeId);
+  const vouchActiveFor = [...meta.vouch_active_for];
+  for (const target of vouchTargets) {
+    if (!vouchActiveFor.includes(target)) {
+      vouchActiveFor.push(target);
+    }
+  }
+
+  const nextMeta: GameMeta = {
+    ...meta,
+    scarcity_remaining: nextRemaining,
+    vouch_active_for: vouchActiveFor,
+  };
+  const depleted = nextRemaining <= 0;
+
+  const passesLabel = depleted
+    ? "Closed for the night"
+    : `${nextRemaining} sunset pass${nextRemaining === 1 ? "" : "es"} remain`;
+
+  const streams = Array.isArray(doc.object_streams)
+    ? (doc.object_streams as Record<string, unknown>[]).map((row) => {
+        if (row.id === "relay" || row.label === "Passes") {
+          return { ...row, value: passesLabel };
+        }
+        if (row.id === "bulletin" || row.label === "Vouch") {
+          return {
+            ...row,
+            value: vouchTargets.length
+              ? `Vouch live for ${vouchTargets.join(", ")}`
+              : row.value,
+          };
+        }
+        return row;
+      })
+    : doc.object_streams;
+
+  const publicState = depleted
+    ? "Witness seal closed for the night — sunset passes exhausted"
+    : "Sunset pass issued — witness vouch live on the cabinet path";
+
+  return {
+    doc: {
+      ...doc,
+      public_state: publicState,
+      game_meta: nextMeta,
+      object_streams: streams,
+    },
+    meta: nextMeta,
+    depleted,
+  };
 }
 
 export function gameNodeShowsContribute(

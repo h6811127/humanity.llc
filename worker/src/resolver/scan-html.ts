@@ -25,10 +25,15 @@ import {
   GAME_FRAGMENT_CONTRIBUTE_EYEBROW,
   GAME_FRAGMENT_CONTRIBUTE_LEAD,
   GAME_FRAGMENT_CONTRIBUTE_SUBMIT_LABEL,
+  GAME_SCARCITY_CONTRIBUTE_EYEBROW,
+  GAME_SCARCITY_CONTRIBUTE_LEAD,
+  GAME_SCARCITY_CONTRIBUTE_PROGRESS_LABEL,
+  GAME_SCARCITY_CONTRIBUTE_SUBMIT_LABEL,
   GAME_NODE_SCAN_FOOT,
   GAME_NODE_SCAN_PRIVACY_NOTE,
   type GameNodeScanContext,
 } from "../city-game/scan-view";
+import { seasonWindowChip, seasonWindowScanNote } from "../city-game/season-window";
 import {
   credentialCodeFromScanUrl,
   deriveCredentialCodeSync,
@@ -428,11 +433,13 @@ function renderLostItemCreateHint(origin: string): string {
 function renderGameNodeMetaChips(gameNode: GameNodeScanContext): string {
   const chips: string[] = [];
   const meta = gameNode.gameMeta;
+  const windowChip = seasonWindowChip(gameNode.seasonWindowPhase);
+  if (windowChip) chips.push(windowChip);
 
   if (gameNode.mode === "care_pause") {
     chips.push("Maintenance pause — care stream wins");
   }
-  if (gameNode.mode === "dormant") {
+  if (gameNode.mode === "dormant" && !windowChip) {
     chips.push("Object dormant — window ended");
   }
   if (meta.compromised) {
@@ -452,7 +459,17 @@ function renderGameNodeMetaChips(gameNode: GameNodeScanContext): string {
   if (meta.unlocked_by.length) {
     chips.push(`Unlocked by ${meta.unlocked_by.join(", ")}`);
   }
-  if (meta.vouch_requires.length) {
+  if (gameNode.vouchGate) {
+    if (gameNode.vouchGate.met) {
+      chips.push(
+        `Witness vouch live · ${gameNode.vouchGate.satisfied.join(", ")}`
+      );
+    } else if (gameNode.vouchGate.pending.length) {
+      chips.push(
+        `Vouch pending from ${gameNode.vouchGate.pending.join(", ")}`
+      );
+    }
+  } else if (meta.vouch_requires.length) {
     chips.push(`Vouch required from ${meta.vouch_requires.join(", ")}`);
   }
   if (!chips.length) return "";
@@ -481,24 +498,50 @@ function renderGameContributeBlock(vm: ScanViewModel): string {
   const progress = meta.collective_progress ?? 0;
   const target = meta.collective_target ?? 0;
   const isFragment = gameNode.contributeMode === "fragment";
-  const eyebrow = isFragment ? GAME_FRAGMENT_CONTRIBUTE_EYEBROW : GAME_CONTRIBUTE_EYEBROW;
-  const lead = isFragment ? GAME_FRAGMENT_CONTRIBUTE_LEAD : GAME_CONTRIBUTE_LEAD;
-  const submitLabel = isFragment
-    ? GAME_FRAGMENT_CONTRIBUTE_SUBMIT_LABEL
-    : GAME_CONTRIBUTE_SUBMIT_LABEL;
+  const isScarcity = gameNode.contributeMode === "scarcity";
+  const eyebrow = isScarcity
+    ? GAME_SCARCITY_CONTRIBUTE_EYEBROW
+    : isFragment
+      ? GAME_FRAGMENT_CONTRIBUTE_EYEBROW
+      : GAME_CONTRIBUTE_EYEBROW;
+  const lead = isScarcity
+    ? GAME_SCARCITY_CONTRIBUTE_LEAD
+    : isFragment
+      ? GAME_FRAGMENT_CONTRIBUTE_LEAD
+      : GAME_CONTRIBUTE_LEAD;
+  const submitLabel = isScarcity
+    ? GAME_SCARCITY_CONTRIBUTE_SUBMIT_LABEL
+    : isFragment
+      ? GAME_FRAGMENT_CONTRIBUTE_SUBMIT_LABEL
+      : GAME_CONTRIBUTE_SUBMIT_LABEL;
   const progressBlock = isFragment
     ? ""
-    : `<p class="scan-game-contribute-progress">
+    : isScarcity
+      ? `<p class="scan-game-contribute-progress">
+    <span class="scan-game-contribute-progress-label">${escapeHtml(GAME_SCARCITY_CONTRIBUTE_PROGRESS_LABEL)}</span>
+    <span class="scan-game-contribute-progress-value" id="scan-game-contribute-progress">${escapeHtml(String(meta.scarcity_remaining ?? 0))}</span>
+  </p>`
+      : `<p class="scan-game-contribute-progress">
     <span class="scan-game-contribute-progress-label">${escapeHtml(GAME_CONTRIBUTE_PROGRESS_LABEL)}</span>
     <span class="scan-game-contribute-progress-value" id="scan-game-contribute-progress">${escapeHtml(String(progress))} / ${escapeHtml(String(target))}</span>
   </p>`;
+  const sectionClass = isScarcity
+    ? " scan-game-contribute--scarcity"
+    : isFragment
+      ? " scan-game-contribute--fragment"
+      : "";
+  const placeholder = isScarcity
+    ? "CR-WITNS-4P"
+    : isFragment
+      ? "CR-MURAL-2F"
+      : "CR-LANTERN-7K";
 
-  return `<section class="scan-game-contribute${isFragment ? " scan-game-contribute--fragment" : ""}" id="scan-game-contribute" aria-labelledby="scan-game-contribute-label">
+  return `<section class="scan-game-contribute${sectionClass}" id="scan-game-contribute" aria-labelledby="scan-game-contribute-label">
   <p class="scan-game-contribute-eyebrow">${escapeHtml(eyebrow)}</p>
   <p class="scan-game-contribute-lead" id="scan-game-contribute-label">${escapeHtml(lead)}</p>
   ${progressBlock}
   <label class="scan-game-contribute-field-label" for="scan-game-contribute-code">${escapeHtml(GAME_CONTRIBUTE_SITE_CODE_LABEL)}</label>
-  <input class="scan-game-contribute-input" id="scan-game-contribute-code" name="site_code" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="32" placeholder="${escapeHtml(isFragment ? "CR-MURAL-2F" : "CR-LANTERN-7K")}" />
+  <input class="scan-game-contribute-input" id="scan-game-contribute-code" name="site_code" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="32" placeholder="${escapeHtml(placeholder)}" />
   <button type="button" class="scan-game-contribute-cta" id="scan-game-contribute-submit">${escapeHtml(submitLabel)}</button>
   <div class="scan-game-contribute-status-panel" id="scan-game-contribute-status-panel" hidden>
     <p class="scan-game-contribute-status" id="scan-game-contribute-status" aria-live="polite"></p>
@@ -523,12 +566,20 @@ function buildGameNodeScanHero(vm: ScanViewModel): { main: string; foot: string 
   const coopHint = gameNode.coopHint
     ? `<p class="scan-game-coop-hint" role="note">${escapeHtml(gameNode.coopHint)}</p>`
     : "";
+  const seasonWindowNote =
+    gameNode.mode === "dormant"
+      ? seasonWindowScanNote(gameNode.seasonWindowPhase)
+      : null;
   const mutedGameCopy =
     gameNode.mode === "care_pause"
       ? `<p class="scan-game-care-note" role="note">Game bulletins are muted while maintenance is live on the care stream.</p>`
+      : seasonWindowNote
+        ? `<p class="scan-game-dormant-note" role="note">${escapeHtml(seasonWindowNote)}</p>`
       : gameNode.mode === "dormant"
         ? `<p class="scan-game-dormant-note" role="note">This temporary object is dormant. The QR still resolves — public state only.</p>`
-        : "";
+        : gameNode.vouchGate && !gameNode.vouchGate.met
+          ? `<p class="scan-game-vouch-note" role="note">Trust path still waiting on ${escapeHtml(gameNode.vouchGate.pending.join(", "))} — cooperation with nearby places opens the deeper route.</p>`
+          : "";
 
   return {
     main: `<p class="scan-hero-eyebrow">${escapeHtml(gameNode.roleEyebrow)}</p>

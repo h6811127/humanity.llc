@@ -6,6 +6,7 @@ import {
   fragmentLatticeProgress,
   gameNodeContributeMode,
   gameNodeShowsContribute,
+  issueWitnessSunsetPass,
   markFragmentNodeClaimed,
   openFinaleSwitch,
   patchesForFragmentContribute,
@@ -98,6 +99,45 @@ describe("unlock-engine", () => {
         "lore_archive"
       )
     ).toBe(null);
+  });
+
+  it("shows scarcity contribute while sunset passes remain", () => {
+    expect(
+      gameNodeContributeMode(
+        "node_10",
+        { scarcity_remaining: 11 } as never,
+        "witness"
+      )
+    ).toBe("scarcity");
+    expect(
+      gameNodeContributeMode(
+        "node_10",
+        { scarcity_remaining: 0 } as never,
+        "witness"
+      )
+    ).toBe(null);
+  });
+
+  it("issues sunset pass and activates witness vouch targets", () => {
+    const out = issueWitnessSunsetPass(
+      {
+        public_state: "Witness seal open",
+        game_meta: { scarcity_remaining: 2, vouch_active_for: [] },
+        object_streams: [
+          { id: "relay", label: "Passes", value: "2 sunset passes remain" },
+          { id: "bulletin", label: "Vouch", value: "Issues trust for cabinet path" },
+        ],
+      },
+      "node_10"
+    );
+    expect(out.meta.scarcity_remaining).toBe(1);
+    expect(out.meta.vouch_active_for).toContain("node_07");
+    expect(out.depleted).toBe(false);
+
+    const depleted = issueWitnessSunsetPass(out.doc, "node_10");
+    expect(depleted.meta.scarcity_remaining).toBe(0);
+    expect(depleted.depleted).toBe(true);
+    expect(depleted.doc.public_state).toContain("closed for the night");
   });
 
   it("records fragments on finale and opens when lattice complete", () => {

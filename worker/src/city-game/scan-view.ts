@@ -1,8 +1,14 @@
 import type { GameMeta } from "./game-meta";
 import { gameMetaFromChildDocumentJson, normalizeGameMeta } from "./game-meta";
 import { GAME_NODE_OBJECT_TYPE, isCityGameEnabled } from "./constants";
-import { gameNodeContributeMode, type GameContributeMode } from "./unlock-engine";
-import { seasonNodeIdForObject } from "./season-config";
+import { gameNodeContributeMode, isWitnessScarcityDepleted, type GameContributeMode } from "./unlock-engine";
+import { seasonNodeIdForObject, type CrSeasonConfig } from "./season-config";
+import {
+  isSeasonPlayOpen,
+  resolveSeasonWindowPhase,
+  type SeasonWindowPhase,
+} from "./season-window";
+import { resolveGameVouchGate, type GameVouchGate } from "./vouch-graph";
 import type { ObjectPublicStream } from "../validation/object-streams";
 import { parseObjectStreamsFromDocument } from "../validation/object-streams";
 
@@ -20,6 +26,9 @@ export type GameNodeScanContext = {
   /** Voluntary site-code quorum block on scan (temp_drop collective nodes). */
   showsContribute: boolean;
   contributeMode: GameContributeMode | null;
+  /** Read-only vouch graph for nodes with `vouch_requires`. */
+  vouchGate: GameVouchGate | null;
+  seasonWindowPhase: SeasonWindowPhase;
 };
 
 const CARE_PAUSE_RE = /pause|closed|maintenance|flood|blocked|out of service/i;
@@ -62,6 +71,12 @@ export const GAME_FRAGMENT_CONTRIBUTE_EYEBROW = "District fragment";
 export const GAME_FRAGMENT_CONTRIBUTE_LEAD =
   "Register this fragment on the public lattice. Enter the site code from the sticker or backing card — not from this URL alone.";
 export const GAME_FRAGMENT_CONTRIBUTE_SUBMIT_LABEL = "Mark fragment";
+
+export const GAME_SCARCITY_CONTRIBUTE_EYEBROW = "Sunset pass";
+export const GAME_SCARCITY_CONTRIBUTE_LEAD =
+  "Claim a sunset pass from the witness seal. Enter the site code from the sticker or backing card — not from this URL alone.";
+export const GAME_SCARCITY_CONTRIBUTE_SUBMIT_LABEL = "Claim sunset pass";
+export const GAME_SCARCITY_CONTRIBUTE_PROGRESS_LABEL = "Passes remaining";
 
 export const GAME_NODE_FORBIDDEN_COPY = [
   "leaderboard",
@@ -163,6 +178,8 @@ export function resolveGameNodeScanContext(input: {
   documentJson: string | null | undefined;
   objectStreams: ObjectPublicStream[];
   env: { CITY_GAME_ENABLED?: string };
+  vouchWitnesses?: Record<string, GameMeta>;
+  seasonForWindow?: Pick<CrSeasonConfig, "window" | "status">;
   now?: Date;
 }): GameNodeScanContext | null {
   if (input.objectType !== GAME_NODE_OBJECT_TYPE) return null;
@@ -171,6 +188,10 @@ export function resolveGameNodeScanContext(input: {
 
   const enabled = isCityGameEnabled(input.env);
   const now = input.now ?? new Date();
+  const seasonWindowPhase = resolveSeasonWindowPhase(
+    now,
+    input.seasonForWindow
+  );
   const streams = fields.objectStreams.length ? fields.objectStreams : input.objectStreams;
 
   const base = {
@@ -180,16 +201,28 @@ export function resolveGameNodeScanContext(input: {
     gameMeta: fields.gameMeta,
     showsContribute: false,
     contributeMode: null as GameContributeMode | null,
+    vouchGate: null as GameVouchGate | null,
+    seasonWindowPhase,
   };
 
   const nodeId =
     input.objectId != null ? seasonNodeIdForObject(input.objectId) : null;
   const contributeMode = gameNodeContributeMode(nodeId, fields.gameMeta, fields.nodeRole);
   const showsContribute = contributeMode != null;
+  const vouchGate = resolveGameVouchGate(
+    nodeId,
+    fields.gameMeta,
+    input.vouchWitnesses ?? {}
+  );
+
+  const withVouchGate = {
+    ...base,
+    vouchGate,
+  };
 
   if (!enabled) {
     return {
-      ...base,
+      ...withVouchGate,
       enabled: false,
       mode: "fallback",
       coopHint: null,
@@ -199,7 +232,7 @@ export function resolveGameNodeScanContext(input: {
 
   if (isCareStreamPaused(streams)) {
     return {
-      ...base,
+      ...withVouchGate,
       enabled: true,
       mode: "care_pause",
       coopHint: gameNodeCoopHint(fields.nodeRole, fields.gameMeta),
@@ -207,9 +240,29 @@ export function resolveGameNodeScanContext(input: {
     };
   }
 
+  if (!isSeasonPlayOpen(seasonWindowPhase)) {
+    return {
+      ...withVouchGate,
+      enabled: true,
+      mode: "dormant",
+      coopHint: null,
+      roleEyebrow: gameNodeRoleEyebrow(fields.nodeRole, fields.district),
+    };
+  }
+
   if (isGameNodeExpired(fields.gameMeta, now)) {
     return {
-      ...base,
+      ...withVouchGate,
+      enabled: true,
+      mode: "dormant",
+      coopHint: null,
+      roleEyebrow: gameNodeRoleEyebrow(fields.nodeRole, fields.district),
+    };
+  }
+
+  if (isWitnessScarcityDepleted(fields.gameMeta, fields.nodeRole)) {
+    return {
+      ...withVouchGate,
       enabled: true,
       mode: "dormant",
       coopHint: null,
@@ -218,7 +271,7 @@ export function resolveGameNodeScanContext(input: {
   }
 
   return {
-    ...base,
+    ...withVouchGate,
     enabled: true,
     mode: "game",
     coopHint: gameNodeCoopHint(fields.nodeRole, fields.gameMeta),

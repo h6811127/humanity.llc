@@ -25,6 +25,7 @@ describe("city-game-smoke-local-core", () => {
     const html = `<main>
       <h1 class="scan-hero-title">Riverwalk River Lantern</h1>
       <ul class="scan-game-chips"><li class="scan-game-chip">Collective 4/20</li></ul>
+      <section class="scan-game-contribute" id="scan-game-contribute"></section>
       <p class="scan-game-coop-hint" role="note">Share the seed clue outward</p>
       <p class="scan-hero-foot">${GAME_NODE_SCAN_FOOT}</p>
     </main>`;
@@ -33,6 +34,7 @@ describe("city-game-smoke-local-core", () => {
         nodeId: "node_04",
         label: "Riverwalk River Lantern",
         requireCoopHint: true,
+        requireContributeBlock: true,
       })
     ).toEqual({ ok: true });
   });

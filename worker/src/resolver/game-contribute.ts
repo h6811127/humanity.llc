@@ -3,6 +3,11 @@ import { isCareStreamPaused } from "../city-game/scan-view";
 import { validateGameNodeDocument, normalizeGameMeta } from "../city-game/game-meta";
 import { GAME_NODE_OBJECT_TYPE, isCityGameEnabled } from "../city-game/constants";
 import {
+  isSeasonPlayOpen,
+  resolveSeasonWindowPhase,
+  seasonWindowContributeMessage,
+} from "../city-game/season-window";
+import {
   CR_SEASON_01,
   normalizeSiteCode,
   seasonContributeCode,
@@ -16,12 +21,14 @@ import {
   bumpCollectiveProgress,
   fragmentLatticeProgress,
   gameNodeContributeMode,
+  issueWitnessSunsetPass,
   markFragmentNodeClaimed,
   openFinaleSwitch,
   patchesForFragmentContribute,
   patchesForQuorumUnlock,
   recordFragmentOnFinale,
 } from "../city-game/unlock-engine";
+import { seasonVouchTargetsFrom } from "../city-game/season-config";
 import { getChildObject, updateChildObject } from "../db/child-objects";
 import {
   gameContributeObjectDailyCapReached,
@@ -81,6 +88,16 @@ export async function handlePostGameContribute(
 ): Promise<Response> {
   if (!isCityGameEnabled(env)) {
     return errorResponse("NOT_AVAILABLE", "City game endpoints are not enabled.", 404);
+  }
+
+  const now = new Date();
+  const windowPhase = resolveSeasonWindowPhase(now);
+  if (!isSeasonPlayOpen(windowPhase)) {
+    return errorResponse(
+      "SEASON_CLOSED",
+      seasonWindowContributeMessage(windowPhase),
+      409
+    );
   }
 
   if (!PROFILE_ID_REGEX.test(pathProfileId)) {
@@ -185,7 +202,7 @@ export async function handlePostGameContribute(
         { "Cache-Control": "no-store" }
       );
     }
-  } else if (meta.unlocked_by.includes(nodeId)) {
+  } else if (contributeMode === "fragment" && meta.unlocked_by.includes(nodeId)) {
     const finaleObjectId = seasonObjectIdForNode(seasonFinaleNodeId());
     let lattice = { claimed: 0, required: seasonFragmentNodeIds().length, complete: false };
     if (finaleObjectId) {
@@ -211,7 +228,6 @@ export async function handlePostGameContribute(
     );
   }
 
-  const now = new Date();
   const bucketDate = utcDateKey(now);
 
   const ipHash = await hashIp(clientIp(request));
@@ -285,6 +301,34 @@ export async function handlePostGameContribute(
         collective_target: target,
         quorum_complete: bumped.reachedTarget,
         unlocked_nodes: unlockedNodes,
+      },
+      200,
+      { "Cache-Control": "no-store" }
+    );
+  }
+
+  if (contributeMode === "scarcity") {
+    const issued = issueWitnessSunsetPass(doc, nodeId);
+    doc = issued.doc;
+    const updatedAt = now.toISOString();
+
+    await persistGameNodeDocument(
+      db,
+      existing,
+      doc,
+      typeof doc.public_state === "string" ? doc.public_state : existing.public_state,
+      updatedAt
+    );
+
+    return jsonResponse(
+      {
+        object_id: pathObjectId,
+        node_id: nodeId,
+        contribute_mode: "scarcity",
+        pass_issued: true,
+        scarcity_remaining: issued.meta.scarcity_remaining,
+        witness_depleted: issued.depleted,
+        vouch_targets: seasonVouchTargetsFrom(nodeId),
       },
       200,
       { "Cache-Control": "no-store" }

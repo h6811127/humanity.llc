@@ -229,15 +229,15 @@ Optional TTL purge post-season. **No** row per contribution event if policy requ
 | # | Task | Tests |
 |---|------|-------|
 | 1 | Policy amendment: count-only quorum + site codes | Doc review |
-| 2 | `game-contribute` handler + rate limits | `city-game-contribute.test.ts` |
-| 3 | `unlock-engine.ts` + season edge wiring | `city-game-unlock-engine.test.ts` |
-| 4 | Vouch graph read for `node_07` gate | extend `city-game-scan.test.ts` |
-| 5 | Scan HTML contribute block + client POST | e2e optional; unit on core |
-| 6 | Season window guard | `city-game-season-readiness` + cron stub |
-| 7 | Seed script: generate per-node site codes into `.local/` | seed-local output |
-| 8 | Deprecate operator quorum flips in runbook for spine nodes | update operator docs |
+| 2 | ✓ `game-contribute` handler + rate limits | `city-game-contribute.test.ts` |
+| 3 | ✓ `unlock-engine.ts` + season edge wiring | `unlock-engine.test.ts` |
+| 4 | ✓ Vouch graph read for `node_07` gate | `vouch-graph.test.ts` + `city-game-scan.test.ts` |
+| 5 | ✓ Scan HTML contribute block + client POST | `scan-game-contribute.mjs` + scan tests |
+| 6 | ✓ Season window guard | `city-game-season-window.test.ts` + cron stub |
+| 7 | ✓ Seed script: per-node site codes into `.local/` | `city-game-seed-site-codes.test.ts` |
+| 8 | ✓ Deprecate operator quorum flips for spine nodes | operator docs updated |
 
-**Regression gate:** extend `npm run verify:city-game` with contribute + unlock tests.
+**Regression gate:** extend `npm run verify:city-game` with contribute + unlock tests · local spine proof: `npm run city-game:smoke-contribute-local` (+ `--spine`).
 
 ---
 
@@ -267,6 +267,6 @@ Keep operator tests for **revoke**, **care pause**, **compromise** only.
 ## Related
 
 - [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) — full season vision  
-- [`CITY_GAME_LOCAL_DEV.md`](CITY_GAME_LOCAL_DEV.md) — local proof path (update after contribute ships)  
-- [`CITY_GAME_OPERATOR_RUNBOOK.md`](CITY_GAME_OPERATOR_RUNBOOK.md) — trim manual quorum steps after ship  
+- [`CITY_GAME_LOCAL_DEV.md`](CITY_GAME_LOCAL_DEV.md) — local proof path (contribute smoke + site codes)
+- [`CITY_GAME_OPERATOR_RUNBOOK.md`](CITY_GAME_OPERATOR_RUNBOOK.md) — spine quorum/flips deprecated; safety flips remain
 - [`PHYSICAL_WORLD_MULTIPLAYER_RESEARCH_SPEC.md`](PHYSICAL_WORLD_MULTIPLAYER_RESEARCH_SPEC.md) — design north star

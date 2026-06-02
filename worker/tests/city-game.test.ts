@@ -132,6 +132,7 @@ describe("city game game_meta", () => {
       collective_target: null,
       unlocked_by: [],
       vouch_requires: [],
+      vouch_active_for: [],
       scarcity_remaining: null,
       fragment_id: null,
     });

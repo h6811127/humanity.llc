@@ -1,3 +1,4 @@
+import { CR_SEASON_01 } from "../city-game/season-config";
 import { loadScanContext } from "../db/scan";
 import { getLiveControlChallenge, getRecentLiveControlProof } from "../db/live-control";
 import { PROFILE_ID_REGEX } from "../crypto";
@@ -88,6 +89,7 @@ export async function handleGetScan(
   const now = new Date();
   const vm = buildScanViewModel(profileId, qrId, ctx, origin, now, {
     env: { CITY_GAME_ENABLED: env.CITY_GAME_ENABLED },
+    seasonForWindow: CR_SEASON_01,
   });
   await applyLiveControlProofIfPresent(
     env.DB,

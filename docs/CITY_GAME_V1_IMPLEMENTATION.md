@@ -391,7 +391,7 @@ Run **in parallel** with hoodie launch prep. Do not block merch on game work.
 
 ### Product / trust
 
-- [x] [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md) — collective mechanic v1 path documented (operator flip OK)
+- [x] [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md) — collective mechanic v1 path documented (site-code contribute)
 - [x] Rules page states what scans prove / do not prove
 - [x] Care stream present on every node with physical safety copy where needed *(launch-gates test + node_14 template)*
 - [x] Forbidden: leaderboard, XP, player accounts, heatmaps *(scan + rules guards)*

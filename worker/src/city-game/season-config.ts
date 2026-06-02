@@ -26,8 +26,15 @@ export type SeasonAutomation = {
   witness_scarcity_node?: string;
 };
 
+export type SeasonWindow = {
+  starts_at: string | null;
+  ends_at: string | null;
+};
+
 export type CrSeasonConfig = {
   season_id: string;
+  status?: string;
+  window?: SeasonWindow;
   nodes: SeasonNodeRow[];
   unlock_edges: SeasonUnlockEdge[];
   contribute_codes?: Record<string, SeasonContributeCode>;
@@ -70,9 +77,21 @@ export function seasonFinaleNodeId(): string {
   return CR_SEASON_01.automation?.finale_node ?? "node_13";
 }
 
+export function seasonWitnessScarcityNodeId(): string {
+  return CR_SEASON_01.automation?.witness_scarcity_node ?? "node_10";
+}
+
 export function seasonContributableNodeIds(): string[] {
-  const ids = new Set([...seasonQuorumNodeIds(), ...seasonFragmentNodeIds()]);
+  const ids = new Set([
+    ...seasonQuorumNodeIds(),
+    ...seasonFragmentNodeIds(),
+    seasonWitnessScarcityNodeId(),
+  ]);
   return [...ids];
+}
+
+export function seasonVouchTargetsFrom(nodeId: string): string[] {
+  return seasonUnlockEdgesFrom(nodeId).map((edge) => edge.to);
 }
 
 export function seasonUnlockEdgesFrom(nodeId: string): SeasonUnlockEdge[] {

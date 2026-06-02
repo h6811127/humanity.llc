@@ -51,7 +51,7 @@ export function forbiddenCopyInMain(main, term) {
 
 /**
  * @param {string} html
- * @param {{ nodeId: string; label?: string; requireCoopHint?: boolean; expectDormant?: boolean }} opts
+ * @param {{ nodeId: string; label?: string; requireCoopHint?: boolean; requireContributeBlock?: boolean; expectDormant?: boolean }} opts
  * @returns {{ ok: true } | { ok: false; reason: string }}
  */
 export function assessGameScanHtml(html, opts) {
@@ -89,6 +89,14 @@ export function assessGameScanHtml(html, opts) {
 
   if (opts.requireCoopHint && !hasRenderedClass(main, "scan-game-coop-hint")) {
     return { ok: false, reason: `${opts.nodeId}: expected scan-game-coop-hint` };
+  }
+
+  if (opts.requireContributeBlock) {
+    const hasContribute =
+      hasRenderedClass(main, "scan-game-contribute") || /id="scan-game-contribute"/.test(main);
+    if (!hasContribute) {
+      return { ok: false, reason: `${opts.nodeId}: expected scan-game-contribute block` };
+    }
   }
 
   return { ok: true };

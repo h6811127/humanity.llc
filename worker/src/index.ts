@@ -6,6 +6,7 @@
 import { schemaReady } from "./db";
 import { handleGetResolverHealth } from "./resolver/resolver-health";
 import { runOrphanPurge } from "./db/orphan-purge";
+import { logCityGameSeasonWindowPhase } from "./city-game/season-window";
 import { runPrintifyReconcile } from "./print/printify-reconcile";
 import {
   corsHeaders,
@@ -164,6 +165,7 @@ export default {
 
       if (event.cron === "0,30 * * * *") {
         await runPrintifyReconcile(env.DB, env);
+        logCityGameSeasonWindowPhase(env);
         return;
       }
 

@@ -12,6 +12,7 @@
  *   API_ORIGIN=http://127.0.0.1:8787 npm run city-game:seed-local -- --write-season
  *
  * Writes operator keys + scan URLs to worker/.local/city-game-seed.json (gitignored).
+ * Writes sticker site codes to worker/.local/city-game-site-codes.json (gitignored).
  * Never commit that file.
  */
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
@@ -21,6 +22,11 @@ import { fileURLToPath } from "node:url";
 import {
   buildAllGameNodeTemplates,
 } from "./city-game-node-defaults.mjs";
+import {
+  attachSiteCodesToSeedNodes,
+  buildSeedSiteCodeRows,
+  missingSeedSiteCodeWarnings,
+} from "./city-game-seed-site-codes-core.mjs";
 import {
   createShowcaseWithHandleRetry,
   newShowcaseKeypair,
@@ -32,6 +38,7 @@ import {
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const seasonPath = join(root, "site/data/city-game-cr-season-01.json");
 const outPath = join(root, "worker/.local/city-game-seed.json");
+const siteCodesPath = join(root, "worker/.local/city-game-site-codes.json");
 
 const apiOrigin = (process.env.API_ORIGIN || "http://127.0.0.1:8787").replace(/\/$/, "");
 const scanOrigin = (
@@ -299,6 +306,12 @@ async function main() {
     console.log("  ✓ %s · %s", template.node_id, localUrl || url);
   }
 
+  const nodesWithSiteCodes = attachSiteCodesToSeedNodes(season, nodeRows);
+  const siteCodeRows = buildSeedSiteCodeRows(season, nodesWithSiteCodes);
+  for (const warning of missingSeedSiteCodeWarnings(siteCodeRows)) {
+    console.warn("  ⚠ site code:", warning);
+  }
+
   const { base58 } = await import("@scure/base");
   const payload = {
     season_id: season.season_id,
@@ -314,12 +327,27 @@ async function main() {
     game_operator_private_key_b58: base58.encode(operator.privateKey),
     owner_public_key: owner.publicKeyBase58,
     owner_private_key_b58: base58.encode(owner.privateKey),
-    nodes: nodeRows,
+    nodes: nodesWithSiteCodes,
+    contribute_site_codes: siteCodeRows,
     note: "Local dev seed only — never commit. Store keys offline before production season.",
   };
 
   mkdirSync(dirname(outPath), { recursive: true });
   writeFileSync(outPath, `${JSON.stringify(payload, null, 2)}\n`);
+  writeFileSync(
+    siteCodesPath,
+    `${JSON.stringify(
+      {
+        season_id: season.season_id,
+        profile_id: profileId,
+        generated_at: now,
+        note: "Sticker/backing-card site codes for autonomous contribute nodes — never commit.",
+        codes: siteCodeRows,
+      },
+      null,
+      2
+    )}\n`
+  );
 
   if (writeSeason) {
     season.season_root_profile_id = profileId;
@@ -333,11 +361,18 @@ async function main() {
   }
 
   console.log("\nWrote %s (gitignored — do not commit)", outPath);
+  console.log("Wrote %s — site codes for sticker QA", siteCodesPath);
+  console.log("\nAutonomous contribute codes:");
+  for (const row of siteCodeRows) {
+    if (!row.site_code) continue;
+    console.log("  %s · %s · %s", row.node_id, row.site_code, row.contribute_mode);
+  }
   console.log("\nNext:");
   console.log("  1. Save owner + game-operator keys from worker/.local/city-game-seed.json offline");
-  console.log("  2. Open /game-operator/ · paste game-operator private key · load nodes");
+  console.log("  2. Open /game-operator/ · paste game-operator private key · load nodes (safety flips only)");
   console.log("  3. npm run city-game:smoke-local — spot-scan node_01, node_04, node_07");
-  console.log("  4. docs/CITY_GAME_INSTALL_QA.md when stickers are ready");
+  console.log("  4. Test quorum: two browsers contribute CR-LANTERN-7K at node_04 → node_07 unlocks");
+  console.log("  5. docs/CITY_GAME_INSTALL_QA.md when stickers are ready");
 }
 
 main().catch((err) => {

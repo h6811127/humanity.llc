@@ -40,6 +40,7 @@ function childDocument(overrides: Record<string, unknown> = {}) {
       collective_target: null,
       unlocked_by: [],
       vouch_requires: [],
+      vouch_active_for: [],
       scarcity_remaining: null,
       fragment_id: null,
     },
@@ -286,5 +287,217 @@ describe("city game scan view", () => {
       env: { CITY_GAME_ENABLED: "1" },
     });
     expect(ctx?.coopHint).toContain("sanctuary");
+  });
+
+  it("shows vouch pending on cabinet until library witness vouches", async () => {
+    const cabinetObject = "obj_cr_node_07_cabinet";
+    const vmPending = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: cardRow(),
+        qr: { ...qrRow(), object_id: cabinetObject },
+        verification: summary(),
+        childObject: childRow({
+          object_id: cabinetObject,
+          public_label: "Czech Village cabinet",
+          public_state: "Unlocked together — ask the mural what remembers winter",
+          child_object_document_json: childDocument({
+            object_id: cabinetObject,
+            node_role: "lore_archive",
+            district: "czech_village",
+            game_meta: {
+              unlocked_by: ["node_04"],
+              vouch_requires: ["node_10"],
+              fragment_id: "czech_1",
+            },
+          }),
+        }),
+        revocationDisplay: null,
+        gameVouchWitnesses: {
+          node_10: {
+            visible_until: null,
+            compromised: false,
+            collective_progress: null,
+            collective_target: null,
+            unlocked_by: [],
+            vouch_requires: [],
+            vouch_active_for: [],
+            scarcity_remaining: 25,
+            fragment_id: null,
+          },
+        },
+      },
+      "https://humanity.llc",
+      new Date("2026-06-01T18:00:00.000Z"),
+      { env: { CITY_GAME_ENABLED: "1" } }
+    );
+
+    expect(vmPending.gameNode?.vouchGate?.met).toBe(false);
+    const htmlPending = await renderScanPage(vmPending, "https://humanity.llc");
+    expect(htmlPending).toContain("Vouch pending from node_10");
+    expect(htmlPending).toContain("scan-game-vouch-note");
+
+    const vmLive = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: cardRow(),
+        qr: { ...qrRow(), object_id: cabinetObject },
+        verification: summary(),
+        childObject: childRow({
+          object_id: cabinetObject,
+          public_label: "Czech Village cabinet",
+          public_state: "Unlocked together — ask the mural what remembers winter",
+          child_object_document_json: childDocument({
+            object_id: cabinetObject,
+            node_role: "lore_archive",
+            district: "czech_village",
+            game_meta: {
+              unlocked_by: ["node_04"],
+              vouch_requires: ["node_10"],
+              fragment_id: "czech_1",
+            },
+          }),
+        }),
+        revocationDisplay: null,
+        gameVouchWitnesses: {
+          node_10: {
+            visible_until: null,
+            compromised: false,
+            collective_progress: null,
+            collective_target: null,
+            unlocked_by: [],
+            vouch_requires: [],
+            vouch_active_for: ["node_07"],
+            scarcity_remaining: 24,
+            fragment_id: null,
+          },
+        },
+      },
+      "https://humanity.llc",
+      new Date("2026-06-01T18:00:00.000Z"),
+      { env: { CITY_GAME_ENABLED: "1" } }
+    );
+
+    expect(vmLive.gameNode?.vouchGate?.met).toBe(true);
+    const htmlLive = await renderScanPage(vmLive, "https://humanity.llc");
+    expect(htmlLive).toContain("Witness vouch live · node_10");
+    expect(htmlLive).not.toContain("Vouch pending from node_10");
+  });
+
+  it("renders sunset pass contribute on library witness and dormant at zero", async () => {
+    const witnessObject = "obj_cr_node_10_library";
+    const vmOpen = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: cardRow(),
+        qr: { ...qrRow(), object_id: witnessObject },
+        verification: summary(),
+        childObject: childRow({
+          object_id: witnessObject,
+          public_label: "Library witness seal",
+          child_object_document_json: childDocument({
+            object_id: witnessObject,
+            node_role: "witness",
+            district: "downtown",
+            game_meta: { scarcity_remaining: 11 },
+            object_streams: [
+              { id: "relay", class: "route", label: "Passes", value: "11 sunset passes remain" },
+            ],
+          }),
+        }),
+        revocationDisplay: null,
+      },
+      "https://humanity.llc",
+      new Date("2026-06-01T18:00:00.000Z"),
+      { env: { CITY_GAME_ENABLED: "1" } }
+    );
+
+    expect(vmOpen.gameNode?.contributeMode).toBe("scarcity");
+    const htmlOpen = await renderScanPage(vmOpen, "https://humanity.llc");
+    expect(htmlOpen).toContain("Claim sunset pass");
+    expect(htmlOpen).toContain('data-game-contribute-mode="scarcity"');
+
+    const vmClosed = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: cardRow(),
+        qr: { ...qrRow(), object_id: witnessObject },
+        verification: summary(),
+        childObject: childRow({
+          object_id: witnessObject,
+          public_label: "Library witness seal",
+          public_state: "Witness seal closed for the night",
+          child_object_document_json: childDocument({
+            object_id: witnessObject,
+            node_role: "witness",
+            district: "downtown",
+            game_meta: { scarcity_remaining: 0 },
+          }),
+        }),
+        revocationDisplay: null,
+      },
+      "https://humanity.llc",
+      new Date("2026-06-01T18:00:00.000Z"),
+      { env: { CITY_GAME_ENABLED: "1" } }
+    );
+
+    expect(vmClosed.gameNode?.mode).toBe("dormant");
+    expect(vmClosed.gameNode?.showsContribute).toBe(false);
+  });
+
+  it("mutes game progression before and after the season window", async () => {
+    const seasonWindow = {
+      status: "planned",
+      window: {
+        starts_at: "2026-06-06T18:00:00-05:00",
+        ends_at: "2026-06-08T22:00:00-05:00",
+      },
+    };
+    const opts = {
+      env: { CITY_GAME_ENABLED: "1" as const },
+      seasonForWindow: seasonWindow,
+    };
+
+    const vmBefore = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: cardRow(),
+        qr: qrRow(),
+        verification: summary(),
+        childObject: childRow(),
+        revocationDisplay: null,
+      },
+      "https://humanity.llc",
+      new Date("2026-06-06T12:00:00-05:00"),
+      opts
+    );
+    expect(vmBefore.gameNode?.mode).toBe("dormant");
+    expect(vmBefore.gameNode?.seasonWindowPhase).toBe("before");
+    const htmlBefore = await renderScanPage(vmBefore, "https://humanity.llc");
+    expect(htmlBefore).toContain("Season not open yet");
+    expect(htmlBefore).not.toContain("Contribute to quorum");
+
+    const vmAfter = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: cardRow(),
+        qr: qrRow(),
+        verification: summary(),
+        childObject: childRow(),
+        revocationDisplay: null,
+      },
+      "https://humanity.llc",
+      new Date("2026-06-09T08:00:00-05:00"),
+      opts
+    );
+    expect(vmAfter.gameNode?.seasonWindowPhase).toBe("after");
+    const htmlAfter = await renderScanPage(vmAfter, "https://humanity.llc");
+    expect(htmlAfter).toContain("Season ended");
   });
 });

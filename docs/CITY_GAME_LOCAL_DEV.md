@@ -13,7 +13,7 @@ This is the **careful local path** before physical install QA or production laun
 |------|-------------|
 | E1 | `npm run verify:city-game` — unit tests + season structure |
 | E3 | `city-game:seed-local` — season root + 15 nodes + QRs in local D1 |
-| E5 | `city-game:smoke-local` — game scan template on `node_01`, `node_04`, `node_07` |
+| E5 | `city-game:smoke-local` + `city-game:smoke-contribute-local` on `node_01`, `node_04`, `node_07` |
 | Manual | `/game-operator/` — signed game-update flip |
 
 Physical stickers, 3-phone install, and GT comprehension are **human gates** — see [`CITY_GAME_INSTALL_QA.md`](CITY_GAME_INSTALL_QA.md) and [`CITY_GAME_COMPREHENSION_RUNBOOK.md`](CITY_GAME_COMPREHENSION_RUNBOOK.md).
@@ -71,7 +71,8 @@ API_ORIGIN=http://127.0.0.1:8787 npm run city-game:seed-local -- --write-season
 
 This writes:
 
-- **`worker/.local/city-game-seed.json`** — owner + game-operator keys, scan URLs (**never commit**)
+- **`worker/.local/city-game-seed.json`** — owner + game-operator keys, scan URLs, per-node site codes (**never commit**)
+- **`worker/.local/city-game-site-codes.json`** — sticker/backing-card reference for autonomous contribute nodes
 - **`season_root_profile_id`** in `site/data/city-game-cr-season-01.json` (local profile only — revert before prod launch if needed)
 
 Save keys offline, then delete or restrict the seed file on shared machines.
@@ -96,21 +97,39 @@ Open a `local_scan_url` from the seed file in Safari if you want eyes-on confirm
 
 ---
 
-## Step 5 — Operator flip (manual)
+## Step 5 — Autonomous contribute smoke (spine)
 
-Terminal C (Pages, for static `/game-operator/` UI):
+With worker still running:
 
 ```bash
-npm run pages:dev
+API_ORIGIN=http://127.0.0.1:8787 npm run city-game:smoke-contribute-local
 ```
 
-Open `http://localhost:8788/game-operator/`:
+Full spine (quorum + 3 fragments + finale):
 
-1. Paste **game-operator private key** from seed file.
-2. Enter **season root profile_id**.
-3. Load nodes → pick `node_04` → apply “River Lantern quorum met” preset → publish.
+```bash
+API_ORIGIN=http://127.0.0.1:8787 npm run city-game:smoke-contribute-local -- --spine
+```
 
-Re-run smoke or spot-scan `node_04` to see updated copy.
+This POSTs site codes from the seed file — no `/game-operator/` quorum flip. Site codes are listed in `worker/.local/city-game-site-codes.json` after seed.
+
+Reset dev state:
+
+| Command | Resets |
+|---------|--------|
+| `npm run city-game:reset-quorum-local` | `node_04` quorum + `node_07` cabinet lock |
+| `npm run city-game:reset-spine-local` | Full spine above + fragments (`node_09`/`node_11`/`node_01`) + `node_13` finale + `node_10` witness passes |
+
+### Manual browser walkthrough (A3 — fragment → finale)
+
+After quorum smoke passes (or reset spine), eyes-on the fragment lattice:
+
+1. Open `node_09` scan from seed — enter **`CR-MURAL-2F`** → expect “Fragment registered” and `1 / 3` on finale need stream.
+2. Open `node_11` — **`CR-MARK-9P`** → `2 / 3`.
+3. Open `node_01` — **`CR-RELAY-1N`** → finale opens; spot-scan `node_13` for “Finale switch live” copy.
+4. Optional witness scarcity: `node_10` with **`CR-WITNS-4P`** → then `node_07` scan shows witness vouch chip when `node_10` lists cabinet in `vouch_active_for`.
+
+Use `:8787` scan URLs only (Worker resolver). Pages `:8788` does not serve `/c/…`.
 
 ---
 
@@ -161,4 +180,7 @@ From [`CITY_GAME_INSTALL_QA.md`](CITY_GAME_INSTALL_QA.md) § Scenario spot-check
 | `npm run city-game:prep-season` | season-root + mint templates chained |
 | `npm run city-game:seed-local` | Create season root + 15 nodes on local D1 |
 | `npm run city-game:smoke-local` | Verify game scan HTML after seed |
+| `npm run city-game:smoke-contribute-local` | Autonomous quorum → cabinet (add `--spine` for finale) |
+| `npm run city-game:reset-quorum-local` | Reset River Lantern quorum + cabinet lock (local D1) |
+| `npm run city-game:reset-spine-local` | Reset full autonomous spine for replay |
 | `npm run verify:city-game` | Full regression bundle |

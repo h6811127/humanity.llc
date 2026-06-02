@@ -53,6 +53,12 @@ function contributeModeFromPage() {
   return hero?.dataset.gameContributeMode ?? "quorum";
 }
 
+function updateScarcityRemaining(remaining) {
+  const el = document.getElementById("scan-game-contribute-progress");
+  if (!el) return;
+  el.textContent = String(remaining);
+}
+
 async function submitContribute() {
   const profileId = profileIdFromHero();
   const objectId = objectIdFromHero();
@@ -116,6 +122,32 @@ async function submitContribute() {
           ? " The finale switch is waking."
           : "";
       setStatus(`Fragment registered.${registered}${finale}`, "success");
+      return;
+    }
+
+    if (data.contribute_mode === "scarcity" || contributeModeFromPage() === "scarcity") {
+      if (typeof data.scarcity_remaining === "number") {
+        updateScarcityRemaining(data.scarcity_remaining);
+      }
+      if (data.witness_depleted) {
+        hideContributeForm();
+        setStatus("Final sunset pass claimed — witness seal closed for the night.", "success");
+        return;
+      }
+      const remaining =
+        typeof data.scarcity_remaining === "number" ? data.scarcity_remaining : null;
+      const vouch =
+        Array.isArray(data.vouch_targets) && data.vouch_targets.length
+          ? " Cabinet vouch is live."
+          : "";
+      setStatus(
+        remaining != null
+          ? `Pass claimed — ${remaining} remain tonight.${vouch}`
+          : `Pass claimed.${vouch}`,
+        "success"
+      );
+      input.value = "";
+      submit.disabled = false;
       return;
     }
 

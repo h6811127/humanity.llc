@@ -1,8 +1,8 @@
 # Cedar Rapids city game — operator runbook
 
-**Status:** Internal · Season 1 prep  
+**Status:** Internal · Season 1 prep · **autonomous v1 spine shipped**  
 **Audience:** Weekend operators  
-**Canonical spec:** [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) · **Custody:** [`CITY_GAME_OPERATOR_CUSTODY.md`](CITY_GAME_OPERATOR_CUSTODY.md)
+**Canonical spec:** [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) · **Autonomous spine:** [`CITY_GAME_AUTONOMOUS_V1.md`](CITY_GAME_AUTONOMOUS_V1.md) · **Custody:** [`CITY_GAME_OPERATOR_CUSTODY.md`](CITY_GAME_OPERATOR_CUSTODY.md)
 
 ---
 
@@ -20,14 +20,16 @@
 
 Use [`/game-operator/`](../site/game-operator/index.html) or signed `POST …/game-update`.
 
+**Autonomous v1 spine (do not flip manually):** River Lantern quorum (`node_04` → `node_07`), fragment lattice (`node_09`, `node_11`, `node_01` → `node_13`), witness sunset passes (`node_10`), and finale open (`node_13`) are driven by player **site-code contribute** + resolver unlock rules. Operators monitor scan copy only.
+
 | Situation | What to publish | Fields |
 |-----------|-----------------|--------|
 | **Relay bulletin rotation** | New public bulletin line | `public_state`, narrative stream |
 | **Faction hold change** | Controller field update | `place` stream Controller value |
-| **River Lantern quorum met** | “Unlocked together” copy | `collective_progress`, `unlocked_by: ["node_04"]`, unlock `node_07` in copy |
+| ~~**River Lantern quorum met**~~ | **Deprecated — autonomous** | Players contribute `CR-LANTERN-7K` at scan; resolver unlocks `node_07` |
 | **Cabinet dilemma beat** | Shared vs private ending state | narrative stream + schedule in operator notes |
-| **Scarcity pass issued** | Decrement witness passes | `game_meta.scarcity_remaining` |
-| **Finale ready** | Three fragments met | `node_13` streams + `unlocked_by` from season config |
+| ~~**Scarcity pass issued**~~ | **Deprecated — autonomous** | Players contribute `CR-WITNS-4P` at Library witness |
+| ~~**Finale ready**~~ | **Deprecated — autonomous** | Fragment contributes open `node_13` when lattice complete |
 
 **Game-theory check:** every flip describes **world state**, not player rewards. No leaderboard, XP, or scan counts.
 
@@ -68,13 +70,15 @@ Verify scan shows revoked/paused truth — no ghost game copy.
 
 ---
 
-## Finale flip (`node_13`)
+## Finale (`node_13`)
 
-Finale switch stays **dormant** until coordination lattice complete:
+Finale switch stays **dormant** until the coordination lattice completes via **player contribute** at fragment nodes:
 
-- Fragment nodes: `node_09`, `node_11`, plus operator confirmation for NewBo relay (`node_01`) per season config unlock edges.
-- When 3/3 met, flip `node_13` streams from Dormant → Finale live.
+- Fragment nodes: `node_09`, `node_11`, `node_01` (site codes in season JSON + `worker/.local/city-game-site-codes.json` after seed).
+- When 3/3 fragments are registered on `node_13`, the resolver auto-opens finale scan copy — **no operator flip**.
 - Announce via public rules page + optional research page banner update at launch (Phase D).
+
+**Recovery only:** if resolver state is wrong after a drill, use `/game-operator/` to reset bulletin copy — not for normal weekend play.
 
 ---
 

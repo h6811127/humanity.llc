@@ -1,6 +1,7 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { handlePostGameContribute } from "../src/resolver/game-contribute";
+import * as seasonWindow from "../src/city-game/season-window";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const RIVER_OBJECT = "obj_cr_node_04_river";
@@ -430,5 +431,122 @@ describe("game-contribute", () => {
     expect(finaleDoc.game_meta.unlocked_by).toEqual(
       expect.arrayContaining(["node_09", "node_11", "node_01"])
     );
+  });
+
+  it("issues sunset pass, decrements scarcity, and activates cabinet vouch", async () => {
+    const WITNESS_OBJECT = "obj_cr_node_10_library";
+    const WITNESS_QR = "qr_cr_node_10_library01";
+
+    const db = new ContributeDb();
+    db.qr = {
+      ...db.qr,
+      qr_id: WITNESS_QR,
+      object_id: WITNESS_OBJECT,
+    };
+    db.objects.set(WITNESS_OBJECT, {
+      object_id: WITNESS_OBJECT,
+      parent_profile_id: PROFILE,
+      object_type: "game_node",
+      public_label: "Library witness seal",
+      public_state: "Witness seal open",
+      status: "active",
+      child_object_document_json: JSON.stringify({
+        object_id: WITNESS_OBJECT,
+        parent_profile_id: PROFILE,
+        object_type: "game_node",
+        public_label: "Library witness seal",
+        public_state: "Witness seal open",
+        status: "active",
+        season_id: "cr_season_01_wake",
+        node_role: "witness",
+        district: "downtown",
+        object_streams: [
+          { id: "relay", class: "route", label: "Passes", value: "2 sunset passes remain" },
+          { id: "bulletin", class: "narrative", label: "Vouch", value: "Issues trust for cabinet path" },
+        ],
+        game_meta: {
+          visible_until: null,
+          compromised: false,
+          collective_progress: null,
+          collective_target: null,
+          unlocked_by: [],
+          vouch_requires: [],
+          vouch_active_for: [],
+          scarcity_remaining: 2,
+          fragment_id: null,
+        },
+        created_at: CREATED,
+        updated_at: CREATED,
+      }),
+      created_at: CREATED,
+      updated_at: CREATED,
+    });
+
+    const res = await handlePostGameContribute(
+      new Request("https://humanity.llc/.well-known/hc/v1/cards/x/objects/y/game-contribute", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "CF-Connecting-IP": "203.0.113.20" },
+        body: JSON.stringify({ qr_id: WITNESS_QR, site_code: "CR-WITNS-4P" }),
+      }),
+      db as unknown as D1Database,
+      { CITY_GAME_ENABLED: "1" },
+      PROFILE,
+      WITNESS_OBJECT
+    );
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      contribute_mode: string;
+      scarcity_remaining: number;
+      witness_depleted: boolean;
+      vouch_targets: string[];
+    };
+    expect(body.contribute_mode).toBe("scarcity");
+    expect(body.scarcity_remaining).toBe(1);
+    expect(body.witness_depleted).toBe(false);
+    expect(body.vouch_targets).toContain("node_07");
+
+    const witness = db.objects.get(WITNESS_OBJECT)!;
+    const witnessDoc = JSON.parse(witness.child_object_document_json);
+    expect(witnessDoc.game_meta.scarcity_remaining).toBe(1);
+    expect(witnessDoc.game_meta.vouch_active_for).toContain("node_07");
+
+    const finalRes = await handlePostGameContribute(
+      new Request("https://humanity.llc/.well-known/hc/v1/cards/x/objects/y/game-contribute", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "CF-Connecting-IP": "203.0.113.21" },
+        body: JSON.stringify({ qr_id: WITNESS_QR, site_code: "cr-witns-4p" }),
+      }),
+      db as unknown as D1Database,
+      { CITY_GAME_ENABLED: "1" },
+      PROFILE,
+      WITNESS_OBJECT
+    );
+    const finalBody = (await finalRes.json()) as {
+      scarcity_remaining: number;
+      witness_depleted: boolean;
+    };
+    expect(finalBody.scarcity_remaining).toBe(0);
+    expect(finalBody.witness_depleted).toBe(true);
+    expect(witness.public_state).toContain("closed for the night");
+  });
+
+  it("rejects contribute when season window is closed", async () => {
+    vi.spyOn(seasonWindow, "resolveSeasonWindowPhase").mockReturnValue("before");
+    const db = new ContributeDb();
+    const res = await handlePostGameContribute(
+      new Request("https://humanity.llc/.well-known/hc/v1/cards/x/objects/y/game-contribute", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "CF-Connecting-IP": "203.0.113.30" },
+        body: JSON.stringify({ qr_id: QR, site_code: "CR-LANTERN-7K" }),
+      }),
+      db as unknown as D1Database,
+      { CITY_GAME_ENABLED: "1" },
+      PROFILE,
+      RIVER_OBJECT
+    );
+    expect(res.status).toBe(409);
+    const body = (await res.json()) as { error?: string };
+    expect(body.error).toBe("SEASON_CLOSED");
+    vi.restoreAllMocks();
   });
 });

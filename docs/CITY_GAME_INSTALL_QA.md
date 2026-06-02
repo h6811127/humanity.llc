@@ -32,14 +32,17 @@ Local/staging proof first: `CITY_GAME_ENABLED=1` in **`worker/.dev.vars`**, then
 | Node | Scenario | Expected scan |
 |------|----------|---------------|
 | `node_01` | Relay bulletin live | Controller + bulletin streams |
-| `node_04` | Temp drop active | Collective progress copy |
+| `node_04` | Temp drop active | Collective progress copy + contribute block |
+| `node_04` | Site code contribute | `CR-LANTERN-7K` → quorum fills → `node_07` unlocks (no operator) |
 | `node_04` | After `visible_until` | Dormant note; QR still resolves |
 | `node_05` | Compromise flip then **revoke** | Revoked/unavailable — no game bulletins |
 | `node_07` | Locked cabinet | Vouch / choice copy; no account gate |
+| `node_07` | After River quorum | Unlocked together copy (autonomous) |
+| `node_09`, `node_11`, `node_01` | Fragment site codes | Fragment registers on `node_13` → finale opens |
 | `node_02` or `node_12` | Sanctuary | Regroup / no-capture coop hint |
 | `node_14` | Care pause flip | Game bulletins muted; care stream wins |
 
-Operator flips via [`/game-operator/`](../site/game-operator/index.html) on staging.
+Safety flips only via [`/game-operator/`](../site/game-operator/index.html) on staging (compromise, care pause, bulletin rotation).
 
 ---
 

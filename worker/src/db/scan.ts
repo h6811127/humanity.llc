@@ -1,5 +1,10 @@
 import { getChildObject } from "./child-objects";
 import { getRevocationDisplay } from "./revoke";
+import { GAME_NODE_OBJECT_TYPE } from "../city-game/constants";
+import { gameMetaFromChildDocumentJson } from "../city-game/game-meta";
+import type { GameMeta } from "../city-game/game-meta";
+import { parseGameNodeFields } from "../city-game/scan-view";
+import { seasonObjectIdForNode } from "../city-game/season-config";
 import type {
   CardRow,
   ChildObjectRow,
@@ -16,6 +21,8 @@ export interface ScanContext {
     display_mode: string | null;
     public_reason: string | null;
   } | null;
+  /** Witness game_node metas for vouch gate read on scan (node_id → meta). */
+  gameVouchWitnesses?: Record<string, GameMeta> | null;
 }
 
 export async function loadScanContext(
@@ -75,11 +82,42 @@ export async function loadScanContext(
     );
   }
 
+  let gameVouchWitnesses: Record<string, GameMeta> | null = null;
+  if (
+    childObject?.object_type === GAME_NODE_OBJECT_TYPE &&
+    childObject.status === "active"
+  ) {
+    const fields = parseGameNodeFields(childObject.child_object_document_json);
+    if (fields?.gameMeta.vouch_requires.length) {
+      gameVouchWitnesses = {};
+      for (const witnessNodeId of fields.gameMeta.vouch_requires) {
+        const witnessObjectId = seasonObjectIdForNode(witnessNodeId);
+        if (!witnessObjectId) continue;
+        const witnessRow = await getChildObject(db, witnessObjectId);
+        if (
+          !witnessRow ||
+          witnessRow.parent_profile_id !== profileId ||
+          witnessRow.status !== "active" ||
+          witnessRow.object_type !== GAME_NODE_OBJECT_TYPE
+        ) {
+          continue;
+        }
+        const witnessMeta = gameMetaFromChildDocumentJson(
+          witnessRow.child_object_document_json
+        );
+        if (witnessMeta) {
+          gameVouchWitnesses[witnessNodeId] = witnessMeta;
+        }
+      }
+    }
+  }
+
   return {
     card: card ?? null,
     qr: qr ?? null,
     childObject,
     verification,
     revocationDisplay,
+    gameVouchWitnesses,
   };
 }

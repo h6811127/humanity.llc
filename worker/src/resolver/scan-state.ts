@@ -139,7 +139,13 @@ export function buildScanViewModel(
   ctx: ScanContext,
   origin: string = "https://humanity.llc",
   now: Date = new Date(),
-  options: { env?: { CITY_GAME_ENABLED?: string } } = {}
+  options: {
+    env?: { CITY_GAME_ENABLED?: string };
+    seasonForWindow?: Pick<
+      import("../city-game/season-config").CrSeasonConfig,
+      "window" | "status"
+    >;
+  } = {}
 ): ScanViewModel {
   if (!qrId) {
     return malformedView(profileId, null, origin, "missing_qr");
@@ -290,6 +296,8 @@ export function buildScanViewModel(
       documentJson: child.child_object_document_json,
       objectStreams,
       env: options.env ?? {},
+      vouchWitnesses: ctx.gameVouchWitnesses ?? undefined,
+      seasonForWindow: options.seasonForWindow,
       now,
     });
     const vm = baseView(
