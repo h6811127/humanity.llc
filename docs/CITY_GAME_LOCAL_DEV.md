@@ -14,7 +14,7 @@ This is the **careful local path** before physical install QA or production laun
 | E1 | `npm run verify:city-game` — unit tests + season structure |
 | E3 | `city-game:seed-local` — season root + 15 nodes + QRs in local D1 |
 | E5 | `city-game:smoke-local` + `city-game:smoke-contribute-local` on `node_01`, `node_04`, `node_07` |
-| Manual | `/game-operator/` — signed game-update flip |
+| Manual | `/game-operator/` — safety flips only (compromise, care pause, bulletin rotation) |
 
 Physical stickers, 3-phone install, and GT comprehension are **human gates** — see [`CITY_GAME_INSTALL_QA.md`](CITY_GAME_INSTALL_QA.md) and [`CITY_GAME_COMPREHENSION_RUNBOOK.md`](CITY_GAME_COMPREHENSION_RUNBOOK.md).
 
@@ -45,7 +45,7 @@ Do **not** change `CITY_GAME_ENABLED` in `worker/wrangler.toml` for local dev. T
 npm run verify:city-game
 ```
 
-Expect 27 tests green and season warnings for missing `season_root_profile_id` (normal pre-seed).
+Expect `npm run verify:city-game` green (80+ unit tests) and season warnings for missing `season_root_profile_id` (normal pre-seed).
 
 ---
 

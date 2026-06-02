@@ -6,6 +6,7 @@ import {
 } from "../crypto";
 import { GAME_NODE_OBJECT_TYPE, isCityGameEnabled } from "../city-game/constants";
 import { validateGameNodeDocument } from "../city-game/game-meta";
+import { applyUnlockSideEffects, seasonNodeIdFromObjectId } from "../city-game/unlock-evaluator";
 import { getChildObject, updateChildObject } from "../db/child-objects";
 import { errorResponse, jsonResponse } from "../http/resolver";
 import { CHILD_OBJECT_ID_REGEX } from "./child-objects";
@@ -194,6 +195,12 @@ export async function handlePostGameUpdate(
     return errorResponse("RESOLVER_ERROR", msg, 500);
   }
 
+  const nodeId = seasonNodeIdFromObjectId(pathObjectId);
+  const unlockEffects =
+    nodeId != null
+      ? await applyUnlockSideEffects(db, nodeId, doc, new Date(updatedAt))
+      : { unlockedNodes: [] as string[] };
+
   return jsonResponse(
     {
       profile_id: pathProfileId,
@@ -204,6 +211,7 @@ export async function handlePostGameUpdate(
       status: "active",
       updated_at: updatedAt,
       signer_role: signerRole,
+      unlocked_nodes: unlockEffects.unlockedNodes,
     },
     200,
     { "Cache-Control": "no-store" }

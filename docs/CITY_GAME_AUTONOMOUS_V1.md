@@ -228,7 +228,7 @@ Optional TTL purge post-season. **No** row per contribution event if policy requ
 
 | # | Task | Tests |
 |---|------|-------|
-| 1 | Policy amendment: count-only quorum + site codes | Doc review |
+| 1 | ✓ Policy amendment: count-only quorum + site codes | [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md) § Cedar Rapids |
 | 2 | ✓ `game-contribute` handler + rate limits | `city-game-contribute.test.ts` |
 | 3 | ✓ `unlock-engine.ts` + season edge wiring | `unlock-engine.test.ts` |
 | 4 | ✓ Vouch graph read for `node_07` gate | `vouch-graph.test.ts` + `city-game-scan.test.ts` |
@@ -236,6 +236,7 @@ Optional TTL purge post-season. **No** row per contribution event if policy requ
 | 6 | ✓ Season window guard | `city-game-season-window.test.ts` + cron stub |
 | 7 | ✓ Seed script: per-node site codes into `.local/` | `city-game-seed-site-codes.test.ts` |
 | 8 | ✓ Deprecate operator quorum flips for spine nodes | operator docs updated |
+| 9 | ✓ Unlock evaluator after `game-update` | `unlock-evaluator.test.ts` + `city-game.test.ts` |
 
 **Regression gate:** extend `npm run verify:city-game` with contribute + unlock tests · local spine proof: `npm run city-game:smoke-contribute-local` (+ `--spine`).
 

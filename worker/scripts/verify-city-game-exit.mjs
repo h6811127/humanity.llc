@@ -31,6 +31,7 @@ if (!skipTests) {
     "worker/tests/city-game-smoke-contribute-core.test.ts",
     "worker/tests/city-game-season-registry.test.ts",
     "worker/tests/unlock-engine.test.ts",
+    "worker/tests/unlock-evaluator.test.ts",
     "worker/tests/vouch-graph.test.ts",
     "worker/tests/city-game-launch-gates.test.ts",
     "worker/tests/city-game-smoke-local-core.test.ts",

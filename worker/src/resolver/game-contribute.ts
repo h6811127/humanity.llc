@@ -17,16 +17,14 @@ import {
   seasonNodeIdForObject,
   seasonObjectIdForNode,
 } from "../city-game/season-config";
+import { applyUnlockSideEffects } from "../city-game/unlock-evaluator";
 import {
   bumpCollectiveProgress,
   fragmentLatticeProgress,
   gameNodeContributeMode,
   issueWitnessSunsetPass,
   markFragmentNodeClaimed,
-  openFinaleSwitch,
-  patchesForFragmentContribute,
   patchesForQuorumUnlock,
-  recordFragmentOnFinale,
 } from "../city-game/unlock-engine";
 import { seasonVouchTargetsFrom } from "../city-game/season-config";
 import { getChildObject, updateChildObject } from "../db/child-objects";
@@ -272,25 +270,9 @@ export async function handlePostGameContribute(
       updatedAt
     );
 
-    const unlockedNodes: string[] = [];
-    if (bumped.reachedTarget) {
-      for (const patch of patchesForQuorumUnlock(nodeId)) {
-        const targetRow = await getChildObject(db, patch.objectId);
-        if (!targetRow || targetRow.status !== "active") continue;
-        const targetDoc = patch.transform(parseDocument(targetRow.child_object_document_json));
-        const targetUpdatedAt = new Date(now.getTime() + 1).toISOString();
-        await persistGameNodeDocument(
-          db,
-          targetRow,
-          targetDoc,
-          typeof targetDoc.public_state === "string"
-            ? targetDoc.public_state
-            : targetRow.public_state,
-          targetUpdatedAt
-        );
-        unlockedNodes.push(patch.toNodeId);
-      }
-    }
+    const unlockEffects = bumped.reachedTarget
+      ? await applyUnlockSideEffects(db, nodeId, doc, now)
+      : { unlockedNodes: [] as string[] };
 
     return jsonResponse(
       {
@@ -300,7 +282,7 @@ export async function handlePostGameContribute(
         collective_progress: bumped.meta.collective_progress,
         collective_target: target,
         quorum_complete: bumped.reachedTarget,
-        unlocked_nodes: unlockedNodes,
+        unlocked_nodes: unlockEffects.unlockedNodes,
       },
       200,
       { "Cache-Control": "no-store" }
@@ -345,40 +327,7 @@ export async function handlePostGameContribute(
     updatedAt
   );
 
-  const fragmentPatch = patchesForFragmentContribute(nodeId);
-  const unlockedNodes: string[] = [];
-  let fragmentsRegistered = 0;
-  let fragmentsRequired = seasonFragmentNodeIds().length;
-  let finaleOpen = false;
-
-  if (fragmentPatch) {
-    const finaleRow = await getChildObject(db, fragmentPatch.finaleObjectId);
-    if (finaleRow && finaleRow.status === "active") {
-      let finaleDoc = parseDocument(finaleRow.child_object_document_json);
-      const recorded = recordFragmentOnFinale(finaleDoc, nodeId);
-      finaleDoc = recorded.doc;
-      const lattice = fragmentLatticeProgress(normalizeGameMeta(finaleDoc.game_meta));
-      fragmentsRegistered = lattice.claimed;
-      fragmentsRequired = lattice.required;
-      finaleOpen = recorded.latticeComplete;
-
-      if (recorded.latticeComplete) {
-        finaleDoc = openFinaleSwitch(finaleDoc);
-        unlockedNodes.push(fragmentPatch.finaleNodeId);
-      }
-
-      const finaleUpdatedAt = new Date(now.getTime() + 1).toISOString();
-      await persistGameNodeDocument(
-        db,
-        finaleRow,
-        finaleDoc,
-        typeof finaleDoc.public_state === "string"
-          ? finaleDoc.public_state
-          : finaleRow.public_state,
-        finaleUpdatedAt
-      );
-    }
-  }
+  const unlockEffects = await applyUnlockSideEffects(db, nodeId, doc, now);
 
   return jsonResponse(
     {
@@ -386,10 +335,10 @@ export async function handlePostGameContribute(
       node_id: nodeId,
       contribute_mode: "fragment",
       fragment_claimed: true,
-      fragments_registered: fragmentsRegistered,
-      fragments_required: fragmentsRequired,
-      finale_open: finaleOpen,
-      unlocked_nodes: unlockedNodes,
+      fragments_registered: unlockEffects.fragmentsRegistered ?? 0,
+      fragments_required: unlockEffects.fragmentsRequired ?? seasonFragmentNodeIds().length,
+      finale_open: unlockEffects.finaleOpen ?? false,
+      unlocked_nodes: unlockEffects.unlockedNodes,
     },
     200,
     { "Cache-Control": "no-store" }
