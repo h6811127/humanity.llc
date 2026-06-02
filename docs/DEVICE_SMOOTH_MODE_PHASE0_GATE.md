@@ -114,7 +114,23 @@ When rows 2/3 and 3/3 are filled, update Path 1 gate § Low-end lab matrix to **
 | Proceed to Phase 1 implementation? | ☑ **N — deferred** (boot graph for Nord cold open first) | Eng |
 
 **Date signed:** 2026-06-02 (low-end matrix **3/3** — rows 2/3 + 3/3 operator pass)  
-**Notes:** Do **not** start `device-shell-tier.mjs`. Nord N200 cold boot is isolated; iPhone SE class + Android Go pass full S1–S3. Next engineering focus: boot graph / first paint ([`SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md`](SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md)), not Smooth mode Phase 1 quiet-defaults.
+**Notes:** Do **not** start `device-shell-tier.mjs`. Nord N200 cold boot is isolated; iPhone SE class + Android Go pass full S1–S3. Next engineering focus: **RC-18** boot graph / first paint ([`SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md`](SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md) § RC-18), not Smooth mode Phase 1 quiet-defaults.
+
+---
+
+## Next engineering (RC-18)
+
+After Phase 0 gate sign-off, **RC-18** is the only open boot-graph item:
+
+| Step | Action | Owner |
+|------|--------|-------|
+| R1 | Nord N200 cold S1 repro on production (cleared site data) | QA / eng |
+| R2 | USB Performance trace: empty wallet → dot → hub; repeat @ 1 and 7 cards | Eng |
+| R3 | Same S1 on iPhone SE class (control — pass device) | QA |
+| R4 | Classify: content flash vs layout jank vs both | Eng |
+| R5 | Targeted fix or written deferral in shell flash doc § RC-18 | Eng + product |
+
+Desk gates (`npm run device-smooth:phase0 -- --e2e`, `worker:test:shell-boot`) catch regressions only — they **do not** substitute for R1–R3 on Nord hardware.
 
 ---
 
@@ -122,6 +138,7 @@ When rows 2/3 and 3/3 are filled, update Path 1 gate § Low-end lab matrix to **
 
 | Date | Note |
 |------|------|
+| 2026-06-02 | **RC-18 handoff** — boot-graph investigation scoped in shell flash doc; Nord repro + trace pending |
 | 2026-06-02 | **Low-end matrix 3/3** — iPhone SE class + Android Go signed pass (S1–S3); Nord cold hub remains only outlier |
 | 2026-06-02 | **Lab matrix rows 2–3** — pending templates + desk E2E proxy (`boot-ready-ms=623`); lab capture worksheet added |
 | 2026-06-02 | **Automated preflight recorded** — baseline v82 / 465.1 KiB graph · Vitest + E2E green |

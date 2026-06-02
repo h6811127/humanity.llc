@@ -156,6 +156,16 @@ Run on **production** (or staging with full Pages deploy) after `site/` ships. M
 
 **Fail signals:** Hub unusably janky with 10 cards on all three low-end devices; boot > 2× mid median on every low-end device (record numbers — Phase 1 target is ≤50% of this baseline).
 
+**Post–Phase 0 follow-up (RC-18):** Nord N200 cold S1 remains the only low-end outlier. Do **not** reopen Phase 1 until RC-18 triage completes. See [`SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md`](SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md) § RC-18 and gate doc § Next engineering.
+
+| Step | Device | Action | Record |
+|------|--------|--------|--------|
+| R1 | OnePlus Nord N200 5G | Cleared site data · cold S1 on prod HTTPS | Jumpy / Pass + TTI (s) |
+| R2 | Same | USB Performance trace: dot tap → hub settled (empty wallet) | Trace saved; note `data-boot` / hub render timing |
+| R3 | Same | Repeat R2 with 1 card and 7 cards in wallet | Compare stranger vs saved path |
+| R4 | iPhone SE class (control) | Same R1 protocol | Pass baseline for comparison |
+| R5 | Eng | Classify content flash vs layout jank; update shell flash doc § RC-18 sign-off | Root cause or fix shipped |
+
 ### P1-4 · Hub intro coachmark (first visit)
 
 Spec: [`DEVICE_HUB_INTRO_COACHMARK.md`](DEVICE_HUB_INTRO_COACHMARK.md). Automated: `e2e/device-status-dot.spec.ts` (hub intro coachmark block).
@@ -474,6 +484,15 @@ Automated: `npm run worker:test:hub-restore-always` · `npm run e2e:key-loss-sad
 
 **Prerequisites:** Run desk gate first: `npm run card-disabled-since-visit:desk-gate` · then **iPhone Safari on https://humanity.llc** after deploy.
 
+**Sign-off status**
+
+| Gate | Command | Status | Date |
+|------|---------|--------|------|
+| Desk preflight | `npm run card-disabled-since-visit:desk-gate` | ☑ Pass — 85 Vitest + 4 WebKit E2E | 2026-06-02 |
+| Prod WebKit | Manual **P1-P0b-1** below on `https://humanity.llc` | ☐ Pending re-verify after Pages deploy | |
+
+Prior prod pass: 2026-05-30 · iPhone Safari (see [`archive/SAFARI_KEYS_WIPE_INVESTIGATION.md`](archive/SAFARI_KEYS_WIPE_INVESTIGATION.md)). Re-run after each deploy that touches wallet since-visit or hub boot graph.
+
 | Step | Action | Expected |
 |------|--------|----------|
 | 1 | Fresh create → save on device → finish setup (same Safari session) | Card row shows **Reachable** (or checking → reachable) |
@@ -624,6 +643,15 @@ Automated: `npm run worker:test:pwa-install` (includes `pwa-scan-handoff-core.te
 **Spec:** [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) · **Modules:** `device-hub-qr-scanner.mjs`, `device-hub-open-scan.mjs`, `vouch-issue.mjs`
 
 **Prerequisites:** Steward card saved in **Home Screen PWA** (iPhone); printed or on-screen Humanity scan QR.
+
+**Sign-off status**
+
+| Gate | Command | Status | Date |
+|------|---------|--------|------|
+| Desk / CI preflight | `npm run steward-scan-handoff:verify` | ☑ Pass — 98 Vitest + 14 E2E | 2026-06-02 |
+| Prod WebKit (PWA + Camera) | Manual steps below on `https://humanity.llc` | ☐ Pending | |
+
+Record prod pass in [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) § QA sign-off and [`PRODUCT_WORKSTREAM_COORDINATION.md`](PRODUCT_WORKSTREAM_COORDINATION.md) changelog.
 
 | Step | Action | Expected |
 |------|--------|----------|

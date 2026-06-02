@@ -256,7 +256,7 @@ Scan bundle CSS unchanged.
 
 ### Phase 1 — Smooth UX + quiet defaults (same bootstrap) **← deferred pending lab**
 
-**Gate (2026-06-01):** Do **not** start until [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md) matrix complete or product reopens scope. Nord N200 row suggests Phase 1 may **not** address the observed cold-hub pain.
+**Gate (2026-06-02):** Phase 0 lab **3/3 complete**. Phase 1 remains **deferred** — invest in **RC-18** ([`SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md`](SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md) § RC-18) before `device-shell-tier.mjs` or quiet-defaults work. Nord N200 cold first hub open is the only outlier; SE class + Android Go pass cold S1.
 
 | In scope | Out of scope |
 |----------|--------------|
@@ -384,6 +384,7 @@ When smooth mode ships:
 
 | Date | Note |
 |------|------|
+| 2026-06-02 | **RC-18 scoped** — Nord cold hub boot-graph investigation; Phase 1 still deferred · [`SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md`](SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md) |
 | 2026-06-02 | **Phase 0 lab 3/3** — iPhone SE class + Android Go pass; Nord cold hub only outlier · Phase 1 still deferred · [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md) |
 | 2026-06-01 | **Phase 0 lab row 1** — Nord N200 5G: cold hub jumpy, steady-state OK; **Phase 1 deferred** · [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md) |
 | 2026-06-01 | **Phase 0 started** — baseline script, snapshot, P0-SMOOTH QA, gate doc · `npm run device-smooth:phase0` |

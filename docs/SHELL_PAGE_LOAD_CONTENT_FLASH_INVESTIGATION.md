@@ -1,7 +1,7 @@
 # Shell page load content flash — investigation
 
-**Status:** RC-1–RC-17 **shipped** (2026-05-30)  
-**Date:** 2026-05-30  
+**Status:** RC-1–RC-17 **shipped** (2026-05-30) · **RC-18 scoped** (2026-06-02 — Nord cold hub; Smooth Phase 0 outlier)  
+**Date:** 2026-05-30 (RC-18 scope 2026-06-02)  
 **Reported symptom:** Opening any shell or device page shows wrong or “random” data for a brief moment, then content disappears or is replaced with local device truth. Distracting and ugly.  
 **Related:** [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md) (stub → archive) · [`HUB_CARD_SAFARI_RELIABILITY.md`](HUB_CARD_SAFARI_RELIABILITY.md) · [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH_QA_2026-05-26.md) · [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) · [`CREATED_QR_BOOTSTRAP_FIX.md`](CREATED_QR_BOOTSTRAP_FIX.md)
 
@@ -348,6 +348,67 @@ Any step that paints before the next step completes can flash “wrong” data.
 
 ---
 
+### RC-18 · Nord cold first hub open (Smooth Phase 0 outlier) — **Scoped, not shipped**
+
+**Trigger:** [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md) lab matrix **3/3** (2026-06-02). **OnePlus Nord N200 5G** (4 GB RAM, Android 12, Chrome on production) is the **only** low-end device where **S1 cold first hub open** is subjectively **jumpy**. iPhone SE class and Android Go / 3 GB budget **pass cold S1–S3**. Nord **warm** reopen, 7-card scroll, PWA standalone, and `/created/` Live all **pass**.
+
+**Symptom (lab language):** After cold load `/` with cleared site data, user taps status dot → hub sheet opens with visible layout/content churn before settling. Not a steady-state scroll or signing regression. Desk Playwright proxy reports `boot-ready-ms=623` on fast hardware — **does not reproduce** this device class.
+
+**Why RC-7 did not close this:** RC-7 defers hub `innerHTML` rebuild until `data-boot=ready`. Nord pain persists on **first** hub open after cold boot, which suggests one or more of:
+
+| Hypothesis | What to check |
+|------------|---------------|
+| **H1 — Post-ready hub paint cost** | Gap between `data-boot=ready` / `hc-device-boot-ready` and first stable hub frame on 4 GB Android (70-module graph already parsed; first `renderHub*` still heavy) |
+| **H2 — Sheet open + render race** | Hub overlay animation concurrent with first full stranger-empty or saved-list render → layout shift reads as “jumpy” |
+| **H3 — Stranger vs saved path** | Cold empty wallet uses stranger-empty HTML path; compare with 1-card and 7-card wallet on same device |
+| **H4 — Chrome tab vs PWA** | Nord PWA steady-state pass; confirm whether cold S1 jumpiness differs in standalone vs browser tab |
+| **H5 — Wrong-then-right flash** | Distinguish **layout jank** (CLS) from **content flash** (placeholder → truth). RC-1–RC-17 targeted content flash; RC-18 may be perf/CLS on one Android tier |
+
+**Investigation protocol (minimum)**
+
+1. **Reproduce** on Nord N200 · Chrome · `https://humanity.llc` · cleared site data · cold S1 from gate worksheet.
+2. **Record** stopwatch TTI (load → dot state → hub tap → visually settled) and subjective **Jumpy / Pass**.
+3. **DevTools Performance** (USB debugging): one trace per variant — empty wallet, 1 card, 7 cards; note `data-boot`, `hc-device-boot-ready`, first hub `innerHTML` / sheet open.
+4. **Control device:** repeat S1 on iPhone SE class (pass row) with same wallet states.
+5. **Desk regression only** (not a lab substitute):
+
+```bash
+npm run device-smooth:phase0 -- --e2e
+npm run worker:test:shell-boot
+npm run worker:test -- worker/tests/device-status-shell-modules.test.ts
+```
+
+6. **Classify outcome:** content flash (wrong copy/chips) vs layout jank vs both — drives fix direction.
+
+**Likely code touchpoints (if H1/H2 confirmed)**
+
+| Area | Files |
+|------|-------|
+| Boot → hub handoff | `device-shell-boot.mjs`, `device-shell-boot-core.mjs`, `device-hub-boot-core.mjs` |
+| First hub render | `device-hub-ui.mjs` (`renderHub*`, stranger-empty), `device-hub-stranger-empty*` |
+| Hub sheet chrome | Hub open path from status dot / `device-status-hub*` |
+| CSS gates | `device-shell.css` — `.device-boot-gated`, hub sheet transitions |
+
+**Success criteria (RC-18 close)**
+
+- Nord cold S1 **Pass** on production after a targeted fix **or**
+- Written root-cause note in this section + product decision: accept, defer Phase 4 graph, or reopen Smooth Phase 1 scope
+
+**Explicit non-goals until RC-18 triage completes**
+
+- Do **not** start Smooth mode Phase 1 (`device-shell-tier.mjs`, quiet defaults) — unlikely to fix cold bootstrap on Nord per Phase 0 gate.
+- Do **not** split bootstrap graph (Phase 4) unless investigation proves **H1** and transfer/eval cost is the dominant factor (baseline: shell v82, **465.1 KiB** graph, 70 modules — [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md)).
+
+**Sign-off**
+
+| Role | Status | Date |
+|------|--------|------|
+| Investigation scoped | ☑ | 2026-06-02 |
+| Nord repro + trace captured | ☐ | |
+| Root cause / fix shipped | ☐ | |
+
+---
+
 ## Surface matrix (quick reference)
 
 | Surface | Primary RC IDs | First paint source | Stabilizes when |
@@ -369,6 +430,7 @@ Any step that paints before the next step completes can flash “wrong” data.
 3. **Two tabs**, close one → watch remaining tab badge ([`CROSS_TAB_KEYS_FLASH…`](CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md) protocol).
 4. **`localStorage.hc_debug = "1"`** → hub build stamp + console `formatSiteBuildConsoleLine` to correlate deploy vs cache bust ([`SITE_BUILD_VERSIONING.md`](SITE_BUILD_VERSIONING.md)).
 5. Scan: hard reload on active card — strip should settle without redundant **Checking** hold when SSR `data-arrive-label` matches resolver (RC-8).
+6. **RC-18:** OnePlus Nord N200 5G · cleared site data · cold `/` → dot → hub — compare with iPhone SE class on same network; capture Performance trace on first hub open (see § RC-18).
 
 ---
 
@@ -415,6 +477,7 @@ After status-graph or hub network changes, also run dot/inbox E2E per [`DEVICE_O
 | Landing settings On/Off flash | **Shipped (RC-15)** — `data-prefs-boot`, prefs boot core, gated settings section |
 | Child object list rebuild flash | **Shipped (RC-16)** — incremental child row patch after network reconcile |
 | Wallet blank then list pop | **Shipped (RC-17)** — `data-boot=local` + local-gated saved section; banners at ready |
+| Nord cold first hub open (Smooth Phase 0) | **Scoped (RC-18)** — lab outlier only; boot-graph triage before Smooth Phase 1 · [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md) |
 
 ---
 
@@ -441,3 +504,4 @@ After status-graph or hub network changes, also run dot/inbox E2E per [`DEVICE_O
 | 2026-05-30 | RC-13 fix: setup Manage tab hint + Live/Manage done copy; user-facing Advanced tab pointers → Manage · `created.mjs?v=79` |
 | 2026-05-30 | RC-14 fix: skip dot View Transitions during boot and unchanged state · shell v78 |
 | 2026-05-30 | RC-15 fix: landing settings prefs boot + shared toggle copy · RC-16 fix: incremental hub child-object row patch |
+| 2026-06-02 | **RC-18 scoped** — Nord N200 cold first hub open (Smooth Phase 0 3/3 outlier); investigation protocol + non-goals · Phase 1 deferred |

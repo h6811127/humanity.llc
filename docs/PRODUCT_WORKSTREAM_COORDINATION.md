@@ -13,11 +13,11 @@
 |--------|---------------|---------------------|------------------|
 | **Steward scan handoff / PWA vouch** | [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) | **S1–S7 shipped** · **`steward-scan-handoff:verify`** | § Incident history (dual-QR RC-1) |
 | **Hub card Safari reliability** | [`HUB_CARD_SAFARI_RELIABILITY.md`](HUB_CARD_SAFARI_RELIABILITY.md) | **Closed — monitoring** · **`hub-card-disappeared:verify`** | RC-1–RC-16 shipped |
-| **Shell page load flash** | [`SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md`](SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md) | **RC-1–RC-17 shipped** · **`worker:test:shell-boot`** · **`worker:test:card-disabled-since-visit`** | RC-18+ future only |
+| **Shell page load flash** | [`SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md`](SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md) | **RC-1–RC-17 shipped** · **RC-18 scoped** (Nord cold hub) · **`worker:test:shell-boot`** · **`device-smooth:phase0`** | RC-18 repro + trace on Nord N200 |
 | **Safari keys / ITP** | [`SAFARI_KEYS_CUSTODY.md`](SAFARI_KEYS_CUSTODY.md) | P0–P2 **shipped** (steps 1–22) | `device-quiet-tab-rehydrate*`, `scan-tab-keys`, `safari-itp-storage-notice*`, `safari-storage-persist-denied-notice*` |
 | **Ownership restore UX** | [`OWNERSHIP_RESTORE_UX_PLAN.md`](OWNERSHIP_RESTORE_UX_PLAN.md) | Phases 1–4 + Safari cross-refs | `/created/` view mode, hub import, `device-ownership-*` |
 | **H-12 printed live-control QA** | [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md) | H-09–H-13 · sad-path S10–S12 | Scan live proof, `e2e/live-control-loop.spec.ts`, operator scripts |
-| **Cedar Rapids city game** | [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) · [`CITY_GAME_AUTONOMOUS_V1.md`](CITY_GAME_AUTONOMOUS_V1.md) | Phase C prep · **`verify:city-game` ☑** · human gates open (install QA, GT comprehension, custody) | Autonomous spine, launch checklist, install map |
+| **Cedar Rapids city game** | [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) · [`CITY_GAME_AUTONOMOUS_V1.md`](CITY_GAME_AUTONOMOUS_V1.md) | Phase C human gates open · **Phase D surfaces ready** (`city-game:launch-surfaces`) | Install QA, GT comprehension, custody · launch `--apply` after gates |
 | **Smooth mode (low-end mobile)** | [`DEVICE_LITE_MOBILE_PLAN.md`](DEVICE_LITE_MOBILE_PLAN.md) | **Phase 0 lab 3/3 ☑** · Phase 1 **deferred** (Nord cold boot → boot graph) · [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md) | Boot graph investigation for Nord cold open |
 
 ---
@@ -38,11 +38,13 @@ Update this table when new PRs open.
 
 | Priority | Item | Owner type | Command / proof |
 |----------|------|------------|-----------------|
-| P0b-1 step 2 sign-off | Card disabled since visit — **prod WebKit** re-verify on humanity.llc after deploy | Human QA | Desk gate: `npm run card-disabled-since-visit:desk-gate` · manual **P1-P0b-1** · sign-off: `card-disabled-since-visit:sign-off` |
+| P0b-1 prod WebKit | Card disabled since visit — **re-verify on humanity.llc** after Pages deploy | Human QA | Desk ☑ `card-disabled-since-visit:desk-gate` (2026-06-02) · manual **P1-P0b-1** · `card-disabled-since-visit:sign-off -- --pass --apply` |
+| P1-PWA-V prod WebKit | Vouch from printed QR — **PWA + Camera on humanity.llc** | Human QA | Desk ☑ `steward-scan-handoff:verify` (2026-06-02) · manual **P1-PWA-V** · changelog line in this doc |
 | H-12 human § A–C | ~~Printed QR camera QA on ≥3 phones~~ **Passed 2026-05-30** | Human QA | Sign-off: `live-control:printed-qa:sign-off -- --pass --apply` |
 | P3-1 / P3-2 | WebAuthn / optional encrypted persistence | Architecture | Not scheduled |
-| **Smooth mode Phase 0–1** | UX + quiet defaults on same bootstrap | **Phase 0 complete 3/3** · Phase 1 **deferred** — Nord cold boot → boot graph | [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md) · do not start `device-shell-tier.mjs` |
-| **S3** | In-app hub QR scanner (PWA vouch from print) | **Shipped** | [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) · `npm run e2e:steward-scan-handoff` (CI) · **P1-PWA-V** prod WebKit |
+| **Smooth mode Phase 0–1** | UX + quiet defaults on same bootstrap | **Phase 0 complete 3/3** · Phase 1 **deferred** — **RC-18** Nord cold hub | [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md) · [`SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md`](SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md) § RC-18 |
+| **RC-18 boot graph** | Nord cold first hub open (Smooth Phase 0 outlier) | **Scoped** — repro + Performance trace pending | § RC-18 in shell flash doc · do not start Phase 1 / `device-shell-tier.mjs` until triage |
+| **S3** | In-app hub QR scanner (PWA vouch from print) | **Shipped** · desk ☑ 2026-06-02 | [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) · **P1-PWA-V** prod WebKit pending |
 
 ---
 
@@ -90,6 +92,10 @@ npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts
 
 | Date | Event |
 |------|--------|
+| 2026-06-02 | **RC-18 scoped** — Nord N200 cold first hub open investigation (Smooth Phase 0 outlier); Phase 1 still deferred · [`SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md`](SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md) |
+| 2026-06-02 | **City game Phase D surfaces** — `city-game:launch-surfaces` + `city-game:post-season` tooling; P3/P4 runbook in launch checklist · `--apply` blocked until human gates |
+| 2026-06-02 | **P0b-1 desk preflight** — `card-disabled-since-visit:desk-gate` pass (85 Vitest + 4 WebKit E2E); prod WebKit **P1-P0b-1** re-verify pending after deploy |
+| 2026-06-02 | **P1-PWA-V desk preflight** — `steward-scan-handoff:verify` pass (98 Vitest + 14 E2E); prod WebKit **P1-PWA-V** pending · [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) |
 | 2026-06-02 | **Smooth mode Phase 0 lab 3/3** — iPhone SE class + Android Go pass; Nord cold hub only outlier · Phase 1 still deferred · [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md) |
 | 2026-06-02 | **Smooth mode Phase 0 lab matrix** — rows 2–3 pending (iPhone SE + Android Go); automated preflight + desk E2E proxy recorded · [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md) |
 | 2026-06-02 | **City game Phase C preflight** — `verify:city-game` pass; install QA, comprehension, and custody runbooks split engineering vs human gates · [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) |
