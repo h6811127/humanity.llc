@@ -1,6 +1,6 @@
 # Device smooth mode plan (low-end mobile)
 
-**Status:** Phase 0 lab in progress — **Phase 1 deferred** (Nord N200 steady-state pass; cold hub open only)  
+**Status:** Phase 0 lab **complete (3/3)** — **Phase 1 deferred** (Nord cold boot only; boot-graph investigation next)  
 **Audience:** Product, frontend, QA, support  
 **Opened:** 2026-06-01  
 **Gate:** [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md)
@@ -384,6 +384,7 @@ When smooth mode ships:
 
 | Date | Note |
 |------|------|
+| 2026-06-02 | **Phase 0 lab 3/3** — iPhone SE class + Android Go pass; Nord cold hub only outlier · Phase 1 still deferred · [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md) |
 | 2026-06-01 | **Phase 0 lab row 1** — Nord N200 5G: cold hub jumpy, steady-state OK; **Phase 1 deferred** · [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md) |
 | 2026-06-01 | **Phase 0 started** — baseline script, snapshot, P0-SMOOTH QA, gate doc · `npm run device-smooth:phase0` |
 | 2026-06-01 | Initial plan — architecture reference, phased delivery |

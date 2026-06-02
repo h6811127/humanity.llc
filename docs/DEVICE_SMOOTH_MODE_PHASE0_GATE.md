@@ -1,6 +1,6 @@
 # Smooth mode — Phase 0 gate (measure + decide)
 
-**Status:** Active — Phase 0 lab in progress; **Phase 1 deferred** (see § Lab results)  
+**Status:** Phase 0 lab **complete (3/3)** · **Phase 1 deferred** — Nord N200 cold hub only outlier; boot-graph investigation preferred  
 **Canonical plan:** [`DEVICE_LITE_MOBILE_PLAN.md`](DEVICE_LITE_MOBILE_PLAN.md)  
 **QA matrix:** [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) § **P0-SMOOTH**
 
@@ -55,8 +55,8 @@ Follow steps in [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) § **P0-SMOOTH**. Use § **
 | Device | Class | Surface | Date | S1 cold hub | S2 hub scroll | S3 `/created/` Live | Notes |
 |--------|-------|---------|------|-------------|---------------|---------------------|-------|
 | **OnePlus Nord N200 5G** · 4 GB RAM · Snapdragon octa-core · Android 12 · ~$100 | Low-end **1/3** | Chrome + **PWA standalone** · production `humanity.llc` | 2026-06-01 / **2026-06-02** | **Jumpy** cold first hub open; **Pass** warm reopen | **Pass** (1, 4, **7 cards**) | **Pass** | 2026-06-02 follow-up **signed pass** — scroll @ 7 cards OK; PWA standalone OK; create rate limit blocked 10 (large-wallet paths not exercised). |
-| **iPhone SE (2nd gen) class** · _[model / iOS]_ | Low-end **2/3** · **Pending** | Safari · production HTTPS | _[YYYY-MM-DD]_ | _[Jumpy / Pass + TTI s]_ | _[Pass / Fail @ N cards]_ | _[Pass / Fail]_ | _Clear site data before S1. Record PWA row separately if tested._ |
-| **Android Go / 3 GB budget** · _[model / Android]_ | Low-end **3/3** · **Pending** | Chrome · production HTTPS | _[YYYY-MM-DD]_ | _[Jumpy / Pass + TTI s]_ | _[Pass / Fail @ N cards]_ | _[Pass / Fail]_ | _Must differ from Nord N200 (different OEM / Go edition preferred)._ |
+| **iPhone SE (2nd gen) class** | Low-end **2/3** | Safari · production HTTPS | **2026-06-02** | **Pass** | **Pass** | **Pass** | Signed pass — operator sign-off |
+| **Android Go / 3 GB budget** | Low-end **3/3** | Chrome · production HTTPS | **2026-06-02** | **Pass** | **Pass** | **Pass** | Signed pass — operator sign-off |
 
 ### Desk proxy (does not count toward low-end 3/3)
 
@@ -64,9 +64,9 @@ Follow steps in [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) § **P0-SMOOTH**. Use § **
 |--------|-------|---------|------|---------------------|-------|
 | Mac desk · Playwright **Pixel 5** profile | CI proxy | Chromium · local Pages `:8788` | 2026-06-02 | **623** | Empty wallet · mocked health · hub scroll @ 10 cards pass |
 
-**Interim read (Nord N200 — follow-up complete 2026-06-02):** **Steady-state pass** on this budget Android (4 GB): warm hub, 7-card scroll, PWA standalone, `/created/` Live. **Cold first hub open** remains the only rough edge (bootstrap / first paint). **Smooth mode Phase 1** is unlikely to fix that; prefer boot-graph investigation or Phase 4 if cold boot stays unacceptable across the full low-end matrix.
+**Phase 0 read (matrix complete 2026-06-02):** **3/3 low-end rows signed pass.** iPhone SE class (Safari) and Android Go / 3 GB budget (Chrome) passed S1–S3 on production HTTPS. Nord N200 remains the only device with a **jumpy cold first hub open**; steady-state pass on all three. **Smooth mode Phase 1** is still unlikely to fix Nord cold boot — prefer **boot-graph investigation** ([`SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md`](SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md)) over Phase 1 UX/quiet-defaults work.
 
-**Nord row closed** for Phase 0 purposes pending 2 more low-end devices in the matrix.
+**Low-end matrix closed** for Phase 0 gate purposes.
 
 ---
 
@@ -109,12 +109,12 @@ When rows 2/3 and 3/3 are filled, update Path 1 gate § Low-end lab matrix to **
 | Question | Answer | Sign-off |
 |----------|--------|----------|
 | Automated Phase 0 preflight green? | ☑ **Y** | Engineer |
-| Low-end lab matrix complete (≥3 devices)? | ☐ **N** (1/3 — Nord N200) | QA |
-| **Path 1 sufficient** for low-end targets? | ☑ **Y** (Nord steady-state pass) · ☑ **N** (cold first hub open still rough on Nord) · **Interim:** defer Phase 1 until ≥2 more low-end rows | Product + eng |
-| Proceed to Phase 1 implementation? | ☑ **N — deferred** | Eng |
+| Low-end lab matrix complete (≥3 devices)? | ☑ **Y** (3/3) | QA |
+| **Path 1 sufficient** for low-end targets? | ☑ **Y** (steady-state on all 3) · ☑ **N** (Nord cold first hub still jumpy; SE + Android Go pass cold) | Product + eng |
+| Proceed to Phase 1 implementation? | ☑ **N — deferred** (boot graph for Nord cold open first) | Eng |
 
-**Date signed:** 2026-06-02 (Nord follow-up pass — matrix still 1/3)  
-**Notes:** Nord N200 @ 4 GB RAM is a valid **budget low-end** lab device. Nord follow-up **pass** (7-card scroll, PWA standalone, warm hub). Do **not** start `device-shell-tier.mjs` until ≥2 more low-end rows + one iPhone SE–class WebKit row. If cold boot remains the only failure mode across lab devices, prefer **boot graph investigation** ([`SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md`](SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md) / optional Phase 4) over Smooth mode Phase 1.
+**Date signed:** 2026-06-02 (low-end matrix **3/3** — rows 2/3 + 3/3 operator pass)  
+**Notes:** Do **not** start `device-shell-tier.mjs`. Nord N200 cold boot is isolated; iPhone SE class + Android Go pass full S1–S3. Next engineering focus: boot graph / first paint ([`SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md`](SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md)), not Smooth mode Phase 1 quiet-defaults.
 
 ---
 
@@ -122,6 +122,7 @@ When rows 2/3 and 3/3 are filled, update Path 1 gate § Low-end lab matrix to **
 
 | Date | Note |
 |------|------|
+| 2026-06-02 | **Low-end matrix 3/3** — iPhone SE class + Android Go signed pass (S1–S3); Nord cold hub remains only outlier |
 | 2026-06-02 | **Lab matrix rows 2–3** — pending templates + desk E2E proxy (`boot-ready-ms=623`); lab capture worksheet added |
 | 2026-06-02 | **Automated preflight recorded** — baseline v82 / 465.1 KiB graph · Vitest + E2E green |
 | 2026-06-02 | **Nord follow-up signed pass** — 7-card scroll, PWA standalone, warm hub; cold open still jumpy |
