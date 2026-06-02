@@ -1,8 +1,9 @@
 # Device smooth mode plan (low-end mobile)
 
-**Status:** Planning — no smooth tier shipped  
+**Status:** Phase 0 lab in progress — **Phase 1 deferred** (Nord N200 steady-state pass; cold hub open only)  
 **Audience:** Product, frontend, QA, support  
 **Opened:** 2026-06-01  
+**Gate:** [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md)
 **Related:** [`DEVICE_OS.md`](DEVICE_OS.md) · [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) · [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md) · [`VISUAL_DEVICE_SHELL.md`](VISUAL_DEVICE_SHELL.md) · [`M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) · [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) · [`STEWARD_DEVICE_ROADMAP.md`](STEWARD_DEVICE_ROADMAP.md)
 
 **Filename note:** This file keeps the `DEVICE_LITE_MOBILE_PLAN.md` path for links already in the repo. **Product and support copy must not say “lite.”** Use **Smooth mode** (preferred) or **Basic mode**.
@@ -18,6 +19,8 @@ The steward **device shell** (Pages routes `/`, `/wallet/`, `/create/`, `/create
 - Battery and thermal pressure from background polling when watch / browser alerts are on
 
 These symptoms are documented for Safari generally in [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md). Shell perf mitigations (S1–S12 in [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md)) help **large wallets on capable devices** but do not change all **automatic background work** on every steward session.
+
+**Phase 0 lab note (2026-06-01):** On **OnePlus Nord N200 5G** (4 GB RAM, Android 12, ~$100, Chrome on production), **steady-state** hub scroll and `/created/` Live were acceptable with 1–4 saved cards; **cold first hub open** was jumpy. That pattern points at **bootstrap / first paint**, not ongoing Smooth-tier quiet-defaults work — see gate doc before investing in Phase 1.
 
 **Strangers scanning QR codes are out of scope.** The public scan surface is already Worker SSR with a bounded bundle ([`M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md)). Smooth mode targets **steward custody and control**, not scan trust UI.
 
@@ -247,11 +250,13 @@ Scan bundle CSS unchanged.
 | Deliverable | Proof |
 |-------------|-------|
 | This doc + roadmap index | Review |
-| Baseline: TTI, scroll jank, module transfer size on full shell | Script or CI artifact |
-| Device lab matrix: 3 low-end + 3 mid + P0-W WebKit | [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) draft **P1-SMOOTH** |
-| **Gate document:** Path 1 sufficient? Y/N on lab devices | Written sign-off in PR |
+| Baseline: TTI, scroll jank, module transfer size on full shell | `npm run device-smooth:phase0` · [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md) |
+| Device lab matrix: 3 low-end + 3 mid + P0-W WebKit | [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) § **P0-SMOOTH** |
+| **Gate document:** Path 1 sufficient? Y/N on lab devices | [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md) sign-off |
 
-### Phase 1 — Smooth UX + quiet defaults (same bootstrap) **← ship first**
+### Phase 1 — Smooth UX + quiet defaults (same bootstrap) **← deferred pending lab**
+
+**Gate (2026-06-01):** Do **not** start until [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md) matrix complete or product reopens scope. Nord N200 row suggests Phase 1 may **not** address the observed cold-hub pain.
 
 | In scope | Out of scope |
 |----------|--------------|
@@ -379,5 +384,7 @@ When smooth mode ships:
 
 | Date | Note |
 |------|------|
+| 2026-06-01 | **Phase 0 lab row 1** — Nord N200 5G: cold hub jumpy, steady-state OK; **Phase 1 deferred** · [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md) |
+| 2026-06-01 | **Phase 0 started** — baseline script, snapshot, P0-SMOOTH QA, gate doc · `npm run device-smooth:phase0` |
 | 2026-06-01 | Initial plan — architecture reference, phased delivery |
 | 2026-06-01 | **Strategy lock:** product name Smooth/Basic mode; UX + quiet defaults first; separate bootstrap only if Phase 0 lab gate fails |

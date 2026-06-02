@@ -3,7 +3,7 @@
 **Purpose:** Single reference for parallel agents and humans — active work, regression gates, file ownership.  
 **Also read:** [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) (rules that must stay true) · [`DOC_MAINTENANCE.md`](DOC_MAINTENANCE.md) (doc policy)
 
-**Last updated:** 2026-06-01
+**Last updated:** 2026-06-02
 
 ---
 
@@ -90,6 +90,7 @@ npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts
 
 | Date | Event |
 |------|--------|
+| 2026-06-02 | **Smooth mode Phase 0 doc bundle** — gate doc, P0-SMOOTH QA matrix, Nord N200 follow-up pass (7-card scroll, PWA standalone); Phase 1 **deferred** · [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md) |
 | 2026-06-01 | **Smooth mode Phase 0 lab row 1** — OnePlus Nord N200 5G (4 GB, Android 12): cold hub jumpy, steady-state pass @ 4 cards; Phase 1 **deferred** · [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md) |
 | 2026-06-01 | **Smooth mode Phase 0** — shell transfer baseline script, snapshot fixture, P0-SMOOTH QA matrix, gate doc · `npm run device-smooth:phase0` |
 | 2026-05-30 | **Shell page load flash RC-11** — since-visit gate waits for wallet poll after health ok · [`SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md`](SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md) · `npm run worker:test:card-disabled-since-visit` |

@@ -130,6 +130,30 @@ Run on **production** (or staging with full Pages deploy) after `site/` ships. M
 
 **Automated gate:** device shell E2E in CI — `npm run device-shell:e2e` (see [`DEVICE_SHELL_E2E_CI_REMEDIATION.md`](DEVICE_SHELL_E2E_CI_REMEDIATION.md)). **P0-W** sign-off is still manual on real WebKit devices.
 
+### P0-SMOOTH · Smooth mode Phase 0 lab matrix (standard tier baseline)
+
+**Spec:** [`DEVICE_LITE_MOBILE_PLAN.md`](DEVICE_LITE_MOBILE_PLAN.md) § Phase 0 · **Gate:** [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md)
+
+**Purpose:** Measure the **full standard shell** before Phase 1 ships Smooth mode UX + quiet defaults. No Smooth toggle exists yet — this is baseline only.
+
+**Automated preflight:** `npm run device-smooth:phase0` · optional E2E: `npm run device-smooth:phase0 -- --e2e`
+
+| Step | Device class | Action | Record |
+|------|--------------|--------|--------|
+| S0 | Any | `npm run device-shell:baseline -- --json` | `module_count`, `transfer_bytes_shell_graph` |
+| S1 | Low-end ×3 | Cold load `/` (cleared site data) → dot shows state → tap opens hub | TTI stopwatch (s) |
+| S2 | Same | Save or seed **10 cards**; open hub; fling scroll saved list | Jank: pass / fail + notes |
+| S3 | Same | `/created/` with keys — open Live tab | Signing UI responsive |
+| S4 | Mid ×3 | Repeat S1–S2 | Reference median |
+| S5 | P0-W WebKit | Repeat W1–W3 from § P0-W on production HTTPS | No regression vs P0-W |
+| S6 | Engineer | Fill Path 1 gate in [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md) | Y/N sufficient |
+
+**Lab devices (minimum):** iPhone SE (2nd gen) class · **OnePlus Nord N200 5G class** (4 GB budget Android — see gate doc row) · one Android Go-class phone · one older WebKit device · iPhone 13 / Pixel 6a class for mid reference.
+
+**Recorded results:** [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md) § Lab results.
+
+**Fail signals:** Hub unusably janky with 10 cards on all three low-end devices; boot > 2× mid median on every low-end device (record numbers — Phase 1 target is ≤50% of this baseline).
+
 ### P1-4 · Hub intro coachmark (first visit)
 
 Spec: [`DEVICE_HUB_INTRO_COACHMARK.md`](DEVICE_HUB_INTRO_COACHMARK.md). Automated: `e2e/device-status-dot.spec.ts` (hub intro coachmark block).
