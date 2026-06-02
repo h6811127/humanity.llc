@@ -157,7 +157,7 @@ import {
 import { tabNoticeCount } from "./device-counts.mjs";
 import { mountHubBuildStamp } from "./device-hub-build-stamp.mjs";
 import { mountHubNetworkTools } from "./device-hub-network-tools.mjs";
-import { syncInboxBackdropForOpenHub } from "./device-sheet-backdrop-sync.mjs?v=82";
+import { syncInboxBackdropForOpenHub } from "./device-sheet-backdrop-sync.mjs?v=83";
 import {
   HUB_STRANGER_EMPTY_CLASS,
   isHubStrangerEmptyState,
@@ -2359,11 +2359,12 @@ export function refreshDeviceHub() {
 }
 
 /**
- * Pre-render wallet hub DOM while still boot-gated so one ready flip reveals full page.
+ * Pre-render hub DOM while still boot-gated so first sheet open does not rebuild innerHTML (RC-18).
+ * Landing `/` and `/wallet/` — sheet stays collapsed until user taps the dot.
  * @see docs/SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md RC-17 · RC-18
  */
-export function prepareWalletHubBootReveal() {
-  if (!document.getElementById("wallet-page")) return;
+export function prepareShellHubBootReveal() {
+  if (!document.getElementById("device-hub")) return;
   renderActivityRows();
   applyHubStrangerEmptyChrome();
   renderSavedRows();
@@ -2373,6 +2374,11 @@ export function prepareWalletHubBootReveal() {
   syncHubInboxAlertGroups();
   syncBrowserNotifPrompts();
   renderHubKeysCustodyPanel();
+}
+
+/** @deprecated Use prepareShellHubBootReveal — wallet-only name kept for call-site clarity. */
+export function prepareWalletHubBootReveal() {
+  prepareShellHubBootReveal();
 }
 
 export function focusHubSearch() {

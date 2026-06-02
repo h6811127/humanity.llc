@@ -2,13 +2,13 @@
   "schema": "device_shell_baseline_v1",
   "generated_at": "2026-06-02",
   "phase": "smooth_mode_phase_0",
-  "asset_version": 82,
+  "asset_version": 83,
   "module_count": 70,
-  "js_bytes_total": 407498,
+  "js_bytes_total": 407916,
   "shell_css_bytes_total": 68761,
-  "landing_css_bytes_total": 305525,
-  "transfer_bytes_shell_graph": 476259,
-  "transfer_bytes_landing_first_paint": 713023,
+  "landing_css_bytes_total": 305559,
+  "transfer_bytes_shell_graph": 476677,
+  "transfer_bytes_landing_first_paint": 713475,
   "js_modules": [
     {
       "file": "js/device-status-bootstrap.mjs",
@@ -68,7 +68,7 @@
     },
     {
       "file": "js/device-chrome-refresh.mjs",
-      "bytes": 7642
+      "bytes": 7790
     },
     {
       "file": "js/device-live-proof-banner.mjs",
@@ -236,7 +236,7 @@
     },
     {
       "file": "js/device-hub-ui.mjs",
-      "bytes": 89771
+      "bytes": 90041
     },
     {
       "file": "js/device-hub-build-stamp.mjs",

@@ -33,6 +33,23 @@ test.describe("device shell Phase 0 boot baseline", () => {
     console.log(`[device-shell-baseline] boot-ready-ms=${bootReadyMs}`);
   });
 
+  test("landing cold hub open reaches sheet open within CI ceiling (RC-18 proxy)", async ({ page }) => {
+    await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route));
+
+    await page.goto("/");
+    await expect(page.locator("body")).toHaveAttribute("data-boot", "ready", { timeout: 20_000 });
+
+    const started = Date.now();
+    await page.locator("#brand-status-dot-btn").click();
+    await expect(page.locator("body")).toHaveClass(/device-hub-sheet-open/, { timeout: 8000 });
+    await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/);
+    await expect(page.locator("#device-hub-saved-group")).toBeVisible();
+
+    const hubOpenMs = Date.now() - started;
+    console.log(`[device-shell-baseline] hub-open-ms=${hubOpenMs}`);
+    expect(hubOpenMs).toBeLessThan(5000);
+  });
+
   test("hub open scroll remains interactive with 10 saved cards (jank proxy)", async ({ page }) => {
     await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route));
 

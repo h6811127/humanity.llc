@@ -1,6 +1,6 @@
 # Shell page load content flash — investigation
 
-**Status:** RC-1–RC-17 **shipped** (2026-05-30) · **RC-18 scoped** (2026-06-02 — Nord cold hub; Smooth Phase 0 outlier)  
+**Status:** RC-1–RC-17 **shipped** (2026-05-30) · **RC-18 in progress** (2026-06-02 — landing hub pre-render; Nord verify pending)  
 **Date:** 2026-05-30 (RC-18 scope 2026-06-02)  
 **Reported symptom:** Opening any shell or device page shows wrong or “random” data for a brief moment, then content disappears or is replaced with local device truth. Distracting and ugly.  
 **Related:** [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md) (stub → archive) · [`HUB_CARD_SAFARI_RELIABILITY.md`](HUB_CARD_SAFARI_RELIABILITY.md) · [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH_QA_2026-05-26.md) · [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) · [`CREATED_QR_BOOTSTRAP_FIX.md`](CREATED_QR_BOOTSTRAP_FIX.md)
@@ -348,7 +348,11 @@ Any step that paints before the next step completes can flash “wrong” data.
 
 ---
 
-### RC-18 · Nord cold first hub open (Smooth Phase 0 outlier) — **Scoped, not shipped**
+### RC-18 · Nord cold first hub open (Smooth Phase 0 outlier) — **In progress**
+
+**Desk fix (2026-06-02, H2):** Extend wallet **prepareShellHubBootReveal** to landing `/` — pre-render hub innerHTML while sheet collapsed before `data-boot=ready`, so first dot tap does not trigger a cold `renderSavedRows` + inbox rebuild during sheet animation. Shell **v83** · `device-chrome-refresh.mjs` + `device-hub-ui.mjs`.
+
+**Verify on Nord:** cold S1 after deploy — still required to close RC-18.
 
 **Trigger:** [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md) lab matrix **3/3** (2026-06-02). **OnePlus Nord N200 5G** (4 GB RAM, Android 12, Chrome on production) is the **only** low-end device where **S1 cold first hub open** is subjectively **jumpy**. iPhone SE class and Android Go / 3 GB budget **pass cold S1–S3**. Nord **warm** reopen, 7-card scroll, PWA standalone, and `/created/` Live all **pass**.
 
@@ -404,6 +408,7 @@ npm run worker:test -- worker/tests/device-status-shell-modules.test.ts
 | Role | Status | Date |
 |------|--------|------|
 | Investigation scoped | ☑ | 2026-06-02 |
+| Landing hub pre-render shipped (H2) | ☑ | 2026-06-02 |
 | Nord repro + trace captured | ☐ | |
 | Root cause / fix shipped | ☐ | |
 

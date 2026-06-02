@@ -16,7 +16,7 @@ import {
   inboxBadgeChromaKind,
   inboxBadgeChromaClass,
   inboxBadgeChromaClassNames,
-} from "./device-inbox-core.mjs?v=82";
+} from "./device-inbox-core.mjs?v=83";
 import { tabNoticeCount } from "./device-counts.mjs";
 import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
 import { getLiveControlPendingCount } from "./device-live-control-inbox.mjs";
@@ -25,7 +25,7 @@ import {
   getCrossTabNotificationState,
   invalidateCrossTabNotificationState,
 } from "./device-cross-tab-state.mjs";
-import { gatherCardDisabledSinceVisitForInbox } from "./device-inbox-card-disabled.mjs?v=82";
+import { gatherCardDisabledSinceVisitForInbox } from "./device-inbox-card-disabled.mjs?v=83";
 
 /** Coalesce gather reads outside a chrome refresh tick (Path G). */
 const GATHER_COALESCE_MS = 50;
@@ -59,7 +59,7 @@ export {
   inboxBadgeChromaKind,
   inboxBadgeChromaClass,
   inboxBadgeChromaClassNames,
-} from "./device-inbox-core.mjs?v=82";
+} from "./device-inbox-core.mjs?v=83";
 
 function tabSessionLabel() {
   const session = getTabSession();

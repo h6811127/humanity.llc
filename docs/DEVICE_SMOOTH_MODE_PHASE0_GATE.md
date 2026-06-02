@@ -19,9 +19,9 @@ npm run device-smooth:phase0 -- --e2e  # + Playwright boot/jank proxy
 
 | Check | Command | Pass when | Last run |
 |-------|---------|-----------|----------|
-| Module transfer snapshot | `npm run device-shell:baseline` | Matches `worker/fixtures/device-shell-baseline.json` | ☑ **2026-06-02** — shell v82, 70 modules, 465.1 KiB graph |
+| Module transfer snapshot | `npm run device-shell:baseline` | Matches `worker/fixtures/device-shell-baseline.json` | ☑ **2026-06-02** — shell v83, 70 modules, 465.5 KiB graph |
 | Core math + snapshot | `npm run worker:test:device-shell-baseline` | Vitest green | ☑ **2026-06-02** — 7 tests |
-| Boot-ready proxy (CI) | `e2e/device-shell-baseline.spec.ts` | `data-boot=ready` < 20s; hub scroll OK with 10 cards | ☑ **2026-06-02** — `boot-ready-ms=623` (desk Chromium · local Pages) |
+| Boot-ready proxy (CI) | `e2e/device-shell-baseline.spec.ts` | `data-boot=ready` < 20s; hub scroll OK with 10 cards | ☑ **2026-06-02** — `boot-ready-ms=618` · `hub-open-ms=72` (desk Chromium · local Pages) |
 
 **Desk proxy only:** Playwright on a developer Mac is **not** a low-end lab row. Use it to catch regressions; record real hardware in § Lab results.
 

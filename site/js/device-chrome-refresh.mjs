@@ -20,12 +20,13 @@ import {
 import { renderCrossTabKeysBanner } from "./device-cross-tab-banner.mjs";
 import { renderLiveProofBanner } from "./device-live-proof-banner.mjs";
 import { refreshHubGlance } from "./device-hub-glance.mjs";
-import { prepareWalletHubBootReveal, refreshHubInboxAlertsFromChrome } from "./device-hub-ui.mjs";
+import { prepareShellHubBootReveal, refreshHubInboxAlertsFromChrome } from "./device-hub-ui.mjs";
+import { isLandingHomePath } from "./device-hub-stranger-empty-core.mjs";
 import { loadInboxSheetModule } from "./device-inbox-sheet-loader.mjs";
 import {
   loadInboxModule,
   resetPresenceInboxGatherCache,
-} from "./device-inbox-loader.mjs?v=82";
+} from "./device-inbox-loader.mjs?v=83";
 import { getOrphanRemovedTabsWithKeys, getOtherTabsWithKeys } from "./device-tab-presence.mjs";
 import { primeCrossTabNotificationState } from "./device-cross-tab-state.mjs";
 import { refreshWalletContextFromChrome } from "./wallet-page-chrome.mjs";
@@ -142,11 +143,12 @@ async function runChromeRefreshAsync() {
     const bootBefore = document.body?.dataset?.boot;
     const path = document.location?.pathname ?? "";
     if (
-      isWalletShellPage(path) &&
+      document.getElementById("device-hub") &&
+      (isWalletShellPage(path) || isLandingHomePath(path)) &&
       isResolverHealthBootSettled() &&
       !isDeviceBootReadyState(bootBefore)
     ) {
-      prepareWalletHubBootReveal();
+      prepareShellHubBootReveal();
       refreshWalletContextFromChrome();
     }
     markDeviceBootReadyIfShellPage();
