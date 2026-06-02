@@ -6,6 +6,10 @@ OPERATOR_AUDIT_TOKEN=dev-only-change-me
 # Cedar Rapids city game local scan template (worker:dev only — prod stays wrangler.toml "0")
 # CITY_GAME_ENABLED=1
 
+# Local scan HTML (:8787) + Pages static JS (:8788). Required when wrangler simulates humanity.llc routes.
+# SCAN_RESOLVER_ORIGIN=http://127.0.0.1:8787
+# SCAN_PAGES_JS_ORIGIN=http://127.0.0.1:8788
+
 # Merch / Printify catalog lookup (npm run printify:lookup-blueprint)
 # PRINTIFY_API_TOKEN=
 # PRINTIFY_SHOP_ID=

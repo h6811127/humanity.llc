@@ -1,8 +1,10 @@
+import { GAME_NODE_OBJECT_TYPE, isCityGameEnabled } from "../city-game/constants";
 import { CR_SEASON_01 } from "../city-game/season-config";
-import { loadScanContext } from "../db/scan";
+import { reconcileSeasonUnlockDrift } from "../city-game/unlock-evaluator";
+import { loadScanContext, type ScanContext } from "../db/scan";
 import { getLiveControlChallenge, getRecentLiveControlProof } from "../db/live-control";
 import { PROFILE_ID_REGEX } from "../crypto";
-import { htmlResponse, requestOrigin } from "../http/resolver";
+import { htmlResponse, requestOrigin, type ScanPageOriginEnv } from "../http/resolver";
 import { renderScanPage, SCAN_UI_VERSION } from "./scan-html";
 import { buildScanSafetyModel } from "./scan-safety";
 import {
@@ -22,11 +24,20 @@ const CACHE_EPHEMERAL_PROOF = "no-store";
 
 export async function handleGetScan(
   request: Request,
-  env: { DB: D1Database; CITY_GAME_ENABLED?: string },
+  env: {
+    DB: D1Database;
+    CITY_GAME_ENABLED?: string;
+    SCAN_PAGES_JS_ORIGIN?: string;
+    SCAN_RESOLVER_ORIGIN?: string;
+  },
   profileId: string
 ): Promise<Response> {
   const origin = requestOrigin(request);
   const url = new URL(request.url);
+  const scanOriginEnv: ScanPageOriginEnv = {
+    SCAN_PAGES_JS_ORIGIN: env.SCAN_PAGES_JS_ORIGIN,
+    SCAN_RESOLVER_ORIGIN: env.SCAN_RESOLVER_ORIGIN,
+  };
 
   if (scanRedirectQueryBlocked(url)) {
     const qrRaw = url.searchParams.get("q");
@@ -40,7 +51,7 @@ export async function handleGetScan(
     );
     return guardScanResponse(
       request,
-      htmlResponse(await renderScanPage(vm, origin), 400, {
+      htmlResponse(await renderScanPage(vm, origin, undefined, request, scanOriginEnv), 400, {
         "Cache-Control": vm.cacheControl,
         "X-HC-Scan-UI": SCAN_UI_VERSION,
         "X-HC-Scan-Redirect-Blocked": "query",
@@ -56,7 +67,7 @@ export async function handleGetScan(
     const vm = malformedScanView(profileId, qrId, origin);
     return guardScanResponse(
       request,
-      htmlResponse(await renderScanPage(vm, origin), 400, {
+      htmlResponse(await renderScanPage(vm, origin, undefined, request, scanOriginEnv), 400, {
         "Cache-Control": vm.cacheControl,
         "X-HC-Scan-UI": SCAN_UI_VERSION,
       })
@@ -67,7 +78,7 @@ export async function handleGetScan(
     const vm = malformedScanView(profileId, null, origin);
     return guardScanResponse(
       request,
-      htmlResponse(await renderScanPage(vm, origin), 400, {
+      htmlResponse(await renderScanPage(vm, origin, undefined, request, scanOriginEnv), 400, {
         "Cache-Control": vm.cacheControl,
         "X-HC-Scan-UI": SCAN_UI_VERSION,
       })
@@ -78,15 +89,21 @@ export async function handleGetScan(
     const vm = malformedScanView(profileId, qrId, origin);
     return guardScanResponse(
       request,
-      htmlResponse(await renderScanPage(vm, origin), 400, {
+      htmlResponse(await renderScanPage(vm, origin, undefined, request, scanOriginEnv), 400, {
         "Cache-Control": vm.cacheControl,
         "X-HC-Scan-UI": SCAN_UI_VERSION,
       })
     );
   }
 
-  const ctx = await loadScanContext(env.DB, profileId, qrId);
   const now = new Date();
+  const ctx = await loadScanContextWithUnlockDriftRepair(
+    env.DB,
+    profileId,
+    qrId,
+    now,
+    env
+  );
   const vm = buildScanViewModel(profileId, qrId, ctx, origin, now, {
     env: { CITY_GAME_ENABLED: env.CITY_GAME_ENABLED },
     seasonForWindow: CR_SEASON_01,
@@ -106,7 +123,7 @@ export async function handleGetScan(
   return guardScanResponse(
     request,
     htmlResponse(
-      await renderScanPage(vm, origin, safety),
+      await renderScanPage(vm, origin, safety, request, scanOriginEnv),
       httpStatusForScanKind(vm.kind),
       {
         "Cache-Control": vm.cacheControl,
@@ -114,6 +131,35 @@ export async function handleGetScan(
       }
     )
   );
+}
+
+async function loadScanContextWithUnlockDriftRepair(
+  db: D1Database,
+  profileId: string,
+  qrId: string,
+  now: Date,
+  env: { CITY_GAME_ENABLED?: string }
+): Promise<ScanContext> {
+  let ctx = await loadScanContext(db, profileId, qrId);
+  if (!shouldRepairGameUnlockDriftOnScan(env, profileId, ctx)) return ctx;
+
+  const { repaired } = await reconcileSeasonUnlockDrift(db, now);
+  if (repaired.length > 0) {
+    ctx = await loadScanContext(db, profileId, qrId);
+  }
+  return ctx;
+}
+
+function shouldRepairGameUnlockDriftOnScan(
+  env: { CITY_GAME_ENABLED?: string },
+  profileId: string,
+  ctx: ScanContext
+): boolean {
+  if (!isCityGameEnabled(env)) return false;
+  if (ctx.childObject?.object_type !== GAME_NODE_OBJECT_TYPE) return false;
+  const seasonRoot = CR_SEASON_01.season_root_profile_id;
+  if (seasonRoot && seasonRoot !== profileId) return false;
+  return true;
 }
 
 async function applyLiveControlProofIfPresent(

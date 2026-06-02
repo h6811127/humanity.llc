@@ -10,6 +10,7 @@ import {
   readQuorumContributeResponse,
   remainingQuorumContributions,
   resolveSeedContributeNode,
+  resolveSeedScanNode,
   synthContributorIp,
 } from "../scripts/city-game-smoke-contribute-core.mjs";
 import { GAME_NODE_SCAN_FOOT } from "../scripts/city-game-smoke-local-core.mjs";
@@ -92,6 +93,25 @@ describe("city-game-smoke-contribute-core", () => {
       siteCode: "CR-LANTERN-7K",
       objectId: "obj_cr_node_04_river",
     });
+  });
+
+  it("resolves scan-only seed node without site code", () => {
+    const node = resolveSeedScanNode(
+      [
+        {
+          node_id: "node_07",
+          object_id: "obj_cr_node_07_cabinet",
+          qr_id: "qr_cabinet",
+          local_scan_url: "http://127.0.0.1:8787/c/x?q=qr_cabinet",
+        },
+      ],
+      "node_07"
+    );
+    expect(node).toMatchObject({
+      objectId: "obj_cr_node_07_cabinet",
+      qrId: "qr_cabinet",
+    });
+    expect(resolveSeedContributeNode([], {}, "node_07")).toBeNull();
   });
 
   it("uses synth contributor IPs in RFC5737 range", () => {

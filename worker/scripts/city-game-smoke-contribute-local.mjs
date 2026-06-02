@@ -26,6 +26,7 @@ import {
   readQuorumContributeResponse,
   remainingQuorumContributions,
   resolveSeedContributeNode,
+  resolveSeedScanNode,
   synthContributorIp,
 } from "./city-game-smoke-contribute-core.mjs";
 
@@ -61,9 +62,9 @@ async function postContribute(profileId, objectId, qrId, siteCode, ipIndex) {
 
 async function fillRiverQuorum(seed, seasonCodes) {
   const river = resolveSeedContributeNode(seed.nodes, seasonCodes, "node_04");
-  const cabinet = resolveSeedContributeNode(seed.nodes, seasonCodes, "node_07");
+  const cabinet = resolveSeedScanNode(seed.nodes, "node_07");
   if (!river || !cabinet) {
-    throw new Error("seed missing node_04/node_07 rows with qr_id + site_code");
+    throw new Error("seed missing node_04 contribute row or node_07 scan row");
   }
 
   const riverScanUrl = resolveSmokeScanUrl(apiOrigin, river.localScanUrl, river.scanUrl);

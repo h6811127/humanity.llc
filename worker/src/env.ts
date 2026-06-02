@@ -33,4 +33,8 @@ export interface Env {
   TIER0_SHOPIFY_INVENTORY_VARIANT_IDS?: string;
   /** Cloudflare Workers AI (L3 explain snapshot). */
   AI?: Ai;
+  /** worker:dev — scan page chrome origin when wrangler simulates production routes. */
+  SCAN_RESOLVER_ORIGIN?: string;
+  /** worker:dev — static `/js` origin (Pages :8788) for scan script tags. */
+  SCAN_PAGES_JS_ORIGIN?: string;
 }

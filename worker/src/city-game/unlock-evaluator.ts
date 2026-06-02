@@ -1,6 +1,11 @@
 import { getChildObject, updateChildObject } from "../db/child-objects";
 import { normalizeGameMeta } from "./game-meta";
-import { seasonNodeIdForObject } from "./season-config";
+import {
+  seasonFragmentNodeIds,
+  seasonNodeIdForObject,
+  seasonObjectIdForNode,
+  seasonQuorumNodeIds,
+} from "./season-config";
 import {
   fragmentLatticeProgress,
   isFragmentNodeClaimed,
@@ -126,4 +131,81 @@ export async function applyUnlockSideEffects(
 
 export function seasonNodeIdFromObjectId(objectId: string): string | null {
   return seasonNodeIdForObject(objectId);
+}
+
+async function quorumUnlockNeedsRepair(
+  db: D1Database,
+  fromNodeId: string,
+  sourceDoc: Record<string, unknown>
+): Promise<boolean> {
+  const meta = normalizeGameMeta(sourceDoc.game_meta);
+  const target = meta.collective_target;
+  const progress = meta.collective_progress ?? 0;
+  if (target == null || progress < target) return false;
+
+  for (const patch of patchesForQuorumUnlock(fromNodeId)) {
+    const targetRow = await getChildObject(db, patch.objectId);
+    if (!targetRow || targetRow.status !== "active") continue;
+    const targetDoc = parseDocument(targetRow.child_object_document_json);
+    const targetMeta = normalizeGameMeta(targetDoc.game_meta);
+    if (!targetMeta.unlocked_by.includes(fromNodeId)) return true;
+  }
+  return false;
+}
+
+async function fragmentUnlockNeedsRepair(
+  db: D1Database,
+  fromNodeId: string,
+  sourceDoc: Record<string, unknown>
+): Promise<boolean> {
+  const meta = normalizeGameMeta(sourceDoc.game_meta);
+  if (!isFragmentNodeClaimed(meta, fromNodeId)) return false;
+
+  const fragmentPatch = patchesForFragmentContribute(fromNodeId);
+  if (!fragmentPatch) return false;
+
+  const finaleRow = await getChildObject(db, fragmentPatch.finaleObjectId);
+  if (!finaleRow || finaleRow.status !== "active") return false;
+
+  const finaleDoc = parseDocument(finaleRow.child_object_document_json);
+  const finaleMeta = normalizeGameMeta(finaleDoc.game_meta);
+  if (!finaleMeta.unlocked_by.includes(fromNodeId)) return true;
+
+  const lattice = fragmentLatticeProgress(finaleMeta);
+  if (lattice.complete && !String(finaleRow.public_state).includes("Finale switch live")) {
+    return true;
+  }
+  return false;
+}
+
+/** Repair unlock graph drift after manual game-update or legacy state (no contribute side effects). */
+export async function reconcileSeasonUnlockDrift(
+  db: D1Database,
+  now: Date
+): Promise<{ repaired: string[] }> {
+  const repaired: string[] = [];
+
+  for (const nodeId of seasonQuorumNodeIds()) {
+    const objectId = seasonObjectIdForNode(nodeId);
+    if (!objectId) continue;
+    const row = await getChildObject(db, objectId);
+    if (!row || row.status !== "active") continue;
+    const doc = parseDocument(row.child_object_document_json);
+    if (!(await quorumUnlockNeedsRepair(db, nodeId, doc))) continue;
+    const result = await applyUnlockSideEffects(db, nodeId, doc, now);
+    repaired.push(...result.unlockedNodes);
+  }
+
+  for (const nodeId of seasonFragmentNodeIds()) {
+    const objectId = seasonObjectIdForNode(nodeId);
+    if (!objectId) continue;
+    const row = await getChildObject(db, objectId);
+    if (!row || row.status !== "active") continue;
+    const doc = parseDocument(row.child_object_document_json);
+    if (!(await fragmentUnlockNeedsRepair(db, nodeId, doc))) continue;
+    const result = await applyUnlockSideEffects(db, nodeId, doc, now);
+    repaired.push(...result.unlockedNodes);
+  }
+
+  return { repaired: [...new Set(repaired)] };
 }

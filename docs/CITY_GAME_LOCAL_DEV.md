@@ -163,6 +163,24 @@ This runs `verify:city-game`, validates the seed file, `smoke-local`, and full-s
 
 ---
 
+## Step 8 — Multi-phone on your LAN (optional, pre-stickers)
+
+**One URL on each phone** — no copy/paste from the seed file:
+
+```bash
+npm run city-game:lan-hub -- --write-dev-vars
+npm run worker:dev -- --ip 0.0.0.0
+npm run pages:dev -- --ip 0.0.0.0
+```
+
+The script writes `site/dev/city-game-lan-hub.html` and prints a bookmark like `http://192.168.x.x:8788/dev/city-game-lan-hub.html`. Open that on each phone — tap scans; site codes are shown inline.
+
+`--write-dev-vars` patches `SCAN_RESOLVER_ORIGIN` / `SCAN_PAGES_JS_ORIGIN` in `worker/.dev.vars` (restart `worker:dev` after).
+
+Witness scarcity: one pass per device per UTC day — use a second phone to confirm the pool decrements while the first phone’s form stays hidden.
+
+---
+
 ## Step 7 — Scenario spot-checks (optional, local)
 
 From [`CITY_GAME_INSTALL_QA.md`](CITY_GAME_INSTALL_QA.md) § Scenario spot-checks — run on local URLs before stickers:
@@ -216,3 +234,5 @@ From [`CITY_GAME_INSTALL_QA.md`](CITY_GAME_INSTALL_QA.md) § Scenario spot-check
 | `npm run city-game:reset-quorum-local` | Reset River Lantern quorum + cabinet lock (local D1) |
 | `npm run city-game:reset-spine-local` | Reset full autonomous spine for replay |
 | `npm run verify:city-game` | Full regression bundle |
+
+**Multi-phone LAN:** `npm run city-game:lan-hub -- --write-dev-vars` → one bookmark on each phone.

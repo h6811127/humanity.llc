@@ -2,7 +2,11 @@ import type { GameMeta } from "./game-meta";
 import { gameMetaFromChildDocumentJson, normalizeGameMeta } from "./game-meta";
 import { GAME_NODE_OBJECT_TYPE, isCityGameEnabled } from "./constants";
 import { gameNodeContributeMode, isWitnessScarcityDepleted, type GameContributeMode } from "./unlock-engine";
-import { seasonNodeIdForObject, type CrSeasonConfig } from "./season-config";
+import {
+  seasonContributeCode,
+  seasonNodeIdForObject,
+  type CrSeasonConfig,
+} from "./season-config";
 import {
   isSeasonPlayOpen,
   resolveSeasonWindowPhase,
@@ -26,6 +30,8 @@ export type GameNodeScanContext = {
   /** Voluntary site-code quorum block on scan (temp_drop collective nodes). */
   showsContribute: boolean;
   contributeMode: GameContributeMode | null;
+  /** Example site code from season config for the scanned node (input placeholder only). */
+  contributeSiteCodePlaceholder: string | null;
   /** Read-only vouch graph for nodes with `vouch_requires`. */
   vouchGate: GameVouchGate | null;
   seasonWindowPhase: SeasonWindowPhase;
@@ -99,6 +105,23 @@ export function gameNodeRoleEyebrow(role: string, district: string | null): stri
   return `${place} · ${roleLabel}`;
 }
 
+export function gameNodeContributeSiteCodePlaceholder(nodeId: string | null): string {
+  if (!nodeId) return "";
+  return seasonContributeCode(nodeId)?.code ?? "";
+}
+
+export function gameNodeContributeEyebrow(
+  mode: GameContributeMode,
+  district: string | null
+): string {
+  if (mode === "scarcity") return GAME_SCARCITY_CONTRIBUTE_EYEBROW;
+  if (mode === "fragment") {
+    const place = formatGameDistrict(district);
+    return place !== "Cedar Rapids" ? `${place} fragment` : GAME_FRAGMENT_CONTRIBUTE_EYEBROW;
+  }
+  return GAME_CONTRIBUTE_EYEBROW;
+}
+
 export function isCareStreamPaused(streams: ObjectPublicStream[]): boolean {
   const care = streams.find((s) => s.class === "care" || s.id === "care");
   if (!care?.value) return false;
@@ -132,6 +155,9 @@ export function gameNodeCoopHint(role: string, meta: GameMeta): string | null {
   }
   if (role === "care_loop") {
     return "Discovery rewards attention — maintenance truth on the care stream wins over game copy.";
+  }
+  if (role === "mobile_lore") {
+    return "Courier nodes carry hints — the owner updates this line. No scan count, no rank.";
   }
   return null;
 }
@@ -201,6 +227,7 @@ export function resolveGameNodeScanContext(input: {
     gameMeta: fields.gameMeta,
     showsContribute: false,
     contributeMode: null as GameContributeMode | null,
+    contributeSiteCodePlaceholder: null,
     vouchGate: null as GameVouchGate | null,
     seasonWindowPhase,
   };
@@ -278,6 +305,9 @@ export function resolveGameNodeScanContext(input: {
     roleEyebrow: gameNodeRoleEyebrow(fields.nodeRole, fields.district),
     showsContribute,
     contributeMode,
+    contributeSiteCodePlaceholder: showsContribute
+      ? gameNodeContributeSiteCodePlaceholder(nodeId) || null
+      : null,
   };
 }
 

@@ -3,20 +3,33 @@
  */
 import { postGameContributeUrl, resolverApiOrigin } from "./hc-sign.mjs";
 import { resolverErrorMessage } from "./resolver-user-error-core.mjs";
+import {
+  SCARCITY_CEILING_ALREADY_CLAIMED_MESSAGE,
+  SCARCITY_CEILING_STORAGE_KEY,
+  buildScarcityCeilingRecord,
+  deviceHasScarcityClaimToday,
+  scarcityCeilingUtcDateKey,
+  serializeScarcityCeilingRecord,
+} from "./scan-game-scarcity-ceiling-core.mjs";
+
+function scanHero() {
+  return document.getElementById("scan-safety-header");
+}
 
 function profileIdFromHero() {
-  const hero = document.getElementById("scan-safety-header");
-  return hero?.dataset.profileId ?? null;
+  return scanHero()?.dataset.profileId ?? null;
 }
 
 function objectIdFromHero() {
-  const hero = document.getElementById("scan-safety-header");
-  return hero?.dataset.objectId ?? null;
+  return scanHero()?.dataset.objectId ?? null;
 }
 
 function qrIdFromHero() {
-  const hero = document.getElementById("scan-safety-header");
-  return hero?.dataset.qrId ?? null;
+  return scanHero()?.dataset.qrId ?? null;
+}
+
+function seasonIdFromHero() {
+  return scanHero()?.dataset.seasonId ?? null;
 }
 
 function isContributePage() {
@@ -49,14 +62,80 @@ function hideContributeForm() {
 }
 
 function contributeModeFromPage() {
-  const hero = document.getElementById("scan-safety-header");
-  return hero?.dataset.gameContributeMode ?? "quorum";
+  return scanHero()?.dataset.gameContributeMode ?? "quorum";
 }
 
 function updateScarcityRemaining(remaining) {
   const el = document.getElementById("scan-game-contribute-progress");
   if (!el) return;
   el.textContent = String(remaining);
+}
+
+function readScarcityCeilingStorage() {
+  try {
+    return localStorage.getItem(SCARCITY_CEILING_STORAGE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function writeScarcityCeilingClaim(seasonId, objectId) {
+  if (!seasonId || !objectId) return;
+  try {
+    const record = buildScarcityCeilingRecord(
+      seasonId,
+      objectId,
+      scarcityCeilingUtcDateKey()
+    );
+    localStorage.setItem(SCARCITY_CEILING_STORAGE_KEY, serializeScarcityCeilingRecord(record));
+  } catch {
+    /* private mode / quota — server pool still decremented */
+  }
+}
+
+function applyScarcityDeviceCeilingIfNeeded() {
+  if (contributeModeFromPage() !== "scarcity") return false;
+
+  const seasonId = seasonIdFromHero();
+  const objectId = objectIdFromHero();
+  if (!seasonId || !objectId) return false;
+  if (!deviceHasScarcityClaimToday(readScarcityCeilingStorage(), seasonId, objectId)) {
+    return false;
+  }
+
+  hideContributeForm();
+  setStatus(SCARCITY_CEILING_ALREADY_CLAIMED_MESSAGE, "success");
+  return true;
+}
+
+function finishScarcityContribute(data) {
+  const seasonId = seasonIdFromHero();
+  const objectId = objectIdFromHero();
+  writeScarcityCeilingClaim(seasonId, objectId);
+
+  if (typeof data.scarcity_remaining === "number") {
+    updateScarcityRemaining(data.scarcity_remaining);
+  }
+
+  hideContributeForm();
+
+  if (data.witness_depleted) {
+    setStatus("Final sunset pass claimed — witness seal closed for the night.", "success");
+    return;
+  }
+
+  const remaining =
+    typeof data.scarcity_remaining === "number" ? data.scarcity_remaining : null;
+  const vouch =
+    Array.isArray(data.vouch_targets) && data.vouch_targets.length
+      ? " Cabinet vouch is live."
+      : "";
+  setStatus(
+    remaining != null
+      ? `Pass claimed — ${remaining} remain tonight for everyone.${vouch}`
+      : `Pass claimed.${vouch}`,
+    "success"
+  );
 }
 
 async function submitContribute() {
@@ -126,28 +205,7 @@ async function submitContribute() {
     }
 
     if (data.contribute_mode === "scarcity" || contributeModeFromPage() === "scarcity") {
-      if (typeof data.scarcity_remaining === "number") {
-        updateScarcityRemaining(data.scarcity_remaining);
-      }
-      if (data.witness_depleted) {
-        hideContributeForm();
-        setStatus("Final sunset pass claimed — witness seal closed for the night.", "success");
-        return;
-      }
-      const remaining =
-        typeof data.scarcity_remaining === "number" ? data.scarcity_remaining : null;
-      const vouch =
-        Array.isArray(data.vouch_targets) && data.vouch_targets.length
-          ? " Cabinet vouch is live."
-          : "";
-      setStatus(
-        remaining != null
-          ? `Pass claimed — ${remaining} remain tonight.${vouch}`
-          : `Pass claimed.${vouch}`,
-        "success"
-      );
-      input.value = "";
-      submit.disabled = false;
+      finishScarcityContribute(data);
       return;
     }
 
@@ -175,6 +233,11 @@ function init() {
   const submit = document.getElementById("scan-game-contribute-submit");
   const input = document.getElementById("scan-game-contribute-code");
   if (!(submit instanceof HTMLButtonElement) || !(input instanceof HTMLInputElement)) {
+    return;
+  }
+
+  if (applyScarcityDeviceCeilingIfNeeded()) {
+    void resolverApiOrigin();
     return;
   }
 

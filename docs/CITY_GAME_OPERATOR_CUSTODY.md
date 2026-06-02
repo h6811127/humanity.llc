@@ -70,6 +70,8 @@ Creates the season root card, mints all 15 `game_node` objects, issues QRs, writ
 
 The `/create/` UI path below is still valid for production/staging when you want browser-held keys instead of the seed script.
 
+**After Cedar Rapids pilot:** new organizers use the **self-serve setup cockpit** on `/created/` (Phase E) — no terminal. See [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) § Phase E.
+
 ### Manual create (production / staging)
 
 1. Open [`/create/`](../site/create/) on local or staging resolver.
@@ -126,9 +128,19 @@ The `/create/` UI path below is still valid for production/staging when you want
 
 ## Related operator surfaces
 
-| Surface | URL |
-|---------|-----|
-| Manual state flip | `/game-operator/` |
-| Organizer / emergency revoke | `/organizer-revoke/` |
-| Owner stewardship | `/created/` |
-| Runbook (compromise, finale, pause) | [`CITY_GAME_OPERATOR_RUNBOOK.md`](CITY_GAME_OPERATOR_RUNBOOK.md) |
+| Surface | URL | Notes |
+|---------|-----|-------|
+| Manual state flip | `/game-operator/` | Weekend play console |
+| Organizer / emergency revoke | `/organizer-revoke/` | |
+| Owner stewardship | `/created/` | Phase E adds **game season setup** here |
+| Runbook (compromise, finale, pause) | [`CITY_GAME_OPERATOR_RUNBOOK.md`](CITY_GAME_OPERATOR_RUNBOOK.md) | |
+
+### Self-serve setup (Phase E — post-pilot)
+
+Organizers who are not running Cedar Rapids internal scripts will:
+
+1. Create season root at [`/create/`](../site/create/) (game-operator public key under Organizer / issuer).
+2. Add `game_node` children, issue QRs, and edit season metadata on [`/created/`](../site/created/) Live · Manage — same child-object pattern as status plates ([`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md)).
+3. Operate live state at [`/game-operator/`](../site/game-operator/) with session-only private key paste.
+
+Terminal commands (`city-game:season-root`, `city-game:mint-node`, `city-game:seed-local`) remain for **engineering, CI, and Cedar Rapids pilot ops** — not for public organizers once Phase E ships.

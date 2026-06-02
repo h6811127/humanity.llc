@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { applyUnlockSideEffects } from "../src/city-game/unlock-evaluator";
+import {
+  applyUnlockSideEffects,
+  reconcileSeasonUnlockDrift,
+} from "../src/city-game/unlock-evaluator";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const RIVER_OBJECT = "obj_cr_node_04_river";
@@ -159,5 +162,82 @@ describe("unlock-evaluator", () => {
     const finale = db.objects.get(FINALE_OBJECT)!;
     const finaleDoc = JSON.parse(finale.child_object_document_json);
     expect(finaleDoc.game_meta.unlocked_by).toContain("node_09");
+  });
+
+  it("reconcileSeasonUnlockDrift repairs cabinet when River quorum met but unlock missed", async () => {
+    const db = new UnlockDb();
+    db.objects.set(RIVER_OBJECT, {
+      object_id: RIVER_OBJECT,
+      parent_profile_id: PROFILE,
+      object_type: "game_node",
+      public_label: "Riverwalk River Lantern",
+      public_state: "Unlocked together",
+      status: "active",
+      child_object_document_json: JSON.stringify({
+        game_meta: { collective_progress: 20, collective_target: 20, unlocked_by: [] },
+      }),
+      created_at: CREATED,
+      updated_at: CREATED,
+    });
+    db.objects.set(CABINET_OBJECT, {
+      object_id: CABINET_OBJECT,
+      parent_profile_id: PROFILE,
+      object_type: "game_node",
+      public_label: "Czech Village cabinet",
+      public_state: "Locked until River Lantern quorum",
+      status: "active",
+      child_object_document_json: JSON.stringify({
+        game_meta: { unlocked_by: [], vouch_requires: ["node_10"] },
+      }),
+      created_at: CREATED,
+      updated_at: CREATED,
+    });
+
+    const { repaired } = await reconcileSeasonUnlockDrift(
+      db as unknown as D1Database,
+      new Date(CREATED)
+    );
+
+    expect(repaired).toContain("node_07");
+    const cabinet = db.objects.get(CABINET_OBJECT)!;
+    const cabinetDoc = JSON.parse(cabinet.child_object_document_json);
+    expect(cabinetDoc.game_meta.unlocked_by).toContain("node_04");
+  });
+
+  it("reconcileSeasonUnlockDrift is a no-op when unlock graph is already consistent", async () => {
+    const db = new UnlockDb();
+    db.objects.set(RIVER_OBJECT, {
+      object_id: RIVER_OBJECT,
+      parent_profile_id: PROFILE,
+      object_type: "game_node",
+      public_label: "Riverwalk River Lantern",
+      public_state: "Unlocked together",
+      status: "active",
+      child_object_document_json: JSON.stringify({
+        game_meta: { collective_progress: 20, collective_target: 20, unlocked_by: [] },
+      }),
+      created_at: CREATED,
+      updated_at: CREATED,
+    });
+    db.objects.set(CABINET_OBJECT, {
+      object_id: CABINET_OBJECT,
+      parent_profile_id: PROFILE,
+      object_type: "game_node",
+      public_label: "Czech Village cabinet",
+      public_state: "Unlocked together",
+      status: "active",
+      child_object_document_json: JSON.stringify({
+        game_meta: { unlocked_by: ["node_04"], vouch_requires: ["node_10"] },
+      }),
+      created_at: CREATED,
+      updated_at: CREATED,
+    });
+
+    const { repaired } = await reconcileSeasonUnlockDrift(
+      db as unknown as D1Database,
+      new Date(CREATED)
+    );
+
+    expect(repaired).toEqual([]);
   });
 });

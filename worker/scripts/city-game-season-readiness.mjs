@@ -3,6 +3,7 @@
  */
 
 import { seasonContributableNodeIds } from "./city-game-seed-site-codes-core.mjs";
+import { validateMobileLoreEnrollmentList } from "./city-game-mobile-lore-core.mjs";
 
 const NODE_ID_RE = /^node_\d{2}$/;
 const OBJECT_ID_RE = /^obj_cr_node_\d{2}_[a-z0-9_]+$/;
@@ -156,6 +157,8 @@ export function cityGameSeasonReadiness(season, opts = {}) {
 
   if (!Array.isArray(s.mobile_lore_enrollment)) {
     issues.push("mobile_lore_enrollment must be an array (empty OK).");
+  } else {
+    issues.push(...validateMobileLoreEnrollmentList(s.mobile_lore_enrollment));
   }
 
   validateAutonomousSpine(s, nodeIds, issues, warnings);

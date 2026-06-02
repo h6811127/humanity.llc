@@ -559,6 +559,7 @@ Use this checklist in **Phase C/D PRs** and release review. Link risk **R-*** wh
 | B9 | Business vouch plan: operator flip vs delegation pilot | Before S3 CR-P03 | **R-02** |
 | B10 | Post-season: season root **active/paused** vs orphan purge documented | Before S3 | **R-15** |
 | B11 | Second season spike OR explicit “Cedar Rapids only” in roadmap | Before non-CR marketing | **R-11** |
+| B12 | Phase E self-serve setup on `/created/` — no terminal for new organizers | Before “create your own game” marketing | Phase E **E3** |
 
 **Widen rollout rule:** Do not add nodes to S2/S3 until **B7** passes at the **previous** footprint. Adding nodes does not close **R-08**, **R-09**, or **R-10** without dedicated engineering.
 
@@ -618,6 +619,67 @@ Run **in parallel** with hoodie launch prep. Do not block merch on game work.
 - [ ] Monitor: no scan logging enabled; support macros — [`CITY_GAME_SUPPORT_MACROS.md`](CITY_GAME_SUPPORT_MACROS.md)
 - [ ] Post-season: objects revert to `paused` or living-infrastructure mode
 
+### Phase E — Self-serve game network setup (post–Cedar Rapids pilot)
+
+**Status:** **Planned — not in S1 scope.** Cedar Rapids Season 1 uses terminal scripts for season bootstrap ([`CITY_GAME_OPERATOR_CUSTODY.md`](CITY_GAME_OPERATOR_CUSTODY.md)). That is an **internal pilot shortcut**, not the intended organizer experience. After the pilot proves scan UX, privacy copy, and operator runbooks, third-party organizers must be able to stand up a game season **from the website** — no terminal, no repo access.
+
+**Product promise:** Any steward who can create a Humanity Card today should be able to create and operate a city game season without running `npm run city-game:*`.
+
+#### Organizer journey (target)
+
+| Step | Surface | What the organizer does | Today (pilot) |
+|------|---------|-------------------------|---------------|
+| 1 | [`/create/`](../site/create/) | Create a **season root** card; register **game-operator public key** under Organizer / issuer | ☑ Browser |
+| 2 | [`/created/`](../site/created/) **Live · Manage** | **Game season setup** — season id, dates, districts, add `game_node` children, issue scan QRs, export print pack | ☐ Terminal (`city-game:mint-node`, `city-game:seed-local`) |
+| 3 | [`/created/`](../site/created/) or linked rules URL | Publish **rules page** draft (dates, privacy, what scans prove) | ☐ Hand-edited HTML + `city-game:launch-surfaces` |
+| 4 | [`/game-operator/`](../site/game-operator/) | Flip world state during the season (session-only game-operator key) | ☑ Browser (prototype) |
+| 5 | [`/organizer-revoke/`](../site/organizer-revoke/) · [`/created/`](../site/created/) | Emergency revoke / owner lifecycle | ☑ Browser |
+
+**Runtime vs setup:** [`/game-operator/`](../site/game-operator/) is the **weekend console** for live play. Phase E adds the **setup cockpit** on `/created/` — mirroring how status plates and lost-item relays already register child objects in-browser ([`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) steps 6–16).
+
+#### Phase E surfaces (implementation targets)
+
+| Surface | Module area (planned) | Ships |
+|---------|----------------------|-------|
+| **Add game node** on `/created/` Live | `created-child-object-game-node.mjs` (name TBD) | Parent-signed `POST …/objects` with `object_type: game_node`; hub tree row; backup gate |
+| **Issue node scan QR** | Reuse `child-object-register-issue.mjs` pattern | `POST …/objects/{object_id}/issue-qr`; download PNG + copy scan link |
+| **Season metadata editor** | Season config bound to season root card or signed season doc | `season_id`, window dates, districts, `unlock_edges`, mobile lore slots |
+| **Game-operator key helper** | Optional generate-in-browser + register public key at create | Same custody as cards — private key never uploaded except as signatures |
+| **Rules page generator** | Static `/play/{season-slug}/` from season metadata | Privacy + payoff copy templates; noindex until organizer publishes |
+| **Print / install pack** | Export node list + QR PNGs + install checklist | Replaces internal [`CITY_GAME_NODE_INSTALL_MAP.md`](CITY_GAME_NODE_INSTALL_MAP.md) spreadsheet for self-serve |
+
+**Explicit non-goals for Phase E v1:** resolver-backed player accounts, scan analytics, geofence enforcement, delegated child keys ([`DELEGATED_CHILD_CAPABILITIES_GATE.md`](DELEGATED_CHILD_CAPABILITIES_GATE.md)), or requiring a Humanity Card to **read** public game state.
+
+#### Engineering sequence (Phase E)
+
+Build on shipped child-object primitives — do not fork a parallel mint path.
+
+1. **Season loader refactor** — resolve **R-11**: extract hardcoded `CR_SEASON_01` worker paths to season config keyed by `season_root_profile_id` (required before a second city).
+2. **`game_node` register UI on `/created/`** — same signing flow as status plate; validate `game_meta` + role taxonomy server-side.
+3. **Bulk add from template** — optional import of a starter registry (15-node default, editable labels) without terminal JSON editing.
+4. **Rules + launch surfaces** — organizer-triggered publish (replaces operator-only `city-game:launch-surfaces --apply` for self-serve seasons).
+5. **Comprehension + custody copy** — extend setup wizard on season root: game-operator key custody, backup gate before N nodes, link to [`CITY_GAME_OPERATOR_RUNBOOK.md`](CITY_GAME_OPERATOR_RUNBOOK.md) patterns in plain language.
+6. **E2E + regression** — `e2e/city-game-self-serve-setup.spec.ts` (name TBD); keep `verify:city-game` green.
+
+#### Phase E gates (before marketing “create your own game”)
+
+| # | Gate | Blocks |
+|---|------|--------|
+| E1 | Cedar Rapids S1 launch gates **signed** (Phase D) | Pilot not proven |
+| E2 | **R-11** season loader supports ≥2 seasons by config | Second city is a refactor |
+| E3 | Organizer completes full 15-node season in browser on staging — **no terminal** | Self-serve claim |
+| E4 | GT comprehension + privacy review on **self-serve rules** template | Over-promising mechanics |
+| E5 | `SYSTEM_INVARIANTS` § city game updated for self-serve paths | **R-16** |
+
+#### Phase E checklist (engineering)
+
+- [ ] `/created/` **Add game node** — register + first QR in one action (parity with status plate)
+- [ ] Hub nested rows for `game_node` under season root
+- [ ] Season metadata editor (dates, `unlock_edges`, districts)
+- [ ] Browser rules page draft + publish
+- [ ] Deprecate terminal mint for **new** self-serve seasons (keep scripts for CI/fixtures)
+- [ ] Document organizer path in [`CITY_GAME_OPERATOR_CUSTODY.md`](CITY_GAME_OPERATOR_CUSTODY.md) § Self-serve setup
+
 ---
 
 ## Launch gates (all required)
@@ -665,6 +727,7 @@ Run **in parallel** with hoodie launch prep. Do not block merch on game work.
 | **Game launch** | Live scan pages on `/c/…` | Real resolver-backed game template |
 | **Game launch** | Research pages | Update banners → link to live season — `npm run city-game:launch-surfaces -- --apply` |
 | **Never public** | Full operator node spreadsheet, keys, manual flip procedures | Internal / operator doc only |
+| **Phase E (post-pilot)** | `/created/` game season setup | Self-serve node register, QR issue, season metadata, rules publish — [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) § Phase E |
 
 **Launch surfaces patched by `--apply`:** [`site/play/cedar-rapids/index.html`](../site/play/cedar-rapids/index.html) · [`physical-world-multiplayer`](../site/what-can-a-qr-do/physical-world-multiplayer/) · [`cedar-rapids-city-game`](../site/what-can-a-qr-do/combining-ideas/cedar-rapids-city-game/) · [`living-street-infrastructure`](../site/what-can-a-qr-do/living-street-infrastructure/) · [`what-can-a-qr-do.html`](../site/what-can-a-qr-do.html).
 
@@ -711,6 +774,10 @@ From [`PHYSICAL_WORLD_MULTIPLAYER_RESEARCH_SPEC.md`](PHYSICAL_WORLD_MULTIPLAYER_
 | Q4 | Faction capture: pure operator vs client-signed capture action? | Protocol | Phase 2 |
 | Q5 | Post-season: pause all nodes vs leave living-infra subset active? | Product | Launch −1 week |
 | Q6 | Business vouch: manual enrollment for Czech Village café? | Ops | Phase C |
+| Q7 | Self-serve season config: JSON on season root card vs separate signed season document? | Protocol | Phase E start |
+| Q8 | Minimum node count for self-serve launch (15 template vs bring-your-own count)? | Product | Phase E |
+| Q9 | Hosted tier: game seasons on reference operator only vs federated operators? | Product + governance | Phase E |
+| Q10 | Rules page URL: `/play/{slug}/` on Pages vs operator-hosted static? | Engineering | Phase E |
 
 ---
 
@@ -725,6 +792,7 @@ From [`PHYSICAL_WORLD_MULTIPLAYER_RESEARCH_SPEC.md`](PHYSICAL_WORLD_MULTIPLAYER_
 | [`site/what-can-a-qr-do/combining-ideas/games-maintenance/`](../site/what-can-a-qr-do/combining-ideas/games-maintenance/) | Care vs play conflict UX |
 | [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) | Cedar Rapids city game invariants + `verify:city-game` regression |
 | [`PRODUCT_WORKSTREAM_COORDINATION.md`](PRODUCT_WORKSTREAM_COORDINATION.md) | Active work registry |
+| [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) | Child-object UI pattern Phase E extends |
 | [`DELEGATED_CHILD_CAPABILITIES_GATE.md`](DELEGATED_CHILD_CAPABILITIES_GATE.md) | Blocks steward-self-serve business vouch (**R-02**) |
 
 ---
@@ -733,6 +801,7 @@ From [`PHYSICAL_WORLD_MULTIPLAYER_RESEARCH_SPEC.md`](PHYSICAL_WORLD_MULTIPLAYER_
 
 | Date | Event |
 |------|-------|
+| 2026-06-02 | **Phase E — self-serve game network setup** — post-pilot `/created/` season cockpit spec; terminal mint marked pilot-only; gates E1–E5 |
 | 2026-06-02 | **Architecture risks + build process** — alignment table, R-01–R-18, B1–B11 gates; policy collective path corrected to site-code contribute |
 | 2026-06-02 | **Feature page traceability** — complete CR-* / PWM-* catalog; rollout S1(15) → S2(25) → S3(50) node budget |
 | 2026-06-02 | **Phase D prep** — `city-game:launch-surfaces` + `city-game:post-season`; launch checklist P3/P4 runbook · apply blocked until gates |

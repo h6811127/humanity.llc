@@ -26,6 +26,16 @@ export type SeasonAutomation = {
   witness_scarcity_node?: string;
 };
 
+export type SeasonMobileLoreEnrollment = {
+  profile_id: string;
+  print_artifact_id: string;
+  label: string;
+  role?: string;
+  enrolled_at?: string;
+  fragment_hint?: string | null;
+  courier_note?: string | null;
+};
+
 export type SeasonWindow = {
   starts_at: string | null;
   ends_at: string | null;
@@ -34,11 +44,13 @@ export type SeasonWindow = {
 export type CrSeasonConfig = {
   season_id: string;
   status?: string;
+  season_root_profile_id?: string | null;
   window?: SeasonWindow;
   nodes: SeasonNodeRow[];
   unlock_edges: SeasonUnlockEdge[];
   contribute_codes?: Record<string, SeasonContributeCode>;
   automation?: SeasonAutomation;
+  mobile_lore_enrollment?: SeasonMobileLoreEnrollment[];
 };
 
 export const CR_SEASON_01 = seasonJson as CrSeasonConfig;
@@ -100,4 +112,17 @@ export function seasonUnlockEdgesFrom(nodeId: string): SeasonUnlockEdge[] {
 
 export function normalizeSiteCode(raw: string): string {
   return raw.trim().toUpperCase();
+}
+
+export function findSeasonMobileLoreEnrollment(
+  profileId: string,
+  printArtifactId: string | null | undefined,
+  rows: SeasonMobileLoreEnrollment[] = CR_SEASON_01.mobile_lore_enrollment ?? []
+): SeasonMobileLoreEnrollment | null {
+  if (!printArtifactId?.trim()) return null;
+  const id = printArtifactId.trim();
+  return (
+    rows.find((row) => row.profile_id === profileId && row.print_artifact_id === id) ??
+    null
+  );
 }

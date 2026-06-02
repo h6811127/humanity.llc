@@ -132,21 +132,36 @@ export function assessFinaleOpenScanHtml(html) {
 }
 
 /**
+ * @param {Array<{ node_id?: string; object_id?: string; qr_id?: string; local_scan_url?: string; scan_url?: string }>} nodes
+ * @param {string} nodeId
+ */
+export function resolveSeedScanNode(nodes, nodeId) {
+  const row = nodes.find((node) => node.node_id === nodeId);
+  if (!row?.object_id || !row.qr_id) return null;
+  return {
+    nodeId,
+    objectId: row.object_id,
+    qrId: row.qr_id,
+    localScanUrl: row.local_scan_url ?? null,
+    scanUrl: row.scan_url ?? null,
+  };
+}
+
+/**
  * @param {Array<{ node_id?: string; object_id?: string; qr_id?: string; site_code?: string }>} nodes
  * @param {Record<string, { code?: string }>} seasonCodes
  * @param {string} nodeId
  */
 export function resolveSeedContributeNode(nodes, seasonCodes, nodeId) {
-  const row = nodes.find((node) => node.node_id === nodeId);
-  if (!row?.object_id || !row.qr_id) return null;
-  const siteCode = row.site_code ?? seasonCodes[nodeId]?.code ?? null;
+  const row = resolveSeedScanNode(nodes, nodeId);
+  if (!row) return null;
+  const siteCode =
+    nodes.find((node) => node.node_id === nodeId)?.site_code ??
+    seasonCodes[nodeId]?.code ??
+    null;
   if (!siteCode) return null;
   return {
-    nodeId,
-    objectId: row.object_id,
-    qrId: row.qr_id,
+    ...row,
     siteCode: siteCode.trim().toUpperCase(),
-    localScanUrl: row.local_scan_url ?? null,
-    scanUrl: row.scan_url ?? null,
   };
 }

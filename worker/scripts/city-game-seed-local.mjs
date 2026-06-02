@@ -10,12 +10,18 @@
  * Usage:
  *   API_ORIGIN=http://127.0.0.1:8787 npm run city-game:seed-local
  *   API_ORIGIN=http://127.0.0.1:8787 npm run city-game:seed-local -- --write-season
+ *   npm run city-game:seed-local -- --lan 192.168.1.42
+ *   LAN_HOST=192.168.1.42 npm run city-game:seed-local -- --lan
+ *
+ * `--lan` rewrites local_scan_url to http://<LAN>:8787 for phone testing.
+ * Run worker with: wrangler dev --ip 0.0.0.0 (or npm run worker:dev if configured).
  *
  * Writes operator keys + scan URLs to worker/.local/city-game-seed.json (gitignored).
  * Writes sticker site codes to worker/.local/city-game-site-codes.json (gitignored).
  * Never commit that file.
  */
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
+import { networkInterfaces } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -65,6 +71,34 @@ function isLocalOrigin(origin) {
   }
 }
 
+function detectLanHost() {
+  const nets = networkInterfaces();
+  for (const name of Object.keys(nets)) {
+    for (const net of nets[name] ?? []) {
+      if (net.family === "IPv4" && !net.internal) {
+        return net.address;
+      }
+    }
+  }
+  return null;
+}
+
+function resolveLanHost() {
+  const lanIdx = process.argv.indexOf("--lan");
+  if (lanIdx !== -1) {
+    const next = process.argv[lanIdx + 1]?.trim();
+    if (next && !next.startsWith("-")) return next;
+  }
+  if (process.env.LAN_HOST?.trim()) return process.env.LAN_HOST.trim();
+  if (process.argv.includes("--lan")) return detectLanHost();
+  return null;
+}
+
+const lanHost = resolveLanHost();
+const localScanOrigin = lanHost
+  ? `http://${lanHost.replace(/^\[/, "").replace(/\]$/, "")}:8787`
+  : apiOrigin;
+
 function apiHeaders() {
   const headers = { "Content-Type": "application/json" };
   if (isLocalOrigin(apiOrigin)) {
@@ -88,8 +122,8 @@ function scanUrl(profileId, qrId) {
 }
 
 function localDevScanUrl(profileId, qrId) {
-  if (!isLocalOrigin(apiOrigin)) return null;
-  return `${apiOrigin}/c/${profileId}?q=${qrId}`;
+  if (!isLocalOrigin(apiOrigin) && !lanHost) return null;
+  return `${localScanOrigin}/c/${profileId}?q=${qrId}`;
 }
 
 async function signGameNodeObject(owner, profileId, template, createdAt) {
@@ -319,6 +353,7 @@ async function main() {
     handle,
     created_at: now,
     api_origin: apiOrigin,
+    ...(lanHost ? { lan_host: lanHost, local_scan_origin: localScanOrigin } : {}),
     season_root_scan_url: rootScanUrl,
     ...(localDevScanUrl(profileId, rootQrId)
       ? { season_root_local_scan_url: localDevScanUrl(profileId, rootQrId) }
@@ -362,6 +397,10 @@ async function main() {
 
   console.log("\nWrote %s (gitignored — do not commit)", outPath);
   console.log("Wrote %s — site codes for sticker QA", siteCodesPath);
+  if (lanHost) {
+    console.log("\nPhone-ready local URLs use %s (LAN host %s)", localScanOrigin, lanHost);
+    console.log("  Worker must listen on 0.0.0.0 — verify on phone: %s/.well-known/hc/v1/health", localScanOrigin);
+  }
   console.log("\nAutonomous contribute codes:");
   for (const row of siteCodeRows) {
     if (!row.site_code) continue;

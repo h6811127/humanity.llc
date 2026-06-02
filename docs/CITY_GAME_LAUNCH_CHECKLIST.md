@@ -11,7 +11,7 @@
 
 | Step | Command / check | Done? |
 |------|-------------------|-------|
-| E1 | `npm run verify:city-game` green | ☑ **2026-06-02** (109 tests) |
+| E1 | `npm run verify:city-game` green | ☑ **2026-06-02** (117 tests) |
 | E1b | Build gates **B1–B2**, **B5–B8** signed (vouch copy, surfaces honesty, load test, no player-signed over-promise) | ☐ |
 | E2 | `npm run city-game:verify-season -- --require-launch` (season root + dates set) | ☐ |
 | E3 | All 15 nodes minted + QRs issued on season root | ☐ |

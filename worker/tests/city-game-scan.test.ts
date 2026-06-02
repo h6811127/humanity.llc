@@ -7,6 +7,7 @@ import {
   GAME_NODE_SCAN_FOOT,
   GAME_NODE_SCAN_PRIVACY_NOTE,
   gameNodeCoopHint,
+  gameNodeContributeSiteCodePlaceholder,
   isCareStreamPaused,
   resolveGameNodeScanContext,
 } from "../src/city-game/scan-view";
@@ -257,9 +258,62 @@ describe("city game scan view", () => {
     expect(vm.gameNode?.showsContribute).toBe(true);
     const html = await renderScanPage(vm, "https://humanity.llc");
     expect(html).toContain('data-game-contribute="1"');
+    expect(html).toContain('data-season-id="cr_season_01_wake"');
     expect(html).toContain("scan-game-contribute");
     expect(html).toContain("Contribute to quorum");
-    expect(html).toContain("scan-game-contribute.mjs?v=1");
+    expect(html).toContain("scan-game-contribute.mjs?v=2");
+    expect(html).toContain('placeholder="CR-LANTERN-7K"');
+  });
+
+  it("uses season site-code placeholders per contribute node", async () => {
+    expect(gameNodeContributeSiteCodePlaceholder("node_04")).toBe("CR-LANTERN-7K");
+    expect(gameNodeContributeSiteCodePlaceholder("node_09")).toBe("CR-MURAL-2F");
+    expect(gameNodeContributeSiteCodePlaceholder("node_11")).toBe("CR-MARK-9P");
+    expect(gameNodeContributeSiteCodePlaceholder("node_01")).toBe("CR-RELAY-1N");
+    expect(gameNodeContributeSiteCodePlaceholder("node_10")).toBe("CR-WITNS-4P");
+
+    const markerObject = "obj_cr_node_11_marker";
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: cardRow(),
+        qr: { ...qrRow(), object_id: markerObject },
+        verification: summary(),
+        childObject: childRow({
+          object_id: markerObject,
+          public_label: "Greene Square marker",
+          child_object_document_json: childDocument({
+            object_id: markerObject,
+            node_role: "route_splitter",
+            district: "greene_square",
+            public_state: "Fragment live",
+            game_meta: {
+              visible_until: null,
+              compromised: false,
+              collective_progress: null,
+              collective_target: null,
+              unlocked_by: [],
+              vouch_requires: [],
+              vouch_active_for: [],
+              scarcity_remaining: null,
+              fragment_id: "node_11",
+            },
+          }),
+        }),
+        revocationDisplay: null,
+      },
+      "https://humanity.llc",
+      new Date("2026-06-01T18:00:00.000Z"),
+      { env: { CITY_GAME_ENABLED: "1" } }
+    );
+
+    expect(vm.gameNode?.contributeMode).toBe("fragment");
+    expect(vm.gameNode?.contributeSiteCodePlaceholder).toBe("CR-MARK-9P");
+    const html = await renderScanPage(vm, "https://humanity.llc");
+    expect(html).toContain('placeholder="CR-MARK-9P"');
+    expect(html).not.toContain('placeholder="CR-MURAL-2F"');
+    expect(html).toContain("Greene Square fragment");
   });
 
   it("detects care pause and cooperative hints", () => {
@@ -419,6 +473,9 @@ describe("city game scan view", () => {
     const htmlOpen = await renderScanPage(vmOpen, "https://humanity.llc");
     expect(htmlOpen).toContain("Claim sunset pass");
     expect(htmlOpen).toContain('data-game-contribute-mode="scarcity"');
+    expect(htmlOpen).toContain('data-season-id="cr_season_01_wake"');
+    expect(htmlOpen).toContain('placeholder="CR-WITNS-4P"');
+    expect(htmlOpen).toContain("scan-game-contribute.mjs?v=2");
 
     const vmClosed = buildScanViewModel(
       PROFILE,
@@ -447,6 +504,78 @@ describe("city game scan view", () => {
 
     expect(vmClosed.gameNode?.mode).toBe("dormant");
     expect(vmClosed.gameNode?.showsContribute).toBe(false);
+  });
+
+  it("loads contribute script from local Pages when scan origin is :8787", async () => {
+    const witnessObject = "obj_cr_node_10_library";
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: cardRow(),
+        qr: { ...qrRow(), object_id: witnessObject },
+        verification: summary(),
+        childObject: childRow({
+          object_id: witnessObject,
+          public_label: "Library witness seal",
+          child_object_document_json: childDocument({
+            object_id: witnessObject,
+            node_role: "witness",
+            district: "downtown",
+            game_meta: { scarcity_remaining: 11 },
+          }),
+        }),
+        revocationDisplay: null,
+      },
+      "http://127.0.0.1:8787",
+      new Date("2026-06-01T18:00:00.000Z"),
+      { env: { CITY_GAME_ENABLED: "1" } }
+    );
+
+    const localRequest = new Request("https://humanity.llc/c/x?q=qr_y", {
+      headers: { Host: "127.0.0.1:8787" },
+    });
+    const html = await renderScanPage(vm, "https://humanity.llc", undefined, localRequest);
+    expect(html).toContain("http://127.0.0.1:8788/js/scan-game-contribute.mjs?v=2");
+    expect(html).not.toContain("https://humanity.llc/js/scan-game-contribute.mjs");
+  });
+
+  it("loads contribute script from env override when wrangler simulates production host", async () => {
+    const witnessObject = "obj_cr_node_10_library";
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: cardRow(),
+        qr: { ...qrRow(), object_id: witnessObject },
+        verification: summary(),
+        childObject: childRow({
+          object_id: witnessObject,
+          public_label: "Library witness seal",
+          child_object_document_json: childDocument({
+            object_id: witnessObject,
+            node_role: "witness",
+            district: "downtown",
+            game_meta: { scarcity_remaining: 11 },
+          }),
+        }),
+        revocationDisplay: null,
+      },
+      "https://humanity.llc",
+      new Date("2026-06-01T18:00:00.000Z"),
+      { env: { CITY_GAME_ENABLED: "1" } }
+    );
+
+    const wranglerRequest = new Request("https://humanity.llc/c/x?q=qr_y", {
+      headers: { Host: "humanity.llc" },
+    });
+    const html = await renderScanPage(vm, "https://humanity.llc", undefined, wranglerRequest, {
+      SCAN_PAGES_JS_ORIGIN: "http://127.0.0.1:8788",
+      SCAN_RESOLVER_ORIGIN: "http://127.0.0.1:8787",
+    });
+    expect(html).toContain("http://127.0.0.1:8788/js/scan-game-contribute.mjs?v=2");
+    expect(html).toContain('href="http://127.0.0.1:8787/');
+    expect(html).not.toContain("https://humanity.llc/js/scan-game-contribute.mjs");
   });
 
   it("mutes game progression before and after the season window", async () => {

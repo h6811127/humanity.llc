@@ -299,5 +299,7 @@ Delegated capabilities must be root-signed, scoped, expiring, revocable, and cle
 
 17. **Delegated capabilities (deferred):** scoped, expiring, root-signed child keys — **do not implement** until product gates in [`DELEGATED_CHILD_CAPABILITIES_GATE.md`](DELEGATED_CHILD_CAPABILITIES_GATE.md) pass (named team/event pilot, capability matrix, anti-surveillance review). Schema RFC: [`DELEGATED_CHILD_CAPABILITY_SCHEMA.md`](DELEGATED_CHILD_CAPABILITY_SCHEMA.md).
 
-**Sequence status:** Steps **1–16 shipped** (May 2026). Step **17** is the next **product-gated** slice, not the next default engineering slice.
+18. **`game_node` self-serve UI (Phase E — post–Cedar Rapids pilot):** extend `/created/` Live with **Add game node** — register `object_type: game_node`, issue scan QR, season metadata editor, rules page publish. Reuses steps 6–16 signing and hub tree patterns. Terminal mint stays for CI/pilot only. Spec: [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) § Phase E.
+
+**Sequence status:** Steps **1–16 shipped** (May 2026). Step **17** is the next **product-gated** slice, not the next default engineering slice. Step **18** follows Cedar Rapids S1 launch (Phase D gates).
 

@@ -44,8 +44,8 @@ Do **not** create new investigation docs for routine bugs. Update `SYSTEM_INVARI
 ## Agent checklist
 
 1. Read `PRODUCT_WORKSTREAM_COORDINATION.md` — check active branches; do not duplicate open PR scope.
-2. Read `SYSTEM_INVARIANTS.md` for your surface before editing shell/wallet/scan code.
-3. Run the regression block for your surface (see PR template or workstream doc) before finishing.
+2. Read `SYSTEM_INVARIANTS.md` for your surface before editing shell/wallet/scan code. City game: [`docs/CITY_GAME_V1_IMPLEMENTATION.md`](docs/CITY_GAME_V1_IMPLEMENTATION.md) § Architecture (risks **R-***, gates **B***).
+3. Run the regression block for your surface (see PR template or workstream doc) before finishing. City game: `npm run verify:city-game`.
 4. Bump `DEVICE_SHELL_ASSET_VERSION` when adding imports to the status module graph; list files in `DEVICE_STATUS_SHELL_JS_FILES`.
 5. After `site/scan-pass.css` changes: `npm run worker:bundle-scan`.
 6. Shell boot flash (RC-1–RC-7): [`docs/SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md`](docs/SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md) · `npm run worker:test:shell-boot`.

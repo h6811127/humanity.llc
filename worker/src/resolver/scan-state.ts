@@ -23,6 +23,7 @@ import {
   resolveGameNodeScanContext,
   type GameNodeScanContext,
 } from "../city-game/scan-view";
+import { resolveMobileLoreScanForPrintArtifact } from "../city-game/mobile-lore";
 
 export const QR_ID_REGEX =
   /^qr_[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{8,40}$/;
@@ -145,6 +146,7 @@ export function buildScanViewModel(
       import("../city-game/season-config").CrSeasonConfig,
       "window" | "status"
     >;
+    mobileLoreEnrollment?: import("../city-game/season-config").SeasonMobileLoreEnrollment[];
   } = {}
 ): ScanViewModel {
   if (!qrId) {
@@ -321,6 +323,38 @@ export function buildScanViewModel(
       origin
     );
     return vm;
+  }
+
+  if (qr.scope === "print_artifact") {
+    const mobileLore = resolveMobileLoreScanForPrintArtifact({
+      profileId,
+      printArtifactId: qr.print_artifact_id,
+      manifestoLine: card.manifesto_line,
+      env: options.env ?? {},
+      seasonForWindow: options.seasonForWindow,
+      enrollmentRows: options.mobileLoreEnrollment,
+      now,
+    });
+    if (mobileLore) {
+      return baseView(
+        {
+          kind: "active",
+          profileId,
+          qrId,
+          card,
+          qr,
+          verification: ctx.verification,
+          primaryBadge: { label: "Active", tone: "live" },
+          showCardBlock: true,
+          showHumanTrustBlock: true,
+          showArtifactBlock: true,
+          showLiveControlBlock: false,
+          objectStreams: mobileLore.objectStreams,
+          gameNode: mobileLore.gameNode,
+        },
+        origin
+      );
+    }
   }
 
   return baseView(

@@ -36,6 +36,13 @@ if (!skipTests) {
     "worker/tests/city-game-launch-gates.test.ts",
     "worker/tests/city-game-smoke-local-core.test.ts",
     "worker/tests/game-operator-core.test.ts",
+    "worker/tests/city-game-mobile-lore.test.ts",
+    "worker/tests/city-game-mobile-lore-core.test.ts",
+    "worker/tests/city-game-game-theory.test.ts",
+    "worker/tests/city-game-launch-surfaces.test.ts",
+    "worker/tests/scan-game-scarcity-ceiling-core.test.ts",
+    "worker/tests/resolver-origin.test.ts",
+    "worker/tests/city-game-lan-hub-core.test.ts",
   ]);
 }
 

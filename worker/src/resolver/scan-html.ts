@@ -15,22 +15,21 @@ import {
   humanTrustListIcon,
 } from "./verification-display";
 import { governanceProcessUrls, originFromScanUrl } from "./scan-governance";
+import { pagesJsOrigin, scanPageOrigin, type ScanPageOriginEnv } from "../http/resolver";
 import { SCAN_OFFLINE_BANNER_TEXT } from "./scan-offline";
 import {
-  GAME_CONTRIBUTE_EYEBROW,
   GAME_CONTRIBUTE_LEAD,
   GAME_CONTRIBUTE_PROGRESS_LABEL,
   GAME_CONTRIBUTE_SITE_CODE_LABEL,
   GAME_CONTRIBUTE_SUBMIT_LABEL,
-  GAME_FRAGMENT_CONTRIBUTE_EYEBROW,
   GAME_FRAGMENT_CONTRIBUTE_LEAD,
   GAME_FRAGMENT_CONTRIBUTE_SUBMIT_LABEL,
-  GAME_SCARCITY_CONTRIBUTE_EYEBROW,
   GAME_SCARCITY_CONTRIBUTE_LEAD,
   GAME_SCARCITY_CONTRIBUTE_PROGRESS_LABEL,
   GAME_SCARCITY_CONTRIBUTE_SUBMIT_LABEL,
   GAME_NODE_SCAN_FOOT,
   GAME_NODE_SCAN_PRIVACY_NOTE,
+  gameNodeContributeEyebrow,
   type GameNodeScanContext,
 } from "../city-game/scan-view";
 import { seasonWindowChip, seasonWindowScanNote } from "../city-game/season-window";
@@ -95,8 +94,11 @@ export const SCAN_UI_VERSION = "pass-v39";
 export async function renderScanPage(
   vm: ScanViewModel,
   origin: string,
-  safety: ScanSafetyModel = EMPTY_SCAN_SAFETY
+  safety: ScanSafetyModel = EMPTY_SCAN_SAFETY,
+  request?: Request,
+  originEnv?: ScanPageOriginEnv
 ): Promise<string> {
+  const pageOrigin = scanPageOrigin(origin, request, originEnv);
   const title = pageTitle(vm);
   let qrMarkup = "";
   if (vm.scanUrl) {
@@ -116,41 +118,41 @@ export async function renderScanPage(
   <meta name="theme-color" content="#ffffff" />
   <title>${escapeHtml(title)} · humanity.llc</title>
   <meta name="description" content="${escapeHtml(scanLead(vm))}" />
-  <link rel="icon" href="${escapeHtml(origin)}/assets/red_qr_transparent_bg.png" type="image/png" />
+  <link rel="icon" href="${escapeHtml(pageOrigin)}/assets/red_qr_transparent_bg.png" type="image/png" />
   ${SCAN_PAGE_THEME_BOOTSTRAP}
   <style>${SCAN_PASS_CSS}</style>
 </head>
 <body>
   <div class="page scan-page">
-    ${renderScanPageChrome(origin)}
+    ${renderScanPageChrome(pageOrigin)}
     <div class="scan-cross-tab-banner" id="scan-cross-tab-banner" role="status" hidden></div>
     <div class="scan-steward-preview-return" id="scan-steward-preview-return" hidden>
       <a id="scan-steward-preview-return-link" class="scan-steward-preview-return-link" href="#">Back</a>
     </div>
     <p class="scan-offline-banner" id="scan-offline-banner" role="status" hidden>${escapeHtml(SCAN_OFFLINE_BANNER_TEXT)}</p>
     <main class="screen scan-screen">
-      ${renderScanHeroSection(vm, safety, origin, qrMarkup)}
-      ${renderScanActorBand(vm, origin)}
+      ${renderScanHeroSection(vm, safety, pageOrigin, qrMarkup)}
+      ${renderScanActorBand(vm, pageOrigin)}
       ${renderScanTrustModules(vm, safety)}
-      ${renderLimitsSettings(vm, origin)}
-      ${renderTrustGroups(vm, origin)}
+      ${renderLimitsSettings(vm, pageOrigin)}
+      ${renderTrustGroups(vm, pageOrigin)}
       ${renderScanUrlControl(vm)}
-      ${renderFooter(vm, origin)}
+      ${renderFooter(vm, pageOrigin)}
     </main>
   </div>
-  ${renderScanTabKeysScript(vm, origin)}
-  ${renderLiveControlScript(vm, origin)}
-  ${renderVouchIssuanceScript(vm, origin)}
-  ${renderQrFallbackScript(origin, vm.scanUrl)}
+  ${renderScanTabKeysScript(vm, pageOrigin, request, originEnv)}
+  ${renderLiveControlScript(vm, pageOrigin, request)}
+  ${renderVouchIssuanceScript(vm, pageOrigin, request, originEnv)}
+  ${renderQrFallbackScript(pageOrigin, vm.scanUrl)}
   ${renderScanOfflineBannerScript()}
   ${renderScanSafetyHeaderScript()}
-  ${renderScanLiveCheckArriveScript(origin)}
-  ${renderScanActorBandScript(vm, origin)}
-  ${renderScanAiExplainScript(vm, origin)}
-  ${renderScanMerchFunnelScript(origin)}
-  ${renderScanGameContributeScript(vm, origin)}
-  ${renderScanOwnerRestoreCtaScript(vm, origin)}
-  ${renderScanStewardPreviewReturnScript(origin)}
+  ${renderScanLiveCheckArriveScript(pageOrigin, request, originEnv)}
+  ${renderScanActorBandScript(vm, pageOrigin, request, originEnv)}
+  ${renderScanAiExplainScript(vm, pageOrigin, request, originEnv)}
+  ${renderScanMerchFunnelScript(pageOrigin, request, originEnv)}
+  ${renderScanGameContributeScript(vm, pageOrigin, request, originEnv)}
+  ${renderScanOwnerRestoreCtaScript(vm, pageOrigin, request, originEnv)}
+  ${renderScanStewardPreviewReturnScript(pageOrigin, request, originEnv)}
 </body>
 </html>`;
 }
@@ -251,7 +253,7 @@ function renderScanHeroSection(
     : "";
   const gameContributeAttr =
     vm.gameNode?.showsContribute && vm.kind === "active"
-      ? ` data-game-contribute="1" data-game-contribute-mode="${escapeHtml(vm.gameNode.contributeMode ?? "quorum")}"`
+      ? ` data-game-contribute="1" data-game-contribute-mode="${escapeHtml(vm.gameNode.contributeMode ?? "quorum")}" data-season-id="${escapeHtml(vm.gameNode.seasonId)}"`
       : "";
   const resolverRow = safety.objectSignatureVerified
     ? `<p class="scan-safety-resolver scan-arrive-item scan-arrive-item--hidden">${escapeHtml(SCAN_SAFETY_RESOLVER_VERIFIED_COPY)}</p>`
@@ -499,11 +501,7 @@ function renderGameContributeBlock(vm: ScanViewModel): string {
   const target = meta.collective_target ?? 0;
   const isFragment = gameNode.contributeMode === "fragment";
   const isScarcity = gameNode.contributeMode === "scarcity";
-  const eyebrow = isScarcity
-    ? GAME_SCARCITY_CONTRIBUTE_EYEBROW
-    : isFragment
-      ? GAME_FRAGMENT_CONTRIBUTE_EYEBROW
-      : GAME_CONTRIBUTE_EYEBROW;
+  const eyebrow = gameNodeContributeEyebrow(gameNode.contributeMode!, gameNode.district);
   const lead = isScarcity
     ? GAME_SCARCITY_CONTRIBUTE_LEAD
     : isFragment
@@ -530,11 +528,8 @@ function renderGameContributeBlock(vm: ScanViewModel): string {
     : isFragment
       ? " scan-game-contribute--fragment"
       : "";
-  const placeholder = isScarcity
-    ? "CR-WITNS-4P"
-    : isFragment
-      ? "CR-MURAL-2F"
-      : "CR-LANTERN-7K";
+  const placeholder =
+    gameNode.contributeSiteCodePlaceholder?.trim() || "From backing card";
 
   return `<section class="scan-game-contribute${sectionClass}" id="scan-game-contribute" aria-labelledby="scan-game-contribute-label">
   <p class="scan-game-contribute-eyebrow">${escapeHtml(eyebrow)}</p>
@@ -634,7 +629,12 @@ function renderScanOwnerRestoreCta(vm: ScanViewModel, origin: string): string {
 </p>`;
 }
 
-function renderScanOwnerRestoreCtaScript(vm: ScanViewModel, origin: string): string {
+function renderScanOwnerRestoreCtaScript(
+  vm: ScanViewModel,
+  origin: string,
+  request?: Request,
+  originEnv?: ScanPageOriginEnv
+): string {
   if (
     !isScanOwnerRestoreCtaEligible({
       kind: vm.kind,
@@ -644,7 +644,7 @@ function renderScanOwnerRestoreCtaScript(vm: ScanViewModel, origin: string): str
   ) {
     return "";
   }
-  const assetOrigin = pagesJsOrigin(origin);
+  const assetOrigin = pagesJsOrigin(origin, request, originEnv);
   const mod = JSON.stringify(`${assetOrigin}/js/scan-owner-restore-cta.mjs?v=1`);
   return `<script type="module" src=${mod}></script>`;
 }
@@ -1325,33 +1325,56 @@ function vouchIssuanceGroupRows(vm: ScanViewModel): string {
 </li>`;
 }
 
-function renderVouchIssuanceScript(vm: ScanViewModel, origin: string): string {
+function renderVouchIssuanceScript(
+  vm: ScanViewModel,
+  origin: string,
+  request?: Request,
+  originEnv?: ScanPageOriginEnv
+): string {
   if (vm.kind !== "active" || !vm.profileId) return "";
-  const assetOrigin = pagesJsOrigin(origin);
+  const assetOrigin = pagesJsOrigin(origin, request, originEnv);
   const mod = JSON.stringify(`${assetOrigin}/js/vouch-issue.mjs?v=15`);
   return `<script type="module" src=${mod}></script>`;
 }
 
-function renderScanTabKeysScript(vm: ScanViewModel, origin: string): string {
+function renderScanTabKeysScript(
+  vm: ScanViewModel,
+  origin: string,
+  request?: Request,
+  originEnv?: ScanPageOriginEnv
+): string {
   if (vm.kind !== "active" || !vm.profileId) return "";
-  const assetOrigin = pagesJsOrigin(origin);
+  const assetOrigin = pagesJsOrigin(origin, request, originEnv);
   const mod = JSON.stringify(`${assetOrigin}/js/scan-tab-keys.mjs?v=9`);
   return `<script type="module" src=${mod}></script>`;
 }
 
-function renderScanLiveCheckArriveScript(origin: string): string {
-  const assetOrigin = pagesJsOrigin(origin);
+function renderScanLiveCheckArriveScript(
+  origin: string,
+  request?: Request,
+  originEnv?: ScanPageOriginEnv
+): string {
+  const assetOrigin = pagesJsOrigin(origin, request, originEnv);
   const mod = JSON.stringify(`${assetOrigin}/js/scan-live-check-arrive.mjs?v=2`);
   return `<script type="module" src=${mod}></script>`;
 }
 
-function renderScanMerchFunnelScript(origin: string): string {
-  const assetOrigin = pagesJsOrigin(origin);
+function renderScanMerchFunnelScript(
+  origin: string,
+  request?: Request,
+  originEnv?: ScanPageOriginEnv
+): string {
+  const assetOrigin = pagesJsOrigin(origin, request, originEnv);
   const mod = JSON.stringify(`${assetOrigin}/js/scan-merch-funnel.mjs?v=2`);
   return `<script type="module" src=${mod}></script>`;
 }
 
-function renderScanGameContributeScript(vm: ScanViewModel, origin: string): string {
+function renderScanGameContributeScript(
+  vm: ScanViewModel,
+  origin: string,
+  request?: Request,
+  originEnv?: ScanPageOriginEnv
+): string {
   if (
     vm.kind !== "active" ||
     !vm.gameNode?.showsContribute ||
@@ -1360,13 +1383,17 @@ function renderScanGameContributeScript(vm: ScanViewModel, origin: string): stri
   ) {
     return "";
   }
-  const assetOrigin = pagesJsOrigin(origin);
-  const mod = JSON.stringify(`${assetOrigin}/js/scan-game-contribute.mjs?v=1`);
+  const assetOrigin = pagesJsOrigin(origin, request, originEnv);
+  const mod = JSON.stringify(`${assetOrigin}/js/scan-game-contribute.mjs?v=2`);
   return `<script type="module" src=${mod}></script>`;
 }
 
-function renderScanStewardPreviewReturnScript(origin: string): string {
-  const assetOrigin = pagesJsOrigin(origin);
+function renderScanStewardPreviewReturnScript(
+  origin: string,
+  request?: Request,
+  originEnv?: ScanPageOriginEnv
+): string {
+  const assetOrigin = pagesJsOrigin(origin, request, originEnv);
   const mod = JSON.stringify(`${assetOrigin}/js/scan-steward-preview-return.mjs?v=1`);
   return `<script type="module" src=${mod}></script>`;
 }
@@ -1386,37 +1413,30 @@ function renderScanActorBand(vm: ScanViewModel, origin: string): string {
 </section>`;
 }
 
-function renderScanActorBandScript(vm: ScanViewModel, origin: string): string {
+function renderScanActorBandScript(
+  vm: ScanViewModel,
+  origin: string,
+  request?: Request,
+  originEnv?: ScanPageOriginEnv
+): string {
   if (vm.kind !== "active" || !vm.profileId) return "";
-  const assetOrigin = pagesJsOrigin(origin);
+  const assetOrigin = pagesJsOrigin(origin, request, originEnv);
   const mod = JSON.stringify(`${assetOrigin}/js/scan-actor-band.mjs?v=3`);
   return `<script type="module" src=${mod}></script>`;
 }
 
-function renderScanAiExplainScript(vm: ScanViewModel, origin: string): string {
+function renderScanAiExplainScript(
+  vm: ScanViewModel,
+  origin: string,
+  request?: Request,
+  originEnv?: ScanPageOriginEnv
+): string {
   if (vm.kind !== "active" || !vm.objectStreams.length) return "";
   const snapshot = buildPublicObjectSnapshot(vm.manifestoLine, vm.objectStreams);
   if (!snapshot) return "";
-  const assetOrigin = pagesJsOrigin(origin);
+  const assetOrigin = pagesJsOrigin(origin, request, originEnv);
   const mod = JSON.stringify(`${assetOrigin}/js/scan-ai-explain.mjs?v=1`);
   return `<script type="module" src=${mod}></script>`;
-}
-
-/** Local dev: scan HTML is on :8787, static JS on Pages :8788. */
-function pagesJsOrigin(origin: string): string {
-  try {
-    const url = new URL(origin);
-    if (
-      (url.hostname === "127.0.0.1" || url.hostname === "localhost") &&
-      url.port === "8787"
-    ) {
-      url.port = "8788";
-      return url.origin;
-    }
-  } catch {
-    /* use scan origin */
-  }
-  return origin;
 }
 
 function liveControlInteractiveRow(provenAt: string | null): string {
@@ -1549,7 +1569,7 @@ function formatScanTimestamp(iso: string): string {
   });
 }
 
-function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
+function renderLiveControlScript(vm: ScanViewModel, origin: string, _request?: Request): string {
   if (vm.kind !== "active" || !vm.profileId || !vm.qrId) return "";
   const apiOrigin = liveControlApiOrigin(vm, origin);
   const challengeUrl = `${apiOrigin}/.well-known/hc/v1/cards/${encodeURIComponent(

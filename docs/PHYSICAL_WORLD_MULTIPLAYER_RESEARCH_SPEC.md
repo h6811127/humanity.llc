@@ -307,6 +307,8 @@ Not in Phase A:
 
 Current build focus remains the simpler pilots in `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md`.
 
+**Post-pilot (self-serve organizers):** After the Cedar Rapids pilot, stewards create game seasons from the website — season root at `/create/`, node setup on `/created/`, live play at `/game-operator/` — without terminal scripts. Spec: [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) § Phase E.
+
 ---
 
 ## Open questions
