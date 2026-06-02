@@ -50,7 +50,7 @@ const TIER0_THANKS_COPY = {
       "Thanks for backing a founding garment experiment. When it arrives, <strong>scan the shared campaign QR before you wear it</strong>. Strangers read whatever stewards publish on the campaign card  -  buying does not grant control or a vouch.",
     meta: "Thanks for your Glitch LIVE QR hoodie order. Scan when it arrives; buying company merch does not verify you.",
     purchaseNoteHtml:
-      "<strong>Buying this hoodie did not verify you.</strong> The printed QR is a shared batch pointer  -  not your personal Humanity Card.",
+      "<strong>Buying this hoodie did not verify you.</strong> The printed QR is a shared batch pointer  -  not your personal live card.",
   },
 };
 

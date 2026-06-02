@@ -108,8 +108,8 @@ describe("create-template-copy", () => {
     expect(CREATE_TEMPLATE_HERO.status_plate.title).toBe("Add a status plate");
   });
 
-  it("general template emphasizes Humanity Card first", () => {
-    expect(createHeroCopyForTemplate("general").title).toBe("Create a Humanity Card");
-    expect(createHeroCopyForTemplate(undefined).title).toBe("Create a Humanity Card");
+  it("general template emphasizes live card first", () => {
+    expect(createHeroCopyForTemplate("general").title).toBe("Create a live card");
+    expect(createHeroCopyForTemplate(undefined).title).toBe("Create a live card");
   });
 });

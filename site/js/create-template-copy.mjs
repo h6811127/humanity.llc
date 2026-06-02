@@ -8,19 +8,19 @@
 /** @type {Record<CreatePilotTemplate, { title: string; lead: string }>} */
 export const CREATE_TEMPLATE_HERO = {
   general: {
-    title: "Create a Humanity Card",
+    title: "Create a live card",
     lead:
-      "One general root card on the network — add status plates, lost-item relays, and more from Live after create. Same signed QR model: live status, not a frozen link.",
+      "One general live card on the network — add status plates, lost-item relays, and more from Live after create. Signed QR, live status — not a frozen link.",
   },
   status_plate: {
     title: "Add a status plate",
     lead:
-      "Recommended: add under an existing general card on Live — one root key, nested in My objects. Standalone plate cards below stay available for legacy pilots.",
+      "Recommended: add under an existing live card on Live — one root key, nested in My objects. Standalone plate paths below stay available for legacy pilots.",
   },
   lost_item_relay: {
     title: "Add a lost-item relay",
     lead:
-      "Recommended: add under an existing general card on Live — one root key, no phone number on the tag. Standalone relay cards below stay available for legacy pilots.",
+      "Recommended: add under an existing live card on Live — one root key, no phone number on the tag. Standalone relay paths below stay available for legacy pilots.",
   },
 };
 

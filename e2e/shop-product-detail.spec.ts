@@ -14,7 +14,7 @@ const GLITCH_PRODUCT = {
   title: "Glitch LIVE QR hoodie",
   meaning_line: "Founding Glitch art on your chest — your unique QR, your live line.",
   story:
-    "Fixed Glitch garment design with a unique revocable QR tied to your Humanity Card. Change what strangers read from your phone without reprinting. Commerce does not verify you or grant a vouch.",
+    "Fixed Glitch garment design with a unique revocable QR tied to your live card. Change what strangers read from your phone without reprinting. Commerce does not verify you or grant a vouch.",
   product_class: "personalized",
   personalization_indicator: "Personalized QR",
   requires_card: true,

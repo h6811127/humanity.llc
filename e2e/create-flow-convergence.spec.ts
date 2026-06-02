@@ -92,7 +92,7 @@ test.describe("create flow convergence nudge", () => {
     const nudge = page.locator("#create-add-object-nudge");
     await expect(nudge).toBeVisible();
     await expect(page.locator("#create-add-object-nudge-title")).toContainText(
-      "general Humanity Card"
+      "general live card"
     );
 
     const primary = page.locator("#create-add-object-nudge-primary");

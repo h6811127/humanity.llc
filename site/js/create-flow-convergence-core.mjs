@@ -132,7 +132,7 @@ export function createConvergenceNudgeCopy(template, ctx) {
   }
 
   return {
-    title: `Create a general Humanity Card first`,
+    title: `Create a general live card first`,
     body: `Then ${addVerb} from Live on /created/ under that root — no new private key. Standalone ${objectLabel} cards below remain for strangers and legacy pilots.`,
     primaryLabel: "Switch to general card",
     primaryHref: null,

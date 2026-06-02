@@ -11,7 +11,7 @@ export const PROOF_CONSENT_COPY = {
   },
   bearer_not_ownership: {
     label:
-      "A printed QR is a pointer — holding the object does not prove I own the Humanity Card.",
+      "A printed QR is a pointer — holding the object does not prove I own the live card.",
   },
   persistence_revocable: {
     label:

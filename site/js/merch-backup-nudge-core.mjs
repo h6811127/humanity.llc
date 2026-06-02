@@ -96,7 +96,7 @@ export function merchBackupNudgeCopy(phase, opts = {}) {
   if (phase === "post_checkout") {
     return {
       title: "Save a recovery method now — your ownership controls this print",
-      body: "Your live object is tied to your Humanity Card ownership. Add a recovery method or export encrypted backup on Manage before you close this tab — we cannot restore lost control.",
+      body: "Your live object is tied to your live card ownership. Add a recovery method or export encrypted backup on Manage before you close this tab — we cannot restore lost control.",
     };
   }
   if (blocked) {

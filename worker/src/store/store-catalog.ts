@@ -87,7 +87,7 @@ const LAUNCH_PRODUCTS: StoreCatalogProduct[] = [
     title: "Glitch LIVE QR hoodie",
     meaning_line: "Founding Glitch art on your chest. Your unique QR, your live line.",
     story:
-      "Fixed Glitch garment design with a unique revocable QR tied to your Humanity Card. Change what strangers read from your phone without reprinting. Commerce does not verify you or grant a vouch.",
+      "Fixed Glitch garment design with a unique revocable QR tied to your live card. Change what strangers read from your phone without reprinting. Commerce does not verify you or grant a vouch.",
     product_class: "personalized",
     personalization_indicator: "Personalized QR",
     requires_card: true,
@@ -105,7 +105,7 @@ const LAUNCH_PRODUCTS: StoreCatalogProduct[] = [
     title: "Founding LIVE OBJECT purse",
     meaning_line: "The 2023 prototype, carried forward. Your unique QR on the front panel.",
     story:
-      "Original founding satchel design with a unique revocable QR tied to your Humanity Card. Fixed LIVE OBJECT art language; you update what strangers read from your phone without reprinting.",
+      "Original founding satchel design with a unique revocable QR tied to your live card. Fixed LIVE OBJECT art language; you update what strangers read from your phone without reprinting.",
     product_class: "personalized",
     personalization_indicator: "Personalized QR",
     requires_card: true,
@@ -141,7 +141,7 @@ const LAUNCH_PRODUCTS: StoreCatalogProduct[] = [
     title: "Live Object hoodie",
     meaning_line: "Your unique QR on the chest. You change what strangers read; the ink stays.",
     story:
-      "Tier 1 belonging wear. Each hoodie gets its own revocable print artifact tied to your Humanity Card. Update your live line from your phone without reprinting. Lose signing access without recovery and the scan can become a fixed record of the last thing you published.",
+      "Tier 1 belonging wear. Each hoodie gets its own revocable print artifact tied to your live card. Update your live line from your phone without reprinting. Lose signing access without recovery and the scan can become a fixed record of the last thing you published.",
     product_class: "personalized",
     personalization_indicator: "Personalized QR",
     requires_card: true,
@@ -198,7 +198,7 @@ const ROWS: StoreCatalogRow[] = [
     title: "Make it yours",
     subtitle: "Tier 1 belonging",
     story:
-      "Preview the founding Glitch LIVE QR hoodie and the original LIVE OBJECT purse. Fixed art with a unique revocable QR tied to your Humanity Card.",
+      "Preview the founding Glitch LIVE QR hoodie and the original LIVE OBJECT purse. Fixed art with a unique revocable QR tied to your live card.",
     product_ids: [GLITCH_HOODIE_STORE_PRODUCT_ID, FOUNDING_PURSE_STORE_PRODUCT_ID],
     sort_order: 1,
     status: "published",

@@ -71,7 +71,7 @@ describe("createConvergenceNudgeCopy", () => {
       preferredRoot: null,
       rootCount: 0,
     });
-    expect(copy.title).toContain("general Humanity Card");
+    expect(copy.title).toContain("general live card");
     expect(copy.collapseLegacyForm).toBe(false);
   });
 });
