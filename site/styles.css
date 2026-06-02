@@ -6473,7 +6473,8 @@ body.page-wallet #wallet-page {
   width: 100%;
   max-width: 430px;
   margin: 0 auto;
-  padding-top: calc(var(--shell-chrome-h, 52px) + 8px);
+  /* .page already reserves --shell-chrome-h for the fixed dot row */
+  padding-top: 8px;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
