@@ -86,9 +86,7 @@ import {
   hubStatusLineItemsFromSegments,
   scanWalletKeysNotInTab,
   SHELL_DOT_NEUTRAL_EMPTY_CLASS,
-  shellChromeStatusLineFromSegments,
   shellDotUsesNeutralEmptyWallet,
-  shellStatusLinePrimaryInChrome,
   shouldCelebrateStewardTransition,
   statusAriaLabel,
 } from "./device-dot-state-core.mjs?v=82";
@@ -445,27 +443,11 @@ function applyLandingStrangerChrome() {
   );
 }
 
-function renderShellStatusLine(segments) {
-  if (!shellStatusLine) return;
-  const savedWalletCount = loadWalletSummary().count;
-  const device = deviceState();
-  const overlay = dotOverlayState();
-  const show = shellStatusLinePrimaryInChrome({
-    device,
-    overlay,
-    savedWalletCount,
-  });
-  if (!show) {
+function renderShellStatusLine() {
+  if (shellStatusLine) {
     shellStatusLine.hidden = true;
     shellStatusLine.textContent = "";
-    applyLandingStrangerChrome();
-    return;
   }
-  const strangerLanding = isLandingStrangerChrome(strangerChromeInput());
-  shellStatusLine.hidden = false;
-  shellStatusLine.textContent = shellChromeStatusLineFromSegments(segments, {
-    strangerLanding,
-  });
   applyLandingStrangerChrome();
 }
 
@@ -548,7 +530,7 @@ function renderSystemBanner() {
 
 function refreshSummary() {
   const segments = buildStatusSegments(networkStatus);
-  renderShellStatusLine(segments);
+  renderShellStatusLine();
   renderHubStatusPanel(segments);
   renderStatusKey();
   applyDot();

@@ -409,14 +409,11 @@ test.describe("shell S4 empty-wallet chrome", () => {
     await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route, "ok"));
   });
 
-  test("shows primary status line and neutral dot when wallet is empty", async ({
+  test("shows neutral dot without chrome status line when wallet is empty", async ({
     page,
   }) => {
     await page.goto("/");
-    const line = page.locator("#shell-status-line");
-    await expect(line).toBeVisible({ timeout: 15_000 });
-    await expect(line).toContainText(/network reachable/i);
-    await expect(line).not.toContainText(/0 cards/i);
+    await expect(page.locator("#shell-status-line")).toBeHidden({ timeout: 15_000 });
 
     const dot = page.locator("#brand-status-dot");
     await expect(dot).toHaveAttribute("data-dot-state", "ok:none");

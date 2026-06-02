@@ -176,9 +176,7 @@ test.describe("production sad-path — landing after abandon", () => {
 
   test("S1: fresh landing shows empty wallet, not live card success chrome", async ({ page }) => {
     await page.goto("/");
-    const shellLine = page.locator("#shell-status-line");
-    await expect(shellLine).toBeVisible({ timeout: 15_000 });
-    await expect(shellLine).toContainText(/0 cards/i);
+    await expect(page.locator("#shell-status-line")).toBeHidden({ timeout: 15_000 });
     await page.locator("#brand-status-dot-btn").click();
     await expect(page.locator("#device-hub-saved-empty")).toBeVisible({ timeout: 15_000 });
     await expect(page.getByRole("heading", { name: "Your object is live" })).toHaveCount(0);

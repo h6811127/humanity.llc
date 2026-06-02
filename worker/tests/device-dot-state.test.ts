@@ -13,9 +13,7 @@ import {
   inboxOverlayQuickAction,
   overlayAriaText,
   primaryDotTone,
-  shellChromeStatusLineFromSegments,
   shellDotUsesNeutralEmptyWallet,
-  shellStatusLinePrimaryInChrome,
   SHELL_DOT_NEUTRAL_EMPTY_CLASS,
   shouldCelebrateStewardTransition,
   dotTransitionKey,
@@ -401,78 +399,6 @@ describe("shell S4 neutral dot and chrome status line", () => {
         savedWalletCount: 0,
       })
     ).toBe(false);
-  });
-
-  it("shows chrome status line when wallet empty and no urgent device state", () => {
-    expect(
-      shellStatusLinePrimaryInChrome({
-        device: "none",
-        overlay: "none",
-        savedWalletCount: 0,
-      })
-    ).toBe(true);
-    expect(
-      shellStatusLinePrimaryInChrome({
-        device: "keys",
-        overlay: "none",
-        savedWalletCount: 2,
-      })
-    ).toBe(false);
-  });
-
-  it("formats network and saved chips for chrome", () => {
-    const line = shellChromeStatusLineFromSegments([
-      {
-        id: "network",
-        chipLabel: "Network reachable",
-        label: "Resolver Online",
-        detail: "",
-        zero: false,
-        highlight: false,
-      },
-      {
-        id: "saved",
-        chipLabel: "0 cards",
-        label: "No Cards on Device",
-        detail: "",
-        zero: true,
-        highlight: false,
-      },
-      {
-        id: "pinned",
-        chipLabel: "0 pinned",
-        label: "No Pinned Scans",
-        detail: "",
-        zero: true,
-        highlight: false,
-      },
-    ]);
-    expect(line).toBe("Network reachable · 0 cards");
-  });
-
-  it("omits zero saved subcopy on stranger landing", () => {
-    const segments = [
-      {
-        id: "network",
-        chipLabel: "Network reachable",
-        label: "Resolver Online",
-        detail: "",
-        zero: false,
-        highlight: false,
-      },
-      {
-        id: "saved",
-        chipLabel: "0 cards",
-        label: "No Cards on Device",
-        detail: "",
-        zero: true,
-        highlight: false,
-      },
-    ];
-    expect(shellChromeStatusLineFromSegments(segments, { strangerLanding: true })).toBe(
-      "Network reachable"
-    );
-    expect(shellChromeStatusLineFromSegments(segments)).toBe("Network reachable · 0 cards");
   });
 
   it("maps hub status segments to one calm inline status line", () => {

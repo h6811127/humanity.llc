@@ -405,33 +405,6 @@ export function shellDotUsesNeutralEmptyWallet({
 }
 
 /**
- * Top-chrome status line is primary read when wallet is empty and dot is calm.
- * @param {{
- *   device: "none" | "keys" | "unsaved" | "steward",
- *   overlay: DotInboxOverlay,
- *   savedWalletCount: number,
- * }}
- */
-export function shellStatusLinePrimaryInChrome({ device, overlay, savedWalletCount }) {
-  if (savedWalletCount > 0) return false;
-  if (device !== "none") return false;
-  if (overlay !== "none") return false;
-  return true;
-}
-
-/**
- * @param {Array<{ id: string, chipLabel: string }>} segments
- * @param {{ strangerLanding?: boolean }} [opts]
- */
-export function shellChromeStatusLineFromSegments(segments, opts = {}) {
-  const ids = opts.strangerLanding ? ["network"] : ["network", "saved"];
-  return segments
-    .filter((seg) => ids.includes(seg.id))
-    .map((seg) => seg.chipLabel)
-    .join(" · ");
-}
-
-/**
  * @param {string} pathname
  * @param {{ isWalletPage?: boolean }} [opts]
  */
