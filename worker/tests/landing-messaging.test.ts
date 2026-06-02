@@ -21,7 +21,7 @@ describe("landing messaging (Step 3)", () => {
   it("landing meta and OG align with messaging matrix", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
     expect(html).toContain(LANDING_META_SNIPPET);
-    expect(html).toContain("No scan tracking.");
+    expect(html).toContain("No passive scan tracking by default.");
     expect(html).not.toContain("Physical objects with programmable social state");
     expect(html).not.toContain("Live public objects. Not identity, not social media");
   });
@@ -88,7 +88,7 @@ describe("public marketing clarity (AI step 5)", () => {
     expect(publicCopy).toContain("Public programmable objects");
     expect(publicCopy).toContain("Live state<br />on real objects.");
     expect(publicCopy).toContain("signed QR");
-    expect(publicCopy).toContain("No scan tracking.");
+    expect(publicCopy).toContain("No passive scan tracking by default.");
     expect(publicCopy).not.toMatch(/\bAI\b|artificial intelligence|AI profiles|we have AI/i);
   });
 

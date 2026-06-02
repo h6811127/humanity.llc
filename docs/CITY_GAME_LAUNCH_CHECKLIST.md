@@ -15,6 +15,8 @@
 | E4 | `CITY_GAME_ENABLED=1` in `worker/wrangler.toml` · Worker deployed | ☐ |
 | E5 | Scan template live on staging for `node_01`, `node_04`, `node_07` | ☐ |
 
+Local E5: [`CITY_GAME_LOCAL_DEV.md`](CITY_GAME_LOCAL_DEV.md) · `npm run city-game:smoke-local`
+
 ---
 
 ## Product / trust

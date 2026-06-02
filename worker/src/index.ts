@@ -36,6 +36,7 @@ import {
 import { handlePostIssuePrintArtifactQr } from "./resolver/issue-print-artifact-qr";
 import { handlePostIssueChildObjectQr } from "./resolver/issue-child-object-qr";
 import { handlePostGameUpdate } from "./resolver/game-update";
+import { handlePostGameContribute } from "./resolver/game-contribute";
 import { handlePostRotateQr } from "./resolver/rotate-qr";
 import { handlePostExtendQr } from "./resolver/extend-qr";
 import { handleGetScan } from "./resolver/scan";
@@ -655,6 +656,26 @@ export default {
         env.DB,
         childObjectIssueQrMatch[1]!,
         childObjectIssueQrMatch[2]!
+      );
+      return withCors(request, res);
+    }
+
+    const childObjectGameContributeMatch = path.match(
+      /^\/\.well-known\/hc\/v1\/cards\/([^/]+)\/objects\/([^/]+)\/game-contribute$/
+    );
+    if (childObjectGameContributeMatch && request.method === "POST") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostGameContribute(
+        request,
+        env.DB,
+        env,
+        childObjectGameContributeMatch[1]!,
+        childObjectGameContributeMatch[2]!
       );
       return withCors(request, res);
     }

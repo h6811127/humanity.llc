@@ -17,7 +17,16 @@ import {
 import { governanceProcessUrls, originFromScanUrl } from "./scan-governance";
 import { SCAN_OFFLINE_BANNER_TEXT } from "./scan-offline";
 import {
+  GAME_CONTRIBUTE_EYEBROW,
+  GAME_CONTRIBUTE_LEAD,
+  GAME_CONTRIBUTE_PROGRESS_LABEL,
+  GAME_CONTRIBUTE_SITE_CODE_LABEL,
+  GAME_CONTRIBUTE_SUBMIT_LABEL,
+  GAME_FRAGMENT_CONTRIBUTE_EYEBROW,
+  GAME_FRAGMENT_CONTRIBUTE_LEAD,
+  GAME_FRAGMENT_CONTRIBUTE_SUBMIT_LABEL,
   GAME_NODE_SCAN_FOOT,
+  GAME_NODE_SCAN_PRIVACY_NOTE,
   type GameNodeScanContext,
 } from "../city-game/scan-view";
 import {
@@ -73,7 +82,7 @@ import {
 } from "./scan-malformed-hint";
 
 /** Response header  -  confirms pass-card scan UI (not legacy .block layout). */
-export const SCAN_UI_VERSION = "pass-v38";
+export const SCAN_UI_VERSION = "pass-v39";
 
 /**
  * Public scan UI  -  flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
@@ -134,6 +143,7 @@ export async function renderScanPage(
   ${renderScanActorBandScript(vm, origin)}
   ${renderScanAiExplainScript(vm, origin)}
   ${renderScanMerchFunnelScript(origin)}
+  ${renderScanGameContributeScript(vm, origin)}
   ${renderScanOwnerRestoreCtaScript(vm, origin)}
   ${renderScanStewardPreviewReturnScript(origin)}
 </body>
@@ -209,6 +219,14 @@ function renderScanPageChrome(origin: string): string {
 }
 
 /** Live check hero — merges scanner safety + status panel (docs/M3_SCAN_PAGE_UI.md Phase 1). */
+function renderScanHeroFootBlock(vm: ScanViewModel, foot: string): string {
+  if (vm.gameNode?.enabled && vm.gameNode.mode !== "fallback") {
+    return `<p class="scan-hero-foot">${escapeHtml(GAME_NODE_SCAN_FOOT)}</p>
+  <p class="scan-game-privacy-note" role="note">${escapeHtml(GAME_NODE_SCAN_PRIVACY_NOTE)}</p>`;
+  }
+  return foot ? `<p class="scan-hero-foot">${escapeHtml(foot)}</p>` : "";
+}
+
 function renderScanHeroSection(
   vm: ScanViewModel,
   safety: ScanSafetyModel,
@@ -223,13 +241,18 @@ function renderScanHeroSection(
   const qrAttr = vm.qrId ? ` data-qr-id="${escapeHtml(vm.qrId)}"` : "";
   const scanActiveAttr = vm.kind === "active" ? ` data-scan-active="1"` : "";
   const merchFunnelAttr = isMerchFunnelScan(vm) ? ` data-merch-funnel="1"` : "";
+  const objectAttr = vm.childObjectId
+    ? ` data-object-id="${escapeHtml(vm.childObjectId)}"`
+    : "";
+  const gameContributeAttr =
+    vm.gameNode?.showsContribute && vm.kind === "active"
+      ? ` data-game-contribute="1" data-game-contribute-mode="${escapeHtml(vm.gameNode.contributeMode ?? "quorum")}"`
+      : "";
   const resolverRow = safety.objectSignatureVerified
     ? `<p class="scan-safety-resolver scan-arrive-item scan-arrive-item--hidden">${escapeHtml(SCAN_SAFETY_RESOLVER_VERIFIED_COPY)}</p>`
     : "";
   const chipsBlock = renderScanHeroMetaDetails(vm, safety);
-  const footBlock = foot
-    ? `<p class="scan-hero-foot">${escapeHtml(foot)}</p>`
-    : "";
+  const footBlock = renderScanHeroFootBlock(vm, foot);
   const display = parseManifestoDisplay(vm.manifestoLine);
   const heroTemplate = scanHeroTemplate(display, vm.qrScope);
   const lostItemCreateHint =
@@ -239,6 +262,7 @@ function renderScanHeroSection(
       ? renderLostItemCreateHint(origin)
       : "";
   const merchFunnelHint = isMerchFunnelScan(vm) ? renderMerchFunnelHint(origin) : "";
+  const gameContributeBlock = renderGameContributeBlock(vm);
   const ownerRestoreCta = renderScanOwnerRestoreCta(vm, origin);
   const qrBlock = scanHeroQrBlock(vm, qrMarkup);
   const qrSection = qrBlock
@@ -249,7 +273,7 @@ function renderScanHeroSection(
     : "";
 
   return `<div class="scan-pass-layer">
-<article class="scan-hero scan-status-panel scan-safety-header scan-live-check--pending" id="scan-safety-header" aria-label="Live check"${profileAttr}${qrAttr}${scanActiveAttr}${merchFunnelAttr}>
+<article class="scan-hero scan-status-panel scan-safety-header scan-live-check--pending" id="scan-safety-header" aria-label="Live check"${profileAttr}${qrAttr}${objectAttr}${scanActiveAttr}${merchFunnelAttr}${gameContributeAttr}>
   <header class="scan-hero-head">
     ${renderScanHeroHost()}
     ${renderHeroStatusStrip(vm)}
@@ -262,6 +286,7 @@ function renderScanHeroSection(
   ${chipsBlock}
   <p class="scan-safety-first-seen" id="scan-safety-first-seen" hidden></p>
   ${footBlock}
+  ${gameContributeBlock}
   ${lostItemCreateHint}
   ${merchFunnelHint}
   ${ownerRestoreCta}
@@ -438,6 +463,47 @@ function renderGameNodeMetaChips(gameNode: GameNodeScanContext): string {
     )
     .join("\n");
   return `<ul class="scan-game-chips" aria-label="Game state">${items}</ul>`;
+}
+
+function renderGameContributeBlock(vm: ScanViewModel): string {
+  const gameNode = vm.gameNode;
+  if (
+    vm.kind !== "active" ||
+    !gameNode?.showsContribute ||
+    gameNode.mode !== "game" ||
+    !vm.profileId ||
+    !vm.childObjectId
+  ) {
+    return "";
+  }
+
+  const meta = gameNode.gameMeta;
+  const progress = meta.collective_progress ?? 0;
+  const target = meta.collective_target ?? 0;
+  const isFragment = gameNode.contributeMode === "fragment";
+  const eyebrow = isFragment ? GAME_FRAGMENT_CONTRIBUTE_EYEBROW : GAME_CONTRIBUTE_EYEBROW;
+  const lead = isFragment ? GAME_FRAGMENT_CONTRIBUTE_LEAD : GAME_CONTRIBUTE_LEAD;
+  const submitLabel = isFragment
+    ? GAME_FRAGMENT_CONTRIBUTE_SUBMIT_LABEL
+    : GAME_CONTRIBUTE_SUBMIT_LABEL;
+  const progressBlock = isFragment
+    ? ""
+    : `<p class="scan-game-contribute-progress">
+    <span class="scan-game-contribute-progress-label">${escapeHtml(GAME_CONTRIBUTE_PROGRESS_LABEL)}</span>
+    <span class="scan-game-contribute-progress-value" id="scan-game-contribute-progress">${escapeHtml(String(progress))} / ${escapeHtml(String(target))}</span>
+  </p>`;
+
+  return `<section class="scan-game-contribute${isFragment ? " scan-game-contribute--fragment" : ""}" id="scan-game-contribute" aria-labelledby="scan-game-contribute-label">
+  <p class="scan-game-contribute-eyebrow">${escapeHtml(eyebrow)}</p>
+  <p class="scan-game-contribute-lead" id="scan-game-contribute-label">${escapeHtml(lead)}</p>
+  ${progressBlock}
+  <label class="scan-game-contribute-field-label" for="scan-game-contribute-code">${escapeHtml(GAME_CONTRIBUTE_SITE_CODE_LABEL)}</label>
+  <input class="scan-game-contribute-input" id="scan-game-contribute-code" name="site_code" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="32" placeholder="${escapeHtml(isFragment ? "CR-MURAL-2F" : "CR-LANTERN-7K")}" />
+  <button type="button" class="scan-game-contribute-cta" id="scan-game-contribute-submit">${escapeHtml(submitLabel)}</button>
+  <div class="scan-game-contribute-status-panel" id="scan-game-contribute-status-panel" hidden>
+    <p class="scan-game-contribute-status" id="scan-game-contribute-status" aria-live="polite"></p>
+  </div>
+</section>`;
 }
 
 function buildGameNodeScanHero(vm: ScanViewModel): { main: string; foot: string } {
@@ -1231,6 +1297,20 @@ function renderScanLiveCheckArriveScript(origin: string): string {
 function renderScanMerchFunnelScript(origin: string): string {
   const assetOrigin = pagesJsOrigin(origin);
   const mod = JSON.stringify(`${assetOrigin}/js/scan-merch-funnel.mjs?v=2`);
+  return `<script type="module" src=${mod}></script>`;
+}
+
+function renderScanGameContributeScript(vm: ScanViewModel, origin: string): string {
+  if (
+    vm.kind !== "active" ||
+    !vm.gameNode?.showsContribute ||
+    !vm.profileId ||
+    !vm.childObjectId
+  ) {
+    return "";
+  }
+  const assetOrigin = pagesJsOrigin(origin);
+  const mod = JSON.stringify(`${assetOrigin}/js/scan-game-contribute.mjs?v=1`);
   return `<script type="module" src=${mod}></script>`;
 }
 

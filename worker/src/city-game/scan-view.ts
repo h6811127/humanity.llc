@@ -1,6 +1,8 @@
 import type { GameMeta } from "./game-meta";
 import { gameMetaFromChildDocumentJson, normalizeGameMeta } from "./game-meta";
 import { GAME_NODE_OBJECT_TYPE, isCityGameEnabled } from "./constants";
+import { gameNodeContributeMode, type GameContributeMode } from "./unlock-engine";
+import { seasonNodeIdForObject } from "./season-config";
 import type { ObjectPublicStream } from "../validation/object-streams";
 import { parseObjectStreamsFromDocument } from "../validation/object-streams";
 
@@ -15,6 +17,9 @@ export type GameNodeScanContext = {
   gameMeta: GameMeta;
   coopHint: string | null;
   roleEyebrow: string;
+  /** Voluntary site-code quorum block on scan (temp_drop collective nodes). */
+  showsContribute: boolean;
+  contributeMode: GameContributeMode | null;
 };
 
 const CARE_PAUSE_RE = /pause|closed|maintenance|flood|blocked|out of service/i;
@@ -41,6 +46,22 @@ const ROLE_LABELS: Record<string, string> = {
 
 export const GAME_NODE_SCAN_FOOT =
   "This scan shows public object state — not who scanned, player scores, or location history.";
+
+/** Second line under game scan foot — scan privacy vs voluntary contribute. */
+export const GAME_NODE_SCAN_PRIVACY_NOTE =
+  "Opening this QR is not logged. If you choose to contribute, a public count on this object updates — not your identity.";
+
+export const GAME_CONTRIBUTE_EYEBROW = "Collective quorum";
+export const GAME_CONTRIBUTE_LEAD =
+  "Add your visit to the public count. Enter the site code from the sticker or backing card — not from this URL alone.";
+export const GAME_CONTRIBUTE_SITE_CODE_LABEL = "Site code";
+export const GAME_CONTRIBUTE_SUBMIT_LABEL = "Contribute to quorum";
+export const GAME_CONTRIBUTE_PROGRESS_LABEL = "Public progress";
+
+export const GAME_FRAGMENT_CONTRIBUTE_EYEBROW = "District fragment";
+export const GAME_FRAGMENT_CONTRIBUTE_LEAD =
+  "Register this fragment on the public lattice. Enter the site code from the sticker or backing card — not from this URL alone.";
+export const GAME_FRAGMENT_CONTRIBUTE_SUBMIT_LABEL = "Mark fragment";
 
 export const GAME_NODE_FORBIDDEN_COPY = [
   "leaderboard",
@@ -138,6 +159,7 @@ export function parseGameNodeFields(documentJson: string | null | undefined): {
 
 export function resolveGameNodeScanContext(input: {
   objectType: string;
+  objectId?: string | null;
   documentJson: string | null | undefined;
   objectStreams: ObjectPublicStream[];
   env: { CITY_GAME_ENABLED?: string };
@@ -151,14 +173,25 @@ export function resolveGameNodeScanContext(input: {
   const now = input.now ?? new Date();
   const streams = fields.objectStreams.length ? fields.objectStreams : input.objectStreams;
 
+  const base = {
+    seasonId: fields.seasonId,
+    nodeRole: fields.nodeRole,
+    district: fields.district,
+    gameMeta: fields.gameMeta,
+    showsContribute: false,
+    contributeMode: null as GameContributeMode | null,
+  };
+
+  const nodeId =
+    input.objectId != null ? seasonNodeIdForObject(input.objectId) : null;
+  const contributeMode = gameNodeContributeMode(nodeId, fields.gameMeta, fields.nodeRole);
+  const showsContribute = contributeMode != null;
+
   if (!enabled) {
     return {
+      ...base,
       enabled: false,
       mode: "fallback",
-      seasonId: fields.seasonId,
-      nodeRole: fields.nodeRole,
-      district: fields.district,
-      gameMeta: fields.gameMeta,
       coopHint: null,
       roleEyebrow: gameNodeRoleEyebrow(fields.nodeRole, fields.district),
     };
@@ -166,12 +199,9 @@ export function resolveGameNodeScanContext(input: {
 
   if (isCareStreamPaused(streams)) {
     return {
+      ...base,
       enabled: true,
       mode: "care_pause",
-      seasonId: fields.seasonId,
-      nodeRole: fields.nodeRole,
-      district: fields.district,
-      gameMeta: fields.gameMeta,
       coopHint: gameNodeCoopHint(fields.nodeRole, fields.gameMeta),
       roleEyebrow: gameNodeRoleEyebrow(fields.nodeRole, fields.district),
     };
@@ -179,26 +209,22 @@ export function resolveGameNodeScanContext(input: {
 
   if (isGameNodeExpired(fields.gameMeta, now)) {
     return {
+      ...base,
       enabled: true,
       mode: "dormant",
-      seasonId: fields.seasonId,
-      nodeRole: fields.nodeRole,
-      district: fields.district,
-      gameMeta: fields.gameMeta,
       coopHint: null,
       roleEyebrow: gameNodeRoleEyebrow(fields.nodeRole, fields.district),
     };
   }
 
   return {
+    ...base,
     enabled: true,
     mode: "game",
-    seasonId: fields.seasonId,
-    nodeRole: fields.nodeRole,
-    district: fields.district,
-    gameMeta: fields.gameMeta,
     coopHint: gameNodeCoopHint(fields.nodeRole, fields.gameMeta),
     roleEyebrow: gameNodeRoleEyebrow(fields.nodeRole, fields.district),
+    showsContribute,
+    contributeMode,
   };
 }
 

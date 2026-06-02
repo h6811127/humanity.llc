@@ -101,6 +101,7 @@ export interface ScanViewModel {
   /** Set when kind === "malformed" (P2-1 differentiated copy). */
   malformedReason: ScanMalformedReason | null;
   childObjectType: string | null;
+  childObjectId: string | null;
   gameNode: GameNodeScanContext | null;
 }
 
@@ -285,6 +286,7 @@ export function buildScanViewModel(
     );
     const gameNode = resolveGameNodeScanContext({
       objectType: child.object_type,
+      objectId: child.object_id,
       documentJson: child.child_object_document_json,
       objectStreams,
       env: options.env ?? {},
@@ -305,6 +307,7 @@ export function buildScanViewModel(
         showLiveControlBlock: false,
         objectStreams,
         childObjectType: child.object_type,
+        childObjectId: child.object_id,
         gameNode,
       },
       origin
@@ -517,6 +520,7 @@ interface BaseViewInput {
   publicReason?: string | null;
   objectStreams?: ObjectPublicStream[];
   childObjectType?: string | null;
+  childObjectId?: string | null;
   gameNode?: GameNodeScanContext | null;
 }
 
@@ -569,6 +573,7 @@ function baseView(input: BaseViewInput, origin: string): ScanViewModel {
     cacheControl: isHealthy ? CACHE_ACTIVE : CACHE_INACTIVE,
     malformedReason: null,
     childObjectType: input.childObjectType ?? null,
+    childObjectId: input.childObjectId ?? null,
     gameNode: input.gameNode ?? null,
   };
 }

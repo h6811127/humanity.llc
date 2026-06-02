@@ -48,7 +48,15 @@ npm run city-game:prep-season
 
 ### Local dev (automated)
 
-When the local Worker is running with `CITY_GAME_ENABLED=1`:
+**Walkthrough:** [`CITY_GAME_LOCAL_DEV.md`](CITY_GAME_LOCAL_DEV.md)
+
+Enable the game template locally via **`worker/.dev.vars`** (not `wrangler.toml`):
+
+```bash
+CITY_GAME_ENABLED=1
+```
+
+When the local Worker is running:
 
 ```bash
 npm run worker:migrate:local
@@ -89,7 +97,7 @@ The `/create/` UI path below is still valid for production/staging when you want
 | Run `npm run city-game:season-root` and store keys offline | ☐ |
 | Create season root at `/create/` with issuer (game-operator) public key | ☐ |
 | Record `season_root_profile_id` in season JSON | ☐ |
-| Local: `CITY_GAME_ENABLED=1` in `worker/wrangler.toml` | ☐ |
+| Local: `CITY_GAME_ENABLED=1` in `worker/.dev.vars` | ☐ |
 | Mint full registry (`npm run city-game:mint-node -- --all`) | ☐ |
 | Verify scan template + `/game-operator/` flip on local resolver | ☐ |
 

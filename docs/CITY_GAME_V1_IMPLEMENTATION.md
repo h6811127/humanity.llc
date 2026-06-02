@@ -61,6 +61,8 @@ Ship the **full scan UX model** for a **narrow footprint** (~15 nodes, 3 distric
 
 **Design rule:** v1 must **feel** like the Cedar Rapids demo pages on scan — even when operators flip state manually behind the scenes.
 
+**Autonomous minimum (draft):** Operator-manual beats are **not** sufficient for a self-running weekend season. See [`CITY_GAME_AUTONOMOUS_V1.md`](CITY_GAME_AUTONOMOUS_V1.md) for the smallest autonomous spine (`node_04` → `node_07` → fragments → `node_13`) and what stays operator-only.
+
 ---
 
 ## Cedar Rapids Season 1 footprint
@@ -373,7 +375,7 @@ Run **in parallel** with hoodie launch prep. Do not block merch on game work.
 - [x] Mint full 15-node registry — `npm run city-game:mint-node -- --all` · object IDs in season JSON
 - [ ] Enroll 5–10 Glitch hoodie QRs as mobile lore (optional) — `npm run city-game:enroll-mobile-lore -- --write …`
 - [x] Public rules page draft — [`/play/cedar-rapids/`](../site/play/cedar-rapids/index.html) (noindex until launch)
-- [ ] Physical install QA: scan ≥3 phones per node — [`CITY_GAME_INSTALL_QA.md`](CITY_GAME_INSTALL_QA.md)
+- [ ] Physical install QA: scan ≥3 phones per node — [`CITY_GAME_INSTALL_QA.md`](CITY_GAME_INSTALL_QA.md) · local proof first: [`CITY_GAME_LOCAL_DEV.md`](CITY_GAME_LOCAL_DEV.md)
 - [x] Operator runbook — [`CITY_GAME_OPERATOR_RUNBOOK.md`](CITY_GAME_OPERATOR_RUNBOOK.md)
 
 ### Phase D — Launch (~month after hoodie)
@@ -488,3 +490,4 @@ From [`PHYSICAL_WORLD_MULTIPLAYER_RESEARCH_SPEC.md`](PHYSICAL_WORLD_MULTIPLAYER_
 | 2026-06-01 | Phase C season pack — 15-node registry, custody doc, operator runbook, rules page draft |
 | 2026-06-01 | Launch-gates tests, install QA checklist, mobile lore enrollment helper, data policy § city game |
 | 2026-06-01 | Phase D prep — verify:city-game, comprehension runbook, launch checklist, install map, support macros |
+| 2026-06-01 | Local dev walkthrough + smoke-local (`.dev.vars` flag, E5 scan gate) |

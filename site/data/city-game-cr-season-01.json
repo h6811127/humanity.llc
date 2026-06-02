@@ -18,6 +18,18 @@
     { "from": "node_01", "to": "node_13", "label": "NewBo relay fragment (operator flip when lattice complete)" }
   ],
   "mobile_lore_enrollment": [],
+  "contribute_codes": {
+    "node_01": { "code": "CR-RELAY-1N", "epoch": "cr_season_01_wake" },
+    "node_04": { "code": "CR-LANTERN-7K", "epoch": "cr_season_01_wake" },
+    "node_09": { "code": "CR-MURAL-2F", "epoch": "cr_season_01_wake" },
+    "node_11": { "code": "CR-MARK-9P", "epoch": "cr_season_01_wake" }
+  },
+  "automation": {
+    "quorum_nodes": ["node_04"],
+    "fragment_nodes": ["node_09", "node_11", "node_01"],
+    "finale_node": "node_13",
+    "witness_scarcity_node": "node_10"
+  },
   "nodes": [
     { "node_id": "node_01", "object_id": "obj_cr_node_01_newbo", "role": "relay_gate", "district": "newbo", "label": "NewBo relay arch" },
     { "node_id": "node_02", "object_id": "obj_cr_node_02_cafe", "role": "sanctuary", "district": "newbo", "label": "NewBo café window" },

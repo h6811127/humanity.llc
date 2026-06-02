@@ -5,6 +5,7 @@ import { buildScanViewModel } from "../src/resolver/scan-state";
 import {
   GAME_NODE_FORBIDDEN_COPY,
   GAME_NODE_SCAN_FOOT,
+  GAME_NODE_SCAN_PRIVACY_NOTE,
   gameNodeCoopHint,
   isCareStreamPaused,
   resolveGameNodeScanContext,
@@ -136,6 +137,8 @@ describe("city game scan view", () => {
     expect(html).toContain("Controller");
     expect(html).toContain("Red team");
     expect(html).toContain(GAME_NODE_SCAN_FOOT);
+    expect(html).toContain(GAME_NODE_SCAN_PRIVACY_NOTE);
+    expect(html).toContain("scan-game-privacy-note");
     expect(html).toContain("scan-game-coop-hint");
   });
 
@@ -213,6 +216,49 @@ describe("city game scan view", () => {
       }
       expect(hero).not.toMatch(new RegExp(`\\b${forbidden}\\b`));
     }
+  });
+
+  it("renders site-code contribute block on temp_drop quorum nodes", async () => {
+    const riverObject = "obj_cr_node_04_river";
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: cardRow(),
+        qr: { ...qrRow(), object_id: riverObject },
+        verification: summary(),
+        childObject: childRow({
+          object_id: riverObject,
+          public_label: "Riverwalk River Lantern",
+          child_object_document_json: childDocument({
+            object_id: riverObject,
+            node_role: "temp_drop",
+            district: "river_spine",
+            public_state: "Seed clue live",
+            object_streams: [
+              { id: "relay", class: "route", label: "Collective", value: "4 / 20" },
+              { id: "care", class: "care", label: "Trail", value: "Open" },
+            ],
+            game_meta: {
+              visible_until: "2026-06-14T22:00:00-05:00",
+              collective_progress: 4,
+              collective_target: 20,
+            },
+          }),
+        }),
+        revocationDisplay: null,
+      },
+      "https://humanity.llc",
+      new Date("2026-06-01T18:00:00.000Z"),
+      { env: { CITY_GAME_ENABLED: "1" } }
+    );
+
+    expect(vm.gameNode?.showsContribute).toBe(true);
+    const html = await renderScanPage(vm, "https://humanity.llc");
+    expect(html).toContain('data-game-contribute="1"');
+    expect(html).toContain("scan-game-contribute");
+    expect(html).toContain("Contribute to quorum");
+    expect(html).toContain("scan-game-contribute.mjs?v=1");
   });
 
   it("detects care pause and cooperative hints", () => {

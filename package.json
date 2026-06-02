@@ -145,6 +145,7 @@
     "city-game:season-root": "node worker/scripts/city-game-season-root.mjs",
     "city-game:prep-season": "node worker/scripts/city-game-season-root.mjs && node worker/scripts/city-game-mint-node.mjs --all",
     "city-game:seed-local": "node worker/scripts/city-game-seed-local.mjs",
+    "city-game:smoke-local": "node worker/scripts/city-game-smoke-local.mjs",
     "city-game:enroll-mobile-lore": "node worker/scripts/city-game-enroll-mobile-lore.mjs",
     "city-game:verify-season": "node worker/scripts/verify-city-game-season.mjs",
     "verify:city-game": "node worker/scripts/verify-city-game-exit.mjs",

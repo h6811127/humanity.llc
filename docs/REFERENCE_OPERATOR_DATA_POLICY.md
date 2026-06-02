@@ -59,9 +59,11 @@ Saved card rows on `/wallet/` and the device hub may show **checked … ago**. T
 Applies when the reference operator runs [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) on humanity.llc.
 
 - **Public object state only:** faction holds, bulletins, route windows, and collective unlock flags are **operator-published world truth** — not per-player scores or scan-derived rankings.
-- **Collective thresholds (v1):** “20 anonymous scans unlock clue” style beats use **operator-verified quorum flips** (`POST …/game-update`), not hidden scan counts or device trails. See implementation brief § Collective threshold — phase 2 RFC before advertising automatic thresholds.
-- **Must not store for gameplay:** player IDs, scan heatmaps, location history, streaks, or leaderboard rows tied to scans.
-- **Allowed:** aggregate flags on the object document (`collective_progress`, `unlocked_by`) when set by signed game-operator updates — still no per-scanner identity in D1.
+- **Passive scans stay private:** opening a game QR (`GET /c/…`) is **not** logged or counted. No hidden scan analytics.
+- **Voluntary contribute (min autonomous v1):** collective quorum beats (e.g. River Lantern → Czech Village cabinet) use an **explicit player action** — enter a **physical site code** from the sticker/backing card and `POST …/game-contribute`. The resolver increments **aggregate-only** counters on the object document (`collective_progress`) and daily `(object_id, season_id, date)` buckets in D1. **No profile ID, device fingerprint, or per-contributor row.**
+- **Sybil resistance:** IP-hash rate limits (abuse control only, not identity), per-object daily caps, and rotating site codes between seasons.
+- **Must not store for gameplay:** player IDs, scan heatmaps, location history, streaks, or leaderboard rows tied to scans or contributions.
+- **Allowed:** aggregate flags on the object document (`collective_progress`, `unlocked_by`) and unlock graph evaluation after contribute or signed steward `game-update`.
 - **Mobile lore hoodies:** enrolled `print_artifact` QRs show owner-updated status lines; enrollment is catalog metadata in season JSON, not scan logging.
 
 ## Retention (practical v1 targets)

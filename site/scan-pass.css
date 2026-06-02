@@ -1752,6 +1752,145 @@ a {
   color: rgba(60, 60, 67, 0.55);
 }
 
+.scan-game-privacy-note {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: rgba(60, 60, 67, 0.62);
+}
+
+.scan-game-contribute {
+  margin: 14px 0 0;
+  padding: 14px 14px 12px;
+  border-radius: 14px;
+  background: rgba(52, 199, 89, 0.08);
+  border: 0.5px solid rgba(52, 199, 89, 0.24);
+}
+
+.scan-game-contribute--complete {
+  background: rgba(52, 199, 89, 0.12);
+  border-color: rgba(52, 199, 89, 0.32);
+}
+
+.scan-game-contribute-eyebrow {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: rgba(60, 60, 67, 0.62);
+}
+
+.scan-game-contribute-lead {
+  margin: 0 0 12px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: rgba(60, 60, 67, 0.92);
+}
+
+.scan-game-contribute-progress {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  align-items: baseline;
+  margin: 0 0 12px;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.scan-game-contribute-progress-label {
+  font-weight: 600;
+  color: rgba(60, 60, 67, 0.72);
+}
+
+.scan-game-contribute-progress-value {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--black);
+}
+
+.scan-game-contribute-field-label {
+  display: block;
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(60, 60, 67, 0.78);
+}
+
+.scan-game-contribute-input {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--black);
+  background: rgba(255, 255, 255, 0.88);
+  border: 0.5px solid rgba(60, 60, 67, 0.18);
+  border-radius: 12px;
+}
+
+.scan-game-contribute-input:focus {
+  outline: none;
+  border-color: rgba(52, 199, 89, 0.55);
+  box-shadow: 0 0 0 3px rgba(52, 199, 89, 0.18);
+}
+
+.scan-game-contribute-input:disabled {
+  opacity: 0.55;
+}
+
+.scan-game-contribute-cta {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 14px 18px;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--white);
+  background: #248a3d;
+  border: none;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+}
+
+.scan-game-contribute-cta:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.scan-game-contribute-status-panel {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.scan-game-contribute-status {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--grey);
+}
+
+.scan-game-contribute-status[data-tone="error"] {
+  color: var(--red);
+}
+
+.scan-game-contribute-status[data-tone="success"] {
+  color: #248a3d;
+}
+
+.scan-game-contribute-status[data-tone="waiting"] {
+  color: var(--black);
+}
+
 .scan-create-hint,
 .scan-merch-hint,
 .scan-owner-restore-cta {
@@ -3255,6 +3394,11 @@ html[data-theme="dark"] .scan-hero .scan-hero-steward,
 html[data-theme="dark"] .scan-hero .scan-safety-resolver,
 html[data-theme="dark"] .scan-hero .scan-hero-limit,
 html[data-theme="dark"] .scan-hero .scan-hero-foot,
+html[data-theme="dark"] .scan-hero .scan-game-privacy-note,
+html[data-theme="dark"] .scan-hero .scan-game-contribute-lead,
+html[data-theme="dark"] .scan-hero .scan-game-contribute-progress-label,
+html[data-theme="dark"] .scan-hero .scan-game-contribute-field-label,
+html[data-theme="dark"] .scan-hero .scan-game-contribute-eyebrow,
 html[data-theme="dark"] .scan-hero .scan-create-hint,
 html[data-theme="dark"] .scan-hero .scan-merch-hint,
 html[data-theme="dark"] .scan-hero .scan-owner-restore-cta,
@@ -3263,6 +3407,26 @@ html[data-theme="dark"] .scan-hero .scan-hero-meta,
 html[data-theme="dark"] .scan-hero .scan-hero-sub,
 html[data-theme="dark"] .scan-hero .scan-hero-qr-summary {
   color: var(--hc-emphasis-card-detail-fg);
+}
+
+html[data-theme="dark"] .scan-hero .scan-game-contribute {
+  background: rgba(52, 199, 89, 0.12);
+  border-color: rgba(52, 199, 89, 0.28);
+}
+
+html[data-theme="dark"] .scan-hero .scan-game-contribute-input {
+  color: var(--hc-emphasis-card-title-fg);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+html[data-theme="dark"] .scan-hero .scan-game-contribute-progress-value {
+  color: var(--hc-emphasis-card-title-fg);
+}
+
+html[data-theme="dark"] .scan-hero .scan-game-contribute-status-panel {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 html[data-theme="dark"] .scan-hero .scan-owner-restore-cta {

@@ -27,6 +27,7 @@ if (!skipTests) {
     "worker/tests/city-game-season-registry.test.ts",
     "worker/tests/city-game-launch-gates.test.ts",
     "worker/tests/city-game-season-readiness.test.ts",
+    "worker/tests/city-game-smoke-local-core.test.ts",
     "worker/tests/game-operator-core.test.ts",
   ]);
 }

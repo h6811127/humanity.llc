@@ -9,7 +9,7 @@
 
 After all 15 nodes are minted, QR issued, and stickers/placards installed — **before** setting `CITY_GAME_ENABLED=1` on production.
 
-Local/staging proof first: `CITY_GAME_ENABLED=1` in `worker/wrangler.toml`, season root + 3 prototype nodes minimum.
+Local/staging proof first: `CITY_GAME_ENABLED=1` in **`worker/.dev.vars`**, then follow [`CITY_GAME_LOCAL_DEV.md`](CITY_GAME_LOCAL_DEV.md). Season root + 3 prototype nodes minimum.
 
 ---
 

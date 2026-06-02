@@ -4,7 +4,7 @@
  *
  * Prerequisites:
  *   npm run worker:migrate:local
- *   CITY_GAME_ENABLED=1 in worker/wrangler.toml (local only)
+ *   CITY_GAME_ENABLED=1 in worker/.dev.vars (local only)
  *   npm run worker:dev  →  http://127.0.0.1:8787
  *
  * Usage:
@@ -14,7 +14,7 @@
  * Writes operator keys + scan URLs to worker/.local/city-game-seed.json (gitignored).
  * Never commit that file.
  */
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -38,6 +38,15 @@ const scanOrigin = (
   process.env.SCAN_ORIGIN ||
   (isLocalOrigin(apiOrigin) ? "https://humanity.llc" : apiOrigin)
 ).replace(/\/$/, "");
+const devVarsPath = join(root, "worker/.dev.vars");
+
+function localCityGameEnabled() {
+  if (process.env.CITY_GAME_ENABLED === "1") return true;
+  if (!existsSync(devVarsPath)) return false;
+  const text = readFileSync(devVarsPath, "utf8");
+  return /^\s*CITY_GAME_ENABLED\s*=\s*1\s*$/m.test(text);
+}
+
 const writeSeason = process.argv.includes("--write-season");
 
 function isLocalOrigin(origin) {
@@ -142,11 +151,11 @@ async function main() {
     process.exit(1);
   }
 
-  if (!process.env.CITY_GAME_ENABLED && !process.argv.includes("--skip-flag-check")) {
+  if (!localCityGameEnabled() && !process.argv.includes("--skip-flag-check")) {
     console.warn(
-      "\n⚠ Set CITY_GAME_ENABLED=1 in worker/wrangler.toml for local dev so scan pages render game template."
+      "\n⚠ Set CITY_GAME_ENABLED=1 in worker/.dev.vars (local only) so scan pages render the game template."
     );
-    console.warn("  Re-run with --skip-flag-check to ignore this warning.\n");
+    console.warn("  See docs/CITY_GAME_LOCAL_DEV.md · re-run with --skip-flag-check to ignore.\n");
   }
 
   const seasonRaw = readFileSync(seasonPath, "utf8");
@@ -241,6 +250,14 @@ async function main() {
       { object: signedObject }
     );
     if (!createRes.ok) {
+      if (createRes.body?.error === "OBJECT_EXISTS") {
+        console.error(`\nCreate failed for ${template.node_id}: object_id already in local D1.`);
+        console.error("Stable object_ids (obj_cr_node_*) allow only one local season per database.");
+        console.error("Options:");
+        console.error("  • Reuse worker/.local/city-game-seed.json from the first seed + npm run city-game:smoke-local");
+        console.error("  • Reset local D1: rm -rf worker/.wrangler/state/v3/d1 && npm run worker:migrate:local");
+        process.exit(1);
+      }
       console.error(`\nCreate failed for ${template.node_id}:`, createRes.body);
       process.exit(1);
     }
@@ -258,6 +275,13 @@ async function main() {
       { qr_credential: qrCredential }
     );
     if (!issueRes.ok) {
+      const msg = JSON.stringify(issueRes.body);
+      if (msg.includes("scope IN ('card', 'print_artifact')") || msg.includes("child_object")) {
+        console.error(`\nIssue QR failed for ${template.node_id}: local D1 missing child_object QR schema.`);
+        console.error("Run: npm run worker:apply-child-object-qr-schema");
+        console.error("Then restart worker:dev and re-run seed.");
+        process.exit(1);
+      }
       console.error(`\nIssue QR failed for ${template.node_id}:`, issueRes.body);
       process.exit(1);
     }
@@ -312,7 +336,7 @@ async function main() {
   console.log("\nNext:");
   console.log("  1. Save owner + game-operator keys from worker/.local/city-game-seed.json offline");
   console.log("  2. Open /game-operator/ · paste game-operator private key · load nodes");
-  console.log("  3. Spot-scan node_01, node_04, node_07 (CITY_GAME_ENABLED=1 locally)");
+  console.log("  3. npm run city-game:smoke-local — spot-scan node_01, node_04, node_07");
   console.log("  4. docs/CITY_GAME_INSTALL_QA.md when stickers are ready");
 }
 

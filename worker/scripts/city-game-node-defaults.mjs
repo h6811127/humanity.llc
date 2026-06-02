@@ -123,7 +123,7 @@ const NODE_OVERRIDES = {
     public_state: "Seed clue live — share outward to evolve",
     streams: [
       { id: "territory", class: "place", label: "Object", value: "Temp drop · 48h" },
-      { id: "relay", class: "route", label: "Collective", value: "4 / 20 scans" },
+      { id: "relay", class: "route", label: "Collective", value: "4 / 20" },
       { id: "bulletin", class: "narrative", label: "Clue", value: "Lantern path waking" },
       { id: "care", class: "care", label: "Trail", value: "Open" },
     ],
