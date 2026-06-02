@@ -159,7 +159,7 @@ Faster replay after a prior full pass:
 API_ORIGIN=http://127.0.0.1:8787 npm run city-game:proof-local -- --skip-verify --quorum-only
 ```
 
-This runs `verify:city-game`, validates the seed file, `smoke-local`, and full-spine `smoke-contribute-local --spine`.
+This runs `verify:city-game`, validates the seed file, **resets the autonomous spine**, `smoke-local`, and full-spine `smoke-contribute-local --spine`.
 
 ---
 
@@ -169,8 +169,8 @@ This runs `verify:city-game`, validates the seed file, `smoke-local`, and full-s
 
 ```bash
 npm run city-game:lan-hub -- --write-dev-vars
-npm run worker:dev -- --ip 0.0.0.0
-npm run pages:dev -- --ip 0.0.0.0
+npm run worker:dev:lan
+npm run pages:dev:lan
 ```
 
 The script writes `site/dev/city-game-lan-hub.html` and prints a bookmark like `http://192.168.x.x:8788/dev/city-game-lan-hub.html`. Open that on each phone — tap scans; site codes are shown inline.
@@ -211,6 +211,7 @@ From [`CITY_GAME_INSTALL_QA.md`](CITY_GAME_INSTALL_QA.md) § Scenario spot-check
 | `INVALID_QR_PAYLOAD` on seed | Expected — seed uses `https://humanity.llc/c/…` payloads; use `local_scan_url` for browser |
 | Smoke: missing `scan-game-chips` | `CITY_GAME_ENABLED=1` in `.dev.vars` + restart `worker:dev` |
 | Witness: unlimited passes in browser | Run **`pages:dev`** (`:8788`) + add `SCAN_PAGES_JS_ORIGIN` / `SCAN_RESOLVER_ORIGIN` to **`worker/.dev.vars`** + restart **`worker:dev`**. Hard-refresh scan tab — contribute JS must load from `127.0.0.1:8788`, not production. Clear `localStorage` key `hc_game_scarcity_ceiling_v1` to re-test same device. |
+| Phone cannot load LAN hub URL | Re-run **`npm run city-game:lan-hub -- --write-dev-vars`** (IP changes per network). Use **`npm run worker:dev:lan`** + **`npm run pages:dev:lan`**. Kill stale ports: `lsof -ti :8787,:8788 \| xargs kill -9`. **Guest/corp Wi‑Fi** often blocks phone→laptop (AP isolation) — use phone hotspot or non-guest Wi‑Fi. |
 | Smoke: **HTTP 404** on scan URLs | Seed file points at a profile/QR **not in local D1** — re-run `city-game:seed-local -- --write-season` |
 | `CHECK constraint failed: scope IN ('card', 'print_artifact')` | Run `npm run worker:apply-child-object-qr-schema` then re-seed |
 | After `rm -rf worker/.wrangler/state/v3/d1` | Re-migrate, apply QR schema, **restart** `worker:dev`, then seed |

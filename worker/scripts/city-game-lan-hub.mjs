@@ -88,6 +88,14 @@ function main() {
   console.log("\n📱 Open on each phone (bookmark this):");
   console.log("  ", hubUrl);
 
+  if (/guest|isolated|portal/i.test(process.env.WIFI_SSID ?? "")) {
+    console.warn("\n⚠ Guest/captive Wi‑Fi often blocks phone → laptop traffic (AP isolation).");
+    console.warn("  Use a phone hotspot, non-guest Wi‑Fi, or USB tethering if devices cannot connect.");
+  }
+  console.warn(
+    "\n⚠ If the IP changed (new network), re-run this command and restart worker:dev:lan + pages:dev:lan."
+  );
+
   if (process.argv.includes("--write-dev-vars")) {
     const prior = existsSync(devVarsPath) ? readFileSync(devVarsPath, "utf8") : "";
     writeFileSync(devVarsPath, patchDevVarsScanOrigins(prior, lanHost), "utf8");
@@ -99,8 +107,8 @@ function main() {
   }
 
   console.log("\nStart dev on all interfaces:");
-  console.log("  npm run worker:dev -- --ip 0.0.0.0");
-  console.log("  npm run pages:dev -- --ip 0.0.0.0");
+  console.log("  npm run worker:dev:lan");
+  console.log("  npm run pages:dev:lan");
 }
 
 main();

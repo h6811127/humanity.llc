@@ -12,7 +12,7 @@ Run on every branch that touches game scan copy or resolver logic. Does **not** 
 | Step | Command | Pass when | Record |
 |------|---------|-----------|--------|
 | E0 | `npm run verify:city-game` | Vitest green + season registry OK | ☑ **2026-06-02** — 109 tests |
-| E1 | `npm run city-game:proof-local` | Live scan + contribute spine on local D1 | ☐ — needs `worker:dev` + seed |
+| E1 | `npm run city-game:proof-local` | Live scan + contribute spine on local D1 | ☑ **2026-06-02** — full spine pass |
 | E2 | Scenario spot-checks below on **one** phone against local or staging URLs | Same expected copy as production template | ☐ |
 
 Local walkthrough: [`CITY_GAME_LOCAL_DEV.md`](CITY_GAME_LOCAL_DEV.md) · seed: `npm run city-game:seed-local -- --write-season`
@@ -75,6 +75,7 @@ Engineering preflight only: `city-game-game-theory.test.ts` asserts scan templat
 | Gate | Status | Date |
 |------|--------|------|
 | Engineering preflight (`verify:city-game`) | ☑ Pass | 2026-06-02 |
+| Local proof gate (`city-game:proof-local`) | ☑ Pass | 2026-06-02 |
 | Physical install (≥3 phones × 15 nodes) | ☐ Pending | |
 | GT comprehension (≥5 testers) | ☐ Pending | |
 

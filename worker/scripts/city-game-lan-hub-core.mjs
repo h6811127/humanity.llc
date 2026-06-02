@@ -177,8 +177,8 @@ export function buildLanHubHtml(opts) {
   <p class="lead">Tap a scan — no copy/paste. Resolver <strong>${escapeHtml(host)}:8787</strong> · Pages <strong>${escapeHtml(host)}:8788</strong></p>
   <div class="setup">
     Laptop must run:<br />
-    <code>npm run worker:dev -- --ip 0.0.0.0</code><br />
-    <code>npm run pages:dev -- --ip 0.0.0.0</code><br />
+    <code>npm run worker:dev:lan</code><br />
+    <code>npm run pages:dev:lan</code><br />
     And <code>worker/.dev.vars</code> needs <code>SCAN_RESOLVER_ORIGIN=http://${escapeHtml(host)}:8787</code> + <code>SCAN_PAGES_JS_ORIGIN=http://${escapeHtml(host)}:8788</code>
   </div>
   ${sectionHtml}

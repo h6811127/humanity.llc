@@ -78,6 +78,8 @@ async function main() {
     console.log("Site codes:", seed.contribute_site_codes.length);
   }
 
+  run("E5 · reset dev spine", "npm", ["run", "city-game:reset-spine-local"]);
+
   run("E5 · scan smoke", "npm", ["run", "city-game:smoke-local"]);
 
   const contributeArgs = ["run", "city-game:smoke-contribute-local"];

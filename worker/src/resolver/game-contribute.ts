@@ -51,6 +51,32 @@ function parseDocument(json: string): Record<string, unknown> {
   return JSON.parse(json) as Record<string, unknown>;
 }
 
+async function fragmentAlreadyClaimedPayload(
+  db: D1Database,
+  objectId: string,
+  nodeId: string
+): Promise<Record<string, unknown>> {
+  const finaleObjectId = seasonObjectIdForNode(seasonFinaleNodeId());
+  let lattice = { claimed: 0, required: seasonFragmentNodeIds().length, complete: false };
+  if (finaleObjectId) {
+    const finaleRow = await getChildObject(db, finaleObjectId);
+    if (finaleRow) {
+      const finaleDoc = parseDocument(finaleRow.child_object_document_json);
+      lattice = fragmentLatticeProgress(normalizeGameMeta(finaleDoc.game_meta));
+    }
+  }
+  return {
+    object_id: objectId,
+    node_id: nodeId,
+    contribute_mode: "fragment",
+    fragment_claimed: true,
+    fragments_registered: lattice.claimed,
+    fragments_required: lattice.required,
+    finale_open: lattice.complete,
+    message: "Fragment already registered.",
+  };
+}
+
 async function persistGameNodeDocument(
   db: D1Database,
   row: {
@@ -172,6 +198,15 @@ export async function handlePostGameContribute(
   }
 
   const meta = fields.gameMeta;
+
+  if (nodeId && seasonFragmentNodeIds().includes(nodeId) && meta.unlocked_by.includes(nodeId)) {
+    return jsonResponse(
+      await fragmentAlreadyClaimedPayload(db, pathObjectId, nodeId),
+      200,
+      { "Cache-Control": "no-store" }
+    );
+  }
+
   const contributeMode = gameNodeContributeMode(nodeId, meta, fields.nodeRole);
   if (!contributeMode) {
     return errorResponse("NOT_CONTRIBUTABLE", "This object is not accepting contributions.", 422);
@@ -200,30 +235,6 @@ export async function handlePostGameContribute(
         { "Cache-Control": "no-store" }
       );
     }
-  } else if (contributeMode === "fragment" && meta.unlocked_by.includes(nodeId)) {
-    const finaleObjectId = seasonObjectIdForNode(seasonFinaleNodeId());
-    let lattice = { claimed: 0, required: seasonFragmentNodeIds().length, complete: false };
-    if (finaleObjectId) {
-      const finaleRow = await getChildObject(db, finaleObjectId);
-      if (finaleRow) {
-        const finaleDoc = parseDocument(finaleRow.child_object_document_json);
-        lattice = fragmentLatticeProgress(normalizeGameMeta(finaleDoc.game_meta));
-      }
-    }
-    return jsonResponse(
-      {
-        object_id: pathObjectId,
-        node_id: nodeId,
-        contribute_mode: "fragment",
-        fragment_claimed: true,
-        fragments_registered: lattice.claimed,
-        fragments_required: lattice.required,
-        finale_open: lattice.complete,
-        message: "Fragment already registered.",
-      },
-      200,
-      { "Cache-Control": "no-store" }
-    );
   }
 
   const bucketDate = utcDateKey(now);

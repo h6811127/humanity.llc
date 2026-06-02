@@ -92,6 +92,7 @@ npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts
 
 | Date | Event |
 |------|--------|
+| 2026-06-02 | **City game E1 local proof** — `city-game:proof-local` full spine pass; fragment idempotent fix + spine reset in proof gate |
 | 2026-06-02 | **RC-18 scoped** — Nord N200 cold first hub open investigation (Smooth Phase 0 outlier); Phase 1 still deferred · [`SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md`](SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md) |
 | 2026-06-02 | **City game Phase E** — self-serve game network setup on `/created/` (post-pilot); terminal mint pilot-only · [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) § Phase E |
 | 2026-06-02 | **City game risks + build gates** — R-01–R-18, B1–B11 in implementation brief; `SYSTEM_INVARIANTS` § Cedar Rapids city game |

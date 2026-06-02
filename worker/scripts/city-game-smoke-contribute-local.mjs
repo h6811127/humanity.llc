@@ -12,6 +12,7 @@
  *   npm run city-game:smoke-contribute-local -- --spine   # quorum + 3 fragments + finale
  */
 import { readFileSync, existsSync } from "node:fs";
+import { spawnSync } from "node:child_process";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -197,6 +198,20 @@ async function main() {
 
   console.log("Profile:", seed.profile_id);
   console.log("Mode:", runSpine ? "full spine" : "quorum only", "\n");
+
+  if (runSpine) {
+    console.log("=== Reset dev spine (clean replay) ===\n");
+    const reset = spawnSync("npm", ["run", "city-game:reset-spine-local"], {
+      cwd: root,
+      stdio: "inherit",
+      shell: process.platform === "win32",
+      env: { ...process.env, API_ORIGIN: apiOrigin },
+    });
+    if (reset.status !== 0) {
+      process.exit(reset.status ?? 1);
+    }
+    console.log("");
+  }
 
   try {
     await fillRiverQuorum(seed, seasonCodes);

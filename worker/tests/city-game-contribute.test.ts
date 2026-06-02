@@ -431,6 +431,14 @@ describe("game-contribute", () => {
     expect(finaleDoc.game_meta.unlocked_by).toEqual(
       expect.arrayContaining(["node_09", "node_11", "node_01"])
     );
+
+    res = await contributeFragment(MURAL_QR, MURAL_OBJECT, "CR-MURAL-2F", "203.0.113.13");
+    expect(res.status).toBe(200);
+    body = (await res.json()) as typeof body & { message?: string };
+    expect(body.fragment_claimed).toBe(true);
+    expect(body.fragments_registered).toBe(3);
+    expect(body.finale_open).toBe(true);
+    expect(body.message).toContain("already registered");
   });
 
   it("issues sunset pass, decrements scarcity, and activates cabinet vouch", async () => {

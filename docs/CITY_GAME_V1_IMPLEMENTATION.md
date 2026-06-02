@@ -586,7 +586,7 @@ Run **in parallel** with hoodie launch prep. Do not block merch on game work.
 
 ### Phase C — Season pack (week 3–4, post-hoodie)
 
-**Phase C status (2026-06-02):** Engineering preflight **pass** (`npm run verify:city-game`, 109 tests). Human gates **open** — physical install QA, GT comprehension (≥5 testers), operator custody sign-off, install map, weekend roster.
+**Phase C status (2026-06-02):** Engineering preflight **pass** (`npm run verify:city-game`, 122 tests). Local proof gate **pass** (`npm run city-game:proof-local`, full spine). Human gates **open** — physical install QA, GT comprehension (≥5 testers), operator custody sign-off, install map, weekend roster.
 
 | Gate | Owner | Status |
 |------|-------|--------|
