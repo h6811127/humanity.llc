@@ -199,6 +199,18 @@ npm run e2e:key-loss-sad-path              # hub restore visible (K2)
 
 ---
 
+## QA sign-off (P1-PWA-V)
+
+| Gate | Status | Date | Notes |
+|------|--------|------|-------|
+| Engineering (`steward-scan-handoff:verify`) | ☑ Pass | 2026-06-02 | S1–S7 Vitest + dual-QR + hub scanner + fallback E2E |
+| Prod WebKit — PWA in-app scan (steps 1–3) | ☐ Pending | | Home Screen PWA on `https://humanity.llc` |
+| Prod WebKit — Camera → Safari handoff (steps 4–7) | ☐ Pending | | iPhone Camera + `/v/` interstitial |
+
+When prod steps pass, append one line to [`PRODUCT_WORKSTREAM_COORDINATION.md`](PRODUCT_WORKSTREAM_COORDINATION.md) changelog: `P1-PWA-V prod WebKit pass · YYYY-MM-DD · device`.
+
+---
+
 ## Explicit non-goals
 
 - Changing public QR payload away from HTTPS for camera compatibility
@@ -212,6 +224,7 @@ npm run e2e:key-loss-sad-path              # hub restore visible (K2)
 
 | Date | Change |
 |------|--------|
+| 2026-06-02 | **P1-PWA-V desk preflight** — `steward-scan-handoff:verify` pass (98 Vitest + 14 E2E); prod WebKit sign-off pending |
 | 2026-05-30 | **CI closure** — `e2e:steward-scan-handoff` in `test-site.yml` (P1-PWA-V desk) |
 | 2026-05-30 | **S7 shipped** — `/created/` dual-QR public + steward handoff download/copy |
 | 2026-05-30 | **S6 shipped** — `/v/{code}` steward handoff interstitial + code encoder |

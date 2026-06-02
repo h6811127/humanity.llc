@@ -3,6 +3,8 @@
 **Status:** Internal · fill during Phase C install  
 **Season:** `cr_season_01_wake` · [`site/data/city-game-cr-season-01.json`](../site/data/city-game-cr-season-01.json)
 
+**Phase C gate:** All rows must show **Installed? ☑** and **QR issued? ☑** before physical install QA ([`CITY_GAME_INSTALL_QA.md`](CITY_GAME_INSTALL_QA.md)). Engineering registry (15 nodes, object IDs) is verified by `npm run verify:city-game`.
+
 ---
 
 ## Registry

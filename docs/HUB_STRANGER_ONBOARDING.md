@@ -109,7 +109,7 @@ Manual: **P1-HE** in [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) — stranger hub on `/
 
 - Hub sheet **stays collapsed** on first visit; coachmark is the only onboarding overlay (no auto-expand). Enforced in `device-status.mjs` init (`setHubExpanded(false)` + `sessionStorage.hc_hub_open = "0"`).
 - **Focus mode** enables only when `hc_wallet` or pins exist (`landing-focus.mjs`); strangers always see hero + **How it works** until first save.
-- On **`/`** with stranger-empty counts, top chrome uses **network-only** status line (hide `0 cards` subcopy).
+- On **`/`** with stranger-empty counts, `#shell-status-line` stays hidden; the neutral empty-wallet dot is the only top-chrome network cue.
 - Hub intro coachmark uses **stranger copy** when wallet, pins, and inbox actions are all zero.
 
 ### Visible changes (stranger on `/`)
@@ -117,7 +117,7 @@ Manual: **P1-HE** in [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) — stranger hub on `/
 | Element | Behavior |
 |---------|----------|
 | `body.landing-stranger-chrome` | Set while stranger-empty on landing (hook-before-dock styling hook) |
-| `#shell-status-line` | `Network reachable` only — no `· 0 cards` |
+| `#shell-status-line` | Hidden — network state via dot color + hub panel when opened |
 | Hub intro body | *Create a live object first. Later, tap the dot…* (`HUB_INTRO_BODY_STRANGER`) |
 
 ### Files
@@ -125,7 +125,6 @@ Manual: **P1-HE** in [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) — stranger hub on `/
 | Area | Files |
 |------|--------|
 | Core | `site/js/device-hub-stranger-empty-core.mjs` (`isLandingHomePath`, `isLandingStrangerChrome`, `LANDING_STRANGER_CHROME_CLASS`) |
-| Status line | `site/js/device-dot-state-core.mjs` (`shellChromeStatusLineFromSegments` `strangerLanding` opt) |
 | Apply | `site/js/device-status.mjs` (`applyLandingStrangerChrome`, `renderShellStatusLine`) |
 | Coachmark | `site/js/device-hub-intro-coachmark.mjs` |
 | Copy | `site/js/device-ownership-copy-core.mjs` (`HUB_INTRO_BODY_STRANGER`) |

@@ -5,7 +5,23 @@
 
 ---
 
-## When to run
+## Engineering preflight (before stickers)
+
+Run on every branch that touches game scan copy or resolver logic. Does **not** replace the ≥3-phone physical gate below.
+
+| Step | Command | Pass when | Record |
+|------|---------|-----------|--------|
+| E0 | `npm run verify:city-game` | Vitest green + season registry OK | ☑ **2026-06-02** — 109 tests |
+| E1 | `npm run city-game:proof-local` | Live scan + contribute spine on local D1 | ☐ — needs `worker:dev` + seed |
+| E2 | Scenario spot-checks below on **one** phone against local or staging URLs | Same expected copy as production template | ☐ |
+
+Local walkthrough: [`CITY_GAME_LOCAL_DEV.md`](CITY_GAME_LOCAL_DEV.md) · seed: `npm run city-game:seed-local -- --write-season`
+
+Automated copy guard (no leaderboard / XP / streak strings): `worker/tests/city-game-game-theory.test.ts` (included in `verify:city-game`).
+
+---
+
+## When to run (physical)
 
 After all 15 nodes are minted, QR issued, and stickers/placards installed — **before** setting `CITY_GAME_ENABLED=1` on production.
 
@@ -48,11 +64,19 @@ Safety flips only via [`/game-operator/`](../site/game-operator/index.html) on s
 
 ## Game-theory comprehension (GT-1–GT-6)
 
-Run with **5 un coached testers** before launch ([`FOUNDING_COPY_COMPREHENSION_RUNBOOK.md`](FOUNDING_COPY_COMPREHENSION_RUNBOOK.md) pattern). Record pass/fail in implementation brief § Game theory acceptance tests.
+Human gate — run with **5 un coached testers** before launch ([`FOUNDING_COPY_COMPREHENSION_RUNBOOK.md`](FOUNDING_COPY_COMPREHENSION_RUNBOOK.md) pattern). Full runbook: [`CITY_GAME_COMPREHENSION_RUNBOOK.md`](CITY_GAME_COMPREHENSION_RUNBOOK.md).
+
+Engineering preflight only: `city-game-game-theory.test.ts` asserts scan templates never render forbidden score/analytics copy — **not** a substitute for GT-1–GT-6 human pass.
 
 ---
 
 ## Sign-off
+
+| Gate | Status | Date |
+|------|--------|------|
+| Engineering preflight (`verify:city-game`) | ☑ Pass | 2026-06-02 |
+| Physical install (≥3 phones × 15 nodes) | ☐ Pending | |
+| GT comprehension (≥5 testers) | ☐ Pending | |
 
 | Role | Name | Date |
 |------|------|------|

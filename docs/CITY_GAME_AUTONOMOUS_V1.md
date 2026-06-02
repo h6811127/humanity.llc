@@ -1,7 +1,7 @@
 # Cedar Rapids city game — minimum autonomous v1
 
 **Status:** Draft · product + engineering decision  
-**Supersedes (partially):** operator-manual beats in [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) § v1 shipped slice  
+**Feature catalog:** Every public-page bullet is tracked by ID in [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) § Feature page traceability (**CR-***, **PWM-***). This doc covers the smallest **L**-delivery subset for a self-running weekend.  
 **Privacy canon:** [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md) (requires amendment before ship)  
 **Season config:** [`site/data/city-game-cr-season-01.json`](../site/data/city-game-cr-season-01.json)
 
@@ -11,7 +11,7 @@
 
 Research demos ([physical-world multiplayer](../site/what-can-a-qr-do/physical-world-multiplayer/), [Cedar Rapids city game](../site/what-can-a-qr-do/combining-ideas/cedar-rapids-city-game/)) describe **scan-driven public state** — collective unlocks, trust gates, fragment lattices, scarcity — without a human operator flipping every beat.
 
-Current engineering ships **scan UX + operator tooling** only. That is enough for a staged pilot; it is **not** a self-running season.
+Engineering ships **scan UX**, **operator tooling**, and a partial **L** spine (quorum, fragments, scarcity contribute — see CR-G01, CR-G05, CR-G07). Rows still **O** at S1 in the traceability table need operators or S2/S3 automation before advertising a fully autonomous season.
 
 **Minimum autonomous v1** = the smallest set of resolver rules so a weekend season completes its **main coordination spine** with **zero live operator** during play, while stewards retain **revoke, care pause, and compromise recovery** only.
 
@@ -56,18 +56,20 @@ Everything else in the 15-node pack may stay **pre-scripted static copy** or **o
 | **Scarcity decrement** | Library “11 sunset passes remain” | **Contribute** at witness decrements `scarcity_remaining`; auto-dormant at 0 |
 | **Season window** | Weekend open/close | Cron or scan-time check against season JSON `window.starts_at` / `ends_at` |
 
-### Stays operator-only (explicit)
+### Stays operator-only at S1 (explicit · see traceability)
 
-| Mechanism | Why deferred |
-|-----------|--------------|
-| Faction capture / relay PvP | Needs signed player faction actions + anti-grief rules |
-| Spy compromise (player-initiated) | Narrative drill; operator sets `compromised` for rehearsals |
-| Prisoner’s dilemma choice outcomes | Needs choice tokens + branch state machine |
-| Weather / sunrise-only routes | Needs schedule engine + external signal or manual mode flag |
-| Rotating bulletins / live map ticker | Editorial; operator or pre-scheduled JSON copy batch |
-| Care loop repair unlock | Steward-signed care stream only |
-| Guestbook append | Phase 2 |
-| Mobile hoodie lore enrollment | Optional; owner updates still manual |
+| Mechanism | Traceability IDs | Why deferred to S2/S3 or **O** |
+|-----------|------------------|--------------------------------|
+| Faction capture / relay PvP | PWM-ST02, CR-R01 | Needs signed player faction actions + anti-grief rules |
+| Spy compromise (player-initiated) | CR-C01 | Narrative drill; operator sets `compromised` for rehearsals |
+| Prisoner’s dilemma choice outcomes | CR-G04, CR-M05 | Needs choice tokens + branch state machine (**L** target S3) |
+| Weather / sunrise-only routes | CR-X03, PWM-MS05, PWM-W02 | Schedule engine + external signal or manual mode |
+| Rotating bulletins / live map ticker | CR-M01–07 | Editorial; operator or pre-scheduled JSON / rules-page ticker |
+| Anti-hoarding auto-evolve | CR-G02, CR-M03 | Operator bulletin until quorum band triggers **L** |
+| Business vouch (café) | CR-T03, CR-P03 | Q6 manual enrollment until S3 |
+| Care loop repair unlock | PWM-M06, PWM-W05 | Steward-signed care stream only |
+| Guestbook append | CR-SV10, CR-X01 | S3 moderated append |
+| Mobile hoodie lore enrollment | CR-R03 | Optional; owner updates still manual |
 
 **Operator role after min autonomous v1:** safety (revoke, care pause), narrative events (optional bulletin flips), compromise drills — **not** quorum counting or unlock graph maintenance.
 
@@ -252,6 +254,49 @@ Replace manual E5 spot-check expectation:
 | Operator flips finale | Fragment contributes on 3 nodes → `node_13` opens |
 
 Keep operator tests for **revoke**, **care pause**, **compromise** only.
+
+---
+
+## Witness scarcity: device-local ceiling (Option 1)
+
+**Problem:** Library witness (`node_10`) decrements a **shared** pool (`game_meta.scarcity_remaining`). Without a per-player server row (forbidden by [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md)), one browser can claim until the pool is empty. IP-only caps are a poor primary fix at the library — many players share one Wi‑Fi network.
+
+**Chosen tightening:** **Option 1 — device-local ceiling.** After one successful scarcity contribute on a browser profile, the scan client records a **local-only** marker and hides the contribute form for that `(season_id, object_id, UTC date)` tuple. Server pool logic is unchanged; this is UX friction + honest-player guard, not cryptographic identity.
+
+**Not chosen as primary:** Option 2 — strict IP cap (1–2/hour) on scarcity — kept only as the existing generic contribute IP rate limit (20/hour abuse backstop), not per-person enforcement.
+
+### Policy alignment
+
+| Allowed | Forbidden |
+|---------|-----------|
+| `localStorage` JSON on scan origin — no server write | Per-contributor D1 row, profile ID, or device fingerprint on server |
+| Aggregate `scarcity_remaining` on object document | “One pass per account” without an account system |
+| Player clears site data to bypass (accepted v1 tradeoff) | Scan logging to reconstruct who claimed |
+
+### Storage contract
+
+| Field | Value |
+|-------|--------|
+| Key | `hc_game_scarcity_ceiling_v1` |
+| Value | JSON `{ season_id, object_id, bucket_date, claimed_at }` |
+| `bucket_date` | UTC `YYYY-MM-DD` — matches `game_contribute_buckets.bucket_date` and server `utcDateKey()` |
+| Scope | Witness scarcity contribute only (`contribute_mode === "scarcity"`, `node_10`) |
+| TTL | Implicit — new UTC day → new bucket; old record ignored |
+
+Pure helpers live in [`site/js/scan-game-scarcity-ceiling-core.mjs`](../site/js/scan-game-scarcity-ceiling-core.mjs) (importable from Vitest). Browser I/O stays in [`site/js/scan-game-contribute.mjs`](../site/js/scan-game-contribute.mjs).
+
+### Implementation steps
+
+| Step | Status | Deliverable |
+|------|--------|-------------|
+| **1** | **Done** | Core module: key constant, UTC date bucket, parse/build/match record + Vitest |
+| **2** | **Done** | Scan hero `data-season-id`; client init gate + post-success write + hide form + copy |
+| **3** | **Done** | Scan/regression tests; bump `scan-game-contribute.mjs?v=2` |
+| **4** | **Done** | Local dev note (clear `localStorage` to re-test); `verify:city-game` gate; **`SCAN_PAGES_JS_ORIGIN` / `SCAN_RESOLVER_ORIGIN` in `worker/.dev.vars`** + `pages:dev` when wrangler simulates production hostnames |
+
+**Step 2 copy (planned):** success — “Pass claimed — N remain tonight for everyone.”; device gate — “You already claimed a sunset pass from this device tonight. Remaining passes are for others at the library.”
+
+**Regression:** `npm run verify:city-game` includes `scan-game-scarcity-ceiling-core.test.ts` after step 1.
 
 ---
 

@@ -17,7 +17,7 @@
 | **Safari keys / ITP** | [`SAFARI_KEYS_CUSTODY.md`](SAFARI_KEYS_CUSTODY.md) | P0–P2 **shipped** (steps 1–22) | `device-quiet-tab-rehydrate*`, `scan-tab-keys`, `safari-itp-storage-notice*`, `safari-storage-persist-denied-notice*` |
 | **Ownership restore UX** | [`OWNERSHIP_RESTORE_UX_PLAN.md`](OWNERSHIP_RESTORE_UX_PLAN.md) | Phases 1–4 + Safari cross-refs | `/created/` view mode, hub import, `device-ownership-*` |
 | **H-12 printed live-control QA** | [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md) | H-09–H-13 · sad-path S10–S12 | Scan live proof, `e2e/live-control-loop.spec.ts`, operator scripts |
-| **Cedar Rapids city game** | [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) · [`CITY_GAME_AUTONOMOUS_V1.md`](CITY_GAME_AUTONOMOUS_V1.md) | Phase C human gates open · **Phase D surfaces ready** (`city-game:launch-surfaces`) | Install QA, GT comprehension, custody · launch `--apply` after gates |
+| **Cedar Rapids city game** | [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) § Feature page traceability · [`CITY_GAME_AUTONOMOUS_V1.md`](CITY_GAME_AUTONOMOUS_V1.md) | Phase C human gates open · **Phase D surfaces ready** · footprint **S1 15 → S3 50** | Install QA, GT comprehension, custody · launch `--apply` after gates |
 | **Smooth mode (low-end mobile)** | [`DEVICE_LITE_MOBILE_PLAN.md`](DEVICE_LITE_MOBILE_PLAN.md) | **Phase 0 lab 3/3 ☑** · Phase 1 **deferred** (Nord cold boot → boot graph) · [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md) | Boot graph investigation for Nord cold open |
 
 ---
@@ -93,6 +93,8 @@ npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts
 | Date | Event |
 |------|--------|
 | 2026-06-02 | **RC-18 scoped** — Nord N200 cold first hub open investigation (Smooth Phase 0 outlier); Phase 1 still deferred · [`SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md`](SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md) |
+| 2026-06-02 | **City game risks + build gates** — R-01–R-18, B1–B11 in implementation brief; `SYSTEM_INVARIANTS` § Cedar Rapids city game |
+| 2026-06-02 | **City game feature traceability** — full CR-* / PWM-* catalog in implementation brief; rollout S1(15) → S3(50) |
 | 2026-06-02 | **City game Phase D surfaces** — `city-game:launch-surfaces` + `city-game:post-season` tooling; P3/P4 runbook in launch checklist · `--apply` blocked until human gates |
 | 2026-06-02 | **P0b-1 desk preflight** — `card-disabled-since-visit:desk-gate` pass (85 Vitest + 4 WebKit E2E); prod WebKit **P1-P0b-1** re-verify pending after deploy |
 | 2026-06-02 | **P1-PWA-V desk preflight** — `steward-scan-handoff:verify` pass (98 Vitest + 14 E2E); prod WebKit **P1-PWA-V** pending · [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) |

@@ -157,7 +157,9 @@ npm run worker:test:safari-itp-notice
 npm run worker:test:pwa-session-mismatch
 ```
 
-Manual QA: **P1-P0b-1**, **P1-QTR**, **P0-W** in [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md).
+Manual QA: **P1-P0b-1**, **P1-PWA-V**, **P1-QTR**, **P0-W** in [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md).
+
+**P0b-1 sign-off (R10):** Desk gate ☑ 2026-06-02 · Prod WebKit re-verify pending after Pages deploy (prior pass 2026-05-30). Sign-off: `npm run card-disabled-since-visit:sign-off -- --pass --apply`.
 
 ---
 

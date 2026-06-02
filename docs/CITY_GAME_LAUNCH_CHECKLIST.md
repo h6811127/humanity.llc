@@ -1,15 +1,18 @@
 # Cedar Rapids city game — launch checklist (Phase D)
 
 **Status:** Internal · run immediately before public season open  
-**Canonical:** [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) · **Verify:** `npm run verify:city-game -- --require-launch`
+**Canonical:** [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) · **Feature coverage:** § Feature page traceability (CR-* / PWM-*) · **Verify:** `npm run verify:city-game -- --require-launch`
 
 ---
 
 ## Engineering preflight
 
+**Architecture / build gates:** [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) § Build process (**B1–B11**) and risks (**R-01–R-18**).
+
 | Step | Command / check | Done? |
 |------|-------------------|-------|
-| E1 | `npm run verify:city-game` green | ☐ |
+| E1 | `npm run verify:city-game` green | ☑ **2026-06-02** (109 tests) |
+| E1b | Build gates **B1–B2**, **B5–B8** signed (vouch copy, surfaces honesty, load test, no player-signed over-promise) | ☐ |
 | E2 | `npm run city-game:verify-season -- --require-launch` (season root + dates set) | ☐ |
 | E3 | All 15 nodes minted + QRs issued on season root | ☐ |
 | E4 | `CITY_GAME_ENABLED=1` in `worker/wrangler.toml` · Worker deployed | ☐ |
@@ -25,9 +28,22 @@ Local E5: [`CITY_GAME_LOCAL_DEV.md`](CITY_GAME_LOCAL_DEV.md) · `npm run city-ga
 |------|-------|-------|
 | P1 | [`CITY_GAME_COMPREHENSION_RUNBOOK.md`](CITY_GAME_COMPREHENSION_RUNBOOK.md) — ≥5 testers pass GT-1–GT-6 | ☐ |
 | P2 | [`CITY_GAME_INSTALL_QA.md`](CITY_GAME_INSTALL_QA.md) — ≥3 phones × 15 nodes | ☐ |
-| P3 | Rules page: remove `noindex`, add season dates on [`/play/cedar-rapids/`](../site/play/cedar-rapids/index.html) | ☐ |
-| P4 | Research pages: swap “in development” hints → link to live rules | ☐ |
+| P3 | Rules page live — [`/play/cedar-rapids/`](../site/play/cedar-rapids/index.html) | ☐ |
+| P4 | Research pages — live season banners + rules link | ☐ |
 | P5 | Confirm scan analytics still off — [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md) | ☐ |
+
+**P3 + P4 automation (Phase D public surfaces):** After season root + window dates are set and human gates P1–P2 / O1–O3 are signed:
+
+```bash
+npm run city-game:launch-surfaces -- --check    # preflight (pre-launch state OK today)
+npm run city-game:launch-surfaces -- --apply    # launch day only — patches 5 HTML surfaces
+npm run build && npm run pages:deploy           # after --apply
+npm run city-game:launch-surfaces -- --check --expect-applied
+```
+
+Patches: `site/play/cedar-rapids/index.html` · PWM · Cedar Rapids demo · living street · `what-can-a-qr-do.html`. Does **not** set `CITY_GAME_ENABLED` (E4 separate).
+
+**Pre-launch check (2026-06-02):** `--check` confirms draft/noindex state; blockers until launch: `season_root_profile_id`, `window.starts_at` / `ends_at`.
 
 ---
 
@@ -45,10 +61,13 @@ Local E5: [`CITY_GAME_LOCAL_DEV.md`](CITY_GAME_LOCAL_DEV.md) · `npm run city-ga
 
 ## Launch day
 
-1. Set `window.starts_at` / `ends_at` in season JSON (if not already).
-2. Deploy Worker + Pages.
-3. Spot-scan `node_01`, `node_04`, `node_13` on production WebKit.
-4. Post rules link from research hub (no heatmap / player-count claims).
+1. Confirm launch checklist P1–P5 and O1–O4 signed.
+2. Set `window.starts_at` / `ends_at` + `season_root_profile_id` in season JSON (if not already).
+3. **Public surfaces:** `npm run city-game:launch-surfaces -- --apply` → `npm run build` → Pages deploy.
+4. **Resolver:** `CITY_GAME_ENABLED=1` in `worker/wrangler.toml` → Worker deploy (E4).
+5. Verify: `npm run city-game:launch-surfaces -- --check --expect-applied` · `npm run verify:city-game -- --require-launch`
+6. Spot-scan `node_01`, `node_04`, `node_13` on production WebKit.
+7. Post rules link from research hub (no heatmap / player-count claims).
 
 ---
 
@@ -59,5 +78,7 @@ Local E5: [`CITY_GAME_LOCAL_DEV.md`](CITY_GAME_LOCAL_DEV.md) · `npm run city-ga
 | S1 | Decision Q5: pause all nodes vs living-infra subset — document in season JSON `status` | ☐ |
 | S2 | Flip compromised/revoked nodes to paused or living-infrastructure copy | ☐ |
 | S3 | `CITY_GAME_ENABLED=0` or season `status: ended` if disabling game template | ☐ |
+
+Post-season JSON: `npm run city-game:post-season -- --write` (sets `season.status = ended`; node pause per operator runbook).
 
 See [`CITY_GAME_OPERATOR_RUNBOOK.md`](CITY_GAME_OPERATOR_RUNBOOK.md) § Post-season.

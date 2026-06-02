@@ -1,7 +1,9 @@
 # Cedar Rapids city game — weekend operator schedule
 
-**Status:** Internal template · customize per season dates  
+**Status:** Internal template · **assign names before launch**  
 **Runbook:** [`CITY_GAME_OPERATOR_RUNBOOK.md`](CITY_GAME_OPERATOR_RUNBOOK.md)
+
+**Phase C gate:** Replace `[fill]` placeholders with named primary + backup operators and confirm shift coverage for Fri–Sun season window. Required for launch checklist O3 ([`CITY_GAME_LAUNCH_CHECKLIST.md`](CITY_GAME_LAUNCH_CHECKLIST.md)).
 
 ---
 

@@ -1,9 +1,21 @@
 # Cedar Rapids city game — comprehension runbook (GT-1–GT-6)
 
-**Status:** Runbook ready; execution pending (≥5 testers)  
+**Status:** Runbook ready; **human execution pending** (≥5 testers)  
 **Gate:** [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) § Game theory acceptance tests · Launch gates § Copy comprehension  
 **Prerequisite:** Prototype nodes live on staging with `CITY_GAME_ENABLED=1`; rules draft at [`/play/cedar-rapids/`](../site/play/cedar-rapids/index.html) (read aloud OK).  
 **Companion:** [`FOUNDING_COPY_COMPREHENSION_RUNBOOK.md`](FOUNDING_COPY_COMPREHENSION_RUNBOOK.md) pattern · `npm run verify:city-game`
+
+---
+
+## Engineering preflight (not a substitute for human testers)
+
+| Step | Command | Pass when | Record |
+|------|---------|-----------|--------|
+| Copy guard | `npm run verify:city-game` | Includes `city-game-game-theory.test.ts` | ☑ **2026-06-02** |
+| Staging URLs | Seed or mint on staging | `node_04`, `node_07`, sanctuary, `node_14` reachable | ☐ |
+| Install scenarios | [`CITY_GAME_INSTALL_QA.md`](CITY_GAME_INSTALL_QA.md) § Scenario spot-checks | Operator spot-check on one phone | ☐ |
+
+Do **not** mark GT-1–GT-6 passed until ≥5 un coached testers complete the scorecard below.
 
 ---
 

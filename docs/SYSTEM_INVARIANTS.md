@@ -182,3 +182,28 @@ Canonical: [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) ·
 **Regression:** `npm run worker:test:scan-live-check-arrive` · `npm run e2e:scan-hero-visual`
 
 Canonical: [`SCAN_PAGE_TRUST_UI.md`](SCAN_PAGE_TRUST_UI.md) · [`SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md`](SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md) (RC-8)
+
+---
+
+## Cedar Rapids city game
+
+Canonical spec: [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) · risks **R-*** · build gates **B1–B11**.
+
+| Invariant | Detail |
+|-----------|--------|
+| Feature flag | `CITY_GAME_ENABLED=0` in production until launch checklist signed; game scan template and `game-contribute` only when enabled. |
+| Passive scan | `GET /c/…` (scan SSR) does **not** increment collective progress, scarcity, or fragment state. |
+| Contribute | `POST …/game-contribute` may update **aggregate-only** fields (`collective_progress`, `unlocked_by`, `scarcity_remaining`) and count buckets — **no** per-player ID, scan log row, or fingerprint. |
+| Care wins | When care stream is maintenance pause / closure, game bulletins are muted on scan (`scan-view` / `scan-html` precedence). |
+| Lifecycle first | Revoked or paused child object or QR shows lifecycle truth; game hero does not override. |
+| Game-operator scope | `issuer_public_key` may `game-update` **game_node** only — not owner manifesto, human vouch issuance, or non-game child types. |
+| Human vs game vouch | Game `vouch_requires` / `vouch_active_for` on `game_meta` is separate from root-card Steward vouch graph; do not conflate in copy or tests. |
+| Launch deploy | Public “live season” HTML (`city-game:launch-surfaces --apply`) and Worker `CITY_GAME_ENABLED=1` ship in the **same** release train. |
+
+**Regression:**
+
+```bash
+npm run verify:city-game
+```
+
+Touching `worker/src/city-game/*`, `worker/src/resolver/game-contribute.ts`, `worker/src/resolver/game-update.ts`, or `site/js/scan-game-contribute.mjs` requires the block above plus any new test named in the PR. Update this section when adding new automated mechanics.

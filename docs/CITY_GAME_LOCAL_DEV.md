@@ -33,7 +33,11 @@ Add to **`worker/.dev.vars`** (gitignored — never commit):
 
 ```bash
 CITY_GAME_ENABLED=1
+SCAN_RESOLVER_ORIGIN=http://127.0.0.1:8787
+SCAN_PAGES_JS_ORIGIN=http://127.0.0.1:8788
 ```
+
+`SCAN_*` origins are required when wrangler dev simulates production hostnames (`humanity.llc`) so scan HTML loads local Pages JS instead of production.
 
 Do **not** change `CITY_GAME_ENABLED` in `worker/wrangler.toml` for local dev. That file stays `"0"` until launch deploy.
 
@@ -56,6 +60,14 @@ Terminal A:
 ```bash
 npm run worker:dev
 ```
+
+Terminal A2 (required for scan page JavaScript — contribute client, device shell modules):
+
+```bash
+npm run pages:dev
+```
+
+Scan HTML is served on **`:8787`**; static `/js/*.mjs` loads from Pages **`:8788`**. Without `pages:dev`, local scans pull production `humanity.llc` JS (stale until you deploy Pages). Set `SCAN_PAGES_JS_ORIGIN` / `SCAN_RESOLVER_ORIGIN` in `worker/.dev.vars` when wrangler simulates production routes.
 
 Health check: `curl -s http://127.0.0.1:8787/.well-known/hc/v1/health`
 
@@ -127,7 +139,7 @@ After quorum smoke passes (or reset spine), eyes-on the fragment lattice:
 1. Open `node_09` scan from seed — enter **`CR-MURAL-2F`** → expect “Fragment registered” and `1 / 3` on finale need stream.
 2. Open `node_11` — **`CR-MARK-9P`** → `2 / 3`.
 3. Open `node_01` — **`CR-RELAY-1N`** → finale opens; spot-scan `node_13` for “Finale switch live” copy.
-4. Optional witness scarcity: `node_10` with **`CR-WITNS-4P`** → then `node_07` scan shows witness vouch chip when `node_10` lists cabinet in `vouch_active_for`.
+4. Optional witness scarcity: `node_10` with **`CR-WITNS-4P`** → then `node_07` scan shows witness vouch chip when `node_10` lists cabinet in `vouch_active_for`. After one claim, the same browser hides the contribute form until the next UTC day (device-local ceiling — clear `localStorage` key `hc_game_scarcity_ceiling_v1` in dev tools to re-test).
 
 Use `:8787` scan URLs only (Worker resolver). Pages `:8788` does not serve `/c/…`.
 
@@ -180,6 +192,7 @@ From [`CITY_GAME_INSTALL_QA.md`](CITY_GAME_INSTALL_QA.md) § Scenario spot-check
 | `Missing script: "city-game:season-root,"` | Do not paste comma — run commands separately |
 | `INVALID_QR_PAYLOAD` on seed | Expected — seed uses `https://humanity.llc/c/…` payloads; use `local_scan_url` for browser |
 | Smoke: missing `scan-game-chips` | `CITY_GAME_ENABLED=1` in `.dev.vars` + restart `worker:dev` |
+| Witness: unlimited passes in browser | Run **`pages:dev`** (`:8788`) + add `SCAN_PAGES_JS_ORIGIN` / `SCAN_RESOLVER_ORIGIN` to **`worker/.dev.vars`** + restart **`worker:dev`**. Hard-refresh scan tab — contribute JS must load from `127.0.0.1:8788`, not production. Clear `localStorage` key `hc_game_scarcity_ceiling_v1` to re-test same device. |
 | Smoke: **HTTP 404** on scan URLs | Seed file points at a profile/QR **not in local D1** — re-run `city-game:seed-local -- --write-season` |
 | `CHECK constraint failed: scope IN ('card', 'print_artifact')` | Run `npm run worker:apply-child-object-qr-schema` then re-seed |
 | After `rm -rf worker/.wrangler/state/v3/d1` | Re-migrate, apply QR schema, **restart** `worker:dev`, then seed |
