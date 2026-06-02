@@ -238,7 +238,7 @@ Optional TTL purge post-season. **No** row per contribution event if policy requ
 | 8 | ✓ Deprecate operator quorum flips for spine nodes | operator docs updated |
 | 9 | ✓ Unlock evaluator after `game-update` | `unlock-evaluator.test.ts` + `city-game.test.ts` |
 
-**Regression gate:** extend `npm run verify:city-game` with contribute + unlock tests · local spine proof: `npm run city-game:smoke-contribute-local` (+ `--spine`).
+**Regression gate:** extend `npm run verify:city-game` with contribute + unlock tests · local spine proof: `npm run city-game:proof-local` (or `smoke-contribute-local --spine`).
 
 ---
 

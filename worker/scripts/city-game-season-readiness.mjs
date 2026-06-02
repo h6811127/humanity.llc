@@ -2,8 +2,84 @@
  * Cedar Rapids season config readiness checks (Phase C/D gates).
  */
 
+import { seasonContributableNodeIds } from "./city-game-seed-site-codes-core.mjs";
+
 const NODE_ID_RE = /^node_\d{2}$/;
 const OBJECT_ID_RE = /^obj_cr_node_\d{2}_[a-z0-9_]+$/;
+
+const SPINE_UNLOCK_EDGES = [
+  ["node_04", "node_07"],
+  ["node_10", "node_07"],
+  ["node_09", "node_13"],
+  ["node_11", "node_13"],
+  ["node_01", "node_13"],
+];
+
+function sameStringSet(a, b) {
+  const left = [...new Set(a)].sort();
+  const right = [...new Set(b)].sort();
+  return left.length === right.length && left.every((value, index) => value === right[index]);
+}
+
+/**
+ * @param {Record<string, unknown>} season
+ * @param {Set<string>} nodeIds
+ * @param {string[]} issues
+ * @param {string[]} warnings
+ */
+function validateAutonomousSpine(season, nodeIds, issues, warnings) {
+  const auto = season.automation;
+  if (!auto || typeof auto !== "object") {
+    issues.push("automation block required for autonomous v1 spine.");
+    return;
+  }
+
+  const automation = /** @type {Record<string, unknown>} */ (auto);
+  if (!sameStringSet(automation.quorum_nodes ?? [], ["node_04"])) {
+    issues.push('automation.quorum_nodes must be ["node_04"].');
+  }
+  if (!sameStringSet(automation.fragment_nodes ?? [], ["node_09", "node_11", "node_01"])) {
+    issues.push('automation.fragment_nodes must include node_09, node_11, node_01.');
+  }
+  if (automation.finale_node !== "node_13") {
+    issues.push('automation.finale_node must be "node_13".');
+  }
+  if (automation.witness_scarcity_node !== "node_10") {
+    issues.push('automation.witness_scarcity_node must be "node_10".');
+  }
+
+  const edgeKeys = new Set(
+    (Array.isArray(season.unlock_edges) ? season.unlock_edges : []).map(
+      (edge) => `${edge?.from}->${edge?.to}`
+    )
+  );
+  for (const [from, to] of SPINE_UNLOCK_EDGES) {
+    if (!edgeKeys.has(`${from}->${to}`)) {
+      issues.push(`unlock_edges missing spine edge ${from} → ${to}.`);
+    }
+  }
+
+  const codes = season.contribute_codes ?? {};
+  if (!codes || typeof codes !== "object") {
+    issues.push("contribute_codes required for autonomous contribute nodes.");
+    return;
+  }
+
+  for (const nodeId of seasonContributableNodeIds(season)) {
+    if (!nodeIds.has(nodeId)) {
+      issues.push(`${nodeId}: listed in automation but missing from nodes[].`);
+      continue;
+    }
+    const entry = /** @type {{ code?: string; epoch?: string }} | undefined */ (codes[nodeId]);
+    if (!entry?.code?.trim()) {
+      issues.push(`${nodeId}: missing contribute_codes.code.`);
+      continue;
+    }
+    if (entry.epoch && entry.epoch !== season.season_id) {
+      warnings.push(`${nodeId}: contribute_codes.epoch differs from season_id.`);
+    }
+  }
+}
 
 /**
  * @param {unknown} season
@@ -81,6 +157,8 @@ export function cityGameSeasonReadiness(season, opts = {}) {
   if (!Array.isArray(s.mobile_lore_enrollment)) {
     issues.push("mobile_lore_enrollment must be an array (empty OK).");
   }
+
+  validateAutonomousSpine(s, nodeIds, issues, warnings);
 
   return {
     ready: issues.length === 0,

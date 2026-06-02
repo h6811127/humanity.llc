@@ -15,7 +15,7 @@
     { "from": "node_10", "to": "node_07", "label": "Library witness vouch opens cabinet path" },
     { "from": "node_09", "to": "node_13", "label": "Czech Village mural fragment" },
     { "from": "node_11", "to": "node_13", "label": "Greene Square marker fragment" },
-    { "from": "node_01", "to": "node_13", "label": "NewBo relay fragment (operator flip when lattice complete)" }
+    { "from": "node_01", "to": "node_13", "label": "NewBo relay fragment" }
   ],
   "mobile_lore_enrollment": [],
   "contribute_codes": {

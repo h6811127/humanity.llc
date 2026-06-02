@@ -133,7 +133,25 @@ Use `:8787` scan URLs only (Worker resolver). Pages `:8788` does not serve `/c/�
 
 ---
 
-## Step 6 — Scenario spot-checks (optional, local)
+## Step 6 — Local proof gate (E1 + E3 + E5)
+
+With worker still running and seed file present:
+
+```bash
+API_ORIGIN=http://127.0.0.1:8787 npm run city-game:proof-local
+```
+
+Faster replay after a prior full pass:
+
+```bash
+API_ORIGIN=http://127.0.0.1:8787 npm run city-game:proof-local -- --skip-verify --quorum-only
+```
+
+This runs `verify:city-game`, validates the seed file, `smoke-local`, and full-spine `smoke-contribute-local --spine`.
+
+---
+
+## Step 7 — Scenario spot-checks (optional, local)
 
 From [`CITY_GAME_INSTALL_QA.md`](CITY_GAME_INSTALL_QA.md) § Scenario spot-checks — run on local URLs before stickers:
 
@@ -181,6 +199,7 @@ From [`CITY_GAME_INSTALL_QA.md`](CITY_GAME_INSTALL_QA.md) § Scenario spot-check
 | `npm run city-game:seed-local` | Create season root + 15 nodes on local D1 |
 | `npm run city-game:smoke-local` | Verify game scan HTML after seed |
 | `npm run city-game:smoke-contribute-local` | Autonomous quorum → cabinet (add `--spine` for finale) |
+| `npm run city-game:proof-local` | E1 + E3 + E5 gate after seed (add `--skip-verify` / `--quorum-only`) |
 | `npm run city-game:reset-quorum-local` | Reset River Lantern quorum + cabinet lock (local D1) |
 | `npm run city-game:reset-spine-local` | Reset full autonomous spine for replay |
 | `npm run verify:city-game` | Full regression bundle |

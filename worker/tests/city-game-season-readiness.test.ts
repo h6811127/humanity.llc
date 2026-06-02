@@ -34,4 +34,16 @@ describe("cityGameSeasonReadiness", () => {
     expect(ready).toBe(false);
     expect(issues.some((i) => i.includes("node_99"))).toBe(true);
   });
+
+  it("requires autonomous spine config and contribute codes", () => {
+    const broken = {
+      ...season,
+      automation: { ...season.automation, quorum_nodes: [] },
+      contribute_codes: { ...season.contribute_codes, node_04: { code: "", epoch: season.season_id } },
+    };
+    const { ready, issues } = cityGameSeasonReadiness(broken);
+    expect(ready).toBe(false);
+    expect(issues.some((i) => i.includes("quorum_nodes"))).toBe(true);
+    expect(issues.some((i) => i.includes("node_04"))).toBe(true);
+  });
 });
