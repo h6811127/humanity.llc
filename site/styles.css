@@ -1491,6 +1491,16 @@ a.hub-card-menu-item {
   border: 1px solid var(--grey);
 }
 
+.device-hub-group[data-hub-group="import"] {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.device-hub-group[data-hub-group="import"] .device-hub-subgroup-label {
+  margin-bottom: 0;
+}
+
 .device-hub-import-summary {
   display: flex;
   align-items: center;
