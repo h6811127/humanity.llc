@@ -22,7 +22,10 @@ import {
   assessLaunchChecklistReady,
   LAUNCH_CHECKLIST_REL,
 } from "./city-game-launch-checklist-core.mjs";
-import { assessProductionSmokePreflight } from "./city-game-smoke-production-core.mjs";
+import {
+  assessProductionSmokePreflight,
+  launchChecklistE5Signed,
+} from "./city-game-smoke-production-core.mjs";
 import { cityGameSeasonReadiness } from "./city-game-season-readiness.mjs";
 import {
   assessLaunchSurfacesReady,
@@ -156,12 +159,14 @@ async function main() {
   const humanInstallQaPass = installQaDoc.includes(
     "Physical install (≥3 phones × 15 nodes) | ☑"
   );
-  const c4Engineering = assessProductionSmokePreflight({ productionSeed });
 
   const launchChecklistPath = join(root, LAUNCH_CHECKLIST_REL);
   const launchChecklistDoc = existsSync(launchChecklistPath)
     ? readFileSync(launchChecklistPath, "utf8")
     : "";
+
+  const c4Engineering = assessProductionSmokePreflight({ productionSeed });
+  const c4SignedOff = launchChecklistE5Signed(launchChecklistDoc);
   const c5 = assessLaunchChecklistReady({
     launchChecklistDoc,
     scanAnalyticsGateOk: b14.ok,
@@ -184,7 +189,11 @@ async function main() {
       "C3 Physical install QA — ≥3 phones × 15 nodes (npm run city-game:install-qa-preflight)"
     );
   }
-  blockers.push("C4 Production scan smoke — after CITY_GAME_ENABLED=1 deploy (npm run city-game:smoke-production)");
+  if (!c4SignedOff) {
+    blockers.push(
+      "C4 Production scan smoke — npm run city-game:smoke-production-preflight -- --probe · npm run city-game:smoke-production"
+    );
+  }
   for (const blocker of c5.blockers) {
     blockers.push(`C5 ${blocker}`);
   }
@@ -223,6 +232,7 @@ async function main() {
       ready: c4Engineering.ready,
       nodeCount: c4Engineering.nodeCount,
       spotCount: c4Engineering.spotCount,
+      signedOff: c4SignedOff,
     },
     c5: {
       readyForLaunchDay: c5.readyForLaunchDay,

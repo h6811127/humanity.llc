@@ -80,17 +80,50 @@ describe("stewardPushSubscribeAllowed", () => {
 });
 
 describe("hostedTierHubIndicatorLine", () => {
-  it("is null on free tier", () => {
+  it("is null on free tier without usage body", () => {
     expect(hostedTierHubIndicatorLine(REFERENCE_FREE_POLICY)).toBeNull();
   });
 
-  it("returns M5-safe copy when hosted", () => {
-    const line = hostedTierHubIndicatorLine({
-      ...REFERENCE_FREE_POLICY,
-      stewardHosted: true,
+  it("shows reference usage when session entitlements include counters", () => {
+    const line = hostedTierHubIndicatorLine(REFERENCE_FREE_POLICY, {
+      plan_id: "reference_free",
+      usage: {
+        counters: { "poll.live_proof.auto": 12 },
+        limits: { "poll.live_proof.auto": 400 },
+      },
     });
+    expect(line).toBe("Reference plan · auto checks 12/400 today");
+    expect(line).not.toMatch(/premium|verified|upgrade/i);
+  });
+
+  it("returns M5-safe copy when hosted", () => {
+    const line = hostedTierHubIndicatorLine(
+      {
+        ...REFERENCE_FREE_POLICY,
+        stewardHosted: true,
+        planId: "hosted_steward_v1",
+      },
+      {
+        plan_id: "hosted_steward_v1",
+        usage: {
+          counters: { "poll.live_proof.auto": 3 },
+          limits: { "poll.live_proof.auto": 4000 },
+        },
+      }
+    );
     expect(line).toMatch(/Hosted steward plan/);
+    expect(line).toMatch(/3\/4000/);
     expect(line).not.toMatch(/premium|verified/i);
+  });
+
+  it("prioritizes auto-poll at-limit message", () => {
+    const line = hostedTierHubIndicatorLine(REFERENCE_FREE_POLICY, {
+      usage: {
+        counters: { "poll.live_proof.auto": 400 },
+        limits: { "poll.live_proof.auto": 400 },
+      },
+    });
+    expect(line).toMatch(/limit reached/i);
   });
 });
 

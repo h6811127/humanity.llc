@@ -11,7 +11,7 @@
 
 **Public landing:** `site/index.html`  -  “One use” (door plate + QR), “Same idea elsewhere” (mechanism bullets). NFC/mesh diagrams and **Humanity node** vision live on `site/research-directions.html` (`docs/RESEARCH_DIRECTIONS_AND_NODES.md`). Full catalog stays in this doc, not on the homepage scroll.
 
-**Expanded design space (2026-06):** [`QR_DESIGN_SPACE.md`](QR_DESIGN_SPACE.md) · [`site/what-can-a-qr-do/design-space/`](../site/what-can-a-qr-do/design-space/index.html)  -  blind spots, interaction verbs, network primitives, technology pairings, anti-patterns, and open questions beyond the public hub walkthroughs.
+**Expanded design space (2026-06):** [`QR_DESIGN_SPACE.md`](QR_DESIGN_SPACE.md) · [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) · [`site/what-can-a-qr-do/design-space/`](../site/what-can-a-qr-do/design-space/index.html)  -  blind spots, interaction verbs, network primitives, technology pairings, anti-patterns, and open questions beyond the public hub walkthroughs.
 
 **Post-M5 product focus (active):** M5 passed 2026-05-27. Pick **one** vertical to harden on real objects  -  `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` (status plate, lost-item relay, organizer-signed revoke). Do not expand the public idea hub faster than that pilot.
 
@@ -138,7 +138,7 @@ Avoid leading with: social network, universal identity, crypto, or ideology. Tho
 
 Not a build list. Use to test positioning, pilots, and what **not** to promise. Each item still needs the [Use-Case Rule](#use-case-rule) and a phase row before it becomes engineering work.
 
-For blind spots (one-way interaction, time-bound state, custody, stale offline truth, governance, adversarial physical world, accessibility, institutional operators, anti-patterns), additional QR patterns, live-object capabilities, network grammar, and open questions, see **[`QR_DESIGN_SPACE.md`](QR_DESIGN_SPACE.md)**.
+For blind spots (one-way interaction, time-bound state, custody, stale offline truth, governance, adversarial physical world, accessibility, institutional operators, anti-patterns), additional QR patterns, live-object capabilities, network grammar, and open questions, see **[`QR_DESIGN_SPACE.md`](QR_DESIGN_SPACE.md)**. Resolver composition: **[`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md)**.
 
 #### Interaction verbs (cross-cutting)
 

@@ -3,7 +3,18 @@
  * @see docs/HOSTED_TIER_ENTITLEMENTS_AND_METERING.md
  * @see docs/DEVICE_OS_REQUEST_BUDGET.md § Phase 10
  */
+import {
+  gameSeasonBlockFromEntitlementsResponse,
+  gameSeasonMeterUsage,
+  gameSeasonUsageAtLimit,
+} from "./city-game-season-entitlements-core.mjs";
 import { STEWARD_NULL_DEVICE_CAP_FALLBACK } from "./device-steward-quota-core.mjs";
+
+const PLAN_SHORT_LABELS = {
+  reference_free: "Reference",
+  hosted_steward_v1: "Hosted steward",
+  hosted_game_season_v1: "Hosted game season",
+};
 
 export const STEWARD_SESSION_STORAGE_KEY = "hc_steward_session";
 export const STEWARD_DEVICE_ID_STORAGE_KEY = "hc_device_id";
@@ -196,13 +207,49 @@ export function stewardPushSubscribeAllowed(policy) {
 }
 
 /**
- * M5-safe hub line when hosted plan is active.
+ * @param {string | null | undefined} planId
+ */
+function hostedPlanShortLabel(planId) {
+  if (!planId) return PLAN_SHORT_LABELS.reference_free;
+  return PLAN_SHORT_LABELS[planId] ?? planId;
+}
+
+/**
+ * M5-safe hub monitoring line (plan + usage; no upgrade or “verified” copy).
  * @param {StewardEntitlementsPolicy} policy
+ * @param {Record<string, unknown> | null} [body] GET /steward/entitlements JSON
  * @returns {string | null}
  */
-export function hostedTierHubIndicatorLine(policy) {
-  if (!policy.stewardHosted) return null;
-  return "Hosted steward plan — higher automatic check limits on this device. Verification labels are unchanged.";
+export function hostedTierHubIndicatorLine(policy, body = null) {
+  const pollUsage = stewardAutoPollUsageFromBody(body);
+  if (pollUsage && stewardUsageAtLimit(pollUsage.used, pollUsage.limit)) {
+    return "Daily automatic live-proof check limit reached on this device. Use Check for live proof or try again tomorrow.";
+  }
+
+  const gameBlock = gameSeasonBlockFromEntitlementsResponse(body);
+  if (gameBlock) {
+    for (const event of ["game.contribute", "game.snapshot.get", "game.game_update"]) {
+      const row = gameSeasonMeterUsage(gameBlock.usage, event);
+      if (row && gameSeasonUsageAtLimit(row.used, row.limit)) {
+        return "City game daily limit reached for this season. Resolver writes pause until the UTC day resets.";
+      }
+    }
+  }
+
+  const usageSuffix =
+    pollUsage != null
+      ? ` · auto checks ${pollUsage.used}/${pollUsage.limit} today`
+      : "";
+
+  if (policy.stewardHosted) {
+    return `${hostedPlanShortLabel(policy.planId)} plan${usageSuffix} — higher automatic check limits on this device. Verification labels are unchanged.`;
+  }
+
+  if (policy.planId === "reference_free" && pollUsage) {
+    return `${hostedPlanShortLabel(policy.planId)} plan${usageSuffix}`;
+  }
+
+  return null;
 }
 
 /**

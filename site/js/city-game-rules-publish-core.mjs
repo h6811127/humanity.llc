@@ -98,6 +98,41 @@ export function seasonSupportsBrowserRulesPublish(season) {
 }
 
 /**
+ * @param {string} value
+ */
+export function normalizeDistrictSlug(value) {
+  return String(value ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "_")
+    .replace(/[^a-z0-9_]/g, "");
+}
+
+/**
+ * @param {string} text
+ * @returns {string[]}
+ */
+export function parseDistrictsDraftText(text) {
+  const slugs = String(text ?? "")
+    .split(/[\n,]+/)
+    .map((line) => normalizeDistrictSlug(line))
+    .filter(Boolean);
+  return [...new Set(slugs)];
+}
+
+/**
+ * @param {unknown} districts
+ */
+export function formatDistrictsDraftText(districts) {
+  if (!Array.isArray(districts)) return "";
+  return districts
+    .filter((d) => typeof d === "string" && d.trim())
+    .map((d) => normalizeDistrictSlug(d))
+    .filter(Boolean)
+    .join("\n");
+}
+
+/**
  * @param {Record<string, unknown>} season
  * @param {Record<string, unknown> | null | undefined} draft
  * @param {string} profileId
@@ -115,6 +150,11 @@ export function mergeOrganizerPublishSeason(season, draft, profileId) {
   }
   if (typeof draft?.status === "string" && draft.status.trim()) {
     merged.status = draft.status.trim();
+  }
+  if (Array.isArray(draft?.districts)) {
+    merged.districts = draft.districts
+      .map((d) => (typeof d === "string" ? normalizeDistrictSlug(d) : ""))
+      .filter(Boolean);
   }
   return merged;
 }

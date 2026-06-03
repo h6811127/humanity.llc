@@ -19,6 +19,7 @@ import {
   writeGameOperatorCustodyAck,
 } from "./city-game-season-setup-guide-core.mjs";
 import { shouldOfferAddGameNode } from "./created-child-object-game-node-core.mjs";
+import { terminalMintDeprecationUiCopy } from "./city-game-terminal-mint-deprecation-core.mjs";
 
 /**
  * @param {HTMLElement} container
@@ -62,6 +63,7 @@ export function initCreatedGameNodeSetupGuide(ctx) {
   const linksEl = document.getElementById("child-object-game-node-setup-links");
   const statusEl = document.getElementById("child-object-game-node-setup-status");
   const copyBriefBtn = document.getElementById("child-object-game-node-setup-copy-brief");
+  const terminalNoticeEl = document.getElementById("child-object-game-node-setup-terminal-notice");
 
   if (!details) return null;
 
@@ -102,6 +104,24 @@ export function initCreatedGameNodeSetupGuide(ctx) {
     custodyEl.append(fieldset);
   }
 
+  function renderTerminalMintNotice() {
+    if (!(terminalNoticeEl instanceof HTMLElement)) return;
+    const copy = terminalMintDeprecationUiCopy();
+    terminalNoticeEl.hidden = false;
+    terminalNoticeEl.className =
+      "hc-emphasis-card hc-emphasis-card--info created-game-node-setup-terminal-notice";
+    terminalNoticeEl.innerHTML = `
+      <div class="hc-emphasis-card__main">
+        <span class="hc-emphasis-card__dot hc-emphasis-card__dot--info" aria-hidden="true"></span>
+        <div class="hc-emphasis-card__copy">
+          <p class="hc-emphasis-card__eyebrow">Product · ops</p>
+          <p class="hc-emphasis-card__title">${copy.title}</p>
+          <p class="hc-emphasis-card__detail">${copy.body}</p>
+          <p class="hc-emphasis-card__detail created-game-node-setup-terminal-pilot">${copy.pilot}</p>
+        </div>
+      </div>`;
+  }
+
   function renderRunbookCards() {
     if (!runbookEl) return;
     runbookEl.replaceChildren(
@@ -137,6 +157,7 @@ export function initCreatedGameNodeSetupGuide(ctx) {
     }
     details.hidden = false;
 
+    renderTerminalMintNotice();
     renderCustodyCheckboxes();
     renderRunbookCards();
     renderScorecard();

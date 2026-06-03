@@ -166,6 +166,7 @@ Signed card → HTTPS QR → trust-state UI → artifact intent → per-item QR 
 - `docs/PHYSICAL_WORLD_MULTIPLAYER_RESEARCH_SPEC.md`  -  city-scale play with privacy and authority boundaries
 - `docs/V1_USE_CASES.md`  -  primitive + phased examples (not all in v1 code)
 - `docs/QR_DESIGN_SPACE.md`  -  expanded design space: blind spots, verbs, network grammar, open questions
+- `docs/LIVE_OBJECT_ARCHITECTURE.md`  -  five-layer resolver map (object graph, verbs, streams, time, network)
 - `docs/V1_MARKET_AND_GROWTH_STRATEGY.md`
 - `docs/features/Humanity Card v1.0.md`
 - `docs/features/Human Verification v1.0.md`

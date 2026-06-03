@@ -12,6 +12,7 @@ import {
   isoToDatetimeLocalValue,
   jsonBasenameFromPublicUrl,
   mergeOrganizerPublishSeason,
+  parseDistrictsDraftText,
   seasonSupportsBrowserRulesPublish,
 } from "../../site/js/city-game-rules-publish-core.mjs";
 import { rulesPageIsLaunchReady } from "../../site/js/city-game-launch-surfaces-shared.mjs";
@@ -32,6 +33,14 @@ describe("city-game-rules-publish-core", () => {
     expect(datetimeLocalValueToIso(local)).toBeTruthy();
   });
 
+  it("parses district slugs from organizer textarea", () => {
+    expect(parseDistrictsDraftText("Downtown, river\nold town")).toEqual([
+      "downtown",
+      "river",
+      "old_town",
+    ]);
+  });
+
   it("merges organizer profile and window draft onto season", () => {
     const season = loadSeasonJsonFile(root, "city-game-example-season-01.json");
     const merged = mergeOrganizerPublishSeason(
@@ -48,6 +57,12 @@ describe("city-game-rules-publish-core", () => {
     expect(merged.season_root_profile_id).toBe("profile_test_01");
     expect(merged.status).toBe("active");
     expect(merged.window?.starts_at).toBe("2026-07-04T18:00:00.000Z");
+  });
+
+  it("merges organizer districts draft onto season", () => {
+    const season = loadSeasonJsonFile(root, "city-game-example-season-01.json");
+    const merged = mergeOrganizerPublishSeason(season, { districts: ["harbor", "downtown"] }, "");
+    expect(merged.districts).toEqual(["harbor", "downtown"]);
   });
 
   it("assesses example season ready when window and profile set", () => {

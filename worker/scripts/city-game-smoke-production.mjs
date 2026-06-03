@@ -17,12 +17,13 @@ import { fileURLToPath } from "node:url";
 
 import { assessGameScanHtml } from "./city-game-smoke-local-core.mjs";
 import {
-  INSTALL_QA_SPOT_EXPECTATIONS,
   selectProductionSmokeNodes,
+  spotExpectationsForProductionProbe,
 } from "./city-game-smoke-production-core.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const prodSeedPath = join(root, "worker/.local/city-game-production-seed.json");
+const seasonJsonPath = join(root, "site/data/city-game-cr-season-01.json");
 const apiOrigin = (process.env.API_ORIGIN || "https://humanity.llc").replace(/\/$/, "");
 const checkAll = process.argv.includes("--all");
 
@@ -42,6 +43,11 @@ async function main() {
   }
 
   const seed = JSON.parse(readFileSync(prodSeedPath, "utf8"));
+  const season = existsSync(seasonJsonPath)
+    ? JSON.parse(readFileSync(seasonJsonPath, "utf8"))
+    : null;
+  const expectations = spotExpectationsForProductionProbe(season);
+  const preLaunch = !expectations.node_01?.requireCoopHint;
   const targets = selectProductionSmokeNodes({ productionSeed: seed, checkAll });
   if (!targets.length) {
     console.error("No nodes to smoke-test in production seed");
@@ -49,6 +55,9 @@ async function main() {
   }
 
   console.log("Profile:", seed.profile_id);
+  if (preLaunch) {
+    console.log("Season window not open yet — expecting dormant game scan template.\n");
+  }
   console.log("Checking", targets.length, "node(s) at", apiOrigin, "\n");
 
   let failed = 0;
@@ -68,7 +77,7 @@ async function main() {
     }
 
     const html = await res.text();
-    const expect = INSTALL_QA_SPOT_EXPECTATIONS[node.node_id] ?? {};
+    const expect = expectations[node.node_id] ?? {};
     const result = assessGameScanHtml(html, {
       nodeId: node.node_id,
       label: node.public_label,

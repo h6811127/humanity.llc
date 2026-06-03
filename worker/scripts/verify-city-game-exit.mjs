@@ -10,6 +10,7 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const skipTests = process.argv.includes("--skip-tests");
 const requireLaunch = process.argv.includes("--require-launch");
+const runE2e = process.argv.includes("--e2e");
 
 function run(cmd, args) {
   const r = spawnSync(cmd, args, { cwd: root, stdio: "inherit", shell: process.platform === "win32" });
@@ -55,6 +56,7 @@ if (!skipTests) {
     "worker/tests/city-game-comprehension-kit-core.test.ts",
     "worker/tests/city-game-install-qa-core.test.ts",
     "worker/tests/city-game-install-qa-scenario-core.test.ts",
+    "worker/tests/city-game-install-qa-walk-core.test.ts",
     "worker/tests/city-game-install-map-core.test.ts",
     "worker/tests/city-game-operator-ops-core.test.ts",
     "worker/tests/city-game-launch-checklist-core.test.ts",
@@ -76,6 +78,7 @@ if (!skipTests) {
     "worker/tests/city-game-rules-publish-core.test.ts",
     "worker/tests/city-game-season-setup-guide-core.test.ts",
     "worker/tests/city-game-season-template-core.test.ts",
+    "worker/tests/city-game-terminal-mint-deprecation-core.test.ts",
   ]);
 }
 
@@ -86,5 +89,10 @@ run("node", verifyArgs);
 
 console.log("\n=== city-game scaffold play pages ===\n");
 run("node", ["worker/scripts/city-game-scaffold-play.mjs", "--all", "--check"]);
+
+if (runE2e) {
+  console.log("\n=== city-game self-serve setup e2e ===\n");
+  run("npm", ["run", "e2e:city-game-self-serve-setup"]);
+}
 
 console.log("\n✅ verify:city-game complete.");

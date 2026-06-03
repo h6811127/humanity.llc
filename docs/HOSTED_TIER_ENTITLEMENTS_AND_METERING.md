@@ -40,7 +40,7 @@ Requires `HOSTED_STEWARD_ENABLED=1` in [`worker/wrangler.toml`](../worker/wrangl
 | Browser game season policy helper | **Shipped** | `site/js/city-game-season-entitlements-core.mjs` · `/created/` Live panel `created-hosted-entitlements.mjs` (R2) |
 | Stripe → `plan_id` on account | **Partial** | Webhook + `POST …/steward/billing/checkout` (R1) · `metadata.plan_id` including `hosted_game_season_v1` |
 | `POST …/steward/usage/report` | **Not built** | Server-side metering is source of truth |
-| M5 hosted UX copy / upgrade panels | **Partial** | `/created/` **Manage** tab · collapsed **Usage & limits** disclosure + upgrade CTAs (R2/R5); hub line unchanged |
+| M5 hosted UX copy / upgrade panels | **Shipped** | `/created/` **Manage** · collapsed **Usage & limits** + upgrade CTAs (R2/R5); hub **monitoring line** shows plan + daily auto-check usage (E2.5) |
 
 **Local debug:** `npm run hosted:steward-session-local` · [`CITY_GAME_LOCAL_DEV.md`](CITY_GAME_LOCAL_DEV.md) § Three sources of truth.
 

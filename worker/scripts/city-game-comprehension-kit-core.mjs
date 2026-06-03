@@ -574,7 +574,7 @@ function escapeHtml(value) {
  *   local?: { seed: boolean; worker?: boolean };
  *   c2?: { ready: boolean; localOk: boolean; productionOk: boolean; humanSignedOff?: boolean };
  *   c3?: { ready: boolean; localSeedReady: boolean; productionSeedReady: boolean; humanSignedOff?: boolean };
- *   c4?: { ready: boolean; nodeCount: number; spotCount: number };
+ *   c4?: { ready: boolean; nodeCount: number; spotCount: number; signedOff?: boolean };
  *   c5?: { readyForLaunchDay: boolean; allRequiredSigned: boolean; c5Signed: boolean; pending: string[] };
  *   blockers: string[];
  * }} report
@@ -611,9 +611,11 @@ export function formatLaunchPreflightReport(report) {
   }
   if (report.c4) {
     lines.push(
-      `C4 prod scan smoke (engineering): ${report.c4.ready ? "☑" : "☐"} production seed · spot URLs ${report.c4.spotCount}/3`
+      `C4 prod scan smoke: ${report.c4.signedOff ? "☑" : "☐"} E5 checklist · engineering ${report.c4.ready ? "☑" : "☐"} seed · spot URLs ${report.c4.spotCount}/3`
     );
-    lines.push(`  npm run city-game:smoke-production-preflight -- --probe (after CITY_GAME_ENABLED=1 deploy)`);
+    if (!report.c4.signedOff) {
+      lines.push(`  npm run city-game:smoke-production-preflight -- --probe · npm run city-game:smoke-production`);
+    }
   }
   if (report.c5) {
     lines.push(
@@ -657,10 +659,12 @@ export function formatLaunchPreflightReport(report) {
   lines.push("  npm run city-game:install-qa-preflight   → C3 before physical stickers");
   lines.push("  docs/CITY_GAME_COMPREHENSION_RUNBOOK.md · docs/CITY_GAME_INSTALL_QA.md");
   lines.push("");
-  lines.push("After worker deploy (C4):");
-  lines.push("  npm run city-game:smoke-production-preflight -- --probe");
-  lines.push("  npm run city-game:smoke-production");
-  lines.push("");
+  if (report.c4 && !report.c4.signedOff) {
+    lines.push("After worker deploy (C4):");
+    lines.push("  npm run city-game:smoke-production-preflight -- --probe");
+    lines.push("  npm run city-game:smoke-production");
+    lines.push("");
+  }
   lines.push("Launch checklist (C5 — after P1–P2 + ops gates):");
   lines.push("  npm run city-game:operator-ops-preflight");
   lines.push("  npm run city-game:launch-checklist-preflight");

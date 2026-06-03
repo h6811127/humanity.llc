@@ -4,6 +4,11 @@
  */
 
 import {
+  findLaunchChecklistRow,
+  launchChecklistGateSigned,
+  launchChecklistRowIsSigned,
+} from "./city-game-launch-checklist-core.mjs";
+import {
   INSTALL_QA_REQUIRED_NODE_COUNT,
   INSTALL_QA_SPOT_EXPECTATIONS,
   INSTALL_QA_SPOT_NODE_IDS,
@@ -13,7 +18,39 @@ export const DEFAULT_PRODUCTION_API = "https://humanity.llc";
 
 export const LAUNCH_CHECKLIST_REL = "docs/CITY_GAME_LAUNCH_CHECKLIST.md";
 export const LAUNCH_CHECKLIST_E5_PENDING =
-  "| E5 | Scan template live on staging/production for `node_01`, `node_04`, `node_07` | ☐ · `npm run city-game:smoke-production` after `CITY_GAME_ENABLED=1` |";
+  "| E5 | Scan template live on staging/production for `node_01`, `node_04`, `node_07` | ☐ · `npm run city-game:smoke-production` after preflight probe (pre-launch = dormant OK) |";
+
+/**
+ * @param {{ window?: { starts_at?: string; ends_at?: string } } | null | undefined} season
+ * @param {Date} [now]
+ */
+export function isSeasonPlayOpenForSmoke(season, now = new Date()) {
+  const start = season?.window?.starts_at;
+  if (!start) return true;
+  const startMs = Date.parse(start);
+  if (Number.isNaN(startMs)) return true;
+  const endMs = season?.window?.ends_at ? Date.parse(season.window.ends_at) : null;
+  const nowMs = now.getTime();
+  if (nowMs < startMs) return false;
+  if (endMs != null && !Number.isNaN(endMs) && nowMs > endMs) return false;
+  return true;
+}
+
+/**
+ * Pre-launch: game template + dormant note. In-season: coop/contribute spot checks.
+ * @param {{ window?: { starts_at?: string; ends_at?: string } } | null | undefined} season
+ * @param {Date} [now]
+ */
+export function spotExpectationsForProductionProbe(season, now = new Date()) {
+  const open = isSeasonPlayOpenForSmoke(season, now);
+  /** @type {Record<string, { requireCoopHint?: boolean; requireContributeBlock?: boolean; expectDormant?: boolean }>} */
+  const out = {};
+  for (const nodeId of INSTALL_QA_SPOT_NODE_IDS) {
+    const base = INSTALL_QA_SPOT_EXPECTATIONS[nodeId] ?? {};
+    out[nodeId] = open ? { ...base } : { expectDormant: true };
+  }
+  return out;
+}
 
 /**
  * @param {string[]} argv
@@ -86,17 +123,29 @@ export function productionSmokeSignOffSummaryLines(input) {
  * @param {{ dateIso: string; nodes?: string }} opts
  */
 export function applyLaunchChecklistE5Pass(content, opts) {
-  if (!content.includes(LAUNCH_CHECKLIST_E5_PENDING)) {
-    if (content.includes("| E5 | Scan template live") && content.includes("☑")) {
-      return content;
-    }
+  const line = findLaunchChecklistRow(content, "E5");
+  if (!line) {
     throw new Error("launch_checklist_e5_marker_missing");
   }
+  if (launchChecklistRowIsSigned(line)) {
+    return content;
+  }
   const detail = opts.nodes || "node_01, node_04, node_07";
-  return content.replace(
-    LAUNCH_CHECKLIST_E5_PENDING,
-    `| E5 | Scan template live on staging/production for \`node_01\`, \`node_04\`, \`node_07\` | ☑ **${opts.dateIso}** · ${detail} |`
+  const updated = line.replace(
+    /\|\s*☐[^|]*\|$/,
+    `| ☑ **${opts.dateIso}** · ${detail} |`
   );
+  if (updated === line) {
+    throw new Error("launch_checklist_e5_marker_missing");
+  }
+  return content.replace(line, updated);
+}
+
+/**
+ * @param {string} content
+ */
+export function launchChecklistE5Signed(content) {
+  return launchChecklistGateSigned(content, "E5") === true;
 }
 
 /**
@@ -164,7 +213,7 @@ export function formatProductionSmokePreflightReport(c4) {
   if (c4.probeOk === true) {
     lines.push("  HTTP probe (spot nodes): ☑ game template on API_ORIGIN");
   } else if (c4.probeOk === false) {
-    lines.push("  HTTP probe (spot nodes): ☐ failed — is CITY_GAME_ENABLED=1 deployed?");
+    lines.push("  HTTP probe (spot nodes): ☐ failed — confirm CITY_GAME_ENABLED=1 and season phase");
   }
   if (c4.warnings.length) {
     lines.push("");

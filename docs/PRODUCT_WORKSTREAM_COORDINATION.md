@@ -83,7 +83,7 @@ WS-E (Phase E /created/ setup — needs WS-REV entitlements UI)
 
 | | |
 |--|--|
-| **Canonical docs to edit** | [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md) · [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md) · [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) § city game + steward · [`CITY_GAME_LOCAL_DEV.md`](CITY_GAME_LOCAL_DEV.md) · [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) Q9 · this file |
+| **Canonical docs to edit** | [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md) · [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md) · [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) § city game + steward · [`CITY_GAME_LOCAL_DEV.md`](CITY_GAME_LOCAL_DEV.md) · [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) Q9 · [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) · [`QR_DESIGN_SPACE.md`](QR_DESIGN_SPACE.md) · this file |
 | **In scope** | Change doc **Status** headers from “planning only / no implementation” where code shipped; **Implementation status** tables; verb glossary (above); three-sources-of-truth; steward 403 troubleshooting |
 | **Out of scope** | New `*_INVESTIGATION.md` files; Stripe UI code; Phase E UI build |
 | **Exit criteria** | Every API in HOSTED_TIER § HTTP API marked **implemented / partial / planned**; INVARIANTS lists metering + season-link gate; Q9 says metering **done**, checkout **open** |
@@ -104,7 +104,7 @@ WS-E (Phase E /created/ setup — needs WS-REV entitlements UI)
 | **Milestones** | **R1–R4 ☑** · **R5** `hosted:rev:rollout` production playbook + post-deploy WS-REV API gate · close with `--paid` smoke after Stripe test checkout |
 | **Regression** | `npm run worker:test -- worker/tests/city-game-season-entitlements*.test.ts worker/tests/steward-hosted.test.ts worker/tests/billing-lifecycle.test.ts` · `npm run verify:city-game` |
 | **File ownership** | `worker/src/steward/**` · `worker/src/city-game/season-entitlements*.ts` · `worker/src/steward/billing-lifecycle.ts` · `site/js/device-steward-entitlements*.mjs` · `site/js/city-game-season-entitlements-core.mjs` · `site/created/**` (upgrade panel only — coordinate with ownership restore if touching view mode) |
-| **Status** | **R2 complete** — `/created/` Operator plan panel + checkout buttons; entitlements fetch sends `?season_id=` for season-root cards (index `season_root_profile_id`). **Next (human/ops):** Stripe Dashboard prices + `hosted:rev:prod-smoke -- --paid` after test checkout |
+| **Status** | **R5 in progress** — `/created/` Usage & limits shipped. **Next (human/ops):** Stripe prices in Dashboard + wrangler secrets · test checkout · `hosted:rev:prod-smoke -- --paid` · `hosted:rev:rollout -- --post-deploy` |
 | **Blocked by** | M4 pricing sign-off ([`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md)) for public USD copy |
 
 ---
@@ -117,7 +117,7 @@ WS-E (Phase E /created/ setup — needs WS-REV entitlements UI)
 | **In scope** | `npm run city-game:launch-preflight` · human gates P1–P2, O1–O3 · `city-game:launch-surfaces --apply` + `npm run build` + pages deploy · worker deploy `CITY_GAME_ENABLED=1` · production season root custody (not local `CEen…` in committed JSON unless intentional) · map board gates B13–B14 if marketing promises live board |
 | **Out of scope** | Stripe (WS-REV); Phase E browser mint (WS-E); rewriting metering |
 | **Milestones** | **C1 ☑** · **C2** comprehension (human ≥5) · **C3** `city-game:install-qa-preflight` + physical sign-off · **C4** `city-game:smoke-production` · **C5** checklist signed |
-| **Status** | **C3/C4 active** — install QA + prod scan smoke tooling shipped; human gates + `CITY_GAME_ENABLED` deploy |
+| **Status** | **C3/C4 active** — E4/E5 engineering ☑ · **P2** install QA + **O1–O3** ops gates open |
 | **Regression** | `npm run verify:city-game` · `npm run city-game:verify-season -- --require-launch` · `npm run city-game:launch-surfaces -- --check` |
 | **File ownership** | `site/play/cedar-rapids/**` · `site/what-can-a-qr-do/**` (launch surfaces) · `site/data/city-game-cr-season-01.json` (production values only with ops sign-off) · `worker/scripts/city-game-launch-*` |
 | **Parallel with WS-REV** | Pilot can run on **`reference_free`** game caps (15 nodes); paid tier is for **next** organizers |
@@ -128,13 +128,14 @@ WS-E (Phase E /created/ setup — needs WS-REV entitlements UI)
 
 | | |
 |--|--|
-| **Canonical docs** | [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) § Phase E · [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) · [`CITY_GAME_OPERATOR_CUSTODY.md`](CITY_GAME_OPERATOR_CUSTODY.md) (add § Self-serve when shipping) |
-| **In scope** | `/created/` **Add game node** (parity with status plate) · hub rows for `game_node` · season metadata editor · rules draft + publish · bulk template import · `e2e/city-game-self-serve-setup.spec.ts` (name TBD) · deprecate terminal mint for **new** self-serve seasons (keep scripts for CI/fixtures) |
+| **Canonical docs** | [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) § Phase E · [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) · [`CITY_GAME_OPERATOR_CUSTODY.md`](CITY_GAME_OPERATOR_CUSTODY.md) § Self-serve setup |
+| **In scope** | `/created/` **Add game node** (parity with status plate) · hub rows for `game_node` · season metadata editor · rules draft + publish · bulk template import · **`e2e/city-game-self-serve-setup.spec.ts` shipped** · deprecate terminal mint for **new** self-serve seasons (keep scripts for CI/fixtures) |
 | **Out of scope** | Stripe checkout flow (WS-REV); Cedar Rapids launch apply (WS-CR); scan analytics; delegated child keys |
 | **Gates (do not market “create your own game” until)** | **E1** Phase D signed · **E2** loader ≥2 seasons (**met**) · **E3** full 15-node season in browser on staging · **E4** comprehension on self-serve rules · **E5** INVARIANTS updated (**R-16**) |
-| **Regression** | `npm run verify:city-game` · new E2E in WS-E milestone · `npm run worker:test -- worker/tests/city-game-season-loader.test.ts` |
+| **Regression** | `npm run verify:city-game` · `npm run verify:city-game -- --e2e` · `npm run e2e:city-game-self-serve-setup` · `npm run worker:test -- worker/tests/city-game-season-loader.test.ts` |
 | **File ownership** | `site/js/created-*game*` (new modules TBD) · `site/created/index.html` · `worker/src/city-game/season-loader.ts` (registerSeasonConfig only if needed) · **Do not** fork parallel mint API — use `POST …/objects` + `issue-qr` |
-| **Blocked by** | WS-REV **`game_season` UI** on `/created/`; WS-CR **E1** |
+| **Status** | **E2E ☑** · **E5 INVARIANTS ☑** (self-serve + terminal mint scope) · **Next:** **E3** staging walkthrough (15 nodes, no terminal) |
+| **Blocked by** | WS-CR **E1** (Phase D launch sign-off) before marketing self-serve |
 
 ---
 
@@ -248,7 +249,7 @@ npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts
 | Game season metering | WS-REV | `worker/src/city-game/season-entitlements*.ts`, `worker/src/city-game/season-quota.ts`, `worker/migrations/0031_*`, `site/js/city-game-season-entitlements-core.mjs` |
 | Cedar Rapids launch surfaces | WS-CR | `worker/scripts/city-game-launch-surfaces*.mjs`, `site/play/cedar-rapids/`, `site/data/city-game-cr-season-01.json` |
 | Phase E `/created/` game setup | WS-E | `site/created/index.html`, `site/js/created-*.mjs` (new game modules), `site/play/*/index.html` generator paths |
-| Doc status + verbs | WS-DOC | `docs/HOSTED_TIER_*.md`, `docs/PAID_TIER_*.md`, `docs/CITY_GAME_LOCAL_DEV.md`, `docs/SYSTEM_INVARIANTS.md` |
+| Doc status + verbs | WS-DOC | `docs/HOSTED_TIER_*.md`, `docs/PAID_TIER_*.md`, `docs/CITY_GAME_LOCAL_DEV.md`, `docs/LIVE_OBJECT_ARCHITECTURE.md`, `docs/QR_DESIGN_SPACE.md`, `docs/SYSTEM_INVARIANTS.md` |
 
 ---
 
@@ -256,8 +257,11 @@ npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts
 
 | Date | Event |
 |------|--------|
-| 2026-06-03 | **WS-REV R5** — `hosted:rev:pages` deployed `/created/` Operator plan panel; production HTML smoke green |
+| 2026-06-03 | **WS-REV M5/E2.5** — hub monitoring line uses entitlements body (plan + auto-check usage / at-limit) |
+| 2026-06-03 | **WS-REV R5** — `/created/` Usage & limits on Manage tab; production HTML smoke green |
 | 2026-06-03 | **WS-REV R5** — rollout tooling + prod `0031` + worker deploy; API smoke green · `hosted:rev:step1-remote` · `hosted:rev:deploy` |
+| 2026-06-03 | **Live object architecture** — [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md): five-layer resolver map (verbs, streams, time, network); cross-links from QR_DESIGN_SPACE, INVARIANTS, AGENTS |
+| 2026-06-03 | **WS-CR E4/E5** — worker deploy `CITY_GAME_ENABLED=1`; production scan smoke green (pre-window dormant template) |
 | 2026-06-03 | **WS-CR C3/C4** — `city-game:install-qa-preflight` + sign-off; `city-game:smoke-production` + preflight |
 | 2026-06-03 | **WS-CR C2** — comprehension preflight uses production-seed custody; kit regen · human ≥5 testers next |
 | 2026-06-03 | **WS-CR C1** — `verify:city-game --require-launch` green · season root + window dates in CR JSON · launch-preflight engineering gates (B1/B2/B14) pass |

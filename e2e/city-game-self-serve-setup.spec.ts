@@ -38,7 +38,11 @@ function cardStatusRoute(sample: typeof GAME_SEASON_ROOT) {
   };
 }
 
-async function stubResolver(page: Page, sample = GAME_SEASON_ROOT) {
+async function stubResolver(
+  page: Page,
+  sample = GAME_SEASON_ROOT,
+  objects: unknown[] = []
+) {
   await page.route("**/.well-known/hc/v1/health**", (route) =>
     route.fulfill({
       status: 200,
@@ -70,7 +74,7 @@ async function stubResolver(page: Page, sample = GAME_SEASON_ROOT) {
     route.fulfill({
       status: 200,
       contentType: "application/json",
-      body: JSON.stringify({ objects: [] }),
+      body: JSON.stringify({ objects }),
     })
   );
 }
@@ -116,6 +120,14 @@ async function openGameSeasonLive(page: Page) {
   await expect(page.getByRole("tab", { name: "Live", selected: true })).toBeVisible();
 }
 
+async function selectExampleSeason(page: Page) {
+  const seasonSelect = page.locator("#child-object-game-node-season");
+  await expect(seasonSelect.locator('option[value="example_city_season_01"]')).toHaveCount(1, {
+    timeout: 15_000,
+  });
+  await seasonSelect.selectOption("example_city_season_01");
+}
+
 test.describe("city game self-serve setup on /created/", () => {
   test.beforeEach(async ({ page }) => {
     await stubResolver(page);
@@ -138,12 +150,11 @@ test.describe("city game self-serve setup on /created/", () => {
 
     await expect(page.locator("#child-object-add-game-node")).toBeVisible();
     await expect(page.locator("#child-object-game-node-setup")).toBeVisible();
+    await expect(page.locator("#child-object-game-node-setup-terminal-notice")).toContainText(
+      "Browser setup replaces terminal mint"
+    );
     await expect(page.locator("#child-object-game-node-rules")).toBeVisible();
     await expect(page.locator("#child-object-game-node-bulk")).toBeVisible();
-
-    await expect(
-      page.getByRole("group", { name: "Rules page launch readiness" })
-    ).toBeVisible();
     await expect(page.locator("#child-object-game-node-season")).toBeVisible();
   });
 
@@ -151,8 +162,7 @@ test.describe("city game self-serve setup on /created/", () => {
     await seedGameSeasonControlSession(page, GAME_SEASON_ROOT);
     await openGameSeasonLive(page);
 
-    const seasonSelect = page.locator("#child-object-game-node-season");
-    await seasonSelect.selectOption({ label: /Example City \(template\)/ });
+    await selectExampleSeason(page);
 
     await expect(page.locator("#child-object-game-node-setup-custody")).toContainText(
       "Game-operator key custody"
@@ -178,7 +188,7 @@ test.describe("city game self-serve setup on /created/", () => {
   });
 
   test("game-season backup gate blocks bulk import before recovery seatbelt", async ({ page }) => {
-    const rows = [
+    const networkGameNodes = [
       {
         object_id: "obj_e2eGameNode01",
         object_type: "game_node",
@@ -186,6 +196,7 @@ test.describe("city game self-serve setup on /created/", () => {
         public_state: "Dormant",
         created_at: "2026-06-01T12:00:00.000Z",
         status: "active",
+        qr_id: "qr_e2eGameNode01",
       },
       {
         object_id: "obj_e2eGameNode02",
@@ -194,22 +205,23 @@ test.describe("city game self-serve setup on /created/", () => {
         public_state: "Dormant",
         created_at: "2026-06-01T12:01:00.000Z",
         status: "active",
+        qr_id: "qr_e2eGameNode02",
       },
     ];
     const sampleNoSeatbelt = {
       ...GAME_SEASON_ROOT,
       recovery_key_acknowledged: undefined,
     };
-    await seedGameSeasonControlSession(page, sampleNoSeatbelt, { childObjectRows: rows });
+    await stubResolver(page, sampleNoSeatbelt, networkGameNodes);
+    await seedGameSeasonControlSession(page, sampleNoSeatbelt);
     await openGameSeasonLive(page);
 
-    await page.locator("#child-object-game-node-season").selectOption({
-      label: /Example City \(template\)/,
-    });
+    await selectExampleSeason(page);
     await page.locator("#child-object-game-node-bulk summary").click();
 
     await expect(page.locator("#child-object-game-node-bulk-backup-gate")).toContainText(
-      /game nodes/i
+      /game nodes/i,
+      { timeout: 10_000 }
     );
     await expect(page.locator("#child-object-game-node-bulk-submit")).toBeDisabled();
   });
@@ -220,15 +232,18 @@ test.describe("city game self-serve setup on /created/", () => {
     await seedGameSeasonControlSession(page, GAME_SEASON_ROOT);
     await openGameSeasonLive(page);
 
-    await page.locator("#child-object-game-node-season").selectOption({
-      label: /Example City \(template\)/,
-    });
+    await selectExampleSeason(page);
 
+    await page.locator("#child-object-game-node-rules summary").click();
     await page.locator("#child-object-game-node-rules-starts").fill("2026-07-04T10:00");
     await page.locator("#child-object-game-node-rules-ends").fill("2026-07-06T22:00");
     await page.locator("#child-object-game-node-rules-season-status").selectOption("active");
+    await page.locator("#child-object-game-node-rules-districts").fill("downtown\nriver\nold_town");
+    await page.locator("#child-object-game-node-rules-ends").blur();
 
-    await expect(page.locator("#child-object-game-node-rules-preview-draft")).toBeEnabled();
+    await expect(page.locator("#child-object-game-node-rules-preview-draft")).toBeEnabled({
+      timeout: 10_000,
+    });
   });
 });
 

@@ -37,9 +37,9 @@ describe("city-game-launch-checklist-core", () => {
       scanAnalyticsGateOk: true,
     });
     expect(result.allRequiredSigned).toBe(false);
+    expect(result.pending).toEqual(["P2", "O2"]);
     expect(result.pending).not.toContain("P1");
-    expect(result.pending).toContain("P2");
-    expect(result.pending).toContain("O1");
+    expect(result.pending).not.toContain("O1");
     expect(result.readyForLaunchDay).toBe(false);
     expect(result.blockers.some((b) => b.includes("pending"))).toBe(true);
   });
@@ -86,8 +86,11 @@ describe("city-game-launch-checklist-core", () => {
     expect(resolveLaunchChecklistSignOffResult(parsed)).toBe("mark");
   });
 
-  it("flags P4 pending marker in canonical checklist", () => {
-    expect(launchChecklistSample).toContain(LAUNCH_CHECKLIST_P4_PENDING);
+  it("tracks signed P4/O1 and pending C5 in canonical checklist", () => {
+    expect(launchChecklistSample).not.toContain(LAUNCH_CHECKLIST_P4_PENDING);
+    expect(launchChecklistGateSigned(launchChecklistSample, "P4")).toBe(true);
+    expect(launchChecklistGateSigned(launchChecklistSample, "O1")).toBe(true);
     expect(launchChecklistSample).toContain(LAUNCH_CHECKLIST_C5_PENDING);
+    expect(launchChecklistC5Signed(launchChecklistSample)).toBe(false);
   });
 });

@@ -185,6 +185,24 @@ Canonical: [`SCAN_PAGE_TRUST_UI.md`](SCAN_PAGE_TRUST_UI.md) · [`SHELL_PAGE_LOAD
 
 ---
 
+## Live objects (resolver composition)
+
+Canonical architecture: [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) · public catalog: [`QR_DESIGN_SPACE.md`](QR_DESIGN_SPACE.md).
+
+| Invariant | Detail |
+|-----------|--------|
+| Single composition pipeline | Scan HTML and `GET …/status` derive from `buildScanViewModel` in `scan-state.ts` — do not fork parallel scan products per use case. |
+| Lifecycle first | Revoked / suspended card or QR or paused child shows lifecycle truth; overlays (game, streams) do not override. |
+| Passive scan | Opening `/c/…` does not log scanner identity or increment game aggregates ([`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md)). |
+| Verbs are explicit (target) | New scanner/owner actions ship as documented capabilities on status JSON, not ad-hoc HTML-only blocks. |
+| Stream precedence | Care/maintenance streams mute game bulletin copy when in conflict — generalize via shared precedence, not one-off game checks. |
+
+**Regression:** `npm run worker:test -- worker/tests/scan.test.ts worker/tests/update-card.test.ts`
+
+Touching `worker/src/resolver/scan-state.ts`, stream validation, or planned `live-object/*` modules requires updating [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) when layer behavior changes.
+
+---
+
 ## Cedar Rapids city game
 
 Canonical spec: [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) · risks **R-*** · build gates **B1–B11**.
@@ -204,6 +222,8 @@ Canonical spec: [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.m
 | Season root ↔ steward | `GET …/steward/entitlements?season_id=` succeeds only when `steward_account_profiles` links the session `account_id` to that season’s `season_root_profile_id` (bundled season config). |
 | Snapshot quota | Uncached season snapshot builds increment `game.snapshot.get`; **304** (`If-None-Match`) does **not** increment season snapshot quota. |
 | Season config bundle | Worker resolves seasons from `season-registry.generated.ts` imports of `site/data/city-game-*.json` at **bundle load** — editing JSON requires **`worker:dev` restart** (and `city-game:sync-season-root` when local seed ≠ JSON). |
+| Self-serve setup | New public seasons register **game_node** child objects on `/created/` Live · Manage — bulk import, QR issue, rules publish. Organizer uses owner/recovery keys + game-operator public key at `/create/`; weekend flips stay on `/game-operator/` only. |
+| Terminal mint scope | `city-game:mint-node` and `city-game:seed-local` are **Cedar Rapids pilot / CI / engineering** only. Self-serve seasons (`auto_rules_page: true`, not pilot) **exit 1** unless `--force` / `--ci` / `CI=1`. Do not document terminal mint for new organizers. |
 
 **Regression:**
 

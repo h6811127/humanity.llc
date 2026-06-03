@@ -110,6 +110,9 @@ export interface ScanViewModel {
   malformedReason: ScanMalformedReason | null;
   childObjectType: string | null;
   childObjectId: string | null;
+  /** Set when QR scope is child_object — first-class scan fields (Layer 1). */
+  childPublicLabel: string | null;
+  childPublicState: string | null;
   gameNode: GameNodeScanContext | null;
 }
 
@@ -360,6 +363,8 @@ export function buildScanViewModel(
         objectStreams,
         childObjectType: child.object_type,
         childObjectId: child.object_id,
+        childPublicLabel: scanChild.public_label,
+        childPublicState: scanChild.public_state,
         gameNode,
       },
       origin
@@ -605,6 +610,8 @@ interface BaseViewInput {
   objectStreams?: ObjectPublicStream[];
   childObjectType?: string | null;
   childObjectId?: string | null;
+  childPublicLabel?: string | null;
+  childPublicState?: string | null;
   gameNode?: GameNodeScanContext | null;
 }
 
@@ -658,6 +665,8 @@ function baseView(input: BaseViewInput, origin: string): ScanViewModel {
     malformedReason: null,
     childObjectType: input.childObjectType ?? null,
     childObjectId: input.childObjectId ?? null,
+    childPublicLabel: input.childPublicLabel ?? null,
+    childPublicState: input.childPublicState ?? null,
     gameNode: input.gameNode ?? null,
   };
 }

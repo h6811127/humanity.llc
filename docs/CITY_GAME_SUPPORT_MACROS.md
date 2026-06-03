@@ -57,4 +57,4 @@
 
 | Check | Done? |
 |-------|-------|
-| Support team briefed on macros above | ☐ Pending |
+| Support team briefed on macros above | ☑ **2026-06-03** |

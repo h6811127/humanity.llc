@@ -244,9 +244,10 @@ export function formatInstallQaPreflightReport(c3) {
     `C3 human gate: ${c3.humanSignedOff ? "☑" : "☐"} ≥3 phones × 15 nodes (per-node checklist in ${INSTALL_QA_REL})`
   );
   lines.push("");
-  lines.push("Before stickers:");
+  lines.push("Before stickers / LAN walk (3 phones):");
+  lines.push("  npm run city-game:dev -- --lan");
+  lines.push("  npm run city-game:install-qa-walk -- --lan");
   lines.push("  npm run city-game:install-map-preflight");
-  lines.push("  npm run city-game:install-map-sign-off -- --mark-qr-issued --apply");
   lines.push("  npm run city-game:smoke-local");
   lines.push("  npm run city-game:install-qa-scenario -- --sign-off --apply");
   lines.push("After install + CITY_GAME_ENABLED=1 on production:");

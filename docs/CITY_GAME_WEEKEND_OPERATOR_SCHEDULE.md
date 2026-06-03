@@ -48,4 +48,4 @@ Flips via [`/game-operator/`](../site/game-operator/index.html) — document **w
 
 | Check | Done? |
 |-------|-------|
-| Primary + backup operators named for Fri–Sun window | ☐ Pending |
+| Primary + backup operators named for Fri–Sun window | ☑ **2026-06-03** |

@@ -7,8 +7,10 @@ import {
   buildSelfServePublishedRulesHtml,
   datetimeLocalValueToIso,
   deployChecklistText,
+  formatDistrictsDraftText,
   isoToDatetimeLocalValue,
   jsonBasenameFromPublicUrl,
+  parseDistrictsDraftText,
   readSeasonPublishDraft,
   seasonSupportsBrowserRulesPublish,
   suggestedRulesDownloadFilename,
@@ -29,6 +31,7 @@ export function initCreatedGameNodeRulesPublish(ctx) {
   const startsInput = document.getElementById("child-object-game-node-rules-starts");
   const endsInput = document.getElementById("child-object-game-node-rules-ends");
   const statusSelect = document.getElementById("child-object-game-node-rules-season-status");
+  const districtsInput = document.getElementById("child-object-game-node-rules-districts");
   const readinessEl = document.getElementById("child-object-game-node-rules-readiness");
   const statusEl = document.getElementById("child-object-game-node-rules-status");
   const openRulesLink = document.getElementById("child-object-game-node-rules-open");
@@ -57,7 +60,11 @@ export function initCreatedGameNodeRulesPublish(ctx) {
     };
     const status =
       statusSelect instanceof HTMLSelectElement ? statusSelect.value.trim() : "planned";
-    return { window, status };
+    const districts =
+      districtsInput instanceof HTMLTextAreaElement
+        ? parseDistrictsDraftText(districtsInput.value)
+        : [];
+    return { window, status, districts };
   }
 
   function persistDraft(seasonId) {
@@ -171,6 +178,13 @@ export function initCreatedGameNodeRulesPublish(ctx) {
         (typeof seasonBody?.status === "string" && seasonBody.status) ||
         "planned";
     }
+    if (districtsInput instanceof HTMLTextAreaElement) {
+      const storedDistricts = Array.isArray(storedDraft?.districts) ? storedDraft.districts : null;
+      districtsInput.value =
+        storedDistricts !== null
+          ? formatDistrictsDraftText(storedDistricts)
+          : formatDistrictsDraftText(seasonBody?.districts);
+    }
 
     if (!seasonBody || !jsonBasename) {
       if (readinessEl) {
@@ -228,6 +242,8 @@ export function initCreatedGameNodeRulesPublish(ctx) {
   startsInput?.addEventListener("change", onSeasonOrDraftChange);
   endsInput?.addEventListener("change", onSeasonOrDraftChange);
   statusSelect?.addEventListener("change", onSeasonOrDraftChange);
+  districtsInput?.addEventListener("change", onSeasonOrDraftChange);
+  districtsInput?.addEventListener("input", onSeasonOrDraftChange);
 
   previewDraftBtn?.addEventListener("click", () => {
     if (!lastAssessment?.draftHtml) return;

@@ -284,8 +284,19 @@ From [`CITY_GAME_INSTALL_QA.md`](CITY_GAME_INSTALL_QA.md) § Scenario spot-check
 | `npm run city-game:contribute-load-local` | B5 — 20 concurrent quorum POSTs (needs worker + seed) |
 | `npm run city-game:comprehension-preflight` | C2 engineering — kit pages + probe URLs |
 | `npm run city-game:install-qa-preflight` | C3 engineering — seed + install QA doc markers |
+| `npm run city-game:install-qa-walk -- --lan` | C3 LAN walk kit — 15 tap links for 3-phone physical QA |
 | `npm run city-game:smoke-production-preflight` | C4 engineering — production seed + spot scan URLs |
 | `npm run city-game:launch-preflight` | Phase D status (B1–B5, C2–C5 blockers) |
 | `npm run verify:city-game` | Full regression bundle |
+
+### Terminal mint scope (Phase E)
+
+| Audience | Path |
+|----------|------|
+| **New self-serve seasons** | `/create/` season root + `/created/` Live · Manage — **not** `city-game:mint-node` or `city-game:seed-local` |
+| **Cedar Rapids pilot / CI** | `city-game:mint-node`, `city-game:seed-local`, `city-game:prep-season` — pilot season only without `--force` |
+| **CI / fixture export** | `npm run city-game:mint-node -- --all --season example_city_season_01 --force` |
+
+Self-serve seasons exit **1** from terminal mint scripts unless `--force`, `--ci`, or `CI=1`. See [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) § Cedar Rapids city game.
 
 **Multi-phone LAN:** `npm run city-game:lan-hub -- --write-dev-vars` → one bookmark on each phone.

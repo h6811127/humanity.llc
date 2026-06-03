@@ -1,11 +1,15 @@
 #!/usr/bin/env node
 /**
- * Operator helper — mint game_node child objects for Cedar Rapids Season 1.
+ * Operator helper — mint game_node child objects (pilot + CI only for self-serve seasons).
  *
  * Usage:
  *   npm run city-game:mint-node -- node_01
  *   npm run city-game:mint-node -- --all-test   # prototype nodes only (detailed fixtures)
- *   npm run city-game:mint-node -- --all          # full 15-node registry
+ *   npm run city-game:mint-node -- --all          # full registry (Cedar Rapids pilot)
+ *   npm run city-game:mint-node -- --all --season example_city_season_01 --force  # CI/fixtures only
+ *
+ * Self-serve organizers: use /created/ Live · Manage — not this script.
+ * @see docs/CITY_GAME_V1_IMPLEMENTATION.md § Phase E
  */
 
 import fs from "node:fs";
@@ -17,7 +21,12 @@ import {
   buildGameNodeMintTemplate,
   SEASON_OBJECT_IDS,
 } from "./city-game-node-defaults.mjs";
+import { guardTerminalMintScript } from "./city-game-terminal-mint-guard.mjs";
 import { resolveSeasonPathFromCli } from "../../site/js/city-game-season-path-core.mjs";
+import {
+  formatSeasonSetupNextSteps,
+  isPilotTerminalMintSeason,
+} from "../../site/js/city-game-terminal-mint-deprecation-core.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const seasonPath = resolveSeasonPathFromCli(root);
@@ -34,6 +43,7 @@ if (!fs.existsSync(seasonPath)) {
 }
 
 const season = JSON.parse(fs.readFileSync(seasonPath, "utf8"));
+guardTerminalMintScript({ season, scriptName: "city-game:mint-node" });
 
 function printNode(node) {
   console.log(`\n=== ${node.node_id} · ${node.public_label} ===`);
@@ -60,8 +70,13 @@ function printNode(node) {
   );
 }
 
-console.log("Cedar Rapids city game — mint helper");
+console.log("City game — mint helper");
 console.log("Season:", season.season_id, "—", season.title);
+if (isPilotTerminalMintSeason(season)) {
+  console.log("Audience: Cedar Rapids pilot / engineering terminal mint");
+} else if (season.auto_rules_page === true) {
+  console.log("Audience: self-serve — browser setup on /created/ (this run needs --force for CI only)");
+}
 if (season.season_root_profile_id) {
   console.log("Season root profile_id:", season.season_root_profile_id);
 } else {
@@ -94,11 +109,6 @@ if (arg === "--all") {
 }
 
 console.log("\nObject IDs:", Object.keys(SEASON_OBJECT_IDS).length, "planned slugs in registry.");
-console.log("\nNext steps:");
-console.log("  1. Set CITY_GAME_ENABLED=1 in worker/wrangler.toml for local dev.");
-console.log("  2. npm run city-game:season-root — register issuer_public_key on season root.");
-console.log("  3. Sign each payload as child_object (parent_profile_id, created_at, updated_at).");
-console.log("  4. POST /.well-known/hc/v1/cards/{profile_id}/objects");
-console.log("  5. POST …/objects/{object_id}/issue-qr");
-console.log("  6. Flip state at /game-operator/ or POST …/game-update");
+console.log("\nNext steps:\n");
+console.log(formatSeasonSetupNextSteps({ pilot: isPilotTerminalMintSeason(season) }));
 console.log("\nUnlock edges:", JSON.stringify(season.unlock_edges ?? []));

@@ -3,7 +3,9 @@ import {
   LOST_ITEM_RELAY_PREFIX,
   childObjectManifestoLine,
   isObjectForwardManifesto,
+  parseDisplayFromChildObject,
   parseManifestoDisplay,
+  resolveScanHeroDisplay,
   scanHeroTemplate,
   splitManifestoDisplay,
 } from "../src/resolver/manifesto-display";
@@ -57,6 +59,59 @@ describe("splitManifestoDisplay", () => {
   it("remains compatible for status plates", () => {
     const r = splitManifestoDisplay("Studio door\nOpen until 9 PM");
     expect(r.isStatusPlate).toBe(true);
+  });
+});
+
+describe("parseDisplayFromChildObject", () => {
+  it("maps status_plate child rows to status plate display", () => {
+    const d = parseDisplayFromChildObject({
+      object_type: "status_plate",
+      public_label: "Studio door",
+      public_state: "Open until 9 PM",
+    });
+    expect(d).toEqual({
+      kind: "status_plate",
+      objectLabel: "Studio door",
+      statusLine: "Open until 9 PM",
+    });
+  });
+
+  it("maps lost_item_relay child rows without relay prefix in label", () => {
+    const d = parseDisplayFromChildObject({
+      object_type: "lost_item_relay",
+      public_label: "House keys",
+      public_state: "Lost — contact owner through relay",
+    });
+    expect(d).toEqual({
+      kind: "lost_item_relay",
+      objectLabel: "House keys",
+      statusLine: "Lost — contact owner through relay",
+    });
+  });
+});
+
+describe("resolveScanHeroDisplay", () => {
+  it("prefers child object fields over stale manifesto bridge", () => {
+    const r = resolveScanHeroDisplay({
+      manifestoLine: "Old label\nOld state",
+      qrScope: "child_object",
+      childObjectType: "status_plate",
+      childPublicLabel: "Studio door",
+      childPublicState: "Closed until Monday",
+    });
+    expect(r.template).toBe("status_plate");
+    if (r.display.kind === "status_plate") {
+      expect(r.display.objectLabel).toBe("Studio door");
+      expect(r.display.statusLine).toBe("Closed until Monday");
+    }
+  });
+
+  it("falls back to manifesto when child fields are absent", () => {
+    const r = resolveScanHeroDisplay({
+      manifestoLine: "Studio door\nOpen until 9 PM",
+      qrScope: "card",
+    });
+    expect(r.template).toBe("status_plate");
   });
 });
 

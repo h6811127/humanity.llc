@@ -40,6 +40,7 @@ import {
   signDocument,
   withProtocolFields,
 } from "./seed-showcase-core.mjs";
+import { isPilotTerminalMintSeason } from "../../site/js/city-game-terminal-mint-deprecation-core.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const seasonPath = join(root, "site/data/city-game-cr-season-01.json");
@@ -206,6 +207,18 @@ async function main() {
 
   const seasonRaw = readFileSync(seasonPath, "utf8");
   const season = JSON.parse(seasonRaw);
+
+  console.log("\n=== Terminal mint scope ===");
+  if (isPilotTerminalMintSeason(season)) {
+    console.log("Cedar Rapids pilot / engineering — this script seeds local D1 only.");
+    console.log("New self-serve seasons: register nodes on /created/ Live · Manage (not seed-local).");
+  } else {
+    console.warn(
+      "\n⚠ This script targets Cedar Rapids pilot bootstrap. Self-serve organizers must use /created/."
+    );
+  }
+  console.log("");
+
   if (season.season_root_profile_id && !process.argv.includes("--force")) {
     console.error(
       `\nseason_root_profile_id already set (${season.season_root_profile_id}).`

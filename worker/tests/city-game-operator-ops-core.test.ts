@@ -18,7 +18,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const custodySample = readFileSync(join(root, "docs/CITY_GAME_OPERATOR_CUSTODY.md"), "utf8");
 
 describe("city-game-operator-ops-core", () => {
-  it("assesses pending operator ops gates", () => {
+  it("assesses operator ops gates against signed canon docs", () => {
     const ops = assessOperatorOpsReady({
       custodyDoc: custodySample,
       weekendScheduleDoc: readFileSync(
@@ -29,15 +29,33 @@ describe("city-game-operator-ops-core", () => {
       installMapDoc: readFileSync(join(root, "docs/CITY_GAME_NODE_INSTALL_MAP.md"), "utf8"),
       launchChecklistDoc: readFileSync(join(root, "docs/CITY_GAME_LAUNCH_CHECKLIST.md"), "utf8"),
     });
-    expect(ops.o1.docReady).toBe(false);
+    expect(ops.o1.docReady).toBe(true);
+    expect(ops.o1.checklistSigned).toBe(true);
     expect(ops.o2.installMap.qrReady).toBe(true);
-    expect(ops.o3.docReady).toBe(false);
-    expect(ops.o4.docReady).toBe(false);
+    expect(ops.o2.installMap.contactsReady).toBe(false);
+    expect(ops.o2.checklistSigned).toBe(false);
+    expect(ops.o3.docReady).toBe(true);
+    expect(ops.o3.checklistSigned).toBe(true);
+    expect(ops.o4.docReady).toBe(true);
+    expect(ops.o4.checklistSigned).toBe(true);
   });
 
   it("marks custody Phase C gate rows", () => {
-    expect(custodyPhaseCGateReady(custodySample)).toBe(false);
-    const updated = applyCustodyPhaseCGatePass(custodySample, { dateIso: "2026-06-04" });
+    expect(custodyPhaseCGateReady(custodySample)).toBe(true);
+
+    const custodyPendingFixture = `${CUSTODY_PHASE_C_HEADER}
+
+| Game-operator **private** key in offline custody | ☐ |
+| Season root **owner + recovery** keys in offline custody | ☐ |
+| \`season_root_profile_id\` set in season JSON | ☐ |
+| All 15 node QRs issued and tracked in install map | ☐ |
+| Weekend operator roster assigned | ☐ |
+| \`node_14\` care-loop steward contacts filled | ☐ |
+
+## Later
+`;
+    expect(custodyPhaseCGateReady(custodyPendingFixture)).toBe(false);
+    const updated = applyCustodyPhaseCGatePass(custodyPendingFixture, { dateIso: "2026-06-04" });
     expect(updated).toContain(CUSTODY_PHASE_C_HEADER);
     expect(custodyPhaseCGateReady(updated)).toBe(true);
   });

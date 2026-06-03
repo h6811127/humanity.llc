@@ -9786,6 +9786,15 @@ body[data-created-mode="setup"] #created-setup-keys-mount .flow-keys-panel {
   border-top: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.08));
 }
 
+.created-game-node-setup-terminal-notice {
+  margin-bottom: 10px;
+}
+
+.created-game-node-setup-terminal-pilot {
+  margin-top: 0.5rem;
+  opacity: 0.92;
+}
+
 .created-game-node-setup-lead {
   margin-bottom: 10px;
 }

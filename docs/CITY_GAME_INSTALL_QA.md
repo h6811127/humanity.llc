@@ -19,6 +19,8 @@ Run on every branch that touches game scan copy or resolver logic. Does **not** 
 
 Local walkthrough: [`CITY_GAME_LOCAL_DEV.md`](CITY_GAME_LOCAL_DEV.md) · seed: `npm run city-game:seed-local -- --write-season`
 
+**LAN walk kit (before stickers):** on home Wi‑Fi or hotspot, run `npm run city-game:dev -- --lan` then `npm run city-game:install-qa-walk -- --lan`. Open the printed URL on phones A, B, C — tap each node link and work through the seven checks below.
+
 Automated copy guard (no leaderboard / XP / streak strings): `worker/tests/city-game-game-theory.test.ts` (included in `verify:city-game`).
 
 ---

@@ -15,8 +15,8 @@
 | E1b | Build gates **B1–B2**, **B5–B8** signed (vouch copy, surfaces honesty, load test, no player-signed over-promise) | ☐ · B1–B2 ☑ · **B5 ☑ 2026-06-03** local · B6–B8 human/doc |
 | E2 | `npm run city-game:verify-season -- --require-launch` (season root + dates set) | ☑ **2026-06-03** |
 | E3 | All 15 nodes minted + QRs issued on season root | ☐ local ☑ via `city-game:seed-local` |
-| E4 | `CITY_GAME_ENABLED=1` in `worker/wrangler.toml` · Worker deployed | ☐ |
-| E5 | Scan template live on staging/production for `node_01`, `node_04`, `node_07` | ☐ · `npm run city-game:smoke-production` after `CITY_GAME_ENABLED=1` |
+| E4 | `CITY_GAME_ENABLED=1` in `worker/wrangler.toml` · Worker deployed | ☑ **2026-06-03** · worker deploy `0b084cd9` |
+| E5 | Scan template live on staging/production for `node_01`, `node_04`, `node_07` | ☑ **2026-06-03** · node_01,node_04,node_07 |
 
 **Phase D preflight (engineering only):**
 
@@ -35,8 +35,8 @@ Local E5: [`CITY_GAME_LOCAL_DEV.md`](CITY_GAME_LOCAL_DEV.md) · `npm run city-ga
 | P1 | [`CITY_GAME_COMPREHENSION_RUNBOOK.md`](CITY_GAME_COMPREHENSION_RUNBOOK.md) — ≥5 testers pass GT-1–GT-7 (GT-7 when marketing live board) | ☑ **2026-06-03** |
 | P2 | [`CITY_GAME_INSTALL_QA.md`](CITY_GAME_INSTALL_QA.md) — ≥3 phones × 15 nodes | ☐ |
 | P3 | Rules page live — [`/play/cedar-rapids/`](../site/play/cedar-rapids/index.html) | ☑ **2026-06-03** Pages deploy (board + guide + Maps links) |
-| P4 | Research pages — live season banners + rules link | ☐ |
-| P5 | Confirm scan analytics still off — [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md) | ☐ · automated: `city-game-scan-analytics-gate.test.ts` in `verify:city-game` |
+| P4 | Research pages — live season banners + rules link | ☑ **2026-06-03** · `city-game:launch-surfaces --check --expect-applied` |
+| P5 | Confirm scan analytics still off — [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md) | ☑ **2026-06-03** |
 | P6 | If marketing promises a **live city board**: **B13–B14** signed — [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) (optional at S1 **M1** static; required before **M2** snapshot) | ☐ |
 
 **P3 + P4 automation (Phase D public surfaces):** After season root + window dates are set and human gates P1–P2 / O1–O3 are signed:
@@ -58,10 +58,10 @@ Patches: `site/play/cedar-rapids/index.html` · PWM · Cedar Rapids demo · livi
 
 | Step | Check | Done? |
 |------|-------|-------|
-| O1 | Game-operator private key in custody — [`CITY_GAME_OPERATOR_CUSTODY.md`](CITY_GAME_OPERATOR_CUSTODY.md) | ☐ |
+| O1 | Game-operator private key in custody — [`CITY_GAME_OPERATOR_CUSTODY.md`](CITY_GAME_OPERATOR_CUSTODY.md) | ☑ **2026-06-03** |
 | O2 | [`CITY_GAME_NODE_INSTALL_MAP.md`](CITY_GAME_NODE_INSTALL_MAP.md) — install status + node_14 steward contact | ☐ |
-| O3 | Weekend operator schedule assigned — [`CITY_GAME_WEEKEND_OPERATOR_SCHEDULE.md`](CITY_GAME_WEEKEND_OPERATOR_SCHEDULE.md) | ☐ |
-| O4 | Support team has [`CITY_GAME_SUPPORT_MACROS.md`](CITY_GAME_SUPPORT_MACROS.md) | ☐ |
+| O3 | Weekend operator schedule assigned — [`CITY_GAME_WEEKEND_OPERATOR_SCHEDULE.md`](CITY_GAME_WEEKEND_OPERATOR_SCHEDULE.md) | ☑ **2026-06-03** |
+| O4 | Support team has [`CITY_GAME_SUPPORT_MACROS.md`](CITY_GAME_SUPPORT_MACROS.md) | ☑ **2026-06-03** |
 | O5 | Optional: Glitch hoodies in `mobile_lore_enrollment[]` | ☐ |
 
 ---

@@ -2,7 +2,7 @@ import { PRINT_ARTIFACT_NO_CALENDAR_EXPIRY_NOTE } from "./merch-qr-policy";
 import type { ScanViewModel } from "./scan-state";
 import {
   parseManifestoDisplay,
-  scanHeroTemplate,
+  resolveScanHeroDisplay,
 } from "./manifesto-display";
 import { publicReasonLabel } from "./revocation-display";
 import { scanListIcon, type ScanIconId } from "./scan-icons";
@@ -86,6 +86,16 @@ import {
   scanMalformedLead,
   scanMalformedPageTitle,
 } from "./scan-malformed-hint";
+
+function scanHeroDisplay(vm: ScanViewModel) {
+  return resolveScanHeroDisplay({
+    manifestoLine: vm.manifestoLine,
+    qrScope: vm.qrScope,
+    childObjectType: vm.childObjectType,
+    childPublicLabel: vm.childPublicLabel,
+    childPublicState: vm.childPublicState,
+  });
+}
 
 /** Response header  -  confirms pass-card scan UI (not legacy .block layout). */
 export const SCAN_UI_VERSION = "pass-v39";
@@ -272,8 +282,7 @@ function renderScanHeroSection(
     : "";
   const chipsBlock = renderScanHeroMetaDetails(vm, safety);
   const footBlock = renderScanHeroFootBlock(vm, foot);
-  const display = parseManifestoDisplay(vm.manifestoLine);
-  const heroTemplate = scanHeroTemplate(display, vm.qrScope);
+  const { display, template: heroTemplate } = scanHeroDisplay(vm);
   const lostItemCreateHint =
     vm.kind === "active" &&
     heroTemplate === "lost_item_relay" &&
@@ -563,7 +572,7 @@ function renderGameContributeBlock(vm: ScanViewModel): string {
 
 function buildGameNodeScanHero(vm: ScanViewModel): { main: string; foot: string } {
   const gameNode = vm.gameNode!;
-  const display = parseManifestoDisplay(vm.manifestoLine);
+  const { display } = scanHeroDisplay(vm);
   const label =
     display.kind === "status_plate"
       ? display.objectLabel
@@ -610,8 +619,7 @@ function buildGameNodeScanHero(vm: ScanViewModel): { main: string; foot: string 
 function isMerchFunnelScan(vm: ScanViewModel): boolean {
   if (vm.kind !== "active") return false;
   if (vm.gameNode?.enabled && vm.gameNode.mode !== "fallback") return false;
-  const display = parseManifestoDisplay(vm.manifestoLine);
-  const template = scanHeroTemplate(display, vm.qrScope);
+  const { display, template } = scanHeroDisplay(vm);
   if (template === "status_plate" || template === "lost_item_relay") return false;
   if (vm.qrScope === "print_artifact") return true;
   return template === "live_object";
@@ -734,8 +742,7 @@ function buildScanHeroMain(
     };
   }
 
-  const display = parseManifestoDisplay(vm.manifestoLine);
-  const template = scanHeroTemplate(display, vm.qrScope);
+  const { display, template } = scanHeroDisplay(vm);
 
   if (vm.gameNode?.enabled && vm.gameNode.mode !== "fallback") {
     return buildGameNodeScanHero(vm);

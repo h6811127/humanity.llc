@@ -109,12 +109,12 @@ The `/create/` UI path below is still valid for production/staging when you want
 
 | Step | Done? | Notes |
 |------|-------|-------|
-| Game-operator **private** key in offline custody (password manager / hardware) | ☐ | Never commit; session paste at `/game-operator/` only |
-| Season root **owner + recovery** keys in offline custody | ☐ | Same as any Humanity Card |
-| `season_root_profile_id` set in [`site/data/city-game-cr-season-01.json`](../site/data/city-game-cr-season-01.json) | ☐ | `verify:city-game` warns until set |
-| All 15 node QRs issued and tracked in [`CITY_GAME_NODE_INSTALL_MAP.md`](CITY_GAME_NODE_INSTALL_MAP.md) | ☐ | |
-| Weekend operator roster assigned — [`CITY_GAME_WEEKEND_OPERATOR_SCHEDULE.md`](CITY_GAME_WEEKEND_OPERATOR_SCHEDULE.md) | ☐ | |
-| `node_14` care-loop steward contacts filled | ☐ | Install map § node_14 |
+| Game-operator **private** key in offline custody (password manager / hardware) | ☑ **2026-06-03** | Never commit; session paste at `/game-operator/` only |
+| Season root **owner + recovery** keys in offline custody | ☑ **2026-06-03** | Same as any Humanity Card |
+| `season_root_profile_id` set in [`site/data/city-game-cr-season-01.json`](../site/data/city-game-cr-season-01.json) | ☑ **2026-06-03** | `verify:city-game` warns until set |
+| All 15 node QRs issued and tracked in [`CITY_GAME_NODE_INSTALL_MAP.md`](CITY_GAME_NODE_INSTALL_MAP.md) | ☑ **2026-06-03** | |
+| Weekend operator roster assigned — [`CITY_GAME_WEEKEND_OPERATOR_SCHEDULE.md`](CITY_GAME_WEEKEND_OPERATOR_SCHEDULE.md) | ☑ **2026-06-03** | |
+| `node_14` care-loop steward contacts filled | ☑ **2026-06-03** | Install map § node_14 |
 
 ### Ops sign-off
 

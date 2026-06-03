@@ -33,7 +33,7 @@ That is the gap between **revocable** (pull trust back) and **live** (current tr
 |----------|--------|------|------|
 | `/.well-known/hc/v1/cards/{profile_id}/update` | POST | Owner or recovery key | `{ "card": <signed humanity_card> }` |
 
-Target child-object endpoint (not routed yet): `POST /.well-known/hc/v1/cards/{profile_id}/objects/{object_id}/update`, signed by the parent root owner or recovery key.
+Target child-object endpoint (**shipped**): `POST /.well-known/hc/v1/cards/{profile_id}/objects/{object_id}/update`, signed by the parent root owner or recovery key. See `worker/src/resolver/child-objects.ts` and [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md).
 
 **Validation:**
 

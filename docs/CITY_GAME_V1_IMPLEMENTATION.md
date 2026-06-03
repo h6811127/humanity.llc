@@ -687,7 +687,7 @@ Build on shipped child-object primitives — do not fork a parallel mint path.
 3. ~~**Bulk add from template**~~ **Done:** starter registry import in Live panel.
 4. ~~**Rules + launch surfaces**~~ **Done (browser v1):** draft/publish panel on `/created/` — preview, download launch HTML, deploy checklist; Cedar Rapids pilot still uses `city-game:launch-surfaces`.
 5. ~~**Comprehension + custody copy**~~ **Done:** setup checklist on `/created/` Live (custody ack, GT scorecard, runbook cards, comprehension brief); game-season backup gate copy; setup wizard notice for season roots.
-6. **E2E + regression** — `e2e/city-game-self-serve-setup.spec.ts` (name TBD); keep `verify:city-game` green.
+6. ~~**E2E + regression**~~ **Done:** `e2e/city-game-self-serve-setup.spec.ts` · `npm run e2e:city-game-self-serve-setup` · optional `npm run verify:city-game -- --e2e`.
 
 #### Phase E gates (before marketing “create your own game”)
 
@@ -697,16 +697,16 @@ Build on shipped child-object primitives — do not fork a parallel mint path.
 | E2 | **R-11** season loader supports ≥2 seasons by config | **Engineering met** — `registerSeasonConfig` + loader tests; organizer self-serve still **E3** |
 | E3 | Organizer completes full 15-node season in browser on staging — **no terminal** | Self-serve claim |
 | E4 | GT comprehension + privacy review on **self-serve rules** template | Over-promising mechanics |
-| E5 | `SYSTEM_INVARIANTS` § city game updated for self-serve paths | **R-16** |
+| E5 | `SYSTEM_INVARIANTS` § city game updated for self-serve paths | **R-16** — **engineering met** (self-serve + terminal mint scope rows) |
 
 #### Phase E checklist (engineering)
 
 - [x] `/created/` **Add game node** — register + first QR in one action (parity with status plate)
 - [x] Hub nested rows for `game_node` under season root
-- [ ] Season metadata editor (dates, `unlock_edges`, districts) — window/status in rules panel; full JSON editor still open
+- [x] Season metadata editor — window/status + **districts** in rules panel (`/created/`); `unlock_edges` still edited in committed season JSON
 - [x] Browser rules page draft + publish
-- [ ] Deprecate terminal mint for **new** self-serve seasons (keep scripts for CI/fixtures)
-- [ ] Document organizer path in [`CITY_GAME_OPERATOR_CUSTODY.md`](CITY_GAME_OPERATOR_CUSTODY.md) § Self-serve setup — custody + comprehension UI on `/created/` Live
+- [x] Deprecate terminal mint for **new** self-serve seasons (keep scripts for CI/fixtures) — marketing only after **E3**
+- [x] Document organizer path in [`CITY_GAME_OPERATOR_CUSTODY.md`](CITY_GAME_OPERATOR_CUSTODY.md) § Self-serve setup
 
 ---
 

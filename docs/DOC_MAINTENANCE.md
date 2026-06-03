@@ -12,7 +12,7 @@
 | **Invariants** | [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) | Rules that must stay true in code — update when behavior changes |
 | **Feature custody specs** | e.g. [`SAFARI_KEYS_CUSTODY.md`](SAFARI_KEYS_CUSTODY.md), [`HUB_CARD_SAFARI_RELIABILITY.md`](HUB_CARD_SAFARI_RELIABILITY.md) | Slim canonical guides for complex shipped areas |
 | **Indexes** | [`STEWARD_DEVICE_ROADMAP.md`](STEWARD_DEVICE_ROADMAP.md), [`PRODUCT_WORKSTREAM_COORDINATION.md`](PRODUCT_WORKSTREAM_COORDINATION.md) | Where work lives, regression commands, active PRs |
-| **Feature specs** | Named `*_MVP.md`, `DEVICE_*.md`, etc. | Product policy and implementation detail for one concern |
+| **Feature specs** | Named `*_MVP.md`, `DEVICE_*.md`, `LIVE_OBJECT_ARCHITECTURE.md`, etc. | Product policy and implementation detail for one concern |
 
 Public feature map (recruiter-facing) is separate — see [`FEATURE_MAP_MAINTENANCE.md`](FEATURE_MAP_MAINTENANCE.md).
 

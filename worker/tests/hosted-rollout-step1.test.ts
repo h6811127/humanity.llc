@@ -6,7 +6,11 @@ const repoRoot = join(import.meta.dirname, "../..");
 
 describe("hosted-rollout-step1", () => {
   it("references hosted steward D1 migrations on disk", () => {
-    for (const name of ["0012_steward_hosted.sql", "0013_steward_billing.sql"]) {
+    for (const name of [
+      "0012_steward_hosted.sql",
+      "0013_steward_billing.sql",
+      "0031_game_season_metering.sql",
+    ]) {
       expect(existsSync(join(repoRoot, "worker/migrations", name))).toBe(true);
     }
   });
@@ -20,6 +24,7 @@ describe("hosted-rollout-step1", () => {
     expect(script).toContain("worker:migrate:local");
     expect(script).toContain("0012_steward_hosted.sql");
     expect(script).toContain("0013_steward_billing.sql");
+    expect(script).toContain("0031_game_season_metering.sql");
   });
 
   it("package.json exposes hosted:rollout:step1", () => {

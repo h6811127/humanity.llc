@@ -15,6 +15,8 @@ Every item below must still pass the [Use-Case Rule](V1_USE_CASES.md#use-case-ru
 
 **Live product today:** create → scan → revoke → live control. Everything else here is research, imagination, or partial implementation (e.g. city game network primitives).
 
+**Engineering map:** [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) — how verbs, streams, time, and network layers compose in the resolver (companion to this catalog).
+
 ---
 
 ## What the catalog already covers well
@@ -311,6 +313,30 @@ Next work is less “more use cases” and more **verbs** and **network grammar*
 
 ---
 
+## Implementation traceability
+
+Every catalog category below maps to a **phase**, **pilot or demo**, and **code touchpoint**. Status is **Shipped**, **Partial**, **In flight**, or **Research** — not a public shipping claim.
+
+| Category | Phase | Pilot / demo | Code touchpoint | Status |
+|----------|-------|--------------|-----------------|--------|
+| **Read** (current signed state) | A | All cards, scan | `worker/src/resolver/scan-state.ts`, `scan-html.ts` | Shipped |
+| **Request** (live proof) | A + M7 | Live control loop | `scan-live-control*`, `e2e/live-control-loop.spec.ts` | Shipped (narrow) |
+| **Contribute** (public history / game) | B | Cedar Rapids S1 | `game-contribute.ts`, `unlock-evaluator.ts` | In flight |
+| **Time-bound objects** | A | Status plate, city game windows | `manifesto-display.ts`, `route-window-schedule.ts`, `season-window.ts` | Partial |
+| **Revoke / rotate** | A | Core primitive | `update-card.ts`, revoke resolver | Shipped |
+| **Offer** (finder message) | A | Lost-item relay | `manifesto-display.ts` (`[relay]` prefix), `created-child-object-lost-item.mjs` | Partial |
+| **Delegate / custody** | A+ | Child objects | `worker/src/db/child-objects.ts`, `created-child-object*.mjs` | Partial |
+| **Network primitives** | B | Cedar Rapids + map board | `quorum-contribute.ts`, `map-node-snapshot.ts`, `live-map-ticker.ts` | In flight |
+| **Archive / sleep** | B | Season dormancy | `season-window.ts`, `city-game:post-season` | Partial |
+| **Honest offline / stale cache** | Future | — | — | Research |
+| **Governance / succession** | D+ | Organizer revoke | `ORGANIZER_SIGNED_REVOKE_PILOT.md` | Partial (revoke only) |
+| **Anti-patterns** (no scan analytics, etc.) | A | Platform policy | `REFERENCE_OPERATOR_DATA_POLICY.md`, scan limits copy | Shipped (policy) |
+| **Accessibility / dumb phones** | Future | NFC research | `RESEARCH_DIRECTIONS_AND_NODES.md` | Research |
+
+**Rule:** Move a row from **Research** → **Partial** only after a field pilot or season demo proves the verb on a real printed QR. See [`PHASE_A_STRANGER_PATH_PRIORITIES.md`](PHASE_A_STRANGER_PATH_PRIORITIES.md). Layer detail: [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md).
+
+---
+
 ## Related docs
 
 | Doc | Role |
@@ -321,3 +347,4 @@ Next work is less “more use cases” and more **verbs** and **network grammar*
 | [`PHYSICAL_WORLD_MULTIPLAYER_RESEARCH_SPEC.md`](PHYSICAL_WORLD_MULTIPLAYER_RESEARCH_SPEC.md) | City-scale play research |
 | [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) | Shipped / in-flight network play |
 | [`PHASE_A_STRANGER_PATH_PRIORITIES.md`](PHASE_A_STRANGER_PATH_PRIORITIES.md) | Do not expand hub faster than pilot |
+| [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) | Five-layer resolver map: object graph, verbs, streams, time, network |

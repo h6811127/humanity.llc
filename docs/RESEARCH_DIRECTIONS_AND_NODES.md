@@ -53,7 +53,7 @@ The **node** is the ultimate object: links, tap, relay, and edge compute in one 
 
 ## Technology combinations
 
-Full table and rationale: [`QR_DESIGN_SPACE.md`](QR_DESIGN_SPACE.md) § Technology combinations. Carrier layers must preserve resolver semantics — not different trust models.
+Full table and rationale: [`QR_DESIGN_SPACE.md`](QR_DESIGN_SPACE.md) § Technology combinations · resolver layers: [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md). Carrier layers must preserve resolver semantics — not different trust models.
 
 | Technology | Role |
 |------------|------|
@@ -80,4 +80,5 @@ NFC/mesh diagrams were removed from `site/index.html` (May 2026) and live on the
 - `docs/M3_M4_EXECUTION_PLAN.md`  -  NFC/mesh called out as post–vertical-slice
 - `docs/V1_USE_CASES.md`  -  full use-case catalog (not on homepage scroll)
 - `docs/QR_DESIGN_SPACE.md`  -  expanded design space: blind spots, verbs, network grammar, open questions
+- `docs/LIVE_OBJECT_ARCHITECTURE.md`  -  resolver composition for design-space verbs and layers
 - `docs/AI_FEATURE_DEVELOPMENT.md`  -  localized object intelligence + L3 explain (shipped P1)

@@ -1,4 +1,9 @@
 import type { QrScope } from "../db/types";
+import {
+  CHILD_OBJECT_TYPE_LOST_ITEM_RELAY,
+  CHILD_OBJECT_TYPE_STATUS_PLATE,
+  isPhaseAChildObjectType,
+} from "../live-object/object-types";
 
 /**
  * Pilot manifesto layouts (two lines, line 1 may carry a prefix):
@@ -63,10 +68,59 @@ export function childObjectManifestoLine(child: {
   public_state: string;
 }): string {
   const label =
-    child.object_type === "lost_item_relay"
+    child.object_type === CHILD_OBJECT_TYPE_LOST_ITEM_RELAY
       ? `${LOST_ITEM_RELAY_PREFIX}${child.public_label}`
       : child.public_label;
   return `${label}\n${child.public_state}`;
+}
+
+/** First-class child object display — preferred over manifesto bridge when type is known. */
+export function parseDisplayFromChildObject(child: {
+  object_type: string;
+  public_label: string;
+  public_state: string;
+}): ManifestoDisplay | null {
+  const objectLabel = child.public_label.trim();
+  const statusLine = child.public_state.trim();
+  if (!objectLabel || !statusLine) return null;
+  if (child.object_type === CHILD_OBJECT_TYPE_LOST_ITEM_RELAY) {
+    return { kind: "lost_item_relay", objectLabel, statusLine };
+  }
+  if (child.object_type === CHILD_OBJECT_TYPE_STATUS_PLATE) {
+    return { kind: "status_plate", objectLabel, statusLine };
+  }
+  return null;
+}
+
+export type ScanHeroDisplayInput = {
+  manifestoLine: string | null;
+  qrScope: QrScope | null;
+  childObjectType?: string | null;
+  childPublicLabel?: string | null;
+  childPublicState?: string | null;
+};
+
+/** Resolve hero layout from child object fields when present; else manifesto bridge. */
+export function resolveScanHeroDisplay(input: ScanHeroDisplayInput): {
+  display: ManifestoDisplay;
+  template: ScanHeroTemplate;
+} {
+  if (
+    isPhaseAChildObjectType(input.childObjectType) &&
+    input.childPublicLabel?.trim() &&
+    input.childPublicState?.trim()
+  ) {
+    const display = parseDisplayFromChildObject({
+      object_type: input.childObjectType,
+      public_label: input.childPublicLabel,
+      public_state: input.childPublicState,
+    });
+    if (display) {
+      return { display, template: scanHeroTemplate(display, input.qrScope) };
+    }
+  }
+  const display = parseManifestoDisplay(input.manifestoLine);
+  return { display, template: scanHeroTemplate(display, input.qrScope) };
 }
 
 export function scanHeroTemplate(

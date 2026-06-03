@@ -24,6 +24,7 @@ const migrationsDir = path.join(repoRoot, "worker/migrations");
 const HOSTED_MIGRATIONS = [
   "0012_steward_hosted.sql",
   "0013_steward_billing.sql",
+  "0031_game_season_metering.sql",
 ];
 
 const remote = process.argv.includes("--remote");

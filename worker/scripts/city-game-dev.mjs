@@ -19,6 +19,10 @@ import {
   buildComprehensionKitHtml,
   resolveKitScanUrls,
 } from "./city-game-comprehension-kit-core.mjs";
+import {
+  buildInstallQaWalkKitHtml,
+  resolveInstallQaWalkNodes,
+} from "./city-game-install-qa-walk-core.mjs";
 import { ensureCityGameDevVars } from "./city-game-local-env-core.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
@@ -27,6 +31,7 @@ const seedPath = join(root, "worker/.local/city-game-seed.json");
 const seasonPath = join(root, "site/data/city-game-cr-season-01.json");
 const hubPath = join(root, "site/dev/city-game-lan-hub.html");
 const comprehensionPath = join(root, "site/dev/city-game-comprehension.html");
+const installQaWalkPath = join(root, "site/dev/city-game-install-qa-walk.html");
 
 const bootstrap = process.argv.includes("--bootstrap");
 const lanMode = process.argv.includes("--lan");
@@ -117,6 +122,19 @@ function writeComprehensionKit(host, hubUrl) {
   return `http://${host}:8788/dev/city-game-comprehension`;
 }
 
+/** @returns {string | null} */
+function writeInstallQaWalkKit(host) {
+  if (!existsSync(seedPath)) return null;
+  const seed = JSON.parse(readFileSync(seedPath, "utf8"));
+  if (!seed.profile_id || !Array.isArray(seed.nodes)) return null;
+
+  const nodes = resolveInstallQaWalkNodes(seed.nodes, seed.profile_id, host);
+  const html = buildInstallQaWalkKitHtml(nodes, { host });
+  mkdirSync(dirname(installQaWalkPath), { recursive: true });
+  writeFileSync(installQaWalkPath, html, "utf8");
+  return `http://${host}:8788/dev/city-game-install-qa-walk`;
+}
+
 function openUrl(url) {
   if (noOpen || !url) return;
   const cmd = process.platform === "darwin" ? "open" : process.platform === "win32" ? "start" : "xdg-open";
@@ -195,6 +213,11 @@ async function main() {
     if (comprehensionUrl) {
       console.log("\n📝 GT comprehension kit (Phase D human gate):");
       console.log("  ", comprehensionUrl);
+    }
+    const walkUrl = writeInstallQaWalkKit(envPatch.host);
+    if (walkUrl) {
+      console.log("\n📱 Install QA walk kit (C3 · 3 phones × 15 nodes):");
+      console.log("  ", walkUrl);
     }
     openUrl(hubUrl);
   } else if (bootstrap) {
