@@ -14,6 +14,16 @@ export function tabSessionHasSigningKeys(session) {
 }
 
 /**
+ * Wallet row or hub public view — owner key, recovery key, or summary flag.
+ * @param {Record<string, unknown> | null | undefined} entry
+ */
+export function walletEntryHasSigningMaterial(entry) {
+  if (!entry || typeof entry !== "object") return false;
+  if (entry.has_signing_key === true) return true;
+  return tabSessionHasSigningKeys(entry);
+}
+
+/**
  * @param {string | null | undefined} raw
  * @returns {{ action: "absent" } | { action: "keep", session: Record<string, unknown> } | { action: "strip" }}
  */

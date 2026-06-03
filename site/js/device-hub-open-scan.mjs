@@ -6,6 +6,7 @@ import {
   HUB_OPEN_SCAN_SUMMARY,
 } from "./device-ownership-copy-core.mjs";
 import { parseHumanityScanUrl } from "./device-hub-open-scan-core.mjs";
+import { patchWalletScanUrlFromOfficialLink } from "./device-wallet.mjs";
 
 const HUB_OPEN_SCAN_HINT_ID = "hub-open-scan-form-hint";
 const HUB_OPEN_SCAN_SUMMARY_CLASS = "hub-open-scan-list-sub";
@@ -69,6 +70,7 @@ export function initHubOpenScanLink(form, statusEl, opts = {}) {
       return;
     }
     setStatus("Opening scan…");
+    patchWalletScanUrlFromOfficialLink(scanUrl);
     window.dispatchEvent(new CustomEvent("hc-hub-sheet-close"));
     navigate(scanUrl);
   });

@@ -115,7 +115,7 @@ export const SETUP_DONE_IOS_HOME_SCREEN_TITLE =
   "Add to Home Screen after you finish here";
 
 export const SETUP_DONE_IOS_HOME_SCREEN_DETAIL =
-  "Tap Share → Add to Home Screen, then manage your cards only from that icon. To vouch from a printed QR in the app, tap the scan icon in the top bar — not your camera alone. Safari tabs keep a separate copy. Keep your recovery backup.";
+  "Tap Share → Add to Home Screen, then manage your cards only from that icon. Never remove it to refresh — pull down in the app instead. Keep your recovery backup. For printed QRs, tap the scan icon in the app — not your camera alone.";
 
 export const DEFAULT_FOR_ATTESTATION = "Default for attestation";
 
@@ -237,6 +237,13 @@ export const WALLET_CORRUPT_HELP_HREF = "/help/#ownership";
 /** PWA vs Safari signing context split (P2-2 · R5). */
 export const RESTORE_CONTROL_IN_THIS_APP = "Restore control in this app";
 
+/**
+ * iOS Home Screen — removing the icon uninstalls the PWA and deletes hc_wallet in that app.
+ * @see docs/PWA_INSTALL.md § iPhone home screen custody
+ */
+export const IOS_PWA_NEVER_REMOVE_ICON_WITHOUT_BACKUP =
+  "Never remove the Home Screen icon to refresh or clear cache — iOS deletes saved cards when you remove it. Pull down to refresh instead. Keep an encrypted backup or recovery code before removing the icon.";
+
 export const PWA_MISMATCH_TITLE_STANDALONE =
   "Use only this app on iPhone";
 
@@ -262,10 +269,10 @@ export const SAFARI_ITP_NOTICE_EYEBROW = "iPhone storage";
 export const SAFARI_ITP_NOTICE_TITLE = "On iPhone, pick one app";
 
 export const SAFARI_ITP_NOTICE_DETAIL_BROWSER =
-  "Safari and your Home Screen app store cards separately. If you added humanity.llc to your Home Screen, use only that icon — not Safari tabs. Safari may also delete saved cards after about seven days without a visit. Keep an encrypted backup.";
+  "Safari and your Home Screen app store cards separately. If you added humanity.llc to your Home Screen, use only that icon — not Safari tabs. Safari may also delete saved cards after about seven days without a visit. Never remove the Home Screen icon to refresh — pull down in the app instead. Keep an encrypted backup.";
 
 export const SAFARI_ITP_NOTICE_DETAIL_STANDALONE =
-  "Use only this home screen icon on iPhone — not Safari tabs. iOS keeps them as separate saved wallets. Open this app regularly so iOS does not clear storage. Keep an encrypted backup.";
+  "Use only this home screen icon on iPhone — not Safari tabs. iOS keeps them as separate saved wallets. Open this app regularly so iOS does not clear storage. Never remove this icon to refresh — pull down instead; iOS deletes saved cards when you remove it. Keep an encrypted backup.";
 
 /** iOS Safari persist() denied — saved ownership may be evicted (RC-2). */
 export const STORAGE_PERSIST_DENIED_EYEBROW = "iPhone storage";
@@ -330,7 +337,7 @@ export const HUB_STEWARD_VOUCH_GUIDANCE_EYEBROW = "Printed QR on iPhone";
 export const HUB_STEWARD_VOUCH_GUIDANCE_TITLE = "Vouch from this app";
 
 export const HUB_STEWARD_VOUCH_GUIDANCE_DETAIL =
-  "Your camera opens Safari, which does not share cards with this Home Screen app. Tap the scan icon in the top bar — or use Open scan link after copying the URL in Safari.";
+  "Your camera opens Safari, which does not share cards with this Home Screen app. Tap the scan icon in the top bar — or use Open scan link after copying the URL in Safari. Never remove this Home Screen icon to refresh — pull down instead.";
 
 /** Hub steward vouch guidance — Safari browser on iPhone (S4). */
 export const HUB_STEWARD_SAFARI_VOUCH_GUIDANCE_TITLE = "Your card is here — use this browser";
@@ -340,7 +347,7 @@ export const HUB_STEWARD_SAFARI_VOUCH_GUIDANCE_DETAIL =
 
 /** PWA install card — iOS manual Add to Home Screen detail (S4). */
 export const PWA_INSTALL_IOS_DETAIL =
-  "Same keys and inbox — no account. Tap Share → Add to Home Screen. On iPhone, use only that home screen icon afterward. To vouch from prints, tap the scan icon in the app — not your camera alone.";
+  "Same keys and inbox — no account. Tap Share → Add to Home Screen, then use only that icon on iPhone. Never remove it to refresh — pull down instead. Keep a backup. For prints, tap the scan icon in the app — not your camera alone.";
 
 /** Hub backup import summary line (Phase 4). */
 export const HUB_RESTORE_IMPORT_SUMMARY = "Encrypted backup file";

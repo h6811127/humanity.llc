@@ -14,7 +14,14 @@ import {
   parseProfileIdFromCardRef,
 } from "./device-hub-import-recovery-core.mjs";
 import { getCardJsonUrl, publicKeyFromPrivateKeyBase58 } from "./hc-sign.mjs";
-import { loadWallet, saveWallet } from "./device-wallet.mjs";
+import { buildOfficialScanUrl } from "./qr-scan-url-lock.mjs";
+import { markSetupDone } from "./created-mode.mjs";
+import { loadWallet, saveWallet, walletEntryQrId } from "./device-wallet.mjs";
+import {
+  normalizeWalletRecoveryImportLabels,
+  normalizeWalletScanUrls,
+  parseQrIdFromCardRef,
+} from "./device-wallet-scan-url-core.mjs";
 
 const HUB_RECOVERY_FORM_HINT_ID = "hub-recovery-import-form-hint";
 const HUB_RECOVERY_SUMMARY_CLASS = "hub-recovery-import-list-sub";
@@ -107,8 +114,14 @@ export function initHubRecoveryImport(form, statusEl) {
         card?.recovery_public_key,
         publicKeyFromPrivateKeyBase58
       );
-      const scanUrl = `${location.origin}/c/${profileId}`;
-      const qrId = card?.qr?.active_qr_id ?? null;
+      const qrId =
+        parseQrIdFromCardRef(cardRef) ?? card?.qr?.active_qr_id ?? null;
+      const scanUrl =
+        qrId != null
+          ? buildOfficialScanUrl(profileId, qrId, location.origin)
+          : cardRef.startsWith("http") && cardRef.includes("?q=")
+            ? cardRef
+            : `${location.origin}/c/${profileId}`;
       const merged = mergeRecoveryIntoWallet(loadWallet(), {
         profileId,
         recoveryPublicKeyB58,
@@ -124,7 +137,13 @@ export function initHubRecoveryImport(form, statusEl) {
         setStatus(write.error, true);
         return;
       }
+      const repaired = normalizeWalletScanUrls(loadWallet(), location.origin, walletEntryQrId);
+      const labeled = normalizeWalletRecoveryImportLabels(repaired.entries);
+      if (repaired.changed || labeled.changed) {
+        saveWallet(labeled.entries);
+      }
       activateWalletEntry(merged.entry);
+      markSetupDone(profileId);
       setStatus(IMPORT_OWNERSHIP_LOADED_TAB);
       showImportOpenControlsCta(statusEl, merged.entry);
       logDeviceActivity("recovery_import", merged.entry.label || "Imported recovery", {

@@ -10,11 +10,30 @@
 
 Returning **stewards** (users with saved cards on this device) may install the **device shell** as a home-screen / standalone app on supported browsers. **Strangers scanning a QR must never be prompted to install** — the product promise is browser-native public objects with no app required ([`features/QR Public Profile v1.0.md`](features/QR%20Public%20Profile%20v1.0.md) QR-US-07).
 
-PWA install is **device-layer chrome only**: faster return to saved cards, hub, and inbox — not a new custody or network channel. Keys remain in `sessionStorage` / `localStorage` per browser profile; install does **not** sync keys to the server or across devices. **Storage:** Add to Home Screen does **not** allocate extra quota or a separate database — the PWA and in-browser tabs on the same origin share `localStorage` (~5–10 MB site-wide). Child object indexes (`hc_child_objects_v1:{profile_id}`) live there too; see [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) § Device storage.
+PWA install is **device-layer chrome only**: faster return to saved cards, hub, and inbox — not a new custody or network channel. Keys remain in browser storage on this device only (`localStorage` / `sessionStorage` per browsing context); install does **not** sync keys to the server or across devices.
 
-**Product sentence:** *Install puts the device hub on your home screen — the same browser-held keys and inbox you already have, without a separate account or app store.*
+**Storage (platform nuance):** On **desktop and Android**, the installed PWA and in-browser tabs on the same origin **usually share** `localStorage` (`hc_wallet`, ~5–10 MB site-wide). On **iPhone**, Safari and the Home Screen app are **separate storage buckets** — Add to Home Screen does **not** copy an existing Safari wallet into the app, and **removing the icon uninstalls the PWA and can delete** that app's saved cards. Child object indexes (`hc_child_objects_v1:{profile_id}`) follow the same bucket. See § iPhone home screen custody · [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) · [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) § Device storage.
+
+**Never remove the Home Screen icon** to clear cache or refresh unless you have an **encrypted backup or recovery code** — pull-to-refresh, the hub glance **Refresh** row, and the stale-shell reload banner are the safe paths (§ Standalone refresh & resume). Vitest QA contract: `worker/tests/ios-pwa-uninstall-storage-qa-contract.test.ts` · manual **P1-PWA-U** in [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md).
+
+**Product sentence:** *Install puts the device hub on your home screen — your saved cards stay in that app on iPhone, without a separate account or app store.*
 
 **Refresh gap (Phases 6–9):** Standalone mode hides the browser URL bar and native reload affordances. Stewards who add the shell to their home screen need **automatic soft refresh on resume** and **pull-to-refresh** as a manual override — without a shell-caching service worker or full `location.reload()` on every open. See § Standalone refresh & resume.
+
+---
+
+## iPhone home screen custody
+
+| Action | Risk | Safe alternative |
+|--------|------|------------------|
+| **Remove icon from Home Screen** | **Uninstalls the PWA** and can **delete** `localStorage.hc_wallet` in that app | Pull-to-refresh · hub glance **Refresh** · stale-shell banner reload |
+| Open the same site in a **Safari tab** after install | **Separate wallet bucket** on iPhone — not two tabs sharing one wallet | Use **only** the Home Screen icon, or export/import backup between contexts |
+| Pull-to-refresh in standalone PWA | Safe **data** refresh (not uninstall) | Default steward cache-bust |
+| Encrypted backup / recovery code | Required before intentional icon removal or device change | Hub **Restore & scan** |
+
+Product copy surfaces: `#device-pwa-install-card` (iOS Add to Home Screen detail) · `#device-safari-itp-notice-card` (browser + standalone) · hub steward vouch guidance (standalone iPhone). Constants: `IOS_PWA_NEVER_REMOVE_ICON_WITHOUT_BACKUP` in [`device-ownership-copy-core.mjs`](../site/js/device-ownership-copy-core.mjs).
+
+**Manual QA only (not CI):** **P1-PWA-U** in [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) — confirm uninstall deletes wallet; confirm product warnings visible before stewards remove the icon.
 
 ---
 
@@ -135,7 +154,7 @@ Homepage **Shortcuts & settings** (`#landing-device-settings` on `/` only) inclu
 1. **Standalone:** `navigator.standalone === true` (US home-screen PWA). If false, user is in browser context — shortcuts should show.
 2. **Hide vs paint:** for each shortcut id, if `row.hidden === true` but `getComputedStyle(row).display !== 'none'`, treat as **CSS cache** — not a logic bug.
 3. **Stylesheet:** confirm `.list-row[hidden] { display: none }` appears in loaded `device-shell.css`.
-4. **Recovery:** remove and re-add home-screen icon, or hard reload via Phase 8 stale-shell banner when JS stamp mismatches.
+4. **Recovery:** pull-to-refresh or stale-shell banner reload when JS/CSS is stale. **Do not remove the Home Screen icon without a backup** — iOS uninstall deletes saved cards in that app (§ iPhone home screen custody).
 
 **Automated gaps:** E2E steps 13–14 use Chromium + injected `matchMedia` only — **not real iPhone PWA.** Manual **P1-PWA-R** steps 13–14 need **re-sign-off** on installed iPhone after deploy (iOS sign-off 2026-05-28 predates Phase 10).
 
@@ -546,7 +565,7 @@ Manual override when stewards do not trust background refresh or want an explici
 
 ### Cross-tab
 
-Installed PWA and Safari tab on the same origin share `localStorage`. Resume soft refresh re-reads wallet; `storage` events still drive chrome refresh when another context writes. Explicit pull gives stewards confidence when they are unsure which context is authoritative ([`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md)).
+Installed PWA and Safari tab on the same origin **may share** `localStorage` on desktop/Android. On **iPhone**, treat them as **separate wallets** unless the steward exports/imports a backup ([`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md)). Resume soft refresh re-reads wallet from the **current** bucket; `storage` events still drive chrome refresh when another context on the same bucket writes. Explicit pull gives stewards confidence when they are unsure which context is authoritative ([`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md)).
 
 ### Error handling (refresh)
 
@@ -744,6 +763,7 @@ On home-screen app after deploy + pull-to-refresh (or reinstall icon):
 
 | Date | Change |
 |------|--------|
+| 2026-06-03 | Executive summary — iPhone separate storage buckets; § iPhone home screen custody; never remove icon without backup; P1-PWA-U QA contract |
 | 2026-05-30 | Phase 11 — wallet `data-boot=local` + RC-17 DOM stability; shell `v=81` |
 | 2026-05-30 | Phase 11 — standalone shell copy (`device-shell-copy-core`); legacy cross-tab chrome suppressed in PWA |
 | 2026-05-30 | Phase 10 iPhone QA — § iPhone PWA tab-shortcut troubleshooting (folded from draft investigation); **P1-PWA-R** 13–14 re-sign pending on device |

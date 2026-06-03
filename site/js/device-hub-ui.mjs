@@ -24,7 +24,7 @@ import { initHubQrScanner } from "./device-hub-qr-scanner.mjs";
 import { initHubStewardVouchGuidance } from "./device-hub-steward-vouch-guidance.mjs";
 import { mountThemeToggles } from "./device-theme.mjs";
 import { syncBrowserNotifPrompts } from "./device-browser-notifications-loader.mjs";
-import { renderHubInboxAlerts, inboxItemsIncludeKind } from "./device-hub-inbox-alerts.mjs";
+import { renderHubInboxAlerts, inboxItemsIncludeKind, RELAY_OFFER_INBOX_CHANGED } from "./device-hub-inbox-alerts.mjs";
 import { renderHubKeysCustodyPanel } from "./device-hub-keys-custody.mjs";
 import { getInboxItems, notificationCount } from "./device-inbox.mjs";
 import {
@@ -54,11 +54,18 @@ import {
   loadWallet,
   loadWalletSummary,
   normalizeWalletQrIds,
+  repairWalletEntriesFromResolverStorage,
+  repairWalletEntriesInStorage,
   saveWallet,
   formatSavedAt,
   walletEntryKeyPreview,
   walletEntryQrId,
 } from "./device-wallet.mjs";
+import {
+  resolveWalletEntryScanUrl,
+  scanUrlHasOfficialQrParam,
+} from "./device-wallet-scan-url-core.mjs";
+import { walletEntryHasSigningMaterial } from "./device-tab-session-core.mjs";
 import {
   DEVICE_BOOT_LOCAL_EVENT,
   DEVICE_BOOT_READY_EVENT,
@@ -91,12 +98,12 @@ import {
   snapshotNetworkSeenOnExit,
   syncLastSeenFromNetworkMap,
   NETWORK_REFRESHED,
-} from "./device-wallet-network.mjs?v=87";
-import { clearWalletNetworkTruthForProfile } from "./device-wallet-network-truth.mjs?v=87";
+} from "./device-wallet-network.mjs?v=88";
+import { clearWalletNetworkTruthForProfile } from "./device-wallet-network-truth.mjs?v=88";
 import {
   hubNetworkChipStatusForProfile,
   shouldShowHubNetworkCheckingChip,
-} from "./device-wallet-network-core.mjs?v=87";
+} from "./device-wallet-network-core.mjs?v=88";
 import {
   broadcastNetworkSnapshotIfEligible,
   shouldFollowerSkipAutoNetworkFetch,
@@ -110,7 +117,7 @@ import {
   hubCardIdentityLine,
   hubCardStatusLine,
   hubCardTitle,
-} from "./device-hub-card-row-core.mjs?v=87";
+} from "./device-hub-card-row-core.mjs?v=88";
 import {
   childObjectHubFocusHash,
   hubChildObjectIconHtml,
@@ -160,7 +167,7 @@ import {
 import { tabNoticeCount } from "./device-counts.mjs";
 import { mountHubBuildStamp } from "./device-hub-build-stamp.mjs";
 import { mountHubNetworkTools } from "./device-hub-network-tools.mjs";
-import { syncInboxBackdropForOpenHub } from "./device-sheet-backdrop-sync.mjs?v=87";
+import { syncInboxBackdropForOpenHub } from "./device-sheet-backdrop-sync.mjs?v=88";
 import {
   HUB_STRANGER_EMPTY_CLASS,
   isHubStrangerEmptyState,
@@ -179,6 +186,11 @@ import {
   isLiveControlInboxPollingActive,
   LIVE_CONTROL_POLL_SCOPE_CHANGED,
 } from "./device-live-control-inbox.mjs";
+import {
+  checkRelayOffersNow,
+  refreshRelayOfferInbox,
+  relayOfferInboxEligible,
+} from "./device-relay-offer-inbox.mjs";
 import {
   isLargeWallet,
   walletScaleHint,
@@ -220,6 +232,47 @@ import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs"
 const COLLAPSED_SAVED_ROW_PREVIEW_LIMIT = 3;
 const LARGE_HUB_SUMMARY_ROW_INITIAL_LIMIT = 8;
 const LARGE_HUB_SUMMARY_ROW_INCREMENT = 8;
+
+/** @type {Promise<void> | null} */
+let walletScanUrlRepairInFlight = null;
+/** @type {string} */
+let walletScanUrlRepairFingerprint = "";
+
+/**
+ * @param {Array<Record<string, unknown>>} entries
+ */
+function walletScanRepairFingerprint(entries) {
+  return entries
+    .map((entry) => `${entry.profile_id}|${entry.scan_url ?? ""}|${entry.qr_id ?? ""}`)
+    .join("\n");
+}
+
+function ensureWalletScanUrlsRepaired() {
+  repairWalletEntriesInStorage(location.origin);
+  const entries = loadWallet();
+  const fingerprint = walletScanRepairFingerprint(entries);
+  if (fingerprint === walletScanUrlRepairFingerprint) return;
+  const needsNetwork = entries.some(
+    (entry) => !scanUrlHasOfficialQrParam(entry.scan_url) || !entry.qr_id
+  );
+  if (!needsNetwork) {
+    walletScanUrlRepairFingerprint = fingerprint;
+    return;
+  }
+  if (walletScanUrlRepairInFlight) return;
+  walletScanUrlRepairInFlight = repairWalletEntriesFromResolverStorage(location.origin)
+    .then((result) => {
+      if (result.repaired) {
+        walletScanUrlRepairFingerprint = "";
+        renderSavedRows({ viewportSync: true });
+      } else {
+        walletScanUrlRepairFingerprint = walletScanRepairFingerprint(loadWallet());
+      }
+    })
+    .finally(() => {
+      walletScanUrlRepairInFlight = null;
+    });
+}
 const HUB_SUMMARY_VIEWPORT_SCROLL_DEBOUNCE_MS = 80;
 const HUB_SUMMARY_VIEWPORT_NEAR_END_PX = 120;
 
@@ -518,6 +571,8 @@ function setRevokedSinceVisitAlertVisible(li, profileId, show) {
 let savedGroup;
 let liveControlGroup;
 let liveControlList;
+let relayOfferGroup;
+let relayOfferList;
 let cardDisabledGroup;
 let cardDisabledList;
 let savedList;
@@ -623,10 +678,7 @@ function hubCardStatusHtml(profileId, statusOverride, scanKindOverride) {
 }
 
 function scanUrlForEntry(entry) {
-  if (entry.scan_url) return entry.scan_url;
-  const base = `${location.origin}/c/${encodeURIComponent(entry.profile_id)}`;
-  const qrId = entry.qr_id ?? walletEntryQrId(entry);
-  return qrId ? `${base}?q=${encodeURIComponent(qrId)}` : base;
+  return resolveWalletEntryScanUrl(entry, location.origin, walletEntryQrId(entry));
 }
 
 const WALLET_PAGE_SHOW_ALL_KEY = "hc_wallet_page_show_all";
@@ -728,7 +780,7 @@ function appendHubSavedMoreRow(hiddenCount) {
 
 /** @param {Record<string, unknown>} entry Full row or {@link walletEntryPublicView}. */
 function entryHasSigningKeys(entry) {
-  return Boolean(entry.owner_private_key_b58 || entry.has_signing_key);
+  return walletEntryHasSigningMaterial(entry);
 }
 
 function hubCardIconHtml(profileId, { checking = false } = {}) {
@@ -1327,6 +1379,9 @@ export async function refreshResolverChecksFromHub() {
   if (hubConfig.showLiveControlInbox) {
     await checkLiveProofNow();
   }
+  if (relayOfferInboxEligible()) {
+    await checkRelayOffersNow();
+  }
 }
 
 function syncHubInboxAlertGroups() {
@@ -1336,6 +1391,8 @@ function syncHubInboxAlertGroups() {
     noticeGroup,
     liveControlGroup,
     liveControlList,
+    relayOfferGroup,
+    relayOfferList,
     cardDisabledGroup,
     cardDisabledList,
     noticeMode: hubConfig.noticeMode,
@@ -1696,6 +1753,7 @@ function bindHubChildObjectRowHandlers() {
  */
 function renderSavedRows(opts = {}) {
   if (hubSavedListRenderDeferred()) return;
+  ensureWalletScanUrlsRepaired();
   const rowChipOpts = { forceChecking: opts.initialChipChecking === true };
   const summary = loadWalletSummary();
   if (summary.walletFingerprint !== expandedSummaryWalletFingerprint) {
@@ -2302,6 +2360,9 @@ function applySearchFilter() {
     if (hubConfig.showLiveControlInbox && liveControlGroup) {
       liveControlGroup.hidden = !inboxItemsIncludeKind(items, "live_proof");
     }
+    if (relayOfferGroup) {
+      relayOfferGroup.hidden = !inboxItemsIncludeKind(items, "relay_offer");
+    }
     if (cardDisabledGroup) {
       cardDisabledGroup.hidden = !inboxItemsIncludeKind(items, "card_disabled_since_visit");
     }
@@ -2351,6 +2412,8 @@ function bindDom() {
   noticeGroup = hubEl("device-hub-notice-group");
   liveControlGroup = hubEl("device-hub-live-control-group");
   liveControlList = hubEl("device-hub-live-control-list");
+  relayOfferGroup = hubEl("device-hub-relay-offer-group");
+  relayOfferList = hubEl("device-hub-relay-offer-list");
   cardDisabledGroup = hubEl("device-hub-card-disabled-group");
   cardDisabledList = hubEl("device-hub-card-disabled-list");
   activityGroup = hubEl("device-hub-activity-group");
@@ -2500,6 +2563,14 @@ export function initDeviceHub(config = {}) {
     });
   }
 
+  void refreshRelayOfferInbox();
+  window.addEventListener(RELAY_OFFER_INBOX_CHANGED, () => {
+    syncHubInboxAlertGroups();
+    applySearchFilter();
+    refreshEmptyHint();
+    notifyHubChanged();
+  });
+
   if (searchInput) {
     searchInput.addEventListener("input", applySearchFilter);
     searchInput.addEventListener("search", applySearchFilter);
@@ -2518,6 +2589,9 @@ export function initDeviceHub(config = {}) {
       notifyHubChanged();
       if (hubConfig.showLiveControlInbox && isLiveControlInboxPollingActive()) {
         void refreshLiveControlInbox();
+      }
+      if (relayOfferInboxEligible()) {
+        void refreshRelayOfferInbox();
       }
     }
   });
@@ -2545,6 +2619,9 @@ export function initDeviceHub(config = {}) {
         walletNetworkVisibilityRefreshAllowed(lastWalletNetworkFetchAt)
       ) {
         void fetchAndApplyNetworkChips();
+      }
+      if (relayOfferInboxEligible()) {
+        void refreshRelayOfferInbox();
       }
     }
   });

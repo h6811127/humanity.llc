@@ -3,6 +3,7 @@
  */
 import { activateWalletEntry, buildCreatedPageUrl } from "./device-keys.mjs";
 import { navigateTo } from "./device-shell-motion.mjs";
+import { tabSessionHasSigningKeys } from "./device-tab-session-core.mjs";
 import { loadWallet } from "./device-wallet.mjs";
 import { controlActivationRequiresUnlock } from "./device-control-activation-core.mjs";
 import {
@@ -54,13 +55,12 @@ export async function activateWalletEntryGated(entry, opts = {}) {
 export async function openCardNowPageGated(entry, opts = {}) {
   if (!entry?.profile_id) return { error: "Missing profile id." };
 
-  const saved =
-    entry.owner_private_key_b58 != null
-      ? entry
-      : loadWallet().find((w) => w.profile_id === entry.profile_id) ?? null;
+  const saved = tabSessionHasSigningKeys(entry)
+    ? entry
+    : loadWallet().find((w) => w.profile_id === entry.profile_id) ?? null;
 
   const target = saved ?? entry;
-  if (target?.owner_private_key_b58) {
+  if (target && tabSessionHasSigningKeys(target)) {
     const result = await activateWalletEntryGated(target, { pin: opts.pin });
     if (!result.ok) return result;
   }

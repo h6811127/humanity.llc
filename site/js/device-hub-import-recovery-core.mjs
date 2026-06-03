@@ -7,6 +7,31 @@
 const PROFILE_ID_RE = /^[1-9A-HJ-NP-Za-km-z]{20,64}$/;
 
 /**
+ * @param {{
+ *   profileId: string;
+ *   handle?: string | null;
+ *   manifestoLine?: string | null;
+ *   existingLabel?: string | null;
+ * }} input
+ */
+export function recoveryImportLabel(input) {
+  const { profileId, handle, manifestoLine, existingLabel } = input;
+  const label = String(existingLabel ?? "").trim();
+  const looksLikeProfileSlice =
+    label &&
+    (label === profileId.slice(0, 12) || label === profileId.slice(0, 8) || label === profileId);
+  if (label && !looksLikeProfileSlice) return label;
+
+  const handleClean = handle ? String(handle).replace(/^@/, "").trim() : "";
+  if (handleClean) return `@${handleClean}`;
+
+  const manifesto = String(manifestoLine ?? "").trim();
+  if (manifesto) return manifesto.slice(0, 48);
+
+  return label || "Saved card";
+}
+
+/**
  * @param {string | null | undefined} raw
  * @returns {string | null}
  */
@@ -80,6 +105,12 @@ export function mergeRecoveryIntoWallet(entries, unlocked, importedAt = new Date
     const entry = {
       ...entries[idx],
       ...baseFields,
+      label: recoveryImportLabel({
+        profileId: unlocked.profileId,
+        handle: unlocked.handle,
+        manifestoLine: unlocked.manifestoLine,
+        existingLabel: entries[idx].label,
+      }),
       owner_private_key_b58: entries[idx].owner_private_key_b58,
     };
     const next = entries.slice();
@@ -88,7 +119,11 @@ export function mergeRecoveryIntoWallet(entries, unlocked, importedAt = new Date
   }
   const entry = {
     ...baseFields,
-    label: unlocked.profileId.slice(0, 12),
+    label: recoveryImportLabel({
+      profileId: unlocked.profileId,
+      handle: unlocked.handle,
+      manifestoLine: unlocked.manifestoLine,
+    }),
   };
   return { entries: [entry, ...entries], entry, isNew: true };
 }

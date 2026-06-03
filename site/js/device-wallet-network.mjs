@@ -3,6 +3,7 @@
  * Tracks last-seen network status per card for card-disabled-since-visit alerts.
  */
 import { walletEntryQrId, loadWallet, saveWallet, normalizeWalletQrIds } from "./device-wallet.mjs";
+import { scanUrlHasOfficialQrParam } from "./device-wallet-scan-url-core.mjs";
 import { getCardStatusUrl } from "./hc-sign.mjs";
 import { fetchResolverJson } from "./resolver-conditional-fetch-core.mjs";
 import {
@@ -22,7 +23,7 @@ import {
   shouldUseCachedNetworkStatus,
   verificationRecordFromLabelState,
   WALLET_NETWORK_CACHE_TTL_MS,
-} from "./device-wallet-network-core.mjs?v=87";
+} from "./device-wallet-network-core.mjs?v=88";
 import {
   getWalletStatusPollHealth,
   setWalletStatusPollHealthForSinceVisit,
@@ -40,7 +41,7 @@ import {
   setWalletNetworkTruthFromCacheOnly,
   setWalletNetworkTruthFromPoll,
   shouldSuppressCardDisabledSinceVisitFromTruth,
-} from "./device-wallet-network-truth.mjs?v=87";
+} from "./device-wallet-network-truth.mjs?v=88";
 
 export { readCachedVerification };
 export {
@@ -48,7 +49,7 @@ export {
   isSinceVisitBlockedChipStatus,
   listWalletNetworkTruthPollProfileIds,
   shouldSuppressCardDisabledSinceVisitFromTruth,
-} from "./device-wallet-network-truth.mjs?v=87";
+} from "./device-wallet-network-truth.mjs?v=88";
 
 const CACHE_KEY = "hc_wallet_network_cache";
 const LAST_SEEN_KEY = "hc_wallet_last_seen_network";
@@ -234,7 +235,14 @@ export function applyResolverNetworkSnapshot(snapshotEntries, snapshotAt = Date.
     }
   }
 
-  persistWalletFromNetworkPoll({ statusMap, alertStateMap, scanKindMap, qrScopeMap });
+  persistWalletFromNetworkPoll({
+    statusMap,
+    alertStateMap,
+    scanKindMap,
+    qrScopeMap,
+    qrIdMap,
+    scanUrlMap,
+  });
   notifyNetworkRefreshed(statusMap, alertStateMap, scanKindMap, resolverConfirmedMap);
 }
 
@@ -329,13 +337,22 @@ export function getCachedVerification(profileId) {
 
 /**
  * @param {unknown} body
- * @returns {{ status: string, scanKind: string | null, qrScope: string | null, alertState: string }}
+ * @returns {{
+ *   status: string,
+ *   scanKind: string | null,
+ *   qrScope: string | null,
+ *   alertState: string,
+ *   qrId: string | null,
+ *   scanUrl: string | null,
+ * }}
  */
 function parseNetworkFetchBody(body) {
   const scanKind = typeof body?.scan?.kind === "string" ? body.scan.kind : null;
   const qrScope = parseNetworkQrScope(body);
   const status = body?.scan?.card?.status || "unknown";
   const { verificationLabel, verificationState } = parseNetworkVerification(body);
+  const qrIdRaw = typeof body?.scan?.qr_id === "string" ? body.scan.qr_id.trim() : "";
+  const scanUrlRaw = typeof body?.scan?.scan_url === "string" ? body.scan.scan_url.trim() : "";
   return {
     status,
     scanKind,
@@ -343,6 +360,8 @@ function parseNetworkFetchBody(body) {
     alertState: alertStateForNetworkPoll(scanKind, status),
     verificationLabel,
     verificationState,
+    qrId: qrIdRaw || null,
+    scanUrl: scanUrlHasOfficialQrParam(scanUrlRaw) ? scanUrlRaw : null,
   };
 }
 
@@ -388,6 +407,8 @@ function hasStatusPollScanBody(body) {
  * @param {Record<string, string>} alertStateMap
  * @param {Record<string, string>} resolverConfirmedAlertStateMap
  * @param {Record<string, string | null>} resolverConfirmedScanKindMap
+ * @param {Record<string, string | null>} [qrIdMap]
+ * @param {Record<string, string | null>} [scanUrlMap]
  */
 function applyParsedStatusPoll(
   pid,
@@ -400,11 +421,15 @@ function applyParsedStatusPoll(
   qrScopeMap,
   alertStateMap,
   resolverConfirmedAlertStateMap,
-  resolverConfirmedScanKindMap
+  resolverConfirmedScanKindMap,
+  qrIdMap = {},
+  scanUrlMap = {}
 ) {
   statusMap[pid] = parsed.status;
   scanKindMap[pid] = parsed.scanKind;
   qrScopeMap[pid] = parsed.qrScope;
+  if (parsed.qrId) qrIdMap[pid] = parsed.qrId;
+  if (parsed.scanUrl) scanUrlMap[pid] = parsed.scanUrl;
   if (
     parsed.alertState != null &&
     shouldResolverConfirmStatusPoll(parsed.scanKind, httpStatus)
@@ -493,6 +518,8 @@ export async function refreshWalletNetworkStatuses(entries, onDone, options = {}
   const alertStateMap = {};
   const scanKindMap = {};
   const qrScopeMap = {};
+  const qrIdMap = {};
+  const scanUrlMap = {};
   const resolverConfirmedAlertStateMap = {};
   const resolverConfirmedScanKindMap = {};
   const fetches = [];
@@ -547,7 +574,9 @@ export async function refreshWalletNetworkStatuses(entries, onDone, options = {}
                 qrScopeMap,
                 alertStateMap,
                 resolverConfirmedAlertStateMap,
-                resolverConfirmedScanKindMap
+                resolverConfirmedScanKindMap,
+                qrIdMap,
+                scanUrlMap
               );
               return;
             }
@@ -575,7 +604,9 @@ export async function refreshWalletNetworkStatuses(entries, onDone, options = {}
             qrScopeMap,
             alertStateMap,
             resolverConfirmedAlertStateMap,
-            resolverConfirmedScanKindMap
+            resolverConfirmedScanKindMap,
+            qrIdMap,
+            scanUrlMap
           );
         } catch {
           statusMap[pid] = "offline";
@@ -632,7 +663,14 @@ export async function refreshWalletNetworkStatuses(entries, onDone, options = {}
   );
   const bannerAlertStateMap = { ...resolverConfirmedAlertStateMap };
   const bannerScanKindMap = { ...resolverConfirmedScanKindMap };
-  persistWalletFromNetworkPoll({ statusMap, alertStateMap, scanKindMap, qrScopeMap });
+  persistWalletFromNetworkPoll({
+    statusMap,
+    alertStateMap,
+    scanKindMap,
+    qrScopeMap,
+    qrIdMap,
+    scanUrlMap,
+  });
   notifyNetworkRefreshed(
     statusMap,
     bannerAlertStateMap,
@@ -718,10 +756,18 @@ export function syncLastSeenFromNetworkMap(alertStateMap) {
  *   alertStateMap?: Record<string, string>,
  *   scanKindMap?: Record<string, string | null>,
  *   qrScopeMap?: Record<string, string | null>,
+ *   qrIdMap?: Record<string, string | null>,
+ *   scanUrlMap?: Record<string, string | null>,
  * }} poll
  */
 export function persistWalletFromNetworkPoll(poll) {
-  const { statusMap = {}, scanKindMap = {}, qrScopeMap = {} } = poll;
+  const {
+    statusMap = {},
+    scanKindMap = {},
+    qrScopeMap = {},
+    qrIdMap = {},
+    scanUrlMap = {},
+  } = poll;
   if (poll.alertStateMap) syncLastSeenFromNetworkMap(poll.alertStateMap);
 
   const stored = loadWallet();
@@ -747,15 +793,25 @@ export function persistWalletFromNetworkPoll(poll) {
     const hadQrScope = Object.prototype.hasOwnProperty.call(e, "qr_scope");
     const currentQrScope = hadQrScope ? e.qr_scope ?? null : null;
     const qrScopeDirty = qrScope != null && currentQrScope !== qrScope;
+    const polledQrId = qrIdMap[pid] ?? null;
+    const polledScanUrl = scanUrlMap[pid] ?? null;
+    const qrIdDirty = polledQrId && e.qr_id !== polledQrId;
+    const scanUrlDirty =
+      polledScanUrl &&
+      e.scan_url !== polledScanUrl &&
+      !scanUrlHasOfficialQrParam(e.scan_url);
     if (
       (net && (e.status !== net || currentScanKind !== scanKind || qrChanged || qrScopeDirty)) ||
       verificationDirty ||
-      qrScopeDirty
+      qrScopeDirty ||
+      qrIdDirty ||
+      scanUrlDirty
     ) {
       changed = true;
       return {
         ...e,
-        ...(qrChanged ? { qr_id: resolvedQr } : {}),
+        ...(qrChanged || qrIdDirty ? { qr_id: polledQrId ?? resolvedQr } : {}),
+        ...(scanUrlDirty ? { scan_url: polledScanUrl } : {}),
         ...(qrScopeDirty ? { qr_scope: qrScope } : {}),
         ...(net ? { status: net, scan_kind: scanKind } : {}),
         ...(verification ? { verification } : {}),

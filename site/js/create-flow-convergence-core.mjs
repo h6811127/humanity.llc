@@ -4,6 +4,7 @@
  */
 
 import { isGeneralRootWalletEntry } from "./hub-child-object-row-core.mjs";
+import { walletEntryHasSigningMaterial } from "./device-tab-session-core.mjs";
 
 export const ADD_STATUS_PLATE_FOCUS = "add-status-plate";
 export const ADD_LOST_ITEM_FOCUS = "add-lost-item";
@@ -31,7 +32,7 @@ export function isPilotObjectTemplate(template) {
  * @param {Record<string, unknown> | null | undefined} entry
  */
 export function walletEntryHasSigningKeys(entry) {
-  return Boolean(entry?.owner_private_key_b58 || entry?.has_signing_key);
+  return walletEntryHasSigningMaterial(entry);
 }
 
 /**

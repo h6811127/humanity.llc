@@ -589,6 +589,26 @@ Automated: `e2e/device-status-dot.spec.ts` § hub sheet header chrome (steps 6�
 
 Automated (Phase 0+): `npm run worker:test:pwa-install` · Phase 3–4: `npm run e2e:pwa-install` (steps 2, 8–11 + no-SW policy in CI). **Manual HTTPS sign-off:** iOS Safari 2026-05-28 ✅ (steps 1–2, 5–6, 9–10, P0-W, standalone wallet). Re-verify icon after Phase 4.1 deploy (`site:generate-pwa-icons` + Pages).
 
+### P1-PWA-U · iPhone Home Screen uninstall deletes wallet (manual only)
+
+**Spec:** [`PWA_INSTALL.md`](PWA_INSTALL.md) § iPhone home screen custody · **Contract:** `site/js/ios-pwa-uninstall-storage-qa-contract.mjs`
+
+**Not automatable in CI** — requires real iPhone Remove from Home Screen (OS uninstall). Vitest documents copy + mismatch model: `worker/tests/ios-pwa-uninstall-storage-qa-contract.test.ts`.
+
+**Prerequisites:** iPhone with ≥1 card saved in **Home Screen PWA** (not Safari tab alone). Encrypted backup or recovery code exported first if you need to recover afterward.
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Open home-screen app — hub shows saved card | Wallet row present |
+| 2 | Read install card (Safari, pre-install) or iPhone storage notice (installed) | Copy warns **never remove icon to refresh**; pull down instead |
+| 3 | Remove icon (Edit Home Screen → minus) | iOS uninstalls web app |
+| 4 | Re-add from Safari if needed · open app | **Empty wallet** unless backup import — expected OS behavior |
+| 5 | Import recovery or encrypted backup | Card returns with controls |
+
+**Fail signals:** Product copy suggests removing icon to fix cache; stewards lose cards with no prior warning; pull-to-refresh documented as requiring icon removal.
+
+Automated copy gate: `npm run worker:test:pwa-install` (includes P1-PWA-U contract test).
+
 ### P1-PWA-R · PWA standalone refresh (Phases 6–9)
 
 **Spec:** [`PWA_INSTALL.md`](PWA_INSTALL.md) § Standalone refresh & resume · **Implementation:** [`PWA_INSTALL_IMPLEMENTATION.md`](PWA_INSTALL_IMPLEMENTATION.md) Phases 6–9

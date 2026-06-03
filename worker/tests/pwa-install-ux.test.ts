@@ -180,6 +180,7 @@ describe("pwaInstallCardBodyHtml", () => {
     const ios = pwaInstallCardBodyHtml({ iosManual: true });
     expect(ios).toContain("Add to Home Screen");
     expect(ios).toContain("Share");
+    expect(ios).toContain("Never remove");
     expect(ios).not.toContain("data-pwa-install-confirm");
   });
 

@@ -3,6 +3,8 @@
  * @see docs/SAFARI_KEYS_CUSTODY.md P3-3
  */
 
+import { walletEntryHasSigningMaterial } from "./device-tab-session-core.mjs";
+
 export const WALLET_SUMMARY_VERSION = 3;
 
 /** Substrings that must never appear in persisted summary JSON. */
@@ -143,7 +145,7 @@ export function buildWalletSummary(entries, walletFingerprint, resolveQrId) {
       profileIds.push(row.profile_id);
       rows.push(row);
     }
-    if (entry.owner_private_key_b58) {
+    if (walletEntryHasSigningMaterial(entry)) {
       signingKeyCount += 1;
       if (entryHasStewardVerification(entry)) stewardReady = true;
     }

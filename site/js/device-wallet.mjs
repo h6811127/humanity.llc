@@ -17,6 +17,7 @@ import { EPHEMERAL_BROWSING_SAVE_BLOCKED } from "./device-ownership-copy-core.mj
 import { isLocalStorageEphemeral } from "./private-browsing-detect-core.mjs";
 import { mergeOwnershipSeatbeltFields } from "./created-first-session-gate-core.mjs";
 import { classifyWalletStorageRaw } from "./device-wallet-parse-core.mjs";
+import { walletEntryHasSigningMaterial } from "./device-tab-session-core.mjs";
 import {
   WALLET_SUMMARY_VERSION,
   buildWalletSummary,
@@ -27,6 +28,22 @@ import { walletSummaryIntegrityNeedsRepair } from "./device-wallet-summary-integ
 import {
   shouldInvalidateWalletCacheOnVisibility,
 } from "./device-wallet-cache-visibility-core.mjs";
+import {
+  normalizeWalletRecoveryImportLabels,
+  normalizeWalletScanUrls,
+  parseQrIdFromScanUrl,
+  scanUrlHasOfficialQrParam,
+} from "./device-wallet-scan-url-core.mjs";
+import {
+  finalizeWalletScanUrlRepair,
+  repairWalletEntriesFromResolver,
+} from "./device-wallet-scan-url-repair.mjs";
+
+export {
+  normalizeWalletScanUrls,
+  normalizeWalletRecoveryImportLabels,
+  resolveWalletEntryScanUrl,
+} from "./device-wallet-scan-url-core.mjs";
 
 export const WALLET_STORAGE_KEY = "hc_wallet";
 export const WALLET_SUMMARY_STORAGE_KEY = "hc_wallet_summary";
@@ -324,6 +341,77 @@ export function saveWallet(entries) {
   return { ok: true };
 }
 
+/**
+ * Repair wallet rows after recovery import bugs (missing ?q= on scan_url, profile-id labels).
+ * @param {string} [origin]
+ * @returns {{ repaired: boolean, error?: string }}
+ */
+export function repairWalletEntriesInStorage(origin = typeof location !== "undefined" ? location.origin : "https://humanity.llc") {
+  const stored = loadWallet();
+  if (stored.length === 0) return { repaired: false };
+  const { entries: qrEntries, changed: qrChanged } = normalizeWalletQrIds(stored);
+  const finalized = finalizeWalletScanUrlRepair(qrEntries, origin, walletEntryQrId);
+  if (!qrChanged && !finalized.changed) return { repaired: false };
+  const write = saveWallet(finalized.entries);
+  if ("error" in write) return { repaired: false, error: write.error };
+  return { repaired: true };
+}
+
+/**
+ * Fetch active QR from resolver when wallet rows lack ?q= scan URLs (recovery import bug).
+ * @param {string} [origin]
+ */
+export async function repairWalletEntriesFromResolverStorage(
+  origin = typeof location !== "undefined" ? location.origin : "https://humanity.llc"
+) {
+  const stored = loadWallet();
+  if (stored.length === 0) return { repaired: false };
+  const needsNetwork = stored.some(
+    (entry) => !scanUrlHasOfficialQrParam(entry.scan_url) || !entry.qr_id
+  );
+  if (!needsNetwork) {
+    return repairWalletEntriesInStorage(origin);
+  }
+  const fetched = await repairWalletEntriesFromResolver(stored, origin);
+  const baseEntries = fetched.changed ? fetched.entries : stored;
+  const { entries: qrEntries, changed: qrChanged } = normalizeWalletQrIds(baseEntries);
+  const finalized = finalizeWalletScanUrlRepair(qrEntries, origin, walletEntryQrId);
+  if (!fetched.changed && !qrChanged && !finalized.changed) return { repaired: false };
+  const write = saveWallet(finalized.entries);
+  if ("error" in write) return { repaired: false, error: write.error };
+  return { repaired: true };
+}
+
+/**
+ * When the user opens a valid official scan link, persist ?q= on the matching wallet row.
+ * @param {string} scanUrl
+ * @returns {boolean}
+ */
+export function patchWalletScanUrlFromOfficialLink(scanUrl) {
+  if (!scanUrlHasOfficialQrParam(scanUrl)) return false;
+  const qrId = parseQrIdFromScanUrl(scanUrl);
+  if (!qrId) return false;
+  let profileId = "";
+  try {
+    const url = new URL(scanUrl);
+    const match = url.pathname.match(/^\/c\/([^/?#]+)/);
+    if (!match?.[1]) return false;
+    profileId = decodeURIComponent(match[1]);
+  } catch {
+    return false;
+  }
+  if (!profileId) return false;
+  const entries = loadWallet();
+  const idx = entries.findIndex((entry) => entry.profile_id === profileId);
+  if (idx < 0) return false;
+  const entry = entries[idx];
+  if (entry.scan_url === scanUrl && entry.qr_id === qrId) return false;
+  const next = entries.slice();
+  next[idx] = { ...entry, scan_url: scanUrl, qr_id: qrId };
+  const write = saveWallet(next);
+  return !("error" in write);
+}
+
 /** @returns {Array<Record<string, unknown>>} */
 function readWalletEntries() {
   if (walletCache) return walletCache;
@@ -415,7 +503,7 @@ export function walletEntryPublicView(entry) {
     status: entry.status ?? null,
     scan_kind: entry.scan_kind ?? null,
     saved_at: entry.saved_at,
-    has_signing_key: !!entry.owner_private_key_b58,
+    has_signing_key: walletEntryHasSigningMaterial(entry),
   };
 }
 
@@ -447,7 +535,7 @@ export function listWalletDisplayEntries(limit = Infinity) {
 /** @param {(entry: Record<string, unknown>) => boolean} predicate */
 export function walletSomeSigningKey(predicate) {
   for (const entry of readWalletEntries()) {
-    if (entry.owner_private_key_b58 && predicate(entry)) return true;
+    if (walletEntryHasSigningMaterial(entry) && predicate(entry)) return true;
   }
   return false;
 }

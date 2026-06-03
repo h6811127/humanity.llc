@@ -4,6 +4,7 @@ import {
   assertRecoveryKeyMatchesCard,
   mergeRecoveryIntoWallet,
   parseProfileIdFromCardRef,
+  recoveryImportLabel,
 } from "../../site/js/device-hub-import-recovery-core.mjs";
 
 const PROFILE_ID = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
@@ -42,6 +43,18 @@ describe("assertRecoveryKeyMatchesCard", () => {
   });
 });
 
+describe("recoveryImportLabel", () => {
+  it("prefers handle over profile id slice placeholder", () => {
+    expect(
+      recoveryImportLabel({
+        profileId: PROFILE_ID,
+        handle: "steward",
+        existingLabel: PROFILE_ID.slice(0, 12),
+      })
+    ).toBe("@steward");
+  });
+});
+
 describe("mergeRecoveryIntoWallet", () => {
   it("inserts a new wallet row with recovery material", () => {
     const result = mergeRecoveryIntoWallet([], {
@@ -49,12 +62,14 @@ describe("mergeRecoveryIntoWallet", () => {
       recoveryPublicKeyB58: "pubR",
       recoveryPrivateKeyB58: "privR",
       ownerPublicKeyB58: "pubO",
-      scanUrl: `https://humanity.llc/c/${PROFILE_ID}`,
+      scanUrl: `https://humanity.llc/c/${PROFILE_ID}?q=qr_test`,
       qrId: "qr_test",
+      handle: "steward",
     });
     expect(result.isNew).toBe(true);
     expect(result.entry.recovery_private_key_b58).toBe("privR");
     expect(result.entry.recovery_key_acknowledged).toBe(true);
+    expect(result.entry.label).toBe("@steward");
     expect(result.entries).toHaveLength(1);
   });
 

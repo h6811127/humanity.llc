@@ -46,7 +46,7 @@ export function pwaInstallDeferralCardBodyHtml() {
     eyebrow: escapeEmphasisHtml("Home screen app"),
     title: escapeEmphasisHtml("Finish your first object in Safari"),
     detail: escapeEmphasisHtml(
-      "Complete setup on your new card, then add this site to your Home Screen. On iPhone, manage cards only from that icon — not Safari tabs."
+      "Complete setup on your new card, then add this site to your Home Screen. On iPhone, manage cards only from that icon — not Safari tabs. Never remove the icon to refresh — pull down instead."
     ),
     dot: "info",
     actionsHtml: emphasisCardActionsHtml([

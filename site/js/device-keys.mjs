@@ -165,14 +165,13 @@ export function buildCreatedPageUrl(entry, opts = {}) {
 function createdPageUrlForEntry(entry, opts = {}) {
   if (!entry?.profile_id) return null;
 
-  const saved =
-    entry.owner_private_key_b58 != null
-      ? entry
-      : loadWallet().find((w) => w.profile_id === entry.profile_id) ?? null;
+  const saved = tabSessionHasSigningKeys(entry)
+    ? entry
+    : loadWallet().find((w) => w.profile_id === entry.profile_id) ?? null;
 
   const target = saved ?? entry;
-  if (saved?.owner_private_key_b58 && !opts.skipActivate) {
-    activateWalletEntry(saved);
+  if (tabSessionHasSigningKeys(target) && !opts.skipActivate) {
+    activateWalletEntry(target);
   }
   return buildCreatedPageUrl(target, opts);
 }
