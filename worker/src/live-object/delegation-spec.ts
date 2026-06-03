@@ -1,5 +1,5 @@
 /**
- * Delegated child capability — spec types and validation (Order 6).
+ * Delegated child capability — spec types and validation (Order 6 / step 17 prep).
  * Resolver routes deferred until DELEGATED_CHILD_CAPABILITIES_GATE G1–G5 pass.
  * @see docs/DELEGATED_CHILD_CAPABILITY_SCHEMA.md
  */
@@ -25,6 +25,17 @@ export const DELEGATED_FORBIDDEN_OPERATIONS = [
   "scan.analytics",
 ] as const;
 
+/** Resolver child-object routes mappable to delegated operations (step 17). */
+export const DELEGATED_CHILD_OBJECT_ROUTES = [
+  "child_object.update",
+  "child_object.issue_qr",
+  "child_object.revoke_qr",
+  "child_object.revoke",
+  "print_artifact.issue_qr",
+] as const;
+
+export type DelegatedChildObjectRoute = (typeof DELEGATED_CHILD_OBJECT_ROUTES)[number];
+
 export type DelegatedCapabilityDocument = {
   version: string;
   capability_id: string;
@@ -41,6 +52,20 @@ export type DelegatedCapabilityDocument = {
   created_at: string;
 };
 
+export type DelegatedAccessRequest = {
+  capability: DelegatedCapabilityDocument;
+  route: DelegatedChildObjectRoute;
+  objectId?: string | null;
+  printArtifactId?: string | null;
+  /** When false, delegated signer is rejected (root cascade unchanged). */
+  parentCardActive?: boolean;
+  now?: Date;
+};
+
+export type DelegatedAccessResult =
+  | { allowed: true }
+  | { allowed: false; reason: string };
+
 const ISO_RE =
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/;
 
@@ -48,6 +73,72 @@ export function isDelegatedAllowedOperation(
   value: string
 ): value is DelegatedAllowedOperation {
   return (DELEGATED_ALLOWED_OPERATIONS as readonly string[]).includes(value);
+}
+
+export function operationForChildObjectRoute(
+  route: DelegatedChildObjectRoute
+): DelegatedAllowedOperation {
+  return route;
+}
+
+export function isDelegatedCapabilityExpired(
+  capability: Pick<DelegatedCapabilityDocument, "expires_at">,
+  now: Date = new Date()
+): boolean {
+  const expiresMs = Date.parse(capability.expires_at);
+  if (!Number.isFinite(expiresMs)) return true;
+  return now.getTime() >= expiresMs;
+}
+
+/**
+ * Pure access check for resolver (step 17) — no signature verification.
+ * Root owner / recovery key bypasses this helper entirely.
+ */
+export function evaluateDelegatedCapabilityAccess(
+  input: DelegatedAccessRequest
+): DelegatedAccessResult {
+  const { capability, route } = input;
+  const now = input.now ?? new Date();
+
+  if (input.parentCardActive === false) {
+    return { allowed: false, reason: "parent_card_inactive" };
+  }
+  if (capability.status !== "active") {
+    return { allowed: false, reason: "capability_revoked" };
+  }
+  if (isDelegatedCapabilityExpired(capability, now)) {
+    return { allowed: false, reason: "capability_expired" };
+  }
+
+  const operation = operationForChildObjectRoute(route);
+  if (!capability.operations.includes(operation)) {
+    return { allowed: false, reason: "operation_not_granted" };
+  }
+
+  if (
+    operation === "print_artifact.issue_qr" ||
+    route === "print_artifact.issue_qr"
+  ) {
+    const printId = input.printArtifactId?.trim();
+    if (!printId) {
+      return { allowed: false, reason: "print_artifact_id_required" };
+    }
+    const allowedPrints = capability.scope.print_artifact_ids ?? [];
+    if (!allowedPrints.includes(printId)) {
+      return { allowed: false, reason: "print_artifact_out_of_scope" };
+    }
+    return { allowed: true };
+  }
+
+  const objectId = input.objectId?.trim();
+  if (!objectId) {
+    return { allowed: false, reason: "object_id_required" };
+  }
+  if (!capability.scope.object_ids.includes(objectId)) {
+    return { allowed: false, reason: "object_out_of_scope" };
+  }
+
+  return { allowed: true };
 }
 
 /** Shape check for capability documents — no signature verification. */
