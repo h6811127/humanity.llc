@@ -2661,6 +2661,19 @@ body.device-shell-created .created-screen {
   text-decoration: none;
 }
 
+.created-object-streams-fieldset.flow-inset-fields {
+  margin: 16px 0 0;
+  min-width: 0;
+}
+
+.created-object-streams-fieldset.flow-inset-fields legend.form-label {
+  display: block;
+  width: 100%;
+  padding: 0;
+  margin-bottom: 0;
+  float: none;
+}
+
 .flow-disclosure.create-organizer-opt {
   margin: 12px 0 0;
   border-radius: 10px;
