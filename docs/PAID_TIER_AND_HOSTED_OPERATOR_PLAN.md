@@ -1,11 +1,11 @@
-# Hosted steward tier (paid) — planning
+# Hosted steward tier (paid) — product & commercial layer
 
-**Status:** **Planning only** — no billing, entitlements, or push implementation in this phase  
+**Status:** **Product definition active** · **reference-operator revenue path shipped in repo** (Checkout, webhooks, `/created/` caps UI); **open:** Stripe USD prices + public launch date + Legal G7  
 **Opened:** 2026-05-26  
-**Audience:** Product, governance, operators, engineering (for later build)  
+**Audience:** Product, governance, operators, engineering  
 **Supersedes:** Scattered “Phase 10 / paid tier” bullets in [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) only for **product definition** — budget phases 1–9 remain the shipped free-tier contract.
 
-**Related:** [`STEWARD_DEVICE_ROADMAP.md`](STEWARD_DEVICE_ROADMAP.md) (index) · [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) · [`DEVICE_OS.md`](DEVICE_OS.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md) · [`PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`](PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md) · [`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md) · [`SKEPTIC_FAQ.md`](SKEPTIC_FAQ.md) · [`DEMOCRATIC_INFRASTRUCTURE.md`](DEMOCRATIC_INFRASTRUCTURE.md)
+**Related:** [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md) (normative API + keys) · [`STEWARD_DEVICE_ROADMAP.md`](STEWARD_DEVICE_ROADMAP.md) (index) · [`PRODUCT_WORKSTREAM_COORDINATION.md`](PRODUCT_WORKSTREAM_COORDINATION.md) § WS-REV · [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) · [`DEVICE_OS.md`](DEVICE_OS.md) · [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md) · [`SKEPTIC_FAQ.md`](SKEPTIC_FAQ.md)
 
 ---
 
@@ -13,9 +13,32 @@
 
 The **reference operator** (`humanity.llc`) is a **public, data-minimal resolver** with a **device shell** that must not treat every steward as unlimited infrastructure. Phases 1–9 shipped **intent-based polling**, caps, and honest copy so a free site cannot be turned into a 24/7 wallet monitoring network by default.
 
-A **hosted steward tier** (working name; not final marketing) is the **commercial and product layer** for stewards and organizations who **choose** higher availability: more automatic checks, higher request budgets, optional **server-mediated live-proof notification**, and published SLAs — **without** changing the trust model into surveillance or “verified forever” theater.
+**Shippable product today:** printable QR **live objects** (cards, scan, live proof, child objects) on the free reference tier. **Revenue gap:** paid **`plan_id`** assignment and checkout UX — not the underlying resolver.
 
-This document defines **what paid means**, **what stays free**, **what we refuse to sell**, and **what must be decided before any code**. It does **not** specify payment provider, prices, or implementation tasks.
+A **hosted layer** is the **commercial wrapper** for customers who **choose** higher infrastructure budgets — **without** changing the trust model into surveillance or “verified forever” theater.
+
+This document defines **what paid means**, **what stays free**, and **what we refuse to sell**. Implementation detail: [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md) § Implementation status.
+
+---
+
+## Revenue SKUs (reference operator)
+
+Two **`plan_id`** values on the same **`account_id`** / steward-session model. A customer may hold one or both; entitlements **merge** per § Effective policy resolution in the entitlements doc.
+
+| `plan_id` | What it sells | Primary audience | Shipped enforcement |
+|-----------|---------------|------------------|---------------------|
+| **`hosted_steward_v1`** | Higher live-proof auto-poll caps, wallet network parallelism, optional push (`notify.push.live_proof`), shorter SW periodic minimum | Stewards running **many printable QR live objects** | Session + entitlements API; poll caps in client modules; push SSE when plan active |
+| **`hosted_game_season_v1`** | Higher city-game caps: `game.season.node_cap`, `game.contribute.daily_cap`, `game.snapshot.daily_cap`, `game.game_update.daily_cap` | **City-game organizers** (season root profile) | Server quota on contribute / snapshot / game-update / node create; `game_season` on entitlements GET |
+
+| Stays **`reference_free`** | Rule |
+|----------------------------|------|
+| Card create, scan, vouch, revoke, manual hub checks | Never paywalled ([`SKEPTIC_FAQ.md`](SKEPTIC_FAQ.md)) |
+| Stranger scan / play / public map read | Free; fair-use **429** only at abuse scale |
+| Pilot-scale game (15 nodes) | `reference_free` includes `game.season.*` defaults — Cedar Rapids can launch before first paid organizer |
+
+**Not bundled:** game season capacity is **not** `hosted_steward_v1`; do not upsell “verified human” or scan analytics.
+
+**WS-REV shipped (repo):** Stripe Checkout (`POST …/steward/billing/checkout`), webhook `plan_id`, `/created/` Operator plan & limits panel. **Still open:** exact USD in Stripe Dashboard, public marketing launch date, Legal G7 refund copy.
 
 ---
 
@@ -57,7 +80,8 @@ Inherited from [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) and 
 | **Network status** | Visible-row-first; large-wallet round-robin | **Planning:** faster refresh cadence or higher parallel cap |
 | **Server push** | None (device polling only) | **Planning:** optional WebSocket/SSE/queue notify |
 | **SLA** | Best effort; 1027 = degraded | **Planning:** published uptime / response targets |
-| **Billing** | None | Subscription or org seat (TBD) |
+| **Billing** | None | Subscription per SKU (`hosted_steward_v1`, `hosted_game_season_v1`) — checkout **open** |
+| **City game season caps** | `reference_free` defaults (15 nodes, fair-use counters) | `hosted_game_season_v1` raises caps — see entitlements doc |
 
 **Important:** Paid is **not** “create a card.” [`SKEPTIC_FAQ.md`](SKEPTIC_FAQ.md) already states public launch is not a paid gate for identity.
 
@@ -94,9 +118,10 @@ Summary:
 | `poll.live_proof.auto_daily_cap` | `account_id` + `device_id` counter | Overrides 400/day |
 | `poll.network.max_parallel` | Plan | Overrides large-wallet cap |
 | `notify.push.live_proof` | Account | Enables push path (M3) |
+| `game.season.*` | Account linked to **season root** `profile_id` | Organizer resolver load — see § Revenue SKUs |
 | `watch.default_on` | Org policy only | Controversial; requires consent UX |
 
-**Cross-operator:** federated operators issue their own plans; reference site sells `hosted_steward_v1` first.
+**Cross-operator:** federated operators issue their own plans; reference site sells `hosted_steward_v1` and `hosted_game_season_v1` first.
 
 ---
 

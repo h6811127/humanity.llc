@@ -1788,26 +1788,28 @@ a.hub-card-menu-item {
   text-underline-offset: 2px;
 }
 
-.landing-framing.hc-emphasis-card .landing-framing-more-actions {
+.landing-framing.hc-emphasis-card .hc-emphasis-card__actions.landing-framing-more-actions,
+.landing-founder-note.hc-emphasis-card .hc-emphasis-card__actions.landing-framing-more-actions {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: stretch;
   width: 100%;
   max-width: none;
-  justify-content: stretch;
-  margin: 0;
+  justify-content: flex-start;
+  gap: 12px;
+  margin: 16px 0 0;
 }
 
-.landing-framing.hc-emphasis-card .landing-framing-more-actions > * {
+.landing-framing.hc-emphasis-card .landing-framing-more-actions > *,
+.landing-founder-note.hc-emphasis-card .landing-framing-more-actions > * {
   margin: 0;
-  flex: 1 1 100%;
+  flex: 0 0 auto;
+  width: 100%;
 }
 
 .landing-founder-note .hc-emphasis-card__copy .landing-framing-lead + .landing-framing-lead {
   margin-top: 14px;
-}
-
-.landing-founder-note.hc-emphasis-card .landing-framing-more-actions {
-  flex-direction: column;
-  gap: 12px;
-  margin: 16px 0 0;
 }
 
 .landing-founder-note.hc-emphasis-card .landing-framing-more-actions > * {
@@ -6602,6 +6604,86 @@ body.page-wallet .device-hub-status-key {
   display: none !important;
 }
 
+.created-hosted-plan.settings-disclosure-info {
+  margin: 0 0 12px;
+}
+
+.created-hosted-plan[hidden] {
+  display: none !important;
+}
+
+.created-hosted-plan-body .settings-panel-lead {
+  margin-bottom: 12px;
+}
+
+.created-hosted-plan-lead {
+  margin: 0 0 10px;
+}
+
+.created-hosted-plan-metrics {
+  display: grid;
+  grid-template-columns: minmax(8rem, 42%) 1fr;
+  gap: 6px 12px;
+  margin: 0 0 10px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.created-hosted-plan-metrics dt {
+  margin: 0;
+  color: var(--grey);
+  font-weight: 500;
+}
+
+.created-hosted-plan-metrics dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.created-hosted-plan-metric--at-limit {
+  color: #b45309;
+  font-weight: 600;
+}
+
+.created-hosted-plan-at-limit {
+  margin: 0 0 10px;
+  color: #b45309;
+}
+
+.created-hosted-game-season {
+  margin: 12px 0 0;
+  padding-top: 12px;
+  border-top: 0.5px solid var(--border, rgba(60, 60, 67, 0.16));
+}
+
+.created-hosted-game-season[hidden] {
+  display: none !important;
+}
+
+.created-hosted-game-season-title {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.created-hosted-plan-upgrades {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.created-hosted-plan-upgrades[hidden] {
+  display: none !important;
+}
+
+.created-hosted-plan-upgrade {
+  min-height: 40px;
+  padding: 10px 14px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
 .created-live-cockpit {
   margin: 0 0 20px;
 }
@@ -9624,6 +9706,187 @@ body[data-created-mode="setup"] #created-setup-keys-mount .flow-keys-panel {
   font-size: 14px;
 }
 
+.created-game-node-bulk {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(219, 27, 67, 0.12);
+}
+
+.created-game-node-bulk-lead {
+  margin: 8px 0 10px;
+}
+
+.created-game-node-bulk-table-wrap {
+  overflow-x: auto;
+  margin: 10px 0 12px;
+}
+
+.created-game-node-bulk-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.created-game-node-bulk-table th,
+.created-game-node-bulk-table td {
+  padding: 8px 6px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.created-game-node-bulk-table th {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted, #666);
+}
+
+.created-game-node-bulk-table .form-input {
+  width: 100%;
+  min-width: 140px;
+}
+
+.created-game-node-bulk-table tr.is-registered td {
+  opacity: 0.65;
+}
+
+.created-game-node-rules {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.08));
+}
+
+.created-game-node-rules-lead {
+  margin-bottom: 10px;
+}
+
+.created-game-node-rules-readiness {
+  margin: 10px 0;
+  padding-left: 18px;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.created-game-node-rules-readiness li.is-ready {
+  color: var(--hc-success-text, #166534);
+}
+
+.created-game-node-rules-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.created-game-node-setup {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.08));
+}
+
+.created-game-node-setup-lead {
+  margin-bottom: 10px;
+}
+
+.created-game-node-setup-checklist {
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.created-game-node-setup-checklist li {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin-bottom: 6px;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.created-game-node-setup-checklist li.is-done {
+  color: var(--hc-success-text, #166534);
+}
+
+.created-game-node-setup-checklist li.is-pending {
+  color: inherit;
+}
+
+.created-game-node-setup-checklist li.is-optional {
+  opacity: 0.85;
+}
+
+.created-game-node-setup-check {
+  flex-shrink: 0;
+  width: 1.1em;
+  font-weight: 700;
+}
+
+.created-game-node-setup-custody-fieldset {
+  border: 0;
+  margin: 0 0 12px;
+  padding: 0;
+}
+
+.created-game-node-setup-custody-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.created-game-node-setup-runbook-grid {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.created-game-node-setup-runbook-card {
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.08));
+  background: rgba(60, 60, 67, 0.04);
+}
+
+.created-game-node-setup-runbook-card h4 {
+  margin: 0 0 4px;
+  font-size: 14px;
+}
+
+.created-game-node-setup-runbook-card p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-secondary, #666);
+}
+
+.created-game-node-setup-subhead {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.created-game-node-setup-scorecard {
+  margin: 0 0 12px;
+  padding-left: 1.2rem;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.created-game-node-setup-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.created-setup-game-season {
+  margin: 12px 0;
+}
+
 .created-status-plate-loop {
   margin-top: 12px;
   padding: 14px 16px;
@@ -10281,4 +10544,419 @@ body.device-shell-created .flow-keys-group .list-row {
 .operator-audit-page textarea.input {
   min-height: 72px;
   resize: vertical;
+}
+
+/* Cedar Rapids city game — M1 city state board (/play/cedar-rapids/#city-state) */
+.city-game-map-section {
+  scroll-margin-top: calc(12px + env(safe-area-inset-top, 0px));
+}
+
+.city-game-map-root {
+  margin-top: 4px;
+}
+
+.city-game-map-loading,
+.city-game-map-error {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--grey);
+}
+
+.city-game-map-error {
+  color: var(--red);
+}
+
+.city-game-map-board {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  min-width: 0;
+  overflow-x: clip;
+}
+
+.city-game-map-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.city-game-map-eyebrow {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--grey);
+}
+
+.city-game-map-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.city-game-map-lead,
+.city-game-map-privacy {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--black);
+}
+
+.city-game-map-wayfinding {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--grey);
+}
+
+.city-game-map-privacy a {
+  color: var(--red);
+  font-weight: 600;
+}
+
+.city-game-map-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  min-width: 0;
+}
+
+.city-game-map-shell > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Stack on phones and touch devices — avoid 720px grid squeezing map beside list in landscape. */
+@media (min-width: 960px) and (hover: hover) and (pointer: fine) {
+  .city-game-map-shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      "sync sync"
+      "list map";
+    align-items: start;
+  }
+
+  .city-game-map-sync {
+    grid-area: sync;
+  }
+
+  .city-game-map-sketch-block {
+    grid-area: map;
+  }
+
+  .city-game-map-list-panel {
+    grid-area: list;
+    max-height: min(520px, 70vh);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+.city-game-map-figure {
+  margin: 0;
+  padding: 12px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: #fafafa;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.city-game-map-svg {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+}
+
+.city-game-map-zone {
+  fill: rgba(0, 0, 0, 0.02);
+  stroke: rgba(0, 0, 0, 0.06);
+  stroke-width: 0.4;
+}
+
+.city-game-map-zone-label {
+  font-size: 3.2px;
+  font-weight: 600;
+  fill: rgba(0, 0, 0, 0.35);
+  letter-spacing: 0.02em;
+}
+
+.city-game-map-edge {
+  stroke: rgba(219, 27, 67, 0.35);
+  stroke-width: 0.55;
+  stroke-dasharray: 2 1.5;
+}
+
+.city-game-map-edge--satisfied {
+  stroke: rgba(34, 139, 34, 0.55);
+  stroke-dasharray: none;
+}
+
+.city-game-map-pin-dot {
+  fill: var(--white);
+  stroke: rgba(219, 27, 67, 0.85);
+  stroke-width: 0.65;
+}
+
+.city-game-map-pin[data-role="sanctuary"] .city-game-map-pin-dot {
+  stroke: rgba(0, 0, 0, 0.45);
+}
+
+.city-game-map-pin[data-role="finale"] .city-game-map-pin-dot {
+  fill: rgba(219, 27, 67, 0.12);
+  stroke-width: 0.9;
+}
+
+.city-game-map-pin--live .city-game-map-pin-dot {
+  stroke: rgba(34, 139, 34, 0.75);
+  stroke-width: 0.85;
+}
+
+.city-game-map-pin--maintenance .city-game-map-pin-dot {
+  stroke: rgba(120, 120, 120, 0.75);
+}
+
+.city-game-map-pin-label {
+  font-size: 2.6px;
+  font-weight: 700;
+  fill: var(--black);
+}
+
+.city-game-map-figcaption {
+  margin: 10px 0 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--grey);
+}
+
+.city-game-map-sync {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--grey);
+}
+
+.city-game-map-sync--stale {
+  color: var(--red);
+}
+
+.city-game-map-ticker {
+  margin-bottom: 4px;
+}
+
+.city-game-map-list-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: none;
+  overflow: visible;
+  padding-right: 0;
+}
+
+@media (max-width: 959px), (hover: none), (pointer: coarse) {
+  .city-game-map-list-panel {
+    max-height: min(320px, 42vh);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 12px;
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    background: var(--white);
+    box-sizing: border-box;
+  }
+
+  .city-game-map-sketch-block {
+    min-height: 12rem;
+  }
+
+  .city-game-map-figure {
+    min-height: 10rem;
+  }
+}
+
+.city-game-map-list-title,
+.city-game-map-sketch-title {
+  margin: 0 0 4px;
+}
+
+.city-game-map-sketch-block {
+  min-width: 0;
+}
+
+@media (min-width: 960px) and (hover: hover) and (pointer: fine) {
+  .city-game-map-list-panel {
+    padding-right: 4px;
+  }
+}
+
+.city-game-map-district-label {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--grey);
+}
+
+.city-game-map-node-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.city-game-map-node-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: var(--white);
+}
+
+.city-game-map-node-row--live {
+  border-color: rgba(34, 139, 34, 0.25);
+}
+
+.city-game-map-node-row--maintenance {
+  border-color: rgba(120, 120, 120, 0.25);
+  background: rgba(120, 120, 120, 0.04);
+}
+
+.city-game-map-node-row--revoked {
+  opacity: 0.85;
+}
+
+.city-game-map-node-chips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.city-game-map-chip {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  background: rgba(219, 27, 67, 0.06);
+  border: 1px solid rgba(219, 27, 67, 0.12);
+}
+
+.city-game-map-chip-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--grey);
+}
+
+.city-game-map-chip-value {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--black);
+}
+
+.city-game-map-node-title {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.city-game-map-node-meta {
+  font-size: 13px;
+  color: var(--grey);
+}
+
+.city-game-map-node-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.city-game-map-tag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  background: rgba(219, 27, 67, 0.08);
+  color: var(--black);
+}
+
+.city-game-map-live-hint {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--red);
+}
+
+.city-game-map-node-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  align-items: center;
+}
+
+.city-game-map-maps-link {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--black);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.city-game-map-scan-link {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--red);
+}
+
+.city-game-map-unlock-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.city-game-map-edge-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(219, 27, 67, 0.15);
+  background: rgba(219, 27, 67, 0.04);
+}
+
+.city-game-map-edge-row.city-game-map-edge--satisfied {
+  border-color: rgba(34, 139, 34, 0.28);
+  background: rgba(34, 139, 34, 0.06);
+}
+
+.city-game-map-edge-nodes {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.city-game-map-edge-detail {
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--grey);
 }

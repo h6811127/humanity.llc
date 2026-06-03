@@ -199,6 +199,11 @@ Canonical spec: [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.m
 | Game-operator scope | `issuer_public_key` may `game-update` **game_node** only — not owner manifesto, human vouch issuance, or non-game child types. |
 | Human vs game vouch | Game `vouch_requires` / `vouch_active_for` on `game_meta` is separate from root-card Steward vouch graph; do not conflate in copy or tests. |
 | Launch deploy | Public “live season” HTML (`city-game:launch-surfaces --apply`) and Worker `CITY_GAME_ENABLED=1` ship in the **same** release train. |
+| Map dashboard | Read-only **city state board** — same public truth as scan; **no** GPS, visit log, player ID, or device-local scarcity on server snapshot. Passive `GET` snapshot does not increment quorum/fragments. Plan: [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md). Play pages boot via **`city-game-play-page.mjs` only** (one season fetch → board + guide + banners + snapshot). Snapshot chips apply to **`.city-game-map-node-live`** inside each list row — do not remove when editing Maps links. |
+| Season fair use | Organizer caps via `game.*` entitlements on linked steward account (`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md` § City game season). Stranger play stays free; IP rate limits remain. |
+| Season root ↔ steward | `GET …/steward/entitlements?season_id=` succeeds only when `steward_account_profiles` links the session `account_id` to that season’s `season_root_profile_id` (bundled season config). |
+| Snapshot quota | Uncached season snapshot builds increment `game.snapshot.get`; **304** (`If-None-Match`) does **not** increment season snapshot quota. |
+| Season config bundle | Worker resolves seasons from `season-registry.generated.ts` imports of `site/data/city-game-*.json` at **bundle load** — editing JSON requires **`worker:dev` restart** (and `city-game:sync-season-root` when local seed ≠ JSON). |
 
 **Regression:**
 
@@ -206,4 +211,27 @@ Canonical spec: [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.m
 npm run verify:city-game
 ```
 
-Touching `worker/src/city-game/*`, `worker/src/resolver/game-contribute.ts`, `worker/src/resolver/game-update.ts`, or `site/js/scan-game-contribute.mjs` requires the block above plus any new test named in the PR. Update this section when adding new automated mechanics.
+Touching `worker/src/city-game/*`, `worker/src/resolver/game-contribute.ts`, `worker/src/resolver/game-update.ts`, `site/js/scan-game-contribute.mjs`, or season snapshot / map dashboard paths requires the block above plus any new test named in the PR. Update this section when adding new automated mechanics.
+
+---
+
+## Hosted steward (reference operator)
+
+Canonical spec: [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md) · product framing: [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md).
+
+| Invariant | Detail |
+|-----------|--------|
+| Feature gate | Extension active only when `HOSTED_STEWARD_ENABLED=1` and D1 migrations `0012` (+ `0031` for game season keys) applied. |
+| Session bearer | `Authorization: Bearer <token>` from `POST …/steward/session` only — not checkout `acc_…` IDs; token stored client-side as `hc_steward_session` (see entitlements doc). |
+| Entitlements authority | Server `GET …/steward/entitlements` is source of truth for paid caps; client may cache ≤300s; fail closed to `reference_free` when session missing or invalid. |
+| Profile link | One `profile_id` maps to at most one `account_id` (`idx_steward_profile_unique`); link requires owner-signed `steward_account_link_v1`. |
+| Game season attachment | `game_season` on entitlements requires steward account linked to season root profile; optional `?season_id=` must match that link. |
+| No paywall on identity | Paid plans must not block card create, public scan, or vouch ([`SKEPTIC_FAQ.md`](SKEPTIC_FAQ.md)). |
+
+**Regression:**
+
+```bash
+npm run worker:test -- worker/tests/steward-hosted.test.ts worker/tests/city-game-season-entitlements-api.test.ts worker/tests/billing-lifecycle.test.ts
+```
+
+Touching `worker/src/resolver/steward-hosted.ts`, `worker/src/steward/*`, or `site/js/device-steward-entitlements*.mjs` requires the block above when behavior changes.

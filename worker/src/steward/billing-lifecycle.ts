@@ -4,6 +4,7 @@ import type { StewardAccountRow, StewardPlanStatus } from "./plans";
 export const PAST_DUE_GRACE_MS = 7 * 24 * 60 * 60 * 1000;
 
 export const HOSTED_STEWARD_PLAN_ID = "hosted_steward_v1";
+export const HOSTED_GAME_SEASON_PLAN_ID = "hosted_game_season_v1";
 export const REFERENCE_FREE_PLAN_ID = "reference_free";
 
 export interface StripeSubscriptionLike {
@@ -59,7 +60,7 @@ export function stewardUpdateFromStripeSubscription(
 
   return {
     account_id: accountId,
-    plan_id: mapped.plan_id,
+    plan_id: planId,
     plan_version: planVersion,
     status: mapped.status,
     effective_from: effectiveFrom,

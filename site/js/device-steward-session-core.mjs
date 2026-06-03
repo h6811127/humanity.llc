@@ -92,6 +92,37 @@ export function resolveStewardAccountLinkTarget(urlAccountId, pendingAccountId) 
   return null;
 }
 
+const ACCOUNT_ID_ALPHABET =
+  "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+
+/**
+ * New steward billing account id for first link (before or without Stripe checkout).
+ * Operator creates the row on successful POST /steward/session.
+ *
+ * @returns {string}
+ */
+export function generateStewardAccountId() {
+  let suffix = "";
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  for (const b of bytes) {
+    suffix += ACCOUNT_ID_ALPHABET[b % ACCOUNT_ID_ALPHABET.length];
+  }
+  return `acc_${suffix}`;
+}
+
+/**
+ * @param {string | null | undefined} urlAccountId
+ * @param {string | null | undefined} pendingAccountId
+ * @returns {string}
+ */
+export function stewardAccountIdForLink(urlAccountId, pendingAccountId) {
+  return (
+    resolveStewardAccountLinkTarget(urlAccountId, pendingAccountId) ??
+    generateStewardAccountId()
+  );
+}
+
 /**
  * Hub monitoring line while billing checkout return is pending link.
  *

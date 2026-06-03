@@ -15,6 +15,8 @@ import {
   stewardSchemaReady,
 } from "../steward/db";
 import {
+  HOSTED_GAME_SEASON_PLAN_ID,
+  HOSTED_STEWARD_PLAN_ID,
   isCommerceCheckoutEvent,
   isStewardBillingSubscriptionEvent,
   stewardUpdateForPaymentFailed,
@@ -203,9 +205,12 @@ export async function handlePostBillingWebhook(
         : {};
     const accountId =
       typeof metadata.account_id === "string" ? metadata.account_id.trim() : "";
+    const planMeta =
+      typeof metadata.plan_id === "string" ? metadata.plan_id.trim() : "";
     const hostedIntent =
-      metadata.steward_plan === "hosted_steward_v1" ||
-      metadata.plan_id === "hosted_steward_v1";
+      metadata.steward_plan === HOSTED_STEWARD_PLAN_ID ||
+      planMeta === HOSTED_STEWARD_PLAN_ID ||
+      planMeta === HOSTED_GAME_SEASON_PLAN_ID;
     if (mode === "payment" || !hostedIntent || !accountId) {
       return jsonResponse({ received: true, ignored: true, reason: "commerce" }, 200);
     }

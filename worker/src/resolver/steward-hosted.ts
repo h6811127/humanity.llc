@@ -12,14 +12,12 @@ import {
 } from "../steward/config";
 import {
   accountHasLinkedProfile,
-  getSessionByTokenHash,
   insertSession,
   linkProfileToAccount,
   listPublicPlans,
   applyStewardLifecycleTransitions,
   resolveEffectiveEntitlements,
   stewardSchemaReady,
-  touchSession,
   upsertAccount,
   getUsageCount,
 } from "../steward/db";
@@ -31,12 +29,15 @@ import {
 } from "../steward/push";
 import { verifyStewardAccountLink } from "../steward/link-proof";
 import { parseEntitlementsJson, utcDayKey } from "../steward/plans";
-import {
-  generateSessionToken,
-  hashSessionToken,
-  parseBearerToken,
-} from "../steward/session-token";
+import { generateSessionToken, hashSessionToken } from "../steward/session-token";
+import { authenticateStewardSession } from "./steward-session-auth";
 import { PROTOCOL_VERSION } from "../crypto";
+import {
+  accountMayAccessGameSeason,
+  parseGameSeasonIdQuery,
+  resolveGameSeasonEntitlementsAttachment,
+} from "../city-game/season-entitlements-api";
+import { HOSTED_GAME_SEASON_PLAN_ID } from "../steward/billing-lifecycle";
 
 function hostedDisabled(): Response {
   return errorResponse(
@@ -97,6 +98,7 @@ export async function handleGetOperatorCapabilities(
           entitlements: "/.well-known/hc/v1/steward/entitlements",
           session: "/.well-known/hc/v1/steward/session",
           push: "/.well-known/hc/v1/steward/push",
+          billing_checkout: "/.well-known/hc/v1/steward/billing/checkout",
         },
       },
     };
@@ -131,7 +133,15 @@ export async function handleGetOperatorPlans(
             pricing_document: "HOSTED_TIER_PRICING_AND_SLA.md",
           },
         }
-      : {}),
+      : row.plan_id === HOSTED_GAME_SEASON_PLAN_ID
+        ? {
+            commercial: {
+              status: "planning",
+              product: "city_game_season",
+              pricing_document: "HOSTED_TIER_ENTITLEMENTS_AND_METERING.md",
+            },
+          }
+        : {}),
   }));
 
   return jsonResponse(
@@ -229,56 +239,6 @@ export async function handlePostStewardSession(
   );
 }
 
-async function authenticateSession(
-  db: D1Database,
-  request: Request
-): Promise<
-  | { ok: true; account_id: string; device_id: string; token_hash: string }
-  | { ok: false; response: Response }
-> {
-  const token = parseBearerToken(request);
-  if (!token) {
-    return {
-      ok: false,
-      response: errorResponse(
-        "UNAUTHORIZED",
-        "Missing or invalid Authorization bearer token.",
-        401
-      ),
-    };
-  }
-
-  const tokenHash = await hashSessionToken(token);
-  const session = await getSessionByTokenHash(db, tokenHash);
-  if (!session) {
-    return {
-      ok: false,
-      response: errorResponse("UNAUTHORIZED", "Invalid or expired session.", 401),
-    };
-  }
-
-  const expiresMs = Date.parse(session.expires_at);
-  if (!Number.isFinite(expiresMs) || expiresMs <= Date.now()) {
-    return {
-      ok: false,
-      response: errorResponse("UNAUTHORIZED", "Session expired.", 401),
-    };
-  }
-
-  const headerDevice = request.headers.get("X-HC-Device-Id")?.trim() ?? "";
-  const deviceId = session.device_id ?? headerDevice;
-
-  const newExpires = new Date(Date.now() + STEWARD_SESSION_TTL_MS).toISOString();
-  await touchSession(db, tokenHash, newExpires);
-
-  return {
-    ok: true,
-    account_id: session.account_id,
-    device_id: deviceId || "",
-    token_hash: tokenHash,
-  };
-}
-
 /**
  * GET /.well-known/hc/v1/steward/entitlements
  */
@@ -290,7 +250,7 @@ export async function handleGetStewardEntitlements(
   const gate = await requireStewardReady(env, db);
   if (gate) return gate;
 
-  const auth = await authenticateSession(db, request);
+  const auth = await authenticateStewardSession(db, request);
   if (!auth.ok) return auth.response;
 
   const transitioned = await applyStewardLifecycleTransitions(
@@ -322,7 +282,26 @@ export async function handleGetStewardEntitlements(
       ? entitlements["poll.live_proof.auto_daily_cap"]
       : 400;
 
-  const body = {
+  const seasonIdQuery = parseGameSeasonIdQuery(new URL(request.url));
+  if (
+    seasonIdQuery &&
+    !(await accountMayAccessGameSeason(db, auth.account_id, seasonIdQuery))
+  ) {
+    return errorResponse(
+      "FORBIDDEN",
+      "season_id is not linked to this steward account.",
+      403
+    );
+  }
+
+  const gameSeason = await resolveGameSeasonEntitlementsAttachment(
+    db,
+    auth.account_id,
+    entitlements,
+    seasonIdQuery
+  );
+
+  const body: Record<string, unknown> = {
     version: "1.0",
     operator: { id: OPERATOR_ID },
     account_id: account.account_id,
@@ -343,6 +322,10 @@ export async function handleGetStewardEntitlements(
       },
     },
   };
+
+  if (gameSeason) {
+    body.game_season = gameSeason;
+  }
 
   return jsonResponseWithWeakEtag(request, body, 200, {
     "Cache-Control": "private, max-age=300",
@@ -373,7 +356,7 @@ export async function handleGetStewardPush(
     );
   }
 
-  const auth = await authenticateSession(db, request);
+  const auth = await authenticateStewardSession(db, request);
   if (!auth.ok) return auth.response;
 
   const resolved = await resolveEffectiveEntitlements(db, auth.account_id);

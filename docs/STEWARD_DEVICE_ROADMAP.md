@@ -149,7 +149,7 @@ Product boundaries and build order — **do not re-spec here**.
 | Step | Deliverable | Doc |
 |------|-------------|-----|
 | M1 | Product + boundaries (free vs paid) | [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md) |
-| M2 | Entitlements & metering | [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md) |
+| M2 | Entitlements & metering | [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md) — **partially shipped** (session, entitlements, push, `hosted_game_season_v1` enforce); § Implementation status · checkout WS-REV |
 | M3 | Push architecture | [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) |
 | M4 | Pricing & SLA | [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md) |
 | M5 | Public copy / skeptic FAQ | [`SKEPTIC_FAQ.md`](SKEPTIC_FAQ.md) · [`LAUNCH_LANGUAGE_KIT.md`](LAUNCH_LANGUAGE_KIT.md) |

@@ -20,8 +20,9 @@ export function parseBearerToken(request: Request): string | null {
   const header = request.headers.get("Authorization");
   if (!header) return null;
   const m = /^Bearer\s+(.+)$/i.exec(header.trim());
-  if (!m?.[1]) return null;
-  return m[1].trim();
+  const token = m?.[1]?.trim();
+  if (!token) return null;
+  return token;
 }
 
 function base64UrlEncode(bytes: Uint8Array): string {

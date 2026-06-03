@@ -2,8 +2,10 @@
  * Browser steward entitlements probe + resolved policy cache (hosted tier E2).
  * @see docs/HOSTED_TIER_IMPLEMENTATION_EPICS.md § E2
  */
+import { CITY_GAME_SEASONS_INDEX_URL } from "./city-game-season-resolve.mjs";
 import { resolverApiOrigin } from "./hc-sign.mjs";
 import { getTabSession } from "./device-keys.mjs";
+import { seasonIdForStewardEntitlementsQuery } from "./steward-entitlements-season-id-core.mjs";
 import { isDeviceHubExpanded } from "./device-live-control-poll-scheduler.mjs";
 import {
   REFERENCE_FREE_POLICY,
@@ -14,8 +16,10 @@ import {
   parseStewardEntitlementsCache,
   policyFromEntitlementsResponse,
   shouldRefreshStewardEntitlementsCache,
+  stewardAutoPollUsageFromBody,
   stewardEntitlementsRequestHeaders,
   stewardPushSubscribeAllowed,
+  stewardUsageAtLimit,
 } from "./device-steward-entitlements-core.mjs";
 import {
   STEWARD_PENDING_ACCOUNT_STORAGE_KEY,
@@ -28,7 +32,9 @@ import {
 export {
   REFERENCE_FREE_POLICY,
   hostedTierHubIndicatorLine,
+  stewardAutoPollUsageFromBody,
   stewardPushSubscribeAllowed,
+  stewardUsageAtLimit,
 } from "./device-steward-entitlements-core.mjs";
 export {
   STEWARD_MANUAL_POLL_HEADER,
@@ -42,11 +48,49 @@ let activePolicy = { ...REFERENCE_FREE_POLICY };
 
 let hubHookBound = false;
 
+/** @type {{ seasons: Array<Record<string, unknown>> } | null} */
+let cachedSeasonsIndex = null;
+let seasonsIndexPromise = null;
+
+async function loadSeasonsIndexForEntitlements() {
+  if (cachedSeasonsIndex) return cachedSeasonsIndex;
+  if (!seasonsIndexPromise) {
+    seasonsIndexPromise = fetch(CITY_GAME_SEASONS_INDEX_URL, { cache: "no-store" })
+      .then(async (res) => {
+        if (!res.ok) return { seasons: [] };
+        const body = await res.json();
+        if (!body || typeof body !== "object") return { seasons: [] };
+        const seasons = Array.isArray(body.seasons) ? body.seasons : [];
+        cachedSeasonsIndex = { seasons };
+        return cachedSeasonsIndex;
+      })
+      .catch(() => ({ seasons: [] }));
+  }
+  return seasonsIndexPromise;
+}
+
+/**
+ * @param {string | null | undefined} profileId
+ */
+async function stewardEntitlementsSeasonIdQuery(profileId) {
+  const index = await loadSeasonsIndexForEntitlements();
+  const seasonId = seasonIdForStewardEntitlementsQuery(index, profileId);
+  return seasonId ? `season_id=${encodeURIComponent(seasonId)}` : "";
+}
+
 /**
  * @returns {import("./device-steward-entitlements-core.mjs").StewardEntitlementsPolicy}
  */
 export function getStewardEntitlementsPolicy() {
   return activePolicy;
+}
+
+/**
+ * Last cached GET /steward/entitlements JSON (usage + game_season).
+ * @returns {Record<string, unknown> | null}
+ */
+export function getStewardEntitlementsResponseBody() {
+  return readEntitlementsCache()?.body ?? null;
 }
 
 /**
@@ -207,7 +251,11 @@ export async function refreshStewardEntitlements(opts = {}) {
     return policy;
   }
 
-  const url = `${resolverApiOrigin()}/.well-known/hc/v1/steward/entitlements`;
+  const profileId = getTabSession()?.profile_id;
+  const seasonQuery = await stewardEntitlementsSeasonIdQuery(profileId);
+  const url = `${resolverApiOrigin()}/.well-known/hc/v1/steward/entitlements${
+    seasonQuery ? `?${seasonQuery}` : ""
+  }`;
   const headers = {
     Accept: "application/json",
     Authorization: `Bearer ${token}`,

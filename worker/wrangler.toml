@@ -25,8 +25,13 @@ port = 8787
 [vars]
 # G0 signed (2026-05-27): production rollout step 4a — hosted routes on after deploy.
 HOSTED_STEWARD_ENABLED = "1"
+# WS-REV R1 Stripe Checkout (wrangler secret — do not commit):
+# STRIPE_SECRET_KEY = "sk_test_…"
+# STRIPE_WEBHOOK_SECRET = "whsec_…"
+# STRIPE_PRICE_HOSTED_STEWARD_V1 = "price_…"
+# STRIPE_PRICE_HOSTED_GAME_SEASON_V1 = "price_…"
 # Cedar Rapids city game (Phase A): resolver routes off until season launch.
-CITY_GAME_ENABLED = "0"
+CITY_GAME_ENABLED = "1"
 # Tier 0 batch fulfillment (O-002): set when Shopify founding sticker SKU is live.
 # TIER0_CAMPAIGN_PROFILE_ID = ""
 # TIER0_SHOPIFY_VARIANT_IDS = ""

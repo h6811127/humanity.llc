@@ -353,6 +353,25 @@ Condensed index — full rows above. **Living street** guestbook + landmark iden
 | Revoke compromised marker | CR-C03, PWM-ST06, PWM-W04 |
 | Live map / ticker | CR-M01–07 (S3 editorial) |
 | Privacy platform | CR-P01–02, PWM-P01–06 |
+| **City state board (read-only)** | **PWM-MS01–12**, **CR-M01–07**, **PWM-P02–06** — [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) |
+
+---
+
+## Map dashboard (read-only city state board)
+
+Players need orientation across 15–50 nodes without a personal scoreboard. The shipped surface is a **weekend board** on `/play/cedar-rapids/` — schematic districts, unlock graph, and (when live) the same **public object chips** as scan pages.
+
+**Canonical plan:** [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md)
+
+| Phase | Rollout | Engineering |
+|-------|---------|-------------|
+| **M1** | S1 optional | ☑ Static board — `/play/cedar-rapids/#city-state` · season `map_layout` · `city-game-map-board.mjs` |
+| **M2** | S2 | ☑ `GET …/seasons/{season_id}/snapshot` + live chips · `map-node-snapshot.ts` |
+| **M3** | S3 | ☑ Headline ticker from `bulletin_schedule` + unlock-state headlines (**CR-M01–07**) |
+
+**Policy:** No GPS, visit logs, player IDs, or device-local scarcity on the server board. Internal [`CITY_GAME_NODE_INSTALL_MAP.md`](CITY_GAME_NODE_INSTALL_MAP.md) stays operator-only.
+
+**Launch:** Map is **not** a Phase D blocker unless marketing promises a live board — then **B13–B15** in the map doc apply before `launch-surfaces` copy.
 
 ---
 
@@ -406,6 +425,7 @@ Before launch, each must pass with 5 un coached testers (extend [`FOUNDING_COPY_
 - [ ] **GT-4 Dilemma:** Testers understand private vs shared ending tradeoff on cabinet scan without account signup.
 - [ ] **GT-5 Care wins:** When care stream says paused, testers do not treat game bulletins as safety truth.
 - [ ] **GT-6 No score anxiety:** Testers cannot name a personal rank, streak, or scan count displayed anywhere.
+- [ ] **GT-7 City board (when shipped):** Testers describe the map dashboard as **world state**, not personal visits or GPS — [`CITY_GAME_COMPREHENSION_RUNBOOK.md`](CITY_GAME_COMPREHENSION_RUNBOOK.md) · **B13**
 
 ### Engineering implications (game theory → code)
 
@@ -476,7 +496,8 @@ The Cedar Rapids demo assumes “20 anonymous scans unlock clue.” Options that
 | **`game_node` object type** | Validation, hub row meta, scan template branch |
 | **`game_meta` on child document** | Season rules state (see schema above) |
 | **`POST …/game-update`** | Game-operator signed update (extends issuer key) |
-| **Season config** | `site/data/city-game-cr-season-01.json` (or D1 `seasons` table) — node list, unlock graph, dates, rules URL |
+| **Season config** | `site/data/city-game-cr-season-01.json` (or D1 `seasons` table) — node list, unlock graph, dates, rules URL, `map_layout` |
+| **Season snapshot API** | `GET …/seasons/{season_id}/snapshot` — read-only world board JSON (**M2**) — [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) |
 | **Scan template `game_node`** | Multi-stream layout matching CR demo scan views |
 | **Operator UI** | `/game-operator/` — flip state, compromise, scarcity, unlock finale |
 | **Public rules page** | `/play/cedar-rapids/` at launch — not before |
@@ -503,9 +524,9 @@ The Cedar Rapids demo assumes “20 anonymous scans unlock clue.” Options that
 | **Human trust vs game trust** | **Partial** | Two models coexist on scan (see **R-01** below) |
 | **Delegated stewards** | **Gap** | Step 17 deferred — blocks business-owned node updates without operator/root key (**R-02**) |
 | **Player-signed play actions** | **Gap** | Faction capture, spy compromise, dilemma branches need new signing surface (**R-08**) |
-| **City-wide live ticker** | **Gap** | No bulletin-feed store in resolver yet (**R-09**) |
+| **City-wide live board + ticker** | **Shipped (engineering)** | Snapshot API + rules-page board — human **B13–B14** before marketing “live city board” · [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) |
 | **Guestbook / resident lore** | **Gap** | No moderated append API on `game_node` (**R-10**) |
-| **Multi-season / multi-city** | **Gap** | `CR_SEASON_01` hardcoded in worker — second season needs config refactor (**R-11**) |
+| **Multi-season / multi-city** | **Partial (engineering)** | **R-11 shipped:** `season-loader.ts` registry — resolve by `season_id` / `season_root_profile_id`; worker paths take `CrSeasonConfig` · second city still needs JSON + mint, not a refactor |
 
 **Feasibility summary:** **S1 (15 nodes)** — spine + operator + narrow **L** path is feasible on current architecture (proven by `verify:city-game`). **S3 (50 nodes)** — feasible as **more places + streams + operator narrative**; **not** feasible as “every traceability **L** row automated” without items in **Build process** below.
 
@@ -529,11 +550,13 @@ These are **not** missing from the feature traceability table — they are **arc
 | **R-04** | **Sybil fairness ceiling** — device-local scarcity (`localStorage`); site codes leak via photos; IP limits ≠ identity | Scarcity and quorum can be gamed; still policy-acceptable if documented | Do not claim “one-time signed tokens” on prod until shipped (**R-05**); rotate codes between seasons |
 | **R-05** | **Page vs shipped sybil path** — feature pages list tokens + business vouches; **L** today = site codes + IP cap + device ceiling | Over-promise on marketing surfaces until S3 spike | Launch surfaces `--check` copy audit; traceability CR-G06 delivery column |
 | **R-06** | **Contribute requires JS** — play loop is `scan-game-contribute.mjs`; read-only scan works without JS | “Scan-only” players cannot advance quorum | Rules page: “bring the site code”; optional SMS/print fallback is out of scope S1 |
-| **R-07** | **Hot-node write contention** — many concurrent `game-contribute` on one `child_object` row (finale/quorum rush) | D1 write failures or lost increments | Load-test one object ~20 concurrent POSTs before launch; retry on conflict if needed |
+| **R-07** | **Hot-node write contention** — many concurrent `game-contribute` on one `child_object` row (finale/quorum rush) | D1 write failures or lost increments | **Shipped:** optimistic `updated_at` CAS + retry (`quorum-contribute.ts`); B5 load test asserts final progress |
 | **R-08** | **Player-initiated mechanics** — faction PvP, spy compromise, dilemma branches (**CR-G04**, CR-C01 player path) | **L** requires new signed action types + anti-grief + standards update | S1/S2: **O** only; S3: protocol RFC before code — do not imply player-signed in rules until shipped |
-| **R-09** | **Live map / ticker** (CR-M01–07) | No resolver feed; static HTML examples only | S3: season bulletin table or rules-page ticker; not scan logging |
+| **R-09** | **Live map / ticker** (CR-M01–07) | ~~No resolver feed~~ | Snapshot + ticker on rules board — still not scan logging · **B13** before marketing |
+| **R-19** | **Snapshot poll load** at 50 nodes | D1 read amplification if every phone polls snapshot | **Shipped:** Worker cache 20s + ETag (**B14** monitor at S3) |
+| **R-20** | **M1 board looks live** before M2 API | Players assume stale static chips are world truth | “Scan for live state” until snapshot ships; **B2** launch-surfaces honesty |
 | **R-10** | **Guestbook / resident lore** (CR-X01, CR-SV10) | Moderation + privacy story undefined | S3 pipeline or stay **C**; never append without governance |
-| **R-11** | **Hardcoded `CR_SEASON_01`** in worker | Second city/season is a refactor, not config toggle | Extract season loader before non–Cedar Rapids pilot |
+| **R-11** | **Hardcoded `CR_SEASON_01`** in worker | Second city/season is a refactor, not config toggle | **Shipped:** `worker/src/city-game/season-loader.ts` + `resolveSeasonForProfile` / `resolveSeasonById` · `city-game-season-loader.test.ts` (≥2 seasons via `registerSeasonConfig`) |
 | **R-12** | **Dual deploy** — Pages `launch-surfaces` + Worker `CITY_GAME_ENABLED` | Public HTML says “live” while scans show research template | Launch checklist E4 + P3/P4 same change window; `launch-surfaces --expect-applied` |
 | **R-13** | **Public copy lag** — feature pages still say “demo / not resolver yet” | Stranger distrust | `--apply` on launch day + banner removal in same deploy train |
 | **R-14** | **Care loop incomplete** — pause works; **report → maintainer → auto-unlock route** (PWM-M04–06) is operator-only | Game copy may promise repair unlock automation falsely | Operator runbook beats; steward-signed care via `game-update` only |
@@ -560,8 +583,11 @@ Use this checklist in **Phase C/D PRs** and release review. Link risk **R-*** wh
 | B10 | Post-season: season root **active/paused** vs orphan purge documented | Before S3 | **R-15** |
 | B11 | Second season spike OR explicit “Cedar Rapids only” in roadmap | Before non-CR marketing | **R-11** |
 | B12 | Phase E self-serve setup on `/created/` — no terminal for new organizers | Before “create your own game” marketing | Phase E **E3** |
+| B13 | Map dashboard privacy review (snapshot JSON + GT-7) | Before marketing “live city board” | [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) · **R-09** |
+| B14 | Snapshot API in `verify:city-game`; scan analytics still off | M2 deploy | **R-19**, **P5** — `city-game-scan-analytics-gate.test.ts` |
+| B15 | Headline ticker copy — no visit/player language | M3 deploy | **CR-M01–07** |
 
-**Widen rollout rule:** Do not add nodes to S2/S3 until **B7** passes at the **previous** footprint. Adding nodes does not close **R-08**, **R-09**, or **R-10** without dedicated engineering.
+**Widen rollout rule:** Do not add nodes to S2/S3 until **B7** passes at the **previous** footprint. Adding nodes does not close **R-08**, **R-09**, **R-10**, or map phases **M2–M3** without dedicated engineering.
 
 ---
 
@@ -586,7 +612,7 @@ Run **in parallel** with hoodie launch prep. Do not block merch on game work.
 
 ### Phase C — Season pack (week 3–4, post-hoodie)
 
-**Phase C status (2026-06-02):** Engineering preflight **pass** (`npm run verify:city-game`, 122 tests). Local proof gate **pass** (`npm run city-game:proof-local`, full spine). Human gates **open** — physical install QA, GT comprehension (≥5 testers), operator custody sign-off, install map, weekend roster.
+**Phase C status (2026-06-02):** Engineering preflight **pass** (`npm run verify:city-game`). Local proof gate **pass** (`npm run city-game:proof-local`, full spine). Human gates **open** — physical install QA, GT comprehension (≥5 testers), operator custody sign-off, install map, weekend roster.
 
 | Gate | Owner | Status |
 |------|-------|--------|
@@ -606,10 +632,12 @@ Run **in parallel** with hoodie launch prep. Do not block merch on game work.
 
 ### Phase D — Launch (~month after hoodie)
 
-**Phase D status (2026-06-02):** Public-surface tooling **ready** (`city-game:launch-surfaces`, `city-game:post-season`). **Do not `--apply`** until launch checklist human gates pass. Pre-launch `--check` confirms draft/noindex on rules + research pages.
+**Phase D status (2026-06-02):** Public-surface tooling **ready** (`city-game:launch-surfaces`, `city-game:post-season`). Human-gate prep: **`city-game:comprehension-kit`** (tester URLs + scorecard), **`city-game:launch-preflight`** (single status report). **Do not `--apply`** until launch checklist human gates pass. Pre-launch `--check` confirms draft/noindex on rules + research pages.
 
 | Step | Owner | Status | Command / doc |
 |------|-------|--------|---------------|
+| P1 GT comprehension | Product + QA | ☐ | `npm run city-game:comprehension-kit` · [`CITY_GAME_COMPREHENSION_RUNBOOK.md`](CITY_GAME_COMPREHENSION_RUNBOOK.md) |
+| Phase D preflight | Engineering | ☑ tooling | `npm run city-game:launch-preflight` |
 | P3 + P4 public HTML surfaces | Engineering | ☐ Blocked on season root + dates + human gates | `npm run city-game:launch-surfaces -- --apply` · [`CITY_GAME_LAUNCH_CHECKLIST.md`](CITY_GAME_LAUNCH_CHECKLIST.md) |
 | E4 resolver flag + deploy | Engineering | ☐ | `CITY_GAME_ENABLED=1` in `wrangler.toml` |
 | Post-season close | Operator | ☐ | `npm run city-game:post-season -- --write` |
@@ -654,11 +682,11 @@ Run **in parallel** with hoodie launch prep. Do not block merch on game work.
 
 Build on shipped child-object primitives — do not fork a parallel mint path.
 
-1. **Season loader refactor** — resolve **R-11**: extract hardcoded `CR_SEASON_01` worker paths to season config keyed by `season_root_profile_id` (required before a second city).
-2. **`game_node` register UI on `/created/`** — same signing flow as status plate; validate `game_meta` + role taxonomy server-side.
-3. **Bulk add from template** — optional import of a starter registry (15-node default, editable labels) without terminal JSON editing.
-4. **Rules + launch surfaces** — organizer-triggered publish (replaces operator-only `city-game:launch-surfaces --apply` for self-serve seasons).
-5. **Comprehension + custody copy** — extend setup wizard on season root: game-operator key custody, backup gate before N nodes, link to [`CITY_GAME_OPERATOR_RUNBOOK.md`](CITY_GAME_OPERATOR_RUNBOOK.md) patterns in plain language.
+1. ~~**Season loader refactor** — resolve **R-11**~~ **Done (2026-06-02):** `season-loader.ts`; scan/contribute/snapshot/unlock paths keyed by season config + `season_root_profile_id`.
+2. ~~**`game_node` register UI on `/created/`**~~ **Done:** register + QR issue; hub nested rows.
+3. ~~**Bulk add from template**~~ **Done:** starter registry import in Live panel.
+4. ~~**Rules + launch surfaces**~~ **Done (browser v1):** draft/publish panel on `/created/` — preview, download launch HTML, deploy checklist; Cedar Rapids pilot still uses `city-game:launch-surfaces`.
+5. ~~**Comprehension + custody copy**~~ **Done:** setup checklist on `/created/` Live (custody ack, GT scorecard, runbook cards, comprehension brief); game-season backup gate copy; setup wizard notice for season roots.
 6. **E2E + regression** — `e2e/city-game-self-serve-setup.spec.ts` (name TBD); keep `verify:city-game` green.
 
 #### Phase E gates (before marketing “create your own game”)
@@ -666,19 +694,19 @@ Build on shipped child-object primitives — do not fork a parallel mint path.
 | # | Gate | Blocks |
 |---|------|--------|
 | E1 | Cedar Rapids S1 launch gates **signed** (Phase D) | Pilot not proven |
-| E2 | **R-11** season loader supports ≥2 seasons by config | Second city is a refactor |
+| E2 | **R-11** season loader supports ≥2 seasons by config | **Engineering met** — `registerSeasonConfig` + loader tests; organizer self-serve still **E3** |
 | E3 | Organizer completes full 15-node season in browser on staging — **no terminal** | Self-serve claim |
 | E4 | GT comprehension + privacy review on **self-serve rules** template | Over-promising mechanics |
 | E5 | `SYSTEM_INVARIANTS` § city game updated for self-serve paths | **R-16** |
 
 #### Phase E checklist (engineering)
 
-- [ ] `/created/` **Add game node** — register + first QR in one action (parity with status plate)
-- [ ] Hub nested rows for `game_node` under season root
-- [ ] Season metadata editor (dates, `unlock_edges`, districts)
-- [ ] Browser rules page draft + publish
+- [x] `/created/` **Add game node** — register + first QR in one action (parity with status plate)
+- [x] Hub nested rows for `game_node` under season root
+- [ ] Season metadata editor (dates, `unlock_edges`, districts) — window/status in rules panel; full JSON editor still open
+- [x] Browser rules page draft + publish
 - [ ] Deprecate terminal mint for **new** self-serve seasons (keep scripts for CI/fixtures)
-- [ ] Document organizer path in [`CITY_GAME_OPERATOR_CUSTODY.md`](CITY_GAME_OPERATOR_CUSTODY.md) § Self-serve setup
+- [ ] Document organizer path in [`CITY_GAME_OPERATOR_CUSTODY.md`](CITY_GAME_OPERATOR_CUSTODY.md) § Self-serve setup — custody + comprehension UI on `/created/` Live
 
 ---
 
@@ -723,7 +751,7 @@ Build on shipped child-object primitives — do not fork a parallel mint path.
 | When | URL / surface | Content |
 |------|---------------|---------|
 | **Now → hoodie launch** | Existing research pages | “In development” hints on PWM, Cedar Rapids demo, living street, and `what-can-a-qr-do.html` — honest teaser, not live gameplay |
-| **Game launch** | `/play/cedar-rapids/` | Rules, dates, privacy, what scans prove |
+| **Game launch** | `/play/cedar-rapids/` | Rules, dates, privacy, what scans prove; **M1+** city state board — [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) |
 | **Game launch** | Live scan pages on `/c/…` | Real resolver-backed game template |
 | **Game launch** | Research pages | Update banners → link to live season — `npm run city-game:launch-surfaces -- --apply` |
 | **Never public** | Full operator node spreadsheet, keys, manual flip procedures | Internal / operator doc only |
@@ -776,8 +804,10 @@ From [`PHYSICAL_WORLD_MULTIPLAYER_RESEARCH_SPEC.md`](PHYSICAL_WORLD_MULTIPLAYER_
 | Q6 | Business vouch: manual enrollment for Czech Village café? | Ops | Phase C |
 | Q7 | Self-serve season config: JSON on season root card vs separate signed season document? | Protocol | Phase E start |
 | Q8 | Minimum node count for self-serve launch (15 template vs bring-your-own count)? | Product | Phase E |
-| Q9 | Hosted tier: game seasons on reference operator only vs federated operators? | Product + governance | Phase E |
+| Q9 | Game season capacity: `hosted_game_season_v1` on reference operator; federation later | **Metering + UI shipped** — enforce, `game_season` on entitlements, `/created/` Operator plan panel, checkout POST · **Open:** Stripe Dashboard prices + prod paid smoke | Phase E organizer UX consumes same API |
 | Q10 | Rules page URL: `/play/{slug}/` on Pages vs operator-hosted static? | Engineering | Phase E |
+| Q11 | Promote live city board at S1 launch or wait for M2 snapshot? | Product | Launch −1 week |
+| Q12 | Snapshot cache TTL vs freshness for weekend peak? | Engineering | M2 build |
 
 ---
 
@@ -794,6 +824,7 @@ From [`PHYSICAL_WORLD_MULTIPLAYER_RESEARCH_SPEC.md`](PHYSICAL_WORLD_MULTIPLAYER_
 | [`PRODUCT_WORKSTREAM_COORDINATION.md`](PRODUCT_WORKSTREAM_COORDINATION.md) | Active work registry |
 | [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) | Child-object UI pattern Phase E extends |
 | [`DELEGATED_CHILD_CAPABILITIES_GATE.md`](DELEGATED_CHILD_CAPABILITIES_GATE.md) | Blocks steward-self-serve business vouch (**R-02**) |
+| [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) | Read-only city state board — M1/M2/M3 plan, snapshot API, policy boundaries |
 
 ---
 
@@ -801,9 +832,13 @@ From [`PHYSICAL_WORLD_MULTIPLAYER_RESEARCH_SPEC.md`](PHYSICAL_WORLD_MULTIPLAYER_
 
 | Date | Event |
 |------|-------|
+| 2026-06-02 | **Map dashboard plan** — [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md); risks **R-19–R-20**, gates **B13–B15**; open questions Q11–Q12 |
 | 2026-06-02 | **Phase E — self-serve game network setup** — post-pilot `/created/` season cockpit spec; terminal mint marked pilot-only; gates E1–E5 |
 | 2026-06-02 | **Architecture risks + build process** — alignment table, R-01–R-18, B1–B11 gates; policy collective path corrected to site-code contribute |
 | 2026-06-02 | **Feature page traceability** — complete CR-* / PWM-* catalog; rollout S1(15) → S2(25) → S3(50) node budget |
+| 2026-06-02 | **S2 automation — route windows** — `route_window_schedule` sunset + midnight local-hour gates (PWM-S02/S03, CR-X03 partial) |
+| 2026-06-02 | **S2 automation — bulletin schedule** — `bulletin_schedule` in season JSON · relay scan rotation (CR-E02 / CR-R01) |
+| 2026-06-02 | **Anti-hoarding auto-evolve (CR-G02)** — quorum triggers evolved River Lantern + cabinet copy |
 | 2026-06-02 | **Phase D prep** — `city-game:launch-surfaces` + `city-game:post-season`; launch checklist P3/P4 runbook · apply blocked until gates |
 | 2026-06-02 | **Phase C engineering preflight** — `verify:city-game` pass (109 tests); install/comprehension/custody runbooks updated with human vs engineering gates |
 | 2026-06-01 | Initial v1 implementation brief — combines PWM + Cedar Rapids + living street infrastructure |

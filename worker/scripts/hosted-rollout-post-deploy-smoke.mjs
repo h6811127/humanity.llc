@@ -16,6 +16,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { readWranglerHostedFlag } from "./hosted-rollout-step4a.mjs";
+import { smokeRevHostedApi } from "./hosted-rev-prod-smoke.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
@@ -66,7 +67,7 @@ export function runPostDeploySmoke(opts = {}) {
   }
 }
 
-function main() {
+async function main() {
   const verify = process.argv.includes("--verify");
   console.log(
     verify
@@ -75,6 +76,12 @@ function main() {
   );
   console.log("Docs: docs/HOSTED_TIER_IMPLEMENTATION_EPICS.md § step 4b\n");
   runPostDeploySmoke({ verify });
+
+  const origin = (process.env.API_ORIGIN || apiOrigin).replace(/\/$/, "");
+  if (verify && postDeploySmokeTarget() === "step4") {
+    console.log("\n▶ WS-REV R5 API smoke (billing_checkout + revenue plans)");
+    await smokeRevHostedApi(origin);
+  }
 }
 
 const isCli =
@@ -82,5 +89,8 @@ const isCli =
   path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url));
 
 if (isCli) {
-  main();
+  main().catch((err) => {
+    console.error(err instanceof Error ? err.message : err);
+    process.exit(1);
+  });
 }

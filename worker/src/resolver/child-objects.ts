@@ -16,6 +16,8 @@ import { listActiveChildObjectQrsForParent } from "../db/child-object-qr";
 import type { ChildObjectStatus } from "../db/types";
 import { errorResponse, jsonResponse } from "../http/resolver";
 import { GAME_NODE_OBJECT_TYPE } from "../city-game/constants";
+import { resolveSeasonForProfile } from "../city-game/season-loader";
+import { enforceGameNodeCap } from "../city-game/season-quota";
 import { parseGameNodeFields } from "../city-game/scan-view";
 import { validateGameNodeDocument } from "../city-game/game-meta";
 
@@ -198,8 +200,13 @@ async function verifiedChildObjectDoc(
   }
 
   if (objectType === GAME_NODE_OBJECT_TYPE) {
+    const seasonForDistricts = resolveSeasonForProfile(pathProfileId);
     try {
-      validateGameNodeDocument(doc);
+      validateGameNodeDocument(doc, {
+        allowedDistricts: seasonForDistricts?.districts?.length
+          ? seasonForDistricts.districts
+          : undefined,
+      });
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Invalid game_node document.";
       return {
@@ -261,6 +268,19 @@ export async function handlePostChildObjectCreate(
   if (existing) {
     return errorResponse("OBJECT_EXISTS", "Child object already exists.", 409);
   }
+
+  if (parsed.objectType === GAME_NODE_OBJECT_TYPE) {
+    const season = resolveSeasonForProfile(pathProfileId);
+    if (season) {
+      const siblings = await listChildObjectsForParent(db, pathProfileId);
+      const activeGameNodes = siblings.filter(
+        (row) => row.object_type === GAME_NODE_OBJECT_TYPE && row.status === "active"
+      ).length;
+      const nodeCapResponse = await enforceGameNodeCap(db, season, activeGameNodes);
+      if (nodeCapResponse) return nodeCapResponse;
+    }
+  }
+
   try {
     await insertChildObject(db, {
       objectId: parsed.objectId,

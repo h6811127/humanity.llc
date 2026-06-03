@@ -119,3 +119,32 @@ export async function updateChildObject(
   }
 }
 
+/** Optimistic write — returns false when `expectedUpdatedAt` no longer matches (R-07 hot-node contention). */
+export async function updateChildObjectIfUnchanged(
+  db: D1Database,
+  input: ChildObjectWrite,
+  expectedUpdatedAt: string
+): Promise<boolean> {
+  const result = await db
+    .prepare(
+      `UPDATE child_objects
+       SET object_type = ?, public_label = ?, public_state = ?, status = ?,
+           child_object_document_json = ?, updated_at = ?
+       WHERE object_id = ? AND parent_profile_id = ? AND updated_at = ?`
+    )
+    .bind(
+      input.objectType,
+      input.publicLabel,
+      input.publicState,
+      input.status,
+      input.documentJson,
+      input.updatedAt,
+      input.objectId,
+      input.parentProfileId,
+      expectedUpdatedAt
+    )
+    .run();
+
+  return Boolean(result.success && (result.meta.changes ?? 0) > 0);
+}
+

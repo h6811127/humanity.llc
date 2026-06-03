@@ -34,9 +34,18 @@ describe("buildHostedStewardCheckoutReturnUrl", () => {
 });
 
 describe("stripeHostedStewardMetadata", () => {
-  it("returns subscription metadata.account_id", () => {
+  it("returns subscription metadata.account_id and plan_id", () => {
     expect(stripeHostedStewardMetadata("acc_TestHostedSteward1")).toEqual({
-      subscription_metadata: { account_id: "acc_TestHostedSteward1" },
+      subscription_metadata: {
+        account_id: "acc_TestHostedSteward1",
+        plan_id: "hosted_steward_v1",
+        plan_version: "1",
+      },
+      session_metadata: {
+        account_id: "acc_TestHostedSteward1",
+        plan_id: "hosted_steward_v1",
+        plan_version: "1",
+      },
       success_url_hint:
         'Use buildHostedStewardCheckoutReturnUrl(origin, "acc_TestHostedSteward1")',
     });

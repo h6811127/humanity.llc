@@ -6,6 +6,11 @@ import {
 } from "../crypto";
 import { GAME_NODE_OBJECT_TYPE, isCityGameEnabled } from "../city-game/constants";
 import { validateGameNodeDocument } from "../city-game/game-meta";
+import { resolveSeasonForProfile } from "../city-game/season-loader";
+import {
+  enforceGameUpdateSeasonQuota,
+  recordGameUpdateSeasonUsage,
+} from "../city-game/season-quota";
 import { applyUnlockSideEffects, seasonNodeIdFromObjectId } from "../city-game/unlock-evaluator";
 import { getChildObject, updateChildObject } from "../db/child-objects";
 import { errorResponse, jsonResponse } from "../http/resolver";
@@ -178,6 +183,14 @@ export async function handlePostGameUpdate(
       ? doc.public_state.trim().slice(0, 280)
       : existing.public_state;
 
+  const season = resolveSeasonForProfile(pathProfileId);
+  if (!season) {
+    return errorResponse("NOT_FOUND", "City game season not found for this profile.", 404);
+  }
+
+  const updateQuota = await enforceGameUpdateSeasonQuota(db, season);
+  if (updateQuota) return updateQuota;
+
   try {
     await updateChildObject(db, {
       objectId: pathObjectId,
@@ -195,10 +208,12 @@ export async function handlePostGameUpdate(
     return errorResponse("RESOLVER_ERROR", msg, 500);
   }
 
-  const nodeId = seasonNodeIdFromObjectId(pathObjectId);
+  await recordGameUpdateSeasonUsage(db, season.season_id);
+
+  const nodeId = seasonNodeIdFromObjectId(pathObjectId, season);
   const unlockEffects =
     nodeId != null
-      ? await applyUnlockSideEffects(db, nodeId, doc, new Date(updatedAt))
+      ? await applyUnlockSideEffects(db, nodeId, doc, new Date(updatedAt), season)
       : { unlockedNodes: [] as string[] };
 
   return jsonResponse(

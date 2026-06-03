@@ -1,9 +1,10 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { handlePostGameContribute } from "../src/resolver/game-contribute";
 import * as seasonWindow from "../src/city-game/season-window";
+import { CITY_GAME_SEASON_ROOT_PROFILE } from "./city-game-fixture-profile";
 
-const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
+const PROFILE = CITY_GAME_SEASON_ROOT_PROFILE;
 const RIVER_OBJECT = "obj_cr_node_04_river";
 const CABINET_OBJECT = "obj_cr_node_07_cabinet";
 const QR = "qr_cr_node_04_river01";
@@ -163,16 +164,24 @@ class ContributeDb {
           async run() {
             if (sql.startsWith("UPDATE child_objects")) {
               const objectId = String(args[6]);
+              const parentProfileId = String(args[7]);
               const row = db.objects.get(objectId);
-              if (row) {
-                row.object_type = String(args[0]);
-                row.public_label = String(args[1]);
-                row.public_state = String(args[2]);
-                row.status = String(args[3]);
-                row.child_object_document_json = String(args[4]);
-                row.updated_at = String(args[5]);
+              if (!row || row.parent_profile_id !== parentProfileId) {
+                return { success: true, meta: { changes: 0 } };
               }
-              return { success: true, meta: { changes: row ? 1 : 0 } };
+              if (sql.includes("AND updated_at = ?")) {
+                const expectedUpdatedAt = String(args[8]);
+                if (row.updated_at !== expectedUpdatedAt) {
+                  return { success: true, meta: { changes: 0 } };
+                }
+              }
+              row.object_type = String(args[0]);
+              row.public_label = String(args[1]);
+              row.public_state = String(args[2]);
+              row.status = String(args[3]);
+              row.child_object_document_json = String(args[4]);
+              row.updated_at = String(args[5]);
+              return { success: true, meta: { changes: 1 } };
             }
             if (sql.startsWith("INSERT INTO rate_limit_buckets")) {
               const key = String(args[0]);
@@ -207,6 +216,16 @@ class ContributeDb {
 }
 
 describe("game-contribute", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-06-07T18:00:00-05:00"));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
   it("returns 404 when CITY_GAME_ENABLED is off", async () => {
     const db = new ContributeDb();
     const res = await handlePostGameContribute(
@@ -555,6 +574,24 @@ describe("game-contribute", () => {
     expect(res.status).toBe(409);
     const body = (await res.json()) as { error?: string };
     expect(body.error).toBe("SEASON_CLOSED");
+    vi.restoreAllMocks();
+  });
+
+  it("allows contribute before window when CITY_GAME_LOCAL_PLAY_OPEN=1", async () => {
+    vi.spyOn(seasonWindow, "resolveSeasonWindowPhase").mockReturnValue("before");
+    const db = new ContributeDb();
+    const res = await handlePostGameContribute(
+      new Request("https://humanity.llc/.well-known/hc/v1/cards/x/objects/y/game-contribute", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "CF-Connecting-IP": "203.0.113.31" },
+        body: JSON.stringify({ qr_id: QR, site_code: "CR-LANTERN-7K" }),
+      }),
+      db as unknown as D1Database,
+      { CITY_GAME_ENABLED: "1", CITY_GAME_LOCAL_PLAY_OPEN: "1" },
+      PROFILE,
+      RIVER_OBJECT
+    );
+    expect(res.status).toBe(200);
     vi.restoreAllMocks();
   });
 });

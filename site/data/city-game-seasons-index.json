@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "generated_at": "2026-06-03T15:45:14.121Z",
+  "seasons": [
+    {
+      "season_id": "cr_season_01_wake",
+      "title": "Wake the city",
+      "city": "Cedar Rapids, Iowa",
+      "status": "active",
+      "rules_path": "/play/cedar-rapids/",
+      "slug": "cedar-rapids",
+      "season_root_profile_id": "CEenC57QN9qqnr2x5L89cbWt",
+      "json_url": "/data/city-game-cr-season-01.json",
+      "json_basename": "city-game-cr-season-01.json"
+    },
+    {
+      "season_id": "example_city_season_01",
+      "title": "Wake the grid",
+      "city": "Example City (template)",
+      "status": "planned",
+      "rules_path": "/play/example-city/",
+      "slug": "example-city",
+      "season_root_profile_id": null,
+      "json_url": "/data/city-game-example-season-01.json",
+      "json_basename": "city-game-example-season-01.json"
+    }
+  ]
+}

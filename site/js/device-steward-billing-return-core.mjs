@@ -35,17 +35,40 @@ export function buildHostedStewardCheckoutReturnUrl(origin, accountId, opts = {}
 }
 
 /**
- * Stripe Checkout / Billing Portal fields (ops copy-paste).
+ * Stripe Checkout subscription + session metadata (webhook grant).
  *
  * @param {string} accountId
- * @returns {{ subscription_metadata: Record<string, string>, success_url_hint: string }}
+ * @param {string} [planId]
+ * @param {number} [planVersion]
+ * @returns {Record<string, string>}
  */
-export function stripeHostedStewardMetadata(accountId) {
+export function stripeHostedCheckoutMetadata(
+  accountId,
+  planId = "hosted_steward_v1",
+  planVersion = 1
+) {
   if (!isValidStewardAccountId(accountId)) {
     throw new Error("Invalid steward account_id for Stripe metadata.");
   }
   return {
-    subscription_metadata: { account_id: accountId.trim() },
+    account_id: accountId.trim(),
+    plan_id: planId,
+    plan_version: String(planVersion),
+  };
+}
+
+/**
+ * Stripe Checkout / Billing Portal fields (ops copy-paste).
+ *
+ * @param {string} accountId
+ * @param {string} [planId]
+ * @returns {{ subscription_metadata: Record<string, string>, session_metadata: Record<string, string>, success_url_hint: string }}
+ */
+export function stripeHostedStewardMetadata(accountId, planId = "hosted_steward_v1") {
+  const meta = stripeHostedCheckoutMetadata(accountId, planId);
+  return {
+    subscription_metadata: meta,
+    session_metadata: meta,
     success_url_hint: `Use buildHostedStewardCheckoutReturnUrl(origin, "${accountId}")`,
   };
 }

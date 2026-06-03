@@ -49,6 +49,14 @@ function main() {
     "worker/tests/device-steward-session.test.ts",
     "worker/tests/export-e2e-test-keypair.test.ts",
   ]);
+  runNpm("WS-REV R1 Stripe checkout (API + core)", ["run", "worker:test:steward-checkout"]);
+  runNpm("WS-REV R2 /created/ hosted panel", ["run", "worker:test:created-hosted-entitlements"]);
+  runNpm("WS-REV R3 prod smoke helpers", [
+    "run",
+    "worker:test",
+    "--",
+    "worker/tests/hosted-rev-prod-smoke-core.test.ts",
+  ]);
   runNpm("Stripe checkout return URL (device-steward-billing-return-core)", [
     "run",
     "worker:test",

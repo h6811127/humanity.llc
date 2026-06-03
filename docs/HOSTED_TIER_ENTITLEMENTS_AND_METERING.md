@@ -1,9 +1,10 @@
 # Hosted tier — entitlements & metering (M2)
 
-**Status:** **Planning spec** — defines fields, APIs, and enforcement points; **no implementation**  
+**Status:** **Normative spec — partially implemented** on reference operator (`humanity.llc`)  
 **Milestone:** M2 of [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md)  
 **Audience:** Engineering, ops, governance (billing M4 consumes this)  
-**Parent:** [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md) · [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Phase 10 — hosted tier rows (M7)
+**Parent:** [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md) · [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Phase 10 — hosted tier rows (M7)  
+**Coordination:** [`PRODUCT_WORKSTREAM_COORDINATION.md`](PRODUCT_WORKSTREAM_COORDINATION.md) § WS-DOC / WS-REV
 
 ---
 
@@ -18,19 +19,57 @@ Goals:
 3. **Meter without surveilling** — count infrastructure events, not scans, strangers, or locations.
 4. **Federation-ready** — same schema per `operator_id`; reference operator is first consumer.
 
-**Out of scope (M2):** Stripe webhooks, push wire protocol (see M3 [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md)), UI copy (M5), prices and SLA ([`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md) M4), D1 table DDL.
+**Still open (WS-REV):** Exact Stripe USD prices, public marketing launch date, Legal G7 refund copy. **Shipped in repo:** Checkout API, `/created/` panel, `hosted:rev:prod-smoke`. **Governance:** `npm run hosted:rev:m4-sign-off -- --pass --apply`. **See § Implementation status.**
+
+---
+
+## Implementation status (reference operator)
+
+Requires `HOSTED_STEWARD_ENABLED=1` in [`worker/wrangler.toml`](../worker/wrangler.toml) and D1 migrations **`0012_steward_hosted.sql`** + **`0031_game_season_metering.sql`** (`npm run worker:migrate:local`).
+
+| Surface | Status | Code / notes |
+|---------|--------|----------------|
+| `POST …/steward/session` | **Shipped** | `worker/src/resolver/steward-hosted.ts` · `steward_account_link_v1` in `worker/src/steward/link-proof.ts` |
+| `GET …/steward/entitlements` | **Shipped** | Plan merge + poll usage; optional `game_season` block |
+| `GET …/operator/capabilities` · `…/plans` | **Shipped** | Hosted extension gate when schema ready |
+| `GET …/steward/push` (SSE) | **Shipped** | Requires `hosted_steward_v1` + `notify.push.live_proof` |
+| City game entitlement keys | **Shipped** | `worker/src/city-game/season-entitlements.ts` |
+| City game quota enforce | **Shipped** | `season-quota.ts` on contribute, uncached snapshot, game-update, node cap |
+| `game_season_usage_counters` | **Shipped** | Migration `0031` |
+| Browser steward session + entitlements fetch | **Shipped** | `device-steward-session.mjs`, `device-steward-entitlements.mjs` — adds `?season_id=` when tab `profile_id` matches `season_root_profile_id` in [`city-game-seasons-index.json`](../site/data/city-game-seasons-index.json) |
+| Browser game season policy helper | **Shipped** | `site/js/city-game-season-entitlements-core.mjs` · `/created/` Live panel `created-hosted-entitlements.mjs` (R2) |
+| Stripe → `plan_id` on account | **Partial** | Webhook + `POST …/steward/billing/checkout` (R1) · `metadata.plan_id` including `hosted_game_season_v1` |
+| `POST …/steward/usage/report` | **Not built** | Server-side metering is source of truth |
+| M5 hosted UX copy / upgrade panels | **Partial** | `/created/` **Manage** tab · collapsed **Usage & limits** disclosure + upgrade CTAs (R2/R5); hub line unchanged |
+
+**Local debug:** `npm run hosted:steward-session-local` · [`CITY_GAME_LOCAL_DEV.md`](CITY_GAME_LOCAL_DEV.md) § Three sources of truth.
+
+**Production smoke (WS-REV R3):** `npm run hosted:rev:r3` (Vitest preflight + API on `API_ORIGIN`). After Stripe test checkout: `STEWARD_SESSION_TOKEN=… EXPECT_PLAN_ID=hosted_steward_v1 npm run hosted:rev:prod-smoke -- --paid`. **Rollout (R5):** `npm run hosted:rev:rollout` · D1 `0012` + `0013` + `0031` via `npm run hosted:rollout:step1 -- --remote` · post-deploy includes revenue API when `HOSTED_STEWARD_ENABLED=1`.
+
+---
+
+## Normative verbs (API + local commands)
+
+| Verb / artifact | Operation | Rule |
+|-----------------|-----------|------|
+| **Link proof** | Sign `steward_account_link_v1` | Owner key over `{ account_id, profile_id, device_id, … }`; not checkout `acc_…` URL alone |
+| **Mint session** | `POST /.well-known/hc/v1/steward/session` | Returns opaque `token` → `Authorization: Bearer <token>` |
+| **Read entitlements** | `GET /.well-known/hc/v1/steward/entitlements` | Optional `?season_id=`; auto-`game_season` when exactly one linked season |
+| **`game_season` block** | JSON in entitlements 200 | Season limits + UTC-day counters for `game.contribute`, `game.snapshot.get`, `game.game_update` |
+| **Meter (server)** | Quota on resolver paths | Uncached snapshot builds count; **304 snapshot does not** debit `game.snapshot.get` |
+| **Align season JSON** | `npm run city-game:sync-season-root` | Disk only — **restart `worker:dev`** so bundle reloads `site/data/city-game-*.json` |
+| **Local bearer** | `npm run hosted:steward-session-local` | Dev/curl only; reads `worker/.local/city-game-seed.json` when present |
 
 ---
 
 ## Non-goals
 
-| Not in M2 | Where |
-|-----------|--------|
-| Payment provider integration | M4 / E5 |
-| WebSocket / SSE message shapes | [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) (M3) |
-| New trust labels or scan analytics | Forbidden in parent plan |
+| Not sold / not built | Where |
+|---------------------|--------|
+| Scan analytics or per-stranger billing | [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md) |
 | Entitlements that gate **card create** or **public scan** | [`SKEPTIC_FAQ.md`](SKEPTIC_FAQ.md) |
-| Per-stranger metering | Policy violation |
+| Paywall on public map/snapshot read beyond fair-use **429** | City game § City game season |
+| Client-only `usage/report` as billing truth | § `POST …/steward/usage/report` — not implemented |
 
 ---
 
@@ -72,8 +111,9 @@ Plans are **versioned documents** on the operator. Accounts reference `plan_id` 
 | `plan_id` | Audience | Status |
 |-----------|----------|--------|
 | `reference_free` | Everyone on reference operator | **Active** (implicit; matches shipped client) |
-| `hosted_steward_v1` | Paying stewards | **Planning** |
+| `hosted_steward_v1` | Paying stewards (live-proof / wallet budgets) | **Active in D1** — sale/checkout UX open (WS-REV) |
 | `hosted_org_v1` | Orgs (future) | **Reserved** |
+| `hosted_game_season_v1` | City-game organizers (season capacity) | **Active in D1** — migration `0031`; Stripe/checkout open (WS-REV) |
 
 Federated operators MAY define additional `plan_id` values; clients MUST NOT hard-code reference-only IDs without checking `operator_id`.
 
@@ -111,6 +151,22 @@ Use **`null`** in API JSON for “unlimited within fair use” per [`HOSTED_TIER
 |-----|---------|-------|
 | `org.policy.watch_recommended` | `false` | UI hint only; not force |
 | `org.policy.watch_default_on` | `false` | Requires governance + consent flow (parent Q4) |
+
+### City game season (server enforcement)
+
+Attached to the **steward account linked to `season_root_profile_id`** (same link model as hosted steward). Stranger scan/play stays free; caps bound **organizer resolver load**.
+
+| Key | Type | `reference_free` / `hosted_steward_v1` | `hosted_game_season_v1` | Notes |
+|-----|------|----------------------------------------|-------------------------|-------|
+| `game.season.enabled` | bool | `true` | `true` | `false` blocks season writes |
+| `game.season.node_cap` | int | **15** (S1 pilot) | **50** (S3 stretch) | Active `game_node` children under season root |
+| `game.contribute.daily_cap` | int | **25_000** | **250_000** | Season aggregate `POST …/game-contribute` / UTC day |
+| `game.snapshot.daily_cap` | int | **100_000** | **1_000_000** | Uncached `GET …/seasons/{id}/snapshot` builds / UTC day |
+| `game.game_update.daily_cap` | int | **500** | **5_000** | `POST …/game-update` / UTC day |
+
+**Code:** `worker/src/city-game/season-entitlements.ts` · enforcement `season-quota.ts` · counters `game_season_usage_counters` (migration `0031`).
+
+**Not sold:** scan analytics, player accounts, paywall on public map read beyond fair-use 429, or bundling game capacity into “verified human.”
 
 ---
 
@@ -165,14 +221,30 @@ sequenceDiagram
 
 ---
 
-## HTTP API (planning — not implemented)
+## HTTP API
 
 Base: `/.well-known/hc/v1/` (same origin as resolver). All JSON; CORS for browser.
+
+| Endpoint | Implementation |
+|----------|----------------|
+| `GET …/operator/capabilities` | **Shipped** |
+| `GET …/operator/plans` | **Shipped** (includes `hosted_game_season_v1` commercial metadata) |
+| `POST …/steward/session` | **Shipped** |
+| `GET …/steward/entitlements` | **Shipped** (+ `game_season` with `0031`) |
+| `GET …/steward/push` | **Shipped** (SSE) |
+| `POST …/steward/usage/report` | **Planned** (diagnostic only) |
+| `POST …/steward/billing/checkout` | **Shipped** (R1) — session auth before Stripe gate (401 without bearer); requires `STRIPE_SECRET_KEY` + price vars |
+| `POST …/billing/webhook` (Stripe) | **Shipped** — subscription + invoice events → `plan_id`; enable `STRIPE_WEBHOOK_SECRET` at rollout step3b (G8) |
+
+Gate: `HOSTED_STEWARD_ENABLED=1` and migrations `0012` + `0031` applied.
 
 ### `GET /.well-known/hc/v1/steward/entitlements`
 
 **Auth:** `Authorization: Bearer <steward_session_token>`  
-**Optional:** `X-HC-Device-Id: <device_id>` (client-generated UUID, first visit stored in `localStorage`)
+**Optional:** `X-HC-Device-Id: <device_id>` (client-generated UUID, first visit stored in `localStorage`)  
+**Optional query:** `season_id` — when set, response includes `game_season` usage for that season if the linked steward account owns the season root profile. When omitted and exactly one linked season exists, `game_season` is included automatically.
+
+**Browser:** On `/created/` and hub, `refreshStewardEntitlements()` sets `?season_id=` when the active card’s `profile_id` matches exactly one row in the public seasons index (`steward-entitlements-season-id-core.mjs`). Rebuild index after changing season roots: `npm run city-game:build-registry`.
 
 **Response 200:**
 
@@ -206,9 +278,37 @@ Base: `/.well-known/hc/v1/` (same origin as resolver). All JSON; CORS for browse
     "limits": {
       "poll.live_proof.auto": 4000
     }
+  },
+  "game_season": {
+    "season_id": "cr_season_01_wake",
+    "enabled": true,
+    "limits": {
+      "game.season.node_cap": 15,
+      "game.contribute.daily_cap": 25000,
+      "game.snapshot.daily_cap": 100000,
+      "game.game_update.daily_cap": 500
+    },
+    "usage": {
+      "period": "utc_day",
+      "period_key": "2026-06-07",
+      "counters": {
+        "game.contribute": 120,
+        "game.snapshot.get": 840,
+        "game.game_update": 12
+      },
+      "limits": {
+        "game.contribute": 25000,
+        "game.snapshot.get": 100000,
+        "game.game_update": 500
+      }
+    }
   }
 }
 ```
+
+When multiple season roots are linked, `game_season` may instead be `{ "season_ids": ["…"], "hint": "Pass ?season_id=…" }`.
+
+**Response 403:** `season_id` query does not match a season root profile linked to the account.
 
 **Response 401:** invalid/expired session → client uses **`reference_free`** only (fail closed for paid features, not for card use).
 
@@ -218,24 +318,23 @@ Base: `/.well-known/hc/v1/` (same origin as resolver). All JSON; CORS for browse
 
 ### `POST /.well-known/hc/v1/steward/session`
 
-**Purpose:** Issue `steward_session_token` after profile link signature or refresh.  
-**Body (planning):**
+**Status:** **Shipped**  
+**Purpose:** Issue `steward_session_token` after profile link signature; links `profile_id` → `account_id` in `steward_account_profiles`.
+
+**Body:**
 
 ```json
 {
   "profile_id": "…",
   "device_id": "…",
-  "link_proof": {
-    "message_type": "steward_account_link_v1",
-    "account_id": "acc_…",
-    "expires_at": "…",
-    "signature": "base64…"
-  }
+  "link_proof": { }
 }
 ```
 
-**Response:** `{ "token": "…", "expires_in": 86400 }`  
-**Detail:** [`HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md`](HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md) § Signed payload: `steward_account_link_v1`.
+`link_proof` is a full signed document (`message_type`: `steward_account_link_v1`, `account_id`, `profile_id`, `device_id`, `operator_id`, `issued_at`, `expires_at`, `nonce`, Ed25519 `signature`).  
+**Response 200:** `{ "token": "…", "expires_in": <seconds>, "account_id": "acc_…" }` — use **`token`** as Bearer, not `account_id` from checkout URLs.
+
+**Detail:** [`HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md`](HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md) § `steward_account_link_v1` · browser: `site/js/device-steward-session.mjs`.
 
 ### `POST /.well-known/hc/v1/steward/usage/report` (optional)
 
@@ -257,7 +356,33 @@ Base: `/.well-known/hc/v1/` (same origin as resolver). All JSON; CORS for browse
 **Threat model (planning):**
 
 - Stolen session → raised poll caps until expiry; cannot sign vouches without keys.
-- Forged localStorage entitlements → ignored; server caps on authenticated routes when implemented.
+- Forged localStorage entitlements → ignored; server enforces caps on authenticated routes and game season quotas.
+
+### Local debugging (401 / 403 on entitlements)
+
+| Response message | Cause |
+|------------------|--------|
+| `Missing or invalid Authorization bearer token.` | No `Authorization: Bearer …` header, empty `$TOKEN`, or value is not a session token (e.g. `acc_…` from checkout, raw JSON field copy-paste). |
+| `Invalid or expired session.` | Token never issued via `POST …/steward/session`, or local D1 was reset after minting. |
+| `Session expired.` | Token past `expires_at` (re-run session POST). |
+
+**Correct flow:** call the **worker** origin (`http://127.0.0.1:8787`, not Pages `:8788`). Mint a session with a **link proof** signed by the card owner key (same key that created the profile in D1).
+
+```bash
+npm run worker:migrate:local
+npm run worker:dev
+npm run city-game:seed-local   # optional; writes worker/.local/city-game-seed.json
+npm run hosted:steward-session-local
+# paste printed token:
+curl -s -H "Authorization: Bearer <token>" -H "X-HC-Device-Id: devTestdevice1111" \
+  "http://127.0.0.1:8787/.well-known/hc/v1/steward/entitlements?season_id=cr_season_01_wake"
+```
+
+`hosted:steward-session-local` reads owner keys from `city-game-seed.json` when present; otherwise uses the test fixture keypair (`worker/tests/fixtures/keys.json`). For Cedar Rapids game caps, `profile_id` must match `season_root_profile_id` in `site/data/city-game-cr-season-01.json` (see sync command below).
+
+| Response message | Cause |
+|------------------|--------|
+| `season_id is not linked to this steward account.` (403) | Bearer valid but bundled season `season_root_profile_id` ≠ profile linked to session **account**, or worker not restarted after `sync-season-root`. See [`CITY_GAME_LOCAL_DEV.md`](CITY_GAME_LOCAL_DEV.md) § Three sources of truth. |
 
 ---
 
@@ -279,6 +404,9 @@ Base: `/.well-known/hc/v1/` (same origin as resolver). All JSON; CORS for browse
 | `resolver.live_control.challenges.post` | Stranger creates challenge | 1 (stranger; not steward account) |
 | `notify.push.delivered` | Push fan-out — [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) | 1 per device endpoint |
 | `steward.entitlements.get` | Entitlement fetch | 0 (excluded from fair-use) |
+| `game.contribute` | Successful `POST …/game-contribute` | 1 per season / UTC day counter |
+| `game.snapshot.get` | Uncached season snapshot build | 1 per season / UTC day counter |
+| `game.game_update` | Successful `POST …/game-update` | 1 per season / UTC day counter |
 
 ### Aggregation windows
 
@@ -308,6 +436,7 @@ Normative caps: [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.m
 | `steward_account_profiles` | `account_id`, `profile_id`, `linked_at` | Many-to-many |
 | `steward_sessions` | `token_hash`, `account_id`, `device_id`, `expires_at` | Store hash only |
 | `usage_counters` | `account_id`, `device_id?`, `event`, `window`, `window_key`, `count` | Increment atomically |
+| `game_season_usage_counters` | `season_id`, `event`, `window_key`, `count` | City game fair use (migration `0031`) |
 | `plan_definitions` | `plan_id`, `version`, `entitlements_json` | Versioned |
 
 **Retention:** usage detail **90 days**; aggregates for billing **13 months** — align with [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md) governance for rights-affecting retention.
@@ -417,3 +546,4 @@ Reference implementation ships first; second operator copies schema with own `pl
 | 2026-05-26 | M7 cross-link — request-budget rows + test plan in [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Phase 10 |
 | 2026-05-26 | Link to M6 `steward_account_link_v1` — [`HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md`](HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md) |
 | 2026-05-26 | M2 initial entitlement & metering spec (planning only) |
+| 2026-06-03 | **WS-DOC** — implementation status, normative verbs, API shipped/partial table; city game `0031` + `game_season`; local 403 troubleshooting |

@@ -204,3 +204,46 @@ export function hostedTierHubIndicatorLine(policy) {
   if (!policy.stewardHosted) return null;
   return "Hosted steward plan — higher automatic check limits on this device. Verification labels are unchanged.";
 }
+
+/**
+ * @param {Record<string, unknown> | null | undefined} body
+ * @returns {{ used: number, limit: number, periodKey: string | null } | null}
+ */
+export function stewardAutoPollUsageFromBody(body) {
+  if (!body || typeof body !== "object") return null;
+  const usage =
+    body.usage && typeof body.usage === "object"
+      ? /** @type {Record<string, unknown>} */ (body.usage)
+      : null;
+  if (!usage) return null;
+  const counters =
+    usage.counters && typeof usage.counters === "object"
+      ? /** @type {Record<string, number>} */ (usage.counters)
+      : {};
+  const limits =
+    usage.limits && typeof usage.limits === "object"
+      ? /** @type {Record<string, number>} */ (usage.limits)
+      : {};
+  const used =
+    typeof counters["poll.live_proof.auto"] === "number"
+      ? Math.floor(counters["poll.live_proof.auto"])
+      : null;
+  const limit =
+    typeof limits["poll.live_proof.auto"] === "number"
+      ? Math.floor(limits["poll.live_proof.auto"])
+      : null;
+  if (used == null || limit == null) return null;
+  const periodKey =
+    typeof usage.period_key === "string" && usage.period_key
+      ? usage.period_key
+      : null;
+  return { used, limit, periodKey };
+}
+
+/**
+ * @param {number} used
+ * @param {number} limit
+ */
+export function stewardUsageAtLimit(used, limit) {
+  return limit > 0 && used >= limit;
+}

@@ -28,8 +28,12 @@ try {
   const wallet = buildHostedStewardCheckoutReturnUrl(origin, accountId, { path: "/wallet/" });
 
   console.log("Hosted steward — Stripe checkout wiring (E5.6 minimal)\n");
-  console.log("Subscription metadata (required for webhook grant):");
+  console.log("Subscription + session metadata (required for webhook grant):");
   console.log(JSON.stringify(meta.subscription_metadata, null, 2));
+  console.log("\nOr use API checkout (WS-REV R1):");
+  console.log(
+    "  POST /.well-known/hc/v1/steward/billing/checkout with steward session bearer"
+  );
   console.log("\nSuggested success_url values:");
   console.log(`  Landing: ${landing}`);
   console.log(`  Wallet:  ${wallet}`);

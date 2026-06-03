@@ -7,6 +7,8 @@ import { schemaReady } from "./db";
 import { handleGetResolverHealth } from "./resolver/resolver-health";
 import { runOrphanPurge } from "./db/orphan-purge";
 import { logCityGameSeasonWindowPhase } from "./city-game/season-window";
+import { logCityGameBulletinSchedule } from "./city-game/bulletin-schedule";
+import { logCityGameRouteWindowSchedule } from "./city-game/route-window-schedule";
 import { runPrintifyReconcile } from "./print/printify-reconcile";
 import {
   corsHeaders,
@@ -19,6 +21,7 @@ import { handlePostArtifactIntent, handlePostArtifactIntentAttach, handlePostArt
 import { handleGetStoreProduct, handleGetStoreRows } from "./store/store-rows-handler";
 import { handleGetStoreOrderStatus } from "./resolver/store-order-status";
 import { handlePostStoreOrderMint } from "./resolver/store-order-mint";
+import { handleGetSeasonSnapshot } from "./resolver/season-snapshot";
 import { handleGetCard, handlePostCards } from "./resolver/create-card";
 import {
   handleGetLiveControlChallenge,
@@ -72,6 +75,7 @@ import {
   handleGetStewardPush,
   handlePostStewardSession,
 } from "./resolver/steward-hosted";
+import { handlePostStewardBillingCheckout } from "./resolver/steward-billing-checkout";
 import { handleGetStewardOpsSnapshot } from "./resolver/steward-ops";
 import { handlePostBillingWebhook } from "./http/billing-webhook";
 import { handlePostShopifyOrdersWebhook } from "./http/shopify-orders-webhook";
@@ -100,6 +104,10 @@ export interface Env {
   HOSTED_STEWARD_ENABLED?: string;
   /** E5 Stripe webhook signing secret (`whsec_…`). */
   STRIPE_WEBHOOK_SECRET?: string;
+  /** E5 Stripe secret key for Checkout (`sk_…`). */
+  STRIPE_SECRET_KEY?: string;
+  STRIPE_PRICE_HOSTED_STEWARD_V1?: string;
+  STRIPE_PRICE_HOSTED_GAME_SEASON_V1?: string;
   /** O-001 Shopify webhook HMAC secret. */
   SHOPIFY_WEBHOOK_SECRET?: string;
   /** AES-256 key (32 bytes, base64) for encrypted fulfillment shipping at rest. */
@@ -152,6 +160,8 @@ export interface Env {
   AI?: Ai;
   /** Cedar Rapids city game (Phase A): resolver routes when `"1"`. */
   CITY_GAME_ENABLED?: string;
+  /** worker:dev only — allow game-contribute before season window (B5 / E5 local gates). */
+  CITY_GAME_LOCAL_PLAY_OPEN?: string;
   /** worker:dev — scan page chrome origin when wrangler simulates production routes. */
   SCAN_RESOLVER_ORIGIN?: string;
   /** worker:dev — static `/js` origin (Pages :8788) for scan script tags. */
@@ -172,6 +182,8 @@ export default {
       if (event.cron === "0,30 * * * *") {
         await runPrintifyReconcile(env.DB, env);
         logCityGameSeasonWindowPhase(env);
+        logCityGameBulletinSchedule(env);
+        logCityGameRouteWindowSchedule(env);
         return;
       }
 
@@ -201,6 +213,24 @@ export default {
 
     if (path === "/.well-known/hc/v1/health" && request.method === "GET") {
       return handleGetResolverHealth(request, env);
+    }
+
+    const seasonSnapshotMatch = path.match(
+      /^\/\.well-known\/hc\/v1\/seasons\/([^/]+)\/snapshot$/
+    );
+    if (seasonSnapshotMatch && request.method === "GET") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handleGetSeasonSnapshot(
+        request,
+        env,
+        seasonSnapshotMatch[1]!
+      );
+      return withCors(request, res);
     }
 
     if (
@@ -261,6 +291,19 @@ export default {
         );
       }
       const res = await handleGetStewardPush(request, env, env.DB);
+      return withCors(request, res);
+    }
+    if (
+      path === "/.well-known/hc/v1/steward/billing/checkout" &&
+      request.method === "POST"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostStewardBillingCheckout(request, env, env.DB);
       return withCors(request, res);
     }
     if (

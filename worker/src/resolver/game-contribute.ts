@@ -3,12 +3,11 @@ import { isCareStreamPaused } from "../city-game/scan-view";
 import { validateGameNodeDocument, normalizeGameMeta } from "../city-game/game-meta";
 import { GAME_NODE_OBJECT_TYPE, isCityGameEnabled } from "../city-game/constants";
 import {
-  isSeasonPlayOpen,
+  isSeasonContributeOpen,
   resolveSeasonWindowPhase,
   seasonWindowContributeMessage,
 } from "../city-game/season-window";
 import {
-  CR_SEASON_01,
   normalizeSiteCode,
   seasonContributeCode,
   seasonContributableNodeIds,
@@ -16,23 +15,29 @@ import {
   seasonFragmentNodeIds,
   seasonNodeIdForObject,
   seasonObjectIdForNode,
+  seasonVouchTargetsFrom,
 } from "../city-game/season-config";
+import { resolveSeasonForProfile } from "../city-game/season-loader";
 import { applyUnlockSideEffects } from "../city-game/unlock-evaluator";
+import { bumpQuorumProgressWithRetry } from "../city-game/quorum-contribute";
 import {
-  bumpCollectiveProgress,
   fragmentLatticeProgress,
   gameNodeContributeMode,
   issueWitnessSunsetPass,
   markFragmentNodeClaimed,
   patchesForQuorumUnlock,
 } from "../city-game/unlock-engine";
-import { seasonVouchTargetsFrom } from "../city-game/season-config";
+import type { CrSeasonConfig } from "../city-game/season-config";
 import { getChildObject, updateChildObject } from "../db/child-objects";
 import {
   gameContributeObjectDailyCapReached,
   incrementGameContributeBucket,
 } from "../db/game-contribute";
 import { checkGameContributeRateLimit, hashIp } from "../db/rate-limit";
+import {
+  enforceGameContributeSeasonQuota,
+  recordGameContributeSeasonUsage,
+} from "../city-game/season-quota";
 import { loadQrCredentialById } from "../db/qr-metadata";
 import { clientIp, errorResponse, jsonResponse } from "../http/resolver";
 import { parseObjectStreamsFromDocument } from "../validation/object-streams";
@@ -54,15 +59,23 @@ function parseDocument(json: string): Record<string, unknown> {
 async function fragmentAlreadyClaimedPayload(
   db: D1Database,
   objectId: string,
-  nodeId: string
+  nodeId: string,
+  season: CrSeasonConfig
 ): Promise<Record<string, unknown>> {
-  const finaleObjectId = seasonObjectIdForNode(seasonFinaleNodeId());
-  let lattice = { claimed: 0, required: seasonFragmentNodeIds().length, complete: false };
+  const finaleObjectId = seasonObjectIdForNode(seasonFinaleNodeId(season), season);
+  let lattice = {
+    claimed: 0,
+    required: seasonFragmentNodeIds(season).length,
+    complete: false,
+  };
   if (finaleObjectId) {
     const finaleRow = await getChildObject(db, finaleObjectId);
     if (finaleRow) {
       const finaleDoc = parseDocument(finaleRow.child_object_document_json);
-      lattice = fragmentLatticeProgress(normalizeGameMeta(finaleDoc.game_meta));
+      lattice = fragmentLatticeProgress(
+        normalizeGameMeta(finaleDoc.game_meta),
+        seasonFragmentNodeIds(season)
+      );
     }
   }
   return {
@@ -106,7 +119,7 @@ async function persistGameNodeDocument(
 export async function handlePostGameContribute(
   request: Request,
   db: D1Database,
-  env: { CITY_GAME_ENABLED?: string },
+  env: { CITY_GAME_ENABLED?: string; CITY_GAME_LOCAL_PLAY_OPEN?: string },
   pathProfileId: string,
   pathObjectId: string
 ): Promise<Response> {
@@ -114,9 +127,17 @@ export async function handlePostGameContribute(
     return errorResponse("NOT_AVAILABLE", "City game endpoints are not enabled.", 404);
   }
 
+  const season = resolveSeasonForProfile(pathProfileId);
+  if (!season) {
+    return errorResponse("NOT_FOUND", "City game season not found for this profile.", 404);
+  }
+
+  const seasonQuota = await enforceGameContributeSeasonQuota(db, season);
+  if (seasonQuota) return seasonQuota;
+
   const now = new Date();
-  const windowPhase = resolveSeasonWindowPhase(now);
-  if (!isSeasonPlayOpen(windowPhase)) {
+  const windowPhase = resolveSeasonWindowPhase(now, season);
+  if (!isSeasonContributeOpen(windowPhase, env)) {
     return errorResponse(
       "SEASON_CLOSED",
       seasonWindowContributeMessage(windowPhase),
@@ -163,19 +184,19 @@ export async function handlePostGameContribute(
     return errorResponse("OBJECT_NOT_ACTIVE", "Game node is not active.", 409);
   }
 
-  const nodeId = seasonNodeIdForObject(pathObjectId);
-  if (!nodeId || !seasonContributableNodeIds().includes(nodeId)) {
+  const nodeId = seasonNodeIdForObject(pathObjectId, season);
+  if (!nodeId || !seasonContributableNodeIds(season).includes(nodeId)) {
     return errorResponse("NOT_CONTRIBUTABLE", "This object does not accept public contributions.", 422);
   }
 
-  const expectedCode = seasonContributeCode(nodeId);
+  const expectedCode = seasonContributeCode(nodeId, season);
   if (!expectedCode) {
     return errorResponse("NOT_CONTRIBUTABLE", "Site code is not configured for this node.", 503);
   }
   if (normalizeSiteCode(siteCodeRaw) !== normalizeSiteCode(expectedCode.code)) {
     return errorResponse("INVALID_SITE_CODE", "Site code does not match this place.", 403);
   }
-  if (expectedCode.epoch !== CR_SEASON_01.season_id) {
+  if (expectedCode.epoch !== season.season_id) {
     return errorResponse("SEASON_MISMATCH", "Site code is not valid for this season.", 403);
   }
 
@@ -199,15 +220,19 @@ export async function handlePostGameContribute(
 
   const meta = fields.gameMeta;
 
-  if (nodeId && seasonFragmentNodeIds().includes(nodeId) && meta.unlocked_by.includes(nodeId)) {
+  if (fields.seasonId !== season.season_id) {
+    return errorResponse("SEASON_MISMATCH", "Object season does not match this game.", 403);
+  }
+
+  if (nodeId && seasonFragmentNodeIds(season).includes(nodeId) && meta.unlocked_by.includes(nodeId)) {
     return jsonResponse(
-      await fragmentAlreadyClaimedPayload(db, pathObjectId, nodeId),
+      await fragmentAlreadyClaimedPayload(db, pathObjectId, nodeId, season),
       200,
       { "Cache-Control": "no-store" }
     );
   }
 
-  const contributeMode = gameNodeContributeMode(nodeId, meta, fields.nodeRole);
+  const contributeMode = gameNodeContributeMode(nodeId, meta, fields.nodeRole, season);
   if (!contributeMode) {
     return errorResponse("NOT_CONTRIBUTABLE", "This object is not accepting contributions.", 422);
   }
@@ -228,7 +253,7 @@ export async function handlePostGameContribute(
           collective_progress: progress,
           collective_target: target,
           quorum_complete: true,
-          unlocked_nodes: patchesForQuorumUnlock(nodeId).map((p) => p.toNodeId),
+          unlocked_nodes: patchesForQuorumUnlock(nodeId, season).map((p) => p.toNodeId),
           message: "Quorum already complete.",
         },
         200,
@@ -266,42 +291,50 @@ export async function handlePostGameContribute(
   }
 
   await incrementGameContributeBucket(db, pathObjectId, fields.seasonId, bucketDate);
+  await recordGameContributeSeasonUsage(db, season.season_id);
 
   if (contributeMode === "quorum") {
     const target = meta.collective_target!;
-    const bumped = bumpCollectiveProgress(doc);
-    doc = bumped.doc;
-    const updatedAt = now.toISOString();
+    try {
+      const bumped = await bumpQuorumProgressWithRetry(db, {
+        objectId: pathObjectId,
+        parentProfileId: pathProfileId,
+        nodeId,
+        now,
+        season,
+      });
+      if (!bumped) {
+        return errorResponse("NOT_FOUND", "Child object not found.", 404);
+      }
 
-    await persistGameNodeDocument(
-      db,
-      existing,
-      doc,
-      typeof doc.public_state === "string" ? doc.public_state : existing.public_state,
-      updatedAt
-    );
-
-    const unlockEffects = bumped.reachedTarget
-      ? await applyUnlockSideEffects(db, nodeId, doc, now)
-      : { unlockedNodes: [] as string[] };
-
-    return jsonResponse(
-      {
-        object_id: pathObjectId,
-        node_id: nodeId,
-        contribute_mode: "quorum",
-        collective_progress: bumped.meta.collective_progress,
-        collective_target: target,
-        quorum_complete: bumped.reachedTarget,
-        unlocked_nodes: unlockEffects.unlockedNodes,
-      },
-      200,
-      { "Cache-Control": "no-store" }
-    );
+      return jsonResponse(
+        {
+          object_id: pathObjectId,
+          node_id: nodeId,
+          contribute_mode: "quorum",
+          collective_progress: bumped.collectiveProgress,
+          collective_target: bumped.collectiveTarget,
+          quorum_complete: bumped.quorumComplete,
+          unlocked_nodes: bumped.unlockedNodes,
+          ...(bumped.alreadyComplete ? { message: "Quorum already complete." } : {}),
+        },
+        200,
+        { "Cache-Control": "no-store" }
+      );
+    } catch (e) {
+      if (e instanceof Error && e.message === "QUORUM_WRITE_CONFLICT") {
+        return errorResponse(
+          "QUORUM_WRITE_CONFLICT",
+          "Quorum update conflict under load. Try again.",
+          409
+        );
+      }
+      throw e;
+    }
   }
 
   if (contributeMode === "scarcity") {
-    const issued = issueWitnessSunsetPass(doc, nodeId);
+    const issued = issueWitnessSunsetPass(doc, nodeId, season);
     doc = issued.doc;
     const updatedAt = now.toISOString();
 
@@ -321,7 +354,7 @@ export async function handlePostGameContribute(
         pass_issued: true,
         scarcity_remaining: issued.meta.scarcity_remaining,
         witness_depleted: issued.depleted,
-        vouch_targets: seasonVouchTargetsFrom(nodeId),
+        vouch_targets: seasonVouchTargetsFrom(nodeId, season),
       },
       200,
       { "Cache-Control": "no-store" }
@@ -338,7 +371,7 @@ export async function handlePostGameContribute(
     updatedAt
   );
 
-  const unlockEffects = await applyUnlockSideEffects(db, nodeId, doc, now);
+  const unlockEffects = await applyUnlockSideEffects(db, nodeId, doc, now, season);
 
   return jsonResponse(
     {
@@ -347,7 +380,7 @@ export async function handlePostGameContribute(
       contribute_mode: "fragment",
       fragment_claimed: true,
       fragments_registered: unlockEffects.fragmentsRegistered ?? 0,
-      fragments_required: unlockEffects.fragmentsRequired ?? seasonFragmentNodeIds().length,
+      fragments_required: unlockEffects.fragmentsRequired ?? seasonFragmentNodeIds(season).length,
       finale_open: unlockEffects.finaleOpen ?? false,
       unlocked_nodes: unlockEffects.unlockedNodes,
     },

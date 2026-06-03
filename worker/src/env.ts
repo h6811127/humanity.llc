@@ -9,6 +9,12 @@ export interface Env {
   HOSTED_STEWARD_ENABLED?: string;
   /** E5 Stripe webhook signing secret (`whsec_…`). */
   STRIPE_WEBHOOK_SECRET?: string;
+  /** E5 Stripe secret key (`sk_test_…` / `sk_live_…`) for Checkout session create. */
+  STRIPE_SECRET_KEY?: string;
+  /** Stripe Price id for `hosted_steward_v1` (`price_…`). */
+  STRIPE_PRICE_HOSTED_STEWARD_V1?: string;
+  /** Stripe Price id for `hosted_game_season_v1` (`price_…`). */
+  STRIPE_PRICE_HOSTED_GAME_SEASON_V1?: string;
   /** O-001 Shopify webhook HMAC secret. */
   SHOPIFY_WEBHOOK_SECRET?: string;
   /** O-002 Printify personal access token (server-only). */

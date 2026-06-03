@@ -10,6 +10,7 @@ export const CREATED_VIEW_LIVE_SIGNING_ONLY_IDS = [
   "created-custody-disclosure",
   "created-scanners-see-gate-hint",
   "created-live-setup-memory-wrap",
+  "created-hosted-plan",
 ];
 
 /** Urgent live-proof strip (signing required). */

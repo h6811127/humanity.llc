@@ -1,7 +1,7 @@
 # Cedar Rapids city game — local development walkthrough
 
 **Status:** Internal · Phase C engineering gate  
-**Canonical:** [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) · **Launch:** [`CITY_GAME_LAUNCH_CHECKLIST.md`](CITY_GAME_LAUNCH_CHECKLIST.md)
+**Canonical:** [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) · **Launch:** [`CITY_GAME_LAUNCH_CHECKLIST.md`](CITY_GAME_LAUNCH_CHECKLIST.md) · **City board (planned):** [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md)
 
 This is the **careful local path** before physical install QA or production launch. Production stays `CITY_GAME_ENABLED=0` until the launch checklist is signed.
 
@@ -16,7 +16,35 @@ This is the **careful local path** before physical install QA or production laun
 | E5 | `city-game:smoke-local` + `city-game:smoke-contribute-local` on `node_01`, `node_04`, `node_07` |
 | Manual | `/game-operator/` — safety flips only (compromise, care pause, bulletin rotation) |
 
-Physical stickers, 3-phone install, and GT comprehension are **human gates** — see [`CITY_GAME_INSTALL_QA.md`](CITY_GAME_INSTALL_QA.md) and [`CITY_GAME_COMPREHENSION_RUNBOOK.md`](CITY_GAME_COMPREHENSION_RUNBOOK.md).
+Physical stickers, 3-phone install, and GT comprehension are **human gates** — see [`CITY_GAME_INSTALL_QA.md`](CITY_GAME_INSTALL_QA.md) and [`CITY_GAME_COMPREHENSION_RUNBOOK.md`](CITY_GAME_COMPREHENSION_RUNBOOK.md). Before launch day: `npm run city-game:launch-preflight`.
+
+---
+
+## Three sources of truth (season root)
+
+Local entitlements and game resolver paths can disagree when these three differ:
+
+| # | Source | What it controls |
+|---|--------|------------------|
+| 1 | **`worker/.local/city-game-seed.json`** (gitignored) | Profile + keys used by `city-game:seed-local` and `hosted:steward-session-local` |
+| 2 | **`site/data/city-game-cr-season-01.json`** | Committed `season_root_profile_id` and season metadata |
+| 3 | **Running `worker:dev` bundle** | `worker/src/city-game/season-registry.generated.ts` imports (2) at **load time** |
+
+**Symptoms:** `GET …/steward/entitlements?season_id=…` returns **403** `season_id is not linked` while bearer auth works — usually (2) ≠ (1) or (3) stale after editing (2).
+
+**Fix:**
+
+```bash
+npm run city-game:sync-season-root   # align (2) to (1) on disk
+# restart worker:dev — mandatory
+npm run hosted:steward-session-local
+```
+
+`city-game:seed-local -- --write-season` only updates (2) during a **full seed** when `season_root_profile_id` is empty (or use `--force` to re-mint). Prefer **sync** when D1 already has nodes.
+
+**Production:** committed `season_root_profile_id` in (2) is canonical for deploy; do not commit local-only profile ids from (1) unless ops intends to change production root.
+
+Steward entitlements verbs: [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md) § Normative verbs.
 
 ---
 
@@ -24,22 +52,20 @@ Physical stickers, 3-phone install, and GT comprehension are **human gates** —
 
 ```bash
 npm install
-npm run worker:migrate:local
-npm run worker:apply-child-object-qr-schema   # required — child_object QR scope
-cp worker/.dev.vars.example worker/.dev.vars   # if missing
+npm run city-game:dev -- --bootstrap
 ```
 
-Add to **`worker/.dev.vars`** (gitignored — never commit):
+That command alone: patches **`worker/.dev.vars`** (you never edit it by hand), migrates D1, seeds the season if missing, starts worker + pages, writes the tap-to-scan hub **and GT comprehension kit**, and opens the hub in your browser.
+
+First time only needs `--bootstrap`. After that:
 
 ```bash
-CITY_GAME_ENABLED=1
-SCAN_RESOLVER_ORIGIN=http://127.0.0.1:8787
-SCAN_PAGES_JS_ORIGIN=http://127.0.0.1:8788
+npm run city-game:dev
 ```
 
-`SCAN_*` origins are required when wrangler dev simulates production hostnames (`humanity.llc`) so scan HTML loads local Pages JS instead of production.
+Ctrl+C stops both servers. For phone LAN (non-guest Wi‑Fi only): `npm run city-game:dev -- --lan`.
 
-Do **not** change `CITY_GAME_ENABLED` in `worker/wrangler.toml` for local dev. That file stays `"0"` until launch deploy.
+Legacy manual steps below if you need them.
 
 ---
 
@@ -55,17 +81,24 @@ Expect `npm run verify:city-game` green (80+ unit tests) and season warnings for
 
 ## Step 2 — Start resolver
 
+**Use `npm run city-game:dev`** (see One-time setup). It replaces separate worker/pages terminals and `.dev.vars` editing.
+
+<details>
+<summary>Manual fallback (two terminals)</summary>
+
 Terminal A:
 
 ```bash
 npm run worker:dev
 ```
 
-Terminal A2 (required for scan page JavaScript — contribute client, device shell modules):
+Terminal A2:
 
 ```bash
 npm run pages:dev
 ```
+
+</details>
 
 Scan HTML is served on **`:8787`**; static `/js/*.mjs` loads from Pages **`:8788`**. Without `pages:dev`, local scans pull production `humanity.llc` JS (stale until you deploy Pages). Set `SCAN_PAGES_JS_ORIGIN` / `SCAN_RESOLVER_ORIGIN` in `worker/.dev.vars` when wrangler simulates production routes.
 
@@ -106,6 +139,14 @@ API_ORIGIN=http://127.0.0.1:8787 npm run city-game:smoke-local -- --all
 ```
 
 Open a `local_scan_url` from the seed file in Safari if you want eyes-on confirmation.
+
+**City board (GT-7 engineering proxy):**
+
+```bash
+npm run e2e:city-game-map-board
+```
+
+Or open `http://localhost:8788/play/cedar-rapids/#city-state` with worker + `CITY_GAME_ENABLED=1` for live snapshot chips.
 
 ---
 
@@ -210,12 +251,15 @@ From [`CITY_GAME_INSTALL_QA.md`](CITY_GAME_INSTALL_QA.md) § Scenario spot-check
 | `Missing script: "city-game:season-root,"` | Do not paste comma — run commands separately |
 | `INVALID_QR_PAYLOAD` on seed | Expected — seed uses `https://humanity.llc/c/…` payloads; use `local_scan_url` for browser |
 | Smoke: missing `scan-game-chips` | `CITY_GAME_ENABLED=1` in `.dev.vars` + restart `worker:dev` |
+| Scan says **season not open yet** (before window dates) | `npm run city-game:local-env` sets `CITY_GAME_LOCAL_PLAY_OPEN=1` — restart `worker:dev`. Production uses real window only (no override). |
+| Full automatic spine (no browser) | `npm run worker:dev` then `npm run city-game:smoke-contribute-local -- --spine` or `npm run city-game:proof-local` |
 | Witness: unlimited passes in browser | Run **`pages:dev`** (`:8788`) + add `SCAN_PAGES_JS_ORIGIN` / `SCAN_RESOLVER_ORIGIN` to **`worker/.dev.vars`** + restart **`worker:dev`**. Hard-refresh scan tab — contribute JS must load from `127.0.0.1:8788`, not production. Clear `localStorage` key `hc_game_scarcity_ceiling_v1` to re-test same device. |
 | Phone cannot load LAN hub URL | Re-run **`npm run city-game:lan-hub -- --write-dev-vars`** (IP changes per network). Use **`npm run worker:dev:lan`** + **`npm run pages:dev:lan`**. Kill stale ports: `lsof -ti :8787,:8788 \| xargs kill -9`. **Guest/corp Wi‑Fi** often blocks phone→laptop (AP isolation) — use phone hotspot or non-guest Wi‑Fi. |
 | Smoke: **HTTP 404** on scan URLs | Seed file points at a profile/QR **not in local D1** — re-run `city-game:seed-local -- --write-season` |
 | `CHECK constraint failed: scope IN ('card', 'print_artifact')` | Run `npm run worker:apply-child-object-qr-schema` then re-seed |
 | After `rm -rf worker/.wrangler/state/v3/d1` | Re-migrate, apply QR schema, **restart** `worker:dev`, then seed |
 | `season_root_profile_id already set` | `npm run city-game:seed-local -- --force` or clear field in season JSON |
+| Steward `season_id is not linked` (403) | Seed `profile_id` ≠ `season_root_profile_id` in season JSON — `npm run city-game:sync-season-root`, restart `worker:dev`, re-mint session |
 | `object_id already in local D1` | Reuse seed file or reset D1 (migrate + apply-child-object-qr-schema + restart worker) |
 | Game-operator 404 | `CITY_GAME_ENABLED=1` locally; check profile_id matches seed |
 
@@ -229,11 +273,19 @@ From [`CITY_GAME_INSTALL_QA.md`](CITY_GAME_INSTALL_QA.md) § Scenario spot-check
 | `npm run city-game:mint-node -- --all` | Print unsigned node payloads |
 | `npm run city-game:prep-season` | season-root + mint templates chained |
 | `npm run city-game:seed-local` | Create season root + 15 nodes on local D1 |
+| `npm run city-game:sync-season-root` | Set `season_root_profile_id` from `worker/.local/city-game-seed.json` (no re-mint) |
+| `npm run hosted:steward-session-local` | Mint bearer for `GET /steward/entitlements` (local curl) |
 | `npm run city-game:smoke-local` | Verify game scan HTML after seed |
 | `npm run city-game:smoke-contribute-local` | Autonomous quorum → cabinet (add `--spine` for finale) |
 | `npm run city-game:proof-local` | E1 + E3 + E5 gate after seed (add `--skip-verify` / `--quorum-only`) |
 | `npm run city-game:reset-quorum-local` | Reset River Lantern quorum + cabinet lock (local D1) |
 | `npm run city-game:reset-spine-local` | Reset full autonomous spine for replay |
+| `npm run city-game:local-env` | Patch `worker/.dev.vars` (`CITY_GAME_ENABLED=1`, `CITY_GAME_LOCAL_PLAY_OPEN=1`) |
+| `npm run city-game:contribute-load-local` | B5 — 20 concurrent quorum POSTs (needs worker + seed) |
+| `npm run city-game:comprehension-preflight` | C2 engineering — kit pages + probe URLs |
+| `npm run city-game:install-qa-preflight` | C3 engineering — seed + install QA doc markers |
+| `npm run city-game:smoke-production-preflight` | C4 engineering — production seed + spot scan URLs |
+| `npm run city-game:launch-preflight` | Phase D status (B1–B5, C2–C5 blockers) |
 | `npm run verify:city-game` | Full regression bundle |
 
 **Multi-phone LAN:** `npm run city-game:lan-hub -- --write-dev-vars` → one bookmark on each phone.

@@ -35,7 +35,7 @@ Card creation needs Ed25519-signed JSON (fixtures in `worker/tests/fixtures/`). 
 |------|-----|
 | **Engineering invariants** | [`docs/SYSTEM_INVARIANTS.md`](docs/SYSTEM_INVARIANTS.md) |
 | **Safari keys custody** | [`docs/SAFARI_KEYS_CUSTODY.md`](docs/SAFARI_KEYS_CUSTODY.md) |
-| **Active work + regression gates** | [`docs/PRODUCT_WORKSTREAM_COORDINATION.md`](docs/PRODUCT_WORKSTREAM_COORDINATION.md) |
+| **Active work + regression gates** | [`docs/PRODUCT_WORKSTREAM_COORDINATION.md`](docs/PRODUCT_WORKSTREAM_COORDINATION.md) · multi-agent: **WS-DOC / WS-REV / WS-CR / WS-E** |
 | **Feature map / roadmap** | [`docs/STEWARD_DEVICE_ROADMAP.md`](docs/STEWARD_DEVICE_ROADMAP.md) |
 | **Doc policy + archive** | [`docs/DOC_MAINTENANCE.md`](docs/DOC_MAINTENANCE.md) |
 
@@ -44,7 +44,7 @@ Do **not** create new investigation docs for routine bugs. Update `SYSTEM_INVARI
 ## Agent checklist
 
 1. Read `PRODUCT_WORKSTREAM_COORDINATION.md` — check active branches; do not duplicate open PR scope.
-2. Read `SYSTEM_INVARIANTS.md` for your surface before editing shell/wallet/scan code. City game: [`docs/CITY_GAME_V1_IMPLEMENTATION.md`](docs/CITY_GAME_V1_IMPLEMENTATION.md) § Architecture (risks **R-***, gates **B***).
+2. Read `SYSTEM_INVARIANTS.md` for your surface before editing shell/wallet/scan code. City game: [`docs/CITY_GAME_V1_IMPLEMENTATION.md`](docs/CITY_GAME_V1_IMPLEMENTATION.md) § Architecture (risks **R-***, gates **B***). Read-only city board: [`docs/CITY_GAME_MAP_DASHBOARD.md`](docs/CITY_GAME_MAP_DASHBOARD.md).
 3. Run the regression block for your surface (see PR template or workstream doc) before finishing. City game: `npm run verify:city-game`.
 4. Bump `DEVICE_SHELL_ASSET_VERSION` when adding imports to the status module graph; list files in `DEVICE_STATUS_SHELL_JS_FILES`.
 5. After `site/scan-pass.css` changes: `npm run worker:bundle-scan`.

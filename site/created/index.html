@@ -382,6 +382,7 @@
           >
             <h2 class="created-setup-panel-title">Protect your control</h2>
             <p class="created-setup-panel-lead" id="created-setup-seatbelt-lead"></p>
+            <div id="created-setup-game-season-protect" hidden role="note"></div>
             <div class="created-setup-seatbelt-recovery" id="created-setup-seatbelt-recovery" hidden>
               <p class="form-hint" id="created-setup-seatbelt-recovery-hint"></p>
               <p class="mono recovery-key-display" id="created-setup-recovery-key-display"></p>
@@ -441,6 +442,7 @@
               Update copy on <strong>Live</strong>; revoke, recovery, and steward tools are under
               <strong>Manage</strong>.
             </p>
+            <div id="created-setup-game-season-done" hidden role="note"></div>
             <p
               class="created-setup-wallet-saved-confirm form-hint"
               id="created-setup-wallet-saved-confirm"
@@ -1175,6 +1177,183 @@
           </section>
 
           <section
+            class="created-what-now created-what-now-compact"
+            id="child-object-add-game-node"
+            hidden
+            aria-labelledby="child-object-add-game-node-title"
+          >
+            <h2 class="created-what-now-title" id="child-object-add-game-node-title">
+              Add game node under this root
+            </h2>
+            <p class="created-what-now-body">
+              Register a <strong>game node</strong> sticker object and issue its first scan link in one
+              step. Requires an organizer / game-operator public key on this card at create.
+            </p>
+            <div
+              id="child-object-game-node-backup-gate"
+              class="hc-notice child-object-backup-gate"
+              hidden
+              role="alert"
+            ></div>
+            <form id="child-object-game-node-form" class="compact-form" novalidate>
+              <label class="form-label" for="child-object-game-node-season">Season</label>
+              <select class="form-input" id="child-object-game-node-season" required></select>
+              <label class="form-label" for="child-object-game-node-label">Place name</label>
+              <input
+                class="form-input"
+                id="child-object-game-node-label"
+                type="text"
+                maxlength="120"
+                autocomplete="off"
+                required
+              />
+              <label class="form-label" for="child-object-game-node-role">Node role</label>
+              <select class="form-input" id="child-object-game-node-role" required></select>
+              <label class="form-label" for="child-object-game-node-district">District</label>
+              <select class="form-input" id="child-object-game-node-district"></select>
+              <button type="submit" class="btn-secondary" id="child-object-game-node-submit">
+                Register &amp; issue scan link
+              </button>
+            </form>
+            <p class="form-hint" id="child-object-game-node-status" hidden role="status"></p>
+
+            <details class="created-game-node-setup" id="child-object-game-node-setup" open>
+              <summary>Setup checklist · custody &amp; comprehension</summary>
+              <p class="form-hint created-game-node-setup-lead">
+                Confirm key custody before registering many nodes. Run comprehension with ≥5 un coached
+                testers before marketing — patterns from the weekend operator runbook in plain language.
+              </p>
+              <div id="child-object-game-node-setup-checklist" aria-label="Self-serve setup progress"></div>
+              <div id="child-object-game-node-setup-custody"></div>
+              <div
+                class="created-game-node-setup-runbook-grid"
+                id="child-object-game-node-setup-runbook"
+                aria-label="Weekend operator patterns"
+              ></div>
+              <h3 class="created-game-node-setup-subhead">Comprehension scorecard (GT-1–GT-7)</h3>
+              <div id="child-object-game-node-setup-scorecard"></div>
+              <div class="created-game-node-setup-links" id="child-object-game-node-setup-links"></div>
+              <button
+                type="button"
+                class="btn-secondary"
+                id="child-object-game-node-setup-copy-brief"
+              >
+                Copy comprehension brief
+              </button>
+              <p class="form-hint" id="child-object-game-node-setup-status" role="status"></p>
+            </details>
+
+            <details class="created-game-node-bulk" id="child-object-game-node-bulk">
+              <summary>Bulk import starter registry</summary>
+              <p class="form-hint created-game-node-bulk-lead">
+                Edit place names, then register missing nodes from the season template (15-node S1
+                footprint when the season JSON has no node list yet).
+              </p>
+              <p class="form-hint" id="child-object-game-node-bulk-summary" role="status"></p>
+              <div
+                id="child-object-game-node-bulk-backup-gate"
+                class="hc-notice child-object-backup-gate"
+                hidden
+                role="alert"
+              ></div>
+              <div id="child-object-game-node-bulk-table-wrap" class="created-game-node-bulk-table-wrap"></div>
+              <button
+                type="button"
+                class="btn-secondary"
+                id="child-object-game-node-bulk-submit"
+                disabled
+              >
+                Register selected nodes
+              </button>
+              <p class="form-hint" id="child-object-game-node-bulk-status" hidden role="status"></p>
+            </details>
+
+            <details class="created-game-node-rules" id="child-object-game-node-rules">
+              <summary>Rules page &amp; launch</summary>
+              <p class="form-hint created-game-node-rules-lead">
+                Prepare the public rules page at <code>/play/{slug}/</code>. Window dates and
+                <code>status</code> are saved on this device until you commit season JSON and deploy
+                the downloaded HTML.
+              </p>
+              <label class="form-label" for="child-object-game-node-rules-starts">Season starts</label>
+              <input
+                class="form-input"
+                type="datetime-local"
+                id="child-object-game-node-rules-starts"
+              />
+              <label class="form-label" for="child-object-game-node-rules-ends">Season ends</label>
+              <input
+                class="form-input"
+                type="datetime-local"
+                id="child-object-game-node-rules-ends"
+              />
+              <label class="form-label" for="child-object-game-node-rules-season-status">Season status</label>
+              <select class="form-input" id="child-object-game-node-rules-season-status">
+                <option value="planned">Planned (draft / noindex)</option>
+                <option value="active">Active (launch-ready when window set)</option>
+              </select>
+              <ul
+                class="created-game-node-rules-readiness"
+                id="child-object-game-node-rules-readiness"
+                aria-label="Rules page launch readiness"
+              ></ul>
+              <p class="form-hint" id="child-object-game-node-rules-status" role="status"></p>
+              <div class="created-game-node-rules-actions">
+                <button
+                  type="button"
+                  class="btn-secondary"
+                  id="child-object-game-node-rules-preview-draft"
+                  disabled
+                >
+                  Preview draft HTML
+                </button>
+                <button
+                  type="button"
+                  class="btn-secondary"
+                  id="child-object-game-node-rules-preview-launch"
+                  disabled
+                >
+                  Preview launch-ready HTML
+                </button>
+                <button
+                  type="button"
+                  class="btn-secondary"
+                  id="child-object-game-node-rules-download"
+                  disabled
+                >
+                  Download launch HTML
+                </button>
+                <button
+                  type="button"
+                  class="btn-text"
+                  id="child-object-game-node-rules-copy-steps"
+                  disabled
+                >
+                  Copy deploy checklist
+                </button>
+              </div>
+              <p class="form-hint">
+                <a
+                  class="btn-text"
+                  id="child-object-game-node-rules-open"
+                  href="#"
+                  hidden
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Open deployed rules page</a
+                >
+              </p>
+            </details>
+
+            <ul
+              class="list-rows"
+              id="child-object-game-node-list"
+              hidden
+              aria-label="Game nodes under this root on this device"
+            ></ul>
+          </section>
+
+          <section
             class="created-status-plate-loop"
             id="status-plate-loop-scorecard"
             aria-labelledby="status-plate-loop-scorecard-title"
@@ -1584,6 +1763,66 @@
           </details>
 
           <div class="created-manage-tools" id="created-owner-actions">
+            <details
+              class="settings-disclosure settings-disclosure-info created-hosted-plan"
+              id="created-hosted-plan"
+              data-created-signing-only
+              hidden
+            >
+              <summary class="settings-summary">
+                <span class="list-icon list-icon-tone-slate" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </span>
+                <span class="settings-summary-text">
+                  <span class="settings-summary-title" id="created-hosted-plan-summary-title">
+                    Usage &amp; limits
+                  </span>
+                  <span class="settings-summary-sub" id="created-hosted-plan-summary-sub">
+                    Reference tier by default · optional hosted capacity
+                  </span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </summary>
+              <div class="settings-panel settings-panel-info">
+                <div class="settings-panel-info-body created-hosted-plan-body">
+                  <p class="settings-panel-lead created-hosted-plan-lead" id="created-hosted-plan-lead"></p>
+                  <p
+                    class="form-hint created-hosted-plan-link-status"
+                    id="created-hosted-plan-link-status"
+                    hidden
+                    role="status"
+                  ></p>
+                  <dl class="created-hosted-plan-metrics" id="created-hosted-plan-metrics"></dl>
+                  <p
+                    class="form-hint created-hosted-plan-at-limit"
+                    id="created-hosted-plan-at-limit"
+                    hidden
+                    role="status"
+                  ></p>
+                  <section
+                    class="created-hosted-game-season"
+                    id="created-hosted-game-season"
+                    hidden
+                    aria-label="City game season limits"
+                  >
+                    <h4 class="created-hosted-game-season-title" id="created-hosted-game-season-title"></h4>
+                    <p class="form-hint" id="created-hosted-game-season-hint" hidden></p>
+                    <dl
+                      class="created-hosted-plan-metrics"
+                      id="created-hosted-game-season-metrics"
+                    ></dl>
+                    <p
+                      class="form-hint created-hosted-plan-at-limit"
+                      id="created-hosted-game-season-at-limit"
+                      hidden
+                      role="status"
+                    ></p>
+                  </section>
+                  <div class="created-hosted-plan-upgrades" id="created-hosted-plan-upgrades" hidden></div>
+                </div>
+              </div>
+            </details>
+
             <details class="settings-disclosure settings-disclosure-action" id="steward-review-details" hidden>
               <summary class="settings-summary">
                 <span class="list-icon list-icon-tone-red" aria-hidden="true">
@@ -1890,7 +2129,7 @@
       </div>
     </dialog>
     <script src="/js/device-status-bootstrap.mjs?v=83" type="module"></script>
-    <script src="/js/created-hub.mjs?v=3" type="module"></script>
-    <script type="module" src="/js/created.mjs?v=79"></script>
+    <script src="/js/created-hub.mjs?v=5" type="module"></script>
+    <script type="module" src="/js/created.mjs?v=83"></script>
   </body>
 </html>

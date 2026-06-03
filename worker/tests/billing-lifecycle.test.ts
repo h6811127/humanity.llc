@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  HOSTED_GAME_SEASON_PLAN_ID,
   mapStripeSubscriptionStatus,
   PAST_DUE_GRACE_MS,
   shouldExpirePastDueAccount,
@@ -41,6 +42,23 @@ describe("stewardUpdateFromStripeSubscription", () => {
     expect(update?.status).toBe("active");
     expect(update?.plan_id).toBe("hosted_steward_v1");
     expect(update?.account_id).toBe("acc_1");
+  });
+
+  it("maps metadata.plan_id hosted_game_season_v1", () => {
+    const update = stewardUpdateFromStripeSubscription(
+      {
+        id: "sub_game",
+        customer: "cus_1",
+        status: "active",
+        metadata: {
+          account_id: "acc_game",
+          plan_id: HOSTED_GAME_SEASON_PLAN_ID,
+        },
+        current_period_end: Math.floor(NOW / 1000) + 86400,
+      },
+      NOW
+    );
+    expect(update?.plan_id).toBe(HOSTED_GAME_SEASON_PLAN_ID);
   });
 });
 

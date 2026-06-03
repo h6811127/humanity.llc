@@ -3,6 +3,7 @@
  */
 import "./device-steward-billing-return-bootstrap.mjs";
 import { initDeviceHub } from "./device-hub-ui.mjs";
+import { initCreatedHostedEntitlements } from "./created-hosted-entitlements.mjs";
 import "./device-help-fab.mjs";
 
 initDeviceHub({
@@ -10,6 +11,8 @@ initDeviceHub({
   showLiveControlInbox: false,
   savedLabel: "My objects",
 });
+
+initCreatedHostedEntitlements();
 
 document.getElementById("created-hub-manage-tab")?.addEventListener("click", () => {
   document.getElementById("created-tab-btn-advanced")?.click();

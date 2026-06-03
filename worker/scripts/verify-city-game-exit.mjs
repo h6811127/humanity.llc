@@ -16,6 +16,9 @@ function run(cmd, args) {
   if (r.status !== 0) process.exit(r.status ?? 1);
 }
 
+console.log("=== city-game build registry ===\n");
+run("npm", ["run", "city-game:build-registry"]);
+
 if (!skipTests) {
   console.log("=== city-game vitest ===\n");
   run("npm", [
@@ -30,6 +33,11 @@ if (!skipTests) {
     "worker/tests/city-game-seed-site-codes.test.ts",
     "worker/tests/city-game-smoke-contribute-core.test.ts",
     "worker/tests/city-game-season-registry.test.ts",
+    "worker/tests/city-game-season-loader.test.ts",
+    "worker/tests/city-game-season-entitlements.test.ts",
+    "worker/tests/city-game-season-entitlements-api.test.ts",
+    "worker/tests/city-game-season-entitlements-core.test.ts",
+    "worker/tests/city-game-season-path-core.test.ts",
     "worker/tests/unlock-engine.test.ts",
     "worker/tests/unlock-evaluator.test.ts",
     "worker/tests/vouch-graph.test.ts",
@@ -43,6 +51,29 @@ if (!skipTests) {
     "worker/tests/scan-game-scarcity-ceiling-core.test.ts",
     "worker/tests/resolver-origin.test.ts",
     "worker/tests/city-game-lan-hub-core.test.ts",
+    "worker/tests/city-game-local-env-core.test.ts",
+    "worker/tests/city-game-comprehension-kit-core.test.ts",
+    "worker/tests/city-game-install-qa-core.test.ts",
+    "worker/tests/city-game-install-map-core.test.ts",
+    "worker/tests/city-game-launch-checklist-core.test.ts",
+    "worker/tests/city-game-smoke-production-core.test.ts",
+    "worker/tests/city-game-bulletin-schedule.test.ts",
+    "worker/tests/city-game-route-window-schedule.test.ts",
+    "worker/tests/city-game-player-guide-core.test.ts",
+    "worker/tests/city-game-play-page-core.test.ts",
+    "worker/tests/city-game-map-board-core.test.ts",
+    "worker/tests/live-map-ticker.test.ts",
+    "worker/tests/city-game-season-snapshot.test.ts",
+    "worker/tests/map-node-snapshot.test.ts",
+    "worker/tests/city-game-map-snapshot-core.test.ts",
+    "worker/tests/city-game-contribute-load.test.ts",
+    "worker/tests/quorum-contribute.test.ts",
+    "worker/tests/city-game-vouch-copy.test.ts",
+    "worker/tests/city-game-scan-analytics-gate.test.ts",
+    "worker/tests/city-game-scaffold-play-core.test.ts",
+    "worker/tests/city-game-rules-publish-core.test.ts",
+    "worker/tests/city-game-season-setup-guide-core.test.ts",
+    "worker/tests/city-game-season-template-core.test.ts",
   ]);
 }
 
@@ -50,5 +81,8 @@ console.log("\n=== city-game season verify ===\n");
 const verifyArgs = ["worker/scripts/verify-city-game-season.mjs"];
 if (requireLaunch) verifyArgs.push("--require-launch");
 run("node", verifyArgs);
+
+console.log("\n=== city-game scaffold play pages ===\n");
+run("node", ["worker/scripts/city-game-scaffold-play.mjs", "--all", "--check"]);
 
 console.log("\n✅ verify:city-game complete.");
