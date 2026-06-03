@@ -70,6 +70,7 @@ Keep positioning layered; do not collapse into a single slogan:
 | Mechanism | Print once · change or revoke later | Landing hero |
 | Category | Physical software objects | Landing framing + `site/what-can-a-qr-do/physical-software-objects/` |
 | Catalog | What else can a QR do? | `site/what-can-a-qr-do.html` |
+| Expanded catalog | Blind spots, verbs, network grammar, open questions | [`QR_DESIGN_SPACE.md`](QR_DESIGN_SPACE.md) — docs only; do not outpace pilots |
 
 ---
 
@@ -92,5 +93,6 @@ Keep positioning layered; do not collapse into a single slogan:
 | `docs/M5_STRANGER_TEST_RUNBOOK.md` | Phase A exit gate |
 | `docs/M5_5_OWNER_KEY_PORTABILITY.md` | If strangers fail “revoke later” |
 | `docs/V1_USE_CASES.md` | Full use-case catalog (phased) |
+| `docs/QR_DESIGN_SPACE.md` | Expanded design space index (research; not build list) |
 | `docs/V1_0_ARCHITECTURE_ROADMAP.md` | Build order M0–M10 |
 | `docs/REVOKE_AND_LIFECYCLE_V1.md` | Revoke semantics |

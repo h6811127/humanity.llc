@@ -51,6 +51,26 @@ The **node** is the ultimate object: links, tap, relay, and edge compute in one 
 - Whether the node only caches **public** resolver state or ever participates in owner actions
 - Supply chain, engraving, and founding-drop relationship to merch stickers
 
+## Technology combinations
+
+Full table and rationale: [`QR_DESIGN_SPACE.md`](QR_DESIGN_SPACE.md) § Technology combinations. Carrier layers must preserve resolver semantics — not different trust models.
+
+| Technology | Role |
+|------------|------|
+| **NFC** | Same URL as QR; tap path for wristbands, accessibility |
+| **BLE mesh** | Relay signed blobs locally; resolver stays source of truth |
+| **Solar + e-ink** | Display last resolver state without a phone |
+| **Geofence (coarse)** | Optional “meaningful near object”; weak alone |
+| **SMS / voice** | Short code → status for dumb phones (crisis cards) |
+| **Calendar (iCal)** | Signed hours feed for menus, shelters |
+| **Web Push (opt-in)** | State-change subscription — not scan analytics |
+| **Passkeys / hardware keys** | Field maintainer signing without browser tab |
+| **Satellite / LTE** | Off-grid sync for trail markers, disaster nodes |
+| **Printed visual fingerprint** | Anti-swap alongside URL |
+| **Federation** | Cross-operator object graphs |
+
+**Avoid by default:** blockchain provenance, permanent IPFS “can’t revoke,” opaque ML trust scores.
+
 ## Landing page
 
 NFC/mesh diagrams were removed from `site/index.html` (May 2026) and live on the research page only, with a list-row link under “Same idea elsewhere.”
@@ -59,4 +79,5 @@ NFC/mesh diagrams were removed from `site/index.html` (May 2026) and live on the
 
 - `docs/M3_M4_EXECUTION_PLAN.md`  -  NFC/mesh called out as post–vertical-slice
 - `docs/V1_USE_CASES.md`  -  full use-case catalog (not on homepage scroll)
+- `docs/QR_DESIGN_SPACE.md`  -  expanded design space: blind spots, verbs, network grammar, open questions
 - `docs/AI_FEATURE_DEVELOPMENT.md`  -  localized object intelligence + L3 explain (shipped P1)

@@ -387,8 +387,15 @@ const RESEARCH_IN_DEV = [
     iconTone: "orange",
   },
   {
+    title: "Expanded design space",
+    sub: "Verbs, blind spots, network grammar, open questions",
+    href: "/what-can-a-qr-do/design-space/",
+    icon: "why",
+    iconTone: "gold",
+  },
+  {
     title: "What can a QR do?",
-    sub: "Full research index + combining demos",
+    sub: "Use-case walkthroughs + combining demos",
     href: "/what-can-a-qr-do.html",
     icon: "qr",
     iconTone: "red",
