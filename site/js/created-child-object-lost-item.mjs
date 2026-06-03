@@ -30,6 +30,16 @@ import {
   childObjectRegisterProgressLabel,
   childObjectRegisterSuccessMessage,
 } from "./child-object-register-issue-core.mjs";
+import { preserveChildDocumentFields } from "./child-object-time-policy-core.mjs";
+import { renderChildObjectCustodySection } from "./created-child-object-custody.mjs";
+import { renderChildObjectTimePolicySection } from "./created-child-object-time-policy.mjs";
+import { runChildObjectCustodyFormSubmit } from "./child-object-custody-publish.mjs";
+import { runChildObjectTimePolicyFormSubmit } from "./child-object-time-policy-publish.mjs";
+import {
+  dismissRelayOfferFromSection,
+  refreshRelayOffersSection,
+  renderChildObjectRelayOffersSection,
+} from "./created-child-object-lost-item-offers.mjs";
 
 /**
  * @param {string} profileId
@@ -126,7 +136,15 @@ function renderLostItemRelayList(profileId, rows) {
       disableBtn.dataset.objectId = row.object_id;
       disableBtn.textContent = "Disable this relay";
 
-      li.append(scanWrap, form, rowStatus, disableBtn);
+      li.append(
+        scanWrap,
+        form,
+        renderChildObjectCustodySection(row),
+        renderChildObjectTimePolicySection(row),
+        renderChildObjectRelayOffersSection(row),
+        rowStatus,
+        disableBtn
+      );
       return li;
     })
   );
@@ -177,6 +195,50 @@ export function initCreatedLostItemRelay(ctx) {
   listEl?.addEventListener("click", async (event) => {
     const target = event.target;
     if (!(target instanceof HTMLElement)) return;
+
+    if (target.classList.contains("child-object-relay-offers-refresh")) {
+      const section = target.closest(".child-object-relay-offers");
+      const rowEl = target.closest(".child-object-relay-row");
+      const objectId = rowEl instanceof HTMLElement ? rowEl.dataset.objectId : "";
+      if (!(section instanceof HTMLElement) || !objectId) return;
+      try {
+        await refreshRelayOffersSection({
+          section,
+          profileId: ctx.profileId,
+          objectId,
+          getSigningKeys: ctx.getSigningKeys,
+          showError: ctx.showError,
+        });
+      } catch {
+        // refreshRelayOffersSection reports via showError
+      }
+      return;
+    }
+
+    if (target.classList.contains("child-object-relay-offer-dismiss")) {
+      const offerId = target.dataset.offerId;
+      const section = target.closest(".child-object-relay-offers");
+      const rowEl = target.closest(".child-object-relay-row");
+      const objectId = rowEl instanceof HTMLElement ? rowEl.dataset.objectId : "";
+      if (!offerId || !(section instanceof HTMLElement) || !objectId) return;
+      if (target instanceof HTMLButtonElement) target.disabled = true;
+      try {
+        await dismissRelayOfferFromSection({
+          section,
+          profileId: ctx.profileId,
+          objectId,
+          offerId,
+          getSigningKeys: ctx.getSigningKeys,
+          showError: ctx.showError,
+        });
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        ctx.showError(message);
+      } finally {
+        if (target instanceof HTMLButtonElement) target.disabled = false;
+      }
+      return;
+    }
 
     if (target.classList.contains("child-object-relay-copy-scan")) {
       const url = target.dataset.scanUrl;
@@ -314,10 +376,51 @@ export function initCreatedLostItemRelay(ctx) {
 
   listEl?.addEventListener("submit", async (event) => {
     const target = event.target;
-    if (
-      !(target instanceof HTMLFormElement) ||
-      !target.classList.contains("child-object-relay-update-form")
-    ) {
+    if (!(target instanceof HTMLFormElement)) return;
+
+    if (target.classList.contains("child-object-custody-form")) {
+      event.preventDefault();
+      const rowEl = target.closest(".child-object-relay-row");
+      try {
+        await runChildObjectCustodyFormSubmit({
+          form: target,
+          rowEl: rowEl instanceof HTMLElement ? rowEl : null,
+          profileId: ctx.profileId,
+          objectType: CHILD_OBJECT_TYPE_LOST_ITEM_RELAY,
+          getSigningKeys: ctx.getSigningKeys,
+          showError: ctx.showError,
+          storage: localStorage,
+          readRows: readChildObjectRows,
+          refreshList,
+        });
+      } catch {
+        // runChildObjectCustodyFormSubmit reports via showError
+      }
+      return;
+    }
+
+    if (target.classList.contains("child-object-time-policy-form")) {
+      event.preventDefault();
+      const rowEl = target.closest(".child-object-relay-row");
+      try {
+        await runChildObjectTimePolicyFormSubmit({
+          form: target,
+          rowEl: rowEl instanceof HTMLElement ? rowEl : null,
+          profileId: ctx.profileId,
+          objectType: CHILD_OBJECT_TYPE_LOST_ITEM_RELAY,
+          getSigningKeys: ctx.getSigningKeys,
+          showError: ctx.showError,
+          storage: localStorage,
+          readRows: readChildObjectRows,
+          refreshList,
+        });
+      } catch {
+        // runChildObjectTimePolicyFormSubmit reports via showError
+      }
+      return;
+    }
+
+    if (!target.classList.contains("child-object-relay-update-form")) {
       return;
     }
     event.preventDefault();
@@ -364,6 +467,7 @@ export function initCreatedLostItemRelay(ctx) {
         createdAt: stored.created_at,
         privateKeyBase58: keys.privateKeyBase58,
         publicKeyBase58: keys.publicKeyBase58,
+        extraFields: preserveChildDocumentFields(stored),
       });
       await postChildObjectUpdate(ctx.profileId, objectId, signed);
       updateChildObjectRow(localStorage, ctx.profileId, objectId, { public_state: publicState });

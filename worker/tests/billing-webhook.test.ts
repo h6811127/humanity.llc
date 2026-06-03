@@ -144,6 +144,31 @@ describe("handlePostBillingWebhook", () => {
     expect(json.reason).toBe("commerce");
   });
 
+  it("activates hosted plan for checkout.session.completed (subscription)", async () => {
+    const { db, accounts } = billingDb();
+    const body = JSON.stringify({
+      type: "checkout.session.completed",
+      data: {
+        object: {
+          mode: "subscription",
+          customer: CUSTOMER,
+          subscription: SUB,
+          metadata: { account_id: ACCOUNT, plan_id: "hosted_steward_v1" },
+        },
+      },
+    });
+    const now = Math.floor(Date.now() / 1000);
+    const res = await handlePostBillingWebhook(
+      await signedRequest(secret, body, now),
+      env,
+      db
+    );
+    expect(res.status).toBe(200);
+    const row = accounts.get(ACCOUNT)!;
+    expect(row.plan_id).toBe("hosted_steward_v1");
+    expect(row.billing_subscription_id).toBe(SUB);
+  });
+
   it("activates hosted plan for subscription.updated on existing account", async () => {
     const { db, accounts } = billingDb();
     const body = JSON.stringify({

@@ -34,7 +34,7 @@
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=5" />
     <link rel="stylesheet" href="/styles.css?v=146" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=85" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=87" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=30" />
   </head>
   <body class="page-flow has-shell-chrome has-device-hub-search flow-shell flow-shell-create" data-boot="pending">
@@ -696,6 +696,12 @@
       class="device-hub-qr-scanner"
       aria-labelledby="device-hub-qr-scanner-title"
     >
+      <button
+        type="button"
+        class="device-hub-qr-scanner-scrim"
+        data-hub-qr-scanner-close
+        aria-label="Close scanner"
+      ></button>
       <div class="device-hub-qr-scanner-inner">
         <header class="device-hub-qr-scanner-head">
           <h2 id="device-hub-qr-scanner-title">Scan a Humanity QR</h2>
@@ -711,11 +717,14 @@
         <p class="device-hub-qr-scanner-lead" id="device-hub-qr-scanner-lead"></p>
         <div class="device-hub-qr-scanner-video-wrap">
           <video id="device-hub-qr-scanner-video" playsinline muted></video>
+          <div class="device-hub-qr-scanner-viewfinder" aria-hidden="true">
+            <span class="device-hub-qr-scanner-scan-line"></span>
+          </div>
         </div>
         <p class="form-status" id="device-hub-qr-scanner-status" role="status" hidden></p>
       </div>
     </dialog>
-    <script src="/js/device-status-bootstrap.mjs?v=84" type="module"></script>
+    <script src="/js/device-status-bootstrap.mjs?v=87" type="module"></script>
     <script src="/js/create-hub.mjs?v=1" type="module"></script>
     <script type="module" src="/js/create-card.mjs?v=19"></script>
   </body>

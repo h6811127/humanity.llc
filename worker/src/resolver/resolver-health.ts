@@ -11,6 +11,10 @@ import {
   OPERATOR_ID,
   PROTOCOL_VERSION,
 } from "../http/resolver";
+import {
+  operatorHealthDegradedByBudget,
+  readOperatorRequestBudget,
+} from "../operator/request-budget";
 import { resolverHealthBuildField } from "../resolver-health-build";
 
 /**
@@ -41,6 +45,13 @@ export async function handleGetResolverHealth(
     status: string;
     database: string;
     foreign_keys?: string;
+    budget?: {
+      state: string;
+      count: number;
+      soft_cap: number;
+      hard_cap: number;
+      window_key: string;
+    };
     build: ReturnType<typeof resolverHealthBuildField>;
   } = {
     version: PROTOCOL_VERSION,
@@ -68,6 +79,21 @@ export async function handleGetResolverHealth(
     if (!fkOk) {
       body.status = "degraded";
       return jsonResponse(body, 503);
+    }
+
+    const budget = await readOperatorRequestBudget(env, env.DB);
+    if (budget.enabled) {
+      body.budget = {
+        state: budget.state,
+        count: budget.count,
+        soft_cap: budget.softCap,
+        hard_cap: budget.hardCap,
+        window_key: budget.windowKey,
+      };
+      if (operatorHealthDegradedByBudget(budget.state)) {
+        body.status = "degraded";
+        return jsonResponse(body, 200);
+      }
     }
   } catch {
     body.database = "error";

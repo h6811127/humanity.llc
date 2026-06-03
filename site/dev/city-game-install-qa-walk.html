@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Cedar Rapids · install QA walk (C3)</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 42rem; margin: 1rem auto; padding: 0 1rem; line-height: 1.45; }
+    h1 { font-size: 1.25rem; }
+    .intro { background: #f4f4f5; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; }
+    .node { border-top: 1px solid #ddd; padding: 1rem 0; }
+    .scan-link { display: inline-block; margin: 0.5rem 0; font-weight: 600; }
+    .checks { padding-left: 1.1rem; }
+    .missing { color: #b45309; }
+    .footer { margin-top: 2rem; font-size: 0.9rem; color: #555; }
+  </style>
+</head>
+<body>
+  <h1>Physical install QA · 15 nodes × 3 phones</h1>
+  <div class="intro">
+    <p><strong>C3 human gate.</strong> Use phones A, B, C on the same Wi‑Fi as this laptop (192.168.4.37). Tap each link; check all seven items per node.</p>
+    <p>After stickers are placed, mark the install map installed, then:</p>
+    <p><code>npm run city-game:install-qa-sign-off -- --pass --apply --phones 3 --nodes 15</code></p>
+  </div>
+  <section class="node">
+  <h2>node_04 · Riverwalk River Lantern</h2>
+  <a class="scan-link" href="http://192.168.4.37:8787/c/CEenC57QN9qqnr2x5L89cbWt?q=qr_aV3BcFtid5NBfCuM">Riverwalk River Lantern</a>
+  <ul class="checks"><li><label><input type="checkbox" disabled /> 1. QR resolves — HTTP 200, not 404</label></li><li><label><input type="checkbox" disabled /> 2. Same on phone B (different OS if possible)</label></li><li><label><input type="checkbox" disabled /> 3. Same on phone C</label></li><li><label><input type="checkbox" disabled /> 4. Public object state — not app download wall</label></li><li><label><input type="checkbox" disabled /> 5. No leaderboard / streak / XP / scan-count copy</label></li><li><label><input type="checkbox" disabled /> 6. Care stream visible (node_14 boundary copy)</label></li><li><label><input type="checkbox" disabled /> 7. Sticker placement matches registry label</label></li></ul>
+</section>
+<section class="node">
+  <h2>node_07 · Czech Village cabinet</h2>
+  <a class="scan-link" href="http://192.168.4.37:8787/c/CEenC57QN9qqnr2x5L89cbWt?q=qr_Ag51j5E7WAAk5E5t">Czech Village cabinet</a>
+  <ul class="checks"><li><label><input type="checkbox" disabled /> 1. QR resolves — HTTP 200, not 404</label></li><li><label><input type="checkbox" disabled /> 2. Same on phone B (different OS if possible)</label></li><li><label><input type="checkbox" disabled /> 3. Same on phone C</label></li><li><label><input type="checkbox" disabled /> 4. Public object state — not app download wall</label></li><li><label><input type="checkbox" disabled /> 5. No leaderboard / streak / XP / scan-count copy</label></li><li><label><input type="checkbox" disabled /> 6. Care stream visible (node_14 boundary copy)</label></li><li><label><input type="checkbox" disabled /> 7. Sticker placement matches registry label</label></li></ul>
+</section>
+<section class="node">
+  <h2>node_02 · NewBo café window</h2>
+  <a class="scan-link" href="http://192.168.4.37:8787/c/CEenC57QN9qqnr2x5L89cbWt?q=qr_syndkxm9sv8Jh9sG">NewBo café window</a>
+  <ul class="checks"><li><label><input type="checkbox" disabled /> 1. QR resolves — HTTP 200, not 404</label></li><li><label><input type="checkbox" disabled /> 2. Same on phone B (different OS if possible)</label></li><li><label><input type="checkbox" disabled /> 3. Same on phone C</label></li><li><label><input type="checkbox" disabled /> 4. Public object state — not app download wall</label></li><li><label><input type="checkbox" disabled /> 5. No leaderboard / streak / XP / scan-count copy</label></li><li><label><input type="checkbox" disabled /> 6. Care stream visible (node_14 boundary copy)</label></li><li><label><input type="checkbox" disabled /> 7. Sticker placement matches registry label</label></li></ul>
+</section>
+<section class="node">
+  <h2>node_14 · River fountain / rain garden</h2>
+  <a class="scan-link" href="http://192.168.4.37:8787/c/CEenC57QN9qqnr2x5L89cbWt?q=qr_cLDrg7HUdUDLBvXR">River fountain / rain garden</a>
+  <ul class="checks"><li><label><input type="checkbox" disabled /> 1. QR resolves — HTTP 200, not 404</label></li><li><label><input type="checkbox" disabled /> 2. Same on phone B (different OS if possible)</label></li><li><label><input type="checkbox" disabled /> 3. Same on phone C</label></li><li><label><input type="checkbox" disabled /> 4. Public object state — not app download wall</label></li><li><label><input type="checkbox" disabled /> 5. No leaderboard / streak / XP / scan-count copy</label></li><li><label><input type="checkbox" disabled /> 6. Care stream visible (node_14 boundary copy)</label></li><li><label><input type="checkbox" disabled /> 7. Sticker placement matches registry label</label></li></ul>
+</section>
+  <p class="footer">Internal · docs/CITY_GAME_INSTALL_QA.md · not for players</p>
+</body>
+</html>

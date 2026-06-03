@@ -42,7 +42,12 @@ import {
 } from "./object-snapshot";
 import { buildAgentContextPacket } from "./ai-explain-core";
 import type { ScanCapability } from "../live-object/scan-capabilities";
-import { buildScanCapabilities } from "../live-object/scan-capabilities";
+import { objectCustodyStatusPayload } from "../live-object/custody";
+import { buildScanFreshnessPayload, type ScanFreshnessPayload } from "../live-object/staleness-contract";
+import {
+  resolveSuccessionScanContext,
+  type SuccessionScanContext,
+} from "../live-object/succession-spec";
 import { AI_EXPLAIN_ENDPOINT } from "./ai-explain-snapshot";
 
 export { BEARER_WARNING };
@@ -90,6 +95,12 @@ export interface ScanStatusBody {
     live_control: { available: boolean; proven_at: string | null };
     /** Interaction verbs advertised for this scan (Layer 2 — live object architecture). */
     capabilities?: ScanCapability[];
+    /** Possession assignment on Phase A child objects (Layer 1). */
+    custody?: Record<string, unknown>;
+    /** Resolver freshness contract — honest staleness for cache/mesh clients (Order 6). */
+    freshness: ScanFreshnessPayload;
+    /** Archive / sunset hints when object or season is winding down (Order 6). */
+    succession: SuccessionScanContext;
     limits: {
       bearer_warning: string;
       object_details_warning?: string;
@@ -112,7 +123,10 @@ export interface ScanStatusBody {
 
 export type { GovernanceProcessUrls };
 
-export function scanStatusBodyFromViewModel(vm: ScanViewModel): ScanStatusBody {
+export function scanStatusBodyFromViewModel(
+  vm: ScanViewModel,
+  now: Date = new Date()
+): ScanStatusBody {
   const humanTrust = humanTrustDisplay(vm);
   const origin = originFromScanUrl(vm.scanUrl);
   const governance =
@@ -176,7 +190,16 @@ export function scanStatusBodyFromViewModel(vm: ScanViewModel): ScanStatusBody {
         available: vm.liveControlAvailable,
         proven_at: vm.liveControlProvenAt,
       },
-      capabilities: buildScanCapabilities(vm),
+      capabilities: vm.capabilities,
+      ...(objectCustodyStatusPayload(vm.childCustody)
+        ? { custody: objectCustodyStatusPayload(vm.childCustody)! }
+        : {}),
+      freshness: buildScanFreshnessPayload({
+        now,
+        cacheControl: vm.cacheControl,
+        kind: vm.kind,
+      }),
+      succession: resolveSuccessionScanContext(vm),
       limits: {
         bearer_warning: BEARER_WARNING,
         ...(vm.objectStreams.length
@@ -208,6 +231,20 @@ export function scanStatusBodyFromViewModel(vm: ScanViewModel): ScanStatusBody {
           }
         : {}),
       ...(governance ? { governance } : {}),
+    },
+  };
+}
+
+/** ETag fingerprint — scan state only; excludes per-response `freshness.fetched_at`. */
+export function scanStatusBodyForWeakEtag(body: ScanStatusBody): ScanStatusBody {
+  return {
+    ...body,
+    scan: {
+      ...body.scan,
+      freshness: {
+        ...body.scan.freshness,
+        fetched_at: "",
+      },
     },
   };
 }
@@ -317,7 +354,7 @@ async function statusResponse(
   if (status >= 200 && status < 300) {
     return jsonResponseWithWeakEtag(request, payload, status, {
       "Cache-Control": vm.cacheControl,
-    });
+    }, scanStatusBodyForWeakEtag(payload));
   }
   return jsonResponse(payload, status, {
     "Cache-Control": vm.cacheControl,

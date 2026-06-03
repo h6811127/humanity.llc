@@ -67,7 +67,10 @@ import {
   hubPersonalizedRenderDeferred,
   hubSavedListRenderDeferred,
 } from "./device-hub-boot-core.mjs";
-import { shouldSuppressCardDisabledSinceVisitAlerts } from "./device-wallet-since-visit-gate.mjs";
+import {
+  getResolverHealthStatus,
+  shouldSuppressCardDisabledSinceVisitAlerts,
+} from "./device-wallet-since-visit-gate.mjs";
 import {
   getCachedNetworkSeenAt,
   getCachedNetworkScanKind,
@@ -88,12 +91,12 @@ import {
   snapshotNetworkSeenOnExit,
   syncLastSeenFromNetworkMap,
   NETWORK_REFRESHED,
-} from "./device-wallet-network.mjs?v=84";
-import { clearWalletNetworkTruthForProfile } from "./device-wallet-network-truth.mjs?v=84";
+} from "./device-wallet-network.mjs?v=87";
+import { clearWalletNetworkTruthForProfile } from "./device-wallet-network-truth.mjs?v=87";
 import {
   hubNetworkChipStatusForProfile,
   shouldShowHubNetworkCheckingChip,
-} from "./device-wallet-network-core.mjs?v=84";
+} from "./device-wallet-network-core.mjs?v=87";
 import {
   broadcastNetworkSnapshotIfEligible,
   shouldFollowerSkipAutoNetworkFetch,
@@ -107,7 +110,7 @@ import {
   hubCardIdentityLine,
   hubCardStatusLine,
   hubCardTitle,
-} from "./device-hub-card-row-core.mjs?v=84";
+} from "./device-hub-card-row-core.mjs?v=87";
 import {
   childObjectHubFocusHash,
   hubChildObjectIconHtml,
@@ -157,7 +160,7 @@ import {
 import { tabNoticeCount } from "./device-counts.mjs";
 import { mountHubBuildStamp } from "./device-hub-build-stamp.mjs";
 import { mountHubNetworkTools } from "./device-hub-network-tools.mjs";
-import { syncInboxBackdropForOpenHub } from "./device-sheet-backdrop-sync.mjs?v=84";
+import { syncInboxBackdropForOpenHub } from "./device-sheet-backdrop-sync.mjs?v=87";
 import {
   HUB_STRANGER_EMPTY_CLASS,
   isHubStrangerEmptyState,
@@ -197,6 +200,7 @@ import {
 } from "./device-hub-network-tools-core.mjs";
 import {
   isDeviceHubExpanded,
+  liveControlPollAllowedByResolverHealth,
   walletNetworkVisibilityRefreshAllowed,
 } from "./device-live-control-poll-scheduler.mjs";
 import {
@@ -1170,6 +1174,25 @@ async function fetchAndApplyNetworkChips(opts = {}) {
   const manual = opts.manual === true;
   if (manual) {
     claimLiveControlPollLeader();
+  } else if (!liveControlPollAllowedByResolverHealth(getResolverHealthStatus())) {
+    const { entries } = normalizeWalletQrIds(stored);
+    applyNetworkChipsToDom(
+      Object.fromEntries(
+        entries.map((e) => [e.profile_id, hubRowChipStatus(e.profile_id)])
+      ),
+      null,
+      {},
+      null,
+      { allowBannerShow: true }
+    );
+    syncHubInboxAlertGroups();
+    notifyHubChanged();
+    window.dispatchEvent(
+      new CustomEvent(HUB_NETWORK_CHECKED_EVENT, {
+        detail: { at: lastWalletNetworkFetchAt },
+      })
+    );
+    return;
   } else if (shouldFollowerSkipAutoNetworkFetch()) {
     const { entries } = normalizeWalletQrIds(stored);
     applyNetworkChipsToDom(

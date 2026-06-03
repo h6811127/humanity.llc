@@ -3,8 +3,11 @@ import { describe, expect, it } from "vitest";
 import {
   formatStewardLinkUserMessage,
   generateStewardAccountId,
+  generateStewardDeviceId,
   isValidStewardAccountId,
+  isValidStewardDeviceId,
   stewardAccountIdForLink,
+  STEWARD_DEVICE_ID_REGEX,
 } from "../../site/js/device-steward-session-core.mjs";
 
 describe("steward account id for link", () => {
@@ -21,6 +24,20 @@ describe("steward account id for link", () => {
   it("stewardAccountIdForLink mints when no pending id", () => {
     const id = stewardAccountIdForLink(null, null);
     expect(isValidStewardAccountId(id)).toBe(true);
+  });
+});
+
+describe("steward device id", () => {
+  it("generateStewardDeviceId matches operator DEVICE_ID_REGEX", () => {
+    const id = generateStewardDeviceId();
+    expect(id.startsWith("dev_")).toBe(true);
+    expect(isValidStewardDeviceId(id)).toBe(true);
+  });
+
+  it("rejects crypto.randomUUID shape (contains 0)", () => {
+    expect(STEWARD_DEVICE_ID_REGEX.test("550e8400-e29b-41d4-a716-446655440000")).toBe(
+      false
+    );
   });
 });
 

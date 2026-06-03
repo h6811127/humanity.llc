@@ -495,6 +495,7 @@ Use this table when prioritizing work. **Shipped** items have modules named; **P
 | O1 | Workers Paid on production | Ops | Monitor daily requests | 0 |
 | O2 | Per-IP rate limits on hot routes | **Yes** (2026-05-28) | `GET …/status` 300/IP/min; `GET …/live-control/*` 300/IP/min; `GET …/health` 120/IP/min | Server ✅ |
 | O3 | Fail closed on 1027 | Yes | User-visible degraded state | 3 ✅ |
+| O4 | Operator daily request budget (soft cap → health `degraded`) | **Yes** (2026-06-03) | `operator_usage_counters`; default **80k**/UTC day soft cap stops auto polls; manual Check network unchanged | Server ✅ |
 
 ### Implementer order (after Phases 1–9 + 8c)
 
@@ -528,6 +529,7 @@ Tabs with `hc_created` heartbeat into `hc_tab_keys_presence` (max **20** rows). 
 
 | Date | Note |
 |------|------|
+| 2026-06-03 | **O4 shipped:** operator UTC-day request budget — health `degraded` at **80k** soft cap; auto wallet network + live-proof polls pause; manual Check network unchanged |
 | 2026-05-28 | **S12 shipped:** large expanded hub summary-row viewport window (scroll/sentinel + Show more; resets on hub collapse) |
 | 2026-05-28 | **Large-wallet shell perf:** viewport scroll-sync for expanded hub summary rows (visible-row window + sentinel/scroll load); incremental summary-window paths avoid full `hc_wallet` row hydration until action |
 | 2026-05-28 | **O2 step 2 shipped:** per-IP rate limits on `GET …/live-control/*` (300/min) and `GET …/health` (120/min) |

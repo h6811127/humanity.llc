@@ -27,6 +27,12 @@ export function isChildObjectRow(row) {
   if (r.scan_url !== undefined && typeof r.scan_url !== "string") return false;
   if (r.created_at !== undefined && typeof r.created_at !== "string") return false;
   if (r.status !== undefined && typeof r.status !== "string") return false;
+  if (r.time_policy !== undefined && (typeof r.time_policy !== "object" || r.time_policy === null)) {
+    return false;
+  }
+  if (r.custody !== undefined && (typeof r.custody !== "object" || r.custody === null)) {
+    return false;
+  }
   return true;
 }
 
@@ -82,6 +88,12 @@ export function rowsFromNetworkChildObjects(profileId, networkObjects, buildScan
       };
       if (typeof row.status === "string") out.status = row.status;
       if (typeof row.created_at === "string") out.created_at = row.created_at;
+      if (row.time_policy && typeof row.time_policy === "object") {
+        out.time_policy = row.time_policy;
+      }
+      if (row.custody && typeof row.custody === "object") {
+        out.custody = row.custody;
+      }
       const qrId =
         typeof row.active_qr_id === "string" && row.active_qr_id ? row.active_qr_id : null;
       if (qrId) {
@@ -133,7 +145,11 @@ export function updateChildObjectRow(storage, profileId, objectId, patch) {
   if (index < 0) {
     throw new Error("Child object not found on this device.");
   }
-  const updated = { ...rows[index], ...patch };
+  const updated = { ...rows[index] };
+  for (const [key, value] of Object.entries(patch)) {
+    if (value === undefined) delete updated[key];
+    else updated[key] = value;
+  }
   if (!isChildObjectRow(updated)) {
     throw new Error("Invalid child object row.");
   }

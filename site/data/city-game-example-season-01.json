@@ -15,7 +15,11 @@
     "starts_at": null,
     "ends_at": null
   },
-  "districts": ["downtown", "river", "old_town"],
+  "districts": [
+    "downtown",
+    "river",
+    "old_town"
+  ],
   "map_copy": {
     "title": "City state",
     "subtitle": "Weekend board · read-only",
@@ -44,19 +48,54 @@
   },
   "comprehension_kit": {
     "primary_scan_node": "node_02",
-    "probe_nodes": ["node_02", "node_01", "node_03"]
+    "probe_nodes": [
+      "node_02",
+      "node_01",
+      "node_04",
+      "node_07"
+    ]
   },
   "map_layout": {
     "version": 1,
     "nodes": {
-      "node_01": { "x": 0.7, "y": 0.25 },
-      "node_02": { "x": 0.35, "y": 0.55 },
-      "node_03": { "x": 0.55, "y": 0.75 }
+      "node_01": {
+        "x": 0.7,
+        "y": 0.25
+      },
+      "node_02": {
+        "x": 0.35,
+        "y": 0.55
+      },
+      "node_03": {
+        "x": 0.55,
+        "y": 0.75
+      }
     },
     "district_zones": [
-      { "id": "downtown", "x": 58, "y": 8, "w": 38, "h": 32, "label": "Downtown" },
-      { "id": "river", "x": 8, "y": 38, "w": 38, "h": 34, "label": "River" },
-      { "id": "old_town", "x": 42, "y": 58, "w": 38, "h": 34, "label": "Old town" }
+      {
+        "id": "downtown",
+        "x": 58,
+        "y": 8,
+        "w": 38,
+        "h": 32,
+        "label": "Downtown"
+      },
+      {
+        "id": "river",
+        "x": 8,
+        "y": 38,
+        "w": 38,
+        "h": 34,
+        "label": "River"
+      },
+      {
+        "id": "old_town",
+        "x": 42,
+        "y": 58,
+        "w": 38,
+        "h": 34,
+        "label": "Old town"
+      }
     ],
     "svg_title": "Schematic Example City season nodes and unlock paths"
   },
@@ -81,21 +120,120 @@
       "role": "finale",
       "district": "old_town",
       "label": "Old town arch"
+    },
+    {
+      "node_id": "node_04",
+      "object_id": "obj_ex_node_04_lantern",
+      "role": "temp_drop",
+      "district": "downtown",
+      "label": "Quorum drop · collective unlock"
+    },
+    {
+      "node_id": "node_05",
+      "object_id": "obj_ex_node_05_relay",
+      "role": "relay_gate",
+      "district": "river",
+      "label": "Relay gate · River"
+    },
+    {
+      "node_id": "node_06",
+      "object_id": "obj_ex_node_06_split",
+      "role": "route_splitter",
+      "district": "old_town",
+      "label": "Route splitter · choose a path"
+    },
+    {
+      "node_id": "node_07",
+      "object_id": "obj_ex_node_07_lore",
+      "role": "lore_archive",
+      "district": "downtown",
+      "label": "Private cabinet · trust path"
+    },
+    {
+      "node_id": "node_08",
+      "object_id": "obj_ex_node_08_relay",
+      "role": "relay_gate",
+      "district": "river",
+      "label": "Relay gate · River"
+    },
+    {
+      "node_id": "node_09",
+      "object_id": "obj_ex_node_09_lore",
+      "role": "lore_archive",
+      "district": "old_town",
+      "label": "Fragment node · mural or marker"
+    },
+    {
+      "node_id": "node_10",
+      "object_id": "obj_ex_node_10_witness",
+      "role": "witness",
+      "district": "downtown",
+      "label": "Witness seal · library or institution"
+    },
+    {
+      "node_id": "node_11",
+      "object_id": "obj_ex_node_11_split",
+      "role": "route_splitter",
+      "district": "river",
+      "label": "Fragment node · second district"
+    },
+    {
+      "node_id": "node_12",
+      "object_id": "obj_ex_node_12_sanctuary",
+      "role": "sanctuary",
+      "district": "old_town",
+      "label": "Sanctuary · treaty bench"
+    },
+    {
+      "node_id": "node_13",
+      "object_id": "obj_ex_node_13_finale",
+      "role": "finale",
+      "district": "downtown",
+      "label": "Finale arch · lattice switch"
+    },
+    {
+      "node_id": "node_14",
+      "object_id": "obj_ex_node_14_care",
+      "role": "care_loop",
+      "district": "river",
+      "label": "Care loop · fountain or rain garden"
+    },
+    {
+      "node_id": "node_15",
+      "object_id": "obj_ex_node_15_relay",
+      "role": "relay_gate",
+      "district": "old_town",
+      "label": "Relay gate · market or steps"
     }
   ],
   "unlock_edges": [
-    { "from": "node_02", "to": "node_03", "label": "River lantern opens old town arch" }
+    {
+      "from": "node_02",
+      "to": "node_03",
+      "label": "River lantern opens old town arch"
+    }
   ],
   "contribute_codes": {
-    "node_02": { "code": "EX-LANTERN-1", "epoch": "example_city_season_01" }
+    "node_02": {
+      "code": "EX-LANTERN-1",
+      "epoch": "example_city_season_01"
+    }
   },
   "automation": {
-    "quorum_nodes": ["node_02"],
-    "fragment_nodes": ["node_01"],
+    "quorum_nodes": [
+      "node_02"
+    ],
+    "fragment_nodes": [
+      "node_01"
+    ],
     "finale_node": "node_03",
     "witness_scarcity_node": "node_01"
   },
   "mobile_lore_enrollment": [],
-  "bulletin_schedule": { "entries": [] },
-  "route_window_schedule": { "entries": [] }
+  "bulletin_schedule": {
+    "entries": []
+  },
+  "route_window_schedule": {
+    "entries": []
+  }
 }

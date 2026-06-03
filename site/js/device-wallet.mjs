@@ -480,6 +480,16 @@ export function walletEntryFromSession(session, label) {
         session.verification?.state
       ) ?? session.verification,
     issued_vouches: session.issued_vouches,
+    ...(typeof session.issuer_public_key === "string"
+      ? { issuer_public_key: session.issuer_public_key }
+      : {}),
+    ...(typeof session.organizer_public_key_b58 === "string"
+      ? { organizer_public_key_b58: session.organizer_public_key_b58 }
+      : {}),
+    ...(typeof session.organizer_private_key_b58 === "string"
+      ? { organizer_private_key_b58: session.organizer_private_key_b58 }
+      : {}),
+    ...(session.has_organizer_revoke ? { has_organizer_revoke: true } : {}),
   };
   return mergeOwnershipSeatbeltFields(entry, session);
 }
@@ -688,6 +698,12 @@ export function mergeWalletEntryFromSession(existing, session, label = "") {
       session.verification ??
       existing.verification,
     issued_vouches: session.issued_vouches ?? existing.issued_vouches,
+    issuer_public_key: session.issuer_public_key ?? existing.issuer_public_key,
+    organizer_public_key_b58:
+      session.organizer_public_key_b58 ?? existing.organizer_public_key_b58,
+    organizer_private_key_b58:
+      session.organizer_private_key_b58 ?? existing.organizer_private_key_b58,
+    has_organizer_revoke: session.has_organizer_revoke ?? existing.has_organizer_revoke,
     saved_at: new Date().toISOString(),
   };
   return mergeOwnershipSeatbeltFields(merged, session);

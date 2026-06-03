@@ -72,6 +72,11 @@ export const PAYLOAD_FIELD_RULES: Record<PayloadType, PayloadFieldRules> = {
     timestampFields: ["created_at", "updated_at"],
     uniqueIdFields: ["object_id"],
   },
+  [PAYLOAD_TYPES.RELAY_OFFER_OWNER_QUERY]: {
+    subjectProfileField: "profile_id",
+    timestampFields: ["created_at"],
+    uniqueIdFields: ["object_id"],
+  },
 };
 
 export function isPayloadType(value: string): value is PayloadType {

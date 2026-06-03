@@ -17,6 +17,7 @@ import {
   withCors,
 } from "./http/resolver";
 import { maybeCanonicalOriginRedirect } from "./http/canonical-origin";
+import { recordOperatorRequestIfEnabled } from "./operator/request-budget";
 import { handlePostArtifactIntent, handlePostArtifactIntentAttach, handlePostArtifactIntentPreMint } from "./resolver/artifact-intents";
 import { handleGetStoreProduct, handleGetStoreRows } from "./store/store-rows-handler";
 import { handleGetStoreOrderStatus } from "./resolver/store-order-status";
@@ -41,6 +42,10 @@ import { handlePostIssuePrintArtifactQr } from "./resolver/issue-print-artifact-
 import { handlePostIssueChildObjectQr } from "./resolver/issue-child-object-qr";
 import { handlePostGameUpdate } from "./resolver/game-update";
 import { handlePostGameContribute } from "./resolver/game-contribute";
+import {
+  handlePostLostItemOffer,
+  handlePostLostItemOfferOwner,
+} from "./resolver/lost-item-offer";
 import { handlePostRotateQr } from "./resolver/rotate-qr";
 import { handlePostExtendQr } from "./resolver/extend-qr";
 import { handleGetScan } from "./resolver/scan";
@@ -204,6 +209,8 @@ export default {
         headers: corsHeaders(request),
       });
     }
+
+    recordOperatorRequestIfEnabled(env, ctx);
 
     const canonicalRedirect = maybeCanonicalOriginRedirect(request);
     if (canonicalRedirect) return canonicalRedirect;
@@ -727,6 +734,44 @@ export default {
         env,
         childObjectGameContributeMatch[1]!,
         childObjectGameContributeMatch[2]!
+      );
+      return withCors(request, res);
+    }
+
+    const childObjectOfferMatch = path.match(
+      /^\/\.well-known\/hc\/v1\/cards\/([^/]+)\/objects\/([^/]+)\/offer$/
+    );
+    if (childObjectOfferMatch && request.method === "POST") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostLostItemOffer(
+        request,
+        env.DB,
+        childObjectOfferMatch[1]!,
+        childObjectOfferMatch[2]!
+      );
+      return withCors(request, res);
+    }
+
+    const childObjectOfferOwnerMatch = path.match(
+      /^\/\.well-known\/hc\/v1\/cards\/([^/]+)\/objects\/([^/]+)\/offer\/owner$/
+    );
+    if (childObjectOfferOwnerMatch && request.method === "POST") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostLostItemOfferOwner(
+        request,
+        env.DB,
+        childObjectOfferOwnerMatch[1]!,
+        childObjectOfferOwnerMatch[2]!
       );
       return withCors(request, res);
     }

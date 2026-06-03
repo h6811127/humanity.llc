@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import type { CardRow, QrCredentialRow, VerificationSummaryRow } from "../src/db/types";
+import type { CardRow, ChildObjectRow, QrCredentialRow, VerificationSummaryRow } from "../src/db/types";
+import { readTrustGroups } from "../src/live-object/scan-capabilities";
 import { renderScanPage } from "../src/resolver/scan-html";
 import { buildScanViewModel } from "../src/resolver/scan-state";
 
@@ -73,6 +74,7 @@ describe("scan trust groups (M3 zone G)", () => {
     expect(vm.showCardBlock).toBe(false);
     expect(vm.showHumanTrustBlock).toBe(false);
     expect(vm.showArtifactBlock).toBe(false);
+    expect(readTrustGroups(vm.capabilities)).toEqual([]);
 
     const html = await renderScanPage(vm, "https://humanity.llc");
     expect(html).not.toContain('aria-label="Trust details at scan time"');
@@ -98,5 +100,35 @@ describe("scan trust groups (M3 zone G)", () => {
     expect(html).toContain("Check at scan time");
     expect(html).toContain("Card status");
     expect(html).toContain("This QR");
+  });
+
+  it("omits live control trust group on Phase A child object scans", async () => {
+    const child: ChildObjectRow = {
+      object_id: "obj_status_plate_trust",
+      parent_profile_id: PROFILE,
+      object_type: "status_plate",
+      public_label: "Studio door",
+      public_state: "Open",
+      status: "active",
+      child_object_document_json: "{}",
+      created_at: "2026-05-16T17:00:00Z",
+      updated_at: "2026-05-16T17:00:00Z",
+    };
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: card({ manifesto_line: "Studio door\nOpen" }),
+        qr: qrRow({ scope: "child_object", object_id: child.object_id }),
+        verification: summary(),
+        childObject: child,
+        revocationDisplay: null,
+      },
+      "https://humanity.llc"
+    );
+    const html = await renderScanPage(vm, "https://humanity.llc");
+    expect(html).toContain('aria-label="Trust details at scan time"');
+    expect(html).not.toContain("Live control");
+    expect(html).not.toContain('id="live-control-request"');
   });
 });

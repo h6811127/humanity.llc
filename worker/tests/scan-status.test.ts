@@ -6,8 +6,10 @@ import type { CardRow, QrCredentialRow, VerificationSummaryRow } from "../src/db
 import {
   BEARER_WARNING,
   httpStatusForScanKind,
+  scanStatusBodyForWeakEtag,
   scanStatusBodyFromViewModel,
 } from "../src/resolver/scan-status";
+import { weakEtagFromSerializedJson } from "../src/http/conditional-json";
 import {
   buildCardOnlyScanViewModel,
   buildScanViewModel,
@@ -86,6 +88,27 @@ describe("scan status JSON (M3.4)", () => {
     expect(body.scan.limits.scan_analytics).toBe(false);
     expect(body.scan.verification.vouch_count).toBe(0);
     expect(httpStatusForScanKind(vm.kind)).toBe(200);
+    expect(body.scan.freshness.max_age_seconds).toBe(300);
+    expect(body.scan.succession.phase).toBe("live");
+  });
+
+  it("weak ETag ignores per-response freshness.fetched_at", async () => {
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      { card: card(), qr: qr(), verification: summary(), revocationDisplay: null },
+      "https://humanity.llc"
+    );
+    const a = scanStatusBodyForWeakEtag(
+      scanStatusBodyFromViewModel(vm, new Date("2026-06-07T18:00:00.000Z"))
+    );
+    const b = scanStatusBodyForWeakEtag(
+      scanStatusBodyFromViewModel(vm, new Date("2026-06-07T19:00:00.000Z"))
+    );
+    expect(a.scan.freshness.fetched_at).toBe("");
+    expect(
+      await weakEtagFromSerializedJson(JSON.stringify(a))
+    ).toBe(await weakEtagFromSerializedJson(JSON.stringify(b)));
   });
 
   it("status JSON exposes vouch count and latest recency (V-001)", () => {
@@ -348,7 +371,8 @@ describe("scan status JSON (M3.4)", () => {
         `https://humanity.llc/.well-known/hc/v1/cards/${PROFILE}/status?q=${QR}`,
         { headers: { Origin: "http://localhost:8788" } }
       ),
-      { DB: db } as import("../src").Env
+      { DB: db } as import("../src").Env,
+      { waitUntil: () => {} } as ExecutionContext
     );
     expect(res.headers.get("Access-Control-Allow-Origin")).toBe(
       "http://localhost:8788"

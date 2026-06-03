@@ -105,6 +105,16 @@ export function activateWalletEntry(entry) {
         verification: entry.verification,
         issued_vouches: entry.issued_vouches || [],
         wallet_label: entry.label,
+        ...(typeof entry.issuer_public_key === "string"
+          ? { issuer_public_key: entry.issuer_public_key }
+          : {}),
+        ...(typeof entry.organizer_public_key_b58 === "string"
+          ? { organizer_public_key_b58: entry.organizer_public_key_b58 }
+          : {}),
+        ...(typeof entry.organizer_private_key_b58 === "string"
+          ? { organizer_private_key_b58: entry.organizer_private_key_b58 }
+          : {}),
+        ...(entry.has_organizer_revoke ? { has_organizer_revoke: true } : {}),
       },
       entry
     )

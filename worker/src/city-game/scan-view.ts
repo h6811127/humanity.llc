@@ -43,7 +43,7 @@ export type GameNodeScanContext = {
   seasonWindowPhase: SeasonWindowPhase;
 };
 
-const CARE_PAUSE_RE = /pause|closed|maintenance|flood|blocked|out of service/i;
+import { isCareStreamPaused as isCareStreamPausedFromPolicy } from "../live-object/stream-policy";
 
 const DISTRICT_LABELS: Record<string, string> = {
   newbo: "NewBo",
@@ -134,9 +134,7 @@ export function gameNodeContributeEyebrow(
 }
 
 export function isCareStreamPaused(streams: ObjectPublicStream[]): boolean {
-  const care = streams.find((s) => s.class === "care" || s.id === "care");
-  if (!care?.value) return false;
-  return CARE_PAUSE_RE.test(care.value);
+  return isCareStreamPausedFromPolicy(streams);
 }
 
 export function isGameNodeExpired(meta: GameMeta, now: Date): boolean {

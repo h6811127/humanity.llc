@@ -45,6 +45,11 @@ export function generatePrintQuoteId(): string {
   return `pq_${randomBase58(16)}`;
 }
 
+/** ro_ + opaque base58 id for anonymous finder relay offers. */
+export function generateRelayOfferId(): string {
+  return `ro_${randomBase58(18)}`;
+}
+
 /** lc_ + opaque base58 challenge id for short-lived live control proof. */
 export function generateLiveControlChallengeId(): string {
   return `lc_${randomBase58(18)}`;

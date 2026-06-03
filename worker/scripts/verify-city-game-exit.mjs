@@ -31,6 +31,7 @@ if (!skipTests) {
     "worker/tests/city-game-contribute.test.ts",
     "worker/tests/city-game-season-window.test.ts",
     "worker/tests/city-game-season-readiness.test.ts",
+    "worker/tests/network-graph-core.test.ts",
     "worker/tests/city-game-seed-site-codes.test.ts",
     "worker/tests/city-game-smoke-contribute-core.test.ts",
     "worker/tests/city-game-season-registry.test.ts",

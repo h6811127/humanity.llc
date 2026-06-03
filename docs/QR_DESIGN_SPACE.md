@@ -324,12 +324,12 @@ Every catalog category below maps to a **phase**, **pilot or demo**, and **code 
 | **Contribute** (public history / game) | B | Cedar Rapids S1 | `game-contribute.ts`, `live-object/scan-capabilities.ts` | Partial (engineering shipped; pilot P2 open) |
 | **Time-bound objects** | A | Status plate, city game windows | `manifesto-display.ts`, `route-window-schedule.ts`, `season-window.ts` | Partial |
 | **Revoke / rotate** | A | Core primitive | `update-card.ts`, revoke resolver | Shipped |
-| **Offer** (finder message) | A | Lost-item relay | `manifesto-display.ts` (`[relay]` prefix), `created-child-object-lost-item.mjs` | Partial |
+| **Offer** (finder message) | A | Lost-item relay | `POST …/offer`, `POST …/offer/owner`, `scan-lost-item-offer.mjs`, `created-child-object-lost-item-offers.mjs` | Partial |
 | **Delegate / custody** | A+ | Child objects | `worker/src/db/child-objects.ts`, `created-child-object*.mjs` | Partial |
 | **Network primitives** | B | Cedar Rapids + map board | `quorum-contribute.ts`, `map-node-snapshot.ts`, `live-map-ticker.ts` | Partial (engineering shipped; launch gates open) |
 | **Archive / sleep** | B | Season dormancy | `season-window.ts`, `live-object/scan-capabilities.ts` | Partial |
-| **Honest offline / stale cache** | Future | — | — | Research |
-| **Governance / succession** | D+ | Organizer revoke | `ORGANIZER_SIGNED_REVOKE_PILOT.md` | Partial (revoke only) |
+| **Honest offline / stale cache** | Future | — | `live-object/staleness-contract.ts`, `scan-status.ts` `freshness`, `scan-freshness-banner.ts` | Partial (HTML banner + status JSON; mesh TBD) |
+| **Governance / succession** | D+ | Organizer revoke | `live-object/succession-spec.ts`, `ORGANIZER_SIGNED_REVOKE_PILOT.md` | Partial |
 | **Anti-patterns** (no scan analytics, etc.) | A | Platform policy | `REFERENCE_OPERATOR_DATA_POLICY.md`, scan limits copy | Shipped (policy) |
 | **Accessibility / dumb phones** | Future | NFC research | `RESEARCH_DIRECTIONS_AND_NODES.md` | Research |
 

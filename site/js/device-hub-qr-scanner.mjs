@@ -24,12 +24,15 @@ import { getTabSession } from "./device-keys.mjs";
 import { hasStewardVerification } from "./device-dot-state-core.mjs";
 import { getWalletCount, loadWalletSummary } from "./device-wallet.mjs";
 import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
+import { prefersReducedMotion } from "./device-shell-motion.mjs";
 
 /** @type {MediaStream | null} */
 let activeStream = null;
 /** @type {(() => void) | null} */
 let stopScanLoop = null;
 let bound = false;
+
+const SCANNER_CLOSE_MS = 280;
 
 function scannerDialog() {
   return document.getElementById("device-hub-qr-scanner");
@@ -75,13 +78,94 @@ async function stopCamera() {
   if (video) video.srcObject = null;
 }
 
-function closeScannerDialog() {
+function scannerInner() {
+  return document.querySelector(".device-hub-qr-scanner-inner");
+}
+
+function resetScannerDialogPresentation() {
   const dialog = scannerDialog();
+  if (!dialog) return;
+  dialog.classList.remove("device-hub-qr-scanner--present", "device-hub-qr-scanner--closing");
+  scannerInner()?.style.removeProperty("transform-origin");
+}
+
+function syncScannerDialogOrigin() {
+  const inner = scannerInner();
+  const btn = document.getElementById("shell-scan-qr-btn");
+  if (!inner || !btn || btn.hidden) {
+    inner?.style.removeProperty("transform-origin");
+    return;
+  }
+  const btnRect = btn.getBoundingClientRect();
+  const innerRect = inner.getBoundingClientRect();
+  const originX = btnRect.left + btnRect.width / 2 - innerRect.left;
+  const originY = btnRect.top + btnRect.height / 2 - innerRect.top;
+  inner.style.transformOrigin = `${Math.round(originX)}px ${Math.round(originY)}px`;
+}
+
+function revealScannerPresentation() {
+  const dialog = scannerDialog();
+  if (!dialog?.open) return;
+
+  if (prefersReducedMotion()) {
+    dialog.classList.add("device-hub-qr-scanner--present");
+    return;
+  }
+
+  requestAnimationFrame(() => {
+    syncScannerDialogOrigin();
+    void scannerInner()?.offsetWidth;
+    requestAnimationFrame(() => {
+      dialog.classList.add("device-hub-qr-scanner--present");
+    });
+  });
+}
+
+function showScannerModal() {
+  const dialog = scannerDialog();
+  if (!dialog) return;
+  resetScannerDialogPresentation();
+  window.dispatchEvent(new CustomEvent("hc-hub-sheet-close"));
+  dialog.showModal();
+  revealScannerPresentation();
+}
+
+function finishScannerClose() {
+  const dialog = scannerDialog();
+  resetScannerDialogPresentation();
   void stopCamera();
   setScannerStatus("");
   setScannerCameraUi(true);
   dialog?.classList.remove("device-hub-qr-scanner--no-camera");
-  dialog?.close();
+  if (dialog?.open) dialog.close();
+}
+
+function closeScannerDialog() {
+  const dialog = scannerDialog();
+  if (!dialog?.open) return;
+  if (dialog.classList.contains("device-hub-qr-scanner--closing")) return;
+
+  if (prefersReducedMotion() || !dialog.classList.contains("device-hub-qr-scanner--present")) {
+    finishScannerClose();
+    return;
+  }
+
+  dialog.classList.remove("device-hub-qr-scanner--present");
+  dialog.classList.add("device-hub-qr-scanner--closing");
+  const inner = scannerInner();
+  let closed = false;
+  const done = () => {
+    if (closed) return;
+    closed = true;
+    finishScannerClose();
+  };
+  const onTransitionEnd = (event) => {
+    if (event.target !== inner || event.propertyName !== "opacity") return;
+    inner?.removeEventListener("transitionend", onTransitionEnd);
+    done();
+  };
+  inner?.addEventListener("transitionend", onTransitionEnd);
+  window.setTimeout(done, SCANNER_CLOSE_MS + 60);
 }
 
 function onScanUrlFound(url) {
@@ -102,7 +186,7 @@ async function openScannerDialog() {
   if (!backend) {
     setScannerCameraUi(false);
     setScannerStatus(HUB_SCAN_QR_UNSUPPORTED, true);
-    dialog.showModal();
+    showScannerModal();
     return;
   }
 
@@ -112,7 +196,7 @@ async function openScannerDialog() {
   if (lead) lead.textContent = HUB_SCAN_QR_DIALOG_LEAD;
   setScannerCameraUi(true);
   setScannerStatus("Starting camera…");
-  dialog.showModal();
+  showScannerModal();
 
   try {
     activeStream = await navigator.mediaDevices.getUserMedia({
@@ -184,17 +268,21 @@ function bindScannerChrome() {
   bound = true;
 
   const dialog = scannerDialog();
-  dialog?.querySelector("[data-hub-qr-scanner-close]")?.addEventListener("click", (e) => {
+  dialog?.addEventListener("click", (e) => {
+    const closeTarget = e.target.closest("[data-hub-qr-scanner-close]");
+    if (!closeTarget) return;
     e.preventDefault();
     closeScannerDialog();
   });
   dialog?.addEventListener("close", () => {
+    resetScannerDialogPresentation();
     void stopCamera();
     setScannerStatus("");
     setScannerCameraUi(true);
   });
-  dialog?.addEventListener("cancel", () => {
-    void stopCamera();
+  dialog?.addEventListener("cancel", (e) => {
+    e.preventDefault();
+    closeScannerDialog();
   });
 
   document.getElementById("shell-scan-qr-btn")?.addEventListener("click", (e) => {

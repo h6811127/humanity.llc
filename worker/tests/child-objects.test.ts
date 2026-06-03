@@ -169,6 +169,78 @@ describe("child object endpoints", () => {
     expect(body).toMatchObject({ object_id: OBJECT_ID, status: "active" });
   });
 
+  it("accepts optional time_policy on status_plate create", async () => {
+    const keys = await getTestKeypair();
+    const db = new ChildObjectDb();
+    db.parent.public_key = keys.publicKeyBase58;
+    const object = await signedChildObject(keys, {
+      time_policy: {
+        valid_until: "2026-12-31T22:00:00-05:00",
+        timezone: "America/Chicago",
+      },
+    });
+
+    const res = await handlePostChildObjectCreate(
+      requestFor(`/.well-known/hc/v1/cards/${PROFILE}/objects`, object),
+      db as unknown as D1Database,
+      PROFILE
+    );
+
+    expect(res.status).toBe(201);
+    const stored = JSON.parse(
+      db.objects.get(OBJECT_ID)?.child_object_document_json ?? "{}"
+    ) as { time_policy?: { valid_until?: string } };
+    expect(stored.time_policy?.valid_until).toBe("2026-12-31T22:00:00-05:00");
+  });
+
+  it("rejects malformed time_policy schedule slots", async () => {
+    const keys = await getTestKeypair();
+    const db = new ChildObjectDb();
+    db.parent.public_key = keys.publicKeyBase58;
+    const object = await signedChildObject(keys, {
+      time_policy: {
+        schedule: [{ local_hour_from: 9 }],
+      },
+    });
+
+    const res = await handlePostChildObjectCreate(
+      requestFor(`/.well-known/hc/v1/cards/${PROFILE}/objects`, object),
+      db as unknown as D1Database,
+      PROFILE
+    );
+
+    expect(res.status).toBe(422);
+  });
+
+  it("accepts optional custody on lost_item_relay create", async () => {
+    const keys = await getTestKeypair();
+    const db = new ChildObjectDb();
+    db.parent.public_key = keys.publicKeyBase58;
+    const objectId = "obj_lost_item_relay1";
+    const object = await signedChildObject(keys, {
+      object_id: objectId,
+      object_type: "lost_item_relay",
+      public_label: "House keys",
+      public_state: "Lost — contact through relay",
+      custody: {
+        holder_label: "Finder at front desk",
+        note: "Turn in at lobby",
+      },
+    });
+
+    const res = await handlePostChildObjectCreate(
+      requestFor(`/.well-known/hc/v1/cards/${PROFILE}/objects`, object),
+      db as unknown as D1Database,
+      PROFILE
+    );
+
+    expect(res.status).toBe(201);
+    const stored = JSON.parse(
+      db.objects.get(objectId)?.child_object_document_json ?? "{}"
+    ) as { custody?: { holder_label?: string } };
+    expect(stored.custody?.holder_label).toBe("Finder at front desk");
+  });
+
   it("allows recovery key to update an active child object", async () => {
     const owner = await getTestKeypair();
     const recovery = await getTestKeypair();
@@ -269,6 +341,53 @@ describe("child object endpoints", () => {
       active_qr_id: "qr_child_plate_01",
       public_state: "Open",
     });
+  });
+
+  it("lists time_policy on Phase A child objects when present in signed document", async () => {
+    const keys = await getTestKeypair();
+    const db = new ChildObjectDb();
+    db.parent.public_key = keys.publicKeyBase58;
+    const object = await signedChildObject(keys, {
+      time_policy: {
+        valid_until: "2026-12-31T22:00:00-05:00",
+        timezone: "America/Chicago",
+        schedule: [],
+      },
+    });
+    await handlePostChildObjectCreate(
+      requestFor(`/.well-known/hc/v1/cards/${PROFILE}/objects`, object),
+      db as unknown as D1Database,
+      PROFILE
+    );
+
+    const res = await handleGetChildObjects(db as unknown as D1Database, PROFILE);
+    const body = (await res.json()) as {
+      objects: Array<{ time_policy?: { valid_until?: string } }>;
+    };
+    expect(body.objects[0]?.time_policy?.valid_until).toBe("2026-12-31T22:00:00-05:00");
+  });
+
+  it("lists custody on Phase A child objects when present in signed document", async () => {
+    const keys = await getTestKeypair();
+    const db = new ChildObjectDb();
+    db.parent.public_key = keys.publicKeyBase58;
+    const object = await signedChildObject(keys, {
+      custody: {
+        holder_label: "Tool library desk",
+        note: "Return at close",
+      },
+    });
+    await handlePostChildObjectCreate(
+      requestFor(`/.well-known/hc/v1/cards/${PROFILE}/objects`, object),
+      db as unknown as D1Database,
+      PROFILE
+    );
+
+    const res = await handleGetChildObjects(db as unknown as D1Database, PROFILE);
+    const body = (await res.json()) as {
+      objects: Array<{ custody?: { holder_label?: string } }>;
+    };
+    expect(body.objects[0]?.custody?.holder_label).toBe("Tool library desk");
   });
 
   it("returns 404 when parent card is missing", async () => {

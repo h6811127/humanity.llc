@@ -28,15 +28,20 @@ export function ifNoneMatchSatisfied(request: Request, etag: string): boolean {
 
 /**
  * JSON GET with weak ETag and 304 Not Modified when If-None-Match matches.
+ * Pass `etagBody` when the response includes volatile fields (e.g. per-request timestamps)
+ * that must not bust conditional GET.
  */
 export async function jsonResponseWithWeakEtag(
   request: Request,
   body: unknown,
   status: number,
-  extraHeaders?: HeadersInit
+  extraHeaders?: HeadersInit,
+  etagBody?: unknown
 ): Promise<Response> {
   const serialized = JSON.stringify(body);
-  const etag = await weakEtagFromSerializedJson(serialized);
+  const etag = await weakEtagFromSerializedJson(
+    JSON.stringify(etagBody ?? body)
+  );
   const headers = resolverHeaders({
     ETag: etag,
     ...extraHeaders,

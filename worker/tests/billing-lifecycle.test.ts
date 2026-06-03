@@ -7,11 +7,38 @@ import {
   shouldExpirePastDueAccount,
   stewardUpdateForPaymentFailed,
   stewardUpdateForSubscriptionDeleted,
+  stewardUpdateFromHostedCheckoutSession,
   stewardUpdateFromStripeSubscription,
 } from "../src/steward/billing-lifecycle";
 import { effectiveEntitlementsForAccount } from "../src/steward/plans";
 
 const NOW = Date.parse("2026-05-26T12:00:00.000Z");
+
+describe("stewardUpdateFromHostedCheckoutSession", () => {
+  it("maps subscription checkout session to hosted plan", () => {
+    const update = stewardUpdateFromHostedCheckoutSession(
+      {
+        mode: "subscription",
+        customer: "cus_checkout1",
+        subscription: "sub_checkout1",
+        metadata: { account_id: "acc_checkout1", plan_id: "hosted_steward_v1" },
+      },
+      NOW
+    );
+    expect(update?.plan_id).toBe("hosted_steward_v1");
+    expect(update?.status).toBe("active");
+    expect(update?.billing_subscription_id).toBe("sub_checkout1");
+  });
+
+  it("returns null for one-off payment sessions", () => {
+    expect(
+      stewardUpdateFromHostedCheckoutSession({
+        mode: "payment",
+        metadata: { account_id: "acc_1" },
+      })
+    ).toBeNull();
+  });
+});
 
 describe("stewardUpdateFromStripeSubscription", () => {
   it("returns null without account_id metadata (commerce cannot grant)", () => {

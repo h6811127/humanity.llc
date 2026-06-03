@@ -20,6 +20,14 @@ import { resolveSeasonForProfile } from "../city-game/season-loader";
 import { enforceGameNodeCap } from "../city-game/season-quota";
 import { parseGameNodeFields } from "../city-game/scan-view";
 import { validateGameNodeDocument } from "../city-game/game-meta";
+import { validateTimePolicyForChildDocument } from "../live-object/time-policy";
+import { validateCustodyForChildDocument } from "../live-object/custody";
+import { parseObjectTimePolicy } from "../live-object/time-policy";
+import { parseObjectCustody } from "../live-object/custody";
+import {
+  CHILD_OBJECT_TYPE_LOST_ITEM_RELAY,
+  CHILD_OBJECT_TYPE_STATUS_PLATE,
+} from "../live-object/object-types";
 
 export const CHILD_OBJECT_ID_REGEX = /^obj_[A-Za-z0-9_-]{4,76}$/;
 const OBJECT_TYPE_RE = /^[a-z][a-z0-9_-]{0,39}$/;
@@ -196,6 +204,17 @@ async function verifiedChildObjectDoc(
     return {
       ok: false,
       response: errorResponse("MALFORMED_REQUEST", "updated_at must not precede created_at.", 422),
+    };
+  }
+
+  try {
+    validateTimePolicyForChildDocument(doc, objectType);
+    validateCustodyForChildDocument(doc, objectType);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Invalid child object document.";
+    return {
+      ok: false,
+      response: errorResponse("MALFORMED_REQUEST", msg, 422),
     };
   }
 
@@ -390,6 +409,24 @@ export async function handlePostChildObjectRevoke(
   return responseForObject({ profileId: pathProfileId, ...parsed });
 }
 
+function phaseAChildDocumentFields(documentJson: string | null | undefined): {
+  time_policy: ReturnType<typeof parseObjectTimePolicy>;
+  custody: ReturnType<typeof parseObjectCustody>;
+} {
+  if (!documentJson?.trim()) {
+    return { time_policy: null, custody: null };
+  }
+  try {
+    const doc = JSON.parse(documentJson) as Record<string, unknown>;
+    return {
+      time_policy: parseObjectTimePolicy(doc),
+      custody: parseObjectCustody(doc),
+    };
+  } catch {
+    return { time_policy: null, custody: null };
+  }
+}
+
 export async function handleGetChildObjects(
   db: D1Database,
   pathProfileId: string
@@ -423,7 +460,20 @@ export async function handleGetChildObjects(
           updated_at: row.updated_at,
           active_qr_id: qrByObjectId.get(row.object_id) ?? null,
         };
-        if (row.object_type !== GAME_NODE_OBJECT_TYPE) return base;
+        if (row.object_type !== GAME_NODE_OBJECT_TYPE) {
+          if (
+            row.object_type === CHILD_OBJECT_TYPE_STATUS_PLATE ||
+            row.object_type === CHILD_OBJECT_TYPE_LOST_ITEM_RELAY
+          ) {
+            const phaseA = phaseAChildDocumentFields(row.child_object_document_json);
+            return {
+              ...base,
+              ...(phaseA.time_policy ? { time_policy: phaseA.time_policy } : {}),
+              ...(phaseA.custody ? { custody: phaseA.custody } : {}),
+            };
+          }
+          return base;
+        }
         const game = parseGameNodeFields(row.child_object_document_json);
         if (!game) return base;
         return {

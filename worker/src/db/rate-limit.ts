@@ -33,6 +33,9 @@ const VOUCH_APPEAL_BUCKET_PREFIX = "vouch_appeal:";
 /** 20 city-game site-code contributions per IP per hour (abuse control only). */
 export const GAME_CONTRIBUTE_LIMIT_PER_HOUR = 20;
 const GAME_CONTRIBUTE_BUCKET_PREFIX = "game_contribute:";
+/** 10 anonymous finder relay offers per IP per hour (abuse control only). */
+export const RELAY_OFFER_LIMIT_PER_HOUR = 10;
+const RELAY_OFFER_BUCKET_PREFIX = "relay_offer:";
 
 async function incrementBucket(
   db: D1Database,
@@ -388,6 +391,20 @@ export async function checkGameContributeRateLimit(
     ipHash,
     GAME_CONTRIBUTE_BUCKET_PREFIX,
     GAME_CONTRIBUTE_LIMIT_PER_HOUR,
+    now
+  );
+}
+
+export async function checkRelayOfferRateLimit(
+  db: D1Database,
+  ipHash: string,
+  now: Date = new Date()
+): Promise<{ allowed: boolean; retryAfterSec?: number }> {
+  return checkPerHourIpRateLimit(
+    db,
+    ipHash,
+    RELAY_OFFER_BUCKET_PREFIX,
+    RELAY_OFFER_LIMIT_PER_HOUR,
     now
   );
 }

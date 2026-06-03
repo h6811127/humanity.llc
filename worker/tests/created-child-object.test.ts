@@ -214,6 +214,10 @@ describe("child-object issue-qr client", () => {
     expect(src).toContain("issueChildObjectScanLink");
     expect(src).toContain("signChildObjectRevoke");
     expect(src).toContain("postChildObjectRevoke");
+    expect(src).toContain("child-object-time-policy-form");
+    expect(src).toContain("child-object-custody-form");
+    expect(src).toContain("runChildObjectTimePolicyFormSubmit");
+    expect(src).toContain("preserveChildDocumentFields");
   });
 
   it("exports lost-item relay client wiring for /created/", () => {
@@ -228,6 +232,31 @@ describe("child-object issue-qr client", () => {
     expect(src).toContain("issueChildObjectScanLink");
     expect(src).toContain("signChildObjectRevoke");
     expect(src).toContain("refreshChildObjectsFromNetwork");
+    expect(src).toContain("child-object-custody-form");
+    expect(src).toContain("child-object-time-policy-form");
+    expect(src).toContain("renderChildObjectTimePolicySection");
+    expect(src).toContain("runChildObjectTimePolicyFormSubmit");
+    expect(src).toContain("preserveChildDocumentFields");
+    expect(src).toContain("renderChildObjectRelayOffersSection");
+    expect(src).toContain("refreshRelayOffersSection");
+    expect(src).toContain("dismissRelayOfferFromSection");
+  });
+
+  it("exports relay offer owner client helpers", () => {
+    const offers = readFileSync(
+      join(process.cwd(), "site/js/created-child-object-lost-item-offers.mjs"),
+      "utf8"
+    );
+    expect(offers).toContain("listRelayOffers");
+    expect(offers).toContain("dismissRelayOffer");
+    expect(offers).toContain("Finder messages");
+
+    const owner = readFileSync(
+      join(process.cwd(), "site/js/lost-item-offer-owner.mjs"),
+      "utf8"
+    );
+    expect(owner).toContain("relay_offer_owner_query");
+    expect(owner).toContain("postLostItemOfferOwnerUrl");
   });
 });
 

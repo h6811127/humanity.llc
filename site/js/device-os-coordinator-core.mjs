@@ -23,3 +23,16 @@ export function shouldRefreshLiveControlInbox(reason) {
 export function shouldRefreshWalletNetwork(reason) {
   return shouldRefreshLiveControlInbox(reason);
 }
+
+/**
+ * Auto wallet network refresh runs only when resolver health is ok.
+ * Manual Check network bypasses this gate.
+ *
+ * @param {string | null | undefined} reason
+ * @param {'ok' | 'degraded' | 'offline'} resolverHealth
+ * @returns {boolean}
+ */
+export function shouldAutoRefreshWalletNetwork(reason, resolverHealth) {
+  if (!shouldRefreshWalletNetwork(reason)) return false;
+  return resolverHealth === "ok";
+}

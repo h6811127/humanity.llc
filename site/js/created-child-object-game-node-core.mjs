@@ -68,7 +68,11 @@ function isGeneralRootCardSession(session) {
 export function shouldOfferAddGameNode(session) {
   if (!isGeneralRootCardSession(session)) return false;
   const issuer =
-    typeof session?.issuer_public_key === "string" ? session.issuer_public_key.trim() : "";
+    typeof session?.issuer_public_key === "string"
+      ? session.issuer_public_key.trim()
+      : typeof session?.organizer_public_key_b58 === "string"
+        ? session.organizer_public_key_b58.trim()
+        : "";
   return issuer.length > 0;
 }
 

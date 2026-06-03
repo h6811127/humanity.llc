@@ -18,12 +18,43 @@ export const STEWARD_LINK_TTL_MS = 5 * 60 * 1000;
 export const ACCOUNT_ID_REGEX =
   /^acc_[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{8,64}$/;
 
+/** Matches worker `DEVICE_ID_REGEX` (no 0/O/l to avoid ambiguity). */
+export const STEWARD_DEVICE_ID_REGEX =
+  /^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz_-]{8,64}$/;
+
+const DEVICE_ID_ALPHABET =
+  "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+
 /**
  * @param {string | null | undefined} accountId
  * @returns {boolean}
  */
 export function isValidStewardAccountId(accountId) {
   return typeof accountId === "string" && ACCOUNT_ID_REGEX.test(accountId.trim());
+}
+
+/**
+ * @param {string | null | undefined} deviceId
+ */
+export function isValidStewardDeviceId(deviceId) {
+  return (
+    typeof deviceId === "string" && STEWARD_DEVICE_ID_REGEX.test(deviceId.trim())
+  );
+}
+
+/**
+ * Opaque install id for steward metering (must not use crypto.randomUUID — contains `0`).
+ *
+ * @returns {string}
+ */
+export function generateStewardDeviceId() {
+  let suffix = "";
+  const bytes = new Uint8Array(24);
+  crypto.getRandomValues(bytes);
+  for (const b of bytes) {
+    suffix += DEVICE_ID_ALPHABET[b % DEVICE_ID_ALPHABET.length];
+  }
+  return `dev_${suffix}`;
 }
 
 /**
@@ -155,6 +186,9 @@ export function formatStewardLinkUserMessage(status, code, message) {
   }
   if (c === "REPLAYED_NONCE" || msg.includes("nonce already used")) {
     return "That link was already used. Click Connect steward account again.";
+  }
+  if (c === "INVALID_DEVICE_ID" || msg.includes("Invalid device_id")) {
+    return "This browser stored an invalid device id (often from an older build). Refresh the page and click Connect steward account again.";
   }
   if (status === 404 && msg.includes("Hosted steward")) {
     return "Hosted steward is not enabled on this operator.";

@@ -30,6 +30,17 @@ export const LOST_ITEM_RELAY_CREATE_HINT =
   "Tag your own item with a revocable return path — no phone number on the sticker.";
 export const LOST_ITEM_RELAY_CREATE_PATH = "/create/?template=lost_item";
 
+/** Finder offer form on lost-item relay scans (Layer 2 offer verb). */
+export const LOST_ITEM_OFFER_EYEBROW = "Finder";
+export const LOST_ITEM_OFFER_LEAD =
+  "Leave a short return message for the owner. No account — not linked to your scan.";
+export const LOST_ITEM_OFFER_FIELD_LABEL = "Message for owner";
+export const LOST_ITEM_OFFER_SUBMIT_LABEL = "Send through relay";
+export const LOST_ITEM_OFFER_SUCCESS =
+  "Message sent. The owner can read it on their relay — you stay anonymous.";
+export const LOST_ITEM_OFFER_PRIVACY_NOTE =
+  "This does not prove you found the item or who holds it.";
+
 /** Merch funnel — live wear / print_artifact scans (docs/MERCH_FUNNEL_MVP.md). */
 export const MERCH_SCAN_FUNNEL_REF = "scan_customize";
 export const MERCH_SCAN_FUNNEL_HINT =

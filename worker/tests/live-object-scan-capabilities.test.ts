@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import type { CardRow, ChildObjectRow, QrCredentialRow, VerificationSummaryRow } from "../src/db/types";
-import { buildScanCapabilities } from "../src/live-object/scan-capabilities";
+import { buildScanCapabilities, findScanCapability, readTrustGroups, shouldShowLiveControlTrustGroup } from "../src/live-object/scan-capabilities";
+import { scanLayoutForMinimalFailureTrust, scanLayoutForRevocationDisplay } from "../src/resolver/revocation-display";
 import { scanStatusBodyFromViewModel } from "../src/resolver/scan-status";
 import { buildScanViewModel } from "../src/resolver/scan-state";
 import { CITY_GAME_SEASON_ROOT_PROFILE } from "./city-game-fixture-profile";
@@ -175,11 +176,124 @@ describe("buildScanCapabilities (Order 2 — Cedar Rapids verbs)", () => {
 
   it("includes capabilities on scan status JSON for game nodes", () => {
     const vm = gameScanVm(new Date("2026-06-07T18:00:00.000Z"));
+    expect(vm.capabilities.length).toBeGreaterThanOrEqual(3);
     const body = scanStatusBodyFromViewModel(vm);
 
-    expect(body.scan.capabilities).toBeDefined();
-    expect(body.scan.capabilities?.length).toBeGreaterThanOrEqual(3);
+    expect(body.scan.capabilities).toEqual(vm.capabilities);
     expect(body.scan.limits.scan_analytics).toBe(false);
+  });
+
+  it("advertises offer verb on lost-item relay child scans", () => {
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: {
+          profile_id: PROFILE,
+          public_key: "pk",
+          handle: "season_root",
+          handle_normalized: "season_root",
+          manifesto_line: "[relay] Keys\nLost",
+          status: "active",
+          card_document_json: "{}",
+          created_at: "2026-06-01T12:00:00.000Z",
+          updated_at: "2026-06-01T12:00:00.000Z",
+        },
+        qr: {
+          qr_id: QR,
+          profile_id: PROFILE,
+          epoch: 1,
+          scope: "child_object",
+          print_artifact_id: null,
+          object_id: "obj_lost_keys",
+          resolver_hint: "https://humanity.llc",
+          status: "active",
+          payload: `https://humanity.llc/c/${PROFILE}?q=${QR}`,
+          issued_at: "2026-06-01T12:00:00.000Z",
+          expires_at: null,
+          credential_document_json: "{}",
+          created_at: "2026-06-01T12:00:00.000Z",
+          updated_at: "2026-06-01T12:00:00.000Z",
+        },
+        verification: null,
+        childObject: {
+          object_id: "obj_lost_keys",
+          parent_profile_id: PROFILE,
+          object_type: "lost_item_relay",
+          public_label: "Keys",
+          public_state: "Lost — contact owner through relay",
+          status: "active",
+          child_object_document_json: "{}",
+          created_at: "2026-06-01T12:00:00.000Z",
+          updated_at: "2026-06-01T12:00:00.000Z",
+        },
+        revocationDisplay: null,
+      },
+      "https://humanity.llc"
+    );
+
+    expect(findScanCapability(vm.capabilities, "read")).toMatchObject({
+      available: true,
+      kind: "lost_item_relay",
+    });
+    expect(findScanCapability(vm.capabilities, "offer")).toMatchObject({
+      available: true,
+      kind: "finder_relay",
+    });
+    expect(findScanCapability(vm.capabilities, "request")).toBeUndefined();
+  });
+
+  it("omits request verb on status plate child scans", () => {
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: {
+          profile_id: PROFILE,
+          public_key: "pk",
+          handle: "season_root",
+          handle_normalized: "season_root",
+          manifesto_line: "Studio door\nOpen",
+          status: "active",
+          card_document_json: "{}",
+          created_at: "2026-06-01T12:00:00.000Z",
+          updated_at: "2026-06-01T12:00:00.000Z",
+        },
+        qr: {
+          qr_id: QR,
+          profile_id: PROFILE,
+          epoch: 1,
+          scope: "child_object",
+          print_artifact_id: null,
+          object_id: "obj_status_plate_1",
+          resolver_hint: "https://humanity.llc",
+          status: "active",
+          payload: `https://humanity.llc/c/${PROFILE}?q=${QR}`,
+          issued_at: "2026-06-01T12:00:00.000Z",
+          expires_at: null,
+          credential_document_json: "{}",
+          created_at: "2026-06-01T12:00:00.000Z",
+          updated_at: "2026-06-01T12:00:00.000Z",
+        },
+        verification: null,
+        childObject: {
+          object_id: "obj_status_plate_1",
+          parent_profile_id: PROFILE,
+          object_type: "status_plate",
+          public_label: "Studio door",
+          public_state: "Open",
+          status: "active",
+          child_object_document_json: "{}",
+          created_at: "2026-06-01T12:00:00.000Z",
+          updated_at: "2026-06-01T12:00:00.000Z",
+        },
+        revocationDisplay: null,
+      },
+      "https://humanity.llc"
+    );
+
+    expect(findScanCapability(vm.capabilities, "request")).toBeUndefined();
+    expect(shouldShowLiveControlTrustGroup(vm.capabilities)).toBe(false);
   });
 });
 
@@ -228,6 +342,157 @@ describe("buildScanCapabilities (non-game scans)", () => {
       available: false,
       reason: "not_offered",
     });
+    expect(shouldShowLiveControlTrustGroup(caps)).toBe(true);
+    expect(readTrustGroups(caps)).toEqual(["card", "human", "qr"]);
     expect(caps.some((c) => c.verb === "contribute")).toBe(false);
+  });
+
+  it("omits human trust group on minimal failure layout", () => {
+    const layout = scanLayoutForMinimalFailureTrust();
+    const vm = buildScanViewModel(
+      "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+      "qr_7Xk9mP2nQ4rT6vW8",
+      {
+        card: {
+          profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+          public_key: "pk",
+          handle: "river_example",
+          handle_normalized: "river_example",
+          manifesto_line: "Open studio",
+          status: "revoked",
+          card_document_json: "{}",
+          created_at: "2026-05-16T17:00:00Z",
+          updated_at: "2026-05-16T17:00:00Z",
+        },
+        qr: {
+          qr_id: "qr_7Xk9mP2nQ4rT6vW8",
+          profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+          epoch: 1,
+          scope: "card",
+          print_artifact_id: null,
+          resolver_hint: "https://humanity.llc",
+          status: "revoked",
+          payload: "https://humanity.llc/c/7Xk9mP2nQ4rT6vW8yZ1aB3cD5?q=qr_7Xk9mP2nQ4rT6vW8",
+          issued_at: "2026-05-16T17:00:00Z",
+          expires_at: null,
+          credential_document_json: "{}",
+          created_at: "2026-05-16T17:00:00Z",
+          updated_at: "2026-05-16T17:00:00Z",
+        },
+        verification: null,
+        revocationDisplay: {
+          display_mode: "minimal",
+          public_reason: "owner_revoked",
+        },
+      },
+      "https://humanity.llc"
+    );
+
+    expect(layout.showHumanTrustBlock).toBe(false);
+    expect(readTrustGroups(vm.capabilities)).toEqual(["card", "qr"]);
+  });
+
+  it("advertises card-only trust groups on tombstone revocation layout", () => {
+    const layout = scanLayoutForRevocationDisplay({ display_mode: "tombstone", public_reason: "event_ended" });
+    expect(layout.showArtifactBlock).toBe(false);
+    const vm = buildScanViewModel(
+      "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+      "qr_7Xk9mP2nQ4rT6vW8",
+      {
+        card: {
+          profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+          public_key: "pk",
+          handle: "river_example",
+          handle_normalized: "river_example",
+          manifesto_line: "Open studio",
+          status: "revoked",
+          card_document_json: "{}",
+          created_at: "2026-05-16T17:00:00Z",
+          updated_at: "2026-05-16T17:00:00Z",
+        },
+        qr: {
+          qr_id: "qr_7Xk9mP2nQ4rT6vW8",
+          profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+          epoch: 1,
+          scope: "card",
+          print_artifact_id: null,
+          resolver_hint: "https://humanity.llc",
+          status: "revoked",
+          payload: "https://humanity.llc/c/7Xk9mP2nQ4rT6vW8yZ1aB3cD5?q=qr_7Xk9mP2nQ4rT6vW8",
+          issued_at: "2026-05-16T17:00:00Z",
+          expires_at: null,
+          credential_document_json: "{}",
+          created_at: "2026-05-16T17:00:00Z",
+          updated_at: "2026-05-16T17:00:00Z",
+        },
+        verification: null,
+        revocationDisplay: {
+          display_mode: "tombstone",
+          public_reason: "event_ended",
+        },
+      },
+      "https://humanity.llc"
+    );
+
+    expect(readTrustGroups(vm.capabilities)).toEqual(["card"]);
+  });
+
+  it("advertises archive state for Phase A child objects outside time_policy hours", () => {
+    const vm = buildScanViewModel(
+      "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+      "qr_child_status_plate01",
+      {
+        card: {
+          profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+          public_key: "pk",
+          handle: "river_example",
+          handle_normalized: "river_example",
+          manifesto_line: "Studio door\nClosed",
+          status: "active",
+          card_document_json: "{}",
+          created_at: "2026-05-16T17:00:00Z",
+          updated_at: "2026-05-16T17:00:00Z",
+        },
+        qr: {
+          qr_id: "qr_child_status_plate01",
+          profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+          epoch: 1,
+          scope: "child_object",
+          print_artifact_id: null,
+          object_id: "obj_status_plate_live1",
+          resolver_hint: "https://humanity.llc",
+          status: "active",
+          payload:
+            "https://humanity.llc/c/7Xk9mP2nQ4rT6vW8yZ1aB3cD5?q=qr_child_status_plate01",
+          issued_at: "2026-05-16T17:00:00Z",
+          expires_at: null,
+          credential_document_json: "{}",
+          created_at: "2026-05-16T17:00:00Z",
+          updated_at: "2026-05-16T17:00:00Z",
+        },
+        verification: null,
+        revocationDisplay: null,
+        childObject: {
+          object_id: "obj_status_plate_live1",
+          parent_profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+          object_type: "status_plate",
+          public_label: "Studio door",
+          public_state: "Closed",
+          status: "active",
+          child_object_document_json: JSON.stringify({
+            time_policy: {
+              valid_until: "2026-01-01T00:00:00.000Z",
+            },
+          }),
+          created_at: "2026-05-16T17:00:00Z",
+          updated_at: "2026-05-16T17:00:00Z",
+        },
+      },
+      "https://humanity.llc",
+      new Date("2026-06-15T12:00:00.000Z")
+    );
+
+    const archive = buildScanCapabilities(vm).find((c) => c.verb === "archive");
+    expect(archive).toMatchObject({ available: true, state: "after" });
   });
 });

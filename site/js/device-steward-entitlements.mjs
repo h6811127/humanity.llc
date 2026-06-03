@@ -23,7 +23,9 @@ import {
 } from "./device-steward-entitlements-core.mjs";
 import {
   STEWARD_PENDING_ACCOUNT_STORAGE_KEY,
+  generateStewardDeviceId,
   isValidStewardAccountId,
+  isValidStewardDeviceId,
   parseStewardAccountIdFromUrl,
   resolveStewardAccountLinkTarget,
   stewardBillingReturnPendingLine,
@@ -134,16 +136,13 @@ export function clearStewardSession() {
  */
 export function getOrCreateStewardDeviceId() {
   try {
-    const existing = localStorage.getItem(STEWARD_DEVICE_ID_STORAGE_KEY);
-    if (existing && existing.length >= 8) return existing;
-    const id =
-      typeof crypto !== "undefined" && crypto.randomUUID
-        ? crypto.randomUUID()
-        : `dev-${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
+    const existing = localStorage.getItem(STEWARD_DEVICE_ID_STORAGE_KEY)?.trim();
+    if (existing && isValidStewardDeviceId(existing)) return existing;
+    const id = generateStewardDeviceId();
     localStorage.setItem(STEWARD_DEVICE_ID_STORAGE_KEY, id);
     return id;
   } catch {
-    return "unknown-device";
+    return generateStewardDeviceId();
   }
 }
 

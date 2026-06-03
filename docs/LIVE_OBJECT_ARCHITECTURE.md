@@ -61,7 +61,7 @@ Evolve the stack **bottom-up**. Higher layers depend on lower layers; do not ski
 
 | Layer | Responsibility | Primary docs | Code today |
 |-------|----------------|--------------|------------|
-| **1. Object graph** | Root → child → QR; custody; types | [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) | `child-objects.ts`, `scan-state.ts` |
+| **1. Object graph** | Root → child → QR; custody; types | [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) | `child-objects.ts`, `scan-state.ts`, `live-object/custody.ts`, `live-object/time-policy.ts` |
 | **2. Verbs** | What scanners and owners may do | This doc § [Interaction verbs](#interaction-verbs) | Live proof, `game-contribute` (partial) |
 | **3. Streams + precedence** | Multi-signer public fields | [`QR_DESIGN_SPACE.md`](QR_DESIGN_SPACE.md) § blind spot 5 | `object-streams.ts`, game care override |
 | **4. Time policy** | Schedules, expiry, dormancy | § [Time policy](#time-policy) | `season-window.ts`, `route-window-schedule.ts`, manifesto |
@@ -121,9 +121,9 @@ Scan composition reads **`childPublicLabel` / `childPublicState`** on the view m
 
 | Field | Purpose | Design-space link |
 |-------|---------|-------------------|
-| `custody` | “Held by @handle until Friday” — possession, not ownership proof | Custody & handoff |
+| `custody` | “Held by @handle until Friday” — possession, not ownership proof | Custody & handoff — **Partial** (`live-object/custody.ts` + `/created/` editor) |
 | `delegated_capability` | Time-boxed child edit without new root key | Delegate |
-| `time_policy` | See [Time policy](#time-policy) | Time-bound objects |
+| `time_policy` | See [Time policy](#time-policy) | Time-bound objects — **Partial** (`live-object/time-policy.ts`; `/created/` editor on status plates + lost-item relays) |
 
 **Do not** give every child object its own private key by default. Delegation is an explicit, signed, revocable capability document — not a second account.
 
@@ -139,7 +139,7 @@ Verbs are **capabilities the resolver advertises**, not marketing categories. Sc
 |------|-------|---------|---------|-------------------|
 | **read** | Scanner | Current signed state at scan time | ✅ | Default `GET /c/…`, `GET …/status` |
 | **request** | Scanner → owner | Ask for action (live proof, permission, reply) | Partial | Live control (`scan-live-control*`) |
-| **offer** | Scanner → object | Contribute message or signal **without identity trail** | Partial | Lost-item relay copy (`[relay]`); no separate offer API yet |
+| **offer** | Scanner → object | Contribute message or signal **without identity trail** | Partial | `POST …/objects/{id}/offer` (finder) · `POST …/offer/owner` (signed list/dismiss) · scan offer form on `lost_item_relay` |
 | **contribute** | Scanner → network | Append-only **aggregate** public effect | Partial | `POST …/game-contribute` · `scan.capabilities[]` on status JSON (game nodes) |
 | **delegate** | Owner → holder | Temporary capability on object | Research | Future `delegated_capability` on child doc |
 | **inherit** | Governance | Succession when signer/org ends | Research | Future stream signer rotation |
@@ -177,8 +177,8 @@ Add to `GET …/status` (and derive scan blocks from) a capability list:
 
 **Implementation order:**
 
-1. Document capabilities in JSON from existing flags (`liveControlAvailable`, game contribute gate, season phase). **Partial (2026-06-03):** game-node scans + card `read`/`request` on `GET …/status`; HTML still uses view-model flags.
-2. Refactor `scan-html.ts` hero blocks to key off capabilities, not ad-hoc booleans.
+1. Document capabilities in JSON from existing flags (`liveControlAvailable`, game contribute gate, season phase). **Shipped (2026-06-03):** all scans via `ScanViewModel.capabilities` + status JSON.
+2. Refactor `scan-html.ts` hero blocks to key off capabilities, not ad-hoc booleans. **Shipped:** contribute, offer form + API, merch funnel, hero template, game dormant copy, live control trust group + script, card/human/QR trust groups via `read.trust_groups`.
 3. Add new verbs as new capability kinds + one handler each.
 
 ---
@@ -215,9 +215,11 @@ raw streams (owner + child + scheduled overlays)
         └── narrative / place (default display)
 ```
 
-**Shipped precedent:** care wins over game — [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) · `worker/src/city-game/scan-view.ts`.
+**Shipped precedent:** care wins over game — [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) · `worker/src/live-object/stream-policy.ts` · scan SSR and map snapshot both use `composeChildObjectScanState`.
 
 **Target module (planned):** `worker/src/live-object/stream-precedence.ts` (name TBD) consumed by `buildScanViewModel` before HTML render.
+
+**Shipped (2026-06-03):** `worker/src/live-object/stream-policy.ts` (`resolveStreamPolicy`) + `compose-child-object-scan.ts` — consumed by `buildScanViewModel` for child-object scans.
 
 ### Multi-signer without new identity
 
@@ -249,24 +251,29 @@ Time-bound truth is a **core differentiator** vs static QR. Today it is split ac
 
 | Field | Example | Status |
 |-------|---------|--------|
-| `valid_from` / `valid_until` | Flyer valid through Sunday | Planned |
-| `schedule` | Open Thu–Sat (local TZ slots) | Partial — reuse route-window slot shape |
-| `dormant_until` | Season start; object readable but game actions gated | Partial — `season-window.ts`, dormant scan note |
-| `grace_period` | “Recall in 48h unless cleared” | Research |
+| `valid_from` / `valid_until` | Flyer valid through Sunday | **Shipped** — `time-policy.ts` |
+| `schedule` | Open Thu–Sat (local TZ slots) | **Shipped** — `time-policy.ts` schedule slots |
+| `dormant_until` | Season start; object readable but game actions gated | Partial — child `time_policy` + `season-window.ts` |
+| `grace_period_hours` | “Recall in 48h unless cleared” after `valid_until` | **Shipped** — `time-policy.ts` grace phase + owner form |
 
 ### Application order in `buildScanViewModel`
 
+Child-object scans use `composeChildObjectScanState` (`live-object/compose-child-object-scan.ts`).
+Card-scope scans (`qr.scope: card`) use `composeCardScanState` (`live-object/compose-card-scan-state.ts`).
+
 ```text
-1. Lifecycle (revoked / suspended / QR revoked)
-2. Time policy (not yet valid / expired / dormant)
-3. Base manifesto + object_streams
-4. Scheduled stream overlays (bulletin, route window)
-5. Game overlay (if game_node and enabled)
+1. Lifecycle (revoked / suspended / QR revoked) — scan-state before compose
+2. Base object_streams from signed child document OR card document
+3. Game node context (mode, season window, care pause detection) — child game_node only
+4. StreamPolicy.resolve — bulletin + route overlays (care mutes game)
+5. ObjectTimePolicy — valid_from/until, schedule slots → public_state (child objects)
+6. Custody overlay (optional, child objects)
+7. Capabilities + HTML
 ```
 
-**Status plate today:** owner updates `manifesto_line` via `POST …/cards/{id}/update` ([`MANIFESTO_STATUS_UPDATE.md`](MANIFESTO_STATUS_UPDATE.md)) — same QR, new line. Target: same mechanism on child object update endpoint.
+**Status plate today:** owner updates via child object `POST …/objects/{id}/update` or flat-card manifesto bridge ([`MANIFESTO_STATUS_UPDATE.md`](MANIFESTO_STATUS_UPDATE.md)).
 
-**Generalization path:** move `resolveSeasonWindowPhase` / slot matching from `worker/src/city-game/` into `worker/src/live-object/time-policy.ts` (or equivalent) callable for any child type with a `time_policy` block.
+**Time policy:** `worker/src/live-object/time-policy.ts` — shared with Phase A child types; game season dormancy remains in `season-window.ts`.
 
 ---
 
@@ -288,11 +295,11 @@ A **network** is not “many QRs.” It is a **graph of signed state with confli
 |------------|--------------|
 | Quorum / threshold | `quorum-contribute.ts`, unlock evaluator |
 | Route state machine | `route-window-schedule.ts` |
-| Season / act structure | `season-config.ts`, `season-window.ts` |
+| Season / act structure | `network-graph.ts`, `season-config.ts`, `season-window.ts` |
 | Read-only city board | [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) |
 | Fair-use metering | [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md) |
 
-**After S1:** extract `NetworkGraph` + threshold rules so the next organizer loads JSON — do not fork resolver routes per city.
+**After S1:** `worker/src/live-object/network-graph.ts` — city-agnostic graph + automation thresholds; `season-config.ts` delegates lookups for any loaded season JSON.
 
 ### Federation and carriers (research)
 
@@ -306,13 +313,15 @@ Current `buildScanViewModel` flow for `game_node` child (simplified):
 
 ```text
 load ScanContext (card, qr, child, verification)
-  → if child_object && game_node:
-       resolveGameNodeScanContext (game_meta, vouch witnesses)
-       applyBulletinScheduleToStreams
-       applyRouteWindowScheduleToStreams
-       merge public_state / coop_hint
-  → baseView → ScanViewModel
+  → if child_object:
+       composeChildObjectScanState (streams → StreamPolicy → time → custody)
+  → if card scope:
+       composeCardScanState (streams → StreamPolicy)
+  → baseView → ScanViewModel (+ capabilities)
   → scan-html.ts / scan-status.ts
+
+Map snapshot (season board):
+  deriveMapNodeSnapshot → same composeChildObjectScanState pipeline
 ```
 
 | Step to add | Layer | Touches |
@@ -320,7 +329,7 @@ load ScanContext (card, qr, child, verification)
 | `resolveTimePolicy(child, now)` | 4 | Before stream overlays |
 | `resolveStreamPrecedence(streams, policy)` | 3 | Replace ad-hoc care/game mute |
 | `buildScanCapabilities(vm, policy)` | 2 | `scan-status.ts`, then HTML |
-| Generic network hooks (non-game) | 5 | Post-S1 extraction from city-game |
+| Generic network hooks (non-game) | 5 | `live-object/network-graph.ts` (shipped); unlock side effects still game-specific |
 
 ---
 
@@ -331,8 +340,8 @@ load ScanContext (card, qr, child, verification)
 | One-way interaction | Verb capability registry + scanner action endpoints | 2 |
 | Time underplayed | `ObjectTimePolicy` on child objects | 4 |
 | Custody / handoff | Child `custody` block; transfer = signed handoff event | 1 |
-| Stale / offline truth | Staleness contract on cache + status JSON metadata | Future |
-| Governance / succession | Stream signers + organizer revoke; inherit/archive lifecycle | 3, 1 |
+| Stale / offline truth | Staleness contract on cache + status JSON metadata | **Partial** — `scan.freshness` on status JSON |
+| Governance / succession | Stream signers + organizer revoke; inherit/archive lifecycle | **Partial** — `scan.succession` + archive capabilities |
 | Adversarial physical | Scan limits, credential fingerprint, game trust chains | Policy + 3 |
 | Accessibility | Same `/c/…` URL; NFC/SMS as alternate carriers | Research |
 | Institutional operators | Multiple stream signers, not shared root password | 3 |
@@ -340,17 +349,30 @@ load ScanContext (card, qr, child, verification)
 
 ---
 
-## Staleness contract (research)
+## Staleness contract
 
-Before implementing offline/mesh cache broadly, specify:
+Clients and cache layers must treat resolver truth as **time-stamped**, not infinitely fresh.
 
-| Field | Meaning |
-|-------|---------|
-| `status.fetched_at` | When resolver built this response |
-| `status.max_age_seconds` | Client may show as “live” without re-fetch |
-| `status.stale_disclosure` | Honest copy when serving cached or last-known-good |
+| Field | Meaning | Status |
+|-------|---------|--------|
+| `freshness.fetched_at` | When resolver built this response | **Shipped** — `scan-status.ts` |
+| `freshness.max_age_seconds` | Client may treat as live without re-fetch | **Shipped** — from `Cache-Control` |
+| `freshness.stale_disclosure` | Honest copy when serving cached or last-known-good | **Shipped** |
+| `freshness.source` | `resolver` today; `cache` / `mesh` when offline ships | **Partial** |
 
-Crisis cards, food tags, and protest coordination need **honest staleness** as much as live updates. Spec first in this doc’s § Future work; implement only after Phase A pilots prove read/update loop.
+Module: `worker/src/live-object/staleness-contract.ts`. Mesh/offline clients must set `source` ≠ `resolver` and must not claim live without re-fetch.
+
+Crisis cards, food tags, and protest coordination need **honest staleness** as much as live updates. Scan HTML embeds the same `freshness` block as status JSON; a client banner appears when document age exceeds `max_age_seconds` (CDN SWR, bfcache) or when `source` is `cache` / `mesh`.
+
+### Delegation spec (deferred implementation)
+
+Canonical docs: [`DELEGATED_CHILD_CAPABILITY_SCHEMA.md`](DELEGATED_CHILD_CAPABILITY_SCHEMA.md) · gates [`DELEGATED_CHILD_CAPABILITIES_GATE.md`](DELEGATED_CHILD_CAPABILITIES_GATE.md).
+
+Code: `worker/src/live-object/delegation-spec.ts` — allowed/forbidden operations + document shape validation only. **No resolver routes** until G1–G5 pass.
+
+### Succession hints (partial)
+
+Code: `worker/src/live-object/succession-spec.ts` — `scan.succession` on status JSON (`live` \| `sunset` \| `archived`) from revoke state + archive capabilities. **`inherit` verb and dispute fork** remain research.
 
 ---
 
@@ -394,7 +416,7 @@ Still open before **Partial → Shipped** promotion on traceability rows:
 | Criterion | Surface | Status |
 |-----------|---------|--------|
 | Manual pilot sign-off on real printed QRs | [`STATUS_PLATE_PILOT.md`](STATUS_PLATE_PILOT.md), [`LOST_ITEM_RELAY_PILOT.md`](LOST_ITEM_RELAY_PILOT.md) | Open |
-| `custody`, `delegated_capability`, `time_policy` on child doc | Layer 1 planned fields | Research (Order 6 / delegate) |
+| `custody`, `delegated_capability`, `time_policy` on child doc | Layer 1 planned fields | `time_policy` + `custody` **Partial** on Phase A child types · `delegated_capability` research |
 
 **Do not start Order 3** (`scan.capabilities[]`) until manual pilot rows above are signed off or explicitly waived in the workstream doc.
 
@@ -422,13 +444,103 @@ Still open before S1 launch sign-off:
 | Operator install map complete | [`CITY_GAME_NODE_INSTALL_MAP.md`](CITY_GAME_NODE_INSTALL_MAP.md) **O2** | Open (ops) |
 | Map board privacy review before “live city board” marketing | **B13** GT-7 | Open (human) |
 | Production season root + 15 nodes minted | Launch checklist **E3** | Open (ops) |
-| Refactor scan HTML from capabilities (Order 3 step 2) | `scan-html.ts` | Not started |
+| Refactor scan HTML from capabilities (Order 3 step 2) | `scan-html.ts` | Shipped (core paths) |
 
 ---
 | **3** | `scan.capabilities[]` in status JSON; HTML from capabilities | Verbs explicit |
+
+### Order 3 — exit criteria
+
+Engineering (**done** unless noted):
+
+| Criterion | Surface | Status |
+|-----------|---------|--------|
+| `scan.capabilities[]` on every scan view model | `buildScanCapabilities` in `baseView` | Shipped |
+| Status JSON exposes same list | `scan-status.ts` → `scan.capabilities` | Shipped |
+| Game contribute / archive / read kinds | `live-object/scan-capabilities.ts` | Shipped |
+| Phase A `offer` (lost-item) + time_policy `archive` | `scan-capabilities.ts` | Shipped |
+| Lost-item offer API (finder POST + owner signed list/dismiss) | `lost-item-offer.ts`, `0033_lost_item_relay_offers.sql` | Shipped |
+| Scan HTML gates contribute block + scripts from capabilities | `scan-html.ts` | Shipped |
+| Scan HTML hero routing from `read.kind` | `readHeroTemplate(vm.capabilities)` | Shipped |
+| Scan HTML game dormant copy from `archive.state` | `gameNodeMutedCopy` | Shipped |
+
+Still open:
+
+| Criterion | Surface | Status |
+|-----------|---------|--------|
+| Live control trust group keyed off `request` capability | `renderTrustGroups`, `renderLiveControlScript` | Shipped |
+| Full verb registry in HTML (all blocks) | `scan-html.ts`, `read.trust_groups` on capabilities | Shipped |
+| Order 1 pilot sign-off before **Shipped** promotion | Pilot docs | Open |
+
+---
 | **4** | Extract `StreamPolicy` + `ObjectTimePolicy` from game code | Multi-signer, time |
+
+### Order 4 — exit criteria
+
+Engineering (**done** unless noted):
+
+| Criterion | Surface | Status |
+|-----------|---------|--------|
+| `ObjectTimePolicy` parse + scan context | `live-object/time-policy.ts` | Shipped |
+| `StreamPolicy.resolve` — care mutes game schedules | `live-object/stream-policy.ts` | Shipped |
+| Child scan pipeline (streams → time → custody) | `live-object/compose-child-object-scan.ts` | Shipped |
+| `buildScanViewModel` uses compose module | `scan-state.ts` | Shipped |
+| Care pause detection shared (scan-view re-exports) | `stream-policy.ts` ← `scan-view.ts` | Shipped |
+
+Still open:
+
+| Criterion | Surface | Status |
+|-----------|---------|--------|
+| Map snapshot uses `resolveStreamPolicy` (not parallel slot logic) | `map-node-snapshot.ts` via `composeChildObjectScanState` | Shipped |
+| `StreamPolicy` for root-card `object_streams` only scans | `compose-card-scan-state.ts` + `scan-state.ts` card scope | Shipped |
+| `grace_period_hours` on time policy | `live-object/time-policy.ts` + `/created/` editor | Shipped |
+
+---
 | **5** | Extract network graph config from city-game modules | Network grammar |
+
+### Order 5 — exit criteria
+
+Engineering (**done** unless noted):
+
+| Criterion | Surface | Status |
+|-----------|---------|--------|
+| `NetworkGraph` — nodes, edges, object↔node indexes | `live-object/network-graph.ts` | Shipped |
+| Automation thresholds (quorum, fragment, finale, scarcity) | `NetworkGraph.contributableNodeIds()` etc. | Shipped |
+| Unlock edge satisfaction for public snapshot | `publicUnlockEdges`, `isUnlockEdgeSatisfied` | Shipped |
+| Graph validation (structure) | `validateNetworkGraph` | Shipped |
+| `season-config.ts` delegates to shared graph | thin wrappers + re-exports | Shipped |
+
+Still open:
+
+| Criterion | Surface | Status |
+|-----------|---------|--------|
+| Scripts align on `network-graph` (`network-graph-core.mjs`) | shared core + seed/readiness | Shipped |
+| Unlock side effects generic beyond CR patches | `unlock-engine.ts` | Open (game-specific) |
+| Next-organizer JSON loader only (no CR import in graph module) | `season-loader` | Partial |
+
+---
 | **6** | Staleness contract + delegation + succession specs | Blind spots 4–5 |
+
+### Order 6 — exit criteria
+
+Engineering (**done** unless noted):
+
+| Criterion | Surface | Status |
+|-----------|---------|--------|
+| Staleness contract types + disclosure copy | `live-object/staleness-contract.ts` | Shipped |
+| `scan.freshness` on status JSON | `scan-status.ts` | Shipped |
+| Succession phase hints on status JSON | `live-object/succession-spec.ts` | Shipped |
+| Delegation capability shape validation (spec-only) | `live-object/delegation-spec.ts` | Shipped |
+| Cross-links to gate docs | `DELEGATED_CHILD_CAPABILITY_SCHEMA.md`, `DELEGATED_CHILD_CAPABILITIES_GATE.md` | Shipped |
+
+Still open (implementation deferred):
+
+| Criterion | Surface | Status |
+|-----------|---------|--------|
+| Mesh/cache clients emit `freshness.source: cache \| mesh` | Offline/mesh relay | Open |
+| Resolver accepts delegated signer on child routes | Step 17 gates G1–G5 | Open |
+| `inherit` verb + dispute fork UX | Governance research | Open |
+| HTML staleness banner from `freshness` block | `scan-freshness-banner.ts`, `scan-html.ts` | Shipped |
 
 ---
 
@@ -452,9 +564,9 @@ These from [`QR_DESIGN_SPACE.md`](QR_DESIGN_SPACE.md) are **decisions**, not bac
 When changing live-object composition:
 
 ```bash
-npm run worker:test -- worker/tests/scan.test.ts worker/tests/live-object-child-scan.test.ts worker/tests/live-object-scan-capabilities.test.ts worker/tests/city-game-scan.test.ts
+npm run worker:test -- worker/tests/live-object-staleness-contract.test.ts worker/tests/live-object-delegation-spec.test.ts worker/tests/live-object-succession-spec.test.ts worker/tests/scan-freshness-banner.test.ts worker/tests/network-graph-core.test.ts worker/tests/live-object-network-graph.test.ts
 npm run verify:city-game   # if game overlay touched
-npm run worker:test -- worker/tests/update-card.test.ts worker/tests/create-card-object-streams.test.ts
+npm run worker:test -- worker/tests/update-card.test.ts worker/tests/create-card-object-streams.test.ts worker/tests/scan-status.test.ts
 ```
 
 **File ownership hints:**
@@ -463,9 +575,10 @@ npm run worker:test -- worker/tests/update-card.test.ts worker/tests/create-card
 |------|-------|
 | Composition | `worker/src/resolver/scan-state.ts`, `scan-html.ts`, `scan-status.ts` |
 | Child objects | `worker/src/db/child-objects.ts`, `worker/src/resolver/child-objects.ts` |
-| Streams | `worker/src/validation/object-streams.ts`, `site/js/object-streams-core.mjs` |
-| Time (game) | `worker/src/city-game/season-window.ts`, `route-window-schedule.ts`, `bulletin-schedule.ts` |
-| Network (game) | `worker/src/city-game/*`, `worker/src/resolver/game-contribute.ts`, `game-update.ts` |
+| Streams | `worker/src/validation/object-streams.ts`, `worker/src/live-object/stream-policy.ts`, `worker/src/live-object/compose-card-scan-state.ts`, `site/js/object-streams-core.mjs` |
+| Time (game + child) | `worker/src/live-object/time-policy.ts`, `worker/src/live-object/compose-child-object-scan.ts`, `worker/src/city-game/season-window.ts` |
+| Network (game) | `worker/scripts/network-graph-core.mjs`, `worker/src/live-object/network-graph.ts`, `worker/src/city-game/*`, `game-contribute.ts` |
+| Staleness / succession | `worker/src/live-object/staleness-contract.ts`, `succession-spec.ts`, `delegation-spec.ts`, `scan-status.ts`, `scan-freshness-banner.ts` |
 | Owner update | `worker/src/resolver/update-card.ts`, `site/js/created-manifesto-update.mjs` |
 
 Bump `DEVICE_SHELL_ASSET_VERSION` only when adding imports to the device status module graph ([`AGENTS.md`](../AGENTS.md)).

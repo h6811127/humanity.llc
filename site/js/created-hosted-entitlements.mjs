@@ -13,6 +13,7 @@ import {
 import { stewardAccountIdForLink } from "./device-steward-session-core.mjs";
 import { resolverApiOrigin } from "./hc-sign.mjs";
 import {
+  HOSTED_STEWARD_PLAN_ID,
   buildCreatedHostedPlanPanelModel,
   hostedPlanSummarySub,
 } from "./created-hosted-entitlements-core.mjs";
@@ -26,6 +27,75 @@ import {
 } from "./device-steward-entitlements.mjs";
 
 let bound = false;
+let billingReturnPollStarted = false;
+
+/**
+ * After Stripe success_url: open Manage panel and poll until plan_id updates.
+ */
+function initHostedBillingReturnUx() {
+  const fromCheckout =
+    parseStewardAccountIdFromUrl(location.search) || readPendingStewardAccountId();
+  if (!fromCheckout) return;
+
+  document.getElementById("created-tab-btn-advanced")?.click();
+  const details = document.getElementById("created-hosted-plan");
+  if (details instanceof HTMLDetailsElement) details.open = true;
+
+  setHostedPlanLinkStatus(
+    "Payment received — linking this device and activating your hosted plan…",
+    "info"
+  );
+
+  const startPoll = () => {
+    if (billingReturnPollStarted) return;
+    billingReturnPollStarted = true;
+    void pollHostedPlanActivation();
+  };
+
+  if (readStewardSessionToken()) startPoll();
+  else {
+    window.addEventListener("hc-steward-session-linked", startPoll, { once: true });
+  }
+}
+
+/**
+ * @param {number} [maxMs]
+ */
+async function pollHostedPlanActivation(maxMs = 90_000) {
+  const started = Date.now();
+
+  const tick = async () => {
+    await refreshStewardEntitlements({ force: true });
+    syncCreatedHostedPlanPanel();
+
+    const planId = getStewardEntitlementsPolicy().planId;
+    if (planId === HOSTED_STEWARD_PLAN_ID) {
+      delete document.getElementById("created-hosted-plan-link-status")?.dataset
+        .pinnedMessage;
+      setHostedPlanLinkStatus(
+        "Hosted steward is active on this account. Your limits below are updated.",
+        "ok"
+      );
+      return;
+    }
+
+    if (Date.now() - started >= maxMs) {
+      setHostedPlanLinkStatus(
+        "Stripe payment succeeded, but this account still shows Reference (free). Set up the Stripe webhook (STRIPE_WEBHOOK_SECRET) and resend subscription events, or wait a minute and refresh.",
+        "error"
+      );
+      return;
+    }
+
+    setHostedPlanLinkStatus(
+      "Payment received — syncing hosted plan (usually under a minute)…",
+      "info"
+    );
+    window.setTimeout(() => void tick(), 3000);
+  };
+
+  await tick();
+}
 
 /**
  * @param {import("./created-hosted-entitlements-core.mjs").CreatedHostedPlanPanelModel} model
@@ -304,6 +374,7 @@ export function initCreatedHostedEntitlements() {
 
   void import("./device-steward-session.mjs").then((mod) => {
     mod.initStewardSessionClient();
+    initHostedBillingReturnUx();
     refresh();
   });
 }

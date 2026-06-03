@@ -8,9 +8,10 @@ import { resolverApiOrigin } from "./hc-sign.mjs";
 import { fetchResolverHealth } from "./device-network-health.mjs";
 import {
   DEVICE_OS_DEBOUNCE_MS,
+  shouldAutoRefreshWalletNetwork,
   shouldRefreshLiveControlInbox,
-  shouldRefreshWalletNetwork,
 } from "./device-os-coordinator-core.mjs";
+import { setResolverHealthStatusForSinceVisit } from "./device-wallet-since-visit-gate.mjs";
 import { listPollableWalletEntries } from "./device-wallet.mjs";
 import {
   refreshWalletNetworkStatuses,
@@ -21,6 +22,7 @@ import { refreshLiveControlInbox } from "./device-live-control-inbox.mjs";
 import { isPollableWalletEntry } from "./device-live-control-inbox-core.mjs";
 
 export const DEVICE_OS_REFRESHED = "hc-device-os-refreshed";
+const RESOLVER_HEALTH_CHANGED = "hc-resolver-health-changed";
 
 /** @type {'ok' | 'degraded' | 'offline'} */
 let lastNetworkStatus = "offline";
@@ -78,17 +80,21 @@ async function runDeviceOsRefresh(reason) {
   inFlight = (async () => {
     const entries = listPollableWalletEntries();
 
-    const [networkStatus, walletResult] = await Promise.all([
-      fetchResolverHealth(resolverApiOrigin()),
-      shouldRefreshWalletNetwork(reason) && entries.length > 0
-        ? new Promise((resolve) => {
+    const networkStatus = await fetchResolverHealth(resolverApiOrigin());
+    lastNetworkStatus = networkStatus;
+    setResolverHealthStatusForSinceVisit(networkStatus);
+    window.dispatchEvent(
+      new CustomEvent(RESOLVER_HEALTH_CHANGED, { detail: { networkStatus } })
+    );
+
+    const walletResult =
+      shouldAutoRefreshWalletNetwork(reason, networkStatus) && entries.length > 0
+        ? await new Promise((resolve) => {
             refreshWalletNetworkStatuses(entries, (result) => resolve(result));
           })
-        : Promise.resolve(null),
-      Promise.resolve().then(() => syncTabKeysPresence()),
-    ]);
+        : null;
 
-    lastNetworkStatus = networkStatus;
+    await syncTabKeysPresence();
 
     if (
       shouldRefreshLiveControlInbox(reason) &&

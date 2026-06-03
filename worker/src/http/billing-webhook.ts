@@ -21,6 +21,7 @@ import {
   isStewardBillingSubscriptionEvent,
   stewardUpdateForPaymentFailed,
   stewardUpdateForSubscriptionDeleted,
+  stewardUpdateFromHostedCheckoutSession,
   stewardUpdateFromStripeSubscription,
   type StripeSubscriptionLike,
 } from "../steward/billing-lifecycle";
@@ -213,6 +214,20 @@ export async function handlePostBillingWebhook(
       planMeta === HOSTED_GAME_SEASON_PLAN_ID;
     if (mode === "payment" || !hostedIntent || !accountId) {
       return jsonResponse({ received: true, ignored: true, reason: "commerce" }, 200);
+    }
+    if (type === "checkout.session.completed") {
+      const update = stewardUpdateFromHostedCheckoutSession(obj);
+      if (update) {
+        const result = await applyBillingUpdate(db, update);
+        return jsonResponse(
+          { received: true, result, source: "checkout.session.completed" },
+          200
+        );
+      }
+      return jsonResponse(
+        { received: true, ignored: true, reason: "checkout_incomplete" },
+        200
+      );
     }
   }
 

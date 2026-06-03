@@ -420,6 +420,7 @@ let gameNodeCtl = null;
 let createdTabs;
 let workspaceMode = "view";
 let dashboardWired = false;
+let ownerToolsBootstrapped = false;
 let downloadQrClick = null;
 /** @type {ReturnType<typeof initCreatedLiveObjectCard> | null} */
 let liveObjectCardCtl = null;
@@ -449,6 +450,7 @@ function enterControlWorkspace() {
     setupCreatedDashboard();
     dashboardWired = true;
   }
+  void bootstrapOwnerTools();
   void liveObjectCardCtl?.maybeRunArrive();
 }
 
@@ -1355,6 +1357,13 @@ async function bootstrapViewRestoreTools() {
 
 async function bootstrapOwnerTools() {
   if (!profileId || !activeQrId) return;
+  if (ownerToolsBootstrapped) {
+    gameNodeCtl?.refresh?.();
+    childObjectCtl?.refresh?.();
+    lostItemRelayCtl?.refresh?.();
+    return;
+  }
+  ownerToolsBootstrapped = true;
 
   try {
     await hydrateSessionFromNetwork();

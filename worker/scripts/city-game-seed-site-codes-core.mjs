@@ -1,7 +1,12 @@
 /**
  * Pure helpers for exporting physical site codes from season config into seed output.
- * Keep aligned with worker/src/city-game/season-config.ts contribute_codes + automation.
+ * Graph automation: worker/scripts/network-graph-core.mjs
  */
+
+import {
+  contributeModeForNode as contributeModeForNodeCore,
+  contributableNodeIds,
+} from "./network-graph-core.mjs";
 
 /**
  * @param {import("../../site/data/city-game-cr-season-01.json")} season
@@ -9,11 +14,7 @@
  * @returns {"quorum" | "fragment" | "scarcity" | null}
  */
 export function contributeModeForNode(season, nodeId) {
-  const auto = season.automation ?? {};
-  if (auto.quorum_nodes?.includes(nodeId)) return "quorum";
-  if (auto.fragment_nodes?.includes(nodeId)) return "fragment";
-  if (auto.witness_scarcity_node === nodeId) return "scarcity";
-  return null;
+  return contributeModeForNodeCore(season, nodeId);
 }
 
 /**
@@ -21,13 +22,7 @@ export function contributeModeForNode(season, nodeId) {
  * @returns {string[]}
  */
 export function seasonContributableNodeIds(season) {
-  const auto = season.automation ?? {};
-  const ids = new Set([
-    ...(auto.quorum_nodes ?? []),
-    ...(auto.fragment_nodes ?? []),
-    ...(auto.witness_scarcity_node ? [auto.witness_scarcity_node] : []),
-  ]);
-  return [...ids].sort();
+  return contributableNodeIds(season);
 }
 
 /**

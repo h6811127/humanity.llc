@@ -3,7 +3,10 @@
  */
 
 import { validateMapLayout } from "../../site/js/city-game-map-board-core.mjs";
-import { seasonContributableNodeIds } from "./city-game-seed-site-codes-core.mjs";
+import {
+  contributableNodeIds,
+  validateNetworkGraph,
+} from "./network-graph-core.mjs";
 import { validateMobileLoreEnrollmentList } from "./city-game-mobile-lore-core.mjs";
 
 const NODE_ID_RE = /^node_\d{2}$/;
@@ -67,7 +70,7 @@ function validateAutonomousSpine(season, nodeIds, issues, warnings) {
     return;
   }
 
-  for (const nodeId of seasonContributableNodeIds(season)) {
+  for (const nodeId of contributableNodeIds(season)) {
     if (!nodeIds.has(nodeId)) {
       issues.push(`${nodeId}: listed in automation but missing from nodes[].`);
       continue;
@@ -123,18 +126,13 @@ export function cityGameSeasonReadiness(season, opts = {}) {
     }
   }
 
-  if (Array.isArray(s.unlock_edges)) {
-    for (const edge of s.unlock_edges) {
-      if (!edge?.from || !edge?.to) {
-        issues.push("unlock_edges entry missing from/to.");
-        continue;
-      }
-      if (!nodeIds.has(edge.from)) issues.push(`unlock_edges unknown from: ${edge.from}`);
-      if (!nodeIds.has(edge.to)) issues.push(`unlock_edges unknown to: ${edge.to}`);
-    }
-  } else {
-    issues.push("unlock_edges must be an array.");
-  }
+  issues.push(
+    ...validateNetworkGraph({
+      nodes: Array.isArray(s.nodes) ? s.nodes : [],
+      unlock_edges: Array.isArray(s.unlock_edges) ? s.unlock_edges : [],
+      automation: s.automation,
+    }).issues
+  );
 
   if (!s.rules_path || s.rules_path !== "/play/cedar-rapids/") {
     warnings.push(`rules_path should be /play/cedar-rapids/ (got ${String(s.rules_path)}).`);

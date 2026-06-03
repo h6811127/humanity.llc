@@ -20,6 +20,7 @@ export const PAYLOAD_TYPES = {
   LIVE_CONTROL_RESPONSE: "live_control_response",
   STEWARD_ACCOUNT_LINK: "steward_account_link_v1",
   CHILD_OBJECT: "child_object",
+  RELAY_OFFER_OWNER_QUERY: "relay_offer_owner_query",
 } as const;
 
 export type PayloadType = (typeof PAYLOAD_TYPES)[keyof typeof PAYLOAD_TYPES];

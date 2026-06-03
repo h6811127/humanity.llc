@@ -1,32 +1,21 @@
 import seasonJson from "../../../site/data/city-game-cr-season-01.json";
 import type { BulletinScheduleConfig } from "./bulletin-schedule";
 import type { RouteWindowScheduleConfig } from "./route-window-schedule";
+import {
+  networkGraphFromConfig,
+  type NetworkGraphAutomation,
+  type NetworkGraphEdge,
+  type NetworkGraphNode,
+} from "../live-object/network-graph";
 
 export type SeasonContributeCode = {
   code: string;
   epoch: string;
 };
 
-export type SeasonNodeRow = {
-  node_id: string;
-  object_id: string;
-  role: string;
-  district: string;
-  label: string;
-};
-
-export type SeasonUnlockEdge = {
-  from: string;
-  to: string;
-  label: string;
-};
-
-export type SeasonAutomation = {
-  quorum_nodes?: string[];
-  fragment_nodes?: string[];
-  finale_node?: string;
-  witness_scarcity_node?: string;
-};
+export type SeasonNodeRow = NetworkGraphNode;
+export type SeasonUnlockEdge = NetworkGraphEdge;
+export type SeasonAutomation = NetworkGraphAutomation;
 
 export type SeasonMobileLoreEnrollment = {
   profile_id: string;
@@ -74,37 +63,22 @@ export type CitySeasonConfig = CrSeasonConfig;
 /** Pilot season JSON — prefer `defaultSeason()` / `resolveSeasonById()` for new code. */
 export const CR_SEASON_01 = seasonJson as CrSeasonConfig;
 
-type SeasonIndexes = {
-  objectToNode: Map<string, string>;
-  nodeToObject: Map<string, string>;
-};
-
-const indexCache = new WeakMap<CrSeasonConfig, SeasonIndexes>();
-
-function indexesFor(season: CrSeasonConfig): SeasonIndexes {
-  let cached = indexCache.get(season);
-  if (!cached) {
-    cached = {
-      objectToNode: new Map(season.nodes.map((n) => [n.object_id, n.node_id] as const)),
-      nodeToObject: new Map(season.nodes.map((n) => [n.node_id, n.object_id] as const)),
-    };
-    indexCache.set(season, cached);
-  }
-  return cached;
+function graphFor(season: CrSeasonConfig) {
+  return networkGraphFromConfig(season);
 }
 
 export function seasonNodeIdForObject(
   objectId: string,
   season: CrSeasonConfig = CR_SEASON_01
 ): string | null {
-  return indexesFor(season).objectToNode.get(objectId) ?? null;
+  return graphFor(season).nodeIdForObject(objectId);
 }
 
 export function seasonObjectIdForNode(
   nodeId: string,
   season: CrSeasonConfig = CR_SEASON_01
 ): string | null {
-  return indexesFor(season).nodeToObject.get(nodeId) ?? null;
+  return graphFor(season).objectIdForNode(nodeId);
 }
 
 export function seasonContributeCode(
@@ -117,42 +91,37 @@ export function seasonContributeCode(
 }
 
 export function seasonQuorumNodeIds(season: CrSeasonConfig = CR_SEASON_01): string[] {
-  return season.automation?.quorum_nodes ?? ["node_04"];
+  return graphFor(season).quorumNodeIds();
 }
 
 export function seasonFragmentNodeIds(season: CrSeasonConfig = CR_SEASON_01): string[] {
-  return season.automation?.fragment_nodes ?? [];
+  return graphFor(season).fragmentNodeIds();
 }
 
 export function seasonFinaleNodeId(season: CrSeasonConfig = CR_SEASON_01): string {
-  return season.automation?.finale_node ?? "node_13";
+  return graphFor(season).finaleNodeId();
 }
 
 export function seasonWitnessScarcityNodeId(season: CrSeasonConfig = CR_SEASON_01): string {
-  return season.automation?.witness_scarcity_node ?? "node_10";
+  return graphFor(season).witnessScarcityNodeId();
 }
 
 export function seasonContributableNodeIds(season: CrSeasonConfig = CR_SEASON_01): string[] {
-  const ids = new Set([
-    ...seasonQuorumNodeIds(season),
-    ...seasonFragmentNodeIds(season),
-    seasonWitnessScarcityNodeId(season),
-  ]);
-  return [...ids];
+  return graphFor(season).contributableNodeIds();
 }
 
 export function seasonVouchTargetsFrom(
   nodeId: string,
   season: CrSeasonConfig = CR_SEASON_01
 ): string[] {
-  return seasonUnlockEdgesFrom(nodeId, season).map((edge) => edge.to);
+  return graphFor(season).vouchTargetsFrom(nodeId);
 }
 
 export function seasonUnlockEdgesFrom(
   nodeId: string,
   season: CrSeasonConfig = CR_SEASON_01
 ): SeasonUnlockEdge[] {
-  return season.unlock_edges.filter((e) => e.from === nodeId);
+  return graphFor(season).unlockEdgesFrom(nodeId);
 }
 
 export function normalizeSiteCode(raw: string): string {
@@ -171,3 +140,5 @@ export function findSeasonMobileLoreEnrollment(
     null
   );
 }
+
+export { validateNetworkGraph, networkGraphFromConfig } from "../live-object/network-graph";

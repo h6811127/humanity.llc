@@ -142,6 +142,51 @@ export function mapStripeSubscriptionStatus(
   }
 }
 
+/**
+ * checkout.session.completed (mode=subscription) — grant plan when metadata is present.
+ * Subscription webhooks remain authoritative; this covers the first sync after Checkout.
+ */
+export function stewardUpdateFromHostedCheckoutSession(
+  session: Record<string, unknown>,
+  now = Date.now()
+): StewardBillingAccountUpdate | null {
+  if (session.mode !== "subscription") return null;
+
+  const metadata =
+    session.metadata && typeof session.metadata === "object"
+      ? (session.metadata as Record<string, unknown>)
+      : {};
+  const accountId =
+    typeof metadata.account_id === "string" ? metadata.account_id.trim() : "";
+  if (!accountId) return null;
+
+  const planRaw =
+    typeof metadata.plan_id === "string" ? metadata.plan_id.trim() : "";
+  const planId =
+    planRaw === HOSTED_GAME_SEASON_PLAN_ID || planRaw === HOSTED_STEWARD_PLAN_ID
+      ? planRaw
+      : HOSTED_STEWARD_PLAN_ID;
+
+  const customerId =
+    typeof session.customer === "string" ? session.customer.trim() : "";
+  const subscriptionId =
+    typeof session.subscription === "string" ? session.subscription.trim() : "";
+  if (!customerId || !subscriptionId) return null;
+
+  return {
+    account_id: accountId,
+    plan_id: planId,
+    plan_version: parsePlanVersion(
+      typeof metadata.plan_version === "string" ? metadata.plan_version : undefined
+    ),
+    status: "active",
+    effective_from: new Date(now).toISOString(),
+    effective_until: null,
+    billing_customer_id: customerId,
+    billing_subscription_id: subscriptionId,
+  };
+}
+
 /** Subscription ended — immediate downgrade (M2 / M4). */
 export function stewardUpdateForSubscriptionDeleted(
   sub: StripeSubscriptionLike,

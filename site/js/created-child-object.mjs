@@ -30,6 +30,11 @@ import {
   childObjectRegisterProgressLabel,
   childObjectRegisterSuccessMessage,
 } from "./child-object-register-issue-core.mjs";
+import { preserveChildDocumentFields } from "./child-object-time-policy-core.mjs";
+import { renderChildObjectTimePolicySection } from "./created-child-object-time-policy.mjs";
+import { renderChildObjectCustodySection } from "./created-child-object-custody.mjs";
+import { runChildObjectCustodyFormSubmit } from "./child-object-custody-publish.mjs";
+import { runChildObjectTimePolicyFormSubmit } from "./child-object-time-policy-publish.mjs";
 
 /**
  * @param {string} profileId
@@ -120,13 +125,21 @@ function renderStatusPlateList(profileId, rows) {
       rowStatus.hidden = true;
       rowStatus.setAttribute("role", "status");
 
+      li.append(
+        scanWrap,
+        form,
+        renderChildObjectCustodySection(row),
+        renderChildObjectTimePolicySection(row),
+        rowStatus
+      );
+
       const disableBtn = document.createElement("button");
       disableBtn.type = "button";
       disableBtn.className = "btn-text child-object-plate-disable";
       disableBtn.dataset.objectId = row.object_id;
       disableBtn.textContent = "Disable this plate";
 
-      li.append(scanWrap, form, rowStatus, disableBtn);
+      li.append(disableBtn);
       return li;
     })
   );
@@ -313,7 +326,51 @@ export function initCreatedChildObject(ctx) {
 
   listEl?.addEventListener("submit", async (event) => {
     const target = event.target;
-    if (!(target instanceof HTMLFormElement) || !target.classList.contains("child-object-plate-update-form")) {
+    if (!(target instanceof HTMLFormElement)) return;
+
+    if (target.classList.contains("child-object-custody-form")) {
+      event.preventDefault();
+      const rowEl = target.closest(".child-object-plate-row");
+      try {
+        await runChildObjectCustodyFormSubmit({
+          form: target,
+          rowEl: rowEl instanceof HTMLElement ? rowEl : null,
+          profileId: ctx.profileId,
+          objectType: CHILD_OBJECT_TYPE_STATUS_PLATE,
+          getSigningKeys: ctx.getSigningKeys,
+          showError: ctx.showError,
+          storage: localStorage,
+          readRows: readChildObjectRows,
+          refreshList,
+        });
+      } catch {
+        // runChildObjectCustodyFormSubmit reports via showError
+      }
+      return;
+    }
+
+    if (target.classList.contains("child-object-time-policy-form")) {
+      event.preventDefault();
+      const rowEl = target.closest(".child-object-plate-row");
+      try {
+        await runChildObjectTimePolicyFormSubmit({
+          form: target,
+          rowEl: rowEl instanceof HTMLElement ? rowEl : null,
+          profileId: ctx.profileId,
+          objectType: CHILD_OBJECT_TYPE_STATUS_PLATE,
+          getSigningKeys: ctx.getSigningKeys,
+          showError: ctx.showError,
+          storage: localStorage,
+          readRows: readChildObjectRows,
+          refreshList,
+        });
+      } catch {
+        // runChildObjectTimePolicyFormSubmit reports via showError
+      }
+      return;
+    }
+
+    if (!target.classList.contains("child-object-plate-update-form")) {
       return;
     }
     event.preventDefault();
@@ -360,6 +417,7 @@ export function initCreatedChildObject(ctx) {
         createdAt: stored.created_at,
         privateKeyBase58: keys.privateKeyBase58,
         publicKeyBase58: keys.publicKeyBase58,
+        extraFields: preserveChildDocumentFields(stored),
       });
       await postChildObjectUpdate(ctx.profileId, objectId, signed);
       updateChildObjectRow(localStorage, ctx.profileId, objectId, { public_state: publicState });

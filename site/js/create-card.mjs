@@ -330,6 +330,7 @@ export async function runCreateCard(input) {
     qr_expires_at: expiresAt,
     qr_validity_days: qrValidityDays,
     has_organizer_revoke: !!organizerPublicKeyBase58,
+    ...(organizerPublicKeyBase58 ? { issuer_public_key: organizerPublicKeyBase58 } : {}),
     ...(organizerPrivateKey
       ? {
           organizer_private_key_b58: encodePrivateKeyBase58(organizerPrivateKey),

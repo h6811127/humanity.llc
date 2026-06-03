@@ -86,7 +86,13 @@ describe("refreshStewardEntitlements", () => {
     localStore = storageFor();
     vi.stubGlobal("sessionStorage", sessionStore);
     vi.stubGlobal("localStorage", localStore);
-    vi.stubGlobal("crypto", { randomUUID: () => "device-test-12345678" });
+    vi.stubGlobal("crypto", {
+      randomUUID: () => "device-test-12345678",
+      getRandomValues: (bytes) => {
+        for (let i = 0; i < bytes.length; i += 1) bytes[i] = i % 256;
+        return bytes;
+      },
+    });
     vi.stubGlobal("window", { dispatchEvent: vi.fn(), addEventListener: vi.fn() });
     vi.stubGlobal("fetch", vi.fn());
   });
@@ -124,7 +130,7 @@ describe("refreshStewardEntitlements", () => {
         credentials: "omit",
         headers: expect.objectContaining({
           Authorization: "Bearer token-1",
-          "X-HC-Device-Id": "device-test-12345678",
+          "X-HC-Device-Id": expect.stringMatching(/^dev_/),
         }),
       })
     );

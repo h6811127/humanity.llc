@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { DEVICE_OS_DEBOUNCE_MS, shouldRefreshLiveControlInbox, shouldRefreshWalletNetwork } from "../../site/js/device-os-coordinator-core.mjs";
+import { DEVICE_OS_DEBOUNCE_MS, shouldAutoRefreshWalletNetwork, shouldRefreshLiveControlInbox, shouldRefreshWalletNetwork } from "../../site/js/device-os-coordinator-core.mjs";
 
 describe("device-os-coordinator-core", () => {
   it("uses 300ms debounce window", () => {
@@ -11,6 +11,13 @@ describe("device-os-coordinator-core", () => {
     expect(shouldRefreshWalletNetwork("visible")).toBe(true);
     expect(shouldRefreshWalletNetwork("hub-changed")).toBe(true);
     expect(shouldRefreshWalletNetwork("baseline")).toBe(false);
+  });
+
+  it("auto wallet network refresh requires resolver health ok", () => {
+    expect(shouldAutoRefreshWalletNetwork("visible", "ok")).toBe(true);
+    expect(shouldAutoRefreshWalletNetwork("visible", "degraded")).toBe(false);
+    expect(shouldAutoRefreshWalletNetwork("visible", "offline")).toBe(false);
+    expect(shouldAutoRefreshWalletNetwork("baseline", "ok")).toBe(false);
   });
 
   it("refreshes live-control inbox on same reasons as wallet", () => {

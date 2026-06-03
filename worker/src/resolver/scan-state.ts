@@ -14,22 +14,16 @@ import {
 } from "./scan-malformed-hint";
 import { isQrCalendarExpired } from "./merch-qr-policy";
 import { childObjectManifestoLine } from "./manifesto-display";
-import {
-  objectStreamsFromCardDocumentJson,
-  objectStreamsFromChildDocumentJson,
-} from "../validation/object-streams";
+import type { ScanCapability } from "../live-object/scan-capabilities";
+import { buildScanCapabilities } from "../live-object/scan-capabilities";
 import type { ObjectPublicStream } from "../validation/object-streams";
-import {
-  resolveGameNodeScanContext,
-  type GameNodeScanContext,
-} from "../city-game/scan-view";
-import { applyBulletinScheduleToStreams } from "../city-game/bulletin-schedule";
-import { applyRouteWindowScheduleToStreams } from "../city-game/route-window-schedule";
+import type { GameNodeScanContext } from "../city-game/scan-view";
+import { composeChildObjectScanState } from "../live-object/compose-child-object-scan";
+import { composeCardScanState } from "../live-object/compose-card-scan-state";
+import type { ObjectCustodyScanContext } from "../live-object/custody";
+import type { ObjectTimePolicyScanContext } from "../live-object/time-policy";
 import { defaultSeason } from "../city-game/season-loader";
-import {
-  seasonNodeIdForObject,
-  type CrSeasonConfig,
-} from "../city-game/season-config";
+import type { CrSeasonConfig } from "../city-game/season-config";
 import { resolveMobileLoreScanForPrintArtifact } from "../city-game/mobile-lore";
 
 export const QR_ID_REGEX =
@@ -113,6 +107,10 @@ export interface ScanViewModel {
   /** Set when QR scope is child_object — first-class scan fields (Layer 1). */
   childPublicLabel: string | null;
   childPublicState: string | null;
+  childTimePolicy: ObjectTimePolicyScanContext | null;
+  childCustody: ObjectCustodyScanContext | null;
+  /** Interaction verbs for this scan — HTML + status JSON (Order 3). */
+  capabilities: ScanCapability[];
   gameNode: GameNodeScanContext | null;
 }
 
@@ -296,53 +294,18 @@ export function buildScanViewModel(
       manifesto_line: childObjectManifestoLine(child),
       card_document_json: child.child_object_document_json,
     };
-    let objectStreams = objectStreamsFromChildDocumentJson(
-      child.child_object_document_json
-    );
     const season = options.season ?? defaultSeason();
-    let gameNode = resolveGameNodeScanContext({
-      objectType: child.object_type,
-      objectId: child.object_id,
-      documentJson: child.child_object_document_json,
-      objectStreams,
-      env: options.env ?? {},
-      vouchWitnesses: ctx.gameVouchWitnesses ?? undefined,
+    const composed = composeChildObjectScanState({
+      child,
       season,
+      env: options.env ?? {},
       now,
+      vouchWitnesses: ctx.gameVouchWitnesses ?? undefined,
     });
-    const nodeId = seasonNodeIdForObject(child.object_id, season);
-    let scanChild = child;
-    if (gameNode && nodeId) {
-      objectStreams = applyBulletinScheduleToStreams(
-        objectStreams,
-        nodeId,
-        now,
-        season,
-        {
-          nodeRole: gameNode.nodeRole,
-          gameMeta: gameNode.gameMeta,
-          seasonWindowPhase: gameNode.seasonWindowPhase,
-        }
-      );
-      const routeApply = applyRouteWindowScheduleToStreams(
-        objectStreams,
-        nodeId,
-        now,
-        season,
-        {
-          nodeRole: gameNode.nodeRole,
-          gameMeta: gameNode.gameMeta,
-          seasonWindowPhase: gameNode.seasonWindowPhase,
-        }
-      );
-      objectStreams = routeApply.streams;
-      if (routeApply.coopHint) {
-        gameNode = { ...gameNode, coopHint: routeApply.coopHint };
-      }
-      if (routeApply.publicState) {
-        scanChild = { ...child, public_state: routeApply.publicState };
-      }
-    }
+    const scanChild = {
+      ...child,
+      public_state: composed.publicState,
+    };
     const objectCardFinal = {
       ...objectCard,
       manifesto_line: childObjectManifestoLine(scanChild),
@@ -360,14 +323,17 @@ export function buildScanViewModel(
         showHumanTrustBlock: true,
         showArtifactBlock: true,
         showLiveControlBlock: false,
-        objectStreams,
+        objectStreams: composed.objectStreams,
         childObjectType: child.object_type,
         childObjectId: child.object_id,
-        childPublicLabel: scanChild.public_label,
-        childPublicState: scanChild.public_state,
-        gameNode,
+        childPublicLabel: composed.publicLabel,
+        childPublicState: composed.publicState,
+        childTimePolicy: composed.childTimePolicy,
+        childCustody: composed.childCustody,
+        gameNode: composed.gameNode,
       },
-      origin
+      origin,
+      now
     );
     return vm;
   }
@@ -399,7 +365,8 @@ export function buildScanViewModel(
           objectStreams: mobileLore.objectStreams,
           gameNode: mobileLore.gameNode,
         },
-        origin
+        origin,
+        now
       );
     }
   }
@@ -417,8 +384,14 @@ export function buildScanViewModel(
       showHumanTrustBlock: true,
       showArtifactBlock: true,
       showLiveControlBlock: true,
+      objectStreams: composeCardScanState({
+        cardDocumentJson: card.card_document_json,
+        season: options.season ?? defaultSeason(),
+        now,
+      }).objectStreams,
     },
-    origin
+    origin,
+    now
   );
 }
 
@@ -612,24 +585,31 @@ interface BaseViewInput {
   childObjectId?: string | null;
   childPublicLabel?: string | null;
   childPublicState?: string | null;
+  childTimePolicy?: ObjectTimePolicyScanContext | null;
+  childCustody?: ObjectCustodyScanContext | null;
   gameNode?: GameNodeScanContext | null;
 }
 
-function baseView(input: BaseViewInput, origin: string): ScanViewModel {
+function baseView(input: BaseViewInput, origin: string, now: Date = new Date()): ScanViewModel {
   const card = input.card ?? null;
   const qr = input.qr ?? null;
   const verification = input.verification ?? null;
   const isHealthy = input.kind === "active";
 
-  return {
+  const objectStreams =
+    input.objectStreams ??
+    composeCardScanState({
+      cardDocumentJson: card?.card_document_json,
+      now,
+    }).objectStreams;
+
+  const vm: ScanViewModel = {
     kind: input.kind,
     profileId: input.profileId,
     qrId: input.qrId,
     handle: card?.handle ?? null,
     manifestoLine: card?.manifesto_line ?? null,
-    objectStreams:
-      input.objectStreams ??
-      objectStreamsFromCardDocumentJson(card?.card_document_json),
+    objectStreams,
     cardStatus: card?.status ?? null,
     qrStatus: qr?.status ?? null,
     qrScope: qr?.scope ?? null,
@@ -667,6 +647,10 @@ function baseView(input: BaseViewInput, origin: string): ScanViewModel {
     childObjectId: input.childObjectId ?? null,
     childPublicLabel: input.childPublicLabel ?? null,
     childPublicState: input.childPublicState ?? null,
+    childTimePolicy: input.childTimePolicy ?? null,
+    childCustody: input.childCustody ?? null,
+    capabilities: [],
     gameNode: input.gameNode ?? null,
   };
+  return { ...vm, capabilities: buildScanCapabilities(vm, now) };
 }

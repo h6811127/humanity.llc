@@ -1,4 +1,5 @@
 import type { ChildObjectRow } from "../db/types";
+import { composeChildObjectScanState } from "../live-object/compose-child-object-scan";
 import type { GameMeta } from "./game-meta";
 import {
   resolveActiveBulletinSlot,
@@ -15,7 +16,6 @@ import {
 } from "./season-config";
 import {
   parseGameNodeFields,
-  resolveGameNodeScanContext,
   type GameNodeScanMode,
 } from "./scan-view";
 import { seasonWindowChip, type SeasonWindowPhase } from "./season-window";
@@ -41,11 +41,62 @@ export type MapNodeSnapshotRow = {
   active_route: RouteWindowSlot | null;
 };
 
+function mapScheduleSlots(input: {
+  streamPolicy: { gameOverlaysApplied: boolean } | null;
+  nodeId: string;
+  nodeRole: string;
+  gameMeta: GameMeta;
+  now: Date;
+  season: CrSeasonConfig;
+}): {
+  activeBulletin: BulletinScheduleSlot | null;
+  activeRoute: RouteWindowSlot | null;
+} {
+  if (!input.streamPolicy?.gameOverlaysApplied) {
+    return { activeBulletin: null, activeRoute: null };
+  }
+  const activeBulletin =
+    input.nodeRole === "relay_gate" && !input.gameMeta.compromised
+      ? resolveActiveBulletinSlot(input.nodeId, input.now, input.season)
+      : null;
+  const activeRoute = resolveActiveRouteWindowSlot(
+    input.nodeId,
+    input.now,
+    input.season
+  );
+  return { activeBulletin, activeRoute };
+}
+
+function childRowForCompose(
+  child: Pick<
+    ChildObjectRow,
+    "object_id" | "object_type" | "status" | "public_state" | "public_label" | "child_object_document_json"
+  >,
+  labelFallback: string
+): ChildObjectRow {
+  return {
+    object_id: child.object_id,
+    parent_profile_id: "",
+    object_type: child.object_type,
+    public_label: child.public_label?.trim() || labelFallback,
+    public_state: child.public_state,
+    status: child.status,
+    child_object_document_json: child.child_object_document_json,
+    created_at: "",
+    updated_at: "",
+  };
+}
+
 /** Derive aggregate-safe map row from a child object (same precedence as scan SSR). */
 export function deriveMapNodeSnapshot(input: {
   child: Pick<
     ChildObjectRow,
-    "object_id" | "object_type" | "status" | "public_state" | "child_object_document_json"
+    | "object_id"
+    | "object_type"
+    | "status"
+    | "public_state"
+    | "public_label"
+    | "child_object_document_json"
   >;
   season: CrSeasonConfig;
   env: { CITY_GAME_ENABLED?: string };
@@ -67,30 +118,34 @@ export function deriveMapNodeSnapshot(input: {
         ? "paused"
         : "active";
 
-  const gameNode = resolveGameNodeScanContext({
-    objectType: input.child.object_type,
-    objectId: input.child.object_id,
-    documentJson: input.child.child_object_document_json,
-    objectStreams: fields.objectStreams,
-    env: input.env,
-    season: input.season,
-    now: input.now,
-  });
-
-  let mapMode: MapNodeSnapshotRow["map_mode"] =
-    lifecycle === "revoked" ? "revoked" : (gameNode?.mode ?? "fallback");
-  if (lifecycle === "paused") mapMode = "care_pause";
-
-  const activeBulletin =
-    registry.role === "relay_gate" && !fields.gameMeta.compromised
-      ? resolveActiveBulletinSlot(nodeId, input.now, input.season)
-      : null;
-  const activeRoute = resolveActiveRouteWindowSlot(nodeId, input.now, input.season);
-
+  let mapMode: MapNodeSnapshotRow["map_mode"] = "fallback";
   let publicState = input.child.public_state;
-  if (activeRoute?.public_state?.trim()) {
-    publicState = activeRoute.public_state.trim();
+  let streamPolicy = null;
+
+  if (lifecycle === "active") {
+    const composed = composeChildObjectScanState({
+      child: childRowForCompose(input.child, registry.label),
+      season: input.season,
+      env: input.env,
+      now: input.now,
+    });
+    streamPolicy = composed.streamPolicy;
+    publicState = composed.publicState;
+    mapMode = composed.gameNode?.mode ?? "fallback";
+  } else if (lifecycle === "revoked") {
+    mapMode = "revoked";
+  } else {
+    mapMode = "care_pause";
   }
+
+  const { activeBulletin, activeRoute } = mapScheduleSlots({
+    streamPolicy,
+    nodeId,
+    nodeRole: registry.role,
+    gameMeta: fields.gameMeta,
+    now: input.now,
+    season: input.season,
+  });
 
   return {
     node_id: nodeId,
@@ -101,7 +156,9 @@ export function deriveMapNodeSnapshot(input: {
     map_mode: mapMode,
     public_state: publicState,
     game_meta: fields.gameMeta,
-    route_open: activeRoute?.route_open ?? null,
+    route_open: streamPolicy?.gameOverlaysApplied
+      ? (activeRoute?.route_open ?? null)
+      : null,
     active_bulletin: activeBulletin,
     active_route: activeRoute,
   };

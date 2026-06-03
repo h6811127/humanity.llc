@@ -26,7 +26,7 @@ import { loadInboxSheetModule } from "./device-inbox-sheet-loader.mjs";
 import {
   loadInboxModule,
   resetPresenceInboxGatherCache,
-} from "./device-inbox-loader.mjs?v=84";
+} from "./device-inbox-loader.mjs?v=87";
 import { getOrphanRemovedTabsWithKeys, getOtherTabsWithKeys } from "./device-tab-presence.mjs";
 import { primeCrossTabNotificationState } from "./device-cross-tab-state.mjs";
 import { refreshWalletContextFromChrome } from "./wallet-page-chrome.mjs";

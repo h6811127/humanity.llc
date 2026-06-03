@@ -43,4 +43,10 @@ export interface Env {
   SCAN_RESOLVER_ORIGIN?: string;
   /** worker:dev — static `/js` origin (Pages :8788) for scan script tags. */
   SCAN_PAGES_JS_ORIGIN?: string;
+  /** Set to `0` to disable operator-wide daily request budget metering. */
+  OPERATOR_REQUEST_BUDGET_ENABLED?: string;
+  /** UTC-day soft cap; health returns `degraded` at/above this count (default 80000). */
+  OPERATOR_REQUEST_SOFT_CAP?: string;
+  /** UTC-day hard cap for budget telemetry (default 100000). */
+  OPERATOR_REQUEST_HARD_CAP?: string;
 }

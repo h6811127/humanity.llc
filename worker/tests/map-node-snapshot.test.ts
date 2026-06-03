@@ -7,6 +7,9 @@ import {
   type MapNodeSnapshotRow,
 } from "../src/city-game/map-node-snapshot";
 import { CR_SEASON_01 } from "../src/city-game/season-config";
+import { composeChildObjectScanState } from "../src/live-object/compose-child-object-scan";
+
+const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 
 function baseMeta(overrides: Partial<GameMeta> = {}): GameMeta {
   return {
@@ -156,5 +159,65 @@ describe("deriveMapNodeSnapshot", () => {
     });
     expect(snap?.map_mode).toBe("care_pause");
     expect(buildMapNodeChips(snap!, "open")[0]?.kind).toBe("maintenance");
+  });
+
+  it("omits bulletin schedule slots when care stream mutes game overlays", () => {
+    const now = new Date("2026-06-07T00:00:00-05:00");
+    const snap = deriveMapNodeSnapshot({
+      child: {
+        object_id: "obj_cr_node_01_newbo",
+        object_type: "game_node",
+        status: "active",
+        public_state: "Relay readable",
+        child_object_document_json: childDocument({
+          nodeId: "node_01",
+          role: "relay_gate",
+          district: "newbo",
+          careValue: "Closed for maintenance",
+        }),
+      },
+      season: CR_SEASON_01,
+      env: { CITY_GAME_ENABLED: "1" },
+      now,
+    });
+    expect(snap?.active_bulletin).toBeNull();
+    expect(snap?.active_route).toBeNull();
+    expect(snap?.route_open).toBeNull();
+  });
+
+  it("matches scan compose public_state and mode for the same child", () => {
+    const now = new Date("2026-06-07T00:00:00-05:00");
+    const documentJson = childDocument({
+      nodeId: "node_01",
+      role: "relay_gate",
+      district: "newbo",
+      careValue: "Clear",
+    });
+    const child = {
+      object_id: "obj_cr_node_01_newbo",
+      parent_profile_id: PROFILE,
+      object_type: "game_node" as const,
+      public_label: "NewBo relay arch",
+      public_state: "Relay readable",
+      status: "active" as const,
+      child_object_document_json: documentJson,
+      created_at: "2026-06-01T12:00:00.000Z",
+      updated_at: "2026-06-01T12:05:00.000Z",
+    };
+    const composed = composeChildObjectScanState({
+      child,
+      season: CR_SEASON_01,
+      env: { CITY_GAME_ENABLED: "1" },
+      now,
+    });
+    const snap = deriveMapNodeSnapshot({
+      child,
+      season: CR_SEASON_01,
+      env: { CITY_GAME_ENABLED: "1" },
+      now,
+    });
+    expect(snap?.map_mode).toBe(composed.gameNode?.mode);
+    expect(snap?.public_state).toBe(composed.publicState);
+    expect(snap?.active_bulletin).not.toBeNull();
   });
 });

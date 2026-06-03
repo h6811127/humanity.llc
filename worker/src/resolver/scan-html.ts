@@ -4,6 +4,16 @@ import {
   parseManifestoDisplay,
   resolveScanHeroDisplay,
 } from "./manifesto-display";
+import {
+  findScanCapability,
+  gameContributeModeFromCapability,
+  isScanCapabilityAvailable,
+  readHeroTemplate,
+  shouldShowLiveControlTrustGroup,
+  shouldShowCardTrustGroup,
+  shouldShowHumanTrustGroup,
+  shouldShowQrTrustGroup,
+} from "../live-object/scan-capabilities";
 import { publicReasonLabel } from "./revocation-display";
 import { scanListIcon, type ScanIconId } from "./scan-icons";
 import { BEARER_WARNING, OBJECT_PUBLIC_SNAPSHOT_LIMIT, OBJECT_STREAMS_LIMIT, AI_EXPLAIN_LIMIT } from "./trust-copy";
@@ -17,6 +27,11 @@ import {
 import { governanceProcessUrls, originFromScanUrl } from "./scan-governance";
 import { pagesJsOrigin, scanPageOrigin, type ScanPageOriginEnv } from "../http/resolver";
 import { SCAN_OFFLINE_BANNER_TEXT } from "./scan-offline";
+import {
+  renderScanFreshnessBannerMarkup,
+  renderScanFreshnessBannerScript,
+  scanFreshnessForViewModel,
+} from "./scan-freshness-banner";
 import {
   GAME_CONTRIBUTE_LEAD,
   GAME_CONTRIBUTE_FIRST_SCAN_NOTE,
@@ -74,6 +89,11 @@ import {
   SCAN_HERO_QR_DETAILS_SUMMARY,
   LOST_ITEM_RELAY_CREATE_HINT,
   LOST_ITEM_RELAY_CREATE_PATH,
+  LOST_ITEM_OFFER_EYEBROW,
+  LOST_ITEM_OFFER_FIELD_LABEL,
+  LOST_ITEM_OFFER_LEAD,
+  LOST_ITEM_OFFER_PRIVACY_NOTE,
+  LOST_ITEM_OFFER_SUBMIT_LABEL,
   MERCH_SCAN_CREATE_PATH,
   MERCH_SCAN_CUSTOMIZE_PATH,
   MERCH_SCAN_FUNNEL_HINT,
@@ -97,6 +117,29 @@ function scanHeroDisplay(vm: ScanViewModel) {
   });
 }
 
+function gameNodeMutedCopy(
+  vm: ScanViewModel,
+  gameNode: GameNodeScanContext
+): string {
+  const archive = findScanCapability(vm.capabilities, "archive");
+  if (archive?.state === "care_pause") {
+    return `<p class="scan-game-care-note" role="note">Game bulletins are muted while maintenance is live on the care stream.</p>`;
+  }
+  if (archive?.state === "season_not_open" || archive?.state === "season_ended") {
+    const note = seasonWindowScanNote(gameNode.seasonWindowPhase);
+    return note
+      ? `<p class="scan-game-dormant-note" role="note">${escapeHtml(note)}</p>`
+      : "";
+  }
+  if (archive?.state === "dormant") {
+    return `<p class="scan-game-dormant-note" role="note">This temporary object is dormant. The QR still resolves — public state only.</p>`;
+  }
+  if (gameNode.vouchGate && !gameNode.vouchGate.met) {
+    return `<p class="scan-game-vouch-note" role="note">Trust path still waiting on ${escapeHtml(gameNode.vouchGate.pending.join(", "))} — cooperation with nearby places opens the deeper route.</p>`;
+  }
+  return "";
+}
+
 /** Response header  -  confirms pass-card scan UI (not legacy .block layout). */
 export const SCAN_UI_VERSION = "pass-v39";
 
@@ -112,6 +155,7 @@ export async function renderScanPage(
 ): Promise<string> {
   const pageOrigin = scanPageOrigin(origin, request, originEnv);
   const title = pageTitle(vm);
+  const freshness = scanFreshnessForViewModel(vm);
   let qrMarkup = "";
   if (vm.scanUrl) {
     try {
@@ -142,6 +186,7 @@ export async function renderScanPage(
       <a id="scan-steward-preview-return-link" class="scan-steward-preview-return-link" href="#">Back</a>
     </div>
     <p class="scan-offline-banner" id="scan-offline-banner" role="status" hidden>${escapeHtml(SCAN_OFFLINE_BANNER_TEXT)}</p>
+    ${renderScanFreshnessBannerMarkup(freshness)}
     <main class="screen scan-screen">
       ${renderScanHeroSection(vm, safety, pageOrigin, qrMarkup)}
       ${renderScanActorBand(vm, pageOrigin)}
@@ -157,12 +202,14 @@ export async function renderScanPage(
   ${renderVouchIssuanceScript(vm, pageOrigin, request, originEnv)}
   ${renderQrFallbackScript(pageOrigin, vm.scanUrl)}
   ${renderScanOfflineBannerScript()}
+  ${renderScanFreshnessBannerScript()}
   ${renderScanSafetyHeaderScript()}
   ${renderScanLiveCheckArriveScript(pageOrigin, request, originEnv)}
   ${renderScanActorBandScript(vm, pageOrigin, request, originEnv)}
   ${renderScanAiExplainScript(vm, pageOrigin, request, originEnv)}
   ${renderScanMerchFunnelScript(pageOrigin, request, originEnv)}
   ${renderScanGameContributeScript(vm, pageOrigin, request, originEnv)}
+  ${renderScanLostItemOfferScript(vm, pageOrigin, request, originEnv)}
   ${renderScanOwnerRestoreCtaScript(vm, pageOrigin, request, originEnv)}
   ${renderScanStewardPreviewReturnScript(pageOrigin, request, originEnv)}
 </body>
@@ -273,24 +320,27 @@ function renderScanHeroSection(
   const objectAttr = vm.childObjectId
     ? ` data-object-id="${escapeHtml(vm.childObjectId)}"`
     : "";
+  const contributeCap = findScanCapability(vm.capabilities, "contribute");
+  const contributeMode = gameContributeModeFromCapability(contributeCap);
   const gameContributeAttr =
-    vm.gameNode?.showsContribute && vm.kind === "active"
-      ? ` data-game-contribute="1" data-game-contribute-mode="${escapeHtml(vm.gameNode.contributeMode ?? "quorum")}" data-season-id="${escapeHtml(vm.gameNode.seasonId)}"`
+    contributeCap?.available && contributeMode && vm.gameNode
+      ? ` data-game-contribute="1" data-game-contribute-mode="${escapeHtml(contributeMode)}" data-season-id="${escapeHtml(vm.gameNode.seasonId)}"`
       : "";
+  const lostItemOfferAttr = isScanCapabilityAvailable(vm.capabilities, "offer")
+    ? ` data-lost-item-offer="1"`
+    : "";
   const resolverRow = safety.objectSignatureVerified
     ? `<p class="scan-safety-resolver scan-arrive-item scan-arrive-item--hidden">${escapeHtml(SCAN_SAFETY_RESOLVER_VERIFIED_COPY)}</p>`
     : "";
   const chipsBlock = renderScanHeroMetaDetails(vm, safety);
   const footBlock = renderScanHeroFootBlock(vm, foot);
-  const { display, template: heroTemplate } = scanHeroDisplay(vm);
   const lostItemCreateHint =
-    vm.kind === "active" &&
-    heroTemplate === "lost_item_relay" &&
-    display.kind === "lost_item_relay"
+    isScanCapabilityAvailable(vm.capabilities, "offer")
       ? renderLostItemCreateHint(origin)
       : "";
   const merchFunnelHint = isMerchFunnelScan(vm) ? renderMerchFunnelHint(origin) : "";
   const gameContributeBlock = renderGameContributeBlock(vm);
+  const lostItemOfferBlock = renderLostItemOfferBlock(vm);
   const ownerRestoreCta = renderScanOwnerRestoreCta(vm, origin);
   const qrBlock = scanHeroQrBlock(vm, qrMarkup);
   const qrSection = qrBlock
@@ -301,7 +351,7 @@ function renderScanHeroSection(
     : "";
 
   return `<div class="scan-pass-layer">
-<article class="scan-hero scan-status-panel scan-safety-header scan-live-check--pending" id="scan-safety-header" aria-label="Live check"${profileAttr}${qrAttr}${objectAttr}${scanActiveAttr}${merchFunnelAttr}${gameContributeAttr}>
+<article class="scan-hero scan-status-panel scan-safety-header scan-live-check--pending" id="scan-safety-header" aria-label="Live check"${profileAttr}${qrAttr}${objectAttr}${scanActiveAttr}${merchFunnelAttr}${gameContributeAttr}${lostItemOfferAttr}>
   <header class="scan-hero-head">
     ${renderScanHeroHost()}
     ${renderHeroStatusStrip(vm)}
@@ -315,6 +365,7 @@ function renderScanHeroSection(
   <p class="scan-safety-first-seen" id="scan-safety-first-seen" hidden></p>
   ${footBlock}
   ${gameContributeBlock}
+  ${lostItemOfferBlock}
   ${lostItemCreateHint}
   ${merchFunnelHint}
   ${ownerRestoreCta}
@@ -453,6 +504,28 @@ function renderLostItemCreateHint(origin: string): string {
   return `<p class="scan-create-hint" role="note"><a href="${escapeHtml(href)}">Create a lost-item tag</a> — ${escapeHtml(LOST_ITEM_RELAY_CREATE_HINT)}</p>`;
 }
 
+function renderLostItemOfferBlock(vm: ScanViewModel): string {
+  if (
+    !isScanCapabilityAvailable(vm.capabilities, "offer") ||
+    !vm.profileId ||
+    !vm.childObjectId
+  ) {
+    return "";
+  }
+
+  return `<section class="scan-lost-item-offer" id="scan-lost-item-offer" aria-labelledby="scan-lost-item-offer-label">
+  <p class="scan-lost-item-offer-eyebrow">${escapeHtml(LOST_ITEM_OFFER_EYEBROW)}</p>
+  <p class="scan-lost-item-offer-lead" id="scan-lost-item-offer-label">${escapeHtml(LOST_ITEM_OFFER_LEAD)}</p>
+  <label class="scan-lost-item-offer-field-label" for="scan-lost-item-offer-message">${escapeHtml(LOST_ITEM_OFFER_FIELD_LABEL)}</label>
+  <textarea class="scan-lost-item-offer-input" id="scan-lost-item-offer-message" name="message" rows="3" maxlength="280" autocomplete="off" spellcheck="true" placeholder="Where you found it and how to reach you — no account needed"></textarea>
+  <p class="scan-lost-item-offer-note">${escapeHtml(LOST_ITEM_OFFER_PRIVACY_NOTE)}</p>
+  <button type="button" class="scan-lost-item-offer-cta" id="scan-lost-item-offer-submit">${escapeHtml(LOST_ITEM_OFFER_SUBMIT_LABEL)}</button>
+  <div class="scan-lost-item-offer-status-panel" id="scan-lost-item-offer-status-panel" hidden>
+    <p class="scan-lost-item-offer-status" id="scan-lost-item-offer-status" aria-live="polite"></p>
+  </div>
+</section>`;
+}
+
 function renderGameNodeMetaChips(gameNode: GameNodeScanContext): string {
   const chips: string[] = [];
   const meta = gameNode.gameMeta;
@@ -507,10 +580,12 @@ function renderGameNodeMetaChips(gameNode: GameNodeScanContext): string {
 
 function renderGameContributeBlock(vm: ScanViewModel): string {
   const gameNode = vm.gameNode;
+  const contributeCap = findScanCapability(vm.capabilities, "contribute");
+  const contributeMode = gameContributeModeFromCapability(contributeCap);
   if (
-    vm.kind !== "active" ||
-    !gameNode?.showsContribute ||
-    gameNode.mode !== "game" ||
+    !contributeCap?.available ||
+    !contributeMode ||
+    !gameNode ||
     !vm.profileId ||
     !vm.childObjectId
   ) {
@@ -520,9 +595,9 @@ function renderGameContributeBlock(vm: ScanViewModel): string {
   const meta = gameNode.gameMeta;
   const progress = meta.collective_progress ?? 0;
   const target = meta.collective_target ?? 0;
-  const isFragment = gameNode.contributeMode === "fragment";
-  const isScarcity = gameNode.contributeMode === "scarcity";
-  const eyebrow = gameNodeContributeEyebrow(gameNode.contributeMode!, gameNode.district);
+  const isFragment = contributeMode === "fragment";
+  const isScarcity = contributeMode === "scarcity";
+  const eyebrow = gameNodeContributeEyebrow(contributeMode, gameNode.district);
   const lead = isScarcity
     ? GAME_SCARCITY_CONTRIBUTE_LEAD
     : isFragment
@@ -587,20 +662,7 @@ function buildGameNodeScanHero(vm: ScanViewModel): { main: string; foot: string 
   const coopHint = gameNode.coopHint
     ? `<p class="scan-game-coop-hint" role="note">${escapeHtml(gameNode.coopHint)}</p>`
     : "";
-  const seasonWindowNote =
-    gameNode.mode === "dormant"
-      ? seasonWindowScanNote(gameNode.seasonWindowPhase)
-      : null;
-  const mutedGameCopy =
-    gameNode.mode === "care_pause"
-      ? `<p class="scan-game-care-note" role="note">Game bulletins are muted while maintenance is live on the care stream.</p>`
-      : seasonWindowNote
-        ? `<p class="scan-game-dormant-note" role="note">${escapeHtml(seasonWindowNote)}</p>`
-      : gameNode.mode === "dormant"
-        ? `<p class="scan-game-dormant-note" role="note">This temporary object is dormant. The QR still resolves — public state only.</p>`
-        : gameNode.vouchGate && !gameNode.vouchGate.met
-          ? `<p class="scan-game-vouch-note" role="note">Trust path still waiting on ${escapeHtml(gameNode.vouchGate.pending.join(", "))} — cooperation with nearby places opens the deeper route.</p>`
-          : "";
+  const mutedGameCopy = gameNodeMutedCopy(vm, gameNode);
 
   return {
     main: `<p class="scan-hero-eyebrow">${escapeHtml(gameNode.roleEyebrow)}</p>
@@ -616,13 +678,38 @@ function buildGameNodeScanHero(vm: ScanViewModel): { main: string; foot: string 
 }
 
 /** Active live-object / print_artifact scans — curiosity path to create + customize (M8 merch funnel). */
+function renderChildTimePolicyNote(vm: ScanViewModel): string {
+  const note = vm.childTimePolicy?.scanNote;
+  if (!note) return "";
+  return `<p class="scan-game-dormant-note scan-time-policy-note" role="note">${escapeHtml(note)}</p>`;
+}
+
+function renderChildCustodyBlock(vm: ScanViewModel): string {
+  const custody = vm.childCustody;
+  if (!custody || custody.phase === "unset") return "";
+  const parts: string[] = [];
+  if (custody.scanLine) {
+    parts.push(
+      `<p class="scan-custody-line" role="note">${escapeHtml(custody.scanLine)}</p>`
+    );
+  }
+  if (custody.scanNote) {
+    parts.push(
+      `<p class="scan-custody-note" role="note">${escapeHtml(custody.scanNote)}</p>`
+    );
+  }
+  return parts.join("\n    ");
+}
+
 function isMerchFunnelScan(vm: ScanViewModel): boolean {
   if (vm.kind !== "active") return false;
   if (vm.gameNode?.enabled && vm.gameNode.mode !== "fallback") return false;
-  const { display, template } = scanHeroDisplay(vm);
-  if (template === "status_plate" || template === "lost_item_relay") return false;
+  const readTemplate = readHeroTemplate(vm.capabilities);
+  if (readTemplate === "status_plate" || readTemplate === "lost_item_relay") {
+    return false;
+  }
   if (vm.qrScope === "print_artifact") return true;
-  return template === "live_object";
+  return readTemplate === "live_object";
 }
 
 function renderMerchFunnelHint(origin: string): string {
@@ -742,19 +829,24 @@ function buildScanHeroMain(
     };
   }
 
-  const { display, template } = scanHeroDisplay(vm);
+  const { display } = scanHeroDisplay(vm);
+  const readTemplate = readHeroTemplate(vm.capabilities);
 
   if (vm.gameNode?.enabled && vm.gameNode.mode !== "fallback") {
     return buildGameNodeScanHero(vm);
   }
 
-  if (template === "status_plate" && display.kind === "status_plate") {
+  if (readTemplate === "status_plate" && display.kind === "status_plate") {
     const steward = renderStewardStrip(vm);
     const streams = renderObjectStreamsBlock(vm.objectStreams);
     const snapshot = renderPublicSnapshotBlock(vm.manifestoLine, vm.objectStreams);
+    const timePolicyNote = renderChildTimePolicyNote(vm);
+    const custodyBlock = renderChildCustodyBlock(vm);
     return {
       main: `<h1 class="scan-hero-title">${escapeHtml(display.objectLabel)}</h1>
     <p class="scan-hero-line">${escapeHtml(display.statusLine)}</p>
+    ${custodyBlock}
+    ${timePolicyNote}
     ${streams}
     ${snapshot}
     ${steward}`,
@@ -762,20 +854,24 @@ function buildScanHeroMain(
     };
   }
 
-  if (template === "lost_item_relay" && display.kind === "lost_item_relay") {
+  if (readTemplate === "lost_item_relay" && display.kind === "lost_item_relay") {
     const meta = scanStatusMetaLine(vm);
     const steward = renderStewardStrip(vm);
+    const timePolicyNote = renderChildTimePolicyNote(vm);
+    const custodyBlock = renderChildCustodyBlock(vm);
     return {
       main: `<p class="scan-hero-eyebrow">Lost item relay</p>
     <h1 class="scan-hero-title">${escapeHtml(display.objectLabel)}</h1>
     <p class="scan-hero-line">${escapeHtml(display.statusLine)}</p>
+    ${custodyBlock}
+    ${timePolicyNote}
     ${meta ? `<p class="scan-hero-meta">${escapeHtml(meta)}</p>` : ""}
     ${steward}`,
       foot: "This scan does not prove who holds the item.",
     };
   }
 
-  if (template === "live_object") {
+  if (readTemplate === "live_object") {
     const line =
       display.kind === "general" && display.line
         ? display.line
@@ -1070,23 +1166,23 @@ function renderPassBack(origin: string): string {
 function renderTrustGroups(vm: ScanViewModel, origin: string): string {
   const sections: string[] = [];
 
-  if (vm.showCardBlock) {
+  if (shouldShowCardTrustGroup(vm.capabilities)) {
     pushTrustGroup(sections, "Card status", cardGroupRows(vm), "card", vm);
   }
 
-  if (vm.showHumanTrustBlock) {
+  if (shouldShowHumanTrustGroup(vm.capabilities)) {
     pushTrustGroup(sections, "Human trust", humanGroupRows(vm), "human", vm);
   }
 
-  if (vm.showArtifactBlock) {
+  if (shouldShowQrTrustGroup(vm.capabilities)) {
     pushTrustGroup(sections, "This QR", qrGroupRows(vm), "qr", vm);
   }
 
-  if (vm.showLiveControlBlock) {
+  if (shouldShowLiveControlTrustGroup(vm.capabilities)) {
     pushTrustGroup(sections, "Live control", liveControlGroupRows(vm), "live", vm);
   }
 
-  if (vm.kind === "active" && vm.profileId && vm.showHumanTrustBlock) {
+  if (vm.kind === "active" && vm.profileId && shouldShowHumanTrustGroup(vm.capabilities)) {
     const vouch = renderVouchSection(vm, origin);
     if (vouch.trim()) sections.push(vouch);
   }
@@ -1399,9 +1495,9 @@ function renderScanGameContributeScript(
   request?: Request,
   originEnv?: ScanPageOriginEnv
 ): string {
+  const contributeCap = findScanCapability(vm.capabilities, "contribute");
   if (
-    vm.kind !== "active" ||
-    !vm.gameNode?.showsContribute ||
+    !contributeCap?.available ||
     !vm.profileId ||
     !vm.childObjectId
   ) {
@@ -1409,6 +1505,24 @@ function renderScanGameContributeScript(
   }
   const assetOrigin = pagesJsOrigin(origin, request, originEnv);
   const mod = JSON.stringify(`${assetOrigin}/js/scan-game-contribute.mjs?v=2`);
+  return `<script type="module" src=${mod}></script>`;
+}
+
+function renderScanLostItemOfferScript(
+  vm: ScanViewModel,
+  origin: string,
+  request?: Request,
+  originEnv?: ScanPageOriginEnv
+): string {
+  if (
+    !isScanCapabilityAvailable(vm.capabilities, "offer") ||
+    !vm.profileId ||
+    !vm.childObjectId
+  ) {
+    return "";
+  }
+  const assetOrigin = pagesJsOrigin(origin, request, originEnv);
+  const mod = JSON.stringify(`${assetOrigin}/js/scan-lost-item-offer.mjs?v=1`);
   return `<script type="module" src=${mod}></script>`;
 }
 
@@ -1594,7 +1708,14 @@ function formatScanTimestamp(iso: string): string {
 }
 
 function renderLiveControlScript(vm: ScanViewModel, origin: string, _request?: Request): string {
-  if (vm.kind !== "active" || !vm.profileId || !vm.qrId) return "";
+  if (
+    vm.kind !== "active" ||
+    !vm.profileId ||
+    !vm.qrId ||
+    !shouldShowLiveControlTrustGroup(vm.capabilities)
+  ) {
+    return "";
+  }
   const apiOrigin = liveControlApiOrigin(vm, origin);
   const challengeUrl = `${apiOrigin}/.well-known/hc/v1/cards/${encodeURIComponent(
     vm.profileId

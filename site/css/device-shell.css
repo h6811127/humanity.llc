@@ -226,6 +226,324 @@ body.device-hub-sheet-open .shell-scan-qr-btn:not([hidden]),
   z-index: 65;
 }
 
+/* Hub in-app QR scanner — iOS-safe fullscreen shell + inner card transitions */
+.device-hub-qr-scanner {
+  position: fixed;
+  inset: 0;
+  width: auto;
+  height: auto;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.92);
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.device-hub-qr-scanner[open] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.device-hub-qr-scanner::backdrop {
+  background: transparent;
+}
+
+.device-hub-qr-scanner-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: rgba(0, 0, 0, 0.52);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+  backdrop-filter: blur(10px) saturate(120%);
+  opacity: 0;
+  cursor: default;
+  -webkit-tap-highlight-color: transparent;
+  transform: translateZ(0);
+  transition: opacity 0.34s var(--shell-ease, ease);
+}
+
+.device-hub-qr-scanner-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(calc(100vw - 32px), 340px);
+  max-height: calc(
+    100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 32px
+  );
+  padding: 14px 14px 16px;
+  border-radius: var(--shell-radius-sheet, 20px);
+  background: #1c1c1e;
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.45),
+    0 8px 24px rgba(0, 0, 0, 0.28);
+  opacity: 0;
+  transform: scale(0.88);
+  -webkit-transform: scale(0.88);
+  will-change: transform, opacity;
+  transition:
+    opacity 0.42s var(--shell-spring, cubic-bezier(0.32, 0.72, 0, 1)),
+    transform 0.42s var(--shell-spring, cubic-bezier(0.32, 0.72, 0, 1));
+}
+
+.device-hub-qr-scanner--present .device-hub-qr-scanner-scrim {
+  opacity: 1;
+}
+
+.device-hub-qr-scanner--present .device-hub-qr-scanner-inner {
+  opacity: 1;
+  transform: scale(1);
+  -webkit-transform: scale(1);
+}
+
+.device-hub-qr-scanner--closing .device-hub-qr-scanner-scrim {
+  opacity: 0;
+  transition-duration: 0.26s;
+}
+
+.device-hub-qr-scanner--closing .device-hub-qr-scanner-inner {
+  opacity: 0;
+  transform: scale(0.94);
+  -webkit-transform: scale(0.94);
+  transition-duration: 0.26s;
+  transition-timing-function: var(--shell-ease, ease);
+}
+
+.device-hub-qr-scanner-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.device-hub-qr-scanner-head h2 {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+.device-hub-qr-scanner-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 1.375rem;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.88);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.device-hub-qr-scanner-close:active {
+  transform: scale(0.94);
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.device-hub-qr-scanner-lead {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.device-hub-qr-scanner-video-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: calc(var(--shell-radius-control, 12px) + 2px);
+  background: #000;
+}
+
+.device-hub-qr-scanner--no-camera .device-hub-qr-scanner-video-wrap,
+.device-hub-qr-scanner-video-wrap[hidden] {
+  display: none !important;
+}
+
+.device-hub-qr-scanner-video-wrap video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.device-hub-qr-scanner-viewfinder {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.device-hub-qr-scanner-viewfinder::before {
+  content: "";
+  position: absolute;
+  top: 18%;
+  left: 18%;
+  width: 64%;
+  height: 64%;
+  border-radius: 8px;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.42);
+  opacity: 0;
+}
+
+.device-hub-qr-scanner--present .device-hub-qr-scanner-viewfinder::before {
+  animation: hub-qr-scanner-mask-in 0.36s var(--shell-spring, cubic-bezier(0.32, 0.72, 0, 1)) 0.08s both;
+}
+
+.device-hub-qr-scanner-viewfinder::after {
+  content: "";
+  position: absolute;
+  top: 18%;
+  left: 18%;
+  width: 64%;
+  height: 64%;
+  --hub-scanner-corner: rgba(219, 27, 67, 0.94);
+  --hub-scanner-corner-len: 22px;
+  --hub-scanner-corner-thick: 3px;
+  background:
+    linear-gradient(var(--hub-scanner-corner), var(--hub-scanner-corner)) 0 0 /
+      var(--hub-scanner-corner-len) var(--hub-scanner-corner-thick) no-repeat,
+    linear-gradient(var(--hub-scanner-corner), var(--hub-scanner-corner)) 0 0 /
+      var(--hub-scanner-corner-thick) var(--hub-scanner-corner-len) no-repeat,
+    linear-gradient(var(--hub-scanner-corner), var(--hub-scanner-corner)) 100% 0 /
+      var(--hub-scanner-corner-len) var(--hub-scanner-corner-thick) no-repeat,
+    linear-gradient(var(--hub-scanner-corner), var(--hub-scanner-corner)) 100% 0 /
+      var(--hub-scanner-corner-thick) var(--hub-scanner-corner-len) no-repeat,
+    linear-gradient(var(--hub-scanner-corner), var(--hub-scanner-corner)) 0 100% /
+      var(--hub-scanner-corner-len) var(--hub-scanner-corner-thick) no-repeat,
+    linear-gradient(var(--hub-scanner-corner), var(--hub-scanner-corner)) 0 100% /
+      var(--hub-scanner-corner-thick) var(--hub-scanner-corner-len) no-repeat,
+    linear-gradient(var(--hub-scanner-corner), var(--hub-scanner-corner)) 100% 100% /
+      var(--hub-scanner-corner-len) var(--hub-scanner-corner-thick) no-repeat,
+    linear-gradient(var(--hub-scanner-corner), var(--hub-scanner-corner)) 100% 100% /
+      var(--hub-scanner-corner-thick) var(--hub-scanner-corner-len) no-repeat;
+  opacity: 0;
+}
+
+.device-hub-qr-scanner--present .device-hub-qr-scanner-viewfinder::after {
+  animation:
+    hub-qr-scanner-reticle-in 0.48s var(--shell-spring, cubic-bezier(0.32, 0.72, 0, 1)) 0.12s both,
+    hub-qr-scanner-reticle-pulse 2.6s ease-in-out 0.72s infinite;
+}
+
+.device-hub-qr-scanner-scan-line {
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(219, 27, 67, 0.85),
+    transparent
+  );
+  top: 18%;
+  opacity: 0;
+}
+
+.device-hub-qr-scanner--present .device-hub-qr-scanner-scan-line {
+  animation: hub-qr-scanner-sweep 2.4s ease-in-out 0.55s infinite;
+}
+
+@keyframes hub-qr-scanner-mask-in {
+  from {
+    opacity: 0;
+    transform: scale(1.06);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes hub-qr-scanner-reticle-in {
+  from {
+    opacity: 0;
+    transform: scale(1.08);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes hub-qr-scanner-reticle-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.72;
+  }
+}
+
+@keyframes hub-qr-scanner-sweep {
+  0% {
+    top: 18%;
+    opacity: 0;
+  }
+  6% {
+    opacity: 0.75;
+  }
+  94% {
+    top: 82%;
+    opacity: 0.75;
+  }
+  100% {
+    top: 82%;
+    opacity: 0;
+  }
+}
+
+.device-hub-qr-scanner .form-status {
+  margin: 0;
+  font-size: 0.875rem;
+  min-height: 1.35em;
+  color: rgba(255, 255, 255, 0.68);
+  text-align: center;
+}
+
+.device-hub-qr-scanner .form-status.error {
+  color: #ff8a96;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .device-hub-qr-scanner-scrim,
+  .device-hub-qr-scanner-inner,
+  .device-hub-qr-scanner-viewfinder::before,
+  .device-hub-qr-scanner-viewfinder::after,
+  .device-hub-qr-scanner-scan-line {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .device-hub-qr-scanner--present .device-hub-qr-scanner-scrim,
+  .device-hub-qr-scanner--present .device-hub-qr-scanner-inner,
+  .device-hub-qr-scanner--present .device-hub-qr-scanner-viewfinder::before,
+  .device-hub-qr-scanner--present .device-hub-qr-scanner-viewfinder::after {
+    opacity: 1;
+    transform: none;
+    -webkit-transform: none;
+  }
+}
+
 #top-chrome[data-device-status-error] .shell-status-dot-btn {
   outline: 2px solid var(--red, #db1b43);
   outline-offset: 2px;

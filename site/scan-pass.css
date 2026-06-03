@@ -1435,6 +1435,21 @@ a {
   display: none;
 }
 
+.scan-freshness-banner {
+  margin: 0 var(--pad) 12px;
+  padding: 12px 14px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--black);
+  background: var(--hc-emphasis-card-fill-info-glass);
+  border: 0.5px solid var(--hc-emphasis-card-border-info);
+  border-radius: 14px;
+}
+
+.scan-freshness-banner[hidden] {
+  display: none;
+}
+
 .scan-steward-preview-return {
   margin: 0 var(--pad) 12px;
   padding: 10px 14px;
@@ -1911,6 +1926,113 @@ a {
 }
 
 .scan-game-contribute-status[data-tone="waiting"] {
+  color: var(--black);
+}
+
+.scan-lost-item-offer {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(60, 60, 67, 0.12);
+}
+
+.scan-lost-item-offer-eyebrow {
+  margin: 0 0 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(60, 60, 67, 0.55);
+}
+
+.scan-lost-item-offer-lead {
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: rgba(60, 60, 67, 0.78);
+}
+
+.scan-lost-item-offer-field-label {
+  display: block;
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(60, 60, 67, 0.72);
+}
+
+.scan-lost-item-offer-input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 72px;
+  margin: 0 0 8px;
+  padding: 10px 12px;
+  border: 1px solid rgba(60, 60, 67, 0.18);
+  border-radius: 10px;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.4;
+  resize: vertical;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--black);
+}
+
+.scan-lost-item-offer-input:focus {
+  outline: none;
+  border-color: rgba(0, 122, 255, 0.55);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.12);
+}
+
+.scan-lost-item-offer-input:disabled {
+  opacity: 0.65;
+}
+
+.scan-lost-item-offer-note {
+  margin: 0 0 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: rgba(60, 60, 67, 0.55);
+}
+
+.scan-lost-item-offer-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(0, 122, 255, 0.92);
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.scan-lost-item-offer-cta:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.scan-lost-item-offer-status-panel {
+  margin-top: 8px;
+}
+
+.scan-lost-item-offer-status {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: rgba(60, 60, 67, 0.72);
+}
+
+.scan-lost-item-offer-status[data-tone="error"] {
+  color: var(--red);
+}
+
+.scan-lost-item-offer-status[data-tone="success"] {
+  color: #248a3d;
+}
+
+.scan-lost-item-offer-status[data-tone="waiting"] {
   color: var(--black);
 }
 

@@ -2,6 +2,8 @@
 
 **Status:** **Draft RFC** — no resolver routes, wallet storage, or steward UI until [`DELEGATED_CHILD_CAPABILITIES_GATE.md`](DELEGATED_CHILD_CAPABILITIES_GATE.md) **G1–G5** pass.
 
+**Shape validation (spec-only):** `worker/src/live-object/delegation-spec.ts` · `worker/tests/live-object-delegation-spec.test.ts`
+
 **Canonical rules:** [`Technical Standards v1.0.md`](Technical%20Standards%20v1.0.md) §7A.1 · [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) § Delegated child capabilities (future).
 
 ---

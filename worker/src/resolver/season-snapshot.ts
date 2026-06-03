@@ -19,6 +19,7 @@ import {
   seasonNodeIdForObject,
   type CrSeasonConfig,
 } from "../city-game/season-config";
+import { publicUnlockEdges } from "../live-object/network-graph";
 import { resolveSeasonById } from "../city-game/season-loader";
 import {
   enforceGameSnapshotSeasonQuota,
@@ -148,16 +149,6 @@ function buildFinaleSummary(nodes: MapNodeSnapshotRow[], season: CrSeasonConfig)
   };
 }
 
-function unlockEdgeSatisfied(
-  nodes: MapNodeSnapshotRow[],
-  fromNodeId: string,
-  toNodeId: string
-): boolean {
-  const target = nodes.find((row) => row.node_id === toNodeId);
-  if (!target) return false;
-  return target.game_meta.unlocked_by.includes(fromNodeId);
-}
-
 /**
  * GET /.well-known/hc/v1/seasons/{season_id}/snapshot
  * Read-only aggregate city state — no scan logging, no unlock repair.
@@ -243,12 +234,10 @@ export async function handleGetSeasonSnapshot(
     nodes: nodes.map((row) =>
       publicNodeRow(row, windowPhase, scanUrlByNode.get(row.node_id) ?? null)
     ),
-    unlock_edges: season.unlock_edges.map((edge) => ({
-      from: edge.from,
-      to: edge.to,
-      label: edge.label,
-      satisfied: unlockEdgeSatisfied(nodes, edge.from, edge.to),
-    })),
+    unlock_edges: publicUnlockEdges(season.unlock_edges, (nodeId) => {
+      const row = nodes.find((n) => n.node_id === nodeId);
+      return row?.game_meta.unlocked_by ?? [];
+    }),
     finale: buildFinaleSummary(nodes, season),
   };
 

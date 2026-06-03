@@ -136,4 +136,74 @@ describe("live object child scan (Layer 1 — status plate + lost-item relay)", 
     expect(html).toContain("House keys");
     expect(html).toContain("Lost — contact owner through relay");
   });
+
+  it("renders finder offer form on active lost-item relay scans", async () => {
+    const row = child({
+      object_type: "lost_item_relay",
+      public_label: "House keys",
+      public_state: "Lost — contact owner through relay",
+      child_object_document_json: "{}",
+    });
+    const html = await renderScanPage(childScanVm(row), ORIGIN);
+    expect(html).toContain('data-lost-item-offer="1"');
+    expect(html).toContain("scan-lost-item-offer");
+    expect(html).toContain("Send through relay");
+    expect(html).toContain("scan-lost-item-offer.mjs");
+  });
+
+  it("shows time_policy dormant note and keeps HTTP-readable state", async () => {
+    const row = child({
+      child_object_document_json: JSON.stringify({
+        time_policy: {
+          dormant_until: "2026-12-31T12:00:00.000Z",
+        },
+      }),
+    });
+    const vm = childScanVm(row);
+    expect(vm.childTimePolicy?.phase).toBe("dormant");
+    const html = await renderScanPage(vm, ORIGIN);
+    expect(html).toContain("scan-time-policy-note");
+    expect(html).toMatch(/asleep until its scheduled wake time/i);
+    expect(html).toContain("Studio door");
+  });
+
+  it("overlays schedule public_state on scan view model", () => {
+    const row = child({
+      public_state: "Default owner line",
+      child_object_document_json: JSON.stringify({
+        time_policy: {
+          timezone: "UTC",
+          schedule: [
+            {
+              local_hour_from: 0,
+              local_hour_until: 24,
+              public_state: "Thu–Sun until 9 PM",
+            },
+          ],
+        },
+      }),
+    });
+    const vm = childScanVm(row);
+    expect(vm.childPublicState).toBe("Thu–Sun until 9 PM");
+    expect(vm.childTimePolicy?.phase).toBe("active");
+  });
+
+  it("shows custody line and disclaimer on status plate scan", async () => {
+    const row = child({
+      child_object_document_json: JSON.stringify({
+        custody: {
+          holder_label: "@river_gallery",
+          until: "2026-12-31T22:00:00-05:00",
+          note: "On loan for June show",
+        },
+      }),
+    });
+    const vm = childScanVm(row);
+    expect(vm.childCustody?.phase).toBe("active");
+    expect(vm.childCustody?.scanLine).toContain("Held by @river_gallery");
+    const html = await renderScanPage(vm, ORIGIN);
+    expect(html).toContain("scan-custody-line");
+    expect(html).toContain("Held by @river_gallery");
+    expect(html).toMatch(/does not prove you are the card owner/i);
+  });
 });

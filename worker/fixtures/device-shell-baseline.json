@@ -2,13 +2,13 @@
   "schema": "device_shell_baseline_v1",
   "generated_at": "2026-06-03",
   "phase": "smooth_mode_phase_0",
-  "asset_version": 84,
+  "asset_version": 87,
   "module_count": 74,
-  "js_bytes_total": 458835,
-  "shell_css_bytes_total": 68761,
-  "landing_css_bytes_total": 318013,
-  "transfer_bytes_shell_graph": 527596,
-  "transfer_bytes_landing_first_paint": 776848,
+  "js_bytes_total": 462289,
+  "shell_css_bytes_total": 76816,
+  "landing_css_bytes_total": 324887,
+  "transfer_bytes_shell_graph": 539105,
+  "transfer_bytes_landing_first_paint": 787176,
   "js_modules": [
     {
       "file": "js/device-status-bootstrap.mjs",
@@ -236,7 +236,7 @@
     },
     {
       "file": "js/device-hub-ui.mjs",
-      "bytes": 90089
+      "bytes": 90719
     },
     {
       "file": "js/device-hub-card-row-core.mjs",
@@ -264,7 +264,7 @@
     },
     {
       "file": "js/device-steward-entitlements.mjs",
-      "bytes": 10427
+      "bytes": 10375
     },
     {
       "file": "js/device-steward-entitlements-core.mjs",
@@ -272,7 +272,7 @@
     },
     {
       "file": "js/device-steward-session-core.mjs",
-      "bytes": 4141
+      "bytes": 7017
     },
     {
       "file": "js/device-steward-quota-core.mjs",

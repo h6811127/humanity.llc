@@ -100,6 +100,7 @@ export async function signGameNodeChildObjectCreate(opts) {
  *   privateKeyBase58: string;
  *   publicKeyBase58: string;
  *   updatedAt?: string;
+ *   extraFields?: Record<string, unknown>;
  * }} opts
  */
 export async function signChildObjectUpdate(opts) {
@@ -113,6 +114,7 @@ export async function signChildObjectUpdate(opts) {
     privateKeyBase58,
     publicKeyBase58,
     updatedAt = new Date().toISOString(),
+    extraFields,
   } = opts;
   const privateKey = decodePrivateKeyBase58(privateKeyBase58);
   const unsigned = withProtocolFields(
@@ -125,6 +127,7 @@ export async function signChildObjectUpdate(opts) {
       status: "active",
       created_at: createdAt,
       updated_at: updatedAt,
+      ...(extraFields && typeof extraFields === "object" ? extraFields : {}),
     },
     PAYLOAD_TYPE_CHILD_OBJECT
   );
