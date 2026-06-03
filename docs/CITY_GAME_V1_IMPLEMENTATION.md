@@ -688,6 +688,7 @@ Build on shipped child-object primitives — do not fork a parallel mint path.
 4. ~~**Rules + launch surfaces**~~ **Done (browser v1):** draft/publish panel on `/created/` — preview, download launch HTML, deploy checklist; Cedar Rapids pilot still uses `city-game:launch-surfaces`.
 5. ~~**Comprehension + custody copy**~~ **Done:** setup checklist on `/created/` Live (custody ack, GT scorecard, runbook cards, comprehension brief); game-season backup gate copy; setup wizard notice for season roots.
 6. ~~**E2E + regression**~~ **Done:** `e2e/city-game-self-serve-setup.spec.ts` · `npm run e2e:city-game-self-serve-setup` · optional `npm run verify:city-game -- --e2e`.
+7. **E3 staging tooling** — `npm run city-game:self-serve-staging-preflight` · browser walkthrough in [`CITY_GAME_LOCAL_DEV.md`](CITY_GAME_LOCAL_DEV.md) § E3 · human sign-off with `--expect-complete`.
 
 #### Phase E gates (before marketing “create your own game”)
 

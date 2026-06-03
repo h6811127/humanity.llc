@@ -134,7 +134,7 @@ WS-E (Phase E /created/ setup — needs WS-REV entitlements UI)
 | **Gates (do not market “create your own game” until)** | **E1** Phase D signed · **E2** loader ≥2 seasons (**met**) · **E3** full 15-node season in browser on staging · **E4** comprehension on self-serve rules · **E5** INVARIANTS updated (**R-16**) |
 | **Regression** | `npm run verify:city-game` · `npm run verify:city-game -- --e2e` · `npm run e2e:city-game-self-serve-setup` · `npm run worker:test -- worker/tests/city-game-season-loader.test.ts` |
 | **File ownership** | `site/js/created-*game*` (new modules TBD) · `site/created/index.html` · `worker/src/city-game/season-loader.ts` (registerSeasonConfig only if needed) · **Do not** fork parallel mint API — use `POST …/objects` + `issue-qr` |
-| **Status** | **E2E ☑** · **E5 INVARIANTS ☑** (self-serve + terminal mint scope) · **Next:** **E3** staging walkthrough (15 nodes, no terminal) |
+| **Status** | **E2E ☑** · **E5 INVARIANTS ☑** · **E3 tooling ☑** (`city-game:self-serve-staging-preflight`) · **Next:** human E3 walkthrough on staging (15 nodes, no terminal) |
 | **Blocked by** | WS-CR **E1** (Phase D launch sign-off) before marketing self-serve |
 
 ---

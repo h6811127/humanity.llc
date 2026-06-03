@@ -299,4 +299,17 @@ From [`CITY_GAME_INSTALL_QA.md`](CITY_GAME_INSTALL_QA.md) § Scenario spot-check
 
 Self-serve seasons exit **1** from terminal mint scripts unless `--force`, `--ci`, or `CI=1`. See [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) § Cedar Rapids city game.
 
+### E3 self-serve staging (Phase E gate)
+
+Human gate: organizer completes a **full 15-node season in the browser on staging** — no terminal mint.
+
+```bash
+npm run city-game:self-serve-staging-preflight
+npm run city-game:self-serve-staging-preflight -- --season example_city_season_01
+API_ORIGIN=https://humanity.llc npm run city-game:self-serve-staging-preflight -- --profile-id <season_root_profile_id>
+npm run city-game:self-serve-staging-preflight -- --profile-id <id> --expect-complete   # sign-off when done
+```
+
+Walkthrough (browser only): `/create/` root → `/created/` bulk import 15 nodes → issue QRs → rules publish → deploy preview → spot-scan `node_01`, `node_04`, `node_07` on staging WebKit.
+
 **Multi-phone LAN:** `npm run city-game:lan-hub -- --write-dev-vars` → one bookmark on each phone.

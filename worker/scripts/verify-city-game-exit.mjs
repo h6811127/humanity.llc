@@ -79,6 +79,7 @@ if (!skipTests) {
     "worker/tests/city-game-season-setup-guide-core.test.ts",
     "worker/tests/city-game-season-template-core.test.ts",
     "worker/tests/city-game-terminal-mint-deprecation-core.test.ts",
+    "worker/tests/city-game-self-serve-staging-core.test.ts",
   ]);
 }
 
