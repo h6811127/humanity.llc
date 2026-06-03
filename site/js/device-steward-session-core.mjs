@@ -124,6 +124,48 @@ export function stewardAccountIdForLink(urlAccountId, pendingAccountId) {
 }
 
 /**
+ * Map resolver errors to actionable copy on /created/ and hub.
+ *
+ * @param {number} [status]
+ * @param {string} [code]
+ * @param {string} [message]
+ */
+export function formatStewardLinkUserMessage(status, code, message) {
+  const msg = typeof message === "string" ? message.trim() : "";
+  const c = typeof code === "string" ? code.trim() : "";
+
+  if (c === "PROFILE_ALREADY_LINKED" || msg.includes("already linked")) {
+    return msg || "This card is already linked to another steward account.";
+  }
+  if (msg.includes("Card not found") || (status === 404 && c === "NOT_FOUND")) {
+    return "This card is not on the production network yet. Finish setup on Live (publish or sync), or import keys for a card that already exists on humanity.llc.";
+  }
+  if (
+    c === "INVALID_SIGNATURE" ||
+    c === "SIGNATURE_INVALID" ||
+    /signature|verification failed/i.test(msg)
+  ) {
+    return "Keys in this tab do not match the card on the network. On Live, open the correct saved card (Take control), then try Connect again.";
+  }
+  if (c === "CARD_NOT_ACTIVE" || msg.includes("not active")) {
+    return "This card is revoked or inactive on the network. Restore or create an active card before linking a steward account.";
+  }
+  if (c === "LINK_EXPIRED" || msg.includes("expired")) {
+    return "Link proof expired. Click Connect steward account again.";
+  }
+  if (c === "REPLAYED_NONCE" || msg.includes("nonce already used")) {
+    return "That link was already used. Click Connect steward account again.";
+  }
+  if (status === 404 && msg.includes("Hosted steward")) {
+    return "Hosted steward is not enabled on this operator.";
+  }
+  if (msg.includes("Could not reach")) {
+    return msg;
+  }
+  return msg || (status ? `Steward link failed (${status}).` : "Steward link failed.");
+}
+
+/**
  * Hub monitoring line while billing checkout return is pending link.
  *
  * @param {boolean} hasSigningKeys

@@ -7,6 +7,7 @@ import {
   linkStewardAccountWithActiveKeys,
   parseStewardAccountIdFromUrl,
   readPendingStewardAccountId,
+  tryActivateSigningKeysForStewardLink,
   writePendingStewardAccountId,
 } from "./device-steward-session.mjs";
 import { stewardAccountIdForLink } from "./device-steward-session-core.mjs";
@@ -174,7 +175,7 @@ function setHostedPlanLinkStatus(message, tone = "info") {
  * @param {HTMLButtonElement} btn
  */
 async function connectStewardAccountForUpgrade(btn) {
-  if (!getTabSession()?.owner_private_key_b58) {
+  if (!tryActivateSigningKeysForStewardLink()) {
     promptLinkStewardAccountForUpgrade();
     return;
   }

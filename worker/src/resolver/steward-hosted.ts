@@ -14,6 +14,7 @@ import {
   accountHasLinkedProfile,
   insertSession,
   linkProfileToAccount,
+  profileLinkedAccount,
   listPublicPlans,
   applyStewardLifecycleTransitions,
   resolveEffectiveEntitlements,
@@ -197,6 +198,15 @@ export async function handlePostStewardSession(
 
   if (!verified.ok) {
     return errorResponse(verified.code, verified.message, verified.status);
+  }
+
+  const linkedAccount = await profileLinkedAccount(db, verified.profile_id);
+  if (linkedAccount && linkedAccount !== verified.account_id) {
+    return errorResponse(
+      "PROFILE_ALREADY_LINKED",
+      "This card is already linked to a different steward account. Sign in with that billing account or contact support.",
+      409
+    );
   }
 
   const now = new Date();

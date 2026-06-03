@@ -27,6 +27,7 @@ import {
   parseStewardAccountIdFromUrl,
   resolveStewardAccountLinkTarget,
   stewardAccountLinkTimestamps,
+  formatStewardLinkUserMessage,
 } from "./device-steward-session-core.mjs";
 import { LOAD_CONTROL_IN_TAB_FIRST } from "./device-ownership-copy-core.mjs";
 
@@ -110,6 +111,34 @@ export function tryActivateWalletForBillingReturn() {
 }
 
 /**
+ * Load signing keys into this tab when the wallet has a saved card (Manage-tab connect).
+ *
+ * @returns {boolean}
+ */
+export function tryActivateSigningKeysForStewardLink() {
+  if (getTabSession()?.owner_private_key_b58) return true;
+  if (tryActivateWalletForBillingReturn()) return true;
+
+  const tabProfile = getTabSession()?.profile_id;
+  if (tabProfile) {
+    const match = loadWallet().find(
+      (row) => row.profile_id === tabProfile && row.owner_private_key_b58
+    );
+    if (match) {
+      activateWalletEntry(match);
+      return true;
+    }
+  }
+
+  const withKeys = loadWallet().filter((row) => row?.owner_private_key_b58);
+  if (withKeys.length === 1) {
+    activateWalletEntry(withKeys[0]);
+    return true;
+  }
+  return !!getTabSession()?.owner_private_key_b58;
+}
+
+/**
  * @param {string} accountId
  * @returns {Promise<{ ok: true, token: string, account_id: string } | { ok: false, status?: number, message: string }>}
  */
@@ -117,6 +146,8 @@ export async function linkStewardAccountWithActiveKeys(accountId) {
   if (!isValidStewardAccountId(accountId)) {
     return { ok: false, message: "Invalid steward account id." };
   }
+
+  tryActivateSigningKeysForStewardLink();
 
   const session = getTabSession();
   if (!session?.profile_id || !session.owner_private_key_b58) {
@@ -175,13 +206,18 @@ export async function linkStewardAccountWithActiveKeys(accountId) {
   }
 
   if (!res.ok) {
-    const message =
+    const code = body && typeof body.error === "string" ? body.error : "";
+    const raw =
       body && typeof body.message === "string"
         ? body.message
         : res.status === 404
           ? "Hosted steward is not enabled on this operator."
           : `Session request failed (${res.status}).`;
-    return { ok: false, status: res.status, message };
+    return {
+      ok: false,
+      status: res.status,
+      message: formatStewardLinkUserMessage(res.status, code, raw),
+    };
   }
 
   const token = body && typeof body.token === "string" ? body.token.trim() : "";

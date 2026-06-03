@@ -41,6 +41,8 @@ import {
   type PublicObjectSnapshot,
 } from "./object-snapshot";
 import { buildAgentContextPacket } from "./ai-explain-core";
+import type { ScanCapability } from "../live-object/scan-capabilities";
+import { buildScanCapabilities } from "../live-object/scan-capabilities";
 import { AI_EXPLAIN_ENDPOINT } from "./ai-explain-snapshot";
 
 export { BEARER_WARNING };
@@ -86,6 +88,8 @@ export interface ScanStatusBody {
       pill_active: boolean;
     };
     live_control: { available: boolean; proven_at: string | null };
+    /** Interaction verbs advertised for this scan (Layer 2 — live object architecture). */
+    capabilities?: ScanCapability[];
     limits: {
       bearer_warning: string;
       object_details_warning?: string;
@@ -172,6 +176,7 @@ export function scanStatusBodyFromViewModel(vm: ScanViewModel): ScanStatusBody {
         available: vm.liveControlAvailable,
         proven_at: vm.liveControlProvenAt,
       },
+      capabilities: buildScanCapabilities(vm),
       limits: {
         bearer_warning: BEARER_WARNING,
         ...(vm.objectStreams.length

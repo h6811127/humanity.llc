@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  formatStewardLinkUserMessage,
   generateStewardAccountId,
   isValidStewardAccountId,
   stewardAccountIdForLink,
@@ -20,5 +21,23 @@ describe("steward account id for link", () => {
   it("stewardAccountIdForLink mints when no pending id", () => {
     const id = stewardAccountIdForLink(null, null);
     expect(isValidStewardAccountId(id)).toBe(true);
+  });
+});
+
+describe("formatStewardLinkUserMessage", () => {
+  it("explains card not found on production", () => {
+    expect(formatStewardLinkUserMessage(404, "NOT_FOUND", "Card not found.")).toMatch(
+      /production network/i
+    );
+  });
+
+  it("explains profile already linked", () => {
+    expect(
+      formatStewardLinkUserMessage(
+        409,
+        "PROFILE_ALREADY_LINKED",
+        "This card is already linked to a different steward account."
+      )
+    ).toContain("already linked");
   });
 });

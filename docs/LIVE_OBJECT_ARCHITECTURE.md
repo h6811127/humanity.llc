@@ -140,10 +140,10 @@ Verbs are **capabilities the resolver advertises**, not marketing categories. Sc
 | **read** | Scanner | Current signed state at scan time | ✅ | Default `GET /c/…`, `GET …/status` |
 | **request** | Scanner → owner | Ask for action (live proof, permission, reply) | Partial | Live control (`scan-live-control*`) |
 | **offer** | Scanner → object | Contribute message or signal **without identity trail** | Partial | Lost-item relay copy (`[relay]`); no separate offer API yet |
-| **contribute** | Scanner → network | Append-only **aggregate** public effect | Partial | `POST …/game-contribute` (game nodes) |
+| **contribute** | Scanner → network | Append-only **aggregate** public effect | Partial | `POST …/game-contribute` · `scan.capabilities[]` on status JSON (game nodes) |
 | **delegate** | Owner → holder | Temporary capability on object | Research | Future `delegated_capability` on child doc |
 | **inherit** | Governance | Succession when signer/org ends | Research | Future stream signer rotation |
-| **archive** | Owner / governance | Live → read-only canon; season end | Partial | Revoke, season `status: ended`, dormant copy |
+| **archive** | Owner / governance | Live → read-only canon; season end | Partial | Dormant copy · `scan.capabilities[]` `archive` state on game nodes |
 
 **Product priority (Phase A):** optimize **read + owner update** first, then **contribute** (city game), then **offer** (lost-item). See [`PHASE_A_STRANGER_PATH_PRIORITIES.md`](PHASE_A_STRANGER_PATH_PRIORITIES.md).
 
@@ -177,7 +177,7 @@ Add to `GET …/status` (and derive scan blocks from) a capability list:
 
 **Implementation order:**
 
-1. Document capabilities in JSON from existing flags (`liveControlAvailable`, game contribute gate, season phase).
+1. Document capabilities in JSON from existing flags (`liveControlAvailable`, game contribute gate, season phase). **Partial (2026-06-03):** game-node scans + card `read`/`request` on `GET …/status`; HTML still uses view-model flags.
 2. Refactor `scan-html.ts` hero blocks to key off capabilities, not ad-hoc booleans.
 3. Add new verbs as new capability kinds + one handler each.
 
@@ -400,6 +400,31 @@ Still open before **Partial → Shipped** promotion on traceability rows:
 
 ---
 | **2** | Cedar Rapids S1 (in flight) | Contribute, network, archive/sleep |
+
+### Order 2 — exit criteria (Cedar Rapids S1)
+
+Engineering (**done** unless noted):
+
+| Criterion | Surface | Status |
+|-----------|---------|--------|
+| Game node scan + contribute handler | `game-contribute.ts`, `scan-view.ts` | Shipped |
+| Season window / dormancy (archive sleep) | `season-window.ts`, dormant scan copy | Shipped |
+| Network snapshot + map board (M1–M3) | `season-snapshot.ts`, `/play/cedar-rapids/#city-state` | Shipped |
+| `scan.capabilities[]` for game verbs (status JSON) | `live-object/scan-capabilities.ts`, `scan-status.ts` | Shipped |
+| Production smoke (season-aware dormant OK) | `city-game:smoke-production` | Shipped |
+| `verify:city-game` regression block | `npm run verify:city-game` | Shipped |
+
+Still open before S1 launch sign-off:
+
+| Criterion | Surface | Status |
+|-----------|---------|--------|
+| Physical install QA (≥3 phones × 15 nodes) | [`CITY_GAME_INSTALL_QA.md`](CITY_GAME_INSTALL_QA.md) **P2** | Open (human) |
+| Operator install map complete | [`CITY_GAME_NODE_INSTALL_MAP.md`](CITY_GAME_NODE_INSTALL_MAP.md) **O2** | Open (ops) |
+| Map board privacy review before “live city board” marketing | **B13** GT-7 | Open (human) |
+| Production season root + 15 nodes minted | Launch checklist **E3** | Open (ops) |
+| Refactor scan HTML from capabilities (Order 3 step 2) | `scan-html.ts` | Not started |
+
+---
 | **3** | `scan.capabilities[]` in status JSON; HTML from capabilities | Verbs explicit |
 | **4** | Extract `StreamPolicy` + `ObjectTimePolicy` from game code | Multi-signer, time |
 | **5** | Extract network graph config from city-game modules | Network grammar |
@@ -427,7 +452,7 @@ These from [`QR_DESIGN_SPACE.md`](QR_DESIGN_SPACE.md) are **decisions**, not bac
 When changing live-object composition:
 
 ```bash
-npm run worker:test -- worker/tests/scan.test.ts worker/tests/live-object-child-scan.test.ts worker/tests/manifesto-display.test.ts worker/tests/child-objects.test.ts worker/tests/city-game-scan.test.ts
+npm run worker:test -- worker/tests/scan.test.ts worker/tests/live-object-child-scan.test.ts worker/tests/live-object-scan-capabilities.test.ts worker/tests/city-game-scan.test.ts
 npm run verify:city-game   # if game overlay touched
 npm run worker:test -- worker/tests/update-card.test.ts worker/tests/create-card-object-streams.test.ts
 ```

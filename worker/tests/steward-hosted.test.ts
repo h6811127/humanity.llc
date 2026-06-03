@@ -151,7 +151,7 @@ function stewardDb(ownerPublicKey: string): StewardTestDb {
             });
           }
           if (sql.includes("INSERT INTO steward_account_profiles")) {
-            profiles.set(String(params[2]), String(params[0]));
+            profiles.set(String(params[1]), String(params[0]));
           }
           if (sql.includes("INSERT INTO steward_sessions")) {
             sessions.set(String(params[0]), {
@@ -296,6 +296,64 @@ describe("steward hosted E1", () => {
     };
     expect(ent.plan_id).toBe("reference_free");
     expect(ent.entitlements["poll.live_proof.auto_daily_cap"]).toBe(400);
+  });
+
+  it("rejects linking a profile that is already tied to another steward account", async () => {
+    const { privateKey, publicKeyBase58 } = await getTestKeypair();
+    const db = stewardDb(publicKeyBase58);
+    const env: Env = { DB: db, HOSTED_STEWARD_ENABLED: "1" };
+
+    const first = await buildLinkProof(privateKey, publicKeyBase58, "nonce_profile_link_a");
+    const firstRes = await handlePostStewardSession(
+      new Request("https://humanity.llc/.well-known/hc/v1/steward/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          profile_id: PROFILE,
+          device_id: DEVICE,
+          link_proof: first,
+        }),
+      }),
+      env,
+      db
+    );
+    expect(firstRes.status).toBe(200);
+
+    const otherAccount = "acc_TestHostedSteward2";
+    const now = Date.now();
+    const otherProof = await signDocument(
+      withProtocolFields(
+        {
+          profile_id: PROFILE,
+          account_id: otherAccount,
+          operator_id: "humanity.llc",
+          device_id: DEVICE,
+          issued_at: new Date(now).toISOString(),
+          expires_at: new Date(now + 5 * 60 * 1000).toISOString(),
+          nonce: "nonce_profile_link_b",
+        },
+        PAYLOAD_TYPES.STEWARD_ACCOUNT_LINK
+      ),
+      { privateKey, publicKeyBase58 }
+    );
+
+    const secondRes = await handlePostStewardSession(
+      new Request("https://humanity.llc/.well-known/hc/v1/steward/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          profile_id: PROFILE,
+          device_id: DEVICE,
+          link_proof: otherProof,
+        }),
+      }),
+      env,
+      db
+    );
+    const secondText = await secondRes.text();
+    expect(secondRes.status, secondText).toBe(409);
+    const secondBody = JSON.parse(secondText) as { error: string };
+    expect(secondBody.error).toBe("PROFILE_ALREADY_LINKED");
   });
 
   it("expires past-due accounts during entitlements fetch and revokes sessions", async () => {
