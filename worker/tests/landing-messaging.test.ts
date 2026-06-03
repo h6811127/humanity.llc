@@ -87,7 +87,8 @@ describe("public marketing clarity (AI step 5)", () => {
 
     expect(publicCopy).toContain("Public programmable objects");
     expect(publicCopy).toContain("Live state<br />on real objects.");
-    expect(publicCopy).toContain("signed QR");
+    expect(publicCopy).toContain("Active");
+    expect(publicCopy).toContain("Revoked");
     expect(publicCopy).toContain("No passive scan tracking by default.");
     expect(publicCopy).not.toMatch(/\bAI\b|artificial intelligence|AI profiles|we have AI/i);
   });

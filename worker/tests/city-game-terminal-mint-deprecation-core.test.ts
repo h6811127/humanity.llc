@@ -41,14 +41,39 @@ describe("city-game-terminal-mint-deprecation-core", () => {
   });
 
   it("blocks mint-node for self-serve seasons without force", () => {
-    const blocked = assessTerminalMintCliAccess({
-      season: exampleSeason,
-      scriptName: "city-game:mint-node",
-      force: false,
-    });
-    expect(blocked.allowed).toBe(false);
-    expect(blocked.blockMessage).toMatch(/\/created\//);
-    expect(blocked.notice).toMatch(/deprecated/i);
+    const prevCi = process.env.CI;
+    delete process.env.CI;
+    try {
+      const blocked = assessTerminalMintCliAccess({
+        season: exampleSeason,
+        scriptName: "city-game:mint-node",
+        force: false,
+        ci: false,
+      });
+      expect(blocked.allowed).toBe(false);
+      expect(blocked.blockMessage).toMatch(/\/created\//);
+      expect(blocked.notice).toMatch(/deprecated/i);
+    } finally {
+      if (prevCi === undefined) delete process.env.CI;
+      else process.env.CI = prevCi;
+    }
+  });
+
+  it("allows self-serve mint in CI for fixture export", () => {
+    const prevCi = process.env.CI;
+    process.env.CI = "true";
+    try {
+      const allowed = assessTerminalMintCliAccess({
+        season: exampleSeason,
+        scriptName: "city-game:mint-node",
+        force: false,
+      });
+      expect(allowed.allowed).toBe(true);
+      expect(allowed.forced).toBe(true);
+    } finally {
+      if (prevCi === undefined) delete process.env.CI;
+      else process.env.CI = prevCi;
+    }
   });
 
   it("allows pilot season and forced self-serve runs", () => {

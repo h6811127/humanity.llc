@@ -63,6 +63,15 @@ function jsonResponse(body, init = {}) {
   };
 }
 
+function mockStewardEntitlementsFetch(body, init = {}) {
+  vi.mocked(fetch).mockImplementation(async (url) => {
+    if (String(url).includes("city-game-seasons-index")) {
+      return jsonResponse({ seasons: [] });
+    }
+    return jsonResponse(body, init);
+  });
+}
+
 async function importEntitlements() {
   return import("../../site/js/device-steward-entitlements.mjs");
 }
@@ -98,8 +107,7 @@ describe("refreshStewardEntitlements", () => {
   it("fetches hosted entitlements with bearer, device id, and cache headers", async () => {
     sessionStorage.setItem("hc_created", JSON.stringify({ profile_id: "p1" }));
     modWriteSessionPlaceholder();
-    const fetchMock = vi.mocked(fetch);
-    fetchMock.mockResolvedValueOnce(jsonResponse(HOSTED_BODY, { etag: '"hosted-1"' }));
+    mockStewardEntitlementsFetch(HOSTED_BODY, { etag: '"hosted-1"' });
     const mod = await importEntitlements();
 
     const policy = await mod.refreshStewardEntitlements({ force: true });
@@ -108,6 +116,7 @@ describe("refreshStewardEntitlements", () => {
     expect(policy.pollLiveProofAutoDailyCap).toBe(4000);
     expect(policy.pollLiveProofIdleMs).toBe(30_000);
     expect(policy.walletLargeThreshold).toBe(25);
+    const fetchMock = vi.mocked(fetch);
     expect(fetchMock).toHaveBeenCalledWith(
       "https://resolver.test/.well-known/hc/v1/steward/entitlements",
       expect.objectContaining({
@@ -149,7 +158,15 @@ describe("refreshStewardEntitlements", () => {
       JSON.stringify({ fetchedAt: 1, etag: '"hosted-1"', body: HOSTED_BODY })
     );
     const fetchMock = vi.mocked(fetch);
-    fetchMock.mockResolvedValueOnce(jsonResponse({}, { status: 304 }));
+    fetchMock.mockImplementation(async (url, init) => {
+      if (String(url).includes("city-game-seasons-index")) {
+        return jsonResponse({ seasons: [] });
+      }
+      if (init?.headers && "If-None-Match" in init.headers) {
+        return jsonResponse({}, { status: 304 });
+      }
+      return jsonResponse(HOSTED_BODY, { etag: '"hosted-1"' });
+    });
     const mod = await importEntitlements();
 
     const policy = await mod.refreshStewardEntitlements({ force: true });
@@ -166,11 +183,7 @@ describe("refreshStewardEntitlements", () => {
   it("clears session and cached policy on 401", async () => {
     sessionStorage.setItem("hc_created", JSON.stringify({ profile_id: "p1" }));
     modWriteSessionPlaceholder();
-    sessionStorage.setItem(
-      "hc_steward_entitlements_cache",
-      JSON.stringify({ fetchedAt: Date.now(), etag: '"hosted-1"', body: HOSTED_BODY })
-    );
-    vi.mocked(fetch).mockResolvedValueOnce(jsonResponse({}, { status: 401 }));
+    mockStewardEntitlementsFetch({}, { status: 401 });
     const mod = await importEntitlements();
 
     const policy = await mod.refreshStewardEntitlements({ force: true });
