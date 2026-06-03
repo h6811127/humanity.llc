@@ -88,12 +88,12 @@ import {
   snapshotNetworkSeenOnExit,
   syncLastSeenFromNetworkMap,
   NETWORK_REFRESHED,
-} from "./device-wallet-network.mjs";
-import { clearWalletNetworkTruthForProfile } from "./device-wallet-network-truth.mjs";
+} from "./device-wallet-network.mjs?v=84";
+import { clearWalletNetworkTruthForProfile } from "./device-wallet-network-truth.mjs?v=84";
 import {
   hubNetworkChipStatusForProfile,
   shouldShowHubNetworkCheckingChip,
-} from "./device-wallet-network-core.mjs";
+} from "./device-wallet-network-core.mjs?v=84";
 import {
   broadcastNetworkSnapshotIfEligible,
   shouldFollowerSkipAutoNetworkFetch,
@@ -107,7 +107,7 @@ import {
   hubCardIdentityLine,
   hubCardStatusLine,
   hubCardTitle,
-} from "./device-hub-card-row-core.mjs";
+} from "./device-hub-card-row-core.mjs?v=84";
 import {
   childObjectHubFocusHash,
   hubChildObjectIconHtml,
@@ -157,7 +157,7 @@ import {
 import { tabNoticeCount } from "./device-counts.mjs";
 import { mountHubBuildStamp } from "./device-hub-build-stamp.mjs";
 import { mountHubNetworkTools } from "./device-hub-network-tools.mjs";
-import { syncInboxBackdropForOpenHub } from "./device-sheet-backdrop-sync.mjs?v=83";
+import { syncInboxBackdropForOpenHub } from "./device-sheet-backdrop-sync.mjs?v=84";
 import {
   HUB_STRANGER_EMPTY_CLASS,
   isHubStrangerEmptyState,
