@@ -51,6 +51,7 @@ function parseChildObjectBody(body: unknown): Record<string, unknown> | null {
 function parentSignerAllowed(signerKey: string, parent: ChildObjectParentRow): boolean {
   if (signerKey === parent.public_key) return true;
   return Boolean(parent.recovery_public_key && signerKey === parent.recovery_public_key);
+  // Delegated signers: evaluateDelegatedCapabilityAccess (step 17) when G1–G5 pass.
 }
 
 function readStringField(

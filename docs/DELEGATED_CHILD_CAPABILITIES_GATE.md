@@ -26,9 +26,25 @@ Delegated child keys add custody, revocation, and audit surface. The doc require
 | G4 | **Anti-surveillance review** — delegation cannot read scans, cannot grant human trust, cannot vouch | Sign-off against [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md) |
 | G5 | **Revocation story** — root can revoke delegation without revoking root card; delegated key cannot escalate | Written in capability spec before API design |
 
-Until **G1–G5** are satisfied, step 17 stays **docs-only**.
+Until **G1–G5** are satisfied, step 17 stays **docs-only** for resolver routes, D1 migration, and steward UI.
 
 ---
+
+## Engineering prep (shipped — no routes)
+
+Pure verification helpers ship ahead of gates so resolver wiring is a thin slice when a pilot clears G1–G5:
+
+| Surface | Module | Status |
+|---------|--------|--------|
+| Capability document shape validation | `worker/src/live-object/delegation-spec.ts` `validateDelegatedCapabilityShape` | Shipped |
+| Scope / expiry / operation access check | `evaluateDelegatedCapabilityAccess`, `isDelegatedCapabilityExpired` | Shipped |
+| Vitest (shape + access boundaries) | `worker/tests/live-object-delegation-spec.test.ts`, `worker/tests/delegated-child-capability.test.ts` | Shipped |
+
+**Still blocked on G1–G5:** D1 `delegated_capabilities` table, resolver acceptance of delegated signer, `/created/` Manage issuance UI.
+
+```bash
+npm run worker:test -- worker/tests/live-object-delegation-spec.test.ts worker/tests/delegated-child-capability.test.ts
+```
 
 ## Capability templates (fill before engineering)
 

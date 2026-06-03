@@ -298,7 +298,7 @@ Delegated capabilities must be root-signed, scoped, expiring, revocable, and cle
 | 3 | **Shipped** | HTML/JS: no static `hc-notice--warning`; strip tone classes when hiding; `/created/` `styles.css?v=132` |
 | 4 | **Shipped** | Manual QA: `/created/` Live on general root — no empty bars before first child object; warn/block copy when gate fires (confirmed prod 2026-05-30) |
 
-17. **Delegated capabilities (deferred):** scoped, expiring, root-signed child keys — **do not implement** until product gates in [`DELEGATED_CHILD_CAPABILITIES_GATE.md`](DELEGATED_CHILD_CAPABILITIES_GATE.md) pass (named team/event pilot, capability matrix, anti-surveillance review). Schema RFC: [`DELEGATED_CHILD_CAPABILITY_SCHEMA.md`](DELEGATED_CHILD_CAPABILITY_SCHEMA.md).
+17. **Delegated capabilities (deferred):** scoped, expiring, root-signed child keys — **do not implement resolver routes or steward UI** until product gates in [`DELEGATED_CHILD_CAPABILITIES_GATE.md`](DELEGATED_CHILD_CAPABILITIES_GATE.md) pass (G1–G5). **Spec prep shipped:** shape validation + `evaluateDelegatedCapabilityAccess` in [`delegation-spec.ts`](../worker/src/live-object/delegation-spec.ts). Schema RFC: [`DELEGATED_CHILD_CAPABILITY_SCHEMA.md`](DELEGATED_CHILD_CAPABILITY_SCHEMA.md).
 
 18. **`game_node` self-serve UI (Phase E — post–Cedar Rapids pilot):** extend `/created/` Live with **Add game node** — register `object_type: game_node`, issue scan QR, season metadata editor, rules page publish. Reuses steps 6–16 signing and hub tree patterns. Terminal mint stays for CI/pilot only. Spec: [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) § Phase E.
 

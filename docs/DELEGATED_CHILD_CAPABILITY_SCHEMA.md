@@ -4,6 +4,8 @@
 
 **Shape validation (spec-only):** `worker/src/live-object/delegation-spec.ts` · `worker/tests/live-object-delegation-spec.test.ts`
 
+**Access evaluation (spec-only, step 17 prep):** `evaluateDelegatedCapabilityAccess` · `worker/tests/delegated-child-capability.test.ts`
+
 **Canonical rules:** [`Technical Standards v1.0.md`](Technical%20Standards%20v1.0.md) §7A.1 · [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) § Delegated child capabilities (future).
 
 ---
@@ -146,7 +148,7 @@ CREATE TABLE delegated_capabilities (
 | Delegated vouch attempt | 403, no side effects |
 | Escalation to root revoke | 403 |
 
-Vitest: `worker/tests/delegated-child-capability.test.ts` (add when implementation starts).
+Vitest: `worker/tests/delegated-child-capability.test.ts` (access boundaries — **shipped**). Add resolver integration tests when routes land.
 
 ---
 
