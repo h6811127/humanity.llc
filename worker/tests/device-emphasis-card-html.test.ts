@@ -33,7 +33,7 @@ describe("device-emphasis-card-html", () => {
   it("landing index busts styles.css cache when spacing changes", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
     expect(html).toContain('href="/css/hc-emphasis-card.css?v=5"');
-    expect(html).toContain("styles.css?v=145");
+    expect(html).toContain("styles.css?v=146");
   });
 
   it("landing final CTA uses urgent emphasis card and standard CTA", () => {
@@ -229,9 +229,9 @@ describe("device-emphasis-card-html", () => {
 
   it("shell pages bust styles and theme-dark for emphasis alignment", () => {
     const stylesBust = {
-      "site/wallet/index.html": "139",
-      "site/create/index.html": "138",
-      "site/created/index.html": "138",
+      "site/wallet/index.html": "146",
+      "site/create/index.html": "146",
+      "site/created/index.html": "146",
     };
     for (const [page, v] of Object.entries(stylesBust)) {
       const html = readFileSync(join(root, page), "utf8");
