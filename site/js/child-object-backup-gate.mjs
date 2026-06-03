@@ -12,6 +12,7 @@ import {
  *   getSession: () => Record<string, unknown> | null;
  *   noticeId: string;
  *   submitId: string;
+ *   context?: 'default' | 'game_season';
  * }} ctx
  */
 export function syncChildObjectBackupGateUi(ctx) {
@@ -22,7 +23,7 @@ export function syncChildObjectBackupGateUi(ctx) {
     activeCount: countActiveChildObjects(rows),
     hasSeatbelt: rootHasChildObjectBackupSeatbelt(ctx.getSession()),
   });
-  const copy = childObjectBackupGateNoticeCopy(gate);
+  const copy = childObjectBackupGateNoticeCopy(gate, { context: ctx.context });
 
   if (noticeEl) {
     if (!copy) {
@@ -68,11 +69,13 @@ export function syncChildObjectBackupGateUi(ctx) {
  *   getSession: () => Record<string, unknown> | null;
  * }} ctx
  */
-export function assertChildObjectBackupGateAllowsCreate(ctx) {
+export function assertChildObjectBackupGateAllowsCreate(ctx, opts = {}) {
+  const adding = opts.adding ?? 1;
   const rows = readChildObjectRows(localStorage, ctx.profileId);
   const gate = childObjectBackupGateState({
     activeCount: countActiveChildObjects(rows),
     hasSeatbelt: rootHasChildObjectBackupSeatbelt(ctx.getSession()),
+    adding,
   });
   if (!gate.allowed) {
     const copy = childObjectBackupGateNoticeCopy(gate);

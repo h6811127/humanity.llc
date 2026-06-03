@@ -11,8 +11,9 @@ import {
 import { normalizeGameMeta, validateGameNodeDocument } from "../src/city-game/game-meta";
 import { handlePostChildObjectCreate } from "../src/resolver/child-objects";
 import { handlePostGameUpdate } from "../src/resolver/game-update";
+import { CITY_GAME_SEASON_ROOT_PROFILE } from "./city-game-fixture-profile";
 
-const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
+const PROFILE = CITY_GAME_SEASON_ROOT_PROFILE;
 const OBJECT_ID = "obj_cr_node_01_newbo";
 const RIVER_OBJECT = "obj_cr_node_04_river";
 const CABINET_OBJECT = "obj_cr_node_07_cabinet";
@@ -193,6 +194,21 @@ describe("city game game_meta", () => {
     });
     expect(out.seasonId).toBe("cr_season_01_wake");
     expect(out.gameMeta.compromised).toBe(true);
+  });
+
+  it("accepts season-specific districts when allowedDistricts is set", () => {
+    const out = validateGameNodeDocument(
+      {
+        object_type: "game_node",
+        season_id: "example_city_season_01",
+        node_role: "relay_gate",
+        district: "old_town",
+        object_streams: [{ id: "care", class: "care", label: "Site", value: "Clear" }],
+        game_meta: {},
+      },
+      { allowedDistricts: ["downtown", "river", "old_town"] }
+    );
+    expect(out.district).toBe("old_town");
   });
 });
 

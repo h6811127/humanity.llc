@@ -55,9 +55,11 @@ describe("city game season registry", () => {
 });
 
 describe("play rules page draft", () => {
-  it("is noindex until launch", () => {
-    expect(rulesHtml).toContain('name="robots" content="noindex, nofollow"');
-    expect(rulesHtml).toContain("Draft rules page");
+  it("includes city state board boot with season id", () => {
+    expect(rulesHtml).toContain('id="city-game-map-root"');
+    expect(rulesHtml).toContain('data-season-id="cr_season_01_wake"');
+    expect(rulesHtml).toContain("city-game-play-page.mjs");
+    expect(rulesHtml).not.toMatch(/city-game-map-board\.mjs[^"]*"\s*>\s*<script[^>]*city-game-play-page/);
   });
 
   it("states what scans prove and do not prove", () => {

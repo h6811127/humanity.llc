@@ -124,8 +124,30 @@ export function normalizeGameMeta(raw: unknown): GameMeta {
   };
 }
 
+const DISTRICT_SLUG_RE = /^[a-z][a-z0-9_]{0,39}$/;
+
+/**
+ * @param {string | null} district
+ * @param {readonly string[] | null | undefined} allowedDistricts
+ */
+export function validateGameNodeDistrict(
+  district: string | null,
+  allowedDistricts?: readonly string[] | null
+): void {
+  if (!district) return;
+  if (!DISTRICT_SLUG_RE.test(district)) {
+    throw new Error("district must be a lowercase slug or omitted.");
+  }
+  if (allowedDistricts?.length && !allowedDistricts.includes(district)) {
+    throw new Error("district must match a season district or be omitted.");
+  }
+}
+
 /** Validate game_node fields on a signed child_object document. */
-export function validateGameNodeDocument(doc: Record<string, unknown>): {
+export function validateGameNodeDocument(
+  doc: Record<string, unknown>,
+  opts: { allowedDistricts?: readonly string[] | null } = {}
+): {
   seasonId: string;
   nodeRole: string;
   district: string | null;
@@ -148,9 +170,10 @@ export function validateGameNodeDocument(doc: Record<string, unknown>): {
   let district: string | null = null;
   if ("district" in doc && doc.district !== null && doc.district !== undefined) {
     district = readOptionalString(doc, "district", 40);
-    if (district && !(GAME_DISTRICTS as readonly string[]).includes(district)) {
-      throw new Error("district must be a known Cedar Rapids district or omitted.");
-    }
+    validateGameNodeDistrict(
+      district,
+      opts.allowedDistricts?.length ? opts.allowedDistricts : null
+    );
   }
 
   validateObjectStreamsField(doc);

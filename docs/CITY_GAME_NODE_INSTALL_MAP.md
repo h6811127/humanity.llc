@@ -3,6 +3,8 @@
 **Status:** Internal · fill during Phase C install  
 **Season:** `cr_season_01_wake` · [`site/data/city-game-cr-season-01.json`](../site/data/city-game-cr-season-01.json)
 
+**Not the player map:** Public read-only **city state board** for players is specified in [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md). This spreadsheet is operator install + steward contacts only — never publish GPS or steward PII on the website.
+
 **Phase C gate:** All rows must show **Installed? ☑** and **QR issued? ☑** before physical install QA ([`CITY_GAME_INSTALL_QA.md`](CITY_GAME_INSTALL_QA.md)). Engineering registry (15 nodes, object IDs) is verified by `npm run verify:city-game`.
 
 ---
@@ -11,21 +13,21 @@
 
 | node_id | Label | District | object_id | Installed? | QR issued? | Notes |
 |---------|-------|----------|-----------|------------|------------|-------|
-| node_01 | NewBo relay arch | newbo | obj_cr_node_01_newbo | ☐ | ☐ | |
-| node_02 | NewBo café window | newbo | obj_cr_node_02_cafe | ☐ | ☐ | Sanctuary |
-| node_03 | NewBo mural alley | newbo | obj_cr_node_03_mural | ☐ | ☐ | |
-| node_04 | Riverwalk River Lantern | river_spine | obj_cr_node_04_river | ☐ | ☐ | Temp drop · unlocks node_07 |
-| node_05 | 16th Avenue bridge | river_spine | obj_cr_node_05_bridge | ☐ | ☐ | Compromise drill |
-| node_06 | Skywalk note | downtown | obj_cr_node_06_skywalk | ☐ | ☐ | |
-| node_07 | Czech Village cabinet | czech_village | obj_cr_node_07_cabinet | ☐ | ☐ | Dilemma node |
-| node_08 | Czech Village square bench | czech_village | obj_cr_node_08_bench | ☐ | ☐ | Living infra |
-| node_09 | Czech Village mural | czech_village | obj_cr_node_09_mural | ☐ | ☐ | Fragment 1/3 |
-| node_10 | Library witness seal | downtown | obj_cr_node_10_library | ☐ | ☐ | Vouch for node_07 |
-| node_11 | Greene Square marker | greene_square | obj_cr_node_11_marker | ☐ | ☐ | Fragment 2/3 |
-| node_12 | Greene Square bench | greene_square | obj_cr_node_12_bench | ☐ | ☐ | Sanctuary |
-| node_13 | Downtown alley arch | downtown | obj_cr_node_13_finale | ☐ | ☐ | Finale |
-| node_14 | River fountain / rain garden | river_spine | obj_cr_node_14_fountain | ☐ | ☐ | **Care loop steward ↓** |
-| node_15 | Downtown market steps | downtown | obj_cr_node_15_steps | ☐ | ☐ | |
+| node_01 | NewBo relay arch | newbo | obj_cr_node_01_newbo | ☐ | ☑ | |
+| node_02 | NewBo café window | newbo | obj_cr_node_02_cafe | ☐ | ☑ | Sanctuary |
+| node_03 | NewBo mural alley | newbo | obj_cr_node_03_mural | ☐ | ☑ | |
+| node_04 | Riverwalk River Lantern | river_spine | obj_cr_node_04_river | ☐ | ☑ | Temp drop · unlocks node_07 |
+| node_05 | 16th Avenue bridge | river_spine | obj_cr_node_05_bridge | ☐ | ☑ | Compromise drill |
+| node_06 | Skywalk note | downtown | obj_cr_node_06_skywalk | ☐ | ☑ | |
+| node_07 | Czech Village cabinet | czech_village | obj_cr_node_07_cabinet | ☐ | ☑ | Dilemma node |
+| node_08 | Czech Village square bench | czech_village | obj_cr_node_08_bench | ☐ | ☑ | Living infra |
+| node_09 | Czech Village mural | czech_village | obj_cr_node_09_mural | ☐ | ☑ | Fragment 1/3 |
+| node_10 | Library witness seal | downtown | obj_cr_node_10_library | ☐ | ☑ | Vouch for node_07 |
+| node_11 | Greene Square marker | greene_square | obj_cr_node_11_marker | ☐ | ☑ | Fragment 2/3 |
+| node_12 | Greene Square bench | greene_square | obj_cr_node_12_bench | ☐ | ☑ | Sanctuary |
+| node_13 | Downtown alley arch | downtown | obj_cr_node_13_finale | ☐ | ☑ | Finale |
+| node_14 | River fountain / rain garden | river_spine | obj_cr_node_14_fountain | ☐ | ☑ | **Care loop steward ↓** |
+| node_15 | Downtown market steps | downtown | obj_cr_node_15_steps | ☐ | ☑ | |
 
 ---
 

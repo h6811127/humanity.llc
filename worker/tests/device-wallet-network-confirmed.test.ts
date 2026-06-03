@@ -15,6 +15,8 @@ vi.mock("../../site/js/hc-sign.mjs", () => ({
 import {
   buildResolverConfirmedWalletPollMaps,
   getCachedNetworkQrScope,
+  getCachedNetworkScanKind,
+  getCachedNetworkStatus,
   isResolverConfirmedProfile,
   refreshWalletNetworkStatuses,
 } from "../../site/js/device-wallet-network.mjs";
@@ -315,5 +317,64 @@ describe("isResolverConfirmedProfile", () => {
     await refreshWalletNetworkStatuses([{ profile_id: PROFILE_A, qr_id: QR_A }]);
     expect(getWalletStatusPollHealth()).toBe("degraded");
     expect(window.dispatchEvent).toHaveBeenCalled();
+  });
+
+  it("forceRefresh bypasses fresh offline cache (manual Check network)", async () => {
+    const fetchMock = vi.mocked(fetch);
+    fetchMock.mockRejectedValueOnce(new Error("offline"));
+    await refreshWalletNetworkStatuses([{ profile_id: PROFILE_A, qr_id: QR_A }]);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    fetchMock.mockResolvedValueOnce(resolverJsonResponse(ACTIVE_BODY));
+    await refreshWalletNetworkStatuses(
+      [{ profile_id: PROFILE_A, qr_id: QR_A }],
+      undefined,
+      { forceRefresh: true }
+    );
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(isResolverConfirmedProfile(PROFILE_A)).toBe(true);
+  });
+
+  it("404 status JSON maps to unknown scan kind (not generic resolver error)", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      resolverJsonResponse(
+        {
+          scan: {
+            kind: "unknown_profile",
+            profile_id: PROFILE_A,
+            qr_id: QR_A,
+            card: { status: null, handle: null, manifesto_line: null },
+          },
+        },
+        404
+      )
+    );
+    await refreshWalletNetworkStatuses([{ profile_id: PROFILE_A, qr_id: QR_A }]);
+    expect(getCachedNetworkScanKind(PROFILE_A)).toBe("unknown_profile");
+    expect(getCachedNetworkStatus(PROFILE_A)).toBe("unknown");
+    expect(isResolverConfirmedProfile(PROFILE_A)).toBe(false);
+  });
+
+  it("410 card_revoked JSON still resolves disabled state", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      resolverJsonResponse(
+        {
+          scan: {
+            kind: "card_revoked",
+            profile_id: PROFILE_A,
+            qr_id: QR_A,
+            card: { status: "revoked", handle: "e2e", manifesto_line: "Test" },
+            qr: { status: "active", scope: "card" },
+          },
+        },
+        410
+      )
+    );
+    await refreshWalletNetworkStatuses([{ profile_id: PROFILE_A, qr_id: QR_A }]);
+    expect(getCachedNetworkScanKind(PROFILE_A)).toBe("card_revoked");
+    expect(isResolverConfirmedProfile(PROFILE_A)).toBe(true);
+    expect(buildResolverConfirmedWalletPollMaps()?.alertStateMap[PROFILE_A]).toBe(
+      CARD_REVOKED_ALERT_STATE
+    );
   });
 });

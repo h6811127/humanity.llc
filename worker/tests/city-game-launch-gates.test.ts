@@ -16,7 +16,9 @@ const season = JSON.parse(
   readFileSync(join(root, "site/data/city-game-cr-season-01.json"), "utf8")
 );
 
-const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
+import { CITY_GAME_SEASON_ROOT_PROFILE } from "./city-game-fixture-profile";
+
+const PROFILE = CITY_GAME_SEASON_ROOT_PROFILE;
 const QR = "qr_7Xk9mP2nQ4rT6vW8";
 const RIVER_OBJECT = "obj_cr_node_04_river";
 const BRIDGE_OBJECT = "obj_cr_node_05_bridge";

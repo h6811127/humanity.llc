@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Wake the grid · Example City (template) · humanity.llc</title>
+    <meta
+      name="description"
+      content="Template city game season — cooperation-first public object state without tracking players."
+    />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=144" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+
+      <main class="screen screen-landing">
+        <section class="hero hero-compact">
+          <p class="hero-eyebrow">Example City · Template season</p>
+          <h1>Wake the grid</h1>
+          <p class="hero-line">
+            Template season for a second city — same protocol as Cedar Rapids, different places and unlock graph. <strong>Not live</strong> until an operator mints nodes and sets dates.
+          </p>
+          <p class="hero-line hero-line-sub" id="city-game-hero-subline">
+            <a href="#city-state">Jump to the place list</a> — districts, Open in Maps links (scan stickers for live chips).
+          </p>
+        </section>
+
+        <section class="idea-section" aria-labelledby="rules-start-title">
+          <h2 class="group-label" id="rules-start-title">How to start</h2>
+          <ul class="list list-compact" id="city-game-player-guide-list">
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-sub">Loading start guide…</span>
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <div class="research-dev-hint" role="note">
+          <p>
+            <strong>Template only.</strong> Mint nodes, set <code>season_root_profile_id</code>, window dates, and
+            <code>status</code> before launch. Regenerate:
+            <code>npm run city-game:scaffold-play -- --season example_city_season_01 --apply</code>
+          </p>
+        </div>
+
+        <section class="idea-section" aria-labelledby="rules-prove-title">
+          <h2 class="group-label" id="rules-prove-title">What a scan proves</h2>
+          <ul class="list list-compact">
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Public object truth</span>
+                <span class="list-sub">Live signed state on relays, drops, sanctuaries, and finale nodes — not who scanned.</span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Cooperation beats hoarding</span>
+                <span class="list-sub">Quorum nodes evolve when the group shares clues outward.</span>
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <section class="idea-section" aria-labelledby="rules-not-title">
+          <h2 class="group-label" id="rules-not-title">What a scan does not prove</h2>
+          <ul class="list list-compact">
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Who scanned</span>
+                <span class="list-sub">No leaderboard, streak, XP, heatmap, or per-player scan history.</span>
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <section
+          class="idea-section city-game-map-section"
+          id="city-state"
+          aria-labelledby="city-state-title"
+        >
+          <div id="city-game-map-root" class="city-game-map-root" data-season-id="example_city_season_01">
+            <noscript>
+              <p class="city-game-map-error">
+                City board needs JavaScript. Open
+                <a href="/data/city-game-example-season-01.json">season data</a>
+                or scan any game sticker for live state.
+              </p>
+            </noscript>
+            <p class="city-game-map-loading" aria-live="polite">Loading city state board…</p>
+          </div>
+        </section>
+
+        <section class="qr-compare idea-compare" aria-labelledby="rules-privacy-title">
+          <h2 class="group-label" id="rules-privacy-title">Privacy</h2>
+          <p class="group-intro short">
+            Read the <a href="/data-policy.html">operator data policy</a>. Same city truth for everyone — no account, no visit log.
+          </p>
+        </section>
+
+        <p class="idea-footnote">
+          <a href="/play/season/">All city games</a>
+          ·
+          <a href="/what-can-a-qr-do/physical-world-multiplayer/">Physical-world multiplayer research</a>
+        </p>
+      </main>
+    </div>
+    <script type="module" src="/js/city-game-play-page.mjs?v=2"></script>
+  </body>
+</html>

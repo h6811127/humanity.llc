@@ -63,9 +63,9 @@ Everything else in the 15-node pack may stay **pre-scripted static copy** or **o
 | Faction capture / relay PvP | PWM-ST02, CR-R01 | Needs signed player faction actions + anti-grief rules |
 | Spy compromise (player-initiated) | CR-C01 | Narrative drill; operator sets `compromised` for rehearsals |
 | Prisoner’s dilemma choice outcomes | CR-G04, CR-M05 | Needs choice tokens + branch state machine (**L** target S3) |
-| Weather / sunrise-only routes | CR-X03, PWM-MS05, PWM-W02 | Schedule engine + external signal or manual mode |
-| Rotating bulletins / live map ticker | CR-M01–07 | Editorial; operator or pre-scheduled JSON / rules-page ticker |
-| Anti-hoarding auto-evolve | CR-G02, CR-M03 | Operator bulletin until quorum band triggers **L** |
+| Weather / sunrise-only routes | CR-X03, PWM-MS05, PWM-W02, PWM-S03 | **L** partial — `route_window_schedule` local-hour gates (`route-window-schedule.ts`); external weather API still S3 |
+| Rotating bulletins / live map ticker | CR-M01–07 | **L** partial — `bulletin_schedule` + snapshot headlines on rules board (`live-map-ticker.ts`, `GET …/seasons/{id}/snapshot`); WebSocket push still S3 |
+| Anti-hoarding auto-evolve | CR-G02, CR-M03 | **L** at quorum — River Lantern + cabinet bulletins auto-evolve (`evolveRiverLanternAntiHoarding`, `unlockCabinetFromRiver`) |
 | Business vouch (café) | CR-T03, CR-P03 | Q6 manual enrollment until S3 |
 | Care loop repair unlock | PWM-M06, PWM-W05 | Steward-signed care stream only |
 | Guestbook append | CR-SV10, CR-X01 | S3 moderated append |
@@ -303,7 +303,7 @@ Pure helpers live in [`site/js/scan-game-scarcity-ceiling-core.mjs`](../site/js/
 ## Explicit non-goals (still Phase 2)
 
 - Player faction capture changing controller streams
-- Automatic weather/sunset routes
+- External weather API / automatic flood-only mode without operator signal
 - Prisoner’s dilemma branch tokens
 - Full 15-node unique automation (only spine + static ambient nodes)
 - Scan analytics or “anonymous but logged” identity reconstruction

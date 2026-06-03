@@ -25,6 +25,14 @@ import {
   shouldOfferAddLostItemRelay,
   shouldOfferAddStatusPlate,
 } from "../../site/js/created-child-object-core.mjs";
+import {
+  buildGameNodeRegisterUnsigned,
+  CHILD_OBJECT_TYPE_GAME_NODE,
+  CHILD_OBJECT_STATUS_DISABLED,
+  isActiveGameNodeRow,
+  parseGameNodeChildFields,
+  shouldOfferAddGameNode,
+} from "../../site/js/created-child-object-game-node-core.mjs";
 
 const PROFILE = "cuAPt5nFYr8VCCWgPbAAupBS";
 
@@ -302,5 +310,64 @@ describe("created-child-object-core", () => {
     });
     expect(() => parseLostItemRelayChildFields("", "Lost")).toThrow(/required/i);
     expect(() => parseLostItemRelayChildState("")).toThrow(/required/i);
+  });
+});
+
+describe("created-child-object-game-node-core", () => {
+  it("offers add game node when organizer issuer key is registered", () => {
+    expect(shouldOfferAddGameNode({ pilot_template: "general" })).toBe(false);
+    expect(
+      shouldOfferAddGameNode({
+        pilot_template: "general",
+        issuer_public_key: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+      })
+    ).toBe(true);
+
+    expect(
+      parseGameNodeChildFields("Main square relay", "relay_gate", "downtown", "my_city_season_01")
+    ).toEqual({
+      publicLabel: "Main square relay",
+      nodeRole: "relay_gate",
+      district: "downtown",
+      seasonId: "my_city_season_01",
+    });
+
+    expect(
+      isActiveGameNodeRow({
+        object_type: CHILD_OBJECT_TYPE_GAME_NODE,
+        public_label: "Lantern",
+        public_state: "Dormant",
+      })
+    ).toBe(true);
+    expect(
+      isActiveGameNodeRow({
+        object_type: CHILD_OBJECT_TYPE_GAME_NODE,
+        public_label: "Lantern",
+        public_state: "Dormant",
+        status: CHILD_OBJECT_STATUS_DISABLED,
+      })
+    ).toBe(false);
+
+    const payload = buildGameNodeRegisterUnsigned({
+      profileId: "abc123",
+      seasonId: "my_city_season_01",
+      publicLabel: "River lantern",
+      nodeRole: "temp_drop",
+      district: "river",
+    });
+    expect(payload.object_type).toBe("game_node");
+    expect(payload.season_id).toBe("my_city_season_01");
+    expect(payload.node_role).toBe("temp_drop");
+  });
+
+  it("created game node module wires register + issue flow", () => {
+    const src = readFileSync(
+      join(process.cwd(), "site/js/created-child-object-game-node.mjs"),
+      "utf8"
+    );
+    expect(src).toContain("initCreatedGameNode");
+    expect(src).toContain("signGameNodeChildObjectCreate");
+    expect(src).toContain("registerChildObjectAndIssueScanLink");
+    expect(src).toContain("child-object-game-node-bulk");
   });
 });

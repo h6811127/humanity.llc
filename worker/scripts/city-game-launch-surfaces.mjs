@@ -14,10 +14,14 @@
  * @see docs/CITY_GAME_LAUNCH_CHECKLIST.md
  */
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { cityGameSeasonReadiness } from "./city-game-season-readiness.mjs";
+import {
+  resolveSeasonPathFromCli,
+  seasonLaunchContext,
+} from "../../site/js/city-game-season-path-core.mjs";
 import {
   RESEARCH_LAUNCH_PAGE_RELS,
   RULES_PAGE_REL,
@@ -25,11 +29,13 @@ import {
   applyRulesPageLaunchPatches,
   assessLaunchSurfacesApplied,
   assessLaunchSurfacesReady,
+  auditAllLaunchSurfacesCopy,
   rulesPageIsLaunchReady,
 } from "./city-game-launch-surfaces-core.mjs";
+import { auditRulesPageVouchCopy } from "./city-game-vouch-copy-core.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
-const seasonPath = join(root, "site/data/city-game-cr-season-01.json");
+const seasonPath = resolveSeasonPathFromCli(root);
 
 const apply = process.argv.includes("--apply");
 const check = process.argv.includes("--check") || !apply;
@@ -63,11 +69,13 @@ function main() {
   }
 
   const season = JSON.parse(readFileSync(seasonPath, "utf8"));
+  const launchCtx = seasonLaunchContext(season, basename(seasonPath));
   const readiness = cityGameSeasonReadiness(season, { requireLaunch: apply || expectApplied });
   const surfaceReady = assessLaunchSurfacesReady(season);
 
-  console.log("Cedar Rapids launch surfaces\n");
+  console.log("City game launch surfaces\n");
   console.log("Season:", season.season_id);
+  console.log("Rules page:", launchCtx.rulesPageRel);
 
   if (readiness.issues.length) {
     console.log("\nSeason config issues:");
@@ -81,7 +89,7 @@ function main() {
     process.exit(1);
   }
 
-  const rulesHtml = readRel(RULES_PAGE_REL);
+  const rulesHtml = readRel(launchCtx.rulesPageRel);
   const researchHtmlByRel = Object.fromEntries(
     RESEARCH_LAUNCH_PAGE_RELS.map((rel) => [rel, readRel(rel)])
   );
@@ -90,6 +98,7 @@ function main() {
     const { applied, issues } = assessLaunchSurfacesApplied(season, {
       rulesHtml,
       researchHtmlByRel,
+      launchCtx,
     });
     if (!applied) {
       console.log("\nLaunch surfaces not applied:");
@@ -101,6 +110,24 @@ function main() {
   }
 
   if (check && !apply) {
+    const copyAudit = auditAllLaunchSurfacesCopy({
+      rulesHtml,
+      researchHtmlByRel,
+    });
+    const b1Audit = auditRulesPageVouchCopy(rulesHtml);
+    if (copyAudit.ok) {
+      console.log("\n✓ B2 copy audit: rules + research surfaces honest (or design-reference disclaimed).");
+    } else {
+      console.log("\n⚠ B2 copy audit issues:");
+      for (const issue of copyAudit.issues) console.log(`  - ${issue}`);
+    }
+    if (b1Audit.ok) {
+      console.log("✓ B1 vouch copy: rules page distinguishes game witness path.");
+    } else {
+      console.log("⚠ B1 vouch copy issues:");
+      for (const issue of b1Audit.issues) console.log(`  - ${issue}`);
+    }
+
     if (rulesHtml.includes("noindex") && rulesHtml.includes("Draft rules page")) {
       console.log("\n✓ Pre-launch state: rules page noindex + draft hint (expected).");
     } else if (rulesPageIsLaunchReady(rulesHtml)) {
@@ -120,16 +147,25 @@ function main() {
 
   if (apply) {
     const patches = [
-      { rel: RULES_PAGE_REL, next: applyRulesPageLaunchPatches(rulesHtml, season) },
+      {
+        rel: launchCtx.rulesPageRel,
+        next: applyRulesPageLaunchPatches(rulesHtml, season, launchCtx),
+      },
       ...RESEARCH_LAUNCH_PAGE_RELS.map((rel) => ({
         rel,
-        next: applyResearchPageLaunchPatches(researchHtmlByRel[rel], season, rel),
+        next: applyResearchPageLaunchPatches(
+          researchHtmlByRel[rel],
+          season,
+          rel,
+          launchCtx
+        ),
       })),
     ];
 
     console.log("\nPlanned patches:");
     for (const { rel, next } of patches) {
-      const before = rel === RULES_PAGE_REL ? rulesHtml : researchHtmlByRel[rel];
+      const before =
+        rel === launchCtx.rulesPageRel ? rulesHtml : researchHtmlByRel[rel];
       console.log(`  ${before !== next ? "✎" : "·"} ${rel}`);
     }
 
@@ -138,7 +174,7 @@ function main() {
     }
 
     console.log("\n✅ Wrote launch surfaces:");
-    console.log("  -", RULES_PAGE_REL, "(removed noindex, live season window)");
+    console.log("  -", launchCtx.rulesPageRel, "(removed noindex, live season window)");
     for (const rel of RESEARCH_LAUNCH_PAGE_RELS) {
       console.log("  -", rel);
     }

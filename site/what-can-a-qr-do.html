@@ -40,16 +40,12 @@
           </p>
         </section>
 
-        <div class="research-live-banner hc-notice hc-notice--info" role="note">
-          <p>
-            <strong>Season live.</strong> Wake the city · 2026-06-06T18:00:00-05:00 → 2026-06-08T22:00:00-05:00
-          </p>
-          <p>
-            <a href="/play/cedar-rapids/">Read the rules</a> and
-            <a href="/play/cedar-rapids/#city-state">open the city state board</a>
-            before scanning game nodes. Resolver-backed play runs on live <code>/c/…</code> scan URLs — demo layouts on this page remain design reference.
-          </p>
-        </div>
+        <div class="research-live-banner hc-notice hc-notice--info" role="note" data-city-game-season-banner data-season-json="/data/city-game-cr-season-01.json" data-banner-variant="research">
+  <p>
+    <strong data-city-game-season-banner-label>Season window</strong><span data-city-game-season-banner-dates> Wake the city · 2026-06-06T18:00:00-05:00 → 2026-06-08T22:00:00-05:00</span>
+  </p>
+  <p data-city-game-season-banner-body><a href="/play/cedar-rapids/">Read the rules</a> and <a href="/play/cedar-rapids/#city-state">open the city state board</a> before scanning game nodes. Resolver-backed play runs on live <code>/c/…</code> scan URLs — demo layouts on this page remain design reference.</p>
+</div>
 
         <section class="landing-vision" aria-labelledby="streams-title">
           <p class="section-kicker">Where this goes</p>
@@ -64,17 +60,18 @@
             <li>A <strong>maintainer stream</strong>  -  repair notices, closures, safety pauses</li>
             <li>An <strong>artist or place stream</strong>  -  history, commentary, local canon</li>
           </ul>
-          <p class="landing-vision-lead landing-vision-lead--dev">
-            <strong>Season live.</strong> Wake the city · 2026-06-06T18:00:00-05:00 → 2026-06-08T22:00:00-05:00
-            <a href="/play/cedar-rapids/">Read the rules</a>
-            and the
-            <a href="/play/cedar-rapids/#city-state">city state board</a>
-            before scanning game nodes. See the
-            <a href="/what-can-a-qr-do/physical-world-multiplayer/">multiplayer walkthrough</a>
-            and
-            <a href="/what-can-a-qr-do/combining-ideas/cedar-rapids-city-game/">Cedar Rapids demo</a>
-            for design reference.
-          </p>
+          <p class="landing-vision-lead landing-vision-lead--dev" data-city-game-season-banner data-season-json="/data/city-game-cr-season-01.json" data-banner-variant="hub">
+  <strong data-city-game-season-banner-label>Season window</strong><span data-city-game-season-banner-dates> Wake the city · 2026-06-06T18:00:00-05:00 → 2026-06-08T22:00:00-05:00</span>
+  <span data-city-game-season-banner-body> Read the rules and city board before scanning game nodes.</span>
+  <a href="/play/cedar-rapids/">Read the rules</a>
+  and the
+  <a href="/play/cedar-rapids/#city-state">city state board</a>
+  before scanning game nodes. See the
+  <a href="/what-can-a-qr-do/physical-world-multiplayer/">multiplayer walkthrough</a>
+  and
+  <a href="/what-can-a-qr-do/combining-ideas/cedar-rapids-city-game/">Cedar Rapids demo</a>
+  for design reference.
+</p>
           <p class="landing-vision-lead">
             Each stream has an owner and honest limits. Maintenance and safety truth wins when channels
             conflict. This is how benches, murals, and door plates become
@@ -532,5 +529,6 @@
         </section>
       </main>
     </div>
+      <script type="module" src="/js/city-game-season-banner.mjs?v=1"></script>
   </body>
 </html>

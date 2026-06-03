@@ -1,5 +1,8 @@
 import { GAME_NODE_OBJECT_TYPE, isCityGameEnabled } from "../city-game/constants";
-import { CR_SEASON_01 } from "../city-game/season-config";
+import {
+  isSeasonRootProfile,
+  resolveSeasonForProfile,
+} from "../city-game/season-loader";
 import { reconcileSeasonUnlockDrift } from "../city-game/unlock-evaluator";
 import { loadScanContext, type ScanContext } from "../db/scan";
 import { getLiveControlChallenge, getRecentLiveControlProof } from "../db/live-control";
@@ -27,6 +30,7 @@ export async function handleGetScan(
   env: {
     DB: D1Database;
     CITY_GAME_ENABLED?: string;
+    CITY_GAME_LOCAL_PLAY_OPEN?: string;
     SCAN_PAGES_JS_ORIGIN?: string;
     SCAN_RESOLVER_ORIGIN?: string;
   },
@@ -97,16 +101,21 @@ export async function handleGetScan(
   }
 
   const now = new Date();
+  const season = resolveSeasonForProfile(profileId);
   const ctx = await loadScanContextWithUnlockDriftRepair(
     env.DB,
     profileId,
     qrId,
     now,
-    env
+    env,
+    season
   );
   const vm = buildScanViewModel(profileId, qrId, ctx, origin, now, {
-    env: { CITY_GAME_ENABLED: env.CITY_GAME_ENABLED },
-    seasonForWindow: CR_SEASON_01,
+    env: {
+      CITY_GAME_ENABLED: env.CITY_GAME_ENABLED,
+      CITY_GAME_LOCAL_PLAY_OPEN: env.CITY_GAME_LOCAL_PLAY_OPEN,
+    },
+    season: season ?? undefined,
   });
   await applyLiveControlProofIfPresent(
     env.DB,
@@ -138,12 +147,13 @@ async function loadScanContextWithUnlockDriftRepair(
   profileId: string,
   qrId: string,
   now: Date,
-  env: { CITY_GAME_ENABLED?: string }
+  env: { CITY_GAME_ENABLED?: string },
+  season: ReturnType<typeof resolveSeasonForProfile>
 ): Promise<ScanContext> {
   let ctx = await loadScanContext(db, profileId, qrId);
-  if (!shouldRepairGameUnlockDriftOnScan(env, profileId, ctx)) return ctx;
+  if (!shouldRepairGameUnlockDriftOnScan(env, profileId, ctx, season)) return ctx;
 
-  const { repaired } = await reconcileSeasonUnlockDrift(db, now);
+  const { repaired } = await reconcileSeasonUnlockDrift(db, now, season!);
   if (repaired.length > 0) {
     ctx = await loadScanContext(db, profileId, qrId);
   }
@@ -153,13 +163,13 @@ async function loadScanContextWithUnlockDriftRepair(
 function shouldRepairGameUnlockDriftOnScan(
   env: { CITY_GAME_ENABLED?: string },
   profileId: string,
-  ctx: ScanContext
+  ctx: ScanContext,
+  season: ReturnType<typeof resolveSeasonForProfile>
 ): boolean {
   if (!isCityGameEnabled(env)) return false;
+  if (!season) return false;
   if (ctx.childObject?.object_type !== GAME_NODE_OBJECT_TYPE) return false;
-  const seasonRoot = CR_SEASON_01.season_root_profile_id;
-  if (seasonRoot && seasonRoot !== profileId) return false;
-  return true;
+  return isSeasonRootProfile(profileId, season);
 }
 
 async function applyLiveControlProofIfPresent(

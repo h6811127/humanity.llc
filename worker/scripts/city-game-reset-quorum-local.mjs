@@ -81,7 +81,11 @@ async function main() {
 
   await publish("obj_cr_node_04_river", {
     public_state: "Seed clue live — share outward to evolve",
-    game_meta: { collective_progress: 4, collective_target: 20, unlocked_by: [] },
+    game_meta: {
+      collective_progress: process.argv.includes("--from-zero") ? 0 : 4,
+      collective_target: 20,
+      unlocked_by: [],
+    },
   });
   await publish("obj_cr_node_07_cabinet", {
     public_state: "Locked until River Lantern quorum",

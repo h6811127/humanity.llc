@@ -33,6 +33,7 @@ import {
   SETUP_DONE_IOS_HOME_SCREEN_DETAIL,
 } from "./device-ownership-copy-core.mjs";
 import { shouldShowSetupIosSafariCustodyNotice } from "./created-setup-ios-custody-core.mjs";
+import { syncCreatedSetupGameSeasonCustody } from "./created-child-object-game-node-setup.mjs";
 import { isIosWebKitUserAgent } from "./safari-itp-storage-notice-core.mjs";
 import { stewardScanOpenedFeedback } from "./pwa-scan-handoff-core.mjs";
 import { openStewardScanPreviewFromWindow } from "./pwa-scan-handoff.mjs";
@@ -174,6 +175,7 @@ export function initCreatedSetup(opts) {
   }
 
   syncSetupKeysCustody();
+  syncCreatedSetupGameSeasonCustody(getSession());
 
   if (keysStrip && keysMount) {
     keysMount.appendChild(keysStrip);
@@ -344,6 +346,7 @@ export function initCreatedSetup(opts) {
     }
     scrollToCurrentPanel();
     writeStepHistory(!pushHistory);
+    syncCreatedSetupGameSeasonCustody(getSession());
   }
 
   syncSetupQrPreview();

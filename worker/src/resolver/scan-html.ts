@@ -19,6 +19,7 @@ import { pagesJsOrigin, scanPageOrigin, type ScanPageOriginEnv } from "../http/r
 import { SCAN_OFFLINE_BANNER_TEXT } from "./scan-offline";
 import {
   GAME_CONTRIBUTE_LEAD,
+  GAME_CONTRIBUTE_FIRST_SCAN_NOTE,
   GAME_CONTRIBUTE_PROGRESS_LABEL,
   GAME_CONTRIBUTE_SITE_CODE_LABEL,
   GAME_CONTRIBUTE_SUBMIT_LABEL,
@@ -33,6 +34,7 @@ import {
   type GameNodeScanContext,
 } from "../city-game/scan-view";
 import { seasonWindowChip, seasonWindowScanNote } from "../city-game/season-window";
+import { resolveSeasonById } from "../city-game/season-loader";
 import {
   credentialCodeFromScanUrl,
   deriveCredentialCodeSync,
@@ -226,9 +228,19 @@ function renderScanPageChrome(origin: string): string {
 }
 
 /** Live check hero — merges scanner safety + status panel (docs/M3_SCAN_PAGE_UI.md Phase 1). */
+function renderGameNodeRulesLink(gameNode: GameNodeScanContext): string {
+  const season = resolveSeasonById(gameNode.seasonId);
+  const rulesPath = season?.rules_path?.trim() || "/play/season/";
+  const title = season?.title?.trim() || "City game";
+  const city = season?.city?.trim();
+  const label = city ? `${title} · ${city}` : title;
+  return `<p class="scan-game-rules-link" role="navigation"><a href="${escapeHtml(rulesPath)}">Season rules + city board</a><span class="scan-game-rules-link-meta"> · ${escapeHtml(label)}</span></p>`;
+}
+
 function renderScanHeroFootBlock(vm: ScanViewModel, foot: string): string {
   if (vm.gameNode?.enabled && vm.gameNode.mode !== "fallback") {
-    return `<p class="scan-hero-foot">${escapeHtml(GAME_NODE_SCAN_FOOT)}</p>
+    return `${renderGameNodeRulesLink(vm.gameNode)}
+  <p class="scan-hero-foot">${escapeHtml(GAME_NODE_SCAN_FOOT)}</p>
   <p class="scan-game-privacy-note" role="note">${escapeHtml(GAME_NODE_SCAN_PRIVACY_NOTE)}</p>`;
   }
   return foot ? `<p class="scan-hero-foot">${escapeHtml(foot)}</p>` : "";
@@ -523,6 +535,10 @@ function renderGameContributeBlock(vm: ScanViewModel): string {
     <span class="scan-game-contribute-progress-label">${escapeHtml(GAME_CONTRIBUTE_PROGRESS_LABEL)}</span>
     <span class="scan-game-contribute-progress-value" id="scan-game-contribute-progress">${escapeHtml(String(progress))} / ${escapeHtml(String(target))}</span>
   </p>`;
+  const firstScanNote =
+    !isFragment && !isScarcity
+      ? `<p class="scan-game-contribute-note">${escapeHtml(GAME_CONTRIBUTE_FIRST_SCAN_NOTE)}</p>`
+      : "";
   const sectionClass = isScarcity
     ? " scan-game-contribute--scarcity"
     : isFragment
@@ -535,6 +551,7 @@ function renderGameContributeBlock(vm: ScanViewModel): string {
   <p class="scan-game-contribute-eyebrow">${escapeHtml(eyebrow)}</p>
   <p class="scan-game-contribute-lead" id="scan-game-contribute-label">${escapeHtml(lead)}</p>
   ${progressBlock}
+  ${firstScanNote}
   <label class="scan-game-contribute-field-label" for="scan-game-contribute-code">${escapeHtml(GAME_CONTRIBUTE_SITE_CODE_LABEL)}</label>
   <input class="scan-game-contribute-input" id="scan-game-contribute-code" name="site_code" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="32" placeholder="${escapeHtml(placeholder)}" />
   <button type="button" class="scan-game-contribute-cta" id="scan-game-contribute-submit">${escapeHtml(submitLabel)}</button>

@@ -78,13 +78,15 @@ OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run worker:check-st
 
 `OPERATOR_AUDIT_TOKEN` must be **ASCII-only** when passed on the shell (HTTP `Authorization` is a ByteString). Do not paste doc placeholders like `...` or `…` — use the exact value from `wrangler secret list` / GitHub Actions secret.
 
-Migrations: `0012_steward_hosted.sql`, `0013_steward_billing.sql`.
+Migrations: `0012_steward_hosted.sql`, `0013_steward_billing.sql`, `0031_game_season_metering.sql` (game season metering — WS-REV).
 
 **Rollout step 1 (script):**
 
 ```bash
 npm run hosted:rollout:step1              # verify:hosted-g0 + local D1 apply
 npm run hosted:rollout:step1 -- --remote  # + production D1 (Cloudflare auth)
+npm run hosted:rev:step1-remote           # WS-REV R5: step1 --remote + operator/plans smoke
+npm run hosted:rev:pages                  # WS-REV R5: Pages deploy + /created/ panel verify
 ```
 
 **Rollout step 2 (script):**

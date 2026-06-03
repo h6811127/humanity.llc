@@ -2,50 +2,460 @@
   "season_id": "cr_season_01_wake",
   "title": "Wake the city",
   "city": "Cedar Rapids, Iowa",
-  "status": "planned",
-  "season_root_profile_id": null,
+  "status": "active",
+  "season_root_profile_id": "CEenC57QN9qqnr2x5L89cbWt",
   "rules_path": "/play/cedar-rapids/",
   "window": {
-    "starts_at": null,
-    "ends_at": null
+    "starts_at": "2026-06-06T18:00:00-05:00",
+    "ends_at": "2026-06-08T22:00:00-05:00"
   },
-  "districts": ["newbo", "czech_village", "greene_square", "river_spine", "downtown"],
+  "districts": [
+    "newbo",
+    "czech_village",
+    "greene_square",
+    "river_spine",
+    "downtown"
+  ],
+  "map_copy": {
+    "title": "City state",
+    "subtitle": "Weekend board · read-only",
+    "live_hint": "Use the place list for names and directions. Scan the sticker when you arrive for live signed state — faction holds, quorum, fragments, and care pauses.",
+    "wayfinding_intro": "Start anywhere — scan any game sticker you find. Planning from home? Search place names in your maps app; the sketch below is districts only, not streets.",
+    "diagram_note": "District sketch only — not a street map. Names and Open in Maps links are how you find places.",
+    "privacy_note": "Same city truth for everyone. No account. No visit log. No GPS tracking.",
+    "unlock_intro": "Paths below wake when the city unlocks them together — not when you personally check boxes."
+  },
+  "player_guide": {
+    "hero_subline": "Jump to the <a href=\"#city-state\">place list</a> — all spots by district, with Open in Maps links (scan each sticker for live chips).",
+    "steps": [
+      {
+        "title": "No required first stop",
+        "body": "Walk until you spot a game sticker, or pick a place from the list below and head there — any sticker works."
+      },
+      {
+        "title": "Planning from home",
+        "body": "Search place names in Apple Maps or Google Maps. The weekend board is a district sketch, not turn-by-turn directions."
+      }
+    ],
+    "quorum_spot": {
+      "title": "Riverwalk River Lantern",
+      "body": "The shared quorum spot on the riverwalk — scan there to see collective progress and add your visit with the site code on the sticker."
+    }
+  },
+  "comprehension_kit": {
+    "primary_scan_node": "node_04",
+    "probe_nodes": ["node_04", "node_07", "node_02", "node_14"],
+    "blurbs": {
+      "node_04": "GT-1 / GT-2 — collective unlock + seed clue",
+      "node_07": "GT-4 — cabinet trust path (no account)",
+      "node_02": "GT-3 — sanctuary / regroup",
+      "node_14": "GT-5 — care stream vs game bulletins"
+    }
+  },
+  "map_layout": {
+    "version": 1,
+    "nodes": {
+      "node_01": {
+        "x": 0.78,
+        "y": 0.24
+      },
+      "node_02": {
+        "x": 0.72,
+        "y": 0.32
+      },
+      "node_03": {
+        "x": 0.84,
+        "y": 0.34
+      },
+      "node_04": {
+        "x": 0.52,
+        "y": 0.6
+      },
+      "node_05": {
+        "x": 0.46,
+        "y": 0.5
+      },
+      "node_06": {
+        "x": 0.58,
+        "y": 0.4
+      },
+      "node_07": {
+        "x": 0.2,
+        "y": 0.44
+      },
+      "node_08": {
+        "x": 0.26,
+        "y": 0.52
+      },
+      "node_09": {
+        "x": 0.16,
+        "y": 0.36
+      },
+      "node_10": {
+        "x": 0.62,
+        "y": 0.3
+      },
+      "node_11": {
+        "x": 0.34,
+        "y": 0.7
+      },
+      "node_12": {
+        "x": 0.4,
+        "y": 0.76
+      },
+      "node_13": {
+        "x": 0.54,
+        "y": 0.22
+      },
+      "node_14": {
+        "x": 0.44,
+        "y": 0.66
+      },
+      "node_15": {
+        "x": 0.7,
+        "y": 0.46
+      }
+    },
+    "district_zones": [
+      { "id": "newbo", "x": 68, "y": 8, "w": 30, "h": 28, "label": "NewBo" },
+      { "id": "czech_village", "x": 4, "y": 28, "w": 32, "h": 30, "label": "Czech Village" },
+      { "id": "greene_square", "x": 26, "y": 58, "w": 24, "h": 22, "label": "Greene Square" },
+      { "id": "river_spine", "x": 36, "y": 42, "w": 28, "h": 32, "label": "River spine" },
+      { "id": "downtown", "x": 48, "y": 12, "w": 28, "h": 38, "label": "Downtown" }
+    ],
+    "svg_title": "Schematic Cedar Rapids season nodes and unlock paths"
+  },
   "unlock_edges": [
-    { "from": "node_04", "to": "node_07", "label": "River Lantern unlocks Czech Village cabinet" },
-    { "from": "node_10", "to": "node_07", "label": "Library witness vouch opens cabinet path" },
-    { "from": "node_09", "to": "node_13", "label": "Czech Village mural fragment" },
-    { "from": "node_11", "to": "node_13", "label": "Greene Square marker fragment" },
-    { "from": "node_01", "to": "node_13", "label": "NewBo relay fragment" }
+    {
+      "from": "node_04",
+      "to": "node_07",
+      "label": "River Lantern unlocks Czech Village cabinet"
+    },
+    {
+      "from": "node_10",
+      "to": "node_07",
+      "label": "Library witness vouch opens cabinet path"
+    },
+    {
+      "from": "node_09",
+      "to": "node_13",
+      "label": "Czech Village mural fragment"
+    },
+    {
+      "from": "node_11",
+      "to": "node_13",
+      "label": "Greene Square marker fragment"
+    },
+    {
+      "from": "node_01",
+      "to": "node_13",
+      "label": "NewBo relay fragment"
+    }
   ],
   "mobile_lore_enrollment": [],
   "contribute_codes": {
-    "node_01": { "code": "CR-RELAY-1N", "epoch": "cr_season_01_wake" },
-    "node_04": { "code": "CR-LANTERN-7K", "epoch": "cr_season_01_wake" },
-    "node_09": { "code": "CR-MURAL-2F", "epoch": "cr_season_01_wake" },
-    "node_10": { "code": "CR-WITNS-4P", "epoch": "cr_season_01_wake" },
-    "node_11": { "code": "CR-MARK-9P", "epoch": "cr_season_01_wake" }
+    "node_01": {
+      "code": "CR-RELAY-1N",
+      "epoch": "cr_season_01_wake"
+    },
+    "node_04": {
+      "code": "CR-LANTERN-7K",
+      "epoch": "cr_season_01_wake"
+    },
+    "node_09": {
+      "code": "CR-MURAL-2F",
+      "epoch": "cr_season_01_wake"
+    },
+    "node_10": {
+      "code": "CR-WITNS-4P",
+      "epoch": "cr_season_01_wake"
+    },
+    "node_11": {
+      "code": "CR-MARK-9P",
+      "epoch": "cr_season_01_wake"
+    }
   },
   "automation": {
-    "quorum_nodes": ["node_04"],
-    "fragment_nodes": ["node_09", "node_11", "node_01"],
+    "quorum_nodes": [
+      "node_04"
+    ],
+    "fragment_nodes": [
+      "node_09",
+      "node_11",
+      "node_01"
+    ],
     "finale_node": "node_13",
     "witness_scarcity_node": "node_10"
   },
+  "bulletin_schedule": {
+    "entries": [
+      {
+        "node_id": "node_01",
+        "slots": [
+          {
+            "after_start_hours": 0,
+            "controller": "Red team",
+            "relay_status": "Open · 18 min",
+            "bulletin": "Shift west, mural alley stays safe"
+          },
+          {
+            "after_start_hours": 6,
+            "controller": "Red team",
+            "relay_status": "Open · truce window",
+            "bulletin": "Regroup at café window — relay stays public"
+          },
+          {
+            "after_start_hours": 12,
+            "controller": "Blue team",
+            "relay_status": "Open · evening beat",
+            "bulletin": "Bridge watch tonight — share fragments outward"
+          }
+        ]
+      },
+      {
+        "node_id": "node_05",
+        "slots": [
+          {
+            "after_start_hours": 0,
+            "controller": "Neutral",
+            "relay_status": "Watch · compromised drill ready",
+            "bulletin": "Bridge bulletin live — trust the rekey path"
+          }
+        ]
+      },
+      {
+        "node_id": "node_15",
+        "slots": [
+          {
+            "after_start_hours": 0,
+            "controller": "Red team",
+            "relay_status": "Open · market steps",
+            "bulletin": "Lantern Ward reclaimed — rotate west at dusk"
+          },
+          {
+            "after_start_hours": 8,
+            "controller": "Red team",
+            "relay_status": "Open · night route",
+            "bulletin": "Market steps hold — finale fragments need Greene Square"
+          }
+        ]
+      }
+    ]
+  },
+  "live_map_ticker": {
+    "max_headlines": 8
+  },
+  "route_window_schedule": {
+    "timezone": "America/Chicago",
+    "entries": [
+      {
+        "node_id": "node_06",
+        "slots": [
+          {
+            "after_start_hours": 0,
+            "local_hour_from": 6,
+            "local_hour_until": 18,
+            "route_open": false,
+            "territory": "Splitter dormant · day",
+            "relay_route": "Closed · opens at sunset",
+            "secondary_route": "Flood path sealed",
+            "coop_hint": "Skywalk wind route wakes after sunset — check back at dusk."
+          },
+          {
+            "after_start_hours": 0,
+            "local_hour_from": 18,
+            "local_hour_until": 6,
+            "route_open": true,
+            "territory": "Route split live",
+            "relay_route": "Open · wind path after sunset",
+            "secondary_route": "Flood path · weather signal only",
+            "bulletin": "Shared ending needs the group — not a solo shortcut",
+            "coop_hint": "Wind route is live tonight — flood path waits on weather or steward mode."
+          }
+        ]
+      },
+      {
+        "node_id": "node_03",
+        "slots": [
+          {
+            "after_start_hours": 0,
+            "local_hour_from": 0,
+            "local_hour_until": 5,
+            "route_open": true,
+            "territory": "Midnight chapter",
+            "relay_route": "Live · hidden alley verse",
+            "bulletin": "Secret chapter until dawn",
+            "coop_hint": "Midnight mural hour — share outward before the chapter sleeps."
+          },
+          {
+            "after_start_hours": 0,
+            "local_hour_from": 5,
+            "local_hour_until": 24,
+            "route_open": false,
+            "territory": "Archive sealed",
+            "relay_route": "Sealed until midnight",
+            "bulletin": "Artist note returns at 12 AM",
+            "coop_hint": "Mural chapter sleeps until midnight local time."
+          }
+        ]
+      },
+      {
+        "node_id": "node_09",
+        "slots": [
+          {
+            "after_start_hours": 0,
+            "local_hour_from": 0,
+            "local_hour_until": 5,
+            "route_open": true,
+            "territory": "Fragment chapter live",
+            "relay_route": "Live · Czech Village midnight verse",
+            "bulletin": "Register fragment while chapter is open",
+            "coop_hint": "Midnight window — mark the fragment for the lattice while the chapter is live."
+          },
+          {
+            "after_start_hours": 0,
+            "local_hour_from": 5,
+            "local_hour_until": 24,
+            "route_open": false,
+            "territory": "Archive sealed",
+            "relay_route": "Chapter sealed until midnight",
+            "bulletin": "Site code still works — chapter copy sleeps",
+            "coop_hint": "Fragment site code works anytime — lore chapter returns at midnight."
+          }
+        ]
+      },
+      {
+        "node_id": "node_11",
+        "slots": [
+          {
+            "after_start_hours": 0,
+            "local_hour_from": 18,
+            "local_hour_until": 6,
+            "route_open": true,
+            "territory": "Greene dusk split",
+            "relay_route": "Open · marker path after sunset",
+            "secondary_route": "River connector · night only",
+            "coop_hint": "Trail marker splits routes after sunset — coordinate with River Lantern quorum."
+          },
+          {
+            "after_start_hours": 0,
+            "local_hour_from": 6,
+            "local_hour_until": 18,
+            "route_open": false,
+            "territory": "Marker dormant",
+            "relay_route": "Closed until sunset",
+            "secondary_route": "Night route sealed",
+            "coop_hint": "Greene Square marker wakes at sunset for the night route lattice."
+          }
+        ]
+      }
+    ]
+  },
   "nodes": [
-    { "node_id": "node_01", "object_id": "obj_cr_node_01_newbo", "role": "relay_gate", "district": "newbo", "label": "NewBo relay arch" },
-    { "node_id": "node_02", "object_id": "obj_cr_node_02_cafe", "role": "sanctuary", "district": "newbo", "label": "NewBo café window" },
-    { "node_id": "node_03", "object_id": "obj_cr_node_03_mural", "role": "lore_archive", "district": "newbo", "label": "NewBo mural alley" },
-    { "node_id": "node_04", "object_id": "obj_cr_node_04_river", "role": "temp_drop", "district": "river_spine", "label": "Riverwalk River Lantern" },
-    { "node_id": "node_05", "object_id": "obj_cr_node_05_bridge", "role": "relay_gate", "district": "river_spine", "label": "16th Avenue bridge" },
-    { "node_id": "node_06", "object_id": "obj_cr_node_06_skywalk", "role": "route_splitter", "district": "downtown", "label": "Skywalk note" },
-    { "node_id": "node_07", "object_id": "obj_cr_node_07_cabinet", "role": "lore_archive", "district": "czech_village", "label": "Czech Village cabinet" },
-    { "node_id": "node_08", "object_id": "obj_cr_node_08_bench", "role": "relay_gate", "district": "czech_village", "label": "Czech Village square bench" },
-    { "node_id": "node_09", "object_id": "obj_cr_node_09_mural", "role": "lore_archive", "district": "czech_village", "label": "Czech Village mural" },
-    { "node_id": "node_10", "object_id": "obj_cr_node_10_library", "role": "witness", "district": "downtown", "label": "Library witness seal" },
-    { "node_id": "node_11", "object_id": "obj_cr_node_11_marker", "role": "route_splitter", "district": "greene_square", "label": "Greene Square marker" },
-    { "node_id": "node_12", "object_id": "obj_cr_node_12_bench", "role": "sanctuary", "district": "greene_square", "label": "Greene Square bench" },
-    { "node_id": "node_13", "object_id": "obj_cr_node_13_finale", "role": "finale", "district": "downtown", "label": "Downtown alley arch" },
-    { "node_id": "node_14", "object_id": "obj_cr_node_14_fountain", "role": "care_loop", "district": "river_spine", "label": "River fountain / rain garden" },
-    { "node_id": "node_15", "object_id": "obj_cr_node_15_steps", "role": "relay_gate", "district": "downtown", "label": "Downtown market steps" }
+    {
+      "node_id": "node_01",
+      "object_id": "obj_cr_node_01_newbo",
+      "role": "relay_gate",
+      "district": "newbo",
+      "label": "NewBo relay arch"
+    },
+    {
+      "node_id": "node_02",
+      "object_id": "obj_cr_node_02_cafe",
+      "role": "sanctuary",
+      "district": "newbo",
+      "label": "NewBo café window"
+    },
+    {
+      "node_id": "node_03",
+      "object_id": "obj_cr_node_03_mural",
+      "role": "lore_archive",
+      "district": "newbo",
+      "label": "NewBo mural alley"
+    },
+    {
+      "node_id": "node_04",
+      "object_id": "obj_cr_node_04_river",
+      "role": "temp_drop",
+      "district": "river_spine",
+      "label": "Riverwalk River Lantern"
+    },
+    {
+      "node_id": "node_05",
+      "object_id": "obj_cr_node_05_bridge",
+      "role": "relay_gate",
+      "district": "river_spine",
+      "label": "16th Avenue bridge"
+    },
+    {
+      "node_id": "node_06",
+      "object_id": "obj_cr_node_06_skywalk",
+      "role": "route_splitter",
+      "district": "downtown",
+      "label": "Skywalk note"
+    },
+    {
+      "node_id": "node_07",
+      "object_id": "obj_cr_node_07_cabinet",
+      "role": "lore_archive",
+      "district": "czech_village",
+      "label": "Czech Village cabinet"
+    },
+    {
+      "node_id": "node_08",
+      "object_id": "obj_cr_node_08_bench",
+      "role": "relay_gate",
+      "district": "czech_village",
+      "label": "Czech Village square bench"
+    },
+    {
+      "node_id": "node_09",
+      "object_id": "obj_cr_node_09_mural",
+      "role": "lore_archive",
+      "district": "czech_village",
+      "label": "Czech Village mural"
+    },
+    {
+      "node_id": "node_10",
+      "object_id": "obj_cr_node_10_library",
+      "role": "witness",
+      "district": "downtown",
+      "label": "Library witness seal"
+    },
+    {
+      "node_id": "node_11",
+      "object_id": "obj_cr_node_11_marker",
+      "role": "route_splitter",
+      "district": "greene_square",
+      "label": "Greene Square marker"
+    },
+    {
+      "node_id": "node_12",
+      "object_id": "obj_cr_node_12_bench",
+      "role": "sanctuary",
+      "district": "greene_square",
+      "label": "Greene Square bench"
+    },
+    {
+      "node_id": "node_13",
+      "object_id": "obj_cr_node_13_finale",
+      "role": "finale",
+      "district": "downtown",
+      "label": "Downtown alley arch"
+    },
+    {
+      "node_id": "node_14",
+      "object_id": "obj_cr_node_14_fountain",
+      "role": "care_loop",
+      "district": "river_spine",
+      "label": "River fountain / rain garden"
+    },
+    {
+      "node_id": "node_15",
+      "object_id": "obj_cr_node_15_steps",
+      "role": "relay_gate",
+      "district": "downtown",
+      "label": "Downtown market steps"
+    }
   ]
 }

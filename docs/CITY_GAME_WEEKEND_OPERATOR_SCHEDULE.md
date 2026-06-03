@@ -41,3 +41,11 @@ Flips via [`/game-operator/`](../site/game-operator/index.html) — document **w
 - **Compromised sticker:** revoke QR → verify scan shows unavailable ([`CITY_GAME_SUPPORT_MACROS.md`](CITY_GAME_SUPPORT_MACROS.md))
 - **Care pause:** care stream first; mute game bulletins until cleared
 - **Resolver outage:** static scan may cache; do not promise live state until Worker healthy
+
+---
+
+## Launch sign-off (O3)
+
+| Check | Done? |
+|-------|-------|
+| Primary + backup operators named for Fri–Sun window | ☐ Pending |

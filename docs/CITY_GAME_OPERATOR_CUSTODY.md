@@ -140,7 +140,8 @@ The `/create/` UI path below is still valid for production/staging when you want
 Organizers who are not running Cedar Rapids internal scripts will:
 
 1. Create season root at [`/create/`](../site/create/) (game-operator public key under Organizer / issuer).
-2. Add `game_node` children, issue QRs, and edit season metadata on [`/created/`](../site/created/) Live · Manage — same child-object pattern as status plates ([`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md)).
-3. Operate live state at [`/game-operator/`](../site/game-operator/) with session-only private key paste.
+2. Complete the five-step setup wizard — season roots see an extra **Two keys, two jobs** custody card on Protect and Live steps.
+3. Add `game_node` children, issue QRs, edit season metadata, and run comprehension checks on [`/created/`](../site/created/) Live · Manage — **Setup checklist · custody & comprehension** panel (GT scorecard, runbook patterns, backup gate before a third node).
+4. Operate live state at [`/game-operator/`](../site/game-operator/) with session-only private key paste.
 
 Terminal commands (`city-game:season-root`, `city-game:mint-node`, `city-game:seed-local`) remain for **engineering, CI, and Cedar Rapids pilot ops** — not for public organizers once Phase E ships.

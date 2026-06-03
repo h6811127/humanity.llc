@@ -11,6 +11,8 @@ import {
   applyRulesPageLaunchPatches,
   assessLaunchSurfacesApplied,
   assessLaunchSurfacesReady,
+  auditAllLaunchSurfacesCopy,
+  auditLaunchSurfacesCopy,
   formatSeasonWindowLabel,
   researchPageIsLaunchReady,
   rulesPageIsLaunchReady,
@@ -48,9 +50,11 @@ describe("city-game-launch-surfaces-core", () => {
   it("patches rules page for launch", () => {
     const next = applyRulesPageLaunchPatches(rulesHtml, launchSeason);
     expect(next).not.toMatch(/noindex/i);
-    expect(next).toContain("Season live.");
+    expect(next).toContain("data-city-game-season-banner");
+    expect(next).toContain("city-game-play-page.mjs");
     expect(next).toContain("2026-06-06T18:00:00-05:00");
     expect(next).not.toContain("Draft rules page");
+    expect(next).toContain("#city-state");
     expect(rulesPageIsLaunchReady(next)).toBe(true);
   });
 
@@ -77,14 +81,54 @@ describe("city-game-launch-surfaces-core", () => {
       ])
     );
     const { applied, issues } = assessLaunchSurfacesApplied(launchSeason, {
-      rulesHtml: applyRulesPageLaunchPatches(rulesHtml, launchSeason),
+      rulesHtml: applyRulesPageLaunchPatches(rulesHtml, launchSeason, {
+        seasonJsonUrl: "/data/city-game-cr-season-01.json",
+      }),
       researchHtmlByRel,
+      launchCtx: { rulesPath: "/play/cedar-rapids/" },
     });
     expect(issues).toEqual([]);
     expect(applied).toBe(true);
   });
 
   it("pre-launch rules page is not launch-ready", () => {
-    expect(rulesPageIsLaunchReady(rulesHtml)).toBe(false);
+    const draftRules = `<meta name="robots" content="noindex, nofollow"><strong>Draft rules page.</strong>`;
+    expect(rulesPageIsLaunchReady(draftRules)).toBe(false);
+    expect(rulesPageIsLaunchReady(rulesHtml)).toBe(true);
+  });
+
+  it("B2 — rules page does not over-promise unshipped sybil path", () => {
+    const { ok, issues } = auditLaunchSurfacesCopy(rulesHtml, { rel: RULES_PAGE_REL });
+    expect(ok).toBe(true);
+    expect(issues).toEqual([]);
+  });
+
+  it("B2 — patched launch surfaces pass copy audit", () => {
+    const researchHtmlByRel = Object.fromEntries(
+      RESEARCH_LAUNCH_PAGE_RELS.map((rel) => [
+        rel,
+        applyResearchPageLaunchPatches(
+          readFileSync(join(root, rel), "utf8"),
+          launchSeason,
+          rel
+        ),
+      ])
+    );
+    const { ok, issues } = auditAllLaunchSurfacesCopy({
+      rulesHtml: applyRulesPageLaunchPatches(rulesHtml, launchSeason),
+      researchHtmlByRel,
+    });
+    expect(issues).toEqual([]);
+    expect(ok).toBe(true);
+  });
+
+  it("B2 — flags unshipped token copy on rules page", () => {
+    const badRules = rulesHtml.replace(
+      "site code updates that public count",
+      "one-time signed tokens update that public count"
+    );
+    const { ok, issues } = auditLaunchSurfacesCopy(badRules, { rel: RULES_PAGE_REL });
+    expect(ok).toBe(false);
+    expect(issues.some((issue) => issue.includes("one-time signed tokens"))).toBe(true);
   });
 });

@@ -8,6 +8,8 @@ export const CARD_RESOLUTION_LIMIT_PER_MINUTE = 300;
 export const LIVE_CONTROL_GET_LIMIT_PER_MINUTE = 300;
 /** 120 resolver health checks per IP per minute (O2 step 2; shell bootstrap + tab sync). */
 export const RESOLVER_HEALTH_LIMIT_PER_MINUTE = 120;
+/** 120 season snapshot polls per IP per minute (city game map board / ticker). */
+export const SEASON_SNAPSHOT_LIMIT_PER_MINUTE = 120;
 const CREATE_BUCKET_PREFIX = "create:";
 const CREATE_BLOCKED_BUCKET_PREFIX = "create_blocked:";
 const CREATE_DEMO_BUCKET_PREFIX = "create_demo:";
@@ -15,6 +17,7 @@ const CREATE_DEMO_BLOCKED_BUCKET_PREFIX = "create_demo_blocked:";
 const CARD_RESOLUTION_BUCKET_PREFIX = "status:";
 const LIVE_CONTROL_GET_BUCKET_PREFIX = "live_control_get:";
 const RESOLVER_HEALTH_BUCKET_PREFIX = "health:";
+const SEASON_SNAPSHOT_BUCKET_PREFIX = "season_snapshot:";
 /** 30 opt-in AI explain requests per IP per hour (AI L3 P1). */
 export const AI_EXPLAIN_LIMIT_PER_HOUR = 30;
 const AI_EXPLAIN_BUCKET_PREFIX = "ai_explain:";
@@ -216,6 +219,20 @@ export async function checkResolverHealthRateLimit(
     ipHash,
     RESOLVER_HEALTH_BUCKET_PREFIX,
     RESOLVER_HEALTH_LIMIT_PER_MINUTE,
+    now
+  );
+}
+
+export async function checkSeasonSnapshotRateLimit(
+  db: D1Database,
+  ipHash: string,
+  now: Date = new Date()
+): Promise<{ allowed: boolean; retryAfterSec?: number }> {
+  return checkPerMinuteIpRateLimit(
+    db,
+    ipHash,
+    SEASON_SNAPSHOT_BUCKET_PREFIX,
+    SEASON_SNAPSHOT_LIMIT_PER_MINUTE,
     now
   );
 }

@@ -21,6 +21,7 @@ const PAYLOAD_TYPE_CHILD_OBJECT = "child_object";
  *   publicKeyBase58: string;
  *   objectId?: string;
  *   createdAt?: string;
+ *   extraFields?: Record<string, unknown>;
  * }} opts
  */
 export async function signChildObjectCreate(opts) {
@@ -33,6 +34,7 @@ export async function signChildObjectCreate(opts) {
     publicKeyBase58,
     objectId = generateChildObjectId(),
     createdAt = new Date().toISOString(),
+    extraFields,
   } = opts;
   const privateKey = decodePrivateKeyBase58(privateKeyBase58);
   const updatedAt = createdAt;
@@ -46,10 +48,45 @@ export async function signChildObjectCreate(opts) {
       status: "active",
       created_at: createdAt,
       updated_at: updatedAt,
+      ...(extraFields && typeof extraFields === "object" ? extraFields : {}),
     },
     PAYLOAD_TYPE_CHILD_OBJECT
   );
   return signDocument(unsigned, privateKey, publicKeyBase58);
+}
+
+/**
+ * @param {{
+ *   profileId: string;
+ *   seasonId: string;
+ *   publicLabel: string;
+ *   nodeRole: string;
+ *   district: string | null;
+ *   objectId?: string;
+ *   privateKeyBase58: string;
+ *   publicKeyBase58: string;
+ *   templateRow?: Record<string, unknown>;
+ * }} opts
+ */
+export async function signGameNodeChildObjectCreate(opts) {
+  const { buildGameNodeRegisterUnsigned } = await import(
+    "./created-child-object-game-node-core.mjs"
+  );
+  const payload = buildGameNodeRegisterUnsigned({
+    profileId: opts.profileId,
+    seasonId: opts.seasonId,
+    publicLabel: opts.publicLabel,
+    nodeRole: opts.nodeRole,
+    district: opts.district,
+    objectId: opts.objectId,
+    templateRow: opts.templateRow,
+  });
+  const privateKey = decodePrivateKeyBase58(opts.privateKeyBase58);
+  return signDocument(
+    withProtocolFields(payload, PAYLOAD_TYPE_CHILD_OBJECT),
+    privateKey,
+    opts.publicKeyBase58
+  );
 }
 
 /**

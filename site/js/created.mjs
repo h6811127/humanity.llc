@@ -47,6 +47,7 @@ import { initCreatedMerchFunnel } from "./created-merch-funnel.mjs";
 import { initCreatedLiveObjectCard } from "./created-live-object-card.mjs";
 import { initCreatedChildObject } from "./created-child-object.mjs";
 import { initCreatedLostItemRelay } from "./created-child-object-lost-item.mjs";
+import { initCreatedGameNode } from "./created-child-object-game-node.mjs";
 import { initCreatedSetup } from "./created-setup.mjs";
 import { applyStewardScanLinkElement } from "./pwa-scan-handoff-core.mjs";
 import {
@@ -414,6 +415,7 @@ let deviceSaveCtl = null;
 /** @type {{ refresh?: () => void } | null} */
 let childObjectCtl = null;
 let lostItemRelayCtl = null;
+let gameNodeCtl = null;
 /** @type {{ select: (tabId: string) => void } | undefined} */
 let createdTabs;
 let workspaceMode = "view";
@@ -766,6 +768,7 @@ function applyPilotTemplateUi(session) {
   }
   childObjectCtl?.refresh?.();
   lostItemRelayCtl?.refresh?.();
+  gameNodeCtl?.refresh?.();
 }
 
 /** Load handle/manifesto/created_at from resolver when session is partial (return visit). */
@@ -1497,6 +1500,13 @@ async function bootstrapOwnerTools() {
     getSigningKeys: currentSigningKeys,
   });
 
+  gameNodeCtl = initCreatedGameNode({
+    profileId,
+    getSession: loadSession,
+    showError,
+    getSigningKeys: currentSigningKeys,
+  });
+
   const backup = initKeyBackupUi({
     profileId,
     getSession: loadSession,
@@ -1509,6 +1519,7 @@ async function bootstrapOwnerTools() {
       liveControl?.refresh();
       childObjectCtl?.refresh?.();
   lostItemRelayCtl?.refresh?.();
+  gameNodeCtl?.refresh?.();
     },
   });
   const developerExport = initCreatedDeveloperExportUi({
@@ -1528,6 +1539,7 @@ async function bootstrapOwnerTools() {
       developerExport?.refreshPubkeyPreview();
       childObjectCtl?.refresh?.();
   lostItemRelayCtl?.refresh?.();
+  gameNodeCtl?.refresh?.();
     },
   });
   deviceSaveCtl?.refresh();
@@ -1538,10 +1550,12 @@ async function bootstrapOwnerTools() {
     recoveryUi?.refresh();
     childObjectCtl?.refresh?.();
     lostItemRelayCtl?.refresh?.();
+    gameNodeCtl?.refresh?.();
   });
   window.addEventListener("hc-key-backup-exported", () => {
     childObjectCtl?.refresh?.();
     lostItemRelayCtl?.refresh?.();
+    gameNodeCtl?.refresh?.();
   });
   void manifestoUpdate;
 

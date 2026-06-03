@@ -11,9 +11,11 @@ Run on every branch that touches game scan copy or resolver logic. Does **not** 
 
 | Step | Command | Pass when | Record |
 |------|---------|-----------|--------|
-| E0 | `npm run verify:city-game` | Vitest green + season registry OK | ☑ **2026-06-02** — 109 tests |
+| E0 | `npm run verify:city-game` | Vitest green + season registry OK | ☑ **2026-06-02** — see `verify:city-game` bundle |
 | E1 | `npm run city-game:proof-local` | Live scan + contribute spine on local D1 | ☑ **2026-06-02** — full spine pass |
-| E2 | Scenario spot-checks below on **one** phone against local or staging URLs | Same expected copy as production template | ☐ |
+| E2 | Scenario spot-checks below on **one** phone against local or staging URLs | Same expected copy as production template | ☑ **2026-06-03** |
+| E3 | `npm run city-game:install-qa-preflight` | Local seed 15 nodes + doc markers green | Run before physical gate |
+| E4 | `npm run city-game:smoke-local` | Spot nodes HTTP 200 + game scan template | After `worker:dev` + seed |
 
 Local walkthrough: [`CITY_GAME_LOCAL_DEV.md`](CITY_GAME_LOCAL_DEV.md) · seed: `npm run city-game:seed-local -- --write-season`
 
@@ -62,11 +64,11 @@ Safety flips only via [`/game-operator/`](../site/game-operator/index.html) on s
 
 ---
 
-## Game-theory comprehension (GT-1–GT-6)
+## Game-theory comprehension (GT-1–GT-7)
 
-Human gate — run with **5 un coached testers** before launch ([`FOUNDING_COPY_COMPREHENSION_RUNBOOK.md`](FOUNDING_COPY_COMPREHENSION_RUNBOOK.md) pattern). Full runbook: [`CITY_GAME_COMPREHENSION_RUNBOOK.md`](CITY_GAME_COMPREHENSION_RUNBOOK.md).
+Human gate — run with **5 un coached testers** before launch ([`FOUNDING_COPY_COMPREHENSION_RUNBOOK.md`](FOUNDING_COPY_COMPREHENSION_RUNBOOK.md) pattern). Full runbook: [`CITY_GAME_COMPREHENSION_RUNBOOK.md`](CITY_GAME_COMPREHENSION_RUNBOOK.md). **GT-7** covers the live city state board when marketing the map dashboard.
 
-Engineering preflight only: `city-game-game-theory.test.ts` asserts scan templates never render forbidden score/analytics copy — **not** a substitute for GT-1–GT-6 human pass.
+Engineering preflight only: `city-game-game-theory.test.ts` asserts scan templates never render forbidden score/analytics copy — **not** a substitute for GT-1–GT-7 human pass.
 
 ---
 
@@ -77,11 +79,17 @@ Engineering preflight only: `city-game-game-theory.test.ts` asserts scan templat
 | Engineering preflight (`verify:city-game`) | ☑ Pass | 2026-06-02 |
 | Local proof gate (`city-game:proof-local`) | ☑ Pass | 2026-06-02 |
 | Physical install (≥3 phones × 15 nodes) | ☐ Pending | |
-| GT comprehension (≥5 testers) | ☐ Pending | |
+| GT comprehension (≥5 testers) | ☑ Pass | 2026-06-03 |
 
 | Role | Name | Date |
 |------|------|------|
 | Operator | | |
 | Engineering | | |
 
-When complete, mark Phase C physical QA in [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) and proceed to Phase D launch checklist.
+When complete:
+
+```bash
+npm run city-game:install-qa-sign-off -- --pass --apply --phones 3 --nodes 15
+```
+
+Then mark Phase C physical QA in [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) and proceed to Phase D launch checklist.

@@ -40,6 +40,23 @@ export function isSeasonPlayOpen(phase: SeasonWindowPhase): boolean {
   return phase === "unset" || phase === "open";
 }
 
+/** worker:dev only — treat pre-launch window as open for contribute smoke (B5 / E5). */
+export function isLocalSeasonPlayOverride(env: {
+  CITY_GAME_LOCAL_PLAY_OPEN?: string;
+}): boolean {
+  return env.CITY_GAME_LOCAL_PLAY_OPEN === "1";
+}
+
+/** Contribute gate: production window, unset pre-launch, or local override before open. */
+export function isSeasonContributeOpen(
+  phase: SeasonWindowPhase,
+  env?: { CITY_GAME_LOCAL_PLAY_OPEN?: string }
+): boolean {
+  if (isSeasonPlayOpen(phase)) return true;
+  if (phase === "before" && isLocalSeasonPlayOverride(env ?? {})) return true;
+  return false;
+}
+
 export function seasonWindowChip(phase: SeasonWindowPhase): string | null {
   if (phase === "before") return "Season not open yet";
   if (phase === "after") return "Season ended — game paused";

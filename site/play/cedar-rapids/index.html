@@ -9,12 +9,11 @@
     <title>Wake the city · Cedar Rapids · humanity.llc</title>
     <meta
       name="description"
-      content="Rules draft for Cedar Rapids Season 1 — public object state, cooperation-first play, and what scans prove without tracking players."
+      content="Rules for Cedar Rapids Season 1 — public object state, cooperation-first play, and what scans prove without tracking players."
     />
-    <meta name="robots" content="noindex, nofollow" />
-    <meta name="theme-color" content="#ffffff" />
+<meta name="theme-color" content="#ffffff" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=140" />
+    <link rel="stylesheet" href="/styles.css?v=144" />
   </head>
   <body>
     <div class="page">
@@ -35,14 +34,29 @@
             <strong>live signed state</strong> — who holds a relay, which route is awake, whether a
             temporary drop unlocked the next clue. No app. No account.
           </p>
+          <p class="hero-line hero-line-sub" id="city-game-hero-subline">
+            <a href="#city-state">Jump to the place list</a> — all spots by district, with Open in Maps links
+            (scan each sticker for live chips).
+          </p>
         </section>
 
-        <div class="research-dev-hint" role="note">
-          <p>
-            <strong>Draft rules page.</strong> Not linked from the public site until season launch.
-            Dates and live nodes will be filled when <code>CITY_GAME_ENABLED=1</code> on production.
-          </p>
-        </div>
+        <section class="idea-section" aria-labelledby="rules-start-title">
+          <h2 class="group-label" id="rules-start-title">How to start</h2>
+          <ul class="list list-compact" id="city-game-player-guide-list">
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-sub">Loading start guide…</span>
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <div class="research-live-banner hc-notice hc-notice--info" role="note" data-city-game-season-banner data-season-json="/data/city-game-cr-season-01.json" data-banner-variant="rules">
+  <p>
+    <strong data-city-game-season-banner-label>Season window</strong><span data-city-game-season-banner-dates> Wake the city · 2026-06-06T18:00:00-05:00 → 2026-06-08T22:00:00-05:00</span>
+  </p>
+  <p data-city-game-season-banner-body>Scan game stickers around Cedar Rapids to read public object state. No account required. Open the <a href="#city-state">weekend city state board</a> for districts, live chips, and unlock paths.</p>
+</div>
 
         <section class="idea-section" aria-labelledby="rules-prove-title">
           <h2 class="group-label" id="rules-prove-title">What a scan proves</h2>
@@ -122,12 +136,21 @@
           </ul>
         </section>
 
-        <section class="idea-section" aria-labelledby="rules-districts-title">
-          <h2 class="group-label" id="rules-districts-title">Season footprint (15 nodes)</h2>
-          <p class="group-intro short">
-            NewBo · Czech Village · Greene Square · River spine · Downtown core. Full registry in
-            operator season config — public map at launch.
-          </p>
+        <section
+          class="idea-section city-game-map-section"
+          id="city-state"
+          aria-labelledby="city-state-title"
+        >
+          <div id="city-game-map-root" class="city-game-map-root" data-season-id="cr_season_01_wake">
+            <noscript>
+              <p class="city-game-map-error">
+                City board needs JavaScript. Open
+                <a href="/data/city-game-cr-season-01.json">season data</a>
+                or scan any game sticker for live state.
+              </p>
+            </noscript>
+            <p class="city-game-map-loading" aria-live="polite">Loading city state board…</p>
+          </div>
         </section>
 
         <section class="qr-compare idea-compare" aria-labelledby="rules-privacy-title">
@@ -169,5 +192,6 @@
         </p>
       </main>
     </div>
+    <script type="module" src="/js/city-game-play-page.mjs?v=2"></script>
   </body>
 </html>

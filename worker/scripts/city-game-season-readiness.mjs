@@ -2,6 +2,7 @@
  * Cedar Rapids season config readiness checks (Phase C/D gates).
  */
 
+import { validateMapLayout } from "../../site/js/city-game-map-board-core.mjs";
 import { seasonContributableNodeIds } from "./city-game-seed-site-codes-core.mjs";
 import { validateMobileLoreEnrollmentList } from "./city-game-mobile-lore-core.mjs";
 
@@ -162,6 +163,25 @@ export function cityGameSeasonReadiness(season, opts = {}) {
   }
 
   validateAutonomousSpine(s, nodeIds, issues, warnings);
+
+  issues.push(...validateMapLayout(s));
+
+  if (s.bulletin_schedule?.entries?.length && (!s.window?.starts_at || !s.window?.ends_at)) {
+    warnings.push(
+      "bulletin_schedule relative slots need window.starts_at before launch (hour-0 slots still apply in local dev)."
+    );
+  }
+
+  if (s.route_window_schedule?.entries?.length) {
+    if (!s.route_window_schedule.timezone?.trim()) {
+      warnings.push("route_window_schedule.timezone should be set (defaults to America/Chicago).");
+    }
+    if (!s.window?.starts_at || !s.window?.ends_at) {
+      warnings.push(
+        "route_window_schedule local-hour slots need window.starts_at before launch (local-hour slots still apply in local dev)."
+      );
+    }
+  }
 
   return {
     ready: issues.length === 0,

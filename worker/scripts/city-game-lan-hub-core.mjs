@@ -176,10 +176,7 @@ export function buildLanHubHtml(opts) {
   <h1>Cedar Rapids · local scan hub</h1>
   <p class="lead">Tap a scan — no copy/paste. Resolver <strong>${escapeHtml(host)}:8787</strong> · Pages <strong>${escapeHtml(host)}:8788</strong></p>
   <div class="setup">
-    Laptop must run:<br />
-    <code>npm run worker:dev:lan</code><br />
-    <code>npm run pages:dev:lan</code><br />
-    And <code>worker/.dev.vars</code> needs <code>SCAN_RESOLVER_ORIGIN=http://${escapeHtml(host)}:8787</code> + <code>SCAN_PAGES_JS_ORIGIN=http://${escapeHtml(host)}:8788</code>
+    Dev stack: <code>npm run city-game:dev</code> (patches <code>worker/.dev.vars</code>, starts worker + pages, opens this hub).
   </div>
   ${sectionHtml}
   ${allHtml}

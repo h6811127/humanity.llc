@@ -1,4 +1,6 @@
 import seasonJson from "../../../site/data/city-game-cr-season-01.json";
+import type { BulletinScheduleConfig } from "./bulletin-schedule";
+import type { RouteWindowScheduleConfig } from "./route-window-schedule";
 
 export type SeasonContributeCode = {
   code: string;
@@ -41,73 +43,116 @@ export type SeasonWindow = {
   ends_at: string | null;
 };
 
+export type LiveMapTickerConfig = {
+  max_headlines?: number;
+};
+
 export type CrSeasonConfig = {
   season_id: string;
+  title?: string;
+  city?: string;
   status?: string;
   season_root_profile_id?: string | null;
+  rules_path?: string;
+  auto_rules_page?: boolean;
+  /** District slugs for map + game_node validation (city-specific). */
+  districts?: string[];
   window?: SeasonWindow;
   nodes: SeasonNodeRow[];
   unlock_edges: SeasonUnlockEdge[];
   contribute_codes?: Record<string, SeasonContributeCode>;
   automation?: SeasonAutomation;
   mobile_lore_enrollment?: SeasonMobileLoreEnrollment[];
+  bulletin_schedule?: BulletinScheduleConfig;
+  route_window_schedule?: RouteWindowScheduleConfig;
+  live_map_ticker?: LiveMapTickerConfig;
 };
 
+/** Alias — season config is city-agnostic; CR JSON is the pilot instance. */
+export type CitySeasonConfig = CrSeasonConfig;
+
+/** Pilot season JSON — prefer `defaultSeason()` / `resolveSeasonById()` for new code. */
 export const CR_SEASON_01 = seasonJson as CrSeasonConfig;
 
-const objectToNode = new Map(
-  CR_SEASON_01.nodes.map((n) => [n.object_id, n.node_id] as const)
-);
+type SeasonIndexes = {
+  objectToNode: Map<string, string>;
+  nodeToObject: Map<string, string>;
+};
 
-const nodeToObject = new Map(
-  CR_SEASON_01.nodes.map((n) => [n.node_id, n.object_id] as const)
-);
+const indexCache = new WeakMap<CrSeasonConfig, SeasonIndexes>();
 
-export function seasonNodeIdForObject(objectId: string): string | null {
-  return objectToNode.get(objectId) ?? null;
+function indexesFor(season: CrSeasonConfig): SeasonIndexes {
+  let cached = indexCache.get(season);
+  if (!cached) {
+    cached = {
+      objectToNode: new Map(season.nodes.map((n) => [n.object_id, n.node_id] as const)),
+      nodeToObject: new Map(season.nodes.map((n) => [n.node_id, n.object_id] as const)),
+    };
+    indexCache.set(season, cached);
+  }
+  return cached;
 }
 
-export function seasonObjectIdForNode(nodeId: string): string | null {
-  return nodeToObject.get(nodeId) ?? null;
+export function seasonNodeIdForObject(
+  objectId: string,
+  season: CrSeasonConfig = CR_SEASON_01
+): string | null {
+  return indexesFor(season).objectToNode.get(objectId) ?? null;
 }
 
-export function seasonContributeCode(nodeId: string): SeasonContributeCode | null {
-  const entry = CR_SEASON_01.contribute_codes?.[nodeId];
+export function seasonObjectIdForNode(
+  nodeId: string,
+  season: CrSeasonConfig = CR_SEASON_01
+): string | null {
+  return indexesFor(season).nodeToObject.get(nodeId) ?? null;
+}
+
+export function seasonContributeCode(
+  nodeId: string,
+  season: CrSeasonConfig = CR_SEASON_01
+): SeasonContributeCode | null {
+  const entry = season.contribute_codes?.[nodeId];
   if (!entry?.code?.trim()) return null;
-  return { code: entry.code.trim(), epoch: entry.epoch?.trim() ?? CR_SEASON_01.season_id };
+  return { code: entry.code.trim(), epoch: entry.epoch?.trim() ?? season.season_id };
 }
 
-export function seasonQuorumNodeIds(): string[] {
-  return CR_SEASON_01.automation?.quorum_nodes ?? ["node_04"];
+export function seasonQuorumNodeIds(season: CrSeasonConfig = CR_SEASON_01): string[] {
+  return season.automation?.quorum_nodes ?? ["node_04"];
 }
 
-export function seasonFragmentNodeIds(): string[] {
-  return CR_SEASON_01.automation?.fragment_nodes ?? [];
+export function seasonFragmentNodeIds(season: CrSeasonConfig = CR_SEASON_01): string[] {
+  return season.automation?.fragment_nodes ?? [];
 }
 
-export function seasonFinaleNodeId(): string {
-  return CR_SEASON_01.automation?.finale_node ?? "node_13";
+export function seasonFinaleNodeId(season: CrSeasonConfig = CR_SEASON_01): string {
+  return season.automation?.finale_node ?? "node_13";
 }
 
-export function seasonWitnessScarcityNodeId(): string {
-  return CR_SEASON_01.automation?.witness_scarcity_node ?? "node_10";
+export function seasonWitnessScarcityNodeId(season: CrSeasonConfig = CR_SEASON_01): string {
+  return season.automation?.witness_scarcity_node ?? "node_10";
 }
 
-export function seasonContributableNodeIds(): string[] {
+export function seasonContributableNodeIds(season: CrSeasonConfig = CR_SEASON_01): string[] {
   const ids = new Set([
-    ...seasonQuorumNodeIds(),
-    ...seasonFragmentNodeIds(),
-    seasonWitnessScarcityNodeId(),
+    ...seasonQuorumNodeIds(season),
+    ...seasonFragmentNodeIds(season),
+    seasonWitnessScarcityNodeId(season),
   ]);
   return [...ids];
 }
 
-export function seasonVouchTargetsFrom(nodeId: string): string[] {
-  return seasonUnlockEdgesFrom(nodeId).map((edge) => edge.to);
+export function seasonVouchTargetsFrom(
+  nodeId: string,
+  season: CrSeasonConfig = CR_SEASON_01
+): string[] {
+  return seasonUnlockEdgesFrom(nodeId, season).map((edge) => edge.to);
 }
 
-export function seasonUnlockEdgesFrom(nodeId: string): SeasonUnlockEdge[] {
-  return CR_SEASON_01.unlock_edges.filter((e) => e.from === nodeId);
+export function seasonUnlockEdgesFrom(
+  nodeId: string,
+  season: CrSeasonConfig = CR_SEASON_01
+): SeasonUnlockEdge[] {
+  return season.unlock_edges.filter((e) => e.from === nodeId);
 }
 
 export function normalizeSiteCode(raw: string): string {

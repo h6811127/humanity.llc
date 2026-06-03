@@ -1289,6 +1289,7 @@ async function fetchAndApplyNetworkChips(opts = {}) {
       generation: gen,
       isCurrentGeneration: () => gen === walletNetworkApplyGen,
       maxParallel: walletNetworkMaxParallel(entries.length, { manual }, policy),
+      forceRefresh: manual,
     }
   );
 }

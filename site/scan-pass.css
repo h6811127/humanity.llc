@@ -1752,6 +1752,22 @@ a {
   color: rgba(60, 60, 67, 0.55);
 }
 
+.scan-game-rules-link {
+  margin: 10px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  font-weight: 600;
+}
+
+.scan-game-rules-link a {
+  color: var(--red, #db1b43);
+}
+
+.scan-game-rules-link-meta {
+  font-weight: 500;
+  color: rgba(60, 60, 67, 0.62);
+}
+
 .scan-game-privacy-note {
   margin: 8px 0 0;
   font-size: 12px;
@@ -1786,6 +1802,13 @@ a {
   font-size: 14px;
   line-height: 1.45;
   color: rgba(60, 60, 67, 0.92);
+}
+
+.scan-game-contribute-note {
+  margin: 0 0 12px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: rgba(60, 60, 67, 0.72);
 }
 
 .scan-game-contribute-progress {
@@ -3396,6 +3419,7 @@ html[data-theme="dark"] .scan-hero .scan-hero-limit,
 html[data-theme="dark"] .scan-hero .scan-hero-foot,
 html[data-theme="dark"] .scan-hero .scan-game-privacy-note,
 html[data-theme="dark"] .scan-hero .scan-game-contribute-lead,
+html[data-theme="dark"] .scan-hero .scan-game-contribute-note,
 html[data-theme="dark"] .scan-hero .scan-game-contribute-progress-label,
 html[data-theme="dark"] .scan-hero .scan-game-contribute-field-label,
 html[data-theme="dark"] .scan-hero .scan-game-contribute-eyebrow,

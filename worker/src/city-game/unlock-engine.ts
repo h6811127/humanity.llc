@@ -1,11 +1,13 @@
 import { normalizeGameMeta, type GameMeta } from "./game-meta";
 import {
+  CR_SEASON_01,
   seasonFinaleNodeId,
   seasonFragmentNodeIds,
   seasonObjectIdForNode,
   seasonUnlockEdgesFrom,
   seasonVouchTargetsFrom,
   seasonWitnessScarcityNodeId,
+  type CrSeasonConfig,
   type SeasonUnlockEdge,
 } from "./season-config";
 
@@ -19,6 +21,69 @@ export type GameNodeDocumentPatch = {
 
 export function collectiveStreamValue(progress: number, target: number): string {
   return `${progress} / ${target}`;
+}
+
+export function isCollectiveQuorumComplete(meta: GameMeta): boolean {
+  const target = meta.collective_target;
+  if (target == null) return false;
+  return (meta.collective_progress ?? 0) >= target;
+}
+
+const RIVER_LANTERN_EVOLVED_PUBLIC_STATE =
+  "Evolved together — Czech Village cabinet path shared outward";
+const RIVER_LANTERN_EVOLVED_BULLETIN = "Evolved clue · sharing beat hoarding";
+const CABINET_EVOLVED_CHOICE_BULLETIN = "Shared ending path · group unlock live";
+
+function mapObjectStreams(
+  doc: Record<string, unknown>,
+  mapper: (row: Record<string, unknown>) => Record<string, unknown>
+): Record<string, unknown>[] | unknown {
+  if (!Array.isArray(doc.object_streams)) return doc.object_streams;
+  return (doc.object_streams as Record<string, unknown>[]).map(mapper);
+}
+
+/** CR-G02 — auto-evolve River Lantern copy when collective quorum completes. */
+export function evolveRiverLanternAntiHoarding(
+  doc: Record<string, unknown>
+): Record<string, unknown> {
+  const meta = normalizeGameMeta(doc.game_meta);
+  if (!isCollectiveQuorumComplete(meta)) return doc;
+
+  const streams = mapObjectStreams(doc, (row) => {
+    if (row.id === "bulletin" || row.label === "Clue") {
+      return { ...row, value: RIVER_LANTERN_EVOLVED_BULLETIN };
+    }
+    if (row.id === "territory" || row.label === "Object") {
+      return { ...row, value: "Temp drop · quorum met" };
+    }
+    return row;
+  });
+
+  const publicState =
+    typeof doc.public_state === "string" &&
+    doc.public_state.includes("Evolved together")
+      ? doc.public_state
+      : RIVER_LANTERN_EVOLVED_PUBLIC_STATE;
+
+  return {
+    ...doc,
+    public_state: publicState,
+    object_streams: streams,
+    game_meta: meta,
+  };
+}
+
+export function riverLanternNeedsAntiHoardingEvolve(doc: Record<string, unknown>): boolean {
+  const meta = normalizeGameMeta(doc.game_meta);
+  if (!isCollectiveQuorumComplete(meta)) return false;
+  const publicState = typeof doc.public_state === "string" ? doc.public_state : "";
+  if (publicState.includes("Evolved together")) return false;
+  if (!Array.isArray(doc.object_streams)) return true;
+  return !(doc.object_streams as Record<string, unknown>[]).some(
+    (row) =>
+      (row.id === "bulletin" || row.label === "Clue") &&
+      String(row.value).includes("Evolved clue")
+  );
 }
 
 export function bumpCollectiveProgress(
@@ -46,20 +111,17 @@ export function bumpCollectiveProgress(
     : doc.object_streams;
 
   const reachedTarget = next >= target;
-  const publicState =
-    reachedTarget && typeof doc.public_state === "string"
-      ? doc.public_state.includes("together")
-        ? doc.public_state
-        : "Unlocked together — Czech Village cabinet path opening"
-      : doc.public_state;
+  let nextDoc: Record<string, unknown> = {
+    ...doc,
+    game_meta: nextMeta,
+    object_streams: streams,
+  };
+  if (reachedTarget) {
+    nextDoc = evolveRiverLanternAntiHoarding(nextDoc);
+  }
 
   return {
-    doc: {
-      ...doc,
-      game_meta: nextMeta,
-      object_streams: streams,
-      ...(typeof publicState === "string" ? { public_state: publicState } : {}),
-    },
+    doc: nextDoc,
     meta: nextMeta,
     reachedTarget,
   };
@@ -81,6 +143,9 @@ export function unlockCabinetFromRiver(
         if (row.id === "territory" || row.label === "Gate") {
           return { ...row, value: "Visible · quorum met" };
         }
+        if (row.id === "bulletin" || row.label === "Choice") {
+          return { ...row, value: CABINET_EVOLVED_CHOICE_BULLETIN };
+        }
         return row;
       })
     : doc.object_streams;
@@ -96,7 +161,8 @@ export function unlockCabinetFromRiver(
 /** After quorum on `fromNodeId`, return patches for unlock edge targets. */
 export function patchesForQuorumUnlock(
   fromNodeId: string,
-  edges: SeasonUnlockEdge[] = seasonUnlockEdgesFrom(fromNodeId)
+  season: CrSeasonConfig = CR_SEASON_01,
+  edges: SeasonUnlockEdge[] = seasonUnlockEdgesFrom(fromNodeId, season)
 ): { toNodeId: string; objectId: string; transform: (doc: Record<string, unknown>) => Record<string, unknown> }[] {
   const out: {
     toNodeId: string;
@@ -105,7 +171,7 @@ export function patchesForQuorumUnlock(
   }[] = [];
 
   for (const edge of edges) {
-    const objectId = seasonObjectIdForNode(edge.to);
+    const objectId = seasonObjectIdForNode(edge.to, season);
     if (!objectId) continue;
     if (fromNodeId === "node_04" && edge.to === "node_07") {
       out.push({
@@ -122,13 +188,14 @@ export function patchesForQuorumUnlock(
 export function gameNodeContributeMode(
   nodeId: string | null,
   meta: GameMeta,
-  nodeRole: string
+  nodeRole: string,
+  season: CrSeasonConfig = CR_SEASON_01
 ): GameContributeMode | null {
-  if (nodeId && seasonFragmentNodeIds().includes(nodeId)) {
+  if (nodeId && seasonFragmentNodeIds(season).includes(nodeId)) {
     return meta.unlocked_by.includes(nodeId) ? null : "fragment";
   }
   if (
-    nodeId === seasonWitnessScarcityNodeId() &&
+    nodeId === seasonWitnessScarcityNodeId(season) &&
     meta.scarcity_remaining != null &&
     meta.scarcity_remaining > 0
   ) {
@@ -147,7 +214,8 @@ export function isWitnessScarcityDepleted(meta: GameMeta, nodeRole: string): boo
 
 export function issueWitnessSunsetPass(
   doc: Record<string, unknown>,
-  witnessNodeId: string
+  witnessNodeId: string,
+  season: CrSeasonConfig = CR_SEASON_01
 ): { doc: Record<string, unknown>; meta: GameMeta; depleted: boolean } {
   const meta = normalizeGameMeta(doc.game_meta);
   if (meta.scarcity_remaining == null || meta.scarcity_remaining <= 0) {
@@ -155,7 +223,7 @@ export function issueWitnessSunsetPass(
   }
 
   const nextRemaining = meta.scarcity_remaining - 1;
-  const vouchTargets = seasonVouchTargetsFrom(witnessNodeId);
+  const vouchTargets = seasonVouchTargetsFrom(witnessNodeId, season);
   const vouchActiveFor = [...meta.vouch_active_for];
   for (const target of vouchTargets) {
     if (!vouchActiveFor.includes(target)) {
@@ -210,9 +278,10 @@ export function issueWitnessSunsetPass(
 export function gameNodeShowsContribute(
   meta: GameMeta,
   nodeRole: string,
-  nodeId: string | null = null
+  nodeId: string | null = null,
+  season: CrSeasonConfig = CR_SEASON_01
 ): boolean {
-  return gameNodeContributeMode(nodeId, meta, nodeRole) != null;
+  return gameNodeContributeMode(nodeId, meta, nodeRole, season) != null;
 }
 
 export function isFragmentNodeClaimed(meta: GameMeta, nodeId: string): boolean {
@@ -309,13 +378,16 @@ export function openFinaleSwitch(doc: Record<string, unknown>): Record<string, u
   };
 }
 
-export function patchesForFragmentContribute(fromNodeId: string): {
+export function patchesForFragmentContribute(
+  fromNodeId: string,
+  season: CrSeasonConfig = CR_SEASON_01
+): {
   finaleNodeId: string;
   finaleObjectId: string;
 } | null {
-  if (!seasonFragmentNodeIds().includes(fromNodeId)) return null;
-  const finaleNodeId = seasonFinaleNodeId();
-  const finaleObjectId = seasonObjectIdForNode(finaleNodeId);
+  if (!seasonFragmentNodeIds(season).includes(fromNodeId)) return null;
+  const finaleNodeId = seasonFinaleNodeId(season);
+  const finaleObjectId = seasonObjectIdForNode(finaleNodeId, season);
   if (!finaleObjectId) return null;
   return { finaleNodeId, finaleObjectId };
 }

@@ -39,6 +39,21 @@ describe("city-game-smoke-local-core", () => {
     ).toEqual({ ok: true });
   });
 
+  it("passes pre-window node_04 without contribute form when collective copy present", () => {
+    const html = `<main>
+      <h1 class="scan-hero-title">Riverwalk River Lantern</h1>
+      <p class="scan-game-coop-hint" role="note">When enough people contribute together, the next clue unlocks for everyone.</p>
+      <p class="scan-hero-foot">${GAME_NODE_SCAN_FOOT}</p>
+    </main>`;
+    expect(
+      assessGameScanHtml(html, {
+        nodeId: "node_04",
+        requireCoopHint: true,
+        requireContributeBlock: true,
+      })
+    ).toEqual({ ok: true });
+  });
+
   it("ignores dormant CSS outside main", () => {
     const html = `<style>.scan-game-dormant-note { opacity: 0.7; }</style><main>
       <p class="scan-hero-foot">${GAME_NODE_SCAN_FOOT}</p>

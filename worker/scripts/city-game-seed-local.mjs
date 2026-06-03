@@ -43,7 +43,14 @@ import {
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const seasonPath = join(root, "site/data/city-game-cr-season-01.json");
-const outPath = join(root, "worker/.local/city-game-seed.json");
+const writeSeason = process.argv.includes("--write-season");
+const productionOut = process.argv.includes("--production-out");
+const outPath = join(
+  root,
+  productionOut
+    ? "worker/.local/city-game-production-seed.json"
+    : "worker/.local/city-game-seed.json"
+);
 const siteCodesPath = join(root, "worker/.local/city-game-site-codes.json");
 
 const apiOrigin = (process.env.API_ORIGIN || "http://127.0.0.1:8787").replace(/\/$/, "");
@@ -59,8 +66,6 @@ function localCityGameEnabled() {
   const text = readFileSync(devVarsPath, "utf8");
   return /^\s*CITY_GAME_ENABLED\s*=\s*1\s*$/m.test(text);
 }
-
-const writeSeason = process.argv.includes("--write-season");
 
 function isLocalOrigin(origin) {
   try {
@@ -364,7 +369,9 @@ async function main() {
     owner_private_key_b58: base58.encode(owner.privateKey),
     nodes: nodesWithSiteCodes,
     contribute_site_codes: siteCodeRows,
-    note: "Local dev seed only — never commit. Store keys offline before production season.",
+    note: productionOut
+      ? "Production season seed — never commit. Store keys offline immediately."
+      : "Local dev seed only — never commit. Store keys offline before production season.",
   };
 
   mkdirSync(dirname(outPath), { recursive: true });
@@ -407,7 +414,10 @@ async function main() {
     console.log("  %s · %s · %s", row.node_id, row.site_code, row.contribute_mode);
   }
   console.log("\nNext:");
-  console.log("  1. Save owner + game-operator keys from worker/.local/city-game-seed.json offline");
+  const seedFile = productionOut
+    ? "worker/.local/city-game-production-seed.json"
+    : "worker/.local/city-game-seed.json";
+  console.log(`  1. Save owner + game-operator keys from ${seedFile} offline`);
   console.log("  2. Open /game-operator/ · paste game-operator private key · load nodes (safety flips only)");
   console.log("  3. npm run city-game:smoke-local — spot-scan node_01, node_04, node_07");
   console.log("  4. Test quorum: two browsers contribute CR-LANTERN-7K at node_04 → node_07 unlocks");

@@ -43,6 +43,15 @@ if (existsSync(rulesPath)) {
   if (!rules.includes("What a scan proves")) {
     issues.push("Rules page missing 'What a scan proves' section.");
   }
+  if (!rules.includes('id="city-state"')) {
+    issues.push('Rules page missing city state board section (#city-state).');
+  }
+  if (!rules.includes("city-game-play-page.mjs")) {
+    issues.push("Rules page missing city-game-play-page.mjs module (single play-page boot).");
+  }
+  if (rules.includes("city-game-map-board.mjs") && rules.includes("city-game-play-page.mjs")) {
+    issues.push("Rules page loads duplicate board boot scripts — use city-game-play-page.mjs only.");
+  }
 } else {
   issues.push(`Missing rules page: ${rulesPath}`);
 }
@@ -73,7 +82,7 @@ if (ready && issues.length === 0) {
     console.log("  - npm run city-game:season-root → create season root card");
     console.log("  - npm run city-game:mint-node -- --all → mint + issue QRs");
     console.log("  - docs/CITY_GAME_INSTALL_QA.md → physical install");
-    console.log("  - docs/CITY_GAME_COMPREHENSION_RUNBOOK.md → GT-1–GT-6");
+    console.log("  - docs/CITY_GAME_COMPREHENSION_RUNBOOK.md → GT-1–GT-7");
   }
 } else {
   console.log("☐ Season config issues:\n");

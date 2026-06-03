@@ -11,6 +11,7 @@ import {
 import { renderScanPage } from "../src/resolver/scan-html";
 import { buildScanViewModel } from "../src/resolver/scan-state";
 import type { CardRow, QrCredentialRow, VerificationSummaryRow } from "../src/db/types";
+import { CITY_GAME_SEASON_OPEN_NOW } from "./city-game-fixture-profile";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const season = JSON.parse(
@@ -99,9 +100,9 @@ describe("mobile lore enrollment", () => {
       printArtifactId: PA,
       manifestoLine: cardRow().manifesto_line,
       env: { CITY_GAME_ENABLED: "1" },
-      seasonForWindow: seasonWithEnrollment,
+      season: seasonWithEnrollment,
       enrollmentRows: seasonWithEnrollment.mobile_lore_enrollment,
-      now: new Date("2026-06-01T18:00:00.000Z"),
+      now: CITY_GAME_SEASON_OPEN_NOW,
     });
 
     expect(resolved?.gameNode.mode).toBe("game");
@@ -118,10 +119,10 @@ describe("mobile lore enrollment", () => {
         revocationDisplay: null,
       },
       "https://humanity.llc",
-      new Date("2026-06-01T18:00:00.000Z"),
+      CITY_GAME_SEASON_OPEN_NOW,
       {
         env: { CITY_GAME_ENABLED: "1" },
-        seasonForWindow: seasonWithEnrollment,
+        season: seasonWithEnrollment,
         mobileLoreEnrollment: seasonWithEnrollment.mobile_lore_enrollment,
       }
     );

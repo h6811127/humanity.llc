@@ -1,0 +1,101 @@
+{
+  "season_id": "example_city_season_01",
+  "title": "Wake the grid",
+  "city": "Example City (template)",
+  "status": "planned",
+  "season_root_profile_id": null,
+  "rules_path": "/play/example-city/",
+  "auto_rules_page": true,
+  "play_page": {
+    "hero_eyebrow": "Example City · Template season",
+    "hero_line": "Template season for a second city — same protocol as Cedar Rapids, different places and unlock graph. <strong>Not live</strong> until an operator mints nodes and sets dates.",
+    "meta_description": "Template city game season — cooperation-first public object state without tracking players."
+  },
+  "window": {
+    "starts_at": null,
+    "ends_at": null
+  },
+  "districts": ["downtown", "river", "old_town"],
+  "map_copy": {
+    "title": "City state",
+    "subtitle": "Weekend board · read-only",
+    "live_hint": "Scan stickers at each place for live signed state — quorum, fragments, and care pauses.",
+    "wayfinding_intro": "Start anywhere — scan any game sticker you find. Planning from home? Search place names in your maps app; the sketch below is districts only, not streets.",
+    "diagram_note": "District sketch only — not a street map. Names and Open in Maps links are how you find places.",
+    "privacy_note": "Same city truth for everyone. No account. No visit log. No GPS tracking.",
+    "unlock_intro": "Paths wake when the city unlocks them together — not when you personally check boxes."
+  },
+  "player_guide": {
+    "hero_subline": "Jump to the <a href=\"#city-state\">place list</a> — template nodes with Open in Maps links when live.",
+    "steps": [
+      {
+        "title": "No required first stop",
+        "body": "Walk until you spot a game sticker, or pick a place from the list below — any sticker works."
+      },
+      {
+        "title": "Planning from home",
+        "body": "Search place names in your maps app. The board sketch shows districts, not turn-by-turn directions."
+      }
+    ],
+    "quorum_spot": {
+      "title": "River lantern drop",
+      "body": "Template quorum node — scan there for collective progress when the season is live."
+    }
+  },
+  "comprehension_kit": {
+    "primary_scan_node": "node_02",
+    "probe_nodes": ["node_02", "node_01", "node_03"]
+  },
+  "map_layout": {
+    "version": 1,
+    "nodes": {
+      "node_01": { "x": 0.7, "y": 0.25 },
+      "node_02": { "x": 0.35, "y": 0.55 },
+      "node_03": { "x": 0.55, "y": 0.75 }
+    },
+    "district_zones": [
+      { "id": "downtown", "x": 58, "y": 8, "w": 38, "h": 32, "label": "Downtown" },
+      { "id": "river", "x": 8, "y": 38, "w": 38, "h": 34, "label": "River" },
+      { "id": "old_town", "x": 42, "y": 58, "w": 38, "h": 34, "label": "Old town" }
+    ],
+    "svg_title": "Schematic Example City season nodes and unlock paths"
+  },
+  "nodes": [
+    {
+      "node_id": "node_01",
+      "object_id": "obj_ex_node_01_relay",
+      "role": "relay_gate",
+      "district": "downtown",
+      "label": "Main square relay"
+    },
+    {
+      "node_id": "node_02",
+      "object_id": "obj_ex_node_02_lantern",
+      "role": "temp_drop",
+      "district": "river",
+      "label": "River lantern drop"
+    },
+    {
+      "node_id": "node_03",
+      "object_id": "obj_ex_node_03_finale",
+      "role": "finale",
+      "district": "old_town",
+      "label": "Old town arch"
+    }
+  ],
+  "unlock_edges": [
+    { "from": "node_02", "to": "node_03", "label": "River lantern opens old town arch" }
+  ],
+  "contribute_codes": {
+    "node_02": { "code": "EX-LANTERN-1", "epoch": "example_city_season_01" }
+  },
+  "automation": {
+    "quorum_nodes": ["node_02"],
+    "fragment_nodes": ["node_01"],
+    "finale_node": "node_03",
+    "witness_scarcity_node": "node_01"
+  },
+  "mobile_lore_enrollment": [],
+  "bulletin_schedule": { "entries": [] },
+  "route_window_schedule": { "entries": [] }
+}

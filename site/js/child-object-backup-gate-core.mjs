@@ -66,8 +66,24 @@ export function childObjectBackupGateState(input) {
 
 /**
  * @param {{ blocked: boolean, warn: boolean }} gate
+ * @param {{ context?: 'default' | 'game_season' }} [opts]
  */
-export function childObjectBackupGateNoticeCopy(gate) {
+export function childObjectBackupGateNoticeCopy(gate, opts = {}) {
+  if (opts.context === "game_season") {
+    if (gate.blocked) {
+      return {
+        title: "Save recovery before registering more game nodes",
+        body: `This season root holds every game sticker object. Add a recovery method or export encrypted backup on Manage before registering a ${CHILD_OBJECT_BACKUP_GATE_BLOCK_AT_ACTIVE_COUNT + 1}rd node — bulk import stays blocked until then.`,
+      };
+    }
+    if (gate.warn) {
+      return {
+        title: "Save recovery before your season tree grows",
+        body: "You already have one game node on this card. Add recovery on Manage once — you keep control of every sticker under this season root.",
+      };
+    }
+    return null;
+  }
   if (gate.blocked) {
     return {
       title: "Save a recovery method before adding another object",

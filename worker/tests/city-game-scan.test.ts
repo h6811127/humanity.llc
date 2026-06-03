@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { renderScanPage } from "../src/resolver/scan-html";
 import { buildScanViewModel } from "../src/resolver/scan-state";
+import { defaultSeason } from "../src/city-game/season-loader";
 import {
   GAME_NODE_FORBIDDEN_COPY,
   GAME_NODE_SCAN_FOOT,
@@ -13,9 +14,13 @@ import {
 } from "../src/city-game/scan-view";
 import type { CardRow, ChildObjectRow, QrCredentialRow, VerificationSummaryRow } from "../src/db/types";
 
-const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
+import { CITY_GAME_SEASON_ROOT_PROFILE } from "./city-game-fixture-profile";
+
+const PROFILE = CITY_GAME_SEASON_ROOT_PROFILE;
 const QR = "qr_7Xk9mP2nQ4rT6vW8";
 const OBJECT_ID = "obj_cr_node_01_newbo";
+/** Within bundled CR season window (2026-06-06 18:00 → 2026-06-08 22:00 America/Chicago). */
+const SEASON_OPEN_NOW = new Date("2026-06-07T00:00:00-05:00");
 
 function childDocument(overrides: Record<string, unknown> = {}) {
   return JSON.stringify({
@@ -127,7 +132,7 @@ describe("city game scan view", () => {
         revocationDisplay: null,
       },
       "https://humanity.llc",
-      new Date("2026-06-01T18:00:00.000Z"),
+      SEASON_OPEN_NOW,
       { env: { CITY_GAME_ENABLED: "1" } }
     );
 
@@ -140,8 +145,96 @@ describe("city game scan view", () => {
     expect(html).toContain("Red team");
     expect(html).toContain(GAME_NODE_SCAN_FOOT);
     expect(html).toContain(GAME_NODE_SCAN_PRIVACY_NOTE);
+    expect(html).toContain("Season rules + city board");
+    expect(html).toContain("/play/cedar-rapids/");
     expect(html).toContain("scan-game-privacy-note");
     expect(html).toContain("scan-game-coop-hint");
+  });
+
+  it("applies bulletin schedule to relay scan streams when season window is open", () => {
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: cardRow(),
+        qr: qrRow(),
+        verification: summary(),
+        childObject: childRow({
+          child_object_document_json: childDocument({
+            object_streams: [
+              { id: "territory", class: "place", label: "Controller", value: "Unclaimed" },
+              { id: "relay", class: "route", label: "Relay status", value: "Closed" },
+              { id: "bulletin", class: "narrative", label: "Bulletin", value: "Awaiting season open" },
+              { id: "care", class: "care", label: "Site", value: "Clear" },
+            ],
+          }),
+        }),
+        revocationDisplay: null,
+      },
+      "https://humanity.llc",
+      new Date("2026-06-07T00:00:00-05:00"),
+      {
+        env: { CITY_GAME_ENABLED: "1" },
+        season: {
+          ...defaultSeason(),
+          window: {
+            starts_at: "2026-06-06T18:00:00-05:00",
+            ends_at: "2026-06-08T22:00:00-05:00",
+          },
+        },
+      }
+    );
+
+    expect(vm.objectStreams.find((s) => s.id === "bulletin")?.value).toBe(
+      "Regroup at café window — relay stays public"
+    );
+    expect(vm.objectStreams.find((s) => s.id === "relay")?.value).toBe("Open · truce window");
+  });
+
+  it("applies route window schedule on skywalk at sunset", () => {
+    const skywalkId = "obj_cr_node_06_skywalk";
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: cardRow(),
+        qr: qrRow(),
+        verification: summary(),
+        childObject: childRow({
+          object_id: skywalkId,
+          public_label: "Skywalk note",
+          child_object_document_json: childDocument({
+            object_id: skywalkId,
+            public_label: "Skywalk note",
+            node_role: "route_splitter",
+            district: "downtown",
+            object_streams: [
+              { id: "territory", class: "place", label: "Split", value: "Dormant" },
+              { id: "relay", class: "route", label: "Wind route", value: "Closed" },
+              { id: "bulletin", class: "narrative", label: "Flood route", value: "Closed" },
+            ],
+          }),
+        }),
+        revocationDisplay: null,
+      },
+      "https://humanity.llc",
+      new Date("2026-06-07T21:00:00-05:00"),
+      {
+        env: { CITY_GAME_ENABLED: "1" },
+        season: {
+          ...defaultSeason(),
+          window: {
+            starts_at: "2026-06-06T18:00:00-05:00",
+            ends_at: "2026-06-08T22:00:00-05:00",
+          },
+        },
+      }
+    );
+
+    expect(vm.objectStreams.find((s) => s.id === "relay")?.value).toContain(
+      "Open · wind path after sunset"
+    );
+    expect(vm.gameNode?.coopHint).toContain("Wind route is live");
   });
 
   it("falls back to status plate layout when city game flag is off", () => {
@@ -156,7 +249,7 @@ describe("city game scan view", () => {
         revocationDisplay: null,
       },
       "https://humanity.llc",
-      new Date("2026-06-01T18:00:00.000Z"),
+      SEASON_OPEN_NOW,
       { env: { CITY_GAME_ENABLED: "0" } }
     );
 
@@ -184,7 +277,7 @@ describe("city game scan view", () => {
         revocationDisplay: null,
       },
       "https://humanity.llc",
-      new Date("2026-06-01T18:00:00.000Z"),
+      SEASON_OPEN_NOW,
       { env: { CITY_GAME_ENABLED: "1" } }
     );
 
@@ -205,7 +298,7 @@ describe("city game scan view", () => {
         revocationDisplay: null,
       },
       "https://humanity.llc",
-      new Date("2026-06-01T18:00:00.000Z"),
+      SEASON_OPEN_NOW,
       { env: { CITY_GAME_ENABLED: "1" } }
     );
     const html = await renderScanPage(vm, "https://humanity.llc");
@@ -251,7 +344,7 @@ describe("city game scan view", () => {
         revocationDisplay: null,
       },
       "https://humanity.llc",
-      new Date("2026-06-01T18:00:00.000Z"),
+      SEASON_OPEN_NOW,
       { env: { CITY_GAME_ENABLED: "1" } }
     );
 
@@ -261,6 +354,8 @@ describe("city game scan view", () => {
     expect(html).toContain('data-season-id="cr_season_01_wake"');
     expect(html).toContain("scan-game-contribute");
     expect(html).toContain("Contribute to quorum");
+    expect(html).toContain("First scan here?");
+    expect(html).toContain("not your personal score");
     expect(html).toContain("scan-game-contribute.mjs?v=2");
     expect(html).toContain('placeholder="CR-LANTERN-7K"');
   });
@@ -304,7 +399,7 @@ describe("city game scan view", () => {
         revocationDisplay: null,
       },
       "https://humanity.llc",
-      new Date("2026-06-01T18:00:00.000Z"),
+      SEASON_OPEN_NOW,
       { env: { CITY_GAME_ENABLED: "1" } }
     );
 
@@ -330,15 +425,30 @@ describe("city game scan view", () => {
         collective_target: 20,
         unlocked_by: [],
         vouch_requires: [],
+        vouch_active_for: [],
         scarcity_remaining: null,
         fragment_id: null,
       })
     ).toContain("together");
+    expect(
+      gameNodeCoopHint("temp_drop", {
+        visible_until: null,
+        compromised: false,
+        collective_progress: 20,
+        collective_target: 20,
+        unlocked_by: [],
+        vouch_requires: [],
+        vouch_active_for: [],
+        scarcity_remaining: null,
+        fragment_id: null,
+      })
+    ).toContain("evolved");
     const ctx = resolveGameNodeScanContext({
       objectType: "game_node",
       documentJson: childDocument({ node_role: "sanctuary" }),
       objectStreams: [],
       env: { CITY_GAME_ENABLED: "1" },
+      now: SEASON_OPEN_NOW,
     });
     expect(ctx?.coopHint).toContain("sanctuary");
   });
@@ -383,7 +493,7 @@ describe("city game scan view", () => {
         },
       },
       "https://humanity.llc",
-      new Date("2026-06-01T18:00:00.000Z"),
+      SEASON_OPEN_NOW,
       { env: { CITY_GAME_ENABLED: "1" } }
     );
 
@@ -430,7 +540,7 @@ describe("city game scan view", () => {
         },
       },
       "https://humanity.llc",
-      new Date("2026-06-01T18:00:00.000Z"),
+      SEASON_OPEN_NOW,
       { env: { CITY_GAME_ENABLED: "1" } }
     );
 
@@ -465,7 +575,7 @@ describe("city game scan view", () => {
         revocationDisplay: null,
       },
       "https://humanity.llc",
-      new Date("2026-06-01T18:00:00.000Z"),
+      SEASON_OPEN_NOW,
       { env: { CITY_GAME_ENABLED: "1" } }
     );
 
@@ -498,7 +608,7 @@ describe("city game scan view", () => {
         revocationDisplay: null,
       },
       "https://humanity.llc",
-      new Date("2026-06-01T18:00:00.000Z"),
+      SEASON_OPEN_NOW,
       { env: { CITY_GAME_ENABLED: "1" } }
     );
 
@@ -528,7 +638,7 @@ describe("city game scan view", () => {
         revocationDisplay: null,
       },
       "http://127.0.0.1:8787",
-      new Date("2026-06-01T18:00:00.000Z"),
+      SEASON_OPEN_NOW,
       { env: { CITY_GAME_ENABLED: "1" } }
     );
 
@@ -562,7 +672,7 @@ describe("city game scan view", () => {
         revocationDisplay: null,
       },
       "https://humanity.llc",
-      new Date("2026-06-01T18:00:00.000Z"),
+      SEASON_OPEN_NOW,
       { env: { CITY_GAME_ENABLED: "1" } }
     );
 
@@ -580,6 +690,7 @@ describe("city game scan view", () => {
 
   it("mutes game progression before and after the season window", async () => {
     const seasonWindow = {
+      ...defaultSeason(),
       status: "planned",
       window: {
         starts_at: "2026-06-06T18:00:00-05:00",
@@ -588,7 +699,7 @@ describe("city game scan view", () => {
     };
     const opts = {
       env: { CITY_GAME_ENABLED: "1" as const },
-      seasonForWindow: seasonWindow,
+      season: seasonWindow,
     };
 
     const vmBefore = buildScanViewModel(
@@ -628,5 +739,38 @@ describe("city game scan view", () => {
     expect(vmAfter.gameNode?.seasonWindowPhase).toBe("after");
     const htmlAfter = await renderScanPage(vmAfter, "https://humanity.llc");
     expect(htmlAfter).toContain("Season ended");
+  });
+
+  it("opens game scan locally before window when CITY_GAME_LOCAL_PLAY_OPEN=1", async () => {
+    const seasonWindow = {
+      ...defaultSeason(),
+      status: "planned",
+      window: {
+        starts_at: "2026-06-06T18:00:00-05:00",
+        ends_at: "2026-06-08T22:00:00-05:00",
+      },
+    };
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: cardRow(),
+        qr: qrRow(),
+        verification: summary(),
+        childObject: childRow(),
+        revocationDisplay: null,
+      },
+      "https://humanity.llc",
+      new Date("2026-06-03T12:00:00-05:00"),
+      {
+        env: { CITY_GAME_ENABLED: "1", CITY_GAME_LOCAL_PLAY_OPEN: "1" },
+        season: seasonWindow,
+      }
+    );
+    expect(vm.gameNode?.mode).toBe("game");
+    expect(vm.gameNode?.showsContribute).toBe(true);
+    const html = await renderScanPage(vm, "https://humanity.llc");
+    expect(html).not.toContain("has not opened yet");
+    expect(html).toContain("scan-game-contribute");
   });
 });

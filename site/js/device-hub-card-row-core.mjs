@@ -95,6 +95,18 @@ export function hubCardStatusLine(ctx) {
       tone: "ok",
     };
   }
+  if (scanKind === "unknown_profile" || scanKind === "unknown_qr") {
+    return {
+      label: checked ? `Not on network · ${checked}` : "Not on network",
+      tone: "warn",
+    };
+  }
+  if (scanKind === "malformed" || scanKind === "profile_qr_mismatch") {
+    return {
+      label: checked ? `Invalid on network · ${checked}` : "Invalid on network",
+      tone: "warn",
+    };
+  }
   if (status === "checking") {
     return { label: "Checking network…", tone: "muted" };
   }

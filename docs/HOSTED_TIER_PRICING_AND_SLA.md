@@ -185,15 +185,20 @@ Hosted fees fund:
 | G5 | SLA uptime % | 99.5% | Ops + legal |
 | G6 | Push latency SLA | p95 ≤ 5s | Ops |
 | G7 | Refund window | 14 days pro-rata | Legal |
-| G8 | Payment provider | Stripe pending approval | Ops |
+| G8 | Payment provider | **Stripe** — reference operator Checkout + webhooks (test mode → prod secrets) | Ops |
 | G9 | Sell on reference only at launch | Yes | Governance |
 | G10 | Org plan `hosted_org_v1` | Defer post–Commons Pass | Product |
+| G11 | SKU `hosted_game_season_v1` | Separate from steward; price band TBD | Product |
+| G12 | /created/ upgrade UX | Capacity-only copy; no verification upsell | Product |
+| G13 | Commerce firewall | Merch/checkout must not set `metadata.account_id` for hosted grant | Ops |
 
 **Sign-off:** `[x]` Governance · `[x]` Ops · `[ ]` Legal — date: **2026-05-27** (solo founder; no formal meeting — product/governance and ops defaults accepted as listed)
 
-**Legal pending:** G7 refund wording and any customer-facing billing terms remain **planning defaults** until counsel review. Does **not** block engineering production rollout or ops monitoring.
+WS-REV R4 governance sign-off **recorded** (2026-06-03)
 
-**Engineering status (2026-05-27):** E1–E6 code complete in staging. **G0 (Governance + Ops) unlocks production rollout** per [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) § Production rollout (after G0). Enable `HOSTED_STEWARD_ENABLED`, `OPERATOR_AUDIT_TOKEN`; enable `STRIPE_WEBHOOK_SECRET` only after **G8** (Stripe) is explicitly confirmed for production billing.
+**Legal pending:** G7 refund wording and any customer-facing billing terms remain **planning defaults** until counsel review. Does **not** block engineering production rollout, Stripe **test** checkout, or ops monitoring.
+
+**Engineering status (2026-06-03):** WS-REV **R1–R4 shipped** — Checkout session API, `/created/` caps UI, `hosted:rev:prod-smoke`, M4 governance recorded (`hosted:rev:m4-sign-off`). E1–E6 + game season `0031` in staging/production path. **G0 (Governance + Ops) unlocks production rollout** per [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) § Production rollout (after G0). Enable `HOSTED_STEWARD_ENABLED`, `OPERATOR_AUDIT_TOKEN`; enable `STRIPE_WEBHOOK_SECRET` only after **G8** (Stripe) is explicitly confirmed for production billing.
 
 **After sign-off:** Enable production secrets per [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) rollout. Configure repo secret `OPERATOR_AUDIT_TOKEN` for E6.2 daily CI (`.github/workflows/steward-ops-daily.yml`).
 
@@ -223,3 +228,5 @@ Hosted fees fund:
 | 2026-05-26 | M4 initial governance one-pager (planning defaults) |
 | 2026-05-27 | Engineering E1–E6 staging complete; G0 gates production enablement |
 | 2026-05-27 | **G0 signed** (Governance + Ops, solo founder); Legal pending for G7 |
+| 2026-06-03 | **WS-REV R4** — governance sign-off recorded (G8 Stripe Checkout path; G11–G13); Legal still pending G7 |
+

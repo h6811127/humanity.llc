@@ -17,9 +17,10 @@ import {
   buildGameNodeMintTemplate,
   SEASON_OBJECT_IDS,
 } from "./city-game-node-defaults.mjs";
+import { resolveSeasonPathFromCli } from "../../site/js/city-game-season-path-core.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
-const seasonPath = path.join(root, "site/data/city-game-cr-season-01.json");
+const seasonPath = resolveSeasonPathFromCli(root);
 const testTemplatesPath = path.join(
   root,
   "worker/tests/fixtures/city-game-node-templates.json"

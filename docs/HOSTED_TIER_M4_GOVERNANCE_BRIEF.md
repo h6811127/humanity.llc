@@ -23,7 +23,10 @@
 | **G5 SLA uptime** | **99.5%** / month | ☐ |
 | **G6 Push latency** | **p95 ≤ 5s** after stranger challenge | ☐ |
 | **G7 Refund** | **14 days** pro-rata if &lt;10% fair-use used | ☐ |
-| **G8 Payments** | **Stripe** (or member-governed alt.) | ☐ |
+| **G8 Payments** | **Stripe** — Checkout + webhooks (WS-REV R1); prod secrets after confirm | ☐ |
+| **G11 Game season SKU** | **`hosted_game_season_v1`** separate from steward; price TBD | ☐ |
+| **G12 /created/ UX** | Capacity-only upgrade copy (WS-REV R2) | ☐ |
+| **G13 Commerce firewall** | Merch must not grant hosted via `metadata.account_id` | ☐ |
 | **G9 Launch scope** | Reference operator only at v1 | ☐ |
 | **G10 Org plan** | Defer `hosted_org_v1` | ☐ |
 
@@ -81,3 +84,4 @@ Optional depth: [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLE
 | 2026-05-26 | M4 governance brief for sign-off meeting |
 | 2026-05-27 | E1–E6 staging complete; G0 gates production enablement |
 | 2026-05-27 | **G0 signed** (Governance + Ops); Legal pending |
+| 2026-06-03 | **WS-REV R4** — revenue governance recorded; G8 Stripe Checkout path approved for reference operator (test → prod secrets) |

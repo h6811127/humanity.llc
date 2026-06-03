@@ -266,6 +266,18 @@ describe("hubCardStatusLine", () => {
       hubCardStatusLine({ status: "active", scanKind: "card_revoked", checkedAt, now }).label
     ).toContain("Disabled on network");
   });
+
+  it("maps unknown profile/QR to not on network (not resolver unreachable)", () => {
+    expect(
+      hubCardStatusLine({ status: "unknown", scanKind: "unknown_profile", checkedAt, now })
+    ).toEqual({
+      label: "Not on network · checked 2m ago",
+      tone: "warn",
+    });
+    expect(
+      hubCardStatusLine({ status: "unknown", scanKind: "unknown_qr", checkedAt, now }).label
+    ).toContain("Not on network");
+  });
 });
 
 describe("hubCardIdentityLine", () => {

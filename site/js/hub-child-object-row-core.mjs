@@ -9,6 +9,7 @@ import { hubCardTitle } from "./device-hub-card-row-core.mjs";
 
 export const CHILD_OBJECT_TYPE_STATUS_PLATE = "status_plate";
 export const CHILD_OBJECT_TYPE_LOST_ITEM_RELAY = "lost_item_relay";
+export const CHILD_OBJECT_TYPE_GAME_NODE = "game_node";
 export const CHILD_OBJECT_STATUS_DISABLED = "disabled";
 
 export const CHILD_OBJECT_HUB_FOCUS_PREFIX = "child-object-";
@@ -64,6 +65,9 @@ export function hubChildObjectTypeMeta(objectType) {
   }
   if (type === CHILD_OBJECT_TYPE_LOST_ITEM_RELAY) {
     return { label: "Lost item", tone: "lost-item", manageLabel: "Update message" };
+  }
+  if (type === CHILD_OBJECT_TYPE_GAME_NODE) {
+    return { label: "Game node", tone: "general", manageLabel: "Manage on card" };
   }
   return { label: "Object", tone: "general", manageLabel: "Manage on card" };
 }

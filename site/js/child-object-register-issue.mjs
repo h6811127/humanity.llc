@@ -43,14 +43,19 @@ export async function issueChildObjectScanLink(input) {
  * }} input
  */
 export async function registerChildObjectAndIssueScanLink(input) {
-  const signed = await signChildObjectCreate({
-    parentProfileId: input.profileId,
-    objectType: input.objectType,
-    publicLabel: input.publicLabel,
-    publicState: input.publicState,
-    privateKeyBase58: input.privateKeyBase58,
-    publicKeyBase58: input.publicKeyBase58,
-  });
+  const signed =
+    input.signedCreate ??
+    (await signChildObjectCreate({
+      parentProfileId: input.profileId,
+      objectType: input.objectType,
+      publicLabel: input.publicLabel,
+      publicState: input.publicState,
+      privateKeyBase58: input.privateKeyBase58,
+      publicKeyBase58: input.publicKeyBase58,
+      objectId: input.objectId,
+      createdAt: input.createdAt,
+      extraFields: input.extraFields,
+    }));
   const createResult = await postChildObjectCreate(input.profileId, signed);
   const objectId = String(createResult.object_id || signed.object_id);
   const createdAt =

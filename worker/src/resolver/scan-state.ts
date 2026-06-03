@@ -23,6 +23,13 @@ import {
   resolveGameNodeScanContext,
   type GameNodeScanContext,
 } from "../city-game/scan-view";
+import { applyBulletinScheduleToStreams } from "../city-game/bulletin-schedule";
+import { applyRouteWindowScheduleToStreams } from "../city-game/route-window-schedule";
+import { defaultSeason } from "../city-game/season-loader";
+import {
+  seasonNodeIdForObject,
+  type CrSeasonConfig,
+} from "../city-game/season-config";
 import { resolveMobileLoreScanForPrintArtifact } from "../city-game/mobile-lore";
 
 export const QR_ID_REGEX =
@@ -142,10 +149,7 @@ export function buildScanViewModel(
   now: Date = new Date(),
   options: {
     env?: { CITY_GAME_ENABLED?: string };
-    seasonForWindow?: Pick<
-      import("../city-game/season-config").CrSeasonConfig,
-      "window" | "status"
-    >;
+    season?: CrSeasonConfig;
     mobileLoreEnrollment?: import("../city-game/season-config").SeasonMobileLoreEnrollment[];
   } = {}
 ): ScanViewModel {
@@ -289,25 +293,63 @@ export function buildScanViewModel(
       manifesto_line: childObjectManifestoLine(child),
       card_document_json: child.child_object_document_json,
     };
-    const objectStreams = objectStreamsFromChildDocumentJson(
+    let objectStreams = objectStreamsFromChildDocumentJson(
       child.child_object_document_json
     );
-    const gameNode = resolveGameNodeScanContext({
+    const season = options.season ?? defaultSeason();
+    let gameNode = resolveGameNodeScanContext({
       objectType: child.object_type,
       objectId: child.object_id,
       documentJson: child.child_object_document_json,
       objectStreams,
       env: options.env ?? {},
       vouchWitnesses: ctx.gameVouchWitnesses ?? undefined,
-      seasonForWindow: options.seasonForWindow,
+      season,
       now,
     });
+    const nodeId = seasonNodeIdForObject(child.object_id, season);
+    let scanChild = child;
+    if (gameNode && nodeId) {
+      objectStreams = applyBulletinScheduleToStreams(
+        objectStreams,
+        nodeId,
+        now,
+        season,
+        {
+          nodeRole: gameNode.nodeRole,
+          gameMeta: gameNode.gameMeta,
+          seasonWindowPhase: gameNode.seasonWindowPhase,
+        }
+      );
+      const routeApply = applyRouteWindowScheduleToStreams(
+        objectStreams,
+        nodeId,
+        now,
+        season,
+        {
+          nodeRole: gameNode.nodeRole,
+          gameMeta: gameNode.gameMeta,
+          seasonWindowPhase: gameNode.seasonWindowPhase,
+        }
+      );
+      objectStreams = routeApply.streams;
+      if (routeApply.coopHint) {
+        gameNode = { ...gameNode, coopHint: routeApply.coopHint };
+      }
+      if (routeApply.publicState) {
+        scanChild = { ...child, public_state: routeApply.publicState };
+      }
+    }
+    const objectCardFinal = {
+      ...objectCard,
+      manifesto_line: childObjectManifestoLine(scanChild),
+    };
     const vm = baseView(
       {
         kind: "active",
         profileId,
         qrId,
-        card: objectCard,
+        card: objectCardFinal,
         qr,
         verification: ctx.verification,
         primaryBadge: { label: "Active", tone: "live" },
@@ -331,7 +373,7 @@ export function buildScanViewModel(
       printArtifactId: qr.print_artifact_id,
       manifestoLine: card.manifesto_line,
       env: options.env ?? {},
-      seasonForWindow: options.seasonForWindow,
+      season: options.season ?? defaultSeason(),
       enrollmentRows: options.mobileLoreEnrollment,
       now,
     });

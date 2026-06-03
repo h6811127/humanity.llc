@@ -3,15 +3,18 @@ import { describe, expect, it } from "vitest";
 import {
   bumpCollectiveProgress,
   collectiveStreamValue,
+  evolveRiverLanternAntiHoarding,
   fragmentLatticeProgress,
   gameNodeContributeMode,
   gameNodeShowsContribute,
+  isCollectiveQuorumComplete,
   issueWitnessSunsetPass,
   markFragmentNodeClaimed,
   openFinaleSwitch,
   patchesForFragmentContribute,
   patchesForQuorumUnlock,
   recordFragmentOnFinale,
+  riverLanternNeedsAntiHoardingEvolve,
   unlockCabinetFromRiver,
 } from "../src/city-game/unlock-engine";
 
@@ -38,12 +41,32 @@ describe("unlock-engine", () => {
   it("caps progress at target and marks reachedTarget", () => {
     const doc = {
       public_state: "Almost there",
-      object_streams: [{ id: "relay", label: "Collective", value: "19 / 20" }],
+      object_streams: [
+        { id: "relay", label: "Collective", value: "19 / 20" },
+        { id: "bulletin", label: "Clue", value: "Lantern path waking" },
+      ],
       game_meta: { collective_progress: 19, collective_target: 20 },
     };
     const out = bumpCollectiveProgress(doc);
     expect(out.meta.collective_progress).toBe(20);
     expect(out.reachedTarget).toBe(true);
+    expect(out.doc.public_state).toContain("Evolved together");
+    const streams = out.doc.object_streams as { label: string; value: string }[];
+    expect(streams.find((s) => s.label === "Clue")?.value).toContain("Evolved clue");
+  });
+
+  it("evolves River Lantern anti-hoarding copy at quorum", () => {
+    const doc = {
+      public_state: "Seed clue live",
+      object_streams: [{ id: "bulletin", label: "Clue", value: "Lantern path waking" }],
+      game_meta: { collective_progress: 20, collective_target: 20 },
+    };
+    expect(riverLanternNeedsAntiHoardingEvolve(doc)).toBe(true);
+    const evolved = evolveRiverLanternAntiHoarding(doc);
+    expect(riverLanternNeedsAntiHoardingEvolve(evolved)).toBe(false);
+    expect(isCollectiveQuorumComplete({ collective_progress: 20, collective_target: 20 } as never)).toBe(
+      true
+    );
   });
 
   it("shows contribute for temp_drop below target", () => {
@@ -189,11 +212,14 @@ describe("unlock-engine", () => {
       object_streams: [
         { id: "relay", label: "Path", value: "Hidden" },
         { id: "territory", label: "Gate", value: "Locked" },
+        { id: "bulletin", label: "Choice", value: "Private now vs shared ending" },
       ],
     });
     const meta = unlocked.game_meta as { unlocked_by: string[] };
     expect(meta.unlocked_by).toContain("node_04");
     expect(unlocked.public_state).toContain("Unlocked together");
+    const streams = unlocked.object_streams as { label: string; value: string }[];
+    expect(streams.find((s) => s.label === "Choice")?.value).toContain("Shared ending");
   });
 
   it("unlockCabinetFromRiver is idempotent for unlocked_by", () => {

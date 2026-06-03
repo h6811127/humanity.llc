@@ -18,8 +18,19 @@ describe("cityGameSeasonReadiness", () => {
     expect(ready).toBe(true);
   });
 
-  it("requires season root and dates for launch", () => {
+  it("passes requireLaunch when season root and window dates are set", () => {
     const { ready, issues } = cityGameSeasonReadiness(season, { requireLaunch: true });
+    expect(issues).toEqual([]);
+    expect(ready).toBe(true);
+  });
+
+  it("requires season root and dates for launch when unset", () => {
+    const preLaunch = {
+      ...season,
+      season_root_profile_id: "",
+      window: { starts_at: "", ends_at: "" },
+    };
+    const { ready, issues } = cityGameSeasonReadiness(preLaunch, { requireLaunch: true });
     expect(ready).toBe(false);
     expect(issues.some((i) => i.includes("season_root_profile_id"))).toBe(true);
     expect(issues.some((i) => i.includes("window"))).toBe(true);

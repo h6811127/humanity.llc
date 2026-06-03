@@ -1,14 +1,20 @@
 import type { GameMeta } from "./game-meta";
 import { gameMetaFromChildDocumentJson, normalizeGameMeta } from "./game-meta";
 import { GAME_NODE_OBJECT_TYPE, isCityGameEnabled } from "./constants";
-import { gameNodeContributeMode, isWitnessScarcityDepleted, type GameContributeMode } from "./unlock-engine";
+import {
+  gameNodeContributeMode,
+  isCollectiveQuorumComplete,
+  isWitnessScarcityDepleted,
+  type GameContributeMode,
+} from "./unlock-engine";
 import {
   seasonContributeCode,
   seasonNodeIdForObject,
   type CrSeasonConfig,
 } from "./season-config";
+import { defaultSeason } from "./season-loader";
 import {
-  isSeasonPlayOpen,
+  isSeasonContributeOpen,
   resolveSeasonWindowPhase,
   type SeasonWindowPhase,
 } from "./season-window";
@@ -68,7 +74,9 @@ export const GAME_NODE_SCAN_PRIVACY_NOTE =
 
 export const GAME_CONTRIBUTE_EYEBROW = "Collective quorum";
 export const GAME_CONTRIBUTE_LEAD =
-  "Add your visit to the public count. Enter the site code from the sticker or backing card — not from this URL alone.";
+  "This is one shared count for the whole city — not your personal score. Enter the site code printed on the sticker to add your visit. When enough people contribute, the clue here updates for everyone.";
+export const GAME_CONTRIBUTE_FIRST_SCAN_NOTE =
+  "First scan here? Opening this page is not logged. The count below only changes if you choose to contribute.";
 export const GAME_CONTRIBUTE_SITE_CODE_LABEL = "Site code";
 export const GAME_CONTRIBUTE_SUBMIT_LABEL = "Contribute to quorum";
 export const GAME_CONTRIBUTE_PROGRESS_LABEL = "Public progress";
@@ -105,9 +113,12 @@ export function gameNodeRoleEyebrow(role: string, district: string | null): stri
   return `${place} · ${roleLabel}`;
 }
 
-export function gameNodeContributeSiteCodePlaceholder(nodeId: string | null): string {
+export function gameNodeContributeSiteCodePlaceholder(
+  nodeId: string | null,
+  season: CrSeasonConfig = defaultSeason()
+): string {
   if (!nodeId) return "";
-  return seasonContributeCode(nodeId)?.code ?? "";
+  return seasonContributeCode(nodeId, season)?.code ?? "";
 }
 
 export function gameNodeContributeEyebrow(
@@ -139,7 +150,13 @@ export function gameNodeCoopHint(role: string, meta: GameMeta): string | null {
     return "Regroup here — sanctuary nodes do not capture or rank players.";
   }
   if (role === "temp_drop" && meta.collective_target != null) {
-    return "Share the seed clue outward — this object evolves when the group unlocks it together.";
+    if (isCollectiveQuorumComplete(meta)) {
+      return "The clue evolved — sharing helped everyone reach the next path together.";
+    }
+    return "Share what you find — when enough people contribute together, the next clue unlocks for everyone.";
+  }
+  if (role === "lore_archive" && meta.unlocked_by.includes("node_04")) {
+    return "The cabinet evolved after the group shared the path — cooperation beat secrecy.";
   }
   if (meta.vouch_requires.length) {
     return "This path opens with trust from nearby places — cooperation beats solo farming.";
@@ -203,9 +220,9 @@ export function resolveGameNodeScanContext(input: {
   objectId?: string | null;
   documentJson: string | null | undefined;
   objectStreams: ObjectPublicStream[];
-  env: { CITY_GAME_ENABLED?: string };
+  env: { CITY_GAME_ENABLED?: string; CITY_GAME_LOCAL_PLAY_OPEN?: string };
   vouchWitnesses?: Record<string, GameMeta>;
-  seasonForWindow?: Pick<CrSeasonConfig, "window" | "status">;
+  season?: CrSeasonConfig;
   now?: Date;
 }): GameNodeScanContext | null {
   if (input.objectType !== GAME_NODE_OBJECT_TYPE) return null;
@@ -214,10 +231,8 @@ export function resolveGameNodeScanContext(input: {
 
   const enabled = isCityGameEnabled(input.env);
   const now = input.now ?? new Date();
-  const seasonWindowPhase = resolveSeasonWindowPhase(
-    now,
-    input.seasonForWindow
-  );
+  const season = input.season ?? defaultSeason();
+  const seasonWindowPhase = resolveSeasonWindowPhase(now, season);
   const streams = fields.objectStreams.length ? fields.objectStreams : input.objectStreams;
 
   const base = {
@@ -233,8 +248,13 @@ export function resolveGameNodeScanContext(input: {
   };
 
   const nodeId =
-    input.objectId != null ? seasonNodeIdForObject(input.objectId) : null;
-  const contributeMode = gameNodeContributeMode(nodeId, fields.gameMeta, fields.nodeRole);
+    input.objectId != null ? seasonNodeIdForObject(input.objectId, season) : null;
+  const contributeMode = gameNodeContributeMode(
+    nodeId,
+    fields.gameMeta,
+    fields.nodeRole,
+    season
+  );
   const showsContribute = contributeMode != null;
   const vouchGate = resolveGameVouchGate(
     nodeId,
@@ -267,7 +287,7 @@ export function resolveGameNodeScanContext(input: {
     };
   }
 
-  if (!isSeasonPlayOpen(seasonWindowPhase)) {
+  if (!isSeasonContributeOpen(seasonWindowPhase, input.env)) {
     return {
       ...withVouchGate,
       enabled: true,
@@ -306,7 +326,7 @@ export function resolveGameNodeScanContext(input: {
     showsContribute,
     contributeMode,
     contributeSiteCodePlaceholder: showsContribute
-      ? gameNodeContributeSiteCodePlaceholder(nodeId) || null
+      ? gameNodeContributeSiteCodePlaceholder(nodeId, season) || null
       : null,
   };
 }

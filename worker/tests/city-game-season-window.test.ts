@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  isLocalSeasonPlayOverride,
+  isSeasonContributeOpen,
   isSeasonPlayOpen,
   resolveSeasonWindowPhase,
   seasonWindowChip,
@@ -50,5 +52,12 @@ describe("season-window", () => {
     expect(seasonWindowChip("after")).toContain("ended");
     expect(seasonWindowScanNote("after")).toContain("Season 1 has ended");
     expect(seasonWindowContributeMessage("before")).toContain("not opened");
+  });
+
+  it("allows local contribute override before window when env flag set", () => {
+    expect(isSeasonContributeOpen("before", { CITY_GAME_LOCAL_PLAY_OPEN: "1" })).toBe(true);
+    expect(isSeasonContributeOpen("before", {})).toBe(false);
+    expect(isSeasonContributeOpen("after", { CITY_GAME_LOCAL_PLAY_OPEN: "1" })).toBe(false);
+    expect(isLocalSeasonPlayOverride({ CITY_GAME_LOCAL_PLAY_OPEN: "1" })).toBe(true);
   });
 });

@@ -2,10 +2,10 @@ import type { ObjectPublicStream } from "../validation/object-streams";
 import { isCityGameEnabled } from "./constants";
 import { normalizeGameMeta } from "./game-meta";
 import {
-  CR_SEASON_01,
   findSeasonMobileLoreEnrollment,
   type SeasonMobileLoreEnrollment,
 } from "./season-config";
+import { defaultSeason } from "./season-loader";
 import {
   gameNodeRoleEyebrow,
   type GameNodeScanContext,
@@ -47,17 +47,18 @@ export function mobileLoreCoopHint(): string {
 export function resolveMobileLoreScanContext(input: {
   enrollment: SeasonMobileLoreEnrollment;
   env: { CITY_GAME_ENABLED?: string };
-  seasonForWindow?: Pick<CrSeasonConfig, "window" | "status">;
+  season?: CrSeasonConfig;
   now?: Date;
 }): GameNodeScanContext {
   const enabled = isCityGameEnabled(input.env);
   const now = input.now ?? new Date();
-  const seasonWindowPhase = resolveSeasonWindowPhase(now, input.seasonForWindow);
+  const season = input.season ?? defaultSeason();
+  const seasonWindowPhase = resolveSeasonWindowPhase(now, season);
   const nodeRole = "mobile_lore";
   const gameMeta = normalizeGameMeta({});
 
   const base = {
-    seasonId: CR_SEASON_01.season_id,
+    seasonId: season.season_id,
     nodeRole,
     district: null,
     gameMeta,
@@ -109,7 +110,7 @@ export function resolveMobileLoreScanForPrintArtifact(input: {
   printArtifactId: string | null | undefined;
   manifestoLine: string | null;
   env: { CITY_GAME_ENABLED?: string };
-  seasonForWindow?: Pick<CrSeasonConfig, "window" | "status">;
+  season?: CrSeasonConfig;
   enrollmentRows?: SeasonMobileLoreEnrollment[];
   now?: Date;
 }): {
@@ -120,7 +121,9 @@ export function resolveMobileLoreScanForPrintArtifact(input: {
   const enrollment = findSeasonMobileLoreEnrollment(
     input.profileId,
     input.printArtifactId,
-    input.enrollmentRows
+    input.enrollmentRows ??
+      (input.season ?? defaultSeason()).mobile_lore_enrollment ??
+      []
   );
   if (!enrollment) return null;
 
@@ -130,7 +133,7 @@ export function resolveMobileLoreScanForPrintArtifact(input: {
     gameNode: resolveMobileLoreScanContext({
       enrollment,
       env: input.env,
-      seasonForWindow: input.seasonForWindow,
+      season: input.season,
       now: input.now,
     }),
   };

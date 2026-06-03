@@ -5,7 +5,9 @@ import {
   reconcileSeasonUnlockDrift,
 } from "../src/city-game/unlock-evaluator";
 
-const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
+import { CITY_GAME_SEASON_ROOT_PROFILE } from "./city-game-fixture-profile";
+
+const PROFILE = CITY_GAME_SEASON_ROOT_PROFILE;
 const RIVER_OBJECT = "obj_cr_node_04_river";
 const CABINET_OBJECT = "obj_cr_node_07_cabinet";
 const MURAL_OBJECT = "obj_cr_node_09_mural";
@@ -202,6 +204,51 @@ describe("unlock-evaluator", () => {
     const cabinet = db.objects.get(CABINET_OBJECT)!;
     const cabinetDoc = JSON.parse(cabinet.child_object_document_json);
     expect(cabinetDoc.game_meta.unlocked_by).toContain("node_04");
+  });
+
+  it("applyUnlockSideEffects evolves River Lantern when quorum met but copy still seed", async () => {
+    const db = new UnlockDb();
+    db.objects.set(RIVER_OBJECT, {
+      object_id: RIVER_OBJECT,
+      parent_profile_id: PROFILE,
+      object_type: "game_node",
+      public_label: "Riverwalk River Lantern",
+      public_state: "Seed clue live",
+      status: "active",
+      child_object_document_json: JSON.stringify({
+        object_streams: [{ id: "bulletin", label: "Clue", value: "Lantern path waking" }],
+        game_meta: { collective_progress: 20, collective_target: 20, unlocked_by: [] },
+      }),
+      created_at: CREATED,
+      updated_at: CREATED,
+    });
+    db.objects.set(CABINET_OBJECT, {
+      object_id: CABINET_OBJECT,
+      parent_profile_id: PROFILE,
+      object_type: "game_node",
+      public_label: "Czech Village cabinet",
+      public_state: "Locked",
+      status: "active",
+      child_object_document_json: JSON.stringify({
+        game_meta: { unlocked_by: [], vouch_requires: ["node_10"] },
+        object_streams: [],
+      }),
+      created_at: CREATED,
+      updated_at: CREATED,
+    });
+
+    const riverDoc = JSON.parse(db.objects.get(RIVER_OBJECT)!.child_object_document_json);
+    await applyUnlockSideEffects(
+      db as unknown as D1Database,
+      "node_04",
+      riverDoc,
+      new Date(CREATED)
+    );
+
+    const river = db.objects.get(RIVER_OBJECT)!;
+    const riverDocAfter = JSON.parse(river.child_object_document_json);
+    expect(river.public_state).toContain("Evolved together");
+    expect(riverDocAfter.object_streams[0].value).toContain("Evolved clue");
   });
 
   it("reconcileSeasonUnlockDrift is a no-op when unlock graph is already consistent", async () => {

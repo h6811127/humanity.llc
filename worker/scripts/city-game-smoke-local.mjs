@@ -16,6 +16,8 @@ import { fileURLToPath } from "node:url";
 
 import {
   assessGameScanHtml,
+  INSTALL_QA_SPOT_EXPECTATIONS,
+  INSTALL_QA_SPOT_NODE_IDS,
   resolveSmokeScanUrl,
 } from "./city-game-smoke-local-core.mjs";
 
@@ -23,15 +25,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const seedPath = join(root, "worker/.local/city-game-seed.json");
 const apiOrigin = (process.env.API_ORIGIN || "http://127.0.0.1:8787").replace(/\/$/, "");
 const checkAll = process.argv.includes("--all");
-
-/** Minimum install QA spot-check nodes (launch checklist E5). */
-const SPOT_NODES = new Set(["node_01", "node_04", "node_07"]);
-
-const SPOT_EXPECTATIONS = {
-  node_01: { requireCoopHint: true },
-  node_04: { requireCoopHint: true, requireContributeBlock: true },
-  node_07: { requireCoopHint: true },
-};
+const SPOT_NODES = new Set(INSTALL_QA_SPOT_NODE_IDS);
 
 async function main() {
   console.log("Cedar Rapids city game — local scan smoke\n");
@@ -89,7 +83,7 @@ async function main() {
     }
 
     const html = await res.text();
-    const expect = SPOT_EXPECTATIONS[node.node_id] ?? {};
+    const expect = INSTALL_QA_SPOT_EXPECTATIONS[node.node_id] ?? {};
     const result = assessGameScanHtml(html, {
       nodeId: node.node_id,
       label: node.public_label,
@@ -115,9 +109,10 @@ async function main() {
 
   console.log("\n✅ Local scan smoke passed.");
   console.log("\nNext:");
+  console.log("  • npm run city-game:install-qa-scenario — E2 scenario HTTP baseline");
   console.log("  • npm run city-game:smoke-contribute-local — autonomous quorum → cabinet");
   console.log("  • npm run city-game:smoke-contribute-local -- --spine — full fragment → finale");
-  console.log("  • docs/CITY_GAME_INSTALL_QA.md — physical install when stickers ready");
+  console.log("  • npm run city-game:install-qa-preflight — C3 before physical install");
   console.log("  • docs/CITY_GAME_COMPREHENSION_RUNBOOK.md — ≥5 testers before launch");
 }
 

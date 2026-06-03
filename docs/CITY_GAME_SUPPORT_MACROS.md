@@ -41,6 +41,20 @@
 
 ---
 
+## “Is there a map of all the nodes?”
+
+> The **city state board** on the rules page shows districts, unlock paths, and (when live) the same **public** relay/faction/fragment chips as scans — not your personal visits or location. There is no app map tracking where you walk. Scan any sticker for ground truth at that place. Engineering plan: [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) (internal).
+
+---
+
 ## Wrong or offensive bulletin
 
 > Bulletins are operator-published world state. Report to `[season operator contact]` with node label + photo. Emergency safety issues go to local authorities — game nodes are not safety certification.
+
+---
+
+## Launch sign-off (O4)
+
+| Check | Done? |
+|-------|-------|
+| Support team briefed on macros above | ☐ Pending |

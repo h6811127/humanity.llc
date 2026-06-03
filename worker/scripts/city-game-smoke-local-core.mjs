@@ -9,6 +9,48 @@ export const GAME_NODE_SCAN_FOOT =
 export const GAME_NODE_SCAN_PRIVACY_NOTE =
   "Opening this QR is not logged. If you choose to contribute, a public count on this object updates — not your identity.";
 
+/** Launch checklist E5 / install QA minimum HTTP spot-check nodes. */
+export const INSTALL_QA_SPOT_NODE_IDS = ["node_01", "node_04", "node_07"];
+
+/** E2 one-phone scenario baseline nodes — @see docs/CITY_GAME_INSTALL_QA.md § Scenario spot-checks */
+export const INSTALL_QA_SCENARIO_NODE_IDS = [
+  "node_01",
+  "node_02",
+  "node_04",
+  "node_05",
+  "node_07",
+  "node_09",
+  "node_11",
+  "node_12",
+  "node_14",
+];
+
+/** @type {Record<string, { requireCoopHint?: boolean; requireContributeBlock?: boolean; expectDormant?: boolean }>} */
+export const INSTALL_QA_SPOT_EXPECTATIONS = {
+  node_01: { requireCoopHint: true },
+  node_04: { requireCoopHint: true, requireContributeBlock: true },
+  node_07: { requireCoopHint: true },
+};
+
+/** @type {Record<string, { requireCoopHint?: boolean; requireContributeBlock?: boolean; expectDormant?: boolean }>} */
+export const INSTALL_QA_SCENARIO_EXPECTATIONS = {
+  ...INSTALL_QA_SPOT_EXPECTATIONS,
+  node_02: { requireCoopHint: true },
+  node_12: { requireCoopHint: true },
+};
+
+/** Manual follow-ups after HTTP baseline (operator flips / contribute on phone). */
+export const INSTALL_QA_SCENARIO_MANUAL_CHECKS = [
+  "node_04 · site code CR-LANTERN-7K → quorum unlocks node_07 (npm run city-game:smoke-contribute-local)",
+  "node_04 · after visible_until → dormant note (time-gated — optional)",
+  "node_05 · compromise flip then revoke via /game-operator/",
+  "node_07 · after River quorum → unlocked together copy",
+  "node_09, node_11, node_01 · fragment site codes → finale on node_13",
+  "node_14 · care pause flip → game bulletins muted",
+];
+
+export const INSTALL_QA_REQUIRED_NODE_COUNT = 15;
+
 export const GAME_NODE_FORBIDDEN_COPY = [
   "leaderboard",
   "xp",
@@ -95,7 +137,16 @@ export function assessGameScanHtml(html, opts) {
     const hasContribute =
       hasRenderedClass(main, "scan-game-contribute") || /id="scan-game-contribute"/.test(main);
     if (!hasContribute) {
-      return { ok: false, reason: `${opts.nodeId}: expected scan-game-contribute block` };
+      const hasCollectiveProgress =
+        hasRenderedClass(main, "scan-game-coop-hint") ||
+        /shared count for the whole city/i.test(main) ||
+        /when enough people contribute/i.test(main);
+      if (!hasCollectiveProgress) {
+        return {
+          ok: false,
+          reason: `${opts.nodeId}: expected scan-game-contribute block or collective progress copy`,
+        };
+      }
     }
   }
 

@@ -36,17 +36,12 @@
           <p class="hero-line hero-line-sub">Research walkthrough. One object, five directions.</p>
         </section>
 
-        <div class="research-dev-hint" role="note">
-          <p>
-            <strong>In development.</strong> Addressable benches and civic objects are the
-            foundation for a Cedar Rapids play season — public history, care state, and lightweight
-            games on the same signed resolver. See
-            <a href="/what-can-a-qr-do/physical-world-multiplayer/">physical-world multiplayer</a>
-            and the
-            <a href="/what-can-a-qr-do/combining-ideas/cedar-rapids-city-game/">Cedar Rapids demo</a>
-            for where this stack is heading.
-          </p>
-        </div>
+        <div class="research-live-banner hc-notice hc-notice--info" role="note" data-city-game-season-banner data-season-json="/data/city-game-cr-season-01.json" data-banner-variant="research">
+  <p>
+    <strong data-city-game-season-banner-label>Season window</strong><span data-city-game-season-banner-dates> Wake the city · 2026-06-06T18:00:00-05:00 → 2026-06-08T22:00:00-05:00</span>
+  </p>
+  <p data-city-game-season-banner-body><a href="/play/cedar-rapids/">Read the rules</a> and <a href="/play/cedar-rapids/#city-state">open the city state board</a> before scanning game nodes. Resolver-backed play runs on live <code>/c/…</code> scan URLs — demo layouts on this page remain design reference.</p>
+</div>
 
         <section class="idea-section" aria-labelledby="bench-history-title">
           <h2 class="group-label" id="bench-history-title">1 · Public history</h2>
@@ -237,5 +232,6 @@
         </section>
       </main>
     </div>
+      <script type="module" src="/js/city-game-season-banner.mjs?v=1"></script>
   </body>
 </html>
