@@ -8,6 +8,7 @@ import {
 } from "./season-entitlements";
 import { resolveGameSeasonLimits } from "./season-entitlements-resolve";
 import type { GameSeasonLimits } from "./season-entitlements";
+import { localSummerNodeCapOverride } from "./season-window";
 
 export async function gameSeasonSchemaReady(db: D1Database): Promise<boolean> {
   const row = await db
@@ -195,11 +196,15 @@ export async function enforceGameNodeCap(
   db: D1Database,
   season: CrSeasonConfig,
   activeGameNodeCount: number,
-  limits?: GameSeasonLimits
+  limits?: GameSeasonLimits,
+  env?: { CITY_GAME_LOCAL_NODE_CAP?: string }
 ): Promise<Response | null> {
   if (!(await gameSeasonSchemaReady(db))) return null;
 
   const resolved = limits ?? (await resolveGameSeasonLimits(db, season));
+  const localCap = localSummerNodeCapOverride(env ?? {});
+  const nodeCap =
+    localCap != null ? Math.max(resolved.nodeCap, localCap) : resolved.nodeCap;
   if (!resolved.enabled) {
     return gameSeasonQuotaExceededResponse(
       "game.season.node_cap",
@@ -209,11 +214,11 @@ export async function enforceGameNodeCap(
     );
   }
 
-  if (activeGameNodeCount >= resolved.nodeCap) {
+  if (activeGameNodeCount >= nodeCap) {
     return gameSeasonQuotaExceededResponse(
       "game.season.node_cap",
       activeGameNodeCount,
-      resolved.nodeCap,
+      nodeCap,
       "Game node limit reached for this season. Upgrade your season plan to add more nodes."
     );
   }

@@ -7,8 +7,13 @@ import {
   type GameFactionHold,
 } from "./factions";
 import { normalizeGameMeta, type GameMeta } from "./game-meta";
-import type { CrSeasonConfig } from "./season-config";
-import { seasonRelayDecayHours } from "./season-config";
+import { defaultSeason } from "./season-loader";
+import {
+  seasonNodeIdForObject,
+  seasonRelayDecayHours,
+  seasonRelayPointsPerHour,
+  type CrSeasonConfig,
+} from "./season-config";
 
 export const RELAY_CONTRIBUTE_MAX_RETRIES = 24;
 
@@ -110,6 +115,21 @@ function applyOverharvest(meta: GameMeta): { meta: GameMeta; triggered: boolean 
   return { meta: nextMeta, triggered: nextCount >= limit };
 }
 
+function resolvePointsPerHour(
+  meta: GameMeta,
+  nodeId: string | null,
+  season: CrSeasonConfig
+): number {
+  if (meta.points_per_hour != null && meta.points_per_hour > 0) {
+    return meta.points_per_hour;
+  }
+  if (nodeId) {
+    const fromSeason = seasonRelayPointsPerHour(nodeId, season);
+    if (fromSeason != null) return fromSeason;
+  }
+  return 1;
+}
+
 export function applyRelayCaptureLocally(
   doc: Record<string, unknown>,
   input: {
@@ -117,6 +137,8 @@ export function applyRelayCaptureLocally(
     now: Date;
     decayHours: number;
     action: RelayContributeAction;
+    nodeId?: string | null;
+    season?: CrSeasonConfig;
   }
 ): { doc: Record<string, unknown>; meta: GameMeta; overharvestTriggered: boolean } {
   const decayed = applyRelayDecayIfExpired(doc, input.now);
@@ -129,12 +151,34 @@ export function applyRelayCaptureLocally(
 
   const currentHold = readHeldFaction(meta);
 
+  if (
+    input.action === "capture" &&
+    meta.artifact_id === "shield_generator" &&
+    currentHold !== "neutral" &&
+    currentHold !== input.faction
+  ) {
+    const untilMs = meta.held_until ? Date.parse(meta.held_until) : NaN;
+    if (Number.isFinite(untilMs) && untilMs > input.now.getTime()) {
+      throw new Error("RELAY_SHIELDED");
+    }
+  }
+
   if (input.action === "reinforce") {
     if (currentHold !== input.faction) {
       throw new Error("REINFORCE_FACTION_MISMATCH");
     }
     const heldUntil = heldUntilFromNow(input.now, input.decayHours);
-    meta = { ...meta, held_by_faction: input.faction, held_until: heldUntil };
+    const pointsPerHour = resolvePointsPerHour(
+      meta,
+      input.nodeId ?? null,
+      input.season ?? defaultSeason()
+    );
+    meta = {
+      ...meta,
+      held_by_faction: input.faction,
+      held_until: heldUntil,
+      points_per_hour: meta.points_per_hour ?? pointsPerHour,
+    };
     const streams = updateTerritoryStreams(doc, input.faction, heldUntil);
     return {
       doc: {
@@ -149,10 +193,16 @@ export function applyRelayCaptureLocally(
   }
 
   const heldUntil = heldUntilFromNow(input.now, input.decayHours);
+  const pointsPerHour = resolvePointsPerHour(
+    meta,
+    input.nodeId ?? null,
+    input.season ?? defaultSeason()
+  );
   const overharvest = applyOverharvest({
     ...meta,
     held_by_faction: input.faction,
     held_until: heldUntil,
+    points_per_hour: pointsPerHour,
   });
   meta = overharvest.meta;
   const streams = updateTerritoryStreams(doc, input.faction, heldUntil);
@@ -190,6 +240,7 @@ export async function applyRelayContributeWithRetry(
     }
 
     let doc = parseDocument(existing.child_object_document_json);
+    const nodeId = seasonNodeIdForObject(input.objectId, input.season);
     let applied;
     try {
       applied = applyRelayCaptureLocally(doc, {
@@ -197,6 +248,8 @@ export async function applyRelayContributeWithRetry(
         now: input.now,
         decayHours,
         action: input.action,
+        nodeId,
+        season: input.season,
       });
     } catch (e) {
       if (e instanceof Error) {

@@ -165,10 +165,18 @@ export function deriveMapNodeSnapshot(input: {
   };
 }
 
+const ARTIFACT_CHIP_LABELS: Record<string, string> = {
+  double_capture: "Rare · double network weight",
+  shield_generator: "Rare · shielded until hold expires",
+  faction_bonus: "Rare · faction bonus weight",
+  hidden_relay: "Rare · hidden until captured",
+};
+
 /** Aggregate-safe pin chips for the city board (PWM-MS01–12). */
 export function buildMapNodeChips(
   row: MapNodeSnapshotRow,
-  seasonWindowPhase: SeasonWindowPhase
+  seasonWindowPhase: SeasonWindowPhase,
+  opts: { rumored?: Set<string> } = {}
 ): MapNodeChip[] {
   if (row.lifecycle === "revoked") {
     return [{ kind: "revoked", label: "Status", value: "Revoked" }];
@@ -203,6 +211,33 @@ export function buildMapNodeChips(
     });
   }
 
+  if (meta.artifact_id && ARTIFACT_CHIP_LABELS[meta.artifact_id]) {
+    chips.push({
+      kind: "drop",
+      label: "Artifact",
+      value: ARTIFACT_CHIP_LABELS[meta.artifact_id],
+    });
+  }
+
+  if (meta.evolution_week != null && meta.evolution_week > 0) {
+    chips.push({
+      kind: "chapter",
+      label: "Evolution",
+      value: `Week ${meta.evolution_week} fiction live`,
+    });
+  }
+
+  if (opts.rumored?.has(row.node_id) && row.role === "relay_gate") {
+    const hold = meta.held_by_faction;
+    if (!hold || hold === "neutral") {
+      chips.push({
+        kind: "route",
+        label: "Signal",
+        value: "Rumored relay · scan to contest",
+      });
+    }
+  }
+
   if (
     row.role === "relay_gate" &&
     meta.held_by_faction &&
@@ -214,6 +249,20 @@ export function buildMapNodeChips(
       label: "Hold",
       value: factionControllerLabel(meta.held_by_faction),
     });
+    if (meta.held_until) {
+      chips.push({
+        kind: "route",
+        label: "Hold until",
+        value: meta.held_until.slice(0, 16).replace("T", " "),
+      });
+    }
+    if (meta.points_per_hour != null && meta.points_per_hour > 0) {
+      chips.push({
+        kind: "faction",
+        label: "Weight",
+        value: `${meta.points_per_hour} pts/hr`,
+      });
+    }
   }
 
   if (row.active_bulletin?.controller?.trim()) {

@@ -4,6 +4,7 @@ import {
   buildNodeChipsHtml,
   formatFinaleFootnote,
   formatSyncLabel,
+  signalWarSummaryLines,
 } from "../../site/js/city-game-map-snapshot-core.mjs";
 import { buildMapBoardInnerHtml } from "../../site/js/city-game-map-board-core.mjs";
 
@@ -40,6 +41,7 @@ describe("city-game map snapshot core", () => {
       automation: { quorum_nodes: ["node_04"], finale_node: "node_13", fragment_nodes: [] },
     });
     expect(html).toContain('id="city-game-map-sync"');
+    expect(html).toContain('id="city-game-map-signal-war"');
     expect(html).toContain('data-edge-from="node_04"');
     expect(html).toContain('data-node-id="node_04"');
     expect(html).toContain("city-game-map-node-live");
@@ -48,6 +50,17 @@ describe("city-game map snapshot core", () => {
 
   it("formats sync label from snapshot timestamp", () => {
     expect(formatSyncLabel("2026-06-07T18:00:00.000Z")).toContain("City board synced");
+  });
+
+  it("extracts signal war summary lines from snapshot (SW-07)", () => {
+    expect(
+      signalWarSummaryLines({
+        signal_war: {
+          summary_lines: ["Red · 10 network pts", "Blue · 6 network pts"],
+        },
+      })
+    ).toEqual(["Red · 10 network pts", "Blue · 6 network pts"]);
+    expect(signalWarSummaryLines({})).toEqual([]);
   });
 
   it("formats finale lattice footnote from snapshot", () => {

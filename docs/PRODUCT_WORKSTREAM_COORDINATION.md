@@ -22,8 +22,8 @@
 | **H-12 printed live-control QA** | [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md) | H-09–H-13 · sad-path S10–S12 | Scan live proof, `e2e/live-control-loop.spec.ts`, operator scripts |
 | **Cedar Rapids city game** | [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) § Node scale · § Feature page traceability · § **Wake the city · Signal War** · [`CITY_GAME_AUTONOMOUS_V1.md`](CITY_GAME_AUTONOMOUS_V1.md) | Phase C human gates open · **Phase D surfaces ready** · **summer 40→60** (15-row JSON = scaffold) · **SW-*** Signal War rows · weekly GM cadence | Install QA at **~40 open**, comprehension, custody · extend season JSON + mint before field wave 1 |
 | **Commercial + revenue (multi-agent)** | **This file § [Multi-agent program](#multi-agent-program-product--revenue--cedar-rapids)** · [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md) · [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md) | **WS-DOC ☑** · **WS-REV / WS-CR / WS-E** — Phase 1 closeout · § [Phase 2](#engineering-phase-2--summer-2026-program) | Steward session, entitlements, game season caps, checkout |
-| **Summer node scale (40→60)** | [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) § Node scale · [`CITY_GAME_NODE_INSTALL_MAP.md`](CITY_GAME_NODE_INSTALL_MAP.md) | **WS-SCALE** — **blocked on Phase 1 C5** · **SC-1–SC-5** | Season JSON, mint waves, install QA at ~40 open |
-| **Signal War (contest layer)** | [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) § Wake the city · Signal War · [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) | **WS-SW** — **SW-S1** at open · **SW-S2** mid-season | `game-contribute`, snapshot, fog, faction totals |
+| **Summer node scale (40→60)** | [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) § Node scale · [`CITY_GAME_NODE_INSTALL_MAP.md`](CITY_GAME_NODE_INSTALL_MAP.md) | **SC-1–SC-2b ☑ local** · **SC-3** prod seed · **SC-4–SC-5** · B7 physical open | Season JSON, mint waves, install QA at ~40 open |
+| **Signal War (contest layer)** | [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) § Wake the city · Signal War · [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) | **WS-SW** — **SW-S1–S3** shipped · debrief/badge tail | `game-contribute`, snapshot, fog, faction totals |
 | **Smooth mode (low-end mobile)** | [`DEVICE_LITE_MOBILE_PLAN.md`](DEVICE_LITE_MOBILE_PLAN.md) | **Phase 0 lab 3/3 ☑** · Phase 1 **deferred** (Nord cold boot → boot graph) · [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md) | Boot graph investigation for Nord cold open |
 
 ---
@@ -159,10 +159,10 @@ WS-E (Phase E /created/ setup — needs WS-REV entitlements UI)
 | **Blocks** | Broad **consumer / paying** launch positioning until **G-C1–G-C3** pass — WS-REV checkout copy should reference non-recoverable operator |
 | **File ownership (when coding)** | `create-card.mjs`, `device-wallet*.mjs`, `device-keys.mjs`, `device-quiet-tab-rehydrate*.mjs`, `scan-tab-keys.mjs`, `device-control-activation*.mjs`, `vouch-sign-lock.mjs`, new wrap module TBD, `device-ownership-copy-core.mjs` |
 | **Regression (existing — must not break full_keys)** | `npm run e2e:key-loss-sad-path` · `npm run e2e:safari-keys-persistence` · `npm run ownership-restore:verify` · `worker/tests/device-quiet-tab-rehydrate.test.ts` |
-| **Regression (TBD Phase 1+)** | `npm run worker:test:custody-wrap` · `npm run worker:test:custody` · `e2e:custody-device-unlock` (TBD) |
+| **Regression (C1–C3)** | `npm run custody:c1-preflight` · `npm run worker:test:custody-wrap` · `npm run worker:test:custody` · `npm run e2e:custody-device-unlock` |
 | **Regression (C0)** | `npm run custody:phase0-preflight` · `npm run custody:phase0-kit` · `worker/tests/custody-phase0-*.test.ts` |
 | **Human gate (C0-5/6)** | `npm run custody:phase0-kit` → ≥5 testers → `npm run custody:phase0-sign-off -- --pass --apply` |
-| **Status** | **C1 MVP in progress** — wrap/enroll/unlock + create UI wired; **G-C0** human comprehension open · C2 mode-aware rehydrate partial |
+| **Status** | **C1–C4 shipped (engineering slice)** — wrap/unlock, mode-aware rehydrate, migration panel, recovery re-enroll · **G-C0** human comprehension open · synced passkey / P3-2 threat model next |
 
 **Do not duplicate:** Safari P0–P2 mitigations (shipped) — WS-CUSTODY **extends**, not replaces, [`SAFARI_KEYS_CUSTODY.md`](SAFARI_KEYS_CUSTODY.md).
 
@@ -196,8 +196,9 @@ WS-CR ops (install wave 1, GM cadence doc)
 WS-CUSTODY C0 sign-off (parallel)
     ↓ mid-summer
 WS-SCALE SC-3–SC-4 (+10–20 nodes, B7 per wave)
-WS-SW SW-S2 (SW-03–SW-07 L: capture, reinforce, decay, faction totals)
-WS-SW SW-S3 (SW-08–SW-13: fog, artifacts, dual victory — map B13–B15)
+WS-SW SW-S2 (SW-03–SW-07 L: capture, reinforce, decay, faction totals) ☑
+WS-SW SW-S3 (SW-08–SW-13: fog, artifacts, dual victory — map B13–B15) ☑
+WS-SW SW-S3 tail (SW-14 debrief · SW-15 badge scan)
     ↓ after E1
 WS-E self-serve marketing (organizers; not Cedar Rapids field)
 WS-CUSTODY C1+ only if G-C0 pass
@@ -226,13 +227,13 @@ WS-CUSTODY C1+ only if G-C0 pass
 | **Product canon** | **~40 heterogeneous nodes at open** (not 15 clones): ~30 relays, 4 HQ, 5–10 resource/artifact, 1–3 world events · grow to **~60** in install waves |
 | **In scope** | Clone spine rows to full mix · `node_role` extensions in [`worker/src/city-game/constants.ts`](../worker/src/city-game/constants.ts) · `/created/` picker (with WS-E) · mint batches · **B7** + `city-game:install-qa-preflight` at **40** before `--apply` · mid/late waves + bulletin for new installs |
 | **Out of scope** | Signal War **L** logic (WS-SW) · Stripe · custody wrap · new investigation docs |
-| **Milestones** | **SC-1** registry + JSON ~40 rows · **SC-2** mint wave 1 + install map signed · **SC-3** mid wave (+10) · **SC-4** full ~60 · **SC-5** `verify:city-game` + launch preflight at each count |
-| **Regression** | `npm run city-game:scale-sc1` · `npm run city-game:scale-sc2` · `npm run verify:city-game` · `npm run city-game:verify-season -- --require-launch` · `npm run city-game:install-qa-preflight` |
+| **Milestones** | **SC-1 ☑** · **SC-2 ☑** · **SC-2b ☑** · **SC-3** local/C3 walk ☑ · prod seed 40/40 ☐ · **SC-4** mid wave (+10) · **SC-5** full ~60 |
+| **Regression** | `npm run city-game:scale-sc1` · `scale-sc2` · `scale-sc2b` · `scale-sc3` · `npm run verify:city-game` · `npm run city-game:install-qa-preflight` |
 | **File ownership** | `site/data/city-game-cr-season-01.json` · `worker/src/city-game/constants.ts` · `worker/scripts/city-game-*mint*` · install map doc · season registry codegen |
-| **Status** | **SC-1 ☑ engineering** — 40-node registry · **SC-2** `npm run city-game:scale-sc2` (exit 2 until mint + QR column) · M4 map dense sketch preview fix shipped |
-| **Blocked by** | Phase 1 launch sign-off; ops custody for production season root |
+| **Status** | **SC-1–SC-2b ☑ local** · **Next:** B7 physical install · `city-game:seed-production-wave-open` for prod 40/40 |
+| **Blocked by** | Phase 1 launch sign-off for public `--apply`; production mint for prod smoke |
 
-**Honest default:** Committed **15-row JSON** remains CI/scaffold until SC-1 lands — do not market 40-node summer until SC-2 mint completes.
+**Honest default:** Do not market 40-node summer until production mint matches registry and B7 passes.
 
 ---
 
@@ -247,7 +248,7 @@ WS-CUSTODY C1+ only if G-C0 pass
 | **S1 honest default** | Signal War **copy + operator flips** ship at open; player-initiated **SW-03–SW-05** target **S2 L** unless B8 merges earlier — cooperative **CR-G01/G07** stays **L** at S1 |
 | **Regression** | `npm run verify:city-game` · `worker/tests/city-game-contribute*.test.ts` · `worker/tests/map-node-snapshot*.test.ts` · comprehension **GT-8–GT-10** when SW-S2 ships |
 | **File ownership** | `worker/src/city-game/game-contribute*.ts` · `season-snapshot*` / `map-node-snapshot.ts` · `site/js/city-game-*` · scan templates for `relay_gate` · [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) fog section |
-| **Status** | **SW-S1 in progress** — unified rules copy, sanctuary pledge (device-local), operator relay hold flips, `relay_capture_player_enabled: false` at open (doc ☑) |
+| **Status** | **SW-S3 shipped** — fog filter (**SW-08**), artifacts/overharvest (**SW-09–SW-12**), dual victory on snapshot (**SW-13**) · **SW-14** debrief page · **SW-15** badge scan next |
 | **Parallel with** | WS-SCALE (registry must list relay roles before capture **L**) |
 
 ---
@@ -258,6 +259,8 @@ WS-CUSTODY C1+ only if G-C0 pass
 npm run verify:city-game
 npm run city-game:launch-preflight
 npm run custody:phase0-preflight
+npm run custody:c1-preflight
+npm run e2e:custody-device-unlock
 npm run worker:test -- worker/tests/city-game-contribute*.test.ts worker/tests/map-node-snapshot*.test.ts
 npm run build
 ```
@@ -387,6 +390,9 @@ npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts
 
 | Date | Event |
 |------|--------|
+| 2026-06-04 | **WS-SCALE C3 walk fix** — `install-qa-walk` uses full seed (40 nodes, not comprehension probes) · `city-game:scale-sc3` · season JSON re-merged to 40 |
+| 2026-06-04 | **WS-SCALE SC-2b ☑** — `city-game:smoke-local -- --all` (40 scans) · `city-game:scale-sc2b` · `seed-production-wave-open` script |
+| 2026-06-04 | **WS-SCALE SC-2 ☑** — `city-game:seed-wave-open` (25 nodes) · local seed 40/40 · install map QR ☑ · `city-game:scale-sc2` exit 0 |
 | 2026-06-03 | **WS-SCALE SC-1 ☑** — 40-node summer registry + `city-game:scale-sc1` preflight · next SC-2 mint/install |
 | 2026-06-03 | **Engineering Phase 2** — summer program: **WS-SCALE** (40→60), **WS-SW** (Signal War SW-01–15), Phase 1 exit gates; doc audit of custody + city-game canon |
 | 2026-06-03 | **WS-REV M5/E2.5** — hub monitoring line uses entitlements body (plan + auto-check usage / at-limit) |

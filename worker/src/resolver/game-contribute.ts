@@ -435,6 +435,13 @@ export async function handlePostGameContribute(
             409
           );
         }
+        if (e.message === "RELAY_SHIELDED") {
+          return errorResponse(
+            "RELAY_SHIELDED",
+            "Shield artifact active — this relay cannot be captured until the hold expires.",
+            409
+          );
+        }
         if (e.message === "REINFORCE_FACTION_MISMATCH") {
           return errorResponse(
             "REINFORCE_FACTION_MISMATCH",

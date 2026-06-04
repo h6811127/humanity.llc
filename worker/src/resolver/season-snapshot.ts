@@ -21,11 +21,22 @@ import {
 } from "../city-game/season-config";
 import { publicUnlockEdges } from "../live-object/network-graph";
 import { resolveSeasonById } from "../city-game/season-loader";
+import { runRelayTerritoryDecayCron } from "../city-game/relay-decay-cron";
 import {
   enforceGameSnapshotSeasonQuota,
   recordGameSnapshotSeasonUsage,
 } from "../city-game/season-quota";
 import { resolveSeasonWindowPhase } from "../city-game/season-window";
+import { buildSignalWarSnapshotSummary } from "../city-game/faction-network-score";
+import { buildDualVictorySnapshot } from "../city-game/dual-victory";
+import {
+  filterNodesForMapBoard,
+  rumoredNodeIdsForSeason,
+  seasonMapVisibility,
+} from "../city-game/map-fog-filter";
+import {
+  seasonRelayCapturePlayerEnabled,
+} from "../city-game/season-config";
 import { fragmentLatticeProgress } from "../city-game/unlock-engine";
 import {
   ifNoneMatchSatisfied,
@@ -109,7 +120,8 @@ function buildScanUrl(
 function publicNodeRow(
   row: MapNodeSnapshotRow,
   seasonWindowPhase: ReturnType<typeof resolveSeasonWindowPhase>,
-  scanUrl: string | null
+  scanUrl: string | null,
+  rumored: Set<string>
 ): SeasonSnapshotPublicNode {
   return {
     node_id: row.node_id,
@@ -121,8 +133,20 @@ function publicNodeRow(
     public_state: row.public_state,
     route_open: row.route_open,
     scan_url: scanUrl,
-    chips: buildMapNodeChips(row, seasonWindowPhase),
+    chips: buildMapNodeChips(row, seasonWindowPhase, { rumored }),
   };
+}
+
+function dedupeSnapshotHeadlines(lines: string[]): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || seen.has(trimmed)) continue;
+    seen.add(trimmed);
+    out.push(trimmed);
+  }
+  return out;
 }
 
 function buildFinaleSummary(nodes: MapNodeSnapshotRow[], season: CrSeasonConfig) {
@@ -192,6 +216,8 @@ export async function handleGetSeasonSnapshot(
   if (seasonQuota) return seasonQuota;
 
   const now = new Date();
+  await runRelayTerritoryDecayCron(env.DB, env, now, season);
+
   const origin = new URL(request.url).origin;
   const windowPhase = resolveSeasonWindowPhase(now, season);
   const nodes: MapNodeSnapshotRow[] = [];
@@ -223,16 +249,38 @@ export async function handleGetSeasonSnapshot(
     nodes.sort((a, b) => a.node_id.localeCompare(b.node_id));
   }
 
-  const headlines = buildLiveMapHeadlines({ season, nodes, now });
+  const signalWar = buildSignalWarSnapshotSummary({ nodes, season, now });
+  const dualVictory = buildDualVictorySnapshot({
+    nodes,
+    factionPoints: signalWar.faction_network_points,
+    season,
+    now,
+  });
+  const boardNodes = filterNodesForMapBoard({ nodes, season, now });
+  const mapVisibility = seasonMapVisibility(season);
+  const rumored = rumoredNodeIdsForSeason(season, now);
+  const rumoredIds = [...rumored].sort();
+  const headlines = dedupeSnapshotHeadlines([
+    ...dualVictory.summary_lines.slice(0, 1),
+    ...signalWar.summary_lines.slice(0, 2),
+    ...buildLiveMapHeadlines({ season, nodes, now }),
+  ]);
 
   const body = {
     season_id: season.season_id,
-    title: "Wake the city",
+    title: season.title?.trim() || "Wake the city · Signal War",
     window_phase: windowPhase,
     generated_at: now.toISOString(),
+    map_visibility: mapVisibility,
+    rumored_node_ids: rumoredIds,
+    signal_war: {
+      ...signalWar,
+      player_capture_enabled: seasonRelayCapturePlayerEnabled(season),
+      dual_victory: dualVictory,
+    },
     headlines,
-    nodes: nodes.map((row) =>
-      publicNodeRow(row, windowPhase, scanUrlByNode.get(row.node_id) ?? null)
+    nodes: boardNodes.map((row) =>
+      publicNodeRow(row, windowPhase, scanUrlByNode.get(row.node_id) ?? null, rumored)
     ),
     unlock_edges: publicUnlockEdges(season.unlock_edges, (nodeId) => {
       const row = nodes.find((n) => n.node_id === nodeId);

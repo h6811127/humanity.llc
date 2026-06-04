@@ -3,11 +3,15 @@
  * Cedar Rapids city game regression bundle (Phase C/D exit gate).
  * @see docs/CITY_GAME_V1_IMPLEMENTATION.md
  */
+import { readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { SUMMER_OPEN_NODE_COUNT } from "./city-game-summer-scale-core.mjs";
+
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
+const seasonPath = join(root, "site/data/city-game-cr-season-01.json");
 const skipTests = process.argv.includes("--skip-tests");
 const requireLaunch = process.argv.includes("--require-launch");
 const runE2e = process.argv.includes("--e2e");
@@ -15,6 +19,17 @@ const runE2e = process.argv.includes("--e2e");
 function run(cmd, args) {
   const r = spawnSync(cmd, args, { cwd: root, stdio: "inherit", shell: process.platform === "win32" });
   if (r.status !== 0) process.exit(r.status ?? 1);
+}
+
+const season = JSON.parse(readFileSync(seasonPath, "utf8"));
+const nodeCount = Array.isArray(season.nodes) ? season.nodes.length : 0;
+if (nodeCount !== SUMMER_OPEN_NODE_COUNT) {
+  console.error(
+    `\nSeason JSON has ${nodeCount}/${SUMMER_OPEN_NODE_COUNT} nodes in ${seasonPath}.`
+  );
+  console.error("Run: npm run city-game:merge-wave-open");
+  console.error("Then: npm run city-game:spread-map-layout -- --write\n");
+  process.exit(1);
 }
 
 console.log("=== city-game build registry ===\n");
@@ -41,6 +56,8 @@ if (!skipTests) {
     "worker/tests/city-game-season-entitlements-core.test.ts",
     "worker/tests/city-game-season-path-core.test.ts",
     "worker/tests/unlock-engine.test.ts",
+    "worker/tests/relay-contribute.test.ts",
+    "worker/tests/relay-decay-cron.test.ts",
     "worker/tests/unlock-evaluator.test.ts",
     "worker/tests/vouch-graph.test.ts",
     "worker/tests/city-game-launch-gates.test.ts",
@@ -67,8 +84,12 @@ if (!skipTests) {
     "worker/tests/city-game-player-guide-core.test.ts",
     "worker/tests/city-game-play-page-core.test.ts",
     "worker/tests/city-game-map-board-core.test.ts",
+    "worker/tests/city-game-map-interaction-core.test.ts",
     "worker/tests/live-map-ticker.test.ts",
     "worker/tests/city-game-season-snapshot.test.ts",
+    "worker/tests/map-fog-filter.test.ts",
+    "worker/tests/dual-victory.test.ts",
+    "worker/tests/faction-network-score.test.ts",
     "worker/tests/map-node-snapshot.test.ts",
     "worker/tests/city-game-map-snapshot-core.test.ts",
     "worker/tests/city-game-contribute-load.test.ts",
@@ -81,6 +102,7 @@ if (!skipTests) {
     "worker/tests/city-game-season-template-core.test.ts",
     "worker/tests/city-game-terminal-mint-deprecation-core.test.ts",
     "worker/tests/city-game-self-serve-staging-core.test.ts",
+    "worker/tests/created-child-object-game-node-print-pack-core.test.ts",
   ]);
 }
 

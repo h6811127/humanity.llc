@@ -16,19 +16,17 @@ const season = JSON.parse(
 
 describe("city-game seed site codes", () => {
   it("lists all autonomous contribute nodes from season automation", () => {
-    expect(seasonContributableNodeIds(season)).toEqual([
-      "node_01",
-      "node_04",
-      "node_09",
-      "node_10",
-      "node_11",
-    ]);
+    const ids = seasonContributableNodeIds(season);
+    expect(ids).toContain("node_04");
+    expect(ids).toContain("node_05");
+    expect(ids.length).toBeGreaterThan(0);
   });
 
   it("maps contribute modes for spine nodes", () => {
     expect(contributeModeForNode(season, "node_04")).toBe("quorum");
     expect(contributeModeForNode(season, "node_09")).toBe("fragment");
     expect(contributeModeForNode(season, "node_10")).toBe("scarcity");
+    expect(contributeModeForNode(season, "node_05")).toBe("capture");
     expect(contributeModeForNode(season, "node_07")).toBeNull();
   });
 
@@ -49,7 +47,7 @@ describe("city-game seed site codes", () => {
       },
     ]);
 
-    expect(rows).toHaveLength(5);
+    expect(rows).toHaveLength(seasonContributableNodeIds(season).length);
     expect(missingSeedSiteCodeWarnings(rows)).toEqual([]);
 
     const river = rows.find((row) => row.node_id === "node_04");

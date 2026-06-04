@@ -1,7 +1,12 @@
 /**
  * Cedar Rapids city game — M1 static city state board (read-only).
- * @see docs/CITY_GAME_MAP_DASHBOARD.md
+ * @see docs/CITY_GAME_MAP_DASHBOARD.md · M4 interaction in city-game-map-interaction.mjs
  */
+
+import {
+  buildDistrictFilterHtml,
+  isDenseMapBoard,
+} from "./city-game-map-interaction-core.mjs";
 
 export const CITY_GAME_SEASON_JSON_URL = "/data/city-game-cr-season-01.json";
 /** Multi-city index — prefer resolvePlayPageSeason() on play pages. */
@@ -214,7 +219,8 @@ export function buildMapSchematicSvg(season) {
       const pinLabel = escapeMapHtml(abbreviatePinLabel(row.label ?? row.node_id));
       const fullLabel = escapeMapHtml(row.label ?? row.node_id);
       const role = escapeMapHtml(row.role ?? "");
-      return `<g class="city-game-map-pin" data-node-id="${escapeMapHtml(row.node_id)}" data-role="${role}" transform="translate(${cx} ${cy})" aria-label="${fullLabel}">
+      const district = escapeMapHtml(row.district ?? "");
+      return `<g class="city-game-map-pin" data-node-id="${escapeMapHtml(row.node_id)}" data-district="${district}" data-role="${role}" transform="translate(${cx} ${cy})" aria-label="${fullLabel}" tabindex="-1" role="img">
   <title>${fullLabel}</title>
   <circle class="city-game-map-pin-dot" r="3.2" />
   <text class="city-game-map-pin-label" y="6.8" text-anchor="middle">${pinLabel}</text>
@@ -277,7 +283,7 @@ export function buildMapNodeListHtml(season) {
           const liveLine = scanUrl
             ? `<a class="city-game-map-scan-link" href="${escapeMapHtml(scanUrl)}">Open live scan</a>`
             : `<span class="city-game-map-live-hint">Scan sticker for live state</span>`;
-          return `<li class="city-game-map-node-row" data-node-id="${escapeMapHtml(row.node_id)}">
+          return `<li class="city-game-map-node-row" data-node-id="${escapeMapHtml(row.node_id)}" data-district="${escapeMapHtml(row.district ?? "")}" tabindex="0">
   <span class="city-game-map-node-title">${escapeMapHtml(row.label)}</span>
   <span class="city-game-map-node-meta">${escapeMapHtml(roleLabel)} · ${escapeMapHtml(districtLabel)}</span>
   ${tagHtml}
@@ -288,7 +294,7 @@ export function buildMapNodeListHtml(season) {
 </li>`;
         })
         .join("");
-      return `<div class="city-game-map-district">
+      return `<div class="city-game-map-district" data-district="${escapeMapHtml(district)}">
   <h3 class="city-game-map-district-label">${escapeMapHtml(label)}</h3>
   <ul class="city-game-map-node-list">${items}</ul>
 </div>`;
@@ -321,14 +327,43 @@ export function buildUnlockEdgesHtml(season) {
  * @param {Record<string, unknown>} season
  * @returns {string}
  */
+export function buildFogLegendHtml(season) {
+  const mode =
+    season?.signal_war &&
+    typeof season.signal_war === "object" &&
+    typeof /** @type {{ map_visibility?: string }} */ (season.signal_war).map_visibility ===
+      "string"
+      ? /** @type {{ map_visibility?: string }} */ (season.signal_war).map_visibility.trim()
+      : "public";
+  if (mode !== "signal_war" && mode !== "rumor_only") return "";
+  const lead =
+    mode === "rumor_only"
+      ? "Board pins show rumored relays and faction holds only — scan to discover the rest."
+      : "Board pins show owned relays, rumored hints, and cooperative nodes — unclaimed relays stay off the sketch.";
+  return `<section class="city-game-map-fog" aria-labelledby="city-game-map-fog-title">
+    <h3 class="group-label" id="city-game-map-fog-title">Signal War · fog</h3>
+    <p class="group-intro short">${escapeMapHtml(lead)} Full place names stay in the district list below.</p>
+  </section>`;
+}
+
+/**
+ * @param {Record<string, unknown>} season
+ * @returns {string}
+ */
 export function buildMapBoardInnerHtml(season) {
   const copy = resolveMapCopy(season);
+  const dense = isDenseMapBoard(season);
+  const denseClass = dense ? " city-game-map-board--dense" : "";
+  const sketchOpenAttr = dense ? "" : " open";
+  const sketchSummary = dense
+    ? "District sketch (optional) — tap to expand schematic pins"
+    : "District sketch";
   const fragmentCount = season.automation?.fragment_nodes?.length ?? 3;
   const finaleId = season.automation?.finale_node ?? "node_13";
   const finaleLabel =
     nodeRows(season).find((n) => n.node_id === finaleId)?.label ?? finaleId;
 
-  return `<div class="city-game-map-board">
+  return `<div class="city-game-map-board${denseClass}" data-active-district="all">
   <header class="city-game-map-header">
     <p class="city-game-map-eyebrow">${escapeMapHtml(copy.subtitle)}</p>
     <h2 class="city-game-map-title" id="city-state-title">${escapeMapHtml(copy.title)}</h2>
@@ -352,19 +387,35 @@ export function buildMapBoardInnerHtml(season) {
       <li>Loading weekend headlines…</li>
     </ul>
   </section>
+  <section
+    class="city-game-map-signal-war"
+    id="city-game-map-signal-war"
+    aria-labelledby="city-game-map-signal-war-title"
+    hidden
+  >
+    <h3 class="group-label" id="city-game-map-signal-war-title">Signal War · network</h3>
+    <ul
+      id="city-game-map-signal-war-lines"
+      class="guestbook-lines guestbook-lines-update"
+      aria-label="Faction network totals"
+    ></ul>
+  </section>
   <div class="city-game-map-shell">
     <p class="city-game-map-sync" id="city-game-map-sync" aria-live="polite">Loading live city state…</p>
     <div class="city-game-map-list-panel" aria-labelledby="city-game-map-list-title">
       <h3 class="group-label city-game-map-list-title" id="city-game-map-list-title">Places by district</h3>
+      ${buildDistrictFilterHtml(season)}
       ${buildMapNodeListHtml(season)}
     </div>
-    <div class="city-game-map-sketch-block" id="district-sketch">
-      <h3 class="group-label city-game-map-sketch-title">District sketch</h3>
-      <figure class="city-game-map-figure">
-        ${buildMapSchematicSvg(season)}
-        <figcaption class="city-game-map-figcaption">${escapeMapHtml(copy.diagram_note)} Live chips refresh from the season snapshot when the game is enabled.</figcaption>
-      </figure>
-    </div>
+    <details class="city-game-map-sketch-details" id="district-sketch"${sketchOpenAttr}>
+      <summary class="city-game-map-sketch-summary">${escapeMapHtml(sketchSummary)}</summary>
+      <div class="city-game-map-sketch-block">
+        <figure class="city-game-map-figure">
+          ${buildMapSchematicSvg(season)}
+          <figcaption class="city-game-map-figcaption">${escapeMapHtml(copy.diagram_note)} Live chips refresh from the season snapshot when the game is enabled.</figcaption>
+        </figure>
+      </div>
+    </details>
   </div>
   <section class="city-game-map-unlock" aria-labelledby="city-game-map-unlock-title">
     <h3 class="group-label" id="city-game-map-unlock-title">Unlock paths</h3>
@@ -372,6 +423,7 @@ export function buildMapBoardInnerHtml(season) {
     ${buildUnlockEdgesHtml(season)}
     <p class="idea-footnote" id="city-game-map-finale-footnote"><strong>${escapeMapHtml(finaleLabel)}</strong> needs <strong>${fragmentCount}</strong> district fragments plus quorum and witness paths above.</p>
   </section>
+  ${buildFogLegendHtml(season)}
   <section class="city-game-map-legend" aria-labelledby="city-game-map-legend-title">
     <h3 class="group-label" id="city-game-map-legend-title">Roles</h3>
     <ul class="tag-chips tag-chips-neutral" aria-label="Node role types">

@@ -65,6 +65,33 @@ function contributeModeFromPage() {
   return scanHero()?.dataset.gameContributeMode ?? "quorum";
 }
 
+function isCaptureMode() {
+  const mode = contributeModeFromPage();
+  return mode === "capture" || mode === "reinforce";
+}
+
+function selectedFaction() {
+  const select = document.getElementById("scan-game-contribute-faction");
+  if (!(select instanceof HTMLSelectElement)) return null;
+  const value = select.value.trim().toLowerCase();
+  return ["red", "blue", "green", "yellow"].includes(value) ? value : null;
+}
+
+function updateRelayHoldDisplay(data) {
+  const el = document.getElementById("scan-game-contribute-progress");
+  if (!el) return;
+  const faction = data.held_by_faction;
+  const until = data.held_until;
+  if (!faction) return;
+  const label =
+    faction === "neutral"
+      ? "Unclaimed"
+      : `${String(faction).charAt(0).toUpperCase()}${String(faction).slice(1)} team`;
+  el.textContent = until
+    ? `${label} · until ${String(until).slice(0, 16).replace("T", " ")}`
+    : label;
+}
+
 function updateScarcityRemaining(remaining) {
   const el = document.getElementById("scan-game-contribute-progress");
   if (!el) return;
@@ -138,14 +165,18 @@ function finishScarcityContribute(data) {
   );
 }
 
-async function submitContribute() {
+async function submitContribute(relayAction = "capture") {
   const profileId = profileIdFromHero();
   const objectId = objectIdFromHero();
   const qrId = qrIdFromHero();
   const input = document.getElementById("scan-game-contribute-code");
   const submit = document.getElementById("scan-game-contribute-submit");
+  const reinforce = document.getElementById("scan-game-contribute-reinforce");
 
-  if (!(input instanceof HTMLInputElement) || !(submit instanceof HTMLButtonElement)) {
+  if (!(input instanceof HTMLInputElement)) {
+    return;
+  }
+  if (!(submit instanceof HTMLButtonElement)) {
     return;
   }
   if (!profileId || !objectId || !qrId) {
@@ -160,7 +191,19 @@ async function submitContribute() {
     return;
   }
 
+  const body = { qr_id: qrId, site_code: siteCode };
+  if (isCaptureMode()) {
+    const faction = selectedFaction();
+    if (!faction) {
+      setStatus("Choose your faction before capturing or reinforcing.", "error");
+      return;
+    }
+    body.action = relayAction;
+    body.faction = faction;
+  }
+
   submit.disabled = true;
+  if (reinforce instanceof HTMLButtonElement) reinforce.disabled = true;
   setStatus("Sending contribution…", "waiting");
 
   const url = postGameContributeUrl(profileId, objectId);
@@ -168,7 +211,7 @@ async function submitContribute() {
     const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ qr_id: qrId, site_code: siteCode }),
+      body: JSON.stringify(body),
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
@@ -180,6 +223,7 @@ async function submitContribute() {
         "error"
       );
       submit.disabled = false;
+      if (reinforce instanceof HTMLButtonElement) reinforce.disabled = false;
       return;
     }
 
@@ -187,6 +231,22 @@ async function submitContribute() {
     const target = data.collective_target;
     if (typeof progress === "number" && typeof target === "number") {
       updateProgress(progress, target);
+    }
+
+    if (data.contribute_mode === "capture" || data.contribute_mode === "reinforce") {
+      updateRelayHoldDisplay(data);
+      hideContributeForm();
+      const factionLabel =
+        data.held_by_faction && data.held_by_faction !== "neutral"
+          ? `${String(data.held_by_faction).charAt(0).toUpperCase()}${String(data.held_by_faction).slice(1)} holds this relay`
+          : "Relay is unclaimed";
+      setStatus(
+        data.relay_compromised
+          ? `${factionLabel} — relay compromised from overuse.`
+          : factionLabel,
+        data.relay_compromised ? "error" : "success"
+      );
+      return;
     }
 
     if (data.contribute_mode === "fragment" || contributeModeFromPage() === "fragment") {
@@ -224,6 +284,7 @@ async function submitContribute() {
   } catch {
     setStatus("Network error. Check your connection and try again.", "error");
     submit.disabled = false;
+    if (reinforce instanceof HTMLButtonElement) reinforce.disabled = false;
   }
 }
 
@@ -231,6 +292,7 @@ function init() {
   if (!isContributePage()) return;
 
   const submit = document.getElementById("scan-game-contribute-submit");
+  const reinforce = document.getElementById("scan-game-contribute-reinforce");
   const input = document.getElementById("scan-game-contribute-code");
   if (!(submit instanceof HTMLButtonElement) || !(input instanceof HTMLInputElement)) {
     return;
@@ -242,8 +304,13 @@ function init() {
   }
 
   submit.addEventListener("click", () => {
-    void submitContribute();
+    void submitContribute("capture");
   });
+  if (reinforce instanceof HTMLButtonElement) {
+    reinforce.addEventListener("click", () => {
+      void submitContribute("reinforce");
+    });
+  }
   input.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
       event.preventDefault();

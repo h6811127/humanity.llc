@@ -16,6 +16,8 @@ export type SeasonContributeCode = {
 export type SeasonNodeRow = NetworkGraphNode & {
   node_class?: string;
   faction?: string;
+  /** Location weight for Signal War network score (**SW-06**). */
+  points_per_hour?: number;
 };
 export type SeasonUnlockEdge = NetworkGraphEdge;
 export type SeasonAutomation = NetworkGraphAutomation;
@@ -145,6 +147,26 @@ export function seasonRelayCapturePlayerEnabled(
 
 export function seasonRelayDecayHours(season: CrSeasonConfig = CR_SEASON_01): number {
   return graphFor(season).relayDecayHours();
+}
+
+/** SW-06 — location-weighted relay value for network totals. */
+export function seasonRelayPointsPerHour(
+  nodeId: string,
+  season: CrSeasonConfig = CR_SEASON_01
+): number | null {
+  const fromAuto = season.automation?.relay_points_per_hour?.[nodeId];
+  if (typeof fromAuto === "number" && Number.isFinite(fromAuto) && fromAuto > 0) {
+    return Math.min(Math.floor(fromAuto), 10_000);
+  }
+  const row = seasonNodeRow(nodeId, season);
+  if (
+    typeof row?.points_per_hour === "number" &&
+    Number.isFinite(row.points_per_hour) &&
+    row.points_per_hour > 0
+  ) {
+    return Math.min(Math.floor(row.points_per_hour), 10_000);
+  }
+  return null;
 }
 
 export function seasonVouchTargetsFrom(

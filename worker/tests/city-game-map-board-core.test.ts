@@ -11,6 +11,7 @@ import {
   buildMapsSearchUrl,
   validateMapLayout,
 } from "../../site/js/city-game-map-board-core.mjs";
+import { isDenseMapBoard } from "../../site/js/city-game-map-interaction-core.mjs";
 import { cityGameSeasonReadiness } from "../scripts/city-game-season-readiness.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
@@ -77,11 +78,18 @@ describe("city-game map board render", () => {
     expect(html).toContain("city-game-map-node-live");
     expect(html).toContain("Scan sticker for live state");
     expect(html).toContain("Places by district");
-    expect(html).toContain("District sketch");
+    if (isDenseMapBoard(season)) {
+      expect(html).toContain("city-game-map-board--dense");
+    } else {
+      expect(html).not.toContain("city-game-map-board--dense");
+    }
+    expect(html).toContain("city-game-map-filter");
+    expect(html).toContain("city-game-map-sketch-details");
     expect(html).toContain("district-sketch");
     expect(html).toContain("not a street map");
     expect(html).toContain("Data policy");
     expect(html).toContain("Unlock paths");
+    expect(html).toContain("Signal War · fog");
     expect(html).toContain("Live map flavor");
     expect(html).toContain("city-game-live-map-ticker");
     expect(html).toContain("city-game-map-sync");

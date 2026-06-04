@@ -3,7 +3,9 @@ import {
   isSeasonRootProfile,
   resolveSeasonForProfile,
 } from "../city-game/season-loader";
+import { seasonNodeIdForObject } from "../city-game/season-config";
 import { reconcileSeasonUnlockDrift } from "../city-game/unlock-evaluator";
+import { persistRelayDecayIfExpired } from "../city-game/relay-decay-cron";
 import { loadScanContext, type ScanContext } from "../db/scan";
 import { getLiveControlChallenge, getRecentLiveControlProof } from "../db/live-control";
 import { PROFILE_ID_REGEX } from "../crypto";
@@ -102,7 +104,7 @@ export async function handleGetScan(
 
   const now = new Date();
   const season = resolveSeasonForProfile(profileId);
-  const ctx = await loadScanContextWithUnlockDriftRepair(
+  const ctx = await loadScanContextWithGameRepairs(
     env.DB,
     profileId,
     qrId,
@@ -142,7 +144,7 @@ export async function handleGetScan(
   );
 }
 
-async function loadScanContextWithUnlockDriftRepair(
+async function loadScanContextWithGameRepairs(
   db: D1Database,
   profileId: string,
   qrId: string,
@@ -151,10 +153,32 @@ async function loadScanContextWithUnlockDriftRepair(
   season: ReturnType<typeof resolveSeasonForProfile>
 ): Promise<ScanContext> {
   let ctx = await loadScanContext(db, profileId, qrId);
-  if (!shouldRepairGameUnlockDriftOnScan(env, profileId, ctx, season)) return ctx;
+  if (!isCityGameEnabled(env) || !season) return ctx;
 
-  const { repaired } = await reconcileSeasonUnlockDrift(db, now, season!);
-  if (repaired.length > 0) {
+  let reloaded = false;
+
+  if (shouldRepairGameUnlockDriftOnScan(env, profileId, ctx, season)) {
+    const { repaired } = await reconcileSeasonUnlockDrift(db, now, season);
+    if (repaired.length > 0) reloaded = true;
+  }
+
+  if (
+    ctx.childObject?.object_type === GAME_NODE_OBJECT_TYPE &&
+    isSeasonRootProfile(profileId, season)
+  ) {
+    const nodeId = seasonNodeIdForObject(ctx.childObject.object_id, season);
+    const role = season.nodes.find((row) => row.node_id === nodeId)?.role;
+    if (role === "relay_gate") {
+      const decayed = await persistRelayDecayIfExpired(db, {
+        objectId: ctx.childObject.object_id,
+        parentProfileId: profileId,
+        now,
+      });
+      if (decayed) reloaded = true;
+    }
+  }
+
+  if (reloaded) {
     ctx = await loadScanContext(db, profileId, qrId);
   }
   return ctx;

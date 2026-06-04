@@ -660,10 +660,7 @@ describe("game-contribute", () => {
         }),
       }),
       db as unknown as D1Database,
-      {
-        CITY_GAME_ENABLED: "1",
-        CITY_GAME_RELAY_CAPTURE_PLAYER: "1",
-      },
+      { CITY_GAME_ENABLED: "1" },
       PROFILE,
       BRIDGE_OBJECT
     );

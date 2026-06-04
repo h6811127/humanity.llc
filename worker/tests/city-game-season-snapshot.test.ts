@@ -78,11 +78,23 @@ describe("season snapshot API", () => {
       season_id: string;
       headlines: string[];
       nodes: unknown[];
+      signal_war?: {
+        faction_network_points: Record<string, number>;
+      };
     };
     expect(body.season_id).toBe(SEASON_ID);
     expect(body.nodes).toEqual([]);
     expect(body.window_phase).toBe("open");
     expect(body.headlines.some((line) => line.includes("NewBo relay arch"))).toBe(true);
+    expect(body.signal_war).toBeDefined();
+    expect(body.signal_war.faction_network_points).toEqual({
+      red: 0,
+      blue: 0,
+      green: 0,
+      yellow: 0,
+    });
+    expect(body.map_visibility).toBe("signal_war");
+    expect(body.signal_war.dual_victory).toBeDefined();
     expect(res.headers.get("Cache-Control")).toContain("max-age=15");
     expect(res.headers.get("ETag")).toMatch(/^W\/"/);
 

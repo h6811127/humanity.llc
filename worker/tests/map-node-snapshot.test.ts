@@ -125,6 +125,21 @@ describe("buildMapNodeChips", () => {
     expect(chips.some((c) => c.kind === "finale" && c.value.includes("2 / 3"))).toBe(true);
   });
 
+  it("shows artifact and rumored relay chips (SW-09 / SW-08)", () => {
+    const rumored = new Set(["node_08"]);
+    const chips = buildMapNodeChips(
+      snapshotRow({
+        node_id: "node_08",
+        role: "relay_gate",
+        game_meta: baseMeta({ artifact_id: "hidden_relay" }),
+      }),
+      "open",
+      { rumored }
+    );
+    expect(chips.some((c) => c.label === "Artifact")).toBe(true);
+    expect(chips.some((c) => c.value.includes("Rumored relay"))).toBe(true);
+  });
+
   it("shows compromised relay chip", () => {
     const chips = buildMapNodeChips(
       snapshotRow({

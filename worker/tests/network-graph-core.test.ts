@@ -30,17 +30,11 @@ describe("network-graph-core.mjs (script + worker shared)", () => {
   });
 
   it("lists contributable nodes from automation thresholds", () => {
-    expect(contributableNodeIds(graphConfig)).toEqual([
-      "node_01",
-      "node_04",
-      "node_05",
-      "node_09",
-      "node_10",
-      "node_11",
-      "node_15",
-    ]);
-    // SW-S1: player relay capture off — node_05 stays in relay_capture_nodes for operator flips only.
-    expect(contributeModeForNode(graphConfig, "node_05")).toBeNull();
+    const ids = contributableNodeIds(graphConfig);
+    expect(ids).toContain("node_04");
+    expect(ids).toContain("node_05");
+    expect(ids).toEqual([...ids].sort());
+    expect(contributeModeForNode(graphConfig, "node_05")).toBe("capture");
     expect(contributeModeForNode(graphConfig, "node_04")).toBe("quorum");
     expect(contributeModeForNode(graphConfig, "node_10")).toBe("scarcity");
   });

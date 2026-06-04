@@ -73,6 +73,23 @@ describe("relay-contribute (SW-03 / SW-05)", () => {
     expect(decayed.meta.held_until).toBeNull();
   });
 
+  it("blocks capture while shield_generator hold is active", () => {
+    const now = new Date("2026-06-07T12:00:00.000Z");
+    const shielded = relayDoc({
+      held_by_faction: "blue",
+      held_until: "2026-06-08T12:00:00.000Z",
+      artifact_id: "shield_generator",
+    });
+    expect(() =>
+      applyRelayCaptureLocally(shielded, {
+        faction: "red",
+        now,
+        decayHours: 24,
+        action: "capture",
+      })
+    ).toThrow("RELAY_SHIELDED");
+  });
+
   it("compromises relay when overharvest limit reached", () => {
     const now = new Date("2026-06-07T12:00:00.000Z");
     const result = applyRelayCaptureLocally(

@@ -135,6 +135,9 @@ export function applySnapshotToMapBoard(boardRoot, snapshot) {
   for (const pin of boardRoot.querySelectorAll(".city-game-map-pin[data-node-id]")) {
     const nodeId = pin.getAttribute("data-node-id");
     const snap = nodeId ? nodeSnapshot(nodeById, nodeId) : null;
+    const fogHidden = Boolean(nodeId && !snap);
+    pin.hidden = fogHidden;
+    pin.classList.toggle("city-game-map-pin--fog-hidden", fogHidden);
     pin.classList.toggle("city-game-map-pin--live", Boolean(snap?.chips?.length));
     pin.classList.toggle("city-game-map-pin--maintenance", snap?.map_mode === "care_pause");
   }
@@ -158,8 +161,46 @@ export function applySnapshotToMapBoard(boardRoot, snapshot) {
   }
 
   applyFinaleFromSnapshot(boardRoot, snapshot);
+  applySignalWarFromSnapshot(boardRoot, snapshot);
 
   return { ok: true, nodeCount: nodes.length };
+}
+
+/**
+ * @param {Record<string, unknown>} snapshot
+ */
+export function signalWarSummaryLines(snapshot) {
+  const signalWar =
+    snapshot?.signal_war && typeof snapshot.signal_war === "object"
+      ? /** @type {Record<string, unknown>} */ (snapshot.signal_war)
+      : null;
+  if (!Array.isArray(signalWar?.summary_lines)) return [];
+  return signalWar.summary_lines.map((line) => String(line).trim()).filter(Boolean);
+}
+
+/**
+ * @param {HTMLElement} boardRoot
+ * @param {Record<string, unknown>} snapshot
+ */
+export function applySignalWarFromSnapshot(boardRoot, snapshot) {
+  const section = boardRoot.querySelector("#city-game-map-signal-war");
+  const list = boardRoot.querySelector("#city-game-map-signal-war-lines");
+  if (!(section instanceof HTMLElement) || !(list instanceof HTMLUListElement)) return;
+
+  const lines = signalWarSummaryLines(snapshot);
+
+  list.replaceChildren();
+  if (!lines.length) {
+    section.hidden = true;
+    return;
+  }
+
+  for (const line of lines) {
+    const li = document.createElement("li");
+    li.textContent = line;
+    list.appendChild(li);
+  }
+  section.hidden = false;
 }
 
 /**
