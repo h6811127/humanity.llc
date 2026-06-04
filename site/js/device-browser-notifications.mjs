@@ -19,10 +19,10 @@ import {
   shouldShowBrowserNotifPrompt,
   STORAGE_BROWSER_NOTIF,
   STORAGE_PROMPT_DISMISS,
-} from "./device-browser-notifications-core.mjs?v=89";
+} from "./device-browser-notifications-core.mjs?v=90";
 import { buildLiveControlProofHref } from "./device-live-control-inbox-core.mjs";
 import { getLiveControlPending, getLiveControlPendingCount } from "./device-live-control-inbox.mjs";
-import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=89";
+import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=90";
 import {
   registerLiveProofServiceWorker,
   syncLiveProofServiceWorkerState,

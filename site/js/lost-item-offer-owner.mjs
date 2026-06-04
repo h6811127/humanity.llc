@@ -4,10 +4,14 @@ import {
   signDocument,
   withProtocolFields,
 } from "./hc-sign.mjs";
-import { postLostItemOfferOwnerUrl } from "./lost-item-offer-core.mjs";
+import {
+  postLostItemOfferOwnerUrl,
+  postRelayOfferProfileSummaryUrl,
+} from "./lost-item-offer-core.mjs";
 import { resolverErrorMessage } from "./resolver-user-error-core.mjs";
 
-const PAYLOAD_TYPE = "relay_offer_owner_query";
+const OWNER_QUERY_TYPE = "relay_offer_owner_query";
+const PROFILE_SUMMARY_TYPE = "relay_offer_profile_summary";
 
 /**
  * @param {{
@@ -29,9 +33,50 @@ export async function signRelayOfferOwnerQuery(opts) {
       created_at: new Date().toISOString(),
       ...(opts.action === "dismiss" && opts.offerId ? { offer_id: opts.offerId } : {}),
     },
-    PAYLOAD_TYPE
+    OWNER_QUERY_TYPE
   );
   return signDocument(unsigned, privateKey, opts.publicKeyBase58);
+}
+
+/**
+ * @param {{
+ *   profileId: string;
+ *   privateKeyBase58: string;
+ *   publicKeyBase58: string;
+ * }} opts
+ */
+export async function signRelayOfferProfileSummaryQuery(opts) {
+  const privateKey = decodePrivateKeyBase58(opts.privateKeyBase58);
+  const unsigned = withProtocolFields(
+    {
+      profile_id: opts.profileId,
+      created_at: new Date().toISOString(),
+    },
+    PROFILE_SUMMARY_TYPE
+  );
+  return signDocument(unsigned, privateKey, opts.publicKeyBase58);
+}
+
+/**
+ * @param {{
+ *   profileId: string;
+ *   privateKeyBase58: string;
+ *   publicKeyBase58: string;
+ * }} opts
+ */
+export async function fetchRelayOfferProfileSummary(opts) {
+  const query = await signRelayOfferProfileSummaryQuery(opts);
+  const url = new URL(postRelayOfferProfileSummaryUrl(opts.profileId), resolverApiOrigin());
+  const res = await fetch(url.href, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ query }),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(resolverErrorMessage(body, "Could not reach relay offers."));
+  }
+  return body;
 }
 
 /**

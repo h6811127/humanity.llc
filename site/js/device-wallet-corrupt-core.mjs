@@ -7,12 +7,12 @@ import {
   emphasisCardActionsHtml,
   emphasisCardCtaLinkSecondary,
   emphasisCardCtaSecondary,
-} from "./device-emphasis-card-html.mjs?v=89";
+} from "./device-emphasis-card-html.mjs?v=90";
 import {
   WALLET_CORRUPT_HELP_CTA,
   WALLET_CORRUPT_HELP_HREF,
   WALLET_CORRUPT_IMPORT_CTA,
-} from "./device-ownership-copy-core.mjs?v=89";
+} from "./device-ownership-copy-core.mjs?v=90";
 
 export const WALLET_CORRUPT_IMPORT_ATTR = "data-wallet-corrupt-import";
 

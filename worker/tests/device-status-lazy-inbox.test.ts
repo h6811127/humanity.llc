@@ -50,5 +50,21 @@ describe("device-status lazy inbox (P2 hardening)", () => {
     const src = fs.readFileSync(path.join(siteJsDir, "device-hub-sheet-loader.mjs"), "utf8");
     expect(src).toMatch(/import\s*\(\s*[`'"].*device-hub-sheet\.mjs/i);
   });
+
+  it("device-hub-ui.mjs does not statically import device-relay-offer-inbox.mjs", () => {
+    const src = fs.readFileSync(path.join(siteJsDir, "device-hub-ui.mjs"), "utf8");
+    expect(src).not.toMatch(
+      /^\s*import\s+.+\s+from\s+["']\.\/device-relay-offer-inbox\.mjs/i
+    );
+    expect(src).toMatch(/device-relay-offer-inbox-loader\.mjs/);
+  });
+
+  it("device-relay-offer-inbox-loader uses dynamic import for relay inbox", () => {
+    const src = fs.readFileSync(
+      path.join(siteJsDir, "device-relay-offer-inbox-loader.mjs"),
+      "utf8"
+    );
+    expect(src).toMatch(/import\s*\(\s*[`'"].*device-relay-offer-inbox\.mjs/i);
+  });
 });
 

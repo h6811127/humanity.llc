@@ -27,3 +27,10 @@ export function postLostItemOfferUrl(profileId, objectId) {
 export function postLostItemOfferOwnerUrl(profileId, objectId) {
   return `/.well-known/hc/v1/cards/${encodeURIComponent(profileId)}/objects/${encodeURIComponent(objectId)}/offer/owner`;
 }
+
+/**
+ * @param {string} profileId
+ */
+export function postRelayOfferProfileSummaryUrl(profileId) {
+  return `/.well-known/hc/v1/cards/${encodeURIComponent(profileId)}/relay-offers/summary`;
+}

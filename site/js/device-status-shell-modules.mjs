@@ -10,7 +10,7 @@
  * Bump on all shell HTML (`device-status-bootstrap.mjs?v=N`) and on every
  * `./peer.mjs?v=N` import between files in DEVICE_STATUS_SHELL_JS_FILES.
  */
-export const DEVICE_SHELL_ASSET_VERSION = 89;
+export const DEVICE_SHELL_ASSET_VERSION = 90;
 
 /** Cache-bust for shell CSS on Pages HTML (keep in sync with asset version bumps). */
 export const DEVICE_SHELL_CSS_VERSION = DEVICE_SHELL_ASSET_VERSION;
@@ -51,6 +51,8 @@ export const DEVICE_STATUS_SHELL_JS_FILES = [
   "device-inbox-sheet-loader.mjs",
   "device-hub-sheet-loader.mjs",
   "device-inbox-loader.mjs",
+  "device-relay-offer-inbox-loader.mjs",
+  "device-relay-offer-inbox-core.mjs",
   "device-browser-notifications-loader.mjs",
   "device-inbox-sheet.mjs",
   "device-inbox-sheet-core.mjs",

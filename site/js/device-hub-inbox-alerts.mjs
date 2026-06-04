@@ -17,6 +17,11 @@ import {
   liveProofInboxRowSubtitle,
   openLiveControlProof,
 } from "./device-live-control-inbox.mjs";
+import { relayOfferInboxRowSubtitle } from "./device-relay-offer-inbox-core.mjs";
+import {
+  getRelayOfferPending,
+  RELAY_OFFER_INBOX_CHANGED,
+} from "./device-relay-offer-inbox-loader.mjs";
 
 function escapeHtml(s) {
   return String(s)
@@ -30,6 +35,8 @@ function escapeHtml(s) {
  *   noticeGroup: HTMLElement | null,
  *   liveControlGroup: HTMLElement | null,
  *   liveControlList: HTMLElement | null,
+ *   relayOfferGroup: HTMLElement | null,
+ *   relayOfferList: HTMLElement | null,
  *   cardDisabledGroup: HTMLElement | null,
  *   cardDisabledList: HTMLElement | null,
  *   noticeMode: 'created-url' | 'keys-strip',
@@ -41,6 +48,8 @@ export function renderHubInboxAlerts(ctx) {
     noticeGroup,
     liveControlGroup,
     liveControlList,
+    relayOfferGroup,
+    relayOfferList,
     cardDisabledGroup,
     cardDisabledList,
     noticeMode,
@@ -52,6 +61,11 @@ export function renderHubInboxAlerts(ctx) {
     liveControlGroup,
     liveControlList,
     showLiveControlInbox && inboxItemsIncludeKind(items, "live_proof")
+  );
+  renderRelayOfferHubGroup(
+    relayOfferGroup,
+    relayOfferList,
+    inboxItemsIncludeKind(items, "relay_offer")
   );
   renderTabKeysHubNotice(
     noticeGroup,
@@ -229,6 +243,88 @@ function renderLiveProofHubGroup(liveControlGroup, liveControlList, show) {
   }
 }
 
+function openRelayOfferManagement(profileId) {
+  const entry = findWalletEntryByProfileId(profileId);
+  if (entry) {
+    openCardNowPage(entry);
+    return;
+  }
+  const url = new URL("/created/", location.origin);
+  url.searchParams.set("profile_id", profileId);
+  location.href = url.href;
+}
+
+/**
+ * @param {HTMLElement | null} relayOfferGroup
+ * @param {HTMLElement | null} relayOfferList
+ * @param {boolean} show
+ */
+function renderRelayOfferHubGroup(relayOfferGroup, relayOfferList, show) {
+  if (!relayOfferGroup || !relayOfferList) {
+    if (relayOfferGroup) relayOfferGroup.hidden = true;
+    return;
+  }
+
+  relayOfferList.innerHTML = "";
+  if (!show) {
+    relayOfferGroup.hidden = true;
+    return;
+  }
+
+  const pending = getRelayOfferPending();
+  const total = pending.reduce((sum, item) => sum + item.pendingCount, 0);
+  if (total === 0) {
+    relayOfferGroup.hidden = true;
+    const summaryEl = relayOfferGroup.querySelector("#device-hub-relay-offer-summary");
+    if (summaryEl instanceof HTMLElement) {
+      summaryEl.textContent = "";
+      summaryEl.hidden = true;
+    }
+    return;
+  }
+
+  relayOfferGroup.hidden = false;
+
+  const summaryEl = relayOfferGroup.querySelector("#device-hub-relay-offer-summary");
+  const eyebrowEl = relayOfferGroup.querySelector("#device-hub-relay-offer-eyebrow");
+  if (eyebrowEl instanceof HTMLElement) {
+    eyebrowEl.textContent =
+      total === 1 ? "Finder message waiting" : `${total} finder messages waiting`;
+  }
+  if (summaryEl instanceof HTMLElement) {
+    summaryEl.textContent =
+      total === 1
+        ? "Someone left an anonymous return note on your relay. Tap below to read on Now."
+        : `${total} anonymous return notes are waiting. Tap a relay below to read on Now.`;
+    summaryEl.hidden = false;
+  }
+
+  for (const item of pending) {
+    const label = item.publicLabel || "Return relay";
+    const sub = relayOfferInboxRowSubtitle(label, item.pendingCount);
+
+    const li = document.createElement("li");
+    li.className = "list-row list-action device-relay-offer-row";
+    li.dataset.hubSearchable =
+      `finder message waiting ${label} ${item.objectId || ""}`.toLowerCase();
+    li.innerHTML = `
+      <button type="button" class="device-relay-offer-open">
+        <span class="list-icon list-icon-tone-gold" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </span>
+        <span class="list-content">
+          <span class="list-title">${escapeHtml(label)}</span>
+          <span class="list-sub">${escapeHtml(sub)}</span>
+        </span>
+        <span class="list-chevron" aria-hidden="true">›</span>
+      </button>`;
+    li.querySelector(".device-relay-offer-open")?.addEventListener("click", () => {
+      openRelayOfferManagement(item.profileId);
+    });
+    relayOfferList.appendChild(li);
+  }
+}
+
 /**
  * @param {HTMLElement | null} noticeGroup
  * @param {boolean} show
@@ -285,3 +381,4 @@ function renderTabKeysHubNotice(noticeGroup, show, noticeMode) {
 }
 
 export { inboxItemsIncludeKind } from "./device-inbox-core.mjs";
+export { RELAY_OFFER_INBOX_CHANGED } from "./device-relay-offer-inbox-loader.mjs";

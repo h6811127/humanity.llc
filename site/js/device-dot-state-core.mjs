@@ -17,9 +17,9 @@ import {
   UNLOCK_TO_MANAGE_HERE,
   UNLOCK_TO_MANAGE_IN_THIS_TAB,
   UNLOCK_TO_MANAGE_PROMPT,
-} from "./device-ownership-copy-core.mjs?v=89";
-import { walletOwnershipNotInTab } from "./device-ownership-not-in-tab-core.mjs?v=89";
-import { dotOverlayCrossTabPhrase } from "./device-shell-copy-core.mjs?v=89";
+} from "./device-ownership-copy-core.mjs?v=90";
+import { walletOwnershipNotInTab } from "./device-ownership-not-in-tab-core.mjs?v=90";
+import { dotOverlayCrossTabPhrase } from "./device-shell-copy-core.mjs?v=90";
 
 /** @typedef {import("./device-shell-copy-core.mjs").ShellSurface} ShellSurface */
 
