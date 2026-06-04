@@ -31,9 +31,20 @@ export async function importAesGcmKey(rawKeyBytes) {
   return crypto.subtle.importKey("raw", rawKeyBytes, "AES-GCM", false, ["encrypt", "decrypt"]);
 }
 
+/**
+ * @param {Uint8Array | ArrayBuffer | ArrayBufferView} bytes
+ */
 export function bytesToBase64(bytes) {
+  const u8 =
+    bytes instanceof Uint8Array
+      ? bytes
+      : bytes instanceof ArrayBuffer
+        ? new Uint8Array(bytes)
+        : ArrayBuffer.isView(bytes)
+          ? new Uint8Array(bytes.buffer, bytes.byteOffset, bytes.byteLength)
+          : bytes;
   let binary = "";
-  for (const b of bytes) binary += String.fromCharCode(b);
+  for (const b of u8) binary += String.fromCharCode(b);
   return btoa(binary);
 }
 
