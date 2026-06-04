@@ -13,14 +13,14 @@ import {
   statusAriaLabel,
   SHELL_DOT_NEUTRAL_EMPTY_CLASS,
   shellDotUsesNeutralEmptyWallet,
-} from "./device-dot-state-core.mjs?v=88";
-import { shellSurfaceFromStandalone } from "./device-shell-copy-core.mjs";
+} from "./device-dot-state-core.mjs?v=89";
+import { shellSurfaceFromStandalone } from "./device-shell-copy-core.mjs?v=89";
 import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
 import { logDotDiagnostic } from "./device-dot-diagnostics.mjs";
 import { shouldDeferCoreDotPaint } from "./device-status-dot-boot-core.mjs";
 import { markDotBootPending } from "./device-status-dot-boot.mjs";
-import { closeInboxSheet } from "./device-inbox-sheet-loader.mjs?v=88";
-import { syncInboxBackdropForOpenHub } from "./device-sheet-backdrop-sync.mjs?v=88";
+import { closeInboxSheet } from "./device-inbox-sheet-loader.mjs?v=89";
+import { syncInboxBackdropForOpenHub } from "./device-sheet-backdrop-sync.mjs?v=89";
 
 export const DOT_STATE_CHANGED = "hc-dot-state-changed";
 

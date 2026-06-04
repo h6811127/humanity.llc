@@ -64,4 +64,21 @@ describe("device status shell module manifest", () => {
       expect(html, page).toContain(expected);
     }
   });
+
+  it("custody status graph cache-busts copy chain (partial-load regression)", () => {
+    const v = DEVICE_SHELL_ASSET_VERSION;
+    const read = (name) =>
+      fs.readFileSync(path.join(siteJsDir, name), "utf8");
+    expect(read("device-dot-state-core.mjs")).toContain(
+      `device-ownership-copy-core.mjs?v=${v}`
+    );
+    expect(read("device-ownership-copy-core.mjs")).toContain(
+      `device-custody-mode-core.mjs?v=${v}`
+    );
+    expect(read("device-status.mjs")).toContain(`device-dot-state-core.mjs?v=${v}`);
+    expect(read("device-status.mjs")).toContain(
+      `device-wallet-corrupt-core.mjs?v=${v}`
+    );
+    expect(read("device-status-core.mjs")).toContain(`device-dot-state-core.mjs?v=${v}`);
+  });
 });

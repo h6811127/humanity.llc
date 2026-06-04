@@ -10,7 +10,7 @@
  * Bump on all shell HTML (`device-status-bootstrap.mjs?v=N`) and on every
  * `./peer.mjs?v=N` import between files in DEVICE_STATUS_SHELL_JS_FILES.
  */
-export const DEVICE_SHELL_ASSET_VERSION = 88;
+export const DEVICE_SHELL_ASSET_VERSION = 89;
 
 /** Cache-bust for shell CSS on Pages HTML (keep in sync with asset version bumps). */
 export const DEVICE_SHELL_CSS_VERSION = DEVICE_SHELL_ASSET_VERSION;
@@ -37,6 +37,8 @@ export const DEVICE_STATUS_SHELL_JS_FILES = [
   "device-dot-state-core.mjs",
   "device-custody-mode-core.mjs",
   "device-ownership-copy-core.mjs",
+  "device-shell-copy-core.mjs",
+  "device-emphasis-card-html.mjs",
   "device-ownership-not-in-tab-core.mjs",
   "device-chrome-refresh-core.mjs",
   "device-chrome-refresh.mjs",

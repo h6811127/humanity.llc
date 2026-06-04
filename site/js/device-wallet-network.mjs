@@ -23,7 +23,7 @@ import {
   shouldUseCachedNetworkStatus,
   verificationRecordFromLabelState,
   WALLET_NETWORK_CACHE_TTL_MS,
-} from "./device-wallet-network-core.mjs?v=88";
+} from "./device-wallet-network-core.mjs?v=89";
 import {
   getWalletStatusPollHealth,
   setWalletStatusPollHealthForSinceVisit,
@@ -41,7 +41,7 @@ import {
   setWalletNetworkTruthFromCacheOnly,
   setWalletNetworkTruthFromPoll,
   shouldSuppressCardDisabledSinceVisitFromTruth,
-} from "./device-wallet-network-truth.mjs?v=88";
+} from "./device-wallet-network-truth.mjs?v=89";
 
 export { readCachedVerification };
 export {
@@ -49,7 +49,7 @@ export {
   isSinceVisitBlockedChipStatus,
   listWalletNetworkTruthPollProfileIds,
   shouldSuppressCardDisabledSinceVisitFromTruth,
-} from "./device-wallet-network-truth.mjs?v=88";
+} from "./device-wallet-network-truth.mjs?v=89";
 
 const CACHE_KEY = "hc_wallet_network_cache";
 const LAST_SEEN_KEY = "hc_wallet_last_seen_network";
