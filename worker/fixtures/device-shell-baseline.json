@@ -1,14 +1,14 @@
 {
   "schema": "device_shell_baseline_v1",
-  "generated_at": "2026-06-03",
+  "generated_at": "2026-06-04",
   "phase": "smooth_mode_phase_0",
-  "asset_version": 87,
-  "module_count": 74,
-  "js_bytes_total": 462289,
-  "shell_css_bytes_total": 76816,
-  "landing_css_bytes_total": 324887,
-  "transfer_bytes_shell_graph": 539105,
-  "transfer_bytes_landing_first_paint": 787176,
+  "asset_version": 93,
+  "module_count": 84,
+  "js_bytes_total": 546991,
+  "shell_css_bytes_total": 77438,
+  "landing_css_bytes_total": 326348,
+  "transfer_bytes_shell_graph": 624429,
+  "transfer_bytes_landing_first_paint": 873339,
   "js_modules": [
     {
       "file": "js/device-status-bootstrap.mjs",
@@ -32,7 +32,7 @@
     },
     {
       "file": "js/device-status-dot-view-transition-core.mjs",
-      "bytes": 1575
+      "bytes": 1590
     },
     {
       "file": "js/build-meta-browser.mjs",
@@ -44,19 +44,35 @@
     },
     {
       "file": "js/device-status-core.mjs",
-      "bytes": 7461
+      "bytes": 7466
     },
     {
       "file": "js/device-status.mjs",
-      "bytes": 22854
+      "bytes": 23670
     },
     {
       "file": "js/device-hub-intro-coachmark.mjs",
-      "bytes": 6770
+      "bytes": 6775
     },
     {
       "file": "js/device-dot-state-core.mjs",
-      "bytes": 16556
+      "bytes": 18656
+    },
+    {
+      "file": "js/device-custody-mode-core.mjs",
+      "bytes": 5899
+    },
+    {
+      "file": "js/device-ownership-copy-core.mjs",
+      "bytes": 30300
+    },
+    {
+      "file": "js/device-shell-copy-core.mjs",
+      "bytes": 6555
+    },
+    {
+      "file": "js/device-emphasis-card-html.mjs",
+      "bytes": 3378
     },
     {
       "file": "js/device-ownership-not-in-tab-core.mjs",
@@ -68,11 +84,19 @@
     },
     {
       "file": "js/device-chrome-refresh.mjs",
-      "bytes": 7795
+      "bytes": 9044
+    },
+    {
+      "file": "js/device-foreground-attention-core.mjs",
+      "bytes": 2409
+    },
+    {
+      "file": "js/device-foreground-attention.mjs",
+      "bytes": 2728
     },
     {
       "file": "js/device-live-proof-banner.mjs",
-      "bytes": 2279
+      "bytes": 2407
     },
     {
       "file": "js/device-shell-boot-core.mjs",
@@ -88,11 +112,11 @@
     },
     {
       "file": "js/device-shell-resume-core.mjs",
-      "bytes": 949
+      "bytes": 1352
     },
     {
       "file": "js/device-shell-resume.mjs",
-      "bytes": 1801
+      "bytes": 1927
     },
     {
       "file": "js/device-inbox-sheet-loader.mjs",
@@ -107,12 +131,24 @@
       "bytes": 2466
     },
     {
+      "file": "js/device-relay-offer-inbox-loader.mjs",
+      "bytes": 1924
+    },
+    {
+      "file": "js/device-relay-offer-inbox-core.mjs",
+      "bytes": 2595
+    },
+    {
+      "file": "js/device-notification-delivery.mjs",
+      "bytes": 3356
+    },
+    {
       "file": "js/device-browser-notifications-loader.mjs",
       "bytes": 1364
     },
     {
       "file": "js/device-inbox-sheet.mjs",
-      "bytes": 11646
+      "bytes": 12508
     },
     {
       "file": "js/device-inbox-sheet-core.mjs",
@@ -131,8 +167,12 @@
       "bytes": 1459
     },
     {
+      "file": "js/device-notification-delivery-core.mjs",
+      "bytes": 7262
+    },
+    {
       "file": "js/device-inbox-core.mjs",
-      "bytes": 19895
+      "bytes": 23465
     },
     {
       "file": "js/device-cross-tab-state-core.mjs",
@@ -152,11 +192,11 @@
     },
     {
       "file": "js/device-hub-keys-custody-core.mjs",
-      "bytes": 7534
+      "bytes": 8352
     },
     {
       "file": "js/device-hub-keys-custody.mjs",
-      "bytes": 13380
+      "bytes": 14785
     },
     {
       "file": "js/device-presence-inbox-stability-core.mjs",
@@ -164,7 +204,7 @@
     },
     {
       "file": "js/device-quiet-tab-rehydrate-core.mjs",
-      "bytes": 5106
+      "bytes": 5789
     },
     {
       "file": "js/device-quiet-tab-rehydrate-boot-core.mjs",
@@ -176,7 +216,7 @@
     },
     {
       "file": "js/device-quiet-tab-rehydrate.mjs",
-      "bytes": 6746
+      "bytes": 7038
     },
     {
       "file": "js/device-quiet-tab-rehydrate-bootstrap.mjs",
@@ -184,7 +224,7 @@
     },
     {
       "file": "js/device-inbox.mjs",
-      "bytes": 4417
+      "bytes": 5144
     },
     {
       "file": "js/device-tab-presence-core.mjs",
@@ -204,7 +244,7 @@
     },
     {
       "file": "js/device-wallet-corrupt-core.mjs",
-      "bytes": 1250
+      "bytes": 1260
     },
     {
       "file": "js/device-pwa-session-mismatch-core.mjs",
@@ -216,7 +256,7 @@
     },
     {
       "file": "js/wallet-page-chrome.mjs",
-      "bytes": 12200
+      "bytes": 13069
     },
     {
       "file": "js/device-resolver-sync-core.mjs",
@@ -236,7 +276,7 @@
     },
     {
       "file": "js/device-hub-ui.mjs",
-      "bytes": 90719
+      "bytes": 93460
     },
     {
       "file": "js/device-hub-card-row-core.mjs",
@@ -252,7 +292,7 @@
     },
     {
       "file": "js/device-wallet-network.mjs",
-      "bytes": 25011
+      "bytes": 26504
     },
     {
       "file": "js/device-hub-build-stamp.mjs",
@@ -300,11 +340,11 @@
     },
     {
       "file": "js/device-browser-notifications.mjs",
-      "bytes": 11152
+      "bytes": 11101
     },
     {
       "file": "js/device-browser-notifications-core.mjs",
-      "bytes": 1756
+      "bytes": 1786
     }
   ]
 }
