@@ -15,7 +15,7 @@ import {
 } from "../../site/js/created-view-only-copy-core.mjs";
 import {
   OWNERSHIP_NOT_IN_TAB_PROMPT,
-  RESTORE_CONTROL_IN_THIS_TAB,
+  OPEN_CONTROLS_ACTION,
   UNLOCK_TO_MANAGE_IN_THIS_TAB,
   VIEW_ONLY_LIVE_TAB_LEAD,
 } from "../../site/js/device-ownership-copy-core.mjs";
@@ -50,8 +50,8 @@ describe("created-view-only-copy-core", () => {
 
   it("wallet saved live banner copy kept for hub paths (banner hidden in view UI)", () => {
     expect(viewOnlyLiveTabTitle(1)).toBe(OWNERSHIP_NOT_IN_TAB_PROMPT);
-    expect(viewOnlyLiveTabLead(1)).toMatch(/saved on this device/i);
-    expect(viewOnlyLiveTabRestoreLabel(1)).toBe(RESTORE_CONTROL_IN_THIS_TAB);
+    expect(viewOnlyLiveTabLead(1)).toMatch(/Open controls/i);
+    expect(viewOnlyLiveTabRestoreLabel(1)).toBe(OPEN_CONTROLS_ACTION);
     expect(viewOnlyLiveTabTitle(0)).toBe("View only in this tab");
   });
 

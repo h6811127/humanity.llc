@@ -10,8 +10,8 @@ import {
   DEVICE_UNLOCK_REENROLL_IN_THIS_TAB,
   OWNERSHIP_NOT_IN_TAB_PROMPT,
   OWNERSHIP_NOT_IN_TAB_SUBTITLE,
-  RESTORE_CONTROL_HERE,
-  RESTORE_CONTROL_IN_THIS_TAB,
+  OPEN_CONTROLS_ACTION,
+  OPEN_CONTROLS_HERE,
   STEWARD_REVIEW_QUEUE_MANAGE_HINT,
   UNLOCK_NOT_IN_TAB_SUBTITLE,
   UNLOCK_TO_MANAGE_HERE,
@@ -333,7 +333,7 @@ export function describeDotState(network, device, overlay, opts = {}) {
       next:
         overlayText ||
         (pageKind === "scan"
-          ? "Scroll to attest or take control here on this scan."
+          ? "Open controls to attest on this scan."
           : singleSavedCardWithKeys && pageKind !== "wallet"
             ? "Open your saved card to update or revoke."
             : "Open controls to manage a saved card."),
@@ -350,8 +350,8 @@ export function describeDotState(network, device, overlay, opts = {}) {
           ? UNLOCK_TO_MANAGE_HERE
           : UNLOCK_TO_MANAGE_IN_THIS_TAB
         : pageKind === "scan"
-          ? RESTORE_CONTROL_HERE
-          : RESTORE_CONTROL_IN_THIS_TAB;
+          ? OPEN_CONTROLS_HERE
+          : OPEN_CONTROLS_ACTION;
     const actionKind = walletNeedsDeviceUnlockReenroll
       ? "import_backup"
       : pageKind === "scan"
@@ -365,7 +365,7 @@ export function describeDotState(network, device, overlay, opts = {}) {
             ? `${DEVICE_UNLOCK_REENROLL_PROMPT} on this scan.`
             : walletNeedsDeviceUnlock
               ? "Unlock to manage on this scan."
-              : "Ownership not in this tab."
+              : `${OWNERSHIP_NOT_IN_TAB_PROMPT}.`
           : walletNeedsDeviceUnlockReenroll
             ? `${DEVICE_UNLOCK_REENROLL_PROMPT}.`
             : walletNeedsDeviceUnlock
@@ -383,7 +383,7 @@ export function describeDotState(network, device, overlay, opts = {}) {
             ? `${DEVICE_UNLOCK_REENROLL_ON_SCAN}, then enroll in Manage.`
             : walletNeedsDeviceUnlock
               ? `${UNLOCK_TO_MANAGE_HERE} to attest on this scan.`
-              : `${RESTORE_CONTROL_HERE} to attest on this scan.`
+              : `${OPEN_CONTROLS_HERE} to attest on this scan.`
           : walletNeedsDeviceUnlockReenroll
             ? `${DEVICE_UNLOCK_REENROLL_SUBTITLE}.`
             : walletNeedsDeviceUnlock

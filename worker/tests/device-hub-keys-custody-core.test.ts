@@ -72,7 +72,7 @@ describe("buildHubKeysCustodyPanel", () => {
       educationDismissed: true,
     });
     expect(state.rows.map((r) => r.kind)).toEqual(["wallet_not_in_tab"]);
-    expect(state.rows[0].title).toBe("Ownership not in this tab — tap to restore");
+    expect(state.rows[0].title).toBe("Ownership saved on this device");
     expect(state.visible).toBe(true);
   });
 

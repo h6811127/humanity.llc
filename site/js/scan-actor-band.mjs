@@ -10,8 +10,8 @@ import {
 import { getTabSession } from "./device-keys.mjs";
 import {
   OWNERSHIP_NOT_IN_TAB_PROMPT,
-  RESTORE_CONTROL_HERE,
-  RESTORE_CONTROL_IN_THIS_APP,
+  OPEN_CONTROLS_ACTION,
+  OPEN_CONTROLS_HERE,
   DEVICE_UNLOCK_REENROLL_ON_SCAN,
   DEVICE_UNLOCK_REENROLL_PROMPT,
   UNLOCK_TO_MANAGE_HERE,
@@ -111,11 +111,11 @@ function syncActorBandCopy() {
       } else if (pwaMismatch?.canRestoreInThisTab) {
         restoreBtn.textContent = needsUnlock
           ? UNLOCK_TO_MANAGE_IN_THIS_APP
-          : RESTORE_CONTROL_IN_THIS_APP;
+          : OPEN_CONTROLS_ACTION;
       } else {
         restoreBtn.textContent = needsUnlock
           ? UNLOCK_TO_MANAGE_HERE
-          : RESTORE_CONTROL_HERE;
+          : OPEN_CONTROLS_HERE;
       }
     }
     if (vouchBtn) vouchBtn.hidden = true;
@@ -158,7 +158,10 @@ function bindActions() {
       scrollToHubImportForm();
       return;
     }
-    void activateRestoreControlInThisTab({ afterActivate: scrollToVouch });
+    void activateRestoreControlInThisTab({
+      returnUrl: location.href,
+      profileId: profileId || null,
+    });
   });
 }
 

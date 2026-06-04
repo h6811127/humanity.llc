@@ -6,7 +6,7 @@
 import {
   OWNERSHIP_NOT_IN_TAB_PROMPT,
   OWNERSHIP_NOT_IN_TAB_SUBTITLE,
-  RESTORE_CONTROL_IN_THIS_TAB,
+  OPEN_CONTROLS_ACTION,
   UNLOCK_NOT_IN_TAB_SUBTITLE,
   UNLOCK_TO_MANAGE_IN_THIS_TAB,
   UNLOCK_TO_MANAGE_PROMPT,
@@ -98,5 +98,5 @@ export function viewOnlyLiveTabRestoreLabel(signingKeyCount, needsDeviceUnlock =
   if (viewOnlyWalletBranch(signingKeyCount) !== "wallet_saved") {
     return "Restore ownership";
   }
-  return needsDeviceUnlock ? UNLOCK_TO_MANAGE_IN_THIS_TAB : RESTORE_CONTROL_IN_THIS_TAB;
+  return needsDeviceUnlock ? UNLOCK_TO_MANAGE_IN_THIS_TAB : OPEN_CONTROLS_ACTION;
 }

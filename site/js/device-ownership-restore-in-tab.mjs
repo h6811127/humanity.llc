@@ -1,18 +1,16 @@
 /**
- * Restore saved ownership into this tab (hub · wallet · scan).
- * @see docs/SAFARI_KEYS_CUSTODY.md P1-2
+ * Open controls for saved ownership (hub · wallet · scan).
+ * Navigates to /created/ with gated unlock — no separate restore-in-tab UX.
+ * @see docs/CORE_PRODUCT_LOOP.md § View-only deprecation (step 3)
  */
 import { openCardNowPage } from "./device-keys.mjs";
-import {
-  activateWalletEntryGated,
-  activateWalletEntryGatedWithPinPrompt,
-} from "./device-control-activation.mjs";
 import { findWalletEntryByProfileId } from "./device-wallet.mjs";
 import {
   pickWalletEntryForRestoreInTab,
   restoreInTabPlan,
 } from "./device-ownership-restore-in-tab-core.mjs";
 import { walletEntryHasSigningMaterial } from "./device-tab-session-core.mjs";
+import { walletEntryNeedsDeviceUnlock } from "./device-custody-mode-core.mjs";
 import { loadWallet } from "./device-wallet.mjs";
 import { getDefaultVouchProfileId } from "./vouch-ready-keys.mjs";
 
@@ -28,8 +26,21 @@ export function scrollToSavedObjectsOnDevice() {
 }
 
 /**
- * Hub / wallet: open sole saved card or scroll to saved list.
- * @param {{ closeHubSheet?: boolean }} [opts]
+ * @param {Record<string, unknown> | null | undefined} entry
+ * @param {{ returnUrl?: string | null, closeHubSheet?: boolean }} [opts]
+ */
+function openControlsForWalletEntry(entry, opts = {}) {
+  if (!entry?.profile_id) return { ok: false, kind: "no_entry" };
+  if (opts.closeHubSheet) {
+    window.dispatchEvent(new CustomEvent("hc-hub-sheet-close"));
+  }
+  openCardNowPage(entry, { returnUrl: opts.returnUrl ?? null });
+  return { ok: true, kind: "open_controls" };
+}
+
+/**
+ * Hub / wallet: open controls for sole saved card or scroll to saved list.
+ * @param {{ closeHubSheet?: boolean, returnUrl?: string | null }} [opts]
  */
 export function openRestoreControlInThisTab(opts = {}) {
   const signing = signingWalletEntries();
@@ -37,63 +48,53 @@ export function openRestoreControlInThisTab(opts = {}) {
     window.dispatchEvent(new CustomEvent("hc-hub-sheet-close"));
   }
   if (restoreInTabPlan(signing.length) === "open_card" && signing[0]) {
-    openCardNowPage(signing[0]);
-    return { ok: true, kind: "open_card" };
+    return openControlsForWalletEntry(signing[0], opts);
   }
   scrollToSavedObjectsOnDevice();
   return { ok: true, kind: "scroll_list" };
 }
 
 /**
- * Scan: activate wallet row in this tab (matches status-dot restore path).
- * @param {{ afterActivate?: () => void }} [opts]
- */
-/**
- * Load saved ownership for a profile into this tab (created / view-only restore).
  * @param {string} profileId
- * @param {{ pin?: string }} [opts]
+ * @param {{ returnUrl?: string | null, closeHubSheet?: boolean }} [opts]
  */
-export async function restoreProfileControlInThisTab(profileId, opts = {}) {
+export function openControlsForProfile(profileId, opts = {}) {
   const entry = findWalletEntryByProfileId(profileId);
-  if (!entry) {
-    return { ok: false, kind: "no_wallet", message: "No saved ownership for this card." };
+  if (
+    entry &&
+    (walletEntryHasSigningMaterial(entry) || walletEntryNeedsDeviceUnlock(entry))
+  ) {
+    return openControlsForWalletEntry(entry, opts);
   }
-  const result = opts.pin
-    ? await activateWalletEntryGated(entry, { pin: opts.pin })
-    : await activateWalletEntryGatedWithPinPrompt(entry);
-  if (!result.ok) {
-    return { ok: false, kind: "activation_failed", ...result };
-  }
-  window.dispatchEvent(new Event("hc-device-hub-changed"));
-  return { ok: true, kind: "activated" };
+  return { ok: false, kind: "no_wallet", message: "No saved ownership for this card." };
 }
 
+/**
+ * Scan / dot: open controls for default or sole saved card (optional return URL).
+ * @param {{ afterActivate?: () => void, returnUrl?: string | null, profileId?: string | null }} [opts]
+ */
 export async function activateRestoreControlInThisTab(opts = {}) {
-  const existing =
-    document.querySelector(".vouch-use-keys-here") ||
-    document.querySelector("[data-cross-tab-use-keys]");
-  if (existing instanceof HTMLElement) {
-    existing.click();
-    return { ok: true, kind: "delegated_click" };
-  }
-
   const signing = signingWalletEntries();
-  const entry = pickWalletEntryForRestoreInTab(signing, getDefaultVouchProfileId());
-  if (!entry) {
+  const entry = opts.profileId
+    ? findWalletEntryByProfileId(opts.profileId)
+    : pickWalletEntryForRestoreInTab(signing, getDefaultVouchProfileId());
+  if (
+    !entry ||
+    (!walletEntryHasSigningMaterial(entry) && !walletEntryNeedsDeviceUnlock(entry))
+  ) {
     scrollToSavedObjectsOnDevice();
     return { ok: false, kind: "scroll_list" };
   }
-
-  let result = await activateWalletEntryGated(entry);
-  if (!result.ok && result.needsPin) {
-    const pin = window.prompt("Enter PIN to take control in this tab:");
-    if (pin != null && pin.trim()) {
-      result = await activateWalletEntryGated(entry, { pin });
-    }
-  }
-  if (!result.ok) return { ok: false, kind: "activation_failed" };
-
-  window.dispatchEvent(new Event("hc-device-hub-changed"));
+  const result = openControlsForWalletEntry(entry, {
+    returnUrl: opts.returnUrl ?? null,
+  });
   opts.afterActivate?.();
-  return { ok: true, kind: "activated" };
+  return result;
+}
+
+/**
+ * @deprecated Alias — use openControlsForProfile
+ */
+export async function restoreProfileControlInThisTab(profileId, opts = {}) {
+  return openControlsForProfile(profileId, opts);
 }

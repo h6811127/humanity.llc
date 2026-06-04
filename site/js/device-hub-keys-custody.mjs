@@ -23,8 +23,7 @@ import {
 } from "./device-wallet.mjs";
 import { openRestoreControlInThisTab } from "./device-ownership-restore-in-tab.mjs";
 import {
-  RESTORE_CONTROL_IN_THIS_APP,
-  RESTORE_CONTROL_IN_THIS_TAB,
+  OPEN_CONTROLS_ACTION,
   UNLOCK_TO_MANAGE_IN_THIS_APP,
   UNLOCK_TO_MANAGE_IN_THIS_TAB,
 } from "./device-ownership-copy-core.mjs";
@@ -160,7 +159,7 @@ function rowActionsHtml(row) {
   if (row.kind === "pwa_session_mismatch" && row.canRestoreInThisTab) {
     const label = row.needsDeviceUnlock
       ? UNLOCK_TO_MANAGE_IN_THIS_APP
-      : RESTORE_CONTROL_IN_THIS_APP;
+      : OPEN_CONTROLS_ACTION;
     return `<button type="button" class="device-hub-keys-custody-action" data-hub-custody-restore-tab>${label}</button>`;
   }
   if (row.kind === "wallet_not_in_tab") {
@@ -169,7 +168,7 @@ function rowActionsHtml(row) {
     }
     const label = row.needsDeviceUnlock
       ? UNLOCK_TO_MANAGE_IN_THIS_TAB
-      : RESTORE_CONTROL_IN_THIS_TAB;
+      : OPEN_CONTROLS_ACTION;
     return `<button type="button" class="device-hub-keys-custody-action" data-hub-custody-restore-tab>${label}</button>`;
   }
   if (row.kind === "this_tab_unsaved") {
@@ -202,7 +201,7 @@ function rowActionsHtml(row) {
       } else {
         const label = walletEntryNeedsDeviceUnlock(walletEntry)
           ? UNLOCK_TO_MANAGE_IN_THIS_TAB
-          : "Open controls here";
+          : OPEN_CONTROLS_ACTION;
         parts.push(
           `<button type="button" class="device-hub-keys-custody-action device-hub-keys-custody-action--secondary" data-hub-custody-use-here>${label}</button>`
         );

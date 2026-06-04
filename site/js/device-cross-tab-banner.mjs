@@ -2,7 +2,6 @@
  * Banner when control is active in another tab on this device.
  */
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
-import { activateWalletEntryGated } from "./device-control-activation.mjs";
 import {
   ORPHAN_KEYS_INBOX_SUBTITLE_PREFIX,
   ORPHAN_KEYS_INBOX_TITLE,
@@ -171,19 +170,9 @@ function bindUseKeysHere(root, profileId, opts = {}) {
     e.preventDefault();
     e.stopPropagation();
     window.dispatchEvent(new CustomEvent("hc-hub-sheet-close"));
-    if (opts.stayOnPage) {
-      let result = await activateWalletEntryGated(walletEntry);
-      if (!result.ok && result.needsPin) {
-        const pin = window.prompt("Enter PIN to take control in this tab:");
-        if (pin != null && pin.trim()) {
-          result = await activateWalletEntryGated(walletEntry, { pin });
-        }
-      }
-      if (!result.ok) return;
-      window.dispatchEvent(new Event("hc-device-hub-changed"));
-      return;
-    }
-    openCardNowPage(walletEntry);
+    openCardNowPage(walletEntry, {
+      returnUrl: opts.stayOnPage ? location.href : null,
+    });
   });
 }
 

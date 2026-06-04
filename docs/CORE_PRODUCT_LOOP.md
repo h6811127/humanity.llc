@@ -146,7 +146,7 @@ Record Q4 decisions here:
 |------|--------|------|
 | **1** | **Shipped** | `/created/` boot + quiet rehydrate prefer URL `profile_id`: auto `activateWalletEntryGated` (+ PIN prompt). `created-wallet-boot-activation.mjs` |
 | **2** | **Shipped** | Removed restore-in-tab banners/buttons + `restore-control` CTA; K1 **Recovery import** on Manage; wallet-saved view retries boot activation |
-| **3** | Planned | Hub/wallet/scan: drop “restore in this tab” copy; rely on **Open controls** unlock only |
+| **3** | **Shipped** | Hub/wallet/scan: **Open controls** copy + `/created/` unlock path; no in-tab restore activation |
 | **4** | Planned | Notifications rearchitecture decision (inbox vs OS) — separate from custody |
 
 **Regression:** `npm run ownership-restore:verify` · `npm run worker:test` quiet-tab-rehydrate · `e2e:key-loss-sad-path` (K1 must stay view-only when no wallet keys).
@@ -215,6 +215,7 @@ Environment: installed PWA, Android. Triage ID = **P1-MOTO-***. Status: **captur
 
 | Date | Note |
 |------|------|
+| 2026-06-04 | View-only deprecation step 3 — hub/wallet/scan Open controls only |
 | 2026-06-04 | View-only deprecation step 2 — strip restore-in-tab UI; K1 recovery import only |
 | 2026-06-04 | View-only deprecation step 1 — created boot auto-activate + URL quiet rehydrate |
 | 2026-06-04 | Sprint A engineering pass — restore-in-tab, add-hub, open controls, network/notify partial |

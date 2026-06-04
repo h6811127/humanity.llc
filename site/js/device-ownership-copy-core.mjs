@@ -11,16 +11,22 @@ import {
 
 export const OWNERSHIP_NOT_LOADED_TAB = "Ownership not loaded in this tab.";
 
-/** Hub / shell prominence when wallet has control but tab is empty (Safari P1-2 step 1). */
-export const OWNERSHIP_NOT_IN_TAB_PROMPT =
-  "Ownership not in this tab — tap to restore";
+/** Hub / shell when wallet has keys but this tab cannot sign (WS-QUALITY view-only step 3). */
+export const OWNERSHIP_NOT_IN_TAB_PROMPT = "Ownership saved on this device";
 
 export const OWNERSHIP_NOT_IN_TAB_SUBTITLE =
-  "Your ownership is saved on this device. Load control here to manage or attest.";
+  "Tap Open controls to manage or attest on this phone.";
 
-export const RESTORE_CONTROL_ACTION = "Restore control";
+/** Primary shell CTA — navigates to /created/ with unlock when needed. */
+export const OPEN_CONTROLS_ACTION = "Open controls";
 
-export const RESTORE_CONTROL_HERE = "Restore control here";
+export const OPEN_CONTROLS_HERE = "Open controls";
+
+/** @deprecated Use OPEN_CONTROLS_ACTION */
+export const RESTORE_CONTROL_ACTION = OPEN_CONTROLS_ACTION;
+
+/** @deprecated Use OPEN_CONTROLS_HERE */
+export const RESTORE_CONTROL_HERE = OPEN_CONTROLS_HERE;
 
 export const TAKE_CONTROL_HERE = "Take control here";
 
@@ -31,10 +37,10 @@ export const TAKE_CONTROL_HERE_ATTEST =
 export const KEYS_NOT_IN_THIS_TAB_TITLE = "Keys not in this tab";
 
 /** @deprecated Use `OWNERSHIP_NOT_IN_TAB_SUBTITLE`. */
-export const KEYS_NOT_IN_THIS_TAB_RESTORE_SUBTITLE =
-  "Tap to restore control in this tab";
+export const KEYS_NOT_IN_THIS_TAB_RESTORE_SUBTITLE = OWNERSHIP_NOT_IN_TAB_SUBTITLE;
 
-export const RESTORE_CONTROL_IN_THIS_TAB = "Restore control in this tab";
+/** @deprecated Use OPEN_CONTROLS_ACTION */
+export const RESTORE_CONTROL_IN_THIS_TAB = OPEN_CONTROLS_ACTION;
 
 /** device_unlock — Layer 2 (WS-CUSTODY C1). */
 export const UNLOCK_TO_MANAGE = "Unlock to manage";
@@ -131,9 +137,9 @@ export function controlActivationLabelForEntry(entry, ctx = {}) {
     if (ctx.scan) return UNLOCK_TO_MANAGE_HERE;
     return UNLOCK_TO_MANAGE_IN_THIS_TAB;
   }
-  if (ctx.pwa) return RESTORE_CONTROL_IN_THIS_APP;
-  if (ctx.scan) return RESTORE_CONTROL_HERE;
-  return RESTORE_CONTROL_IN_THIS_TAB;
+  if (ctx.pwa) return OPEN_CONTROLS_ACTION;
+  if (ctx.scan) return OPEN_CONTROLS_HERE;
+  return OPEN_CONTROLS_ACTION;
 }
 
 export const LOAD_CONTROL_IN_TAB_FIRST = "Take control in this tab first.";
@@ -390,7 +396,8 @@ export const WALLET_CORRUPT_HELP_CTA = "Backup help";
 export const WALLET_CORRUPT_HELP_HREF = "/help/#ownership";
 
 /** PWA vs Safari signing context split (P2-2 · R5). */
-export const RESTORE_CONTROL_IN_THIS_APP = "Restore control in this app";
+/** @deprecated Use OPEN_CONTROLS_ACTION */
+export const RESTORE_CONTROL_IN_THIS_APP = OPEN_CONTROLS_ACTION;
 
 /**
  * iOS Home Screen — removing the icon uninstalls the PWA and deletes hc_wallet in that app.
@@ -403,7 +410,7 @@ export const PWA_MISMATCH_TITLE_STANDALONE =
   "Use only this app on iPhone";
 
 export const PWA_MISMATCH_DETAIL_STANDALONE =
-  "On iPhone, Safari and this home screen app keep separate saved cards. Do not also create or manage cards in Safari tabs. Restore control here to sign in this app.";
+  "On iPhone, Safari and this home screen app keep separate saved cards. Do not also create or manage cards in Safari tabs. Tap Open controls to manage in this app.";
 
 export const PWA_MISMATCH_TITLE_BROWSER =
   "Use your Home Screen app on iPhone";
@@ -519,7 +526,7 @@ export const HUB_RESTORE_RECOVERY_HINT =
   "Paste your scan link (or profile ID) and the recovery code you saved at create. Works across Safari and your Home Screen app — no file transfer.";
 
 /** Scan page — print_artifact owner path to /created/#restore. */
-export const SCAN_OWNER_RESTORE_CTA_LABEL = "Restore control";
+export const SCAN_OWNER_RESTORE_CTA_LABEL = OPEN_CONTROLS_ACTION;
 
 export const SCAN_OWNER_RESTORE_CTA_HINT =
   "Is this your printed object? Open your card page to import a recovery code or encrypted backup. Control stays on this device — humanity.llc cannot restore keys for you.";

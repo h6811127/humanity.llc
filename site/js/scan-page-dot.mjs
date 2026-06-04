@@ -239,10 +239,7 @@ function scrollToVouchOrLiveProof() {
 
 function useKeysOnScan() {
   void activateRestoreControlInThisTab({
-    afterActivate: () => {
-      refreshScanPageDot();
-      scrollToVouchOrLiveProof();
-    },
+    returnUrl: location.href,
   });
 }
 
@@ -519,7 +516,7 @@ window.addEventListener("hc-scan-live-check-settled", (event) => {
   );
 });
 window.addEventListener("hc-vouch-ready-changed", refreshScanPageDot);
-window.addEventListener("hc-device-hub-changed", refreshScanPageDot);
+// Cross-tab streak: device-chrome-refresh refreshes dot after banner render.
 window.addEventListener("hc-live-control-inbox-changed", refreshScanPageDot);
 window.addEventListener("storage", (e) => {
   if (

@@ -70,7 +70,7 @@ describe("scan-owner-restore-cta-core", () => {
   });
 
   it("copy constants are plain-language and mention card page import", () => {
-    expect(SCAN_OWNER_RESTORE_CTA_LABEL).toBe("Restore control");
+    expect(SCAN_OWNER_RESTORE_CTA_LABEL).toBe("Open controls");
     expect(SCAN_OWNER_RESTORE_CTA_HINT).toMatch(/card page/i);
     expect(SCAN_OWNER_RESTORE_CTA_HINT).toMatch(/recovery code/i);
   });

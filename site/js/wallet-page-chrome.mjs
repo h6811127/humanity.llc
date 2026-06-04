@@ -14,12 +14,10 @@ import {
 } from "./device-shell-copy-core.mjs";
 import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
 import { createdUrlForEntry, getTabSession, openCardNowPage } from "./device-keys.mjs";
-import { activateWalletEntryGated } from "./device-control-activation.mjs";
 import {
   OWNERSHIP_NOT_IN_TAB_PROMPT,
   OWNERSHIP_NOT_IN_TAB_SUBTITLE,
-  RESTORE_CONTROL_IN_THIS_APP,
-  RESTORE_CONTROL_IN_THIS_TAB,
+  OPEN_CONTROLS_ACTION,
   UNLOCK_NOT_IN_TAB_SUBTITLE,
   UNLOCK_TO_MANAGE_IN_THIS_APP,
   DEVICE_UNLOCK_REENROLL_IN_THIS_TAB,
@@ -169,7 +167,7 @@ function setTabHint(tabHint, input) {
     if (useKeysBtn) {
       if (pwaMismatch.canRestoreInThisTab) {
         useKeysBtn.hidden = false;
-        useKeysBtn.textContent = RESTORE_CONTROL_IN_THIS_APP;
+        useKeysBtn.textContent = OPEN_CONTROLS_ACTION;
       } else {
         useKeysBtn.hidden = true;
       }
@@ -218,7 +216,7 @@ function setTabHint(tabHint, input) {
         ? DEVICE_UNLOCK_REENROLL_IN_THIS_TAB
         : needsUnlock
           ? UNLOCK_TO_MANAGE_IN_THIS_TAB
-          : RESTORE_CONTROL_IN_THIS_TAB;
+          : OPEN_CONTROLS_ACTION;
     }
     tabHint.hidden = false;
     return;
@@ -344,16 +342,7 @@ function ensureTabHintListeners() {
     if (!entry) return;
     const walletEntry = walletEntryForProfile(entry.profile_id);
     if (!walletEntry?.owner_private_key_b58) return;
-    let result = await activateWalletEntryGated(walletEntry);
-    if (!result.ok && result.needsPin) {
-      const pin = window.prompt("Enter PIN to take control in this tab:");
-      if (pin != null && pin.trim()) {
-        result = await activateWalletEntryGated(walletEntry, { pin });
-      }
-    }
-    if (result.ok) {
-      window.dispatchEvent(new Event("hc-device-hub-changed"));
-    }
+    openCardNowPage(walletEntry);
   });
 
   document.getElementById("wallet-tab-hint-clear")?.addEventListener("click", (e) => {

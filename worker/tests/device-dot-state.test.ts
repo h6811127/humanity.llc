@@ -283,11 +283,11 @@ describe("describeDotState", () => {
       pageKind: "scan",
       walletKeysNotInTab: true,
     });
-    expect(savedNotInTab.now).toBe("Ownership not in this tab.");
+    expect(savedNotInTab.now).toBe("Ownership saved on this device.");
     expect(savedNotInTab.why).toContain("saved on this device");
     expect(savedNotInTab.action).toEqual({
       kind: "scan_use_keys_here",
-      label: "Restore control here",
+      label: "Open controls",
     });
   });
 
@@ -309,12 +309,10 @@ describe("describeDotState", () => {
       pageKind: "landing",
       walletKeysNotInTab: true,
     });
-    expect(savedNotInTab.now).toBe(
-      "Ownership not in this tab — tap to restore."
-    );
+    expect(savedNotInTab.now).toBe("Ownership saved on this device.");
     expect(savedNotInTab.action).toEqual({
       kind: "open_controls",
-      label: "Restore control in this tab",
+      label: "Open controls",
     });
   });
 });
