@@ -7,8 +7,24 @@ export const SEASON_DATA_DIR = "site/data";
 export const SEASON_INDEX_BASENAME = "city-game-seasons-index.json";
 export const SEASON_JSON_PREFIX = "city-game-";
 
+/** Merge-input drafts under site/data — not bundled seasons (see merge-city-game-wave-open.mjs). */
+export const SEASON_JSON_DRAFT_SUFFIX = "-wave-open-nodes.json";
+
 /** Pilot season file (Cedar Rapids S1). */
 export const PILOT_SEASON_BASENAME = "city-game-cr-season-01.json";
+
+/**
+ * @param {string} name Filename under site/data
+ * @returns {boolean}
+ */
+export function isBundledSeasonJsonBasename(name) {
+  return (
+    name.startsWith(SEASON_JSON_PREFIX) &&
+    name.endsWith(".json") &&
+    name !== SEASON_INDEX_BASENAME &&
+    !name.endsWith(SEASON_JSON_DRAFT_SUFFIX)
+  );
+}
 
 /**
  * @param {string} rulesPath e.g. /play/cedar-rapids/

@@ -22,6 +22,7 @@ describe("city-game season path core", () => {
     const names = listSeasonJsonBasenames(root);
     expect(names).toContain("city-game-cr-season-01.json");
     expect(names).toContain("city-game-example-season-01.json");
+    expect(names).not.toContain("city-game-cr-season-01-wave-open-nodes.json");
   });
 
   it("derives slug from rules_path", () => {

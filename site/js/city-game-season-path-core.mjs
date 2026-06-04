@@ -11,7 +11,9 @@ export {
   PILOT_SEASON_BASENAME,
   SEASON_DATA_DIR,
   SEASON_INDEX_BASENAME,
+  SEASON_JSON_DRAFT_SUFFIX,
   SEASON_JSON_PREFIX,
+  isBundledSeasonJsonBasename,
   seasonIndexEntryFromConfig,
   seasonJsonPublicUrl,
   seasonLaunchContext,
@@ -23,6 +25,7 @@ import {
   SEASON_DATA_DIR,
   SEASON_INDEX_BASENAME,
   SEASON_JSON_PREFIX,
+  isBundledSeasonJsonBasename,
   seasonSlugFromRulesPath,
 } from "./city-game-season-path-shared.mjs";
 
@@ -34,12 +37,7 @@ export function listSeasonJsonBasenames(root) {
   const dir = join(root, SEASON_DATA_DIR);
   if (!existsSync(dir)) return [];
   return readdirSync(dir)
-    .filter(
-      (name) =>
-        name.startsWith(SEASON_JSON_PREFIX) &&
-        name.endsWith(".json") &&
-        name !== SEASON_INDEX_BASENAME
-    )
+    .filter((name) => isBundledSeasonJsonBasename(name))
     .sort();
 }
 
