@@ -28,6 +28,14 @@ import {
 } from "./device-custody-mode-core.mjs";
 import { isDeviceUnlockWebAuthnAvailable } from "./device-custody-webauthn-core.mjs";
 import {
+  createCustodyModeHintForKey,
+  createCustodyModePanelState,
+} from "./device-custody-create-core.mjs";
+import {
+  CREATE_CUSTODY_ORGANIZER_FACE_ID_CALLOUT_ACTION,
+  CREATE_CUSTODY_ORGANIZER_FACE_ID_CALLOUT_DETAIL,
+  CREATE_CUSTODY_ORGANIZER_FACE_ID_CALLOUT_EYEBROW,
+  CREATE_CUSTODY_ORGANIZER_FACE_ID_CALLOUT_TITLE,
   EPHEMERAL_BROWSING_CREATE_BLOCKED,
   EPHEMERAL_BROWSING_DETAIL,
   EPHEMERAL_BROWSING_EYEBROW,
@@ -215,7 +223,30 @@ function readCreateCustodyMode() {
   return CUSTODY_MODE_DEVICE_UNLOCK;
 }
 
-function syncCreateCustodyModeUi() {
+function focusOrganizerRevokeSetting() {
+  const details = document.getElementById("create-organizer-details");
+  if (details instanceof HTMLDetailsElement) details.open = true;
+  const checkbox = document.getElementById("enable-organizer-revoke");
+  checkbox?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  if (checkbox instanceof HTMLInputElement) checkbox.focus();
+}
+
+function syncCreateCustodyOrganizerCallout(show) {
+  const callout = document.getElementById("create-custody-organizer-callout");
+  if (!callout) return;
+  callout.hidden = !show;
+  if (!show) return;
+  const eyebrow = document.getElementById("create-custody-organizer-callout-eyebrow");
+  const title = document.getElementById("create-custody-organizer-callout-title");
+  const detail = document.getElementById("create-custody-organizer-callout-detail");
+  const action = document.getElementById("create-custody-organizer-callout-action");
+  if (eyebrow) eyebrow.textContent = CREATE_CUSTODY_ORGANIZER_FACE_ID_CALLOUT_EYEBROW;
+  if (title) title.textContent = CREATE_CUSTODY_ORGANIZER_FACE_ID_CALLOUT_TITLE;
+  if (detail) detail.textContent = CREATE_CUSTODY_ORGANIZER_FACE_ID_CALLOUT_DETAIL;
+  if (action) action.textContent = CREATE_CUSTODY_ORGANIZER_FACE_ID_CALLOUT_ACTION;
+}
+
+function syncCreateCustodyModeUi(opts = {}) {
   const fieldset = document.getElementById("create-custody-mode");
   const hint = document.getElementById("create-custody-mode-hint");
   const deviceRadio = document.querySelector(
@@ -226,31 +257,33 @@ function syncCreateCustodyModeUi() {
 
   const organizerOn = enableOrganizerEl?.checked ?? false;
   const webAuthnAvailable = isDeviceUnlockWebAuthnAvailable();
-  const deviceAllowed = webAuthnAvailable && !organizerOn && !ephemeralBrowsing;
+  const panel = createCustodyModePanelState({
+    webAuthnAvailable,
+    organizerEnabled: organizerOn,
+    ephemeralBrowsing,
+    urlCustodyParam: new URLSearchParams(location.search).get("custody"),
+    selectedCustodyMode: document.querySelector('input[name="custody_mode"]:checked')?.value ?? null,
+  });
 
-  fieldset.hidden = ephemeralBrowsing;
+  fieldset.hidden = !panel.showFieldset;
   if (deviceRadio instanceof HTMLInputElement) {
-    deviceRadio.disabled = !deviceAllowed;
+    deviceRadio.disabled = !panel.deviceUnlockSelectable;
   }
-  if (fullRadio instanceof HTMLInputElement && !deviceAllowed) {
+  if (fullRadio instanceof HTMLInputElement && panel.forceFullKeysRadio) {
     fullRadio.checked = true;
-  } else if (deviceRadio instanceof HTMLInputElement && deviceAllowed) {
-    const urlParam = new URLSearchParams(location.search).get("custody");
-    if (urlParam !== CUSTODY_MODE_FULL_KEYS) {
-      deviceRadio.checked = true;
-    }
+  } else if (deviceRadio instanceof HTMLInputElement && panel.preferDeviceRadio) {
+    deviceRadio.checked = true;
   }
 
   if (hint) {
-    if (!webAuthnAvailable) {
-      hint.textContent =
-        "This browser cannot use Face ID / Touch ID device unlock. Full control keys will be used.";
-    } else if (organizerOn) {
-      hint.textContent = "Organizer revoke requires full control keys on this device.";
-    } else {
-      hint.textContent =
-        "This device locks your signing key behind your passkey. You won't manage raw keys in normal use.";
-    }
+    hint.textContent = createCustodyModeHintForKey(panel.hintKey);
+  }
+  syncCreateCustodyOrganizerCallout(panel.showOrganizerBlocksFaceIdCallout);
+
+  if (opts.scrollOrganizerCallout && panel.showOrganizerBlocksFaceIdCallout) {
+    document
+      .getElementById("create-custody-organizer-callout")
+      ?.scrollIntoView({ block: "nearest", behavior: "smooth" });
   }
 }
 
@@ -548,10 +581,21 @@ function syncOrganizerFieldsUi() {
   if (organizerPublicKeyEl) organizerPublicKeyEl.disabled = !on || !pasteMode;
 }
 
+let lastOrganizerRevokeOn = enableOrganizerEl?.checked ?? false;
+
 enableOrganizerEl?.addEventListener("change", () => {
+  const organizerOn = enableOrganizerEl?.checked ?? false;
   syncOrganizerFieldsUi();
-  syncCreateCustodyModeUi();
+  syncCreateCustodyModeUi({
+    scrollOrganizerCallout: organizerOn && !lastOrganizerRevokeOn,
+  });
+  lastOrganizerRevokeOn = organizerOn;
 });
+
+document
+  .getElementById("create-custody-organizer-callout-action")
+  ?.addEventListener("click", focusOrganizerRevokeSetting);
+
 document.querySelectorAll('input[name="organizer_key_mode"]').forEach((el) => {
   el.addEventListener("change", syncOrganizerFieldsUi);
 });

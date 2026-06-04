@@ -84,6 +84,28 @@ export const CUSTODY_REENROLL_DEVICE_UNLOCK_BTN = "Set up Face ID on this device
 export const CUSTODY_REENROLL_NEED_BACKUP_HINT =
   "Import your encrypted backup on Manage first — recovery code alone cannot enroll a new passkey.";
 
+/** /create/ Device control hints (G-C3 · K12). */
+export const CREATE_CUSTODY_DEVICE_UNLOCK_DEFAULT_HINT =
+  "This device locks your signing key behind your passkey. You won't manage raw keys in normal use.";
+
+export const CREATE_CUSTODY_ORGANIZER_FULL_KEYS_HINT =
+  "Organizer revoke requires full control keys on this device.";
+
+export const CREATE_CUSTODY_WEBAUTHN_UNAVAILABLE_HINT =
+  "This browser cannot use Face ID / Touch ID device unlock. Full control keys will be used.";
+
+/** /create/ — when organizer revoke blocks Face ID (organizer + WebAuthn available). */
+export const CREATE_CUSTODY_ORGANIZER_FACE_ID_CALLOUT_EYEBROW = "Face ID unavailable";
+
+export const CREATE_CUSTODY_ORGANIZER_FACE_ID_CALLOUT_TITLE =
+  "Organizer revoke uses full control keys";
+
+export const CREATE_CUSTODY_ORGANIZER_FACE_ID_CALLOUT_DETAIL =
+  "Turn off Register an organizer revoke key above to choose This device (Face ID / Touch ID).";
+
+export const CREATE_CUSTODY_ORGANIZER_FACE_ID_CALLOUT_ACTION =
+  "Go to organizer revoke setting";
+
 export const HUB_RECOVERY_DEVICE_UNLOCK_REENROLL_HINT =
   "Recovery saved. Import your encrypted backup, then set up Face ID on this device in Manage.";
 

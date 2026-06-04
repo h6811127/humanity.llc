@@ -34,7 +34,7 @@
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=5" />
     <link rel="stylesheet" href="/styles.css?v=146" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=91" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=92" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=30" />
   </head>
   <body class="page-flow has-shell-chrome has-device-hub-search flow-shell flow-shell-create" data-boot="pending">
@@ -682,6 +682,29 @@
             id="create-custody-mode"
           >
             <legend class="form-label">Device control</legend>
+            <div
+              id="create-custody-organizer-callout"
+              class="hc-emphasis-card hc-emphasis-card--info create-custody-organizer-callout"
+              role="status"
+              hidden
+            >
+              <div class="hc-emphasis-card__main">
+                <span
+                  class="hc-emphasis-card__dot hc-emphasis-card__dot--info"
+                  aria-hidden="true"
+                ></span>
+                <div class="hc-emphasis-card__copy">
+                  <p class="hc-emphasis-card__eyebrow" id="create-custody-organizer-callout-eyebrow"></p>
+                  <p class="hc-emphasis-card__title" id="create-custody-organizer-callout-title"></p>
+                  <p class="hc-emphasis-card__detail" id="create-custody-organizer-callout-detail"></p>
+                  <button
+                    type="button"
+                    class="btn-secondary create-custody-organizer-callout-btn"
+                    id="create-custody-organizer-callout-action"
+                  ></button>
+                </div>
+              </div>
+            </div>
             <label class="revoke-confirm create-custody-opt flow-inset-check">
               <input
                 type="radio"
@@ -768,6 +791,6 @@
     </dialog>
     <script src="/js/device-status-bootstrap.mjs?v=91" type="module"></script>
     <script src="/js/create-hub.mjs?v=1" type="module"></script>
-    <script type="module" src="/js/create-card.mjs?v=19"></script>
+    <script type="module" src="/js/create-card.mjs?v=20"></script>
   </body>
 </html>

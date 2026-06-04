@@ -3007,6 +3007,14 @@ body.device-shell-created .created-screen {
   margin-bottom: 4px;
 }
 
+.create-custody-organizer-callout {
+  margin: 0 0 10px;
+}
+
+.create-custody-organizer-callout-btn {
+  margin-top: 10px;
+}
+
 .flow-disclosure.create-organizer-opt {
   margin: 12px 0 0;
   border-radius: 10px;
