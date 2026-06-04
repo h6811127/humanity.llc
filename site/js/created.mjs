@@ -93,7 +93,11 @@ import {
   setTabSession,
   tabSessionHasSigningKeys,
 } from "./device-keys.mjs";
-import { activateWalletEntryGated } from "./device-control-activation.mjs";
+import { tryActivateWalletForCreatedPage } from "./created-wallet-boot-activation.mjs";
+import {
+  mountChildObjectAddHubSections,
+  syncChildObjectAddHub,
+} from "./created-child-object-add-hub.mjs";
 import { isWalletSaved, loadWallet, getWalletSigningKeyCount } from "./device-wallet.mjs";
 import { saveSessionToWalletWithCustody } from "./device-custody-save.mjs";
 import { savedControlNeedsDeviceUnlockCopy } from "./device-custody-mode-core.mjs";
@@ -204,12 +208,9 @@ await ensureQuietTabRehydrateBootstrap(
 let data = loadSession();
 
 if (profileIdParam && !data?.owner_private_key_b58) {
-  const walletEntry = loadWallet().find((e) => e.profile_id === profileIdParam);
-  if (walletEntry?.owner_private_key_b58) {
-    const activation = await activateWalletEntryGated(walletEntry);
-    if (activation.ok) {
-      data = loadSession();
-    }
+  const activation = await tryActivateWalletForCreatedPage(profileIdParam);
+  if (activation.ok) {
+    data = loadSession();
   }
 }
 
@@ -440,6 +441,7 @@ function getWorkspaceMode() {
 
 function enterControlWorkspace() {
   workspaceMode = "control";
+  delete document.body.dataset.createdViewNeedsUnlock;
   if (profileId) {
     const walletEntry = findWalletEntryByProfileId(profileId);
     const walletSaved = isWalletSaved(profileId);
@@ -452,6 +454,7 @@ function enterControlWorkspace() {
   clearCreatedViewModeUi();
   applyCreatedWorkspaceMode("control");
   restoreKeysStripToControlPanel();
+  syncChildObjectAddHub(loadSession());
   if (!createdTabs) {
     createdTabs = initCreatedTabs();
   }
@@ -1092,31 +1095,40 @@ function setupCreatedDashboard() {
 initVouchReturnBanner();
 
 if (workspaceMode === "view" && profileId && activeQrId) {
-  clearKeylessTabSessionIfPresent();
-  data = loadSession();
-  if (noSessionEl) noSessionEl.hidden = true;
-  applyCreatedViewModeUi({
-    signingKeyCount: getWalletSigningKeyCount(),
-    needsDeviceUnlock: viewOnlyNeedsDeviceUnlock(profileId),
-  });
-  createdTabs = initCreatedTabs();
-  const restoreHash = createdViewRestoreHashKey(location.hash);
-  createdTabs.select(createdViewDefaultTabId(restoreHash));
-  if (restoreHash) {
-    focusCreatedViewRestore((id) => createdTabs.select(id));
+  if (getWalletSigningKeyCount() > 0) {
+    const activation = await tryActivateWalletForCreatedPage(profileId);
+    if (activation.ok) {
+      data = loadSession();
+      enterControlWorkspace();
+    }
   }
-  setupCreatedDashboard();
-  dashboardWired = true;
-  void liveObjectCardCtl?.maybeRunArrive();
-  initCreatedViewLiveReadonly({
-    getScanUrl: () => {
-      const href = openScanBtn?.getAttribute("href");
-      return href && href.startsWith("http") ? href : null;
-    },
-  });
-  document.getElementById("created-view-live-restore-btn")?.addEventListener("click", () => {
-    focusCreatedViewRestore((id) => createdTabs?.select(id));
-  });
+  if (workspaceMode === "view") {
+    clearKeylessTabSessionIfPresent();
+    data = loadSession();
+    if (noSessionEl) noSessionEl.hidden = true;
+    document.body.dataset.createdViewNeedsUnlock = viewOnlyNeedsDeviceUnlock(profileId)
+      ? "1"
+      : "0";
+    applyCreatedViewModeUi({
+      signingKeyCount: getWalletSigningKeyCount(),
+      needsDeviceUnlock: viewOnlyNeedsDeviceUnlock(profileId),
+    });
+    createdTabs = initCreatedTabs();
+    const restoreHash = createdViewRestoreHashKey(location.hash);
+    createdTabs.select(createdViewDefaultTabId(restoreHash));
+    if (restoreHash) {
+      focusCreatedViewRestore((id) => createdTabs.select(id));
+    }
+    setupCreatedDashboard();
+    dashboardWired = true;
+    void liveObjectCardCtl?.maybeRunArrive();
+    initCreatedViewLiveReadonly({
+      getScanUrl: () => {
+        const href = openScanBtn?.getAttribute("href");
+        return href && href.startsWith("http") ? href : null;
+      },
+    });
+  }
 } else if (workspaceMode === "view" && noSessionEl) {
   noSessionEl.hidden = false;
   applyViewOnlyNoSessionCopy();
@@ -1530,6 +1542,9 @@ async function bootstrapOwnerTools() {
     showError,
     getSigningKeys: currentSigningKeys,
   });
+
+  mountChildObjectAddHubSections();
+  syncChildObjectAddHub(loadSession());
 
   const backup = initKeyBackupUi({
     profileId,

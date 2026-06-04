@@ -368,6 +368,9 @@
             <button type="button" class="btn-secondary created-setup-inline-action" data-setup-action="test-scan">
               Open scan page
             </button>
+            <button type="button" class="btn-secondary created-setup-inline-action" data-setup-action="scan-in-app">
+              Scan with this device
+            </button>
             <p class="form-hint created-setup-test-hint">
               Optional preview — opens what scanners see. Tap <strong>Continue</strong> below when
               you’re ready to protect your control (no need to open the scan page first).
@@ -382,6 +385,10 @@
           >
             <h2 class="created-setup-panel-title">Protect your control</h2>
             <p class="created-setup-panel-lead" id="created-setup-seatbelt-lead"></p>
+            <p
+              class="form-hint created-setup-platform-sync-disclaimer"
+              id="created-setup-platform-sync-disclaimer"
+            ></p>
             <div id="created-setup-game-season-protect" hidden role="note"></div>
             <div class="created-setup-seatbelt-recovery" id="created-setup-seatbelt-recovery" hidden>
               <p class="form-hint" id="created-setup-seatbelt-recovery-hint"></p>
@@ -518,16 +525,6 @@
                 <p class="hc-emphasis-card__eyebrow" id="created-view-live-title">View only in this tab</p>
                 <p class="hc-emphasis-card__detail" id="created-view-live-lead"></p>
               </div>
-            </div>
-            <div class="hc-emphasis-card__actions">
-              <button
-                type="button"
-                class="hc-emphasis-card__cta hc-emphasis-card__cta--secondary"
-                id="created-view-live-restore-btn"
-                data-created-view-action="open-restore"
-              >
-                Restore ownership
-              </button>
             </div>
           </section>
 
@@ -668,9 +665,6 @@
               <h3 class="created-live-scanners-see-title" id="created-live-scanners-see-title">
                 What scanners see
               </h3>
-              <p class="form-hint created-live-scanners-see-lead">
-                Same QR. Updates on the next scan.
-              </p>
               <form id="manifesto-update-form" class="compact-form" novalidate>
                 <div id="update-fields-status-plate" hidden>
                   <label class="form-label" for="update-object-label">Object name</label>
@@ -698,49 +692,72 @@
                     maxlength="280"
                   ></textarea>
                 </div>
-                <fieldset
-                  id="update-fields-object-streams"
-                  class="created-object-streams-fieldset flow-inset-fields"
-                  hidden
-                >
-                  <legend class="form-label">Optional details (shown on scan)</legend>
-                  <p class="form-hint">Same QR — add short place facts like tasks or tool status.</p>
-                  <label class="form-label" for="update-stream-1-label">Detail 1 label</label>
-                  <input
-                    class="form-input"
-                    id="update-stream-1-label"
-                    type="text"
-                    maxlength="40"
-                    placeholder="Today's tasks"
-                  />
-                  <label class="form-label" for="update-stream-1-value">Detail 1 value</label>
-                  <input
-                    class="form-input"
-                    id="update-stream-1-value"
-                    type="text"
-                    maxlength="120"
-                    placeholder="Water bed 3 · turn compost"
-                  />
-                  <label class="form-label" for="update-stream-2-label">Detail 2 label</label>
-                  <input
-                    class="form-input"
-                    id="update-stream-2-label"
-                    type="text"
-                    maxlength="40"
-                    placeholder="Tools"
-                  />
-                  <label class="form-label" for="update-stream-2-value">Detail 2 value</label>
-                  <input
-                    class="form-input"
-                    id="update-stream-2-value"
-                    type="text"
-                    maxlength="120"
-                    placeholder="Wheelbarrow available"
-                  />
-                </fieldset>
                 <button type="submit" class="btn-primary" id="manifesto-update-submit">
                   Publish update
                 </button>
+                <p
+                  class="form-hint created-live-scanners-see-lead"
+                  id="created-live-scanners-see-post-publish"
+                >
+                  Same QR. Updates on the next scan.
+                </p>
+                <details
+                  id="update-object-streams-details"
+                  class="flow-disclosure created-scan-details-disclosure"
+                  hidden
+                >
+                  <summary class="created-scan-details-summary">
+                    <span
+                      class="created-scan-details-summary-title"
+                      id="update-streams-summary-title"
+                      >Extra lines on scan card</span>
+                    <span
+                      class="created-scan-details-summary-meta form-hint"
+                      id="update-streams-summary-meta"
+                      hidden
+                    ></span>
+                  </summary>
+                  <div
+                    id="update-fields-object-streams"
+                    class="created-scan-details-panel flow-inset-fields"
+                  >
+                    <p class="form-hint">
+                      Short place facts (tasks, tools) — included when you publish above.
+                    </p>
+                    <label class="form-label" for="update-stream-1-label">Detail 1 label</label>
+                    <input
+                      class="form-input"
+                      id="update-stream-1-label"
+                      type="text"
+                      maxlength="40"
+                      placeholder="Today's tasks"
+                    />
+                    <label class="form-label" for="update-stream-1-value">Detail 1 value</label>
+                    <input
+                      class="form-input"
+                      id="update-stream-1-value"
+                      type="text"
+                      maxlength="120"
+                      placeholder="Water bed 3 · turn compost"
+                    />
+                    <label class="form-label" for="update-stream-2-label">Detail 2 label</label>
+                    <input
+                      class="form-input"
+                      id="update-stream-2-label"
+                      type="text"
+                      maxlength="40"
+                      placeholder="Tools"
+                    />
+                    <label class="form-label" for="update-stream-2-value">Detail 2 value</label>
+                    <input
+                      class="form-input"
+                      id="update-stream-2-value"
+                      type="text"
+                      maxlength="120"
+                      placeholder="Wheelbarrow available"
+                    />
+                  </div>
+                </details>
               </form>
               <p class="form-status" id="manifesto-update-status" hidden role="status"></p>
             </section>
@@ -1053,6 +1070,20 @@
                 <p class="mono-link mono-link-compact" id="scan-url" hidden></p>
               </section>
             </div>
+          </details>
+
+          <details
+            class="created-child-object-add-hub flow-disclosure"
+            id="child-object-add-hub"
+            hidden
+          >
+            <summary class="form-label created-child-object-add-hub-summary">
+              Live objects under this root
+            </summary>
+            <p class="form-hint" id="child-object-add-hub-sub">
+              Status plates · lost items · game nodes
+            </p>
+            <div class="created-child-add-hub-body"></div>
           </details>
 
           <section class="created-what-now created-what-now-compact" id="created-status-plate-tip" hidden>
@@ -1457,23 +1488,6 @@
 
         <!--  -  -  -  Advanced: update, revoke, keys  -  -  -  -->
         <div class="created-tab-panel" data-created-panel="advanced" id="created-tab-advanced" role="tabpanel" aria-labelledby="created-tab-btn-advanced" hidden>
-          <div
-            class="hc-emphasis-card hc-emphasis-card--warn created-view-restore-panel"
-            id="created-view-restore-panel"
-            hidden
-            role="status"
-          >
-            <div class="hc-emphasis-card__main">
-              <span class="hc-emphasis-card__dot hc-emphasis-card__dot--warn" aria-hidden="true"></span>
-              <div class="hc-emphasis-card__copy">
-                <p class="hc-emphasis-card__eyebrow">View only</p>
-                <p class="hc-emphasis-card__title" id="created-view-ownership-hint">
-                  Ownership not loaded in this tab.
-                </p>
-                <p class="hc-emphasis-card__detail" id="created-view-restore-lead"></p>
-              </div>
-            </div>
-          </div>
           <p class="created-tab-lead" id="created-control-manage-lead" data-created-signing-only>
             Rotate, revoke, recovery, and backup. This root ownership controls the card and its
             object QRs; you change resolver state, not the sticker. Public copy publishes on
@@ -1482,8 +1496,12 @@
           </p>
           <p class="created-tab-lead" id="created-view-manage-lead" hidden></p>
 
-          <section class="created-view-restore-tools" aria-labelledby="created-view-restore-import-title">
-            <h3 class="form-label" id="created-view-restore-import-title">Restore ownership</h3>
+          <section
+            class="created-view-restore-tools"
+            id="created-view-restore-tools"
+            aria-labelledby="created-view-restore-import-title"
+          >
+            <h3 class="form-label" id="created-view-restore-import-title">Recovery import</h3>
             <p class="form-hint">Paste the recovery code you saved at create.</p>
             <form id="import-recovery-form" class="compact-form" novalidate>
               <label class="form-label" for="import-recovery-key">Recovery private key (Base58)</label>

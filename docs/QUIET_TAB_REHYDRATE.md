@@ -84,7 +84,8 @@ Once per **shell or scan** page load, **before** first chrome refresh (`device-s
 | Tab already has control | Skip |
 | Zero saved cards | Skip |
 | Two or more saved signing rows | Skip — no guess |
-| `/created/?profile_id=` URL ≠ sole saved card | Skip — keep view-only restore UX (K1b); pass `urlProfileId` into `ensureQuietTabRehydrateBootstrap()` |
+| `/created/?profile_id=` URL ≠ rehydrate target (no matching signing row) | Skip — K1b key-loss view-only; pass `urlProfileId` into `ensureQuietTabRehydrateBootstrap()` |
+| `/created/?profile_id=` matches a saved signing row (multi-card) | Rehydrate **that** row (WS-QUALITY view-only deprecation step 1) |
 | Scan: other tab holds keys (presence heartbeat) | Skip — `maybeQuietTabRehydrateForScan()` after `startTabKeysPresence()` |
 | Scan: vouchee profile ≠ sole saved card | Skip — `quietRehydrateBlockedOnScanForDifferentCard` |
 | Sign lock enabled and locked | Skip — user unlocks via existing take-control flow |

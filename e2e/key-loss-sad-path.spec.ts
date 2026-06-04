@@ -132,17 +132,21 @@ test.describe("key-loss sad paths", () => {
     });
     await expect(page.locator("#created-control-root")).toBeVisible();
     await expect(page.locator("#created-setup-root")).toBeHidden();
-    await expect(page.locator("#created-view-live-banner")).toBeVisible();
-    await expect(page.locator("#created-view-live-lead")).toContainText(/read-only/i);
-    await expect(page.locator("#created-live-scanners-see")).toBeHidden();
-    await expect(page.locator("#created-deploy-print")).toBeVisible();
-    await expect(page.locator("#created-view-live-qr-tasks")).toBeVisible({ timeout: 15_000 });
+    const livePanel = page.locator("#created-tab-now");
+    await expect(livePanel.locator("#created-view-live-banner")).toBeVisible();
+    await expect(livePanel.locator("#created-view-live-lead")).toContainText(/read-only/i);
+    await expect(livePanel.locator("#created-live-scanners-see")).toBeHidden();
+    await expect(livePanel.locator("#created-deploy-print")).toBeVisible();
+    await expect(livePanel.locator("#created-view-live-qr-tasks")).toBeVisible({
+      timeout: 15_000,
+    });
 
     await page.getByRole("tab", { name: "Manage" }).click();
-    await expect(page.locator("#created-view-restore-panel")).toBeVisible();
+    await expect(page.locator("#created-view-restore-tools")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Recovery import" })).toBeVisible();
     await expect(page.locator("#import-recovery-form")).toBeVisible();
     await expect(page.locator("#no-session")).toBeHidden();
-    await expect(page.locator("#created-view-restore-lead")).toContainText(
+    await expect(page.locator("#created-view-manage-lead")).toContainText(
       /recovery code|encrypted backup/i
     );
     await expectNoKeylessHcCreated(page);
@@ -175,7 +179,7 @@ test.describe("key-loss sad paths", () => {
     await expect(page.getByRole("heading", { name: "View this card" })).toBeVisible({
       timeout: 15_000,
     });
-    await expect(page.locator("#created-view-restore-lead")).toContainText(/Open controls/i);
+    await expect(page.locator("#created-view-manage-lead")).toContainText(/Open controls/i);
     await expectNoKeylessHcCreated(page);
   });
 
@@ -208,7 +212,8 @@ test.describe("key-loss sad paths", () => {
     await expect(page.locator("#revoke-qr-btn")).toBeHidden();
 
     await page.getByRole("tab", { name: "Manage" }).click();
-    await expect(page.locator("#created-view-ownership-hint")).toBeVisible();
+    await expect(page.locator("#created-view-manage-lead")).toBeVisible();
+    await expect(page.locator("#import-recovery-form")).toBeVisible();
   });
 
   test("R7: corrupt hc_wallet shows urgent tab hint on /wallet/ not empty-wallet copy", async ({

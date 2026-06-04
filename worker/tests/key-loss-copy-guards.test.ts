@@ -33,8 +33,10 @@ describe("key-loss copy guards", () => {
   it("K1/K5: view mode title and no-session detail match workspace + HTML", () => {
     expect(createdHeroTitleForMode("view")).toBe(VIEW_ONLY_CARD_TITLE);
     const html = readFileSync(join(root, "site/created/index.html"), "utf8");
-    expect(html).toContain("Ownership not loaded in this tab");
-    expect(html).toContain("created-view-restore-panel");
+    expect(html).toContain("Recovery import");
+    expect(html).toContain("created-view-restore-tools");
+    expect(html).not.toContain("created-view-restore-panel");
+    expect(html).not.toContain("created-view-live-restore-btn");
     expect(html).toMatch(/recovery code|encrypted backup/i);
     expect(html).not.toMatch(/Finish create in the tab where you clicked Create/i);
     expect(html).toContain("created-view-live-banner");
@@ -46,7 +48,7 @@ describe("key-loss copy guards", () => {
     expect(viewOnlyNoSessionDetailHtml(1)).toBe(VIEW_ONLY_NO_SESSION_WALLET_SAVED);
     expect(viewOnlyRestoreLead(0)).toBe(VIEW_ONLY_RESTORE_LEAD_EMPTY);
     expect(viewOnlyRestoreLead(1)).toBe(VIEW_ONLY_RESTORE_LEAD_SAVED);
-    expect(VIEW_ONLY_LIVE_TAB_LEAD).toMatch(/Restore ownership|Manage/i);
+    expect(VIEW_ONLY_LIVE_TAB_LEAD).toMatch(/recovery|Manage/i);
   });
 
   it("K2: wrong passphrase copy is plain language", () => {

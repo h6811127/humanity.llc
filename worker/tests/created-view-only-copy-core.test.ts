@@ -32,7 +32,7 @@ describe("created-view-only-copy-core", () => {
     expect(detail).toMatch(/recovery code|encrypted backup/i);
     expect(detail).not.toMatch(/Finish create|other tab|Save ownership on this device/i);
     expect(viewOnlyRestoreLead(0)).toMatch(/recovery code|encrypted backup/i);
-    expect(viewOnlyManageTabLead(0)).toMatch(/restore ownership/i);
+    expect(viewOnlyManageTabLead(0)).toMatch(/recovery code|encrypted backup/i);
   });
 
   it("Live tab lead is read-only and points to restore or deploy tasks", () => {
@@ -48,20 +48,19 @@ describe("created-view-only-copy-core", () => {
     expect(viewOnlyNoSessionDetailHtml(1, true)).toMatch(/Unlock to manage/i);
   });
 
-  it("Live tab banner uses P1-2 restore prompt when wallet saved (step 2)", () => {
+  it("wallet saved live banner copy kept for hub paths (banner hidden in view UI)", () => {
     expect(viewOnlyLiveTabTitle(1)).toBe(OWNERSHIP_NOT_IN_TAB_PROMPT);
     expect(viewOnlyLiveTabLead(1)).toMatch(/saved on this device/i);
     expect(viewOnlyLiveTabRestoreLabel(1)).toBe(RESTORE_CONTROL_IN_THIS_TAB);
     expect(viewOnlyLiveTabTitle(0)).toBe("View only in this tab");
-    expect(viewOnlyLiveTabRestoreLabel(0)).toBe("Restore ownership");
   });
 
-  it("wallet saved copy points to Open controls / restore in this tab", () => {
+  it("wallet saved copy points to Open controls on My objects (no restore-in-tab)", () => {
     const detail = viewOnlyNoSessionDetailHtml(2);
     expect(detail).toMatch(/Open controls/i);
     expect(detail).toMatch(/My objects/i);
-    expect(detail).not.toMatch(/Finish create|other tab/i);
-    expect(viewOnlyRestoreLead(2)).toMatch(/saved on this device/i);
+    expect(detail).not.toMatch(/Finish create|other tab|Restore ownership/i);
+    expect(viewOnlyRestoreLead(2)).toMatch(/Open controls/i);
     expect(viewOnlyManageTabLead(2)).toMatch(/Open controls/i);
   });
 });

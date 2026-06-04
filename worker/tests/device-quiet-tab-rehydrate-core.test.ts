@@ -62,6 +62,26 @@ describe("device-quiet-tab-rehydrate-core", () => {
     expect(resolveQuietTabRehydrateTarget(wallet, null)).toEqual(wallet[0]);
   });
 
+  it("prefers /created/ url profile over last-active when multi-card", () => {
+    const wallet = [
+      { profile_id: "a", owner_private_key_b58: "k1" },
+      { profile_id: "b", owner_private_key_b58: "k2" },
+    ];
+    expect(resolveQuietTabRehydrateTarget(wallet, "a", null, "b")).toEqual(
+      wallet[1]
+    );
+    expect(
+      shouldQuietTabRehydrate({
+        hasTabControl: false,
+        signingWalletCount: 2,
+        targetEntry: wallet[1],
+        requiresUnlock: false,
+        quietRehydrateEnabled: true,
+        urlProfileId: "b",
+      })
+    ).toBe(true);
+  });
+
   it("excludes scan vouchee profile from quiet rehydrate target", () => {
     const wallet = [
       { profile_id: "steward", owner_private_key_b58: "k1" },

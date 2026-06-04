@@ -28,21 +28,31 @@ export function soleSigningWalletEntry(entries) {
  * @param {Array<{ owner_private_key_b58?: string, profile_id?: string }>} entries
  * @param {string | null} lastActiveProfileId
  * @param {string | null | undefined} [excludeProfileId] never auto-load this profile (e.g. scan vouchee)
+ * @param {string | null | undefined} [urlProfileId] prefer this row on /created/ deep links
  * @returns {Record<string, unknown> | null}
  */
 export function resolveQuietTabRehydrateTarget(
   entries,
   lastActiveProfileId,
-  excludeProfileId = null
+  excludeProfileId = null,
+  urlProfileId = null
 ) {
   const exclude =
     typeof excludeProfileId === "string" && excludeProfileId.trim()
       ? excludeProfileId.trim()
       : null;
+  const url =
+    typeof urlProfileId === "string" && urlProfileId.trim()
+      ? urlProfileId.trim()
+      : null;
   const signing = walletEntriesWithSigningKeys(entries).filter(
     (entry) => !exclude || entry.profile_id !== exclude
   );
   if (signing.length === 0) return null;
+  if (url && url !== exclude) {
+    const urlMatch = signing.find((entry) => entry.profile_id === url);
+    if (urlMatch) return urlMatch;
+  }
   if (signing.length === 1) return signing[0];
   if (lastActiveProfileId && lastActiveProfileId !== exclude) {
     const match = signing.find((entry) => entry.profile_id === lastActiveProfileId);

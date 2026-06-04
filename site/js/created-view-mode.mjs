@@ -1,16 +1,12 @@
 /**
- * Apply read-only /created/ workspace chrome when keys are not in this tab.
- * @see docs/OWNERSHIP_RESTORE_UX_PLAN.md
- * @see docs/SAFARI_KEYS_CUSTODY.md P0-7
+ * Apply read-only /created/ workspace chrome when keys are not in this tab (K1).
+ * @see docs/CORE_PRODUCT_LOOP.md § View-only deprecation
  */
 
-import { OWNERSHIP_NOT_LOADED_TAB } from "./device-ownership-copy-core.mjs";
 import {
   viewOnlyLiveTabLead,
-  viewOnlyLiveTabRestoreLabel,
   viewOnlyLiveTabTitle,
   viewOnlyManageTabLead,
-  viewOnlyRestoreLead,
   viewOnlyWalletBranch,
 } from "./created-view-only-copy-core.mjs";
 import {
@@ -23,30 +19,24 @@ import {
 } from "./created-view-live-readonly.mjs";
 
 /**
- * Show restore panel and hide signing-only controls.
- * @param {{ signingKeyCount?: number }} [opts]
+ * Show K1 view-only chrome (recovery import on Manage; no restore-in-tab CTAs).
+ * @param {{ signingKeyCount?: number, needsDeviceUnlock?: boolean }} [opts]
  */
 export function applyCreatedViewModeUi(opts = {}) {
   const signingKeyCount = opts.signingKeyCount ?? 0;
+  const needsDeviceUnlock = opts.needsDeviceUnlock ?? false;
   if (typeof document === "undefined") return;
   document.body.dataset.createdMode = "view";
 
-  const restorePanel = document.getElementById("created-view-restore-panel");
-  if (restorePanel) restorePanel.hidden = false;
+  const walletSaved = viewOnlyWalletBranch(signingKeyCount) === "wallet_saved";
 
   const controlLead = document.getElementById("created-control-manage-lead");
   const viewLead = document.getElementById("created-view-manage-lead");
   if (controlLead) controlLead.hidden = true;
   if (viewLead) {
     viewLead.hidden = false;
-    viewLead.textContent = viewOnlyManageTabLead(signingKeyCount);
+    viewLead.textContent = viewOnlyManageTabLead(signingKeyCount, needsDeviceUnlock);
   }
-
-  const restoreLead = document.getElementById("created-view-restore-lead");
-  if (restoreLead) restoreLead.textContent = viewOnlyRestoreLead(signingKeyCount);
-
-  const ownershipHint = document.getElementById("created-view-ownership-hint");
-  if (ownershipHint) ownershipHint.textContent = OWNERSHIP_NOT_LOADED_TAB;
 
   for (const el of document.querySelectorAll("[data-created-signing-only]")) {
     el.hidden = true;
@@ -55,27 +45,20 @@ export function applyCreatedViewModeUi(opts = {}) {
   const liveBanner = document.getElementById("created-view-live-banner");
   const liveTitle = document.getElementById("created-view-live-title");
   const liveLead = document.getElementById("created-view-live-lead");
-  const liveRestoreBtn = document.getElementById("created-view-live-restore-btn");
   if (liveBanner) {
-    liveBanner.hidden = false;
-    liveBanner.classList.remove("hc-emphasis-card--info", "hc-emphasis-card--warn");
-    liveBanner.classList.add(
-      viewOnlyWalletBranch(signingKeyCount) === "wallet_saved"
-        ? "hc-emphasis-card--warn"
-        : "hc-emphasis-card--info"
-    );
-    const dot = liveBanner.querySelector(".hc-emphasis-card__dot");
-    if (dot) {
-      dot.className =
-        viewOnlyWalletBranch(signingKeyCount) === "wallet_saved"
-          ? "hc-emphasis-card__dot hc-emphasis-card__dot--warn"
-          : "hc-emphasis-card__dot hc-emphasis-card__dot--info";
+    liveBanner.hidden = walletSaved;
+    if (!walletSaved) {
+      liveBanner.classList.remove("hc-emphasis-card--warn");
+      liveBanner.classList.add("hc-emphasis-card--info");
+      const dot = liveBanner.querySelector(".hc-emphasis-card__dot");
+      if (dot) {
+        dot.className = "hc-emphasis-card__dot hc-emphasis-card__dot--info";
+      }
     }
   }
-  if (liveTitle) liveTitle.textContent = viewOnlyLiveTabTitle(signingKeyCount);
-  if (liveLead) liveLead.textContent = viewOnlyLiveTabLead(signingKeyCount);
-  if (liveRestoreBtn) {
-    liveRestoreBtn.textContent = viewOnlyLiveTabRestoreLabel(signingKeyCount);
+  if (!walletSaved) {
+    if (liveTitle) liveTitle.textContent = viewOnlyLiveTabTitle(signingKeyCount);
+    if (liveLead) liveLead.textContent = viewOnlyLiveTabLead(signingKeyCount);
   }
 
   for (const id of CREATED_VIEW_LIVE_SIGNING_ONLY_IDS) {
@@ -102,9 +85,6 @@ export function applyCreatedViewModeUi(opts = {}) {
 /** Restore signing UI after keys load into this tab. */
 export function clearCreatedViewModeUi() {
   if (typeof document === "undefined") return;
-
-  const restorePanel = document.getElementById("created-view-restore-panel");
-  if (restorePanel) restorePanel.hidden = true;
 
   const controlLead = document.getElementById("created-control-manage-lead");
   const viewLead = document.getElementById("created-view-manage-lead");
@@ -136,7 +116,7 @@ export function clearCreatedViewModeUi() {
 export function focusCreatedViewRestore(selectTab) {
   selectTab("advanced");
   requestAnimationFrame(() => {
-    document.getElementById("created-view-restore-panel")?.scrollIntoView({
+    document.getElementById("created-view-restore-tools")?.scrollIntoView({
       behavior: "smooth",
       block: "start",
     });

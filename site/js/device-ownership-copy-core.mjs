@@ -159,7 +159,7 @@ export const VIEW_ONLY_NO_SESSION_WALLET_EMPTY =
 
 /** Wallet has signing rows but this tab cannot sign (P0-7). */
 export const VIEW_ONLY_NO_SESSION_WALLET_SAVED =
-  'Ownership is saved on this device but not in this tab. Open <a href="/wallet/">My objects</a> and tap <strong>Open controls</strong>, or use Restore ownership in Manage below.';
+  'Ownership is saved on this device. Open <a href="/wallet/">My objects</a> and tap <strong>Open controls</strong> to manage.';
 
 /** device_unlock — wallet saved, tab locked (WS-CUSTODY C2). */
 export const VIEW_ONLY_NO_SESSION_WALLET_DEVICE_UNLOCK =
@@ -169,10 +169,10 @@ export const VIEW_ONLY_NO_SESSION_WALLET_DEVICE_UNLOCK =
 export const VIEW_ONLY_NO_SESSION_DETAIL = VIEW_ONLY_NO_SESSION_WALLET_EMPTY;
 
 export const VIEW_ONLY_MANAGE_TAB_LEAD_EMPTY =
-  "Read-only network snapshot and restore paths. Signing controls appear after you restore ownership in this tab.";
+  "Read-only network snapshot. Import your recovery code or encrypted backup below to manage this card.";
 
 export const VIEW_ONLY_MANAGE_TAB_LEAD_SAVED =
-  "Read-only network snapshot. Your ownership is still saved on this device — restore control in this tab below or open My objects and tap Open controls.";
+  "Read-only network snapshot. Open My objects and tap Open controls to manage on this phone.";
 
 export const VIEW_ONLY_MANAGE_TAB_LEAD_DEVICE_UNLOCK =
   "Read-only network snapshot. Unlock below with Face ID or Touch ID to manage in this tab.";
@@ -181,13 +181,14 @@ export const VIEW_ONLY_MANAGE_TAB_LEAD_DEVICE_UNLOCK =
 export const VIEW_ONLY_MANAGE_TAB_LEAD = VIEW_ONLY_MANAGE_TAB_LEAD_EMPTY;
 
 export const VIEW_ONLY_LIVE_QR_TASKS_LEAD =
-  "Preview or share this QR without signing. To change what scanners see, restore ownership under Manage.";
+  "Preview or share this QR without signing. To manage or change what scanners see, import recovery on Manage or open My objects.";
 
 export const VIEW_ONLY_RESTORE_LEAD_EMPTY =
   "Paste the recovery code you saved at create, or import an encrypted backup file. humanity.llc cannot restore your object for you.";
 
+/** @deprecated Restore-in-tab panel removed (WS-QUALITY view-only deprecation step 2). */
 export const VIEW_ONLY_RESTORE_LEAD_SAVED =
-  "Your ownership is still saved on this device. Use Restore ownership below or open My objects and tap Open controls to sign in this tab.";
+  "Your ownership is still saved on this device. Open My objects and tap Open controls.";
 
 export const VIEW_ONLY_RESTORE_LEAD_DEVICE_UNLOCK =
   "Your object is saved on this device. Unlock with Face ID or Touch ID below to manage in this tab.";
@@ -197,11 +198,18 @@ export const VIEW_ONLY_RESTORE_LEAD = VIEW_ONLY_RESTORE_LEAD_EMPTY;
 
 /** Live tab banner when viewing without signing keys (OWNERSHIP_RESTORE Phase 3). */
 export const VIEW_ONLY_LIVE_TAB_LEAD =
-  "Read-only view of your live object. Use the QR and deploy tasks below, or open Manage to restore ownership and update.";
+  "Read-only view of your live object. Use the QR and deploy tasks below, or open Manage to import recovery and update.";
 
 /** Setup wizard protect step (Phase 2 · K7 · WS-CUSTODY C0). */
 export const SETUP_SEATBELT_PANEL_LEAD =
   "Before your object goes live, save a recovery method. Your phone holds control — humanity.llc cannot restore it if this device is lost.";
+
+/** Protect step — device_unlock (WS-CUSTODY G-C1). */
+export const SETUP_SEATBELT_DEVICE_UNLOCK_LEAD =
+  "Before your object goes live, confirm your recovery method. Face ID locks signing on this device — humanity.llc cannot restore it if you lose the phone and skip backup.";
+
+export const CUSTODY_RECOVERY_DEVICE_UNLOCK_PLATFORM_SYNC =
+  "Face ID on this device is not a Humanity recovery path. Save the recovery code below or download an encrypted backup before going live.";
 
 /** Protect step — passkey / platform sync is not operator recovery (C0). */
 export const CUSTODY_RECOVERY_NOT_PLATFORM_SYNC =
@@ -248,6 +256,21 @@ export const SETUP_TEST_SCAN_EXTERNAL_LABEL = "Preview in browser tab";
 
 export const SETUP_TEST_SCAN_HINT =
   "Optional preview. Tap Continue when you are ready to save recovery — you do not need to scan first.";
+
+export const SETUP_PRINT_DEVICE_UNLOCK_HINT =
+  "After you print: unlock with Face ID on this device when you update status — strangers only see the scan page.";
+
+export const SETUP_TEST_SCAN_DEVICE_UNLOCK_LEAD =
+  "Preview what scanners see. Face ID unlock is separate from the public scan page.";
+
+export const SETUP_TEST_SCAN_DEVICE_UNLOCK_HINT =
+  "Use in-app scan to stay in humanity.llc, or open the scan page in a browser tab.";
+
+export const SETUP_DONE_DEVICE_UNLOCK_IOS_DETAIL =
+  "Add to Home Screen and open cards only from that icon. Face ID unlock applies in this app — keep your recovery backup.";
+
+export const DEVICE_UNLOCK_WEBAUTHN_CANCELED_HINT =
+  "Face ID was canceled — your card is still here. Try again when you are ready to unlock.";
 
 export const DEFAULT_FOR_ATTESTATION = "Default for attestation";
 

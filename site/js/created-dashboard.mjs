@@ -3,10 +3,10 @@
  * @see docs/CREATED_TASK_DASHBOARD.md · docs/CREATED_TASKS_TAB_REDESIGN.md
  */
 
-import { isWalletSaved } from "./device-wallet.mjs";
 import { isAutoSaveEnabled, isAutoSaveFailed } from "./device-auto-save.mjs";
 import { syncUpdateStatusTaskGate } from "./created-first-revoke-gate.mjs?v=2";
 import { initCreatedLivePrimaryCta } from "./created-live-primary-cta.mjs";
+import { getWalletSigningKeyCount, isWalletSaved } from "./device-wallet.mjs";
 import { initCreatedLiveSetupMemory } from "./created-live-setup-memory.mjs";
 import { isSetupDone } from "./created-mode.mjs";
 import { openStewardScanPreviewFromWindow } from "./pwa-scan-handoff.mjs";

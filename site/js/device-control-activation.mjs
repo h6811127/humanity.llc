@@ -61,6 +61,22 @@ export async function activateWalletEntryGated(entry, opts = {}) {
   return { ok: true };
 }
 
+const CREATED_PIN_PROMPT =
+  "Enter PIN to manage this card on this phone.";
+
+/**
+ * @param {Record<string, unknown>} entry
+ * @param {{ pin?: string }} [opts]
+ */
+export async function activateWalletEntryGatedWithPinPrompt(entry, opts = {}) {
+  let result = await activateWalletEntryGated(entry, opts);
+  if (result.ok) return result;
+  if (!result.needsPin || typeof window === "undefined") return result;
+  const pin = window.prompt(CREATED_PIN_PROMPT);
+  if (pin == null || !pin.trim()) return result;
+  return activateWalletEntryGated(entry, { ...opts, pin: pin.trim() });
+}
+
 /**
  * @param {Record<string, unknown>} entry
  * @param {{ returnUrl?: string | null, pin?: string }} [opts]
@@ -83,7 +99,17 @@ export async function openCardNowPageGated(entry, opts = {}) {
       walletEntryHasSigningMaterial(target))
   ) {
     const result = await activateWalletEntryGated(target, { pin: opts.pin });
-    if (!result.ok) return result;
+    if (!result.ok) {
+      const fallbackUrl = buildCreatedPageUrl(
+        { profile_id: target.profile_id, qr_id: target.qr_id },
+        opts
+      );
+      if (fallbackUrl) {
+        navigateTo(fallbackUrl.href);
+        return { ok: true, viewOnly: true, activationError: result };
+      }
+      return result;
+    }
   }
 
   const url = buildCreatedPageUrl(getTabSession() ?? target, opts);

@@ -23,9 +23,9 @@ export const CREATED_PANEL_FOCUS = {
   "add-status-plate": "child-object-add-status-plate",
   "add-lost-item": "child-object-add-lost-item",
   /** Backup seatbelt nudges — scroll to recovery or encrypted backup on Manage. */
-  recovery: "created-view-restore-panel",
+  recovery: "created-view-restore-tools",
   backup: "backup-details",
-  restore: "created-view-restore-panel",
+  restore: "created-view-restore-tools",
 };
 
 /** @param {string} [hash] location.hash or bare key */

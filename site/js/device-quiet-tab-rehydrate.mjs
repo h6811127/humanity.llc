@@ -61,7 +61,8 @@ export async function maybeQuietTabRehydrate(opts = {}) {
   const entry = resolveQuietTabRehydrateTarget(
     wallet,
     lastActiveProfileId,
-    excludeProfileId
+    excludeProfileId,
+    urlProfileId
   );
   const profileId = typeof entry?.profile_id === "string" ? entry.profile_id : "";
   const requiresDeviceUnlock = Boolean(entry && walletEntryNeedsDeviceUnlock(entry));

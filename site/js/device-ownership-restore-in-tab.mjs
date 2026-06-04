@@ -3,7 +3,11 @@
  * @see docs/SAFARI_KEYS_CUSTODY.md P1-2
  */
 import { openCardNowPage } from "./device-keys.mjs";
-import { activateWalletEntryGated } from "./device-control-activation.mjs";
+import {
+  activateWalletEntryGated,
+  activateWalletEntryGatedWithPinPrompt,
+} from "./device-control-activation.mjs";
+import { findWalletEntryByProfileId } from "./device-wallet.mjs";
 import {
   pickWalletEntryForRestoreInTab,
   restoreInTabPlan,
@@ -44,6 +48,26 @@ export function openRestoreControlInThisTab(opts = {}) {
  * Scan: activate wallet row in this tab (matches status-dot restore path).
  * @param {{ afterActivate?: () => void }} [opts]
  */
+/**
+ * Load saved ownership for a profile into this tab (created / view-only restore).
+ * @param {string} profileId
+ * @param {{ pin?: string }} [opts]
+ */
+export async function restoreProfileControlInThisTab(profileId, opts = {}) {
+  const entry = findWalletEntryByProfileId(profileId);
+  if (!entry) {
+    return { ok: false, kind: "no_wallet", message: "No saved ownership for this card." };
+  }
+  const result = opts.pin
+    ? await activateWalletEntryGated(entry, { pin: opts.pin })
+    : await activateWalletEntryGatedWithPinPrompt(entry);
+  if (!result.ok) {
+    return { ok: false, kind: "activation_failed", ...result };
+  }
+  window.dispatchEvent(new Event("hc-device-hub-changed"));
+  return { ok: true, kind: "activated" };
+}
+
 export async function activateRestoreControlInThisTab(opts = {}) {
   const existing =
     document.querySelector(".vouch-use-keys-here") ||

@@ -71,6 +71,15 @@ describe("resolveCreatedLivePrimaryCta", () => {
     expect(resolveCreatedLivePrimaryCta(base).mode).toBe("open-scan");
   });
 
+  it("view-only without tab keys uses open-scan when scan URL ready (no restore-control)", () => {
+    const cta = resolveCreatedLivePrimaryCta({
+      ...base,
+      hasSigningKeys: false,
+      walletSaved: true,
+    });
+    expect(cta.mode).toBe("open-scan");
+  });
+
   it("does not offer prove-live when challenge pending but keys absent (sad-path S7)", () => {
     expect(
       resolveCreatedLivePrimaryCta({
