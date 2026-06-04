@@ -35,8 +35,29 @@ export function validateMobileLoreEnrollmentRow(row) {
   if (!label) {
     issues.push("label is required (courier display name).");
   }
-  if (entry.role != null && entry.role !== "mobile_lore") {
-    issues.push('role must be "mobile_lore" when set.');
+  const role = entry.role == null ? "mobile_lore" : String(entry.role).trim();
+  if (role !== "mobile_lore" && role !== "faction_badge") {
+    issues.push('role must be "mobile_lore" or "faction_badge" when set.');
+  }
+  if (role === "faction_badge") {
+    const faction =
+      typeof entry.faction === "string" ? entry.faction.trim().toLowerCase() : "";
+    if (!["red", "blue", "green", "yellow"].includes(faction)) {
+      issues.push("faction must be red, blue, green, or yellow for faction_badge.");
+    }
+    if (
+      entry.mission_line != null &&
+      typeof entry.mission_line !== "string"
+    ) {
+      issues.push("mission_line must be a string when set.");
+    }
+    if (entry.achievement_lines != null) {
+      if (!Array.isArray(entry.achievement_lines)) {
+        issues.push("achievement_lines must be an array when set.");
+      } else if (entry.achievement_lines.length > 6) {
+        issues.push("achievement_lines may include at most 6 entries.");
+      }
+    }
   }
   if (
     entry.fragment_hint != null &&
@@ -79,14 +100,27 @@ export function validateMobileLoreEnrollmentList(rows) {
 /**
  * @param {{ profileId: string; artifact: string; label: string; fragmentHint?: string; courierNote?: string }} input
  */
+/**
+ * @param {{ profileId: string; artifact: string; label: string; role?: string; faction?: string; missionLine?: string; achievementLines?: string[]; fragmentHint?: string; courierNote?: string }} input
+ */
 export function buildMobileLoreEnrollmentRow(input) {
+  const role = input.role?.trim() === "faction_badge" ? "faction_badge" : "mobile_lore";
   const row = {
     profile_id: input.profileId.trim(),
     print_artifact_id: input.artifact.trim(),
-    label: input.label.trim() || "Mobile lore courier",
-    role: "mobile_lore",
+    label: input.label.trim() || (role === "faction_badge" ? "Faction badge" : "Mobile lore courier"),
+    role,
     enrolled_at: new Date().toISOString(),
   };
+  if (role === "faction_badge" && input.faction?.trim()) {
+    row.faction = input.faction.trim().toLowerCase();
+  }
+  if (role === "faction_badge" && input.missionLine?.trim()) {
+    row.mission_line = input.missionLine.trim();
+  }
+  if (role === "faction_badge" && input.achievementLines?.length) {
+    row.achievement_lines = input.achievementLines.map((line) => String(line).trim()).filter(Boolean);
+  }
   if (input.fragmentHint?.trim()) {
     row.fragment_hint = input.fragmentHint.trim();
   }

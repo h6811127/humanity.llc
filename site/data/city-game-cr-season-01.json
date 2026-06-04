@@ -544,5 +544,31 @@
         "body": "The schematic board shows owned relays, rumored hints, and cooperative nodes — not every unclaimed relay. Use Places by district below for full wayfinding."
       }
     ]
+  },
+  "debrief": {
+    "title": "Wake the city · debrief",
+    "lead": "Patterns you may have felt on the street — named after the season without a lecture during play.",
+    "game_theory_patterns": [
+      {
+        "id": "public_goods",
+        "title": "Public goods",
+        "body": "River Lantern quorum and witness scarcity needed everyone to show up — hiding clues delayed the lattice."
+      },
+      {
+        "id": "commons",
+        "title": "Tragedy of the commons",
+        "body": "Hot relays could flip compromised when too many capture attempts piled on — factions still lost the relay."
+      },
+      {
+        "id": "coordination",
+        "title": "Coordination",
+        "body": "Fragment nodes and vouch paths only opened when the city shared clues outward."
+      },
+      {
+        "id": "contest",
+        "title": "Network contest",
+        "body": "Relay holds and decay forced revisits — the board showed faction truth, not personal scan counts."
+      }
+    ]
   }
 }

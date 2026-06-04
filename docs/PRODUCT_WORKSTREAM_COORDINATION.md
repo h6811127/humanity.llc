@@ -159,10 +159,10 @@ WS-E (Phase E /created/ setup — needs WS-REV entitlements UI)
 | **Blocks** | Broad **consumer / paying** launch positioning until **G-C1–G-C3** pass — WS-REV checkout copy should reference non-recoverable operator |
 | **File ownership (when coding)** | `create-card.mjs`, `device-wallet*.mjs`, `device-keys.mjs`, `device-quiet-tab-rehydrate*.mjs`, `scan-tab-keys.mjs`, `device-control-activation*.mjs`, `vouch-sign-lock.mjs`, new wrap module TBD, `device-ownership-copy-core.mjs` |
 | **Regression (existing — must not break full_keys)** | `npm run e2e:key-loss-sad-path` · `npm run e2e:safari-keys-persistence` · `npm run ownership-restore:verify` · `worker/tests/device-quiet-tab-rehydrate.test.ts` |
-| **Regression (C1–C3)** | `npm run custody:c1-preflight` · `npm run worker:test:custody-wrap` · `npm run worker:test:custody` · `npm run e2e:custody-device-unlock` |
+| **Regression (C1–C4)** | `npm run custody:c1-preflight` · `npm run worker:test:custody-wrap` · `npm run worker:test:custody` · `npm run e2e:custody-device-unlock` |
 | **Regression (C0)** | `npm run custody:phase0-preflight` · `npm run custody:phase0-kit` · `worker/tests/custody-phase0-*.test.ts` |
 | **Human gate (C0-5/6)** | `npm run custody:phase0-kit` → ≥5 testers → `npm run custody:phase0-sign-off -- --pass --apply` |
-| **Status** | **C1–C4 shipped (engineering slice)** — wrap/unlock, mode-aware rehydrate, migration panel, recovery re-enroll · **G-C0** human comprehension open · synced passkey / P3-2 threat model next |
+| **Status** | **C1–C4 + G-C4 draft shipped (engineering)** — recovery re-enroll surfaces, K11 E2E, P3-2 documented · **G-C0** human comprehension open · **G-C3** WebAuthn fallback QA next |
 
 **Do not duplicate:** Safari P0–P2 mitigations (shipped) — WS-CUSTODY **extends**, not replaces, [`SAFARI_KEYS_CUSTODY.md`](SAFARI_KEYS_CUSTODY.md).
 
@@ -198,7 +198,7 @@ WS-CUSTODY C0 sign-off (parallel)
 WS-SCALE SC-3–SC-4 (+10–20 nodes, B7 per wave)
 WS-SW SW-S2 (SW-03–SW-07 L: capture, reinforce, decay, faction totals) ☑
 WS-SW SW-S3 (SW-08–SW-13: fog, artifacts, dual victory — map B13–B15) ☑
-WS-SW SW-S3 tail (SW-14 debrief · SW-15 badge scan)
+WS-SW SW-S3 tail (SW-14 debrief · SW-15 badge scan) ☑
     ↓ after E1
 WS-E self-serve marketing (organizers; not Cedar Rapids field)
 WS-CUSTODY C1+ only if G-C0 pass
@@ -248,7 +248,7 @@ WS-CUSTODY C1+ only if G-C0 pass
 | **S1 honest default** | Signal War **copy + operator flips** ship at open; player-initiated **SW-03–SW-05** target **S2 L** unless B8 merges earlier — cooperative **CR-G01/G07** stays **L** at S1 |
 | **Regression** | `npm run verify:city-game` · `worker/tests/city-game-contribute*.test.ts` · `worker/tests/map-node-snapshot*.test.ts` · comprehension **GT-8–GT-10** when SW-S2 ships |
 | **File ownership** | `worker/src/city-game/game-contribute*.ts` · `season-snapshot*` / `map-node-snapshot.ts` · `site/js/city-game-*` · scan templates for `relay_gate` · [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) fog section |
-| **Status** | **SW-S3 shipped** — fog filter (**SW-08**), artifacts/overharvest (**SW-09–SW-12**), dual victory on snapshot (**SW-13**) · **SW-14** debrief page · **SW-15** badge scan next |
+| **Status** | **SW-S3 tail shipped** — debrief page (**SW-14**), faction badge scan (**SW-15**) · WS-SW traceability **SW-01–SW-15** complete for pilot |
 | **Parallel with** | WS-SCALE (registry must list relay roles before capture **L**) |
 
 ---

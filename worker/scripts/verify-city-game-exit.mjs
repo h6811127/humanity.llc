@@ -90,6 +90,8 @@ if (!skipTests) {
     "worker/tests/map-fog-filter.test.ts",
     "worker/tests/dual-victory.test.ts",
     "worker/tests/faction-network-score.test.ts",
+    "worker/tests/city-game-faction-badge.test.ts",
+    "worker/tests/city-game-debrief-core.test.ts",
     "worker/tests/map-node-snapshot.test.ts",
     "worker/tests/city-game-map-snapshot-core.test.ts",
     "worker/tests/city-game-contribute-load.test.ts",

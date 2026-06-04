@@ -1,4 +1,5 @@
 import type { ObjectPublicStream } from "../validation/object-streams";
+import { factionControllerLabel, isGameFaction } from "./factions";
 import { isCityGameEnabled } from "./constants";
 import { normalizeGameMeta } from "./game-meta";
 import {
@@ -17,34 +18,37 @@ import {
 } from "./season-window";
 import type { CrSeasonConfig } from "./season-config";
 
-export type { SeasonPrintArtifactEnrollment as SeasonPrintArtifactEnrollment };
+export type { SeasonPrintArtifactEnrollment };
 
-const MOBILE_LORE_CARE_NOTE = "Glitch hoodie · mobile lore";
+const FACTION_BADGE_CARE_NOTE = "Faction badge · public state only";
 
-export function mobileLoreObjectStreams(
-  enrollment: SeasonPrintArtifactEnrollment,
-  manifestoLine: string | null
+export function factionBadgeObjectStreams(
+  enrollment: SeasonPrintArtifactEnrollment
 ): ObjectPublicStream[] {
-  const statusLine =
-    manifestoLine?.split("\n")[0]?.trim() || "Rotating pseudonym";
-  const dropHint =
-    enrollment.fragment_hint?.trim() ||
-    enrollment.courier_note?.trim() ||
-    "No active hint";
+  const faction = enrollment.faction?.trim();
+  const factionLabel =
+    faction && isGameFaction(faction)
+      ? factionControllerLabel(faction)
+      : faction || "Unassigned";
+  const mission =
+    enrollment.mission_line?.trim() || "No public mission line published";
+  const achievements =
+    enrollment.achievement_lines?.filter((line) => line.trim()).join(" · ") ||
+    "No achievement lines yet";
 
   return [
-    { id: "territory", class: "place", label: "Courier", value: enrollment.label },
-    { id: "relay", class: "route", label: "Drop", value: dropHint },
-    { id: "bulletin", class: "narrative", label: "Status", value: statusLine },
-    { id: "care", class: "care", label: "Note", value: MOBILE_LORE_CARE_NOTE },
+    { id: "territory", class: "place", label: "Faction", value: factionLabel },
+    { id: "bulletin", class: "narrative", label: "Mission", value: mission },
+    { id: "relay", class: "route", label: "Achievements", value: achievements },
+    { id: "care", class: "care", label: "Note", value: FACTION_BADGE_CARE_NOTE },
   ];
 }
 
-export function mobileLoreCoopHint(): string {
-  return "Courier nodes carry hints — the owner updates this line. No scan count, no rank.";
+export function factionBadgeCoopHint(): string {
+  return "Player badges show signed public lines — scanning does not log who you are or rank players.";
 }
 
-export function resolveMobileLoreScanContext(input: {
+export function resolveFactionBadgeScanContext(input: {
   enrollment: SeasonPrintArtifactEnrollment;
   env: { CITY_GAME_ENABLED?: string };
   season?: CrSeasonConfig;
@@ -54,7 +58,7 @@ export function resolveMobileLoreScanContext(input: {
   const now = input.now ?? new Date();
   const season = input.season ?? defaultSeason();
   const seasonWindowPhase = resolveSeasonWindowPhase(now, season);
-  const nodeRole = "mobile_lore";
+  const nodeRole = "faction_badge";
   const gameMeta = normalizeGameMeta({});
 
   const base = {
@@ -79,36 +83,28 @@ export function resolveMobileLoreScanContext(input: {
   }
 
   if (!isSeasonPlayOpen(seasonWindowPhase)) {
-    return dormantMobileLoreContext(base, seasonWindowPhase);
+    return {
+      ...base,
+      seasonWindowPhase,
+      enabled: true,
+      mode: "dormant",
+      coopHint: null,
+      roleEyebrow: "Season closed · faction badge",
+    };
   }
 
   return {
     ...base,
     enabled: true,
     mode: "game",
-    coopHint: mobileLoreCoopHint(),
+    coopHint: factionBadgeCoopHint(),
     roleEyebrow: gameNodeRoleEyebrow(nodeRole, null),
   };
 }
 
-function dormantMobileLoreContext(
-  base: Omit<GameNodeScanContext, "enabled" | "mode" | "coopHint" | "roleEyebrow">,
-  seasonWindowPhase: SeasonWindowPhase
-): GameNodeScanContext {
-  return {
-    ...base,
-    seasonWindowPhase,
-    enabled: true,
-    mode: "dormant",
-    coopHint: null,
-    roleEyebrow: gameNodeRoleEyebrow(base.nodeRole, base.district),
-  };
-}
-
-export function resolveMobileLoreScanForPrintArtifact(input: {
+export function resolveFactionBadgeScanForPrintArtifact(input: {
   profileId: string;
   printArtifactId: string | null | undefined;
-  manifestoLine: string | null;
   env: { CITY_GAME_ENABLED?: string };
   season?: CrSeasonConfig;
   enrollmentRows?: SeasonPrintArtifactEnrollment[];
@@ -121,7 +117,7 @@ export function resolveMobileLoreScanForPrintArtifact(input: {
   const enrollment = findSeasonPrintArtifactEnrollment(
     input.profileId,
     input.printArtifactId,
-    "mobile_lore",
+    "faction_badge",
     input.enrollmentRows ??
       (input.season ?? defaultSeason()).mobile_lore_enrollment ??
       []
@@ -130,8 +126,8 @@ export function resolveMobileLoreScanForPrintArtifact(input: {
 
   return {
     enrollment,
-    objectStreams: mobileLoreObjectStreams(enrollment, input.manifestoLine),
-    gameNode: resolveMobileLoreScanContext({
+    objectStreams: factionBadgeObjectStreams(enrollment),
+    gameNode: resolveFactionBadgeScanContext({
       enrollment,
       env: input.env,
       season: input.season,

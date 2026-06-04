@@ -24,6 +24,7 @@ import type { ObjectCustodyScanContext } from "../live-object/custody";
 import type { ObjectTimePolicyScanContext } from "../live-object/time-policy";
 import { defaultSeason } from "../city-game/season-loader";
 import type { CrSeasonConfig } from "../city-game/season-config";
+import { resolveFactionBadgeScanForPrintArtifact } from "../city-game/faction-badge";
 import { resolveMobileLoreScanForPrintArtifact } from "../city-game/mobile-lore";
 
 export const QR_ID_REGEX =
@@ -339,13 +340,44 @@ export function buildScanViewModel(
   }
 
   if (qr.scope === "print_artifact") {
+    const enrollmentRows = options.mobileLoreEnrollment;
+    const factionBadge = resolveFactionBadgeScanForPrintArtifact({
+      profileId,
+      printArtifactId: qr.print_artifact_id,
+      env: options.env ?? {},
+      season: options.season ?? defaultSeason(),
+      enrollmentRows,
+      now,
+    });
+    if (factionBadge) {
+      return baseView(
+        {
+          kind: "active",
+          profileId,
+          qrId,
+          card,
+          qr,
+          verification: ctx.verification,
+          primaryBadge: { label: "Active", tone: "live" },
+          showCardBlock: true,
+          showHumanTrustBlock: true,
+          showArtifactBlock: true,
+          showLiveControlBlock: false,
+          objectStreams: factionBadge.objectStreams,
+          gameNode: factionBadge.gameNode,
+        },
+        origin,
+        now
+      );
+    }
+
     const mobileLore = resolveMobileLoreScanForPrintArtifact({
       profileId,
       printArtifactId: qr.print_artifact_id,
       manifestoLine: card.manifesto_line,
       env: options.env ?? {},
       season: options.season ?? defaultSeason(),
-      enrollmentRows: options.mobileLoreEnrollment,
+      enrollmentRows,
       now,
     });
     if (mobileLore) {

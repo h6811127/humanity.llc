@@ -22,15 +22,22 @@ export type SeasonNodeRow = NetworkGraphNode & {
 export type SeasonUnlockEdge = NetworkGraphEdge;
 export type SeasonAutomation = NetworkGraphAutomation;
 
-export type SeasonMobileLoreEnrollment = {
+export type SeasonPrintArtifactEnrollment = {
   profile_id: string;
   print_artifact_id: string;
   label: string;
-  role?: string;
+  role?: "mobile_lore" | "faction_badge" | string;
   enrolled_at?: string;
   fragment_hint?: string | null;
   courier_note?: string | null;
+  /** SW-15 — public faction line on badge scan */
+  faction?: string | null;
+  mission_line?: string | null;
+  achievement_lines?: string[] | null;
 };
+
+/** @deprecated Alias — same array as faction badges in `mobile_lore_enrollment`. */
+export type SeasonMobileLoreEnrollment = SeasonPrintArtifactEnrollment;
 
 export type SeasonWindow = {
   starts_at: string | null;
@@ -187,16 +194,34 @@ export function normalizeSiteCode(raw: string): string {
   return raw.trim().toUpperCase();
 }
 
+export function findSeasonPrintArtifactEnrollment(
+  profileId: string,
+  printArtifactId: string | null | undefined,
+  role: "mobile_lore" | "faction_badge" | null = null,
+  rows: SeasonPrintArtifactEnrollment[] = CR_SEASON_01.mobile_lore_enrollment ?? []
+): SeasonPrintArtifactEnrollment | null {
+  if (!printArtifactId?.trim()) return null;
+  const id = printArtifactId.trim();
+  return (
+    rows.find((row) => {
+      if (row.profile_id !== profileId || row.print_artifact_id !== id) return false;
+      if (!role) return true;
+      const rowRole = row.role?.trim() || "mobile_lore";
+      return rowRole === role;
+    }) ?? null
+  );
+}
+
 export function findSeasonMobileLoreEnrollment(
   profileId: string,
   printArtifactId: string | null | undefined,
   rows: SeasonMobileLoreEnrollment[] = CR_SEASON_01.mobile_lore_enrollment ?? []
 ): SeasonMobileLoreEnrollment | null {
-  if (!printArtifactId?.trim()) return null;
-  const id = printArtifactId.trim();
-  return (
-    rows.find((row) => row.profile_id === profileId && row.print_artifact_id === id) ??
-    null
+  return findSeasonPrintArtifactEnrollment(
+    profileId,
+    printArtifactId,
+    "mobile_lore",
+    rows
   );
 }
 

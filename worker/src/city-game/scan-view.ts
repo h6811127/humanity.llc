@@ -68,6 +68,7 @@ const ROLE_LABELS: Record<string, string> = {
   finale: "Finale switch",
   care_loop: "Care loop",
   mobile_lore: "Mobile lore",
+  faction_badge: "Faction badge",
 };
 
 export const GAME_NODE_SCAN_FOOT =
