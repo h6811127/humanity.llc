@@ -3,7 +3,7 @@
  * Click handler for Open controls: `bindWalletActiveOpenControls()` from wallet-page.mjs.
  */
 
-import { gatherInboxInput } from "./device-inbox.mjs?v=87";
+import { gatherInboxInput } from "./device-inbox.mjs?v=88";
 import {
   controlHereDetail,
   controlHereEyebrow,
@@ -20,6 +20,13 @@ import {
   OWNERSHIP_NOT_IN_TAB_SUBTITLE,
   RESTORE_CONTROL_IN_THIS_APP,
   RESTORE_CONTROL_IN_THIS_TAB,
+  UNLOCK_NOT_IN_TAB_SUBTITLE,
+  UNLOCK_TO_MANAGE_IN_THIS_APP,
+  DEVICE_UNLOCK_REENROLL_IN_THIS_TAB,
+  DEVICE_UNLOCK_REENROLL_PROMPT,
+  DEVICE_UNLOCK_REENROLL_SUBTITLE,
+  UNLOCK_TO_MANAGE_IN_THIS_TAB,
+  UNLOCK_TO_MANAGE_PROMPT,
   WALLET_CORRUPT_HELP_CTA,
   WALLET_CORRUPT_HELP_HREF,
   WALLET_CORRUPT_HUB_EYEBROW,
@@ -29,6 +36,10 @@ import {
 } from "./device-ownership-copy-core.mjs";
 import { openRestoreControlInThisTab } from "./device-ownership-restore-in-tab.mjs";
 import { gatherPwaSessionMismatch } from "./device-pwa-session-mismatch.mjs";
+import {
+  savedControlNeedsDeviceUnlockCopy,
+  savedControlNeedsDeviceUnlockReenrollCopy,
+} from "./device-custody-mode-core.mjs";
 import { scrollToHubImportForm } from "./device-wallet-corrupt-core.mjs";
 import { getWalletLoadKind, getWalletSigningKeyCount, isWalletStorageCorrupt, loadWallet } from "./device-wallet.mjs";
 import {
@@ -176,16 +187,38 @@ function setTabHint(tabHint, input) {
       crossTabCount
     )
   ) {
+    const needsReenroll = savedControlNeedsDeviceUnlockReenrollCopy(
+      loadWallet(),
+      getTabSession()?.profile_id ?? null
+    );
+    const needsUnlock = savedControlNeedsDeviceUnlockCopy(
+      loadWallet(),
+      getTabSession()?.profile_id ?? null
+    );
     setTabHintModifier(tabHint, "warn");
     if (eyebrow) eyebrow.textContent = "This tab";
     if (title) {
       title.hidden = false;
-      title.textContent = OWNERSHIP_NOT_IN_TAB_PROMPT;
+      title.textContent = needsReenroll
+        ? DEVICE_UNLOCK_REENROLL_PROMPT
+        : needsUnlock
+          ? UNLOCK_TO_MANAGE_PROMPT
+          : OWNERSHIP_NOT_IN_TAB_PROMPT;
     }
-    if (detail) detail.textContent = OWNERSHIP_NOT_IN_TAB_SUBTITLE;
+    if (detail) {
+      detail.textContent = needsReenroll
+        ? DEVICE_UNLOCK_REENROLL_SUBTITLE
+        : needsUnlock
+          ? UNLOCK_NOT_IN_TAB_SUBTITLE
+          : OWNERSHIP_NOT_IN_TAB_SUBTITLE;
+    }
     if (useKeysBtn) {
       useKeysBtn.hidden = false;
-      useKeysBtn.textContent = RESTORE_CONTROL_IN_THIS_TAB;
+      useKeysBtn.textContent = needsReenroll
+        ? DEVICE_UNLOCK_REENROLL_IN_THIS_TAB
+        : needsUnlock
+          ? UNLOCK_TO_MANAGE_IN_THIS_TAB
+          : RESTORE_CONTROL_IN_THIS_TAB;
     }
     tabHint.hidden = false;
     return;
@@ -295,6 +328,15 @@ function ensureTabHintListeners() {
         input.crossTabEntries.length
       )
     ) {
+      if (
+        savedControlNeedsDeviceUnlockReenrollCopy(
+          loadWallet(),
+          getTabSession()?.profile_id ?? null
+        )
+      ) {
+        scrollToHubImportForm();
+        return;
+      }
       openRestoreControlInThisTab();
       return;
     }

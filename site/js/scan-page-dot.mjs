@@ -13,9 +13,12 @@ import {
   hasStewardVerification,
 } from "./device-dot-state-core.mjs?v=56";
 import { fetchResolverHealth } from "./device-network-health.mjs";
+import { savedControlNeedsDeviceUnlockCopy, savedControlNeedsDeviceUnlockReenrollCopy } from "./device-custody-mode-core.mjs";
 import { getTabSession } from "./device-keys.mjs";
 import { activateRestoreControlInThisTab } from "./device-ownership-restore-in-tab.mjs";
-import { isWalletSaved, loadWalletSummary } from "./device-wallet.mjs";
+import { openHubFromChrome } from "./device-status-core.mjs";
+import { scrollToHubImportForm } from "./device-wallet-corrupt-core.mjs";
+import { isWalletSaved, loadWallet, loadWalletSummary } from "./device-wallet.mjs";
 import { getInboxOverlayCounts } from "./device-inbox.mjs?v=56";
 import { resolverApiOrigin } from "./hc-sign.mjs";
 import {
@@ -153,6 +156,8 @@ function scanDeviceContext() {
   const session = getTabSession();
   const hasTabSigningKeys = Boolean(session?.owner_private_key_b58);
   const summary = loadWalletSummary();
+  const { profileId } = readScanContext();
+  const wallet = loadWallet();
   const stewardReady =
     summary.stewardReady ||
     Boolean(hasTabSigningKeys && hasStewardVerification(session));
@@ -165,7 +170,19 @@ function scanDeviceContext() {
     summary.signingKeyCount,
     hasTabSigningKeys
   );
-  return { device, walletKeysNotInTab, stewardReady, summary };
+  const walletNeedsDeviceUnlock = savedControlNeedsDeviceUnlockCopy(wallet, profileId);
+  const walletNeedsDeviceUnlockReenroll = savedControlNeedsDeviceUnlockReenrollCopy(
+    wallet,
+    profileId
+  );
+  return {
+    device,
+    walletKeysNotInTab,
+    walletNeedsDeviceUnlock,
+    walletNeedsDeviceUnlockReenroll,
+    stewardReady,
+    summary,
+  };
 }
 
 function isScanGlanceOpen() {
@@ -253,6 +270,8 @@ function renderScanGlanceContent(network, device, overlay, ctx) {
     pageKind: "scan",
     singleSavedCardWithKeys: ctx.summary.signingKeyCount === 1,
     walletKeysNotInTab: ctx.walletKeysNotInTab,
+    walletNeedsDeviceUnlock: ctx.walletNeedsDeviceUnlock,
+    walletNeedsDeviceUnlockReenroll: ctx.walletNeedsDeviceUnlockReenroll,
   });
   const primary = scanGlancePrimaryAction(descriptor.action, overlay);
   explainer.innerHTML = renderScanDotExplainerHtml(descriptor, primary);
@@ -288,6 +307,11 @@ function runScanGlanceAction(action) {
   }
   if (action === "scan_use_keys_here") {
     useKeysOnScan();
+    return;
+  }
+  if (action === "import_backup") {
+    openHubFromChrome();
+    scrollToHubImportForm();
   }
 }
 

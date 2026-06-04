@@ -4,6 +4,7 @@
  */
 import { activateWalletEntryGated } from "./device-control-activation.mjs";
 import { controlActivationRequiresUnlock } from "./device-control-activation-core.mjs";
+import { walletEntryNeedsDeviceUnlock } from "./device-custody-mode-core.mjs";
 import { getTabSession } from "./device-keys.mjs";
 import { loadWallet } from "./device-wallet.mjs";
 import {
@@ -63,13 +64,14 @@ export async function maybeQuietTabRehydrate(opts = {}) {
     excludeProfileId
   );
   const profileId = typeof entry?.profile_id === "string" ? entry.profile_id : "";
+  const requiresDeviceUnlock = Boolean(entry && walletEntryNeedsDeviceUnlock(entry));
 
   if (
     !shouldQuietTabRehydrate({
       hasTabControl,
       signingWalletCount: signingEntries.length,
       targetEntry: entry,
-      requiresUnlock: controlActivationRequiresUnlock(profileId),
+      requiresUnlock: controlActivationRequiresUnlock(profileId) || requiresDeviceUnlock,
       quietRehydrateEnabled,
       urlProfileId,
     })
@@ -80,6 +82,7 @@ export async function maybeQuietTabRehydrate(opts = {}) {
       return { skipped: "multi_card_opt_out" };
     }
     if (signingEntries.length > 1 && !entry) return { skipped: "no_last_active" };
+    if (requiresDeviceUnlock) return { skipped: "device_unlock_requires_webauthn" };
     if (controlActivationRequiresUnlock(profileId)) return { skipped: "requires_unlock" };
     if (quietRehydrateBlockedForUrlProfile(entry, urlProfileId)) {
       return { skipped: "url_profile_mismatch" };

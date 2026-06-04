@@ -5,6 +5,7 @@ import { logDeviceActivity } from "./device-activity.mjs";
 import {
   HUB_RESTORE_RECOVERY_HINT,
   HUB_RESTORE_RECOVERY_SUMMARY,
+  HUB_RECOVERY_DEVICE_UNLOCK_REENROLL_HINT,
   IMPORT_OWNERSHIP_LOADED_TAB,
 } from "./device-ownership-copy-core.mjs";
 import { activateWalletEntry, openCardNowPage } from "./device-keys.mjs";
@@ -144,7 +145,10 @@ export function initHubRecoveryImport(form, statusEl) {
       }
       activateWalletEntry(merged.entry);
       markSetupDone(profileId);
-      setStatus(IMPORT_OWNERSHIP_LOADED_TAB);
+      const statusMsg = merged.entry.device_unlock_reenroll_pending
+        ? `${IMPORT_OWNERSHIP_LOADED_TAB} ${HUB_RECOVERY_DEVICE_UNLOCK_REENROLL_HINT}`
+        : IMPORT_OWNERSHIP_LOADED_TAB;
+      setStatus(statusMsg);
       showImportOpenControlsCta(statusEl, merged.entry);
       logDeviceActivity("recovery_import", merged.entry.label || "Imported recovery", {
         profile_id: profileId,

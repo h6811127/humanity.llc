@@ -50,7 +50,26 @@ export function walletEntryCountsAsSigning(entry) {
  * @param {Record<string, unknown> | null | undefined} entry
  */
 export function walletEntryNeedsDeviceUnlock(entry) {
+  if (walletEntryNeedsDeviceUnlockReenroll(entry)) return false;
   return entryHasDeviceUnlockWrap(entry) && !entry?.owner_private_key_b58;
+}
+
+/**
+ * New phone / recovery import — stale passkey wrap removed; backup + re-enroll required (C4 · K11).
+ * @param {Record<string, unknown> | null | undefined} entry
+ */
+export function walletEntryNeedsDeviceUnlockReenroll(entry) {
+  if (!entry || typeof entry !== "object") return false;
+  if (resolveEntryCustodyMode(entry) !== CUSTODY_MODE_DEVICE_UNLOCK) return false;
+  if (entryHasDeviceUnlockWrap(entry) && entry.device_unlock_reenroll_pending !== true) {
+    return false;
+  }
+  return (
+    entry.device_unlock_reenroll_pending === true ||
+    (!entryHasDeviceUnlockWrap(entry) &&
+      typeof entry.recovery_private_key_b58 === "string" &&
+      !!entry.recovery_private_key_b58.trim())
+  );
 }
 
 /**
@@ -87,4 +106,66 @@ export function stripPrivateKeysForDeviceUnlockWallet(entry) {
   next.custody_mode = CUSTODY_MODE_DEVICE_UNLOCK;
   next.has_signing_key = true;
   return next;
+}
+
+/**
+ * Single saved card uses device_unlock (Layer 2 unlock copy).
+ * @param {Array<Record<string, unknown>> | null | undefined} entries
+ */
+export function soleSavedEntryNeedsDeviceUnlock(entries) {
+  if (!Array.isArray(entries)) return false;
+  const signing = entries.filter((entry) => walletEntryCountsAsSigning(entry));
+  if (signing.length !== 1) return false;
+  return walletEntryNeedsDeviceUnlock(signing[0]);
+}
+
+/**
+ * Profile-scoped unlock copy when known; otherwise sole saved device_unlock row.
+ * @param {Array<Record<string, unknown>> | null | undefined} entries
+ * @param {string | null | undefined} profileId
+ */
+export function savedControlNeedsDeviceUnlockCopy(entries, profileId = null) {
+  if (!Array.isArray(entries)) return false;
+  const pid = typeof profileId === "string" ? profileId.trim() : "";
+  if (pid) {
+    const entry = entries.find((row) => row.profile_id === pid);
+    if (entry && walletEntryCountsAsSigning(entry)) {
+      return walletEntryNeedsDeviceUnlock(entry);
+    }
+    return false;
+  }
+  return soleSavedEntryNeedsDeviceUnlock(entries);
+}
+
+/**
+ * @param {Array<Record<string, unknown>> | null | undefined} entries
+ */
+export function soleSavedEntryNeedsDeviceUnlockReenroll(entries) {
+  if (!Array.isArray(entries)) return false;
+  const controlRows = entries.filter(
+    (entry) => walletEntryCountsAsSigning(entry) || walletEntryNeedsDeviceUnlockReenroll(entry)
+  );
+  if (controlRows.length !== 1) return false;
+  return walletEntryNeedsDeviceUnlockReenroll(controlRows[0]);
+}
+
+/**
+ * Profile-scoped re-enroll copy when known; otherwise sole saved pending row.
+ * @param {Array<Record<string, unknown>> | null | undefined} entries
+ * @param {string | null | undefined} profileId
+ */
+export function savedControlNeedsDeviceUnlockReenrollCopy(entries, profileId = null) {
+  if (!Array.isArray(entries)) return false;
+  const pid = typeof profileId === "string" ? profileId.trim() : "";
+  if (pid) {
+    const entry = entries.find((row) => row.profile_id === pid);
+    if (
+      entry &&
+      (walletEntryCountsAsSigning(entry) || walletEntryNeedsDeviceUnlockReenroll(entry))
+    ) {
+      return walletEntryNeedsDeviceUnlockReenroll(entry);
+    }
+    return false;
+  }
+  return soleSavedEntryNeedsDeviceUnlockReenroll(entries);
 }

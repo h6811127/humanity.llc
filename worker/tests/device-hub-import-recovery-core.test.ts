@@ -89,4 +89,27 @@ describe("mergeRecoveryIntoWallet", () => {
     expect(result.entry.owner_private_key_b58).toBe("ownerPriv");
     expect(result.entry.recovery_private_key_b58).toBe("privR");
   });
+
+  it("strips stale device_unlock wrap when merging recovery on new device (C4 · K11)", () => {
+    const existing = {
+      profile_id: PROFILE_ID,
+      custody_mode: "device_unlock",
+      wrapped_owner_key: {
+        version: 1,
+        credential_id: "old-cred",
+        prf_salt: "s",
+        iv: "i",
+        ciphertext: "c",
+      },
+    };
+    const result = mergeRecoveryIntoWallet([existing], {
+      profileId: PROFILE_ID,
+      recoveryPublicKeyB58: "pubR",
+      recoveryPrivateKeyB58: "privR",
+      scanUrl: `https://humanity.llc/c/${PROFILE_ID}`,
+    });
+    expect(result.entry.wrapped_owner_key).toBeUndefined();
+    expect(result.entry.device_unlock_reenroll_pending).toBe(true);
+    expect(result.entry.recovery_private_key_b58).toBe("privR");
+  });
 });

@@ -22,6 +22,10 @@ import {
   OWNERSHIP_NOT_IN_TAB_PROMPT,
   OWNERSHIP_NOT_IN_TAB_SUBTITLE,
   SET_DEFAULT_FOR_ATTESTATION,
+  UNLOCK_NOT_IN_TAB_SUBTITLE,
+  UNLOCK_TO_MANAGE_PROMPT,
+  DEVICE_UNLOCK_REENROLL_PROMPT,
+  DEVICE_UNLOCK_REENROLL_SUBTITLE,
   savedObjectsAttestationNudge,
 } from "./device-ownership-copy-core.mjs";
 import { walletOwnershipNotInTab } from "./device-ownership-not-in-tab-core.mjs";
@@ -43,6 +47,8 @@ import { walletOwnershipNotInTab } from "./device-ownership-not-in-tab-core.mjs"
  * @property {string} subtitle
  * @property {HubKeysCustodyPresenceEntry} [entry]
  * @property {boolean} [canRestoreInThisTab]
+ * @property {boolean} [needsDeviceUnlock]
+ * @property {boolean} [needsDeviceUnlockReenroll]
  */
 
 /**
@@ -83,6 +89,8 @@ export function labelForHubKeysCustodyEntry(entry, surface = "browser") {
  *   pwaSessionMismatchTitle?: string | null,
  *   pwaSessionMismatchDetail?: string | null,
  *   pwaSessionMismatchCanRestore?: boolean,
+ *   walletNeedsDeviceUnlock?: boolean,
+ *   walletNeedsDeviceUnlockReenroll?: boolean,
  *   standalone?: boolean,
  * }} input
  * @returns {HubKeysCustodyPanelState}
@@ -108,6 +116,8 @@ export function buildHubKeysCustodyPanel(input) {
     pwaSessionMismatchTitle = null,
     pwaSessionMismatchDetail = null,
     pwaSessionMismatchCanRestore = false,
+    walletNeedsDeviceUnlock = false,
+    walletNeedsDeviceUnlockReenroll = false,
   } = input;
   const surface = shellSurfaceFromStandalone(standalone);
 
@@ -154,8 +164,18 @@ export function buildHubKeysCustodyPanel(input) {
   ) {
     rows.push({
       kind: "wallet_not_in_tab",
-      title: OWNERSHIP_NOT_IN_TAB_PROMPT,
-      subtitle: OWNERSHIP_NOT_IN_TAB_SUBTITLE,
+      title: walletNeedsDeviceUnlockReenroll
+        ? DEVICE_UNLOCK_REENROLL_PROMPT
+        : walletNeedsDeviceUnlock
+          ? UNLOCK_TO_MANAGE_PROMPT
+          : OWNERSHIP_NOT_IN_TAB_PROMPT,
+      subtitle: walletNeedsDeviceUnlockReenroll
+        ? DEVICE_UNLOCK_REENROLL_SUBTITLE
+        : walletNeedsDeviceUnlock
+          ? UNLOCK_NOT_IN_TAB_SUBTITLE
+          : OWNERSHIP_NOT_IN_TAB_SUBTITLE,
+      needsDeviceUnlock: walletNeedsDeviceUnlock,
+      needsDeviceUnlockReenroll: walletNeedsDeviceUnlockReenroll,
     });
   }
 

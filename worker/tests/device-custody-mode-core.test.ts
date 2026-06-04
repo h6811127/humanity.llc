@@ -5,10 +5,15 @@ import {
   CUSTODY_MODE_FULL_KEYS,
   entryHasDeviceUnlockWrap,
   resolveEntryCustodyMode,
+  savedControlNeedsDeviceUnlockCopy,
+  savedControlNeedsDeviceUnlockReenrollCopy,
   shouldDefaultDeviceUnlockAtCreate,
+  soleSavedEntryNeedsDeviceUnlock,
+  soleSavedEntryNeedsDeviceUnlockReenroll,
   stripPrivateKeysForDeviceUnlockWallet,
   walletEntryCountsAsSigning,
   walletEntryNeedsDeviceUnlock,
+  walletEntryNeedsDeviceUnlockReenroll,
   WRAPPED_OWNER_KEY_VERSION,
 } from "../../site/js/device-custody-mode-core.mjs";
 
@@ -58,6 +63,24 @@ describe("device-custody-mode-core", () => {
     expect(stripped.has_signing_key).toBe(true);
   });
 
+  it("detects sole device_unlock card for unlock copy", () => {
+    const deviceEntry = {
+      profile_id: "p1",
+      custody_mode: CUSTODY_MODE_DEVICE_UNLOCK,
+      wrapped_owner_key: wrap,
+    };
+    expect(soleSavedEntryNeedsDeviceUnlock([deviceEntry])).toBe(true);
+    expect(
+      soleSavedEntryNeedsDeviceUnlock([
+        deviceEntry,
+        { profile_id: "p2", owner_private_key_b58: "k" },
+      ])
+    ).toBe(false);
+    expect(soleSavedEntryNeedsDeviceUnlock([{ profile_id: "p2", owner_private_key_b58: "k" }])).toBe(
+      false
+    );
+  });
+
   it("defaults device unlock when WebAuthn available", () => {
     expect(
       shouldDefaultDeviceUnlockAtCreate({
@@ -83,5 +106,41 @@ describe("device-custody-mode-core", () => {
         organizerEnabled: true,
       })
     ).toBe(false);
+  });
+
+  it("resolves profile-scoped device unlock copy", () => {
+    const wrap = {
+      version: WRAPPED_OWNER_KEY_VERSION,
+      credential_id: "cred",
+      prf_salt: "salt",
+      iv: "iv",
+      ciphertext: "cipher",
+    };
+    const wallet = [
+      { profile_id: "a", owner_private_key_b58: "k1" },
+      {
+        profile_id: "b",
+        custody_mode: CUSTODY_MODE_DEVICE_UNLOCK,
+        wrapped_owner_key: wrap,
+      },
+    ];
+    expect(savedControlNeedsDeviceUnlockCopy(wallet, "b")).toBe(true);
+    expect(savedControlNeedsDeviceUnlockCopy(wallet, "a")).toBe(false);
+    expect(savedControlNeedsDeviceUnlockCopy(wallet, "missing")).toBe(false);
+    expect(savedControlNeedsDeviceUnlockCopy([wallet[1]])).toBe(true);
+  });
+
+  it("detects re-enroll pending after cross-device recovery import (C4 · K11)", () => {
+    const pending = {
+      profile_id: "p1",
+      custody_mode: CUSTODY_MODE_DEVICE_UNLOCK,
+      recovery_private_key_b58: "rec",
+      device_unlock_reenroll_pending: true,
+    };
+    expect(walletEntryNeedsDeviceUnlockReenroll(pending)).toBe(true);
+    expect(walletEntryNeedsDeviceUnlock(pending)).toBe(false);
+    expect(soleSavedEntryNeedsDeviceUnlockReenroll([pending])).toBe(true);
+    expect(savedControlNeedsDeviceUnlockReenrollCopy([pending], "p1")).toBe(true);
+    expect(savedControlNeedsDeviceUnlockCopy([pending], "p1")).toBe(false);
   });
 });

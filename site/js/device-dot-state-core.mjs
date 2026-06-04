@@ -4,11 +4,19 @@
  */
 
 import {
+  DEVICE_UNLOCK_REENROLL_ON_SCAN,
+  DEVICE_UNLOCK_REENROLL_PROMPT,
+  DEVICE_UNLOCK_REENROLL_SUBTITLE,
+  DEVICE_UNLOCK_REENROLL_IN_THIS_TAB,
   OWNERSHIP_NOT_IN_TAB_PROMPT,
   OWNERSHIP_NOT_IN_TAB_SUBTITLE,
   RESTORE_CONTROL_HERE,
   RESTORE_CONTROL_IN_THIS_TAB,
   STEWARD_REVIEW_QUEUE_MANAGE_HINT,
+  UNLOCK_NOT_IN_TAB_SUBTITLE,
+  UNLOCK_TO_MANAGE_HERE,
+  UNLOCK_TO_MANAGE_IN_THIS_TAB,
+  UNLOCK_TO_MANAGE_PROMPT,
 } from "./device-ownership-copy-core.mjs";
 import { walletOwnershipNotInTab } from "./device-ownership-not-in-tab-core.mjs";
 import { dotOverlayCrossTabPhrase } from "./device-shell-copy-core.mjs";
@@ -224,6 +232,8 @@ export function dotExplainerKicker(descriptor, compact) {
  *   pageKind?: string,
  *   singleSavedCardWithKeys?: boolean,
  *   walletKeysNotInTab?: boolean,
+ *   walletNeedsDeviceUnlock?: boolean,
+ *   walletNeedsDeviceUnlockReenroll?: boolean,
  * }} [opts]
  */
 export function describeDotState(network, device, overlay, opts = {}) {
@@ -232,6 +242,8 @@ export function describeDotState(network, device, overlay, opts = {}) {
   const pageKind = opts.pageKind || "landing";
   const singleSavedCardWithKeys = opts.singleSavedCardWithKeys === true;
   const walletKeysNotInTab = opts.walletKeysNotInTab === true;
+  const walletNeedsDeviceUnlock = opts.walletNeedsDeviceUnlock === true;
+  const walletNeedsDeviceUnlockReenroll = opts.walletNeedsDeviceUnlockReenroll === true;
   const openControlsAction =
     singleSavedCardWithKeys && pageKind !== "wallet"
       ? { kind: "open_card_controls", label: "Open controls" }
@@ -329,21 +341,54 @@ export function describeDotState(network, device, overlay, opts = {}) {
     };
   }
   if (device === "none" && walletKeysNotInTab) {
-    const restoreLabel =
-      pageKind === "scan" ? RESTORE_CONTROL_HERE : RESTORE_CONTROL_IN_THIS_TAB;
-    const actionKind = pageKind === "scan" ? "scan_use_keys_here" : "open_controls";
+    const restoreLabel = walletNeedsDeviceUnlockReenroll
+      ? pageKind === "scan"
+        ? DEVICE_UNLOCK_REENROLL_ON_SCAN
+        : DEVICE_UNLOCK_REENROLL_IN_THIS_TAB
+      : walletNeedsDeviceUnlock
+        ? pageKind === "scan"
+          ? UNLOCK_TO_MANAGE_HERE
+          : UNLOCK_TO_MANAGE_IN_THIS_TAB
+        : pageKind === "scan"
+          ? RESTORE_CONTROL_HERE
+          : RESTORE_CONTROL_IN_THIS_TAB;
+    const actionKind = walletNeedsDeviceUnlockReenroll
+      ? "import_backup"
+      : pageKind === "scan"
+        ? "scan_use_keys_here"
+        : "open_controls";
     return {
       id: "none",
       now:
         pageKind === "scan"
-          ? "Ownership not in this tab."
-          : `${OWNERSHIP_NOT_IN_TAB_PROMPT}.`,
-      why: "Your ownership is saved on this device, but this tab cannot sign yet.",
+          ? walletNeedsDeviceUnlockReenroll
+            ? `${DEVICE_UNLOCK_REENROLL_PROMPT} on this scan.`
+            : walletNeedsDeviceUnlock
+              ? "Unlock to manage on this scan."
+              : "Ownership not in this tab."
+          : walletNeedsDeviceUnlockReenroll
+            ? `${DEVICE_UNLOCK_REENROLL_PROMPT}.`
+            : walletNeedsDeviceUnlock
+              ? `${UNLOCK_TO_MANAGE_PROMPT}.`
+              : `${OWNERSHIP_NOT_IN_TAB_PROMPT}.`,
+      why: walletNeedsDeviceUnlockReenroll
+        ? "Recovery is saved here, but Face ID is not set up on this device yet."
+        : walletNeedsDeviceUnlock
+          ? "Your object is saved on this device behind Face ID or Touch ID."
+          : "Your ownership is saved on this device, but this tab cannot sign yet.",
       next:
         overlayText ||
         (pageKind === "scan"
-          ? `${RESTORE_CONTROL_HERE} to attest on this scan.`
-          : `${OWNERSHIP_NOT_IN_TAB_SUBTITLE}.`),
+          ? walletNeedsDeviceUnlockReenroll
+            ? `${DEVICE_UNLOCK_REENROLL_ON_SCAN}, then enroll in Manage.`
+            : walletNeedsDeviceUnlock
+              ? `${UNLOCK_TO_MANAGE_HERE} to attest on this scan.`
+              : `${RESTORE_CONTROL_HERE} to attest on this scan.`
+          : walletNeedsDeviceUnlockReenroll
+            ? `${DEVICE_UNLOCK_REENROLL_SUBTITLE}.`
+            : walletNeedsDeviceUnlock
+              ? `${UNLOCK_NOT_IN_TAB_SUBTITLE}.`
+              : `${OWNERSHIP_NOT_IN_TAB_SUBTITLE}.`),
       action: overlayQuickActionForPage(overlay, pageKind) ?? {
         kind: actionKind,
         label: restoreLabel,

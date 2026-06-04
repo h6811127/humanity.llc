@@ -1,7 +1,9 @@
 /**
  * Hub recovery-code import (pure helpers · Vitest without DOM).
- * @see docs/OWNERSHIP_RESTORE_UX_PLAN.md
+ * @see docs/OWNERSHIP_RESTORE_UX_PLAN.md · docs/CUSTODY_EASY_MODE.md C4
  */
+
+import { stripStaleDeviceUnlockWrapForRecoveryImport } from "./device-custody-reenroll-core.mjs";
 
 /** Loose base58 profile id (resolver cards). */
 const PROFILE_ID_RE = /^[1-9A-HJ-NP-Za-km-z]{20,64}$/;
@@ -102,7 +104,7 @@ export function mergeRecoveryIntoWallet(entries, unlocked, importedAt = new Date
     recovery_imported_at: importedAt,
   };
   if (idx >= 0) {
-    const entry = {
+    const entry = stripStaleDeviceUnlockWrapForRecoveryImport({
       ...entries[idx],
       ...baseFields,
       label: recoveryImportLabel({
@@ -112,7 +114,7 @@ export function mergeRecoveryIntoWallet(entries, unlocked, importedAt = new Date
         existingLabel: entries[idx].label,
       }),
       owner_private_key_b58: entries[idx].owner_private_key_b58,
-    };
+    });
     const next = entries.slice();
     next[idx] = entry;
     return { entries: next, entry, isNew: false };

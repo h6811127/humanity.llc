@@ -8,18 +8,19 @@ import {
   pickWalletEntryForRestoreInTab,
   restoreInTabPlan,
 } from "./device-ownership-restore-in-tab-core.mjs";
+import { walletEntryHasSigningMaterial } from "./device-tab-session-core.mjs";
 import { loadWallet } from "./device-wallet.mjs";
 import { getDefaultVouchProfileId } from "./vouch-ready-keys.mjs";
+
+function signingWalletEntries() {
+  return loadWallet().filter((entry) => walletEntryHasSigningMaterial(entry));
+}
 
 export function scrollToSavedObjectsOnDevice() {
   document.getElementById("device-hub-saved-group")?.scrollIntoView({
     behavior: "smooth",
     block: "nearest",
   });
-}
-
-function signingWalletEntries() {
-  return loadWallet().filter((entry) => Boolean(entry?.owner_private_key_b58));
 }
 
 /**

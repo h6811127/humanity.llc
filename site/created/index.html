@@ -1917,6 +1917,99 @@
               </div>
             </details>
 
+<details
+                class="settings-disclosure settings-disclosure-action"
+                id="created-deploy-print"
+              >
+                <summary class="settings-summary">
+                  <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+                  </span>
+                  <span class="settings-summary-text">
+                    <span class="settings-summary-title">Print &amp; share QR</span>
+                    <span class="settings-summary-sub">Save the image, then print from your phone</span>
+                  </span>
+                  <span class="list-chevron" aria-hidden="true">›</span>
+                </summary>
+                <div class="settings-panel settings-panel-action">
+                  <ol class="created-print-steps">
+                    <li>Download the QR image (button below or under Download QR).</li>
+                    <li>Open it in Photos or Files.</li>
+                    <li>
+                      Share → Print (iPhone) or ⋮ → Print (Android). For a sticker, use label paper or
+                      tape the printout.
+                    </li>
+                  </ol>
+                  <p
+                    class="form-hint created-print-steward-discovery"
+                    id="created-print-steward-discovery"
+                    hidden
+                  ></p>
+                  <button type="button" class="btn-secondary" data-created-action="download-qr">
+                    Download QR image
+                  </button>
+                  <button
+                    type="button"
+                    class="btn-secondary"
+                    id="created-print-steward-cta"
+                    data-created-action="scroll-qr"
+                    hidden
+                  >
+                    View steward handoff QR
+                  </button>
+                </div>
+              </details>
+
+              <details
+                class="settings-disclosure settings-disclosure-action"
+                id="created-deploy-test"
+              >
+                <summary class="settings-summary">
+                  <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
+                  </span>
+                  <span class="settings-summary-text">
+                    <span class="settings-summary-title">Test from another device</span>
+                    <span class="settings-summary-sub">Preview what anyone scanning this QR will see</span>
+                  </span>
+                  <span class="list-chevron" aria-hidden="true">›</span>
+                </summary>
+                <div class="settings-panel settings-panel-action">
+                  <p class="form-hint">
+                    Use a friend’s camera or a second phone. No app required.
+                  </p>
+                  <button type="button" class="btn-primary" data-created-action="test-scan">
+                    Open scan page
+                  </button>
+                </div>
+              </details>
+
+              <details
+                class="settings-disclosure settings-disclosure-action"
+                id="created-deploy-download"
+              >
+                <summary class="settings-summary">
+                  <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  </span>
+                  <span class="settings-summary-text">
+                    <span class="settings-summary-title">Download QR image</span>
+                    <span class="settings-summary-sub">PNG for print, share, or full-size preview</span>
+                  </span>
+                  <span class="list-chevron" aria-hidden="true">›</span>
+                </summary>
+                <div class="settings-panel settings-panel-action">
+                  <p class="form-hint">Same code stays valid when you update public copy on the network.</p>
+                  <button type="button" class="btn-primary" data-created-action="download-qr">
+                    Download QR image
+                  </button>
+                  <button type="button" class="btn-secondary" data-created-action="scroll-qr">
+                    View full-size QR
+                  </button>
+                </div>
+              </details>
+            </div>
+
             <details
               class="settings-disclosure settings-disclosure-info"
               id="created-developer-export-details"

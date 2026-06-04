@@ -4,11 +4,16 @@
  */
 
 /**
+ * Plaintext signing rows only — `device_unlock` wrap rows need explicit WebAuthn (C2).
+ * @see docs/CUSTODY_EASY_MODE.md § Mode-aware quiet rehydrate
  * @param {Array<{ owner_private_key_b58?: string, profile_id?: string }>} entries
  */
 export function walletEntriesWithSigningKeys(entries) {
   return entries.filter((entry) => Boolean(entry?.owner_private_key_b58));
 }
+
+/** Alias — quiet rehydrate never copies wrapped rows silently. */
+export const walletEntriesEligibleForQuietRehydrate = walletEntriesWithSigningKeys;
 
 /**
  * @param {Array<{ owner_private_key_b58?: string }>} entries

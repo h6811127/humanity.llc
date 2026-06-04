@@ -49,4 +49,35 @@ describe("mergeBackupIntoWallet", () => {
     expect(entry.profile_id).toBe(PROFILE);
     expect(entry.owner_private_key_b58).toBe("newPriv");
   });
+
+  it("normalizes device_unlock row after backup import (C4)", () => {
+    const entries = [
+      {
+        profile_id: PROFILE,
+        custody_mode: "device_unlock",
+        device_unlock_reenroll_pending: true,
+        wrapped_owner_key: {
+          version: 1,
+          credential_id: "old",
+          prf_salt: "s",
+          iv: "i",
+          ciphertext: "c",
+        },
+      },
+    ];
+    const { entry } = mergeBackupIntoWallet(
+      entries,
+      {
+        profileId: PROFILE,
+        publicKeyBase58: "newPub",
+        privateKeyBase58: "newPriv",
+      },
+      `https://humanity.llc/c/${PROFILE}`,
+      IMPORTED_AT
+    );
+    expect(entry.owner_private_key_b58).toBe("newPriv");
+    expect(entry.wrapped_owner_key).toBeUndefined();
+    expect(entry.custody_mode).toBe("full_keys");
+    expect(entry.device_unlock_reenroll_pending).toBeUndefined();
+  });
 });

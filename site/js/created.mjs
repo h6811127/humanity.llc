@@ -9,6 +9,7 @@ import { initOwnerRevoke } from "./created-revoke.mjs";
 import { initVoucherRevoke } from "./vouch-revoke.mjs";
 import { initKeyBackupUi } from "./key-backup-ui.mjs";
 import { initRecoveryKeyUi } from "./recovery-key-ui.mjs";
+import { initCreatedCustodyMigrate } from "./created-custody-migrate.mjs";
 import { initCreatedDeveloperExportUi } from "./created-developer-export-ui.mjs";
 import { initManifestoUpdate } from "./created-manifesto-update.mjs";
 import { initQrRotate } from "./created-qr-rotate.mjs";
@@ -95,6 +96,7 @@ import {
 import { activateWalletEntryGated } from "./device-control-activation.mjs";
 import { isWalletSaved, loadWallet, getWalletSigningKeyCount } from "./device-wallet.mjs";
 import { saveSessionToWalletWithCustody } from "./device-custody-save.mjs";
+import { savedControlNeedsDeviceUnlockCopy } from "./device-custody-mode-core.mjs";
 import { applyHumanTrustIconToElement } from "./human-trust-ui.mjs";
 import {
   applyCreatedRoutePendingShell,
@@ -145,8 +147,14 @@ function setNoSessionNotice(html) {
   noSessionEl.innerHTML = `<p class="hc-notice-body">${html}</p>`;
 }
 
+function viewOnlyNeedsDeviceUnlock(forProfileId = null) {
+  return savedControlNeedsDeviceUnlockCopy(loadWallet(), forProfileId);
+}
+
 function applyViewOnlyNoSessionCopy() {
-  setNoSessionNotice(viewOnlyNoSessionDetailHtml(getWalletSigningKeyCount()));
+  setNoSessionNotice(
+    viewOnlyNoSessionDetailHtml(getWalletSigningKeyCount(), viewOnlyNeedsDeviceUnlock())
+  );
 }
 
 function loadSession() {
@@ -1087,7 +1095,10 @@ if (workspaceMode === "view" && profileId && activeQrId) {
   clearKeylessTabSessionIfPresent();
   data = loadSession();
   if (noSessionEl) noSessionEl.hidden = true;
-  applyCreatedViewModeUi({ signingKeyCount: getWalletSigningKeyCount() });
+  applyCreatedViewModeUi({
+    signingKeyCount: getWalletSigningKeyCount(),
+    needsDeviceUnlock: viewOnlyNeedsDeviceUnlock(profileId),
+  });
   createdTabs = initCreatedTabs();
   const restoreHash = createdViewRestoreHashKey(location.hash);
   createdTabs.select(createdViewDefaultTabId(restoreHash));
@@ -1527,6 +1538,7 @@ async function bootstrapOwnerTools() {
     onKeysUnlocked: () => {
       backup?.refreshExportVisibility();
       developerExport?.refreshPubkeyPreview();
+      custodyMigrate?.refresh?.();
       revoke?.refresh();
       voucherRevoke?.refresh();
       liveControl?.refresh();
@@ -1537,6 +1549,11 @@ async function bootstrapOwnerTools() {
   });
   const developerExport = initCreatedDeveloperExportUi({
     getSession: loadSession,
+  });
+  const custodyMigrate = initCreatedCustodyMigrate({
+    profileId,
+    getSession: loadSession,
+    setSession: saveSession,
   });
   deviceSaveCtl?.refresh();
   const recoveryUi = initRecoveryKeyUi({
@@ -1550,6 +1567,7 @@ async function bootstrapOwnerTools() {
       deviceSaveCtl?.refresh();
       recoveryUi?.refresh();
       developerExport?.refreshPubkeyPreview();
+      custodyMigrate?.refresh?.();
       childObjectCtl?.refresh?.();
   lostItemRelayCtl?.refresh?.();
   gameNodeCtl?.refresh?.();
@@ -1558,14 +1576,17 @@ async function bootstrapOwnerTools() {
   deviceSaveCtl?.refresh();
   recoveryUi?.refresh();
   developerExport?.refreshPubkeyPreview();
+  custodyMigrate?.refresh?.();
   window.addEventListener("hc-recovery-acknowledged", () => {
     deviceSaveCtl?.refresh();
     recoveryUi?.refresh();
+    custodyMigrate?.refresh?.();
     childObjectCtl?.refresh?.();
     lostItemRelayCtl?.refresh?.();
     gameNodeCtl?.refresh?.();
   });
   window.addEventListener("hc-key-backup-exported", () => {
+    custodyMigrate?.refresh?.();
     childObjectCtl?.refresh?.();
     lostItemRelayCtl?.refresh?.();
     gameNodeCtl?.refresh?.();

@@ -265,6 +265,19 @@ describe("describeDotState", () => {
     expect(steward.next).toContain("Scroll to vouch");
   });
 
+  it("honest scan copy when wallet has device_unlock but tab cannot sign (C2)", () => {
+    const savedNotInTab = describeDotState("ok", "none", "none", {
+      pageKind: "scan",
+      walletKeysNotInTab: true,
+      walletNeedsDeviceUnlock: true,
+    });
+    expect(savedNotInTab.now).toBe("Unlock to manage on this scan.");
+    expect(savedNotInTab.action).toEqual({
+      kind: "scan_use_keys_here",
+      label: "Unlock to manage here",
+    });
+  });
+
   it("honest scan copy when wallet has keys but tab cannot sign (P0-5)", () => {
     const savedNotInTab = describeDotState("ok", "none", "none", {
       pageKind: "scan",
@@ -275,6 +288,19 @@ describe("describeDotState", () => {
     expect(savedNotInTab.action).toEqual({
       kind: "scan_use_keys_here",
       label: "Restore control here",
+    });
+  });
+
+  it("honest shell copy when device_unlock wallet saved but tab cannot sign (C2)", () => {
+    const savedNotInTab = describeDotState("ok", "none", "none", {
+      pageKind: "landing",
+      walletKeysNotInTab: true,
+      walletNeedsDeviceUnlock: true,
+    });
+    expect(savedNotInTab.now).toContain("Unlock to manage");
+    expect(savedNotInTab.action).toEqual({
+      kind: "open_controls",
+      label: "Unlock to manage in this tab",
     });
   });
 

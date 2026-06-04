@@ -162,6 +162,27 @@ describe("device-quiet-tab-rehydrate-core", () => {
     ).toBe(false);
   });
 
+  it("skips when device_unlock row requires WebAuthn (C2)", () => {
+    expect(
+      shouldQuietTabRehydrate({
+        hasTabControl: false,
+        signingWalletCount: 0,
+        targetEntry: {
+          profile_id: "wrapped_only",
+          custody_mode: "device_unlock",
+          wrapped_owner_key: {
+            version: 1,
+            credential_id: "cred",
+            prf_salt: "salt",
+            iv: "iv",
+            ciphertext: "cipher",
+          },
+        },
+        requiresUnlock: true,
+      })
+    ).toBe(false);
+  });
+
   it("blocks scan rehydrate when vouchee profile differs from sole saved card", () => {
     const entry = { profile_id: "saved_card", owner_private_key_b58: "k" };
     expect(

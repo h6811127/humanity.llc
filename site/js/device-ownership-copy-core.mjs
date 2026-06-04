@@ -3,6 +3,7 @@
  * @see docs/PRODUCT_LANGUAGE_STRATEGY.md
  * @see docs/OWNERSHIP_AND_CONTROL_MODEL.md § Terminology map · D7 · D9g
  */
+import { walletEntryNeedsDeviceUnlock } from "./device-custody-mode-core.mjs";
 import {
   inboxAriaManagingInOtherContext,
   inboxAriaOrphanManagingElsewhere,
@@ -35,6 +36,84 @@ export const KEYS_NOT_IN_THIS_TAB_RESTORE_SUBTITLE =
 
 export const RESTORE_CONTROL_IN_THIS_TAB = "Restore control in this tab";
 
+/** device_unlock — Layer 2 (WS-CUSTODY C1). */
+export const UNLOCK_TO_MANAGE = "Unlock to manage";
+
+export const UNLOCK_TO_MANAGE_HERE = "Unlock to manage here";
+
+export const UNLOCK_TO_MANAGE_IN_THIS_TAB = "Unlock to manage in this tab";
+
+export const UNLOCK_TO_MANAGE_IN_THIS_APP = "Unlock to manage in this app";
+
+export const UNLOCK_TO_MANAGE_PROMPT =
+  "Unlock to manage — tap to use Face ID / Touch ID";
+
+export const UNLOCK_NOT_IN_TAB_SUBTITLE =
+  "Your object is saved on this device. Unlock here to manage or attest.";
+
+/** /created/ Manage — custody mode migration (C3). */
+export const CUSTODY_MIGRATE_MODE_DEVICE_UNLOCK =
+  "This device (Face ID / Touch ID)";
+
+export const CUSTODY_MIGRATE_MODE_FULL_KEYS = "Full control keys";
+
+export const CUSTODY_MIGRATE_SUMMARY_DEVICE_UNLOCK =
+  "Passkey-wrapped — unlock to manage";
+
+export const CUSTODY_MIGRATE_SUMMARY_FULL_KEYS =
+  "Raw signing key saved in this browser";
+
+export const CUSTODY_MIGRATE_TO_FULL_KEYS_LEAD =
+  "Store the raw signing key in this browser wallet. Use only if you need export tools or steward workflows. Keep a recovery code or encrypted backup first.";
+
+export const CUSTODY_MIGRATE_TO_DEVICE_UNLOCK_LEAD =
+  "Wrap your signing key behind Face ID or Touch ID on this device. Raw keys will be removed from saved wallet storage.";
+
+export const CUSTODY_MIGRATE_FULL_KEYS_ACK =
+  "I have a recovery code or encrypted backup for this object";
+
+export const CUSTODY_MIGRATE_UNLOCK_FIRST_HINT =
+  "Unlock in this tab first (Face ID / Touch ID), then you can switch custody mode.";
+
+/** C4 — new phone / recovery import without synced passkey. */
+export const CUSTODY_REENROLL_DEVICE_UNLOCK_LEAD =
+  "This object used Face ID on another device. Import your encrypted backup here, then enroll a passkey on this phone.";
+
+export const CUSTODY_REENROLL_DEVICE_UNLOCK_BTN = "Set up Face ID on this device";
+
+export const CUSTODY_REENROLL_NEED_BACKUP_HINT =
+  "Import your encrypted backup on Manage first — recovery code alone cannot enroll a new passkey.";
+
+export const HUB_RECOVERY_DEVICE_UNLOCK_REENROLL_HINT =
+  "Recovery saved. Import your encrypted backup, then set up Face ID on this device in Manage.";
+
+/** C4 — hub / wallet when recovery imported but passkey not enrolled on this device (K11). */
+export const DEVICE_UNLOCK_REENROLL_PROMPT = "Set up Face ID on this device";
+
+export const DEVICE_UNLOCK_REENROLL_SUBTITLE =
+  "Recovery saved on this device. Import your encrypted backup, then enroll a passkey in Manage.";
+
+export const DEVICE_UNLOCK_REENROLL_IN_THIS_TAB = "Import encrypted backup";
+
+export const DEVICE_UNLOCK_REENROLL_ON_SCAN = "Import backup to set up Face ID";
+
+export const DEVICE_UNLOCK_REENROLL_IN_THIS_APP = "Import backup in this app";
+
+/**
+ * @param {Record<string, unknown> | null | undefined} entry
+ * @param {{ scan?: boolean, pwa?: boolean }} [ctx]
+ */
+export function controlActivationLabelForEntry(entry, ctx = {}) {
+  if (walletEntryNeedsDeviceUnlock(entry)) {
+    if (ctx.pwa) return UNLOCK_TO_MANAGE_IN_THIS_APP;
+    if (ctx.scan) return UNLOCK_TO_MANAGE_HERE;
+    return UNLOCK_TO_MANAGE_IN_THIS_TAB;
+  }
+  if (ctx.pwa) return RESTORE_CONTROL_IN_THIS_APP;
+  if (ctx.scan) return RESTORE_CONTROL_HERE;
+  return RESTORE_CONTROL_IN_THIS_TAB;
+}
+
 export const LOAD_CONTROL_IN_TAB_FIRST = "Take control in this tab first.";
 
 export const IMPORT_OWNERSHIP_LOADED_TAB =
@@ -60,6 +139,10 @@ export const VIEW_ONLY_NO_SESSION_WALLET_EMPTY =
 export const VIEW_ONLY_NO_SESSION_WALLET_SAVED =
   'Ownership is saved on this device but not in this tab. Open <a href="/wallet/">My objects</a> and tap <strong>Open controls</strong>, or use Restore ownership in Manage below.';
 
+/** device_unlock — wallet saved, tab locked (WS-CUSTODY C2). */
+export const VIEW_ONLY_NO_SESSION_WALLET_DEVICE_UNLOCK =
+  'This object is saved on this device but locked behind Face ID / Touch ID. Tap <strong>Unlock to manage</strong> below or open <a href="/wallet/">My objects</a>.';
+
 /** @deprecated Use `viewOnlyNoSessionDetailHtml(signingKeyCount)` — kept for copy guards. */
 export const VIEW_ONLY_NO_SESSION_DETAIL = VIEW_ONLY_NO_SESSION_WALLET_EMPTY;
 
@@ -68,6 +151,9 @@ export const VIEW_ONLY_MANAGE_TAB_LEAD_EMPTY =
 
 export const VIEW_ONLY_MANAGE_TAB_LEAD_SAVED =
   "Read-only network snapshot. Your ownership is still saved on this device — restore control in this tab below or open My objects and tap Open controls.";
+
+export const VIEW_ONLY_MANAGE_TAB_LEAD_DEVICE_UNLOCK =
+  "Read-only network snapshot. Unlock below with Face ID or Touch ID to manage in this tab.";
 
 /** @deprecated Use `viewOnlyManageTabLead(signingKeyCount)`. */
 export const VIEW_ONLY_MANAGE_TAB_LEAD = VIEW_ONLY_MANAGE_TAB_LEAD_EMPTY;
@@ -80,6 +166,9 @@ export const VIEW_ONLY_RESTORE_LEAD_EMPTY =
 
 export const VIEW_ONLY_RESTORE_LEAD_SAVED =
   "Your ownership is still saved on this device. Use Restore ownership below or open My objects and tap Open controls to sign in this tab.";
+
+export const VIEW_ONLY_RESTORE_LEAD_DEVICE_UNLOCK =
+  "Your object is saved on this device. Unlock with Face ID or Touch ID below to manage in this tab.";
 
 /** @deprecated Use `viewOnlyRestoreLead(signingKeyCount)`. */
 export const VIEW_ONLY_RESTORE_LEAD = VIEW_ONLY_RESTORE_LEAD_EMPTY;

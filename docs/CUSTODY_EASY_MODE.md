@@ -1,6 +1,6 @@
 # Custody hybrid — device unlock (easy) + full keys (steward)
 
-**Status:** C1 MVP in progress — `device_unlock` create/enroll/wrap + WebAuthn unlock wired; C2–C4 not shipped  
+**Status:** C1–C4 shipped (engineering) · synced passkey / P3-2 threat model TBD · **G-C4** support macros draft  
 **Audience:** Product, engineering, support, QA  
 **Related:** [`OWNERSHIP_AND_CONTROL_MODEL.md`](OWNERSHIP_AND_CONTROL_MODEL.md) · [`SAFARI_KEYS_CUSTODY.md`](SAFARI_KEYS_CUSTODY.md) · [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) · [`KEY_LOSS_SAD_PATH_MATRIX.md`](KEY_LOSS_SAD_PATH_MATRIX.md) · [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) · [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md) · [`DEVICE_LITE_MOBILE_PLAN.md`](DEVICE_LITE_MOBILE_PLAN.md) · [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) · [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md) · [`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md)
 
@@ -229,7 +229,7 @@ Phase 4 — Cross-device easy mode (hard)
 | **G-C1** | Nontechnical comprehension pass on device_unlock create + unlock + scan | D9-style runbook |
 | **G-C2** | Recovery mandatory + tested sad path (lost passkey, no sync) | E2E + manual |
 | **G-C3** | WebAuthn fallback path QA (desktop, in-app browser denial) | Manual matrix |
-| **G-C4** | Support macros for both custody modes | Support doc |
+| **G-C4** | Support macros for both custody modes | [`CUSTODY_SUPPORT_MACROS.md`](CUSTODY_SUPPORT_MACROS.md) |
 | **G-C5** | Checkout / paid copy — non-recoverable operator | Legal + shop |
 
 **Do not** position broad consumer launch until **G-C1–G-C3** pass.
@@ -275,11 +275,13 @@ Scan script order unchanged: gate unlock **before** `vouch-issue.mjs` / live-con
 | Concern | Module (shipped) | Phase |
 |---------|------------------|-------|
 | WebAuthn gate | `vouch-sign-lock.mjs`, `device-control-activation-core.mjs` | D6 shipped |
-| Quiet rehydrate | `device-quiet-tab-rehydrate*.mjs` | D10 shipped; mode-aware Phase 2 |
-| Scan order | `scan-tab-keys.mjs` | Extend Phase 2 |
-| Layer 2 copy | `device-ownership-copy-core.mjs` | Unlock strings Phase 1 |
-| Wrap / unwrap | TBD | Phase 1 |
-| Create enroll | TBD (`create-card.mjs`) | Phase 1 |
+| Quiet rehydrate | `device-quiet-tab-rehydrate*.mjs` | D10 shipped; **C2** device_unlock gate shipped |
+| Scan order | `scan-tab-keys.mjs` | C2 — unlock before vouch via `activateWalletEntryGated` |
+| Layer 2 copy | `device-ownership-copy-core.mjs` | **C2** unlock strings shipped |
+| Wrap / unwrap | `device-custody-wrap-core.mjs`, `device-custody-unlock.mjs` | C1 shipped |
+| Migration bridges | `device-custody-migrate-core.mjs`, `device-custody-migrate.mjs`, `created-custody-migrate.mjs` | C3 shipped |
+| Cross-device re-enroll | `device-custody-reenroll-core.mjs`, `device-custody-reenroll.mjs`, recovery import strip | **C4 shipped** |
+| Create enroll | `create-card.mjs`, `device-custody-enroll.mjs`, `device-custody-save.mjs` | C1 shipped |
 | Backup gate | `child-object-backup-gate*.mjs` | Recovery hard gate Phase 0 |
 
 ---
@@ -294,9 +296,11 @@ npm run e2e:scan-page-dot
 npm run ownership-restore:verify
 npm run worker:test -- worker/tests/device-quiet-tab-rehydrate.test.ts worker/tests/device-tab-session.test.ts
 
-# TBD when Phase 1 lands
-# npm run e2e:custody-device-unlock
-# npm run worker:test:custody-wrap
+# C1 wrap + C2 mode-aware rehydrate (WS-CUSTODY)
+npm run custody:c1-preflight
+npm run worker:test:custody-wrap
+npm run worker:test:custody
+npm run e2e:custody-device-unlock
 ```
 
 ---

@@ -16,6 +16,7 @@ import {
 import {
   OWNERSHIP_NOT_IN_TAB_PROMPT,
   RESTORE_CONTROL_IN_THIS_TAB,
+  UNLOCK_TO_MANAGE_IN_THIS_TAB,
   VIEW_ONLY_LIVE_TAB_LEAD,
 } from "../../site/js/device-ownership-copy-core.mjs";
 
@@ -38,6 +39,13 @@ describe("created-view-only-copy-core", () => {
     expect(viewOnlyLiveTabLead(0)).toBe(VIEW_ONLY_LIVE_TAB_LEAD);
     expect(VIEW_ONLY_LIVE_TAB_LEAD).toMatch(/read-only|Read-only/i);
     expect(VIEW_ONLY_LIVE_TAB_LEAD).toMatch(/Manage|restore/i);
+  });
+
+  it("shows unlock copy for sole device_unlock wallet row (WS-CUSTODY C2)", () => {
+    expect(viewOnlyLiveTabRestoreLabel(1, true)).toBe(UNLOCK_TO_MANAGE_IN_THIS_TAB);
+    expect(viewOnlyLiveTabTitle(1, true)).toContain("Unlock to manage");
+    expect(viewOnlyLiveTabLead(1, true)).toMatch(/Unlock here to manage/i);
+    expect(viewOnlyNoSessionDetailHtml(1, true)).toMatch(/Unlock to manage/i);
   });
 
   it("Live tab banner uses P1-2 restore prompt when wallet saved (step 2)", () => {

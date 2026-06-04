@@ -39,7 +39,7 @@ This matrix inventories unhappy custody paths, expected UX, and automated regres
 | **K8** | PWA vs Safari tab | Standalone vs browser session | [`PWA_INSTALL.md`](PWA_INSTALL.md) semantics | `e2e/device-pwa-install.spec.ts` | P1-PWA |
 | **K9** | Camera → Safari, keys in PWA | Steward scans print with Camera app | S1 handoff copy + hub Open scan link; **S3** in-app scanner | `npm run worker:test:steward-scan-handoff` | **P1-PWA-V** in [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) |
 | **K10** | device_unlock — WebAuthn canceled | Scan/shell with wrapped row, user dismisses Face ID | **Unlock to manage** retry; no silent fail to view-only without explanation | TBD `e2e:custody-device-unlock` | Comprehension: cancel ≠ wipe |
-| **K11** | device_unlock — passkey lost (no sync) | New phone, no iCloud/Google passkey | Recovery code path only; operator cannot help | TBD + manual | **G-C2** gate |
+| **K11** | device_unlock — passkey lost (no sync) | New phone, no iCloud/Google passkey | Recovery import strips stale wrap → import backup → re-enroll passkey on Manage | `worker/tests/device-custody-reenroll-core.test.ts` · `device-hub-import-recovery-core.test.ts` | **G-C2** gate |
 | **K12** | device_unlock — WebAuthn unavailable | In-app browser or desktop without platform auth | Fallback create as **full_keys** with honest copy | TBD | Environment matrix |
 | **K13** | Skipped recovery on easy path | User skipped Protect; passkey sync failed later | Same as K11 — card may be unmanageable; **block at create** when C0/C1 ships | Policy + gate tests | Worse sad path if recovery optional |
 
@@ -67,7 +67,8 @@ Central strings: `site/js/device-ownership-copy-core.mjs`
 | `WALLET_CORRUPT_*` | Corrupt `hc_wallet` hub + `/wallet/` tab hint (P1-4 · R7) |
 | `CUSTODY_RECOVERY_NOT_PLATFORM_SYNC` | Protect step — platform sync ≠ recovery (C0) |
 | `SETUP_PRINT_IN_APP_HINT` / `SETUP_TEST_SCAN_*` | Setup wizard print + test scan (C0) |
-| `UNLOCK_TO_MANAGE` (planned C1) | device_unlock — primary CTA replacing restore jargon on scan/shell |
+| `UNLOCK_TO_MANAGE` (C1/C2) | device_unlock — primary CTA replacing restore jargon on scan/shell |
+| `DEVICE_UNLOCK_REENROLL_*` (C4) | New phone — recovery imported, passkey re-enroll pending (K11) |
 
 Automated guards: `npm run worker:test:key-loss-copy`
 
@@ -86,7 +87,7 @@ Automated guards: `npm run worker:test:key-loss-copy`
 | S2, S3 (Safari keys) | `npm run e2e:safari-keys-persistence` |
 | Copy | `npm run worker:test:key-loss-copy` |
 | Hub card disappeared (RC-1–RC-16) | `npm run hub-card-disappeared:verify` · `npm run e2e:hub-wallet-debug-monitor` (P2-RC-MON) |
-| K10–K13 (device_unlock) | TBD when WS-CUSTODY Phase 1+ — [`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md) |
+| K10–K13 (device_unlock) | `npm run worker:test:custody` · `npm run e2e:custody-device-unlock` — [`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md) |
 
 ---
 

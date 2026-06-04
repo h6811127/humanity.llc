@@ -231,7 +231,11 @@
     "steward-scan-handoff:verify:fast": "node worker/scripts/verify-steward-scan-handoff-exit.mjs -- --skip-e2e",
     "e2e:wallet-scale-guardrail": "playwright test e2e/wallet-scale-guardrail.spec.ts",
     "e2e:merch-checkout-sad-path": "playwright test e2e/merch-checkout-sad-path.spec.ts",
-    "e2e:merch-funnel": "playwright test e2e/merch-funnel-customize.spec.ts e2e/merch-funnel-checkout.spec.ts e2e/merch-checkout-sad-path.spec.ts e2e/shop-product-detail.spec.ts"
+    "e2e:merch-funnel": "playwright test e2e/merch-funnel-customize.spec.ts e2e/merch-funnel-checkout.spec.ts e2e/merch-checkout-sad-path.spec.ts e2e/shop-product-detail.spec.ts",
+    "custody:c1-preflight": "node worker/scripts/custody-c1-preflight.mjs",
+    "worker:test:custody-wrap": "vitest run worker/tests/device-custody-wrap-core.test.ts worker/tests/device-custody-mode-core.test.ts worker/tests/device-custody-webauthn-core.test.ts",
+    "worker:test:custody": "vitest run worker/tests/device-custody-wrap-core.test.ts worker/tests/device-custody-mode-core.test.ts worker/tests/device-custody-webauthn-core.test.ts worker/tests/device-custody-migrate-core.test.ts worker/tests/device-custody-reenroll-core.test.ts worker/tests/device-quiet-tab-rehydrate-core.test.ts worker/tests/device-hub-keys-custody-core.test.ts worker/tests/created-view-only-copy-core.test.ts worker/tests/device-dot-state.test.ts worker/tests/custody-c1-preflight-core.test.ts worker/tests/device-hub-import-recovery-core.test.ts worker/tests/device-hub-import-core.test.ts -t \"UNLOCK|device_unlock|custody|Layer 2|CUSTODY_MIGRATE|C2|C1 preflight|C4|K11|profile-scoped|re-enroll|reenroll\"",
+    "e2e:custody-device-unlock": "playwright test e2e/custody-device-unlock.spec.ts"
   },
   "dependencies": {
     "@noble/ed25519": "^2.3.0",

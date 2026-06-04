@@ -76,6 +76,33 @@ describe("buildHubKeysCustodyPanel", () => {
     expect(state.visible).toBe(true);
   });
 
+  it("shows unlock copy for sole device_unlock wallet row (WS-CUSTODY C1)", () => {
+    const state = buildHubKeysCustodyPanel({
+      tabNoticeCount: 0,
+      hasActiveKeys: false,
+      walletEntriesWithKeys: 1,
+      walletNeedsDeviceUnlock: true,
+      educationDismissed: true,
+    });
+    expect(state.rows.map((r) => r.kind)).toEqual(["wallet_not_in_tab"]);
+    expect(state.rows[0].title).toContain("Unlock to manage");
+    expect(state.rows[0].needsDeviceUnlock).toBe(true);
+  });
+
+  it("shows re-enroll copy when passkey pending on new device (C4 · K11)", () => {
+    const state = buildHubKeysCustodyPanel({
+      tabNoticeCount: 0,
+      hasActiveKeys: false,
+      walletEntriesWithKeys: 1,
+      walletNeedsDeviceUnlockReenroll: true,
+      educationDismissed: true,
+    });
+    expect(state.rows.map((r) => r.kind)).toEqual(["wallet_not_in_tab"]);
+    expect(state.rows[0].title).toContain("Set up Face ID");
+    expect(state.rows[0].needsDeviceUnlockReenroll).toBe(true);
+    expect(state.rows[0].needsDeviceUnlock).toBeFalsy();
+  });
+
   it("shows orphan rows per tab and suppresses cross-tab when tab unsaved", () => {
     const state = buildHubKeysCustodyPanel({
       tabNoticeCount: 1,

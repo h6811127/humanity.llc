@@ -93,6 +93,7 @@ Canonical inbox taxonomy: [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
 | Quiet rehydrate | `maybeQuietTabRehydrate()` on shell boot (`device-status.mjs`) and scan (`scan-tab-keys.mjs`) **before** vouch/live-control scripts. Shell pages share `ensureQuietTabRehydrateBootstrap()` — `/created/` and `/wallet/` await before reading `hc_created` (RC-10). |
 | Scan script order | `scan-tab-keys.mjs` must load and finish (top-level await) **before** `vouch-issue.mjs` and live-control in `scan-html.ts`. |
 | Tab session writes | Never persist `hc_created` without `owner_private_key_b58` or recovery private key (`setTabSession` / P0-6). |
+| Hybrid `device_unlock` | `hc_wallet` rows may store `wrapped_owner_key` only — never plaintext `owner_private_key_b58` in `localStorage`. Unlock via WebAuthn → populate `hc_created` per tab. Quiet rehydrate **must not** silently copy wrapped rows (C2). Layer 2 copy: **Unlock to manage**, not restore jargon. Cross-device (C4): recovery import **strips stale wrap**; backup import restores owner key; `/created/` Manage offers passkey re-enroll. |
 | Scan dot honesty | Dot / actor band reflect **tab signing state**, not wallet count alone (P0-5). |
 | Save errors | `saveWallet()` try/catch + read-back verify; quota failures surface visibly. |
 | ITP notice | Lazy-load `safari-itp-storage-notice.mjs` after status bootstrap (~7-day eviction + Home Screen timer reset). |
@@ -102,9 +103,9 @@ Canonical inbox taxonomy: [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
 | Steward handoff encode | QR encode for steward handoff URLs must use shared `qr-encode-url-core.mjs` — both `qr-render.mjs` and `qr-branding.mjs` must agree. |
 | Corrupt wallet | `loadWallet()` parse failure → corrupt coach card, not stranger-empty hub (P1-4). |
 
-**Regression:** `npm run e2e:safari-keys-persistence` · `npm run e2e:scan-page-dot` · `npm run e2e:key-loss-sad-path` · `npm run worker:test:safari-itp-notice` · `npm run worker:test:safari-persist-denied-notice` · `npm run worker:test:pwa-session-mismatch` · `npm run steward-scan-handoff:verify:fast`
+**Regression:** `npm run e2e:safari-keys-persistence` · `npm run e2e:scan-page-dot` · `npm run e2e:key-loss-sad-path` · `npm run e2e:custody-device-unlock` · `npm run worker:test:safari-itp-notice` · `npm run worker:test:safari-persist-denied-notice` · `npm run worker:test:pwa-session-mismatch` · `npm run worker:test:custody-wrap` · `npm run steward-scan-handoff:verify:fast`
 
-Canonical: [`SAFARI_KEYS_CUSTODY.md`](SAFARI_KEYS_CUSTODY.md) · [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) · [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) · [`PWA_INSTALL.md`](PWA_INSTALL.md)
+Canonical: [`SAFARI_KEYS_CUSTODY.md`](SAFARI_KEYS_CUSTODY.md) · [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) · [`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md) · [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) · [`PWA_INSTALL.md`](PWA_INSTALL.md)
 
 ---
 

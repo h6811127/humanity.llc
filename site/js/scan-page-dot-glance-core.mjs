@@ -43,6 +43,9 @@ export function scanGlancePrimaryAction(descriptorAction, overlay) {
   if (descriptorAction.kind === "scan_use_keys_here") {
     return descriptorAction;
   }
+  if (descriptorAction.kind === "import_backup") {
+    return descriptorAction;
+  }
   return descriptorAction;
 }
 

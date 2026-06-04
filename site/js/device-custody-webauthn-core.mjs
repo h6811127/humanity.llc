@@ -4,11 +4,16 @@
 
 import { WRAPPED_OWNER_KEY_VERSION } from "./device-custody-mode-core.mjs";
 
-export function deviceUnlockRpId() {
-  const host = typeof location !== "undefined" ? location.hostname : "humanity.llc";
+export function resolveDeviceUnlockRpId(hostname) {
+  const host = String(hostname ?? "humanity.llc");
   if (host === "localhost" || host === "127.0.0.1") return host;
   if (host.endsWith(".humanity.llc")) return "humanity.llc";
   return host;
+}
+
+export function deviceUnlockRpId() {
+  const host = typeof location !== "undefined" ? location.hostname : "humanity.llc";
+  return resolveDeviceUnlockRpId(host);
 }
 
 export function isDeviceUnlockWebAuthnAvailable() {
