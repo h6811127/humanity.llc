@@ -9,8 +9,14 @@ import { relayCaptureNodeIds } from "./network-graph-core.mjs";
 /** Registry count on origin/main pilot season JSON. */
 export const SUMMER_OPEN_NODE_COUNT = 15;
 
+/** Wave-open merge target (nodes 16–40) — not the pilot verify gate. */
+export const SUMMER_WAVE_OPEN_NODE_COUNT = 40;
+
 /** Spine rows (node_01–node_15) have no node_class on the pilot. */
 export const SUMMER_SPINE_NODE_COUNT = 15;
+
+/** @deprecated Alias — use SUMMER_SPINE_NODE_COUNT */
+export const PILOT_SEASON_NODE_COUNT = SUMMER_SPINE_NODE_COUNT;
 
 /** @type {Record<string, number>} */
 export const SUMMER_OPEN_NODE_CLASS_MIN = {};
@@ -52,9 +58,13 @@ export function countNodesByDistrict(nodes) {
 
 /**
  * @param {Record<string, unknown>} season
+ * @param {number} [targetNodeCount]
  * @returns {{ ok: boolean; issues: string[]; warnings: string[]; summary: Record<string, unknown> }}
  */
-export function validateSummerOpenFootprint(season) {
+export function validateSummerOpenFootprint(
+  season,
+  targetNodeCount = SUMMER_OPEN_NODE_COUNT
+) {
   const issues = [];
   const warnings = [];
 
@@ -63,9 +73,9 @@ export function validateSummerOpenFootprint(season) {
   }
 
   const nodes = Array.isArray(season.nodes) ? season.nodes : [];
-  if (nodes.length !== SUMMER_OPEN_NODE_COUNT) {
+  if (nodes.length !== targetNodeCount) {
     issues.push(
-      `Expected ${SUMMER_OPEN_NODE_COUNT} nodes in season registry, found ${nodes.length}.`
+      `Expected ${targetNodeCount} nodes in season registry, found ${nodes.length}.`
     );
   }
 
@@ -77,9 +87,9 @@ export function validateSummerOpenFootprint(season) {
       continue;
     }
     const num = Number(match[1]);
-    if (num < 1 || num > SUMMER_OPEN_NODE_COUNT) {
+    if (num < 1 || num > targetNodeCount) {
       issues.push(
-        `${row.node_id}: id out of pilot range node_01–node_${String(SUMMER_OPEN_NODE_COUNT).padStart(2, "0")}.`
+        `${row.node_id}: id out of pilot range node_01–node_${String(targetNodeCount).padStart(2, "0")}.`
       );
     }
     if (nodeIds.has(row.node_id)) {
@@ -99,7 +109,7 @@ export function validateSummerOpenFootprint(season) {
     }
   }
 
-  for (let i = 1; i <= SUMMER_OPEN_NODE_COUNT; i += 1) {
+  for (let i = 1; i <= targetNodeCount; i += 1) {
     const id = `node_${String(i).padStart(2, "0")}`;
     if (!nodeIds.has(id)) {
       issues.push(`Missing registry row ${id}.`);
@@ -158,4 +168,14 @@ export function validateSummerOpenFootprint(season) {
       relayCaptureCount: relayCapture.length,
     },
   };
+}
+
+/** @param {Record<string, unknown>} season */
+export function validatePilotFootprint(season) {
+  return validateSummerOpenFootprint(season, SUMMER_OPEN_NODE_COUNT);
+}
+
+/** @param {Record<string, unknown>} season */
+export function validateSummerWaveOpenFootprint(season) {
+  return validateSummerOpenFootprint(season, SUMMER_WAVE_OPEN_NODE_COUNT);
 }

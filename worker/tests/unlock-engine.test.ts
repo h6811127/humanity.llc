@@ -102,7 +102,7 @@ describe("unlock-engine", () => {
       gameNodeShowsContribute(
         { unlocked_by: [] } as never,
         "relay_gate",
-        "node_08"
+        "node_35"
       )
     ).toBe(false);
     expect(
@@ -138,7 +138,7 @@ describe("unlock-engine", () => {
         { held_by_faction: null } as never,
         "relay_gate"
       )
-    ).toBe(null);
+    ).toBe("capture");
     expect(
       gameNodeContributeMode(
         "node_05",

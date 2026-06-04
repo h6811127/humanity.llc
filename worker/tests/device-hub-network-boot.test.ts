@@ -50,13 +50,15 @@ describe("hub network checking chip (RC-4)", () => {
     ).toBe("active");
   });
 
-  it("hub-ui uses per-profile checking helpers", () => {
+  it("hub-ui wires Check network through checkNetworkFromHub", () => {
     const src = fs.readFileSync(
       path.join(repoRoot, "site/js/device-hub-ui.mjs"),
       "utf8"
     );
-    expect(src).toContain("hubRowChipStatus");
-    expect(src).toContain("isResolverConfirmedProfile");
-    expect(src).toContain("shouldShowHubNetworkCheckingChip");
+    expect(src).toContain("export async function checkNetworkFromHub()");
+    expect(src).toContain("refreshResolverHealthManual");
+    expect(src).toContain("onCheckNetwork: () => void checkNetworkFromHub()");
+    expect(src).toContain("walletNetworkFetchAllowedByResolverHealth");
+    expect(src).toContain("listWalletEntriesNeedingNetworkFetch");
   });
 });

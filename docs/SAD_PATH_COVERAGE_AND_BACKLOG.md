@@ -68,7 +68,7 @@ Agents are strong at **systematic enumeration** against docs and code. Humans an
 | ID | Gap | User behavior | Risk |
 |----|-----|---------------|------|
 | H-07 | Push-primary (partial) | Owner expects notification; push fails | Stranger waits unless poll/inbox catches it |
-| H-08 | Tab backgrounding (code shipped) | Owner switches to Camera/Messages | Misses 2-minute window without resume poll |
+| H-08 | Tab backgrounding | Owner switches to Camera/Messages | **Non-functional (2026-06-04):** background OS alerts on Android Chrome PWA — deferred; see [`NOTIFICATION_SYSTEM_V2.md`](NOTIFICATION_SYSTEM_V2.md) § Known limitations |
 | **H-09** | **Scan refresh mid-wait** | Scanner refreshes during wait | Must re-ask even if challenge pending |
 | **H-10** | **Expiry retry affordance** | Challenge window ends | Stranger does not notice they can ask again |
 | H-11 | Comprehension runbook | Unscripted strangers | **Passed** 2026-05-29 |

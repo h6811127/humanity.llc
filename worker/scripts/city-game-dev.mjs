@@ -21,6 +21,7 @@ import {
 } from "./city-game-comprehension-kit-core.mjs";
 import {
   buildInstallQaWalkKitHtml,
+  installQaRegistryNodeIds,
   resolveInstallQaWalkNodes,
 } from "./city-game-install-qa-walk-core.mjs";
 import { ensureCityGameDevVars } from "./city-game-local-env-core.mjs";
@@ -128,7 +129,15 @@ function writeInstallQaWalkKit(host) {
   const seed = JSON.parse(readFileSync(seedPath, "utf8"));
   if (!seed.profile_id || !Array.isArray(seed.nodes)) return null;
 
-  const nodes = resolveInstallQaWalkNodes(seed.nodes, seed.profile_id, host);
+  const season = existsSync(seasonPath)
+    ? JSON.parse(readFileSync(seasonPath, "utf8"))
+    : null;
+  const nodes = resolveInstallQaWalkNodes(
+    seed.nodes,
+    seed.profile_id,
+    host,
+    installQaRegistryNodeIds(season)
+  );
   const html = buildInstallQaWalkKitHtml(nodes, { host });
   mkdirSync(dirname(installQaWalkPath), { recursive: true });
   writeFileSync(installQaWalkPath, html, "utf8");

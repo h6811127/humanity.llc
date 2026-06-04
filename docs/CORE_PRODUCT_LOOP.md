@@ -1,7 +1,8 @@
 # Core product loop — quality & UX workstream (WS-QUALITY)
 
-**Status:** Active — **priority over Phase 2 expansion** until Q3 sign-off  
+**Status:** Active — **WS-LIVE** sub-track (steward belt)  
 **Workstream ID:** **WS-QUALITY**  
+**Parent program:** **WS-LIVE** — [`PRODUCT_WORKSTREAM_COORDINATION.md`](PRODUCT_WORKSTREAM_COORDINATION.md) § WS-LIVE  
 **Coordination:** [`PRODUCT_WORKSTREAM_COORDINATION.md`](PRODUCT_WORKSTREAM_COORDINATION.md) § WS-QUALITY  
 **Last updated:** 2026-06-04
 
@@ -9,7 +10,7 @@
 
 ## Purpose
 
-Make the **already-shipped** steward + stranger product **trustworthy and pleasant** before adding summer scale, Signal War depth, or custody C1+.
+Make the **already-shipped** steward + stranger product **trustworthy and pleasant** — **WS-LIVE** sub-track owning Layer **L1** steward path and **LO-1** printed pilots. City-game field launch (**WS-CR** / **WS-SCALE** / **WS-SW**) runs in parallel under WS-LIVE (see coordination doc § Gating).
 
 This is **not** a greenfield rewrite by default. It is:
 
@@ -30,10 +31,10 @@ This is **not** a greenfield rewrite by default. It is:
 | **Stranger** | Scan QR → read status → vouch / live proof wait → trust UI | `/c/{profile}?q=…` scan page |
 | **Recovery** | Import backup / recovery → open controls | Hub import, `/created/` view modes |
 
-**Out of scope (unless blocking a P0 row):**
+**Out of scope (unless blocking a P0 row or LO-1 pilot):**
 
-- Cedar Rapids **40→60** node expansion (**WS-SCALE**)  
-- Signal War **SW-04+** mechanics (**WS-SW**)  
+- Cedar Rapids **40→60** node expansion (**WS-SCALE** — WS-LIVE sub-track)  
+- Signal War maintenance (**WS-SW** — WS-LIVE sub-track)  
 - **device_unlock** C1+ crypto (**WS-CUSTODY** beyond C0 comprehension)  
 - Stripe checkout / entitlements UI (**WS-REV**) — parallel, not owned here  
 - New live-object types or delegation features beyond regression fixes  
@@ -133,8 +134,9 @@ Record Q4 decisions here:
 
 | Date | Decision | Rationale |
 |------|----------|-----------|
-| 2026-06-04 | **No rearchitecture** — start WS-QUALITY Q1–Q3 | Belt recently unified; failures were drift/parallel work, not wrong architecture |
-| 2026-06-04 | **View-only deprecation** — incremental (not full Q4 rewrite) | User-facing “restore ownership / view-only” is deprecated; see § View-only deprecation |
+| 2026-06-04 | **Notifications — go (WS-NOTIF)** | Tiered inbox-first + foreground U0; see [`NOTIFICATION_SYSTEM_V2.md`](NOTIFICATION_SYSTEM_V2.md) |
+| 2026-06-04 | **Custody UI — no full rewrite** | View-only steps 1–3 shipped; Open controls path |
+| 2026-06-04 | **WS-LIVE opened** — five-layer MVP program; WS-QUALITY is sub-track | [`PRODUCT_WORKSTREAM_COORDINATION.md`](PRODUCT_WORKSTREAM_COORDINATION.md) § WS-LIVE |
 
 ---
 
@@ -147,9 +149,9 @@ Record Q4 decisions here:
 | **1** | **Shipped** | `/created/` boot + quiet rehydrate prefer URL `profile_id`: auto `activateWalletEntryGated` (+ PIN prompt). `created-wallet-boot-activation.mjs` |
 | **2** | **Shipped** | Removed restore-in-tab banners/buttons + `restore-control` CTA; K1 **Recovery import** on Manage; wallet-saved view retries boot activation |
 | **3** | **Shipped** | Hub/wallet/scan: **Open controls** copy + `/created/` unlock path; no in-tab restore activation |
-| **4** | Planned | Notifications rearchitecture decision (inbox vs OS) — separate from custody |
+| **4** | **WS-NOTIF in-app (closed)** | N0–N5 ☑; **P0-N2 background OS non-functional** — do not block Q3 on tray alerts; **exit:** P0-N1 + P0-N4 (+ P0-N3 if testable) per [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) |
 
-**Regression:** `npm run ownership-restore:verify` · `npm run worker:test` quiet-tab-rehydrate · `e2e:key-loss-sad-path` (K1 must stay view-only when no wallet keys).
+**Regression:** `npm run ownership-restore:verify` · `npm run worker:test` quiet-tab-rehydrate · `e2e:key-loss-sad-path` (K1). **WS-NOTIF:** `npm run notify:verify` · `npm run notify:field-signoff` · `npm run notify:hosted-push` · `e2e/device-inbox.spec.ts`.
 
 ---
 
@@ -157,8 +159,9 @@ Record Q4 decisions here:
 
 | Role | Mission |
 |------|---------|
-| **WS-QUALITY owner** | Keep belt green; own L1–L8 inventory; PRs ≤300 lines on one loop row |
-| **Other agents** | **STOP** new WS-SCALE / WS-SW scope unless fixing a red **L*** row |
+| **WS-QUALITY owner** | Keep belt green; own L1–L8 inventory; **LO-1** printed pilots; PRs ≤300 lines on one loop row |
+| **WS-LIVE game agents** | **WS-CR** / **WS-SCALE** / **WS-SW** — advance Layer 5 under WS-LIVE; respect file ownership (§ coordination doc) |
+| **Other agents** | Stay inside assigned stream; do not fork parallel live-object composition |
 
 **File ownership (typical):**
 
@@ -183,7 +186,7 @@ Environment: installed PWA, Android. Triage ID = **P1-MOTO-***. Status: **captur
 | P1-MOTO-03 | P1 UX | `/created/` child editors | Status plate / lost item edit UI not using global disclosure/dropdown styling |
 | P1-MOTO-04 | P2 design | Shell / PWA | System-wide **back** (home, tab back) — especially PWA |
 | P1-MOTO-05 | P2 product | `/` hub | **Revoke** / **Manage** shortcuts → active card controls — right default? other shortcuts? |
-| P1-MOTO-06 | **P0 broken** | Hub wallet rows | Many cards stuck **Checking network…** — **partial fix** (manual check refreshes resolver health first; re-verify on device) |
+| P1-MOTO-06 | **P0 fix shipped** | Hub wallet rows | Stuck **Checking network…** when cache fresh but visit-unconfirmed, or health still `unset` — **re-verify on device** |
 | P1-MOTO-07 | **P0 broken** | Hub | **Open controls** opens **landing** — **fix shipped** (sanitize `return_url`; navigate to `/created/` even if unlock fails) |
 | P1-MOTO-08 | P1 copy/settings | Shell / notifications | Notification + system language reads **Safari**; should be browser-aware (Chrome/PWA) |
 | P1-MOTO-09 | P1 UX | `/created/` Live | **Publish update** one-shot then UI hides; also timeout after create if fields untouched |
@@ -198,7 +201,7 @@ Environment: installed PWA, Android. Triage ID = **P1-MOTO-***. Status: **captur
 | P1-MOTO-18 | P2 design | Store | Store page redo — **3 swipable product panes** |
 | P1-MOTO-19 | P1 question | Custody / PWA | Save passkeys in **Chrome app** then add **PWA** — what happens? (doc + test) |
 | P1-MOTO-20 | — | Vouch | Vouching not yet tested this pass |
-| P1-MOTO-21 | **P0 broken** | Live proof | Request from laptop scan → **no notification** — **partial fix** (OS notify when tab visible + requireInteraction; enable Browser alerts + signing keys in tab) |
+| P1-MOTO-21 | **P0 — foreground only** | Live proof | Away-tab OS alert **non-functional** ([`NOTIFICATION_SYSTEM_V2.md`](NOTIFICATION_SYSTEM_V2.md)); use **foreground strip** when PWA open — background path **deferred** |
 | P1-MOTO-22 | P2 polish | Footer | **Create a live object** / **About** buttons need spacing |
 | P1-MOTO-23 | P1 product | Multi-card | How to **switch active ownership** for vouch / merch link to another card? |
 | P1-MOTO-24 | P1 UX | City game | **City state** needs own screen; map nodes expand circles only, no readable detail |
@@ -221,3 +224,5 @@ Environment: installed PWA, Android. Triage ID = **P1-MOTO-***. Status: **captur
 | 2026-06-04 | Sprint A engineering pass — restore-in-tab, add-hub, open controls, network/notify partial |
 | 2026-06-04 | Q3 pass 1 captured (Motorola Chrome PWA) — § Q3 field notes |
 | 2026-06-04 | Workstream opened — Q0 belt green; Q1 inventory table; Phase 2 expansion deprioritized |
+| 2026-06-04 | WS-NOTIF background OS closed as non-functional — WS-QUALITY owns Q2–Q3 + P1-MOTO cluster |
+| 2026-06-04 | **P1-MOTO-06** — fetch unconfirmed profiles + allow wallet poll when resolver health `unset` |

@@ -21,6 +21,7 @@ export function tabSessionHasSigningKeys(session) {
  */
 export function walletEntryHasSigningMaterial(entry) {
   if (!entry || typeof entry !== "object") return false;
+  if (entry.has_signing_key === true) return true;
   if (walletEntryCountsAsSigning(entry)) return true;
   return tabSessionHasSigningKeys(entry);
 }

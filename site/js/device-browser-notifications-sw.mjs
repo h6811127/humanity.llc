@@ -4,7 +4,7 @@
  */
 import { resolverApiOrigin } from "./hc-sign.mjs";
 import { listPollableWalletEntries } from "./device-wallet.mjs";
-import { getLiveControlPending } from "./device-live-control-inbox.mjs";
+import { getLiveControlPendingForDisplay } from "./device-live-control-inbox.mjs";
 import { liveControlPendingSignature } from "./device-live-control-inbox-core.mjs";
 import { isBrowserNotifEnabled } from "./device-browser-notifications-core.mjs";
 import { getResolverHealthStatus } from "./device-wallet-since-visit-gate.mjs";
@@ -98,10 +98,11 @@ export async function syncLiveProofServiceWorkerState(opts = {}) {
   }
 
   const watchOn = isWatchLiveProofEnabled();
-  const pending = getLiveControlPending();
+  const alertsOn = isBrowserNotifEnabled() && notificationGranted();
+  const pending = getLiveControlPendingForDisplay();
   const message = {
     type: "HC_SW_SYNC_STATE",
-    enabled: watchOn,
+    enabled: alertsOn,
     watchLiveProofEnabled: watchOn,
     apiOrigin: resolverApiOrigin(),
     pageOrigin: location.origin,
@@ -109,14 +110,14 @@ export async function syncLiveProofServiceWorkerState(opts = {}) {
     lastSig: liveControlPendingSignature(pending),
     interactShown,
     resolverHealth: getResolverHealthStatus(),
-    pollNow: !!opts.pollNow && watchOn,
+    pollNow: !!opts.pollNow && alertsOn,
     stewardPushEntitled: stewardPushSubscribeAllowed(getStewardEntitlementsPolicy()),
     stewardPushHealthy: isStewardPushHealthy(),
   };
 
   active.postMessage(message);
 
-  if ("sync" in reg && opts.pollNow && watchOn) {
+  if ("sync" in reg && opts.pollNow && alertsOn) {
     try {
       await reg.sync.register(SW_SYNC_TAG);
     } catch {
@@ -126,7 +127,7 @@ export async function syncLiveProofServiceWorkerState(opts = {}) {
 
   if ("periodicSync" in reg) {
     try {
-      if (watchOn) {
+      if (alertsOn) {
         const policy = getStewardEntitlementsPolicy();
         await reg.periodicSync.register(SW_PERIODIC_TAG, {
           minInterval: resolveSwPeriodicMinIntervalMs(policy),

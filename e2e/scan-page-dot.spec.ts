@@ -142,17 +142,23 @@ test.describe("scan page device dot", () => {
     const dot = page.locator("#scan-page-dot");
 
     await expect(btn).toHaveClass(/scan-page-dot--dynamic/, { timeout: 15_000 });
-    await expect(dot).toHaveAttribute("data-dot-state", "ok:keys");
-    await expect(dot).toHaveClass(/pass-dot-status-device-keys/);
+    // P0-5 / mark-first: wallet-only keys → hollow none (not green steward on scan).
+    await expect(dot).toHaveAttribute("data-dot-state", "ok:none");
+    await expect(dot).toHaveClass(/scan-page-dot-device-none-eligible/);
     await expect(dot).not.toHaveClass(/pass-dot-status-device-steward/);
-    await expect(btn).toHaveAttribute("aria-label", /your device/i);
+    await expect(btn).toHaveAttribute(
+      "aria-label",
+      /ownership saved on device, not in this tab/i
+    );
 
     await btn.click();
     const glance = page.locator("#scan-page-dot-glance");
     await expect(glance).toBeVisible();
     await expect(page.locator("body")).toHaveClass(/scan-page-dot-glance-open/);
     await expect(glance.locator(".scan-page-dot-glance-eyebrow")).toContainText("Your device");
-    await expect(glance.locator(".scan-page-dot-glance-now")).not.toBeEmpty();
+    await expect(glance.locator(".scan-page-dot-glance-now")).toContainText(
+      /Ownership saved on this device/i
+    );
     await expect(page.locator("#device-hub")).toHaveCount(0);
   });
 
@@ -223,7 +229,9 @@ test.describe("scan page device dot cross-tab", () => {
     const banner = pageA.locator("#scan-cross-tab-banner");
     await expect(banner).toBeVisible({ timeout: 20_000 });
 
+    const btn = pageA.locator("#scan-page-dot-btn");
     const dot = pageA.locator("#scan-page-dot");
+    await expect(btn).toHaveClass(/scan-page-dot--dynamic/, { timeout: 15_000 });
     await expect(dot).toHaveAttribute("data-dot-overlay", "cross_tab_keys");
     await expect(dot).toHaveClass(/pass-dot-overlay-cross_tab_keys/);
 
@@ -276,11 +284,11 @@ test.describe("scan page device dot R9 honesty (P0-5 · Flow B)", () => {
     const glance = page.locator("#scan-page-dot-glance");
     await expect(glance).toBeVisible();
     await expect(glance.locator(".scan-page-dot-glance-now")).toContainText(
-      /Ownership not in this tab/i
+      /Ownership saved on this device/i
     );
     await expect(
       glance.locator('[data-scan-dot-action="scan_use_keys_here"]')
-    ).toContainText(/Restore control here/i);
+    ).toContainText(/Open controls/i);
 
     const sessionRaw = await page.evaluate(() => sessionStorage.getItem("hc_created"));
     expect(sessionRaw).toBeNull();

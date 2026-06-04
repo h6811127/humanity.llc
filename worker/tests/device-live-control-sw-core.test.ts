@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   anyClientVisible,
+  clientDefersSwLiveProofPolling,
   buildLiveProofSwNotification,
   buildLiveProofSwNotificationFromPushHint,
   liveProofPollTargetsFromWallet,
@@ -32,7 +33,7 @@ describe("pendingLiveControlChallengeUrl", () => {
 });
 
 describe("swLiveProofPollingShouldRun", () => {
-  it("requires alerts enabled, watch on, and resolver ok", () => {
+  it("requires background alerts enabled and resolver ok (not Watch)", () => {
     expect(
       swLiveProofPollingShouldRun({
         enabled: true,
@@ -41,14 +42,14 @@ describe("swLiveProofPollingShouldRun", () => {
       })
     ).toBe(true);
     expect(
-      swLiveProofPollingShouldRun({ enabled: false, resolverHealth: "ok" })
-    ).toBe(false);
-    expect(
       swLiveProofPollingShouldRun({
         enabled: true,
         watchLiveProofEnabled: false,
         resolverHealth: "ok",
       })
+    ).toBe(true);
+    expect(
+      swLiveProofPollingShouldRun({ enabled: false, resolverHealth: "ok" })
     ).toBe(false);
     expect(
       swLiveProofPollingShouldRun({ enabled: true, resolverHealth: "degraded" })
@@ -182,6 +183,21 @@ describe("anyClientVisible", () => {
       ])
     ).toBe(true);
     expect(anyClientVisible([{ visibilityState: "hidden" }])).toBe(false);
+  });
+
+  it("does not defer SW when visible client is unfocused (Android PWA background)", () => {
+    expect(
+      clientDefersSwLiveProofPolling({
+        visibilityState: "visible",
+        focused: false,
+      })
+    ).toBe(false);
+    expect(anyClientVisible([{ visibilityState: "visible", focused: false }])).toBe(
+      false
+    );
+    expect(
+      clientDefersSwLiveProofPolling({ visibilityState: "visible", focused: true })
+    ).toBe(true);
   });
 });
 

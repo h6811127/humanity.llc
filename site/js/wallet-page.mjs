@@ -193,6 +193,7 @@ refreshHelpVisibility();
 window.addEventListener(DEVICE_BOOT_READY_EVENT, () => {
   refreshAutoSaveLine();
   updateContextBanners();
+  refreshDeviceHub();
 });
 
 window.addEventListener("hc-quiet-tab-rehydrated", () => {

@@ -28,6 +28,8 @@ import {
   CHILD_OBJECT_TYPE_LOST_ITEM_RELAY,
   CHILD_OBJECT_TYPE_STATUS_PLATE,
 } from "../live-object/object-types";
+import { authorizeDelegatedChildRoute } from "./delegated-child-signer";
+import type { DelegatedChildObjectRoute } from "../live-object/delegation-spec";
 
 export const CHILD_OBJECT_ID_REGEX = /^obj_[A-Za-z0-9_-]{4,76}$/;
 const OBJECT_TYPE_RE = /^[a-z][a-z0-9_-]{0,39}$/;
@@ -46,12 +48,6 @@ function parseChildObjectBody(body: unknown): Record<string, unknown> | null {
   }
   if (o.type === PAYLOAD_TYPES.CHILD_OBJECT) return o;
   return null;
-}
-
-function parentSignerAllowed(signerKey: string, parent: ChildObjectParentRow): boolean {
-  if (signerKey === parent.public_key) return true;
-  return Boolean(parent.recovery_public_key && signerKey === parent.recovery_public_key);
-  // Delegated signers: evaluateDelegatedCapabilityAccess (step 17) when G1–G5 pass.
 }
 
 function readStringField(
@@ -86,6 +82,7 @@ async function verifiedChildObjectDoc(
   request: Request,
   db: D1Database,
   pathProfileId: string,
+  route: DelegatedChildObjectRoute,
   pathObjectId?: string
 ): Promise<
   | {
@@ -147,16 +144,6 @@ async function verifiedChildObjectDoc(
   if (!verify.ok) {
     return { ok: false, response: errorResponse(verify.code, verify.message, 401) };
   }
-  if (!parentSignerAllowed(verify.signature.public_key, parent)) {
-    return {
-      ok: false,
-      response: errorResponse(
-        CRYPTO_ERROR.INVALID_SIGNATURE,
-        "Child object must be signed by the root owner or recovery key.",
-        401
-      ),
-    };
-  }
 
   const parentProfileId = doc.parent_profile_id;
   if (parentProfileId !== pathProfileId) {
@@ -178,6 +165,21 @@ async function verifiedChildObjectDoc(
     return {
       ok: false,
       response: errorResponse("OBJECT_MISMATCH", "object_id must match URL.", 422),
+    };
+  }
+
+  const auth = await authorizeDelegatedChildRoute(
+    db,
+    pathProfileId,
+    parent,
+    verify.signature.public_key,
+    route,
+    { objectId: objectIdRaw }
+  );
+  if (!auth.ok) {
+    return {
+      ok: false,
+      response: errorResponse(auth.code, auth.message, auth.httpStatus),
     };
   }
 
@@ -279,7 +281,12 @@ export async function handlePostChildObjectCreate(
   db: D1Database,
   pathProfileId: string
 ): Promise<Response> {
-  const parsed = await verifiedChildObjectDoc(request, db, pathProfileId);
+  const parsed = await verifiedChildObjectDoc(
+    request,
+    db,
+    pathProfileId,
+    "child_object.create"
+  );
   if (!parsed.ok) return parsed.response;
   if (parsed.status !== "active") {
     return errorResponse("MALFORMED_REQUEST", "New child objects must start active.", 422);
@@ -326,7 +333,13 @@ export async function handlePostChildObjectUpdate(
   pathProfileId: string,
   pathObjectId: string
 ): Promise<Response> {
-  const parsed = await verifiedChildObjectDoc(request, db, pathProfileId, pathObjectId);
+  const parsed = await verifiedChildObjectDoc(
+    request,
+    db,
+    pathProfileId,
+    "child_object.update",
+    pathObjectId
+  );
   if (!parsed.ok) return parsed.response;
   const existing = await getChildObject(db, pathObjectId);
   if (!existing || existing.parent_profile_id !== pathProfileId) {
@@ -369,7 +382,13 @@ export async function handlePostChildObjectRevoke(
   pathProfileId: string,
   pathObjectId: string
 ): Promise<Response> {
-  const parsed = await verifiedChildObjectDoc(request, db, pathProfileId, pathObjectId);
+  const parsed = await verifiedChildObjectDoc(
+    request,
+    db,
+    pathProfileId,
+    "child_object.revoke",
+    pathObjectId
+  );
   if (!parsed.ok) return parsed.response;
   const existing = await getChildObject(db, pathObjectId);
   if (!existing || existing.parent_profile_id !== pathProfileId) {

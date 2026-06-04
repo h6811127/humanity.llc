@@ -3,6 +3,8 @@
  * @see docs/CITY_GAME_LAUNCH_CHECKLIST.md
  */
 
+import { launchChecklistRequiredGates } from "./city-game-map-board-b13-core.mjs";
+
 export const LAUNCH_CHECKLIST_REL = "docs/CITY_GAME_LAUNCH_CHECKLIST.md";
 
 export const LAUNCH_CHECKLIST_C5_PENDING =
@@ -28,6 +30,9 @@ export const LAUNCH_CHECKLIST_O4_PENDING =
 
 /** @type {readonly string[]} */
 export const LAUNCH_CHECKLIST_REQUIRED_GATES = ["P1", "P2", "P4", "P5", "O1", "O2", "O3", "O4"];
+
+export { LAUNCH_CHECKLIST_P6_PENDING } from "./city-game-map-board-b13-core.mjs";
+export { launchChecklistRequiredGates };
 
 /**
  * @param {string} line
@@ -118,16 +123,19 @@ export function resolveLaunchChecklistSignOffResult(parsed) {
  * @param {{
  *   launchChecklistDoc?: string | null;
  *   scanAnalyticsGateOk?: boolean;
+ *   marketsLiveCityBoard?: boolean;
+ *   mapBoardB13Ready?: boolean;
  * }} input
  */
 export function assessLaunchChecklistReady(input) {
   const content = input.launchChecklistDoc ?? "";
+  const requiredGates = launchChecklistRequiredGates(Boolean(input.marketsLiveCityBoard));
   /** @type {Record<string, boolean | null>} */
   const gates = {};
   /** @type {string[]} */
   const pending = [];
 
-  for (const key of LAUNCH_CHECKLIST_REQUIRED_GATES) {
+  for (const key of requiredGates) {
     const signed = launchChecklistGateSigned(content, key);
     gates[key] = signed;
     if (signed !== true) {
@@ -148,15 +156,18 @@ export function assessLaunchChecklistReady(input) {
     blockers.push("C5 launch sign-off row pending — npm run city-game:launch-checklist-sign-off -- --pass --apply");
   }
 
+  const mapBoardOk = input.mapBoardB13Ready !== false;
+
   return {
     gates,
     p3Signed,
     p5EngineeringOk: Boolean(input.scanAnalyticsGateOk),
     allRequiredSigned,
     c5Signed,
-    readyForLaunchDay: allRequiredSigned && c5Signed,
+    readyForLaunchDay: allRequiredSigned && c5Signed && mapBoardOk,
     pending,
     blockers,
+    requiredGates,
   };
 }
 
@@ -168,16 +179,26 @@ export function assessLaunchChecklistReady(input) {
  *   p3Signed: boolean | null;
  *   p5EngineeringOk?: boolean;
  *   gates: Record<string, boolean | null>;
+ *   requiredGates?: readonly string[];
+ *   marketsLiveCityBoard?: boolean;
+ *   mapBoardB13Ready?: boolean | null;
  * }} c5
  * @returns {string}
  */
 export function formatLaunchChecklistPreflightReport(c5) {
+  const requiredGates = c5.requiredGates ?? LAUNCH_CHECKLIST_REQUIRED_GATES;
   const lines = ["Cedar Rapids · launch checklist preflight (C5)", ""];
   lines.push(
     `C5 launch day ready: ${c5.readyForLaunchDay ? "☑" : "☐"} P1–P5 + O1–O4 signed + C5 row`
   );
+  if (c5.marketsLiveCityBoard) {
+    lines.push("  Live city board marketed: ☑ — P6 required");
+    lines.push(
+      `  B13 ready: ${c5.mapBoardB13Ready ? "☑" : "☐"} (GT-7 + privacy + B14)`
+    );
+  }
   lines.push(`  Rules page P3: ${c5.p3Signed ? "☑" : "☐"}`);
-  for (const key of LAUNCH_CHECKLIST_REQUIRED_GATES) {
+  for (const key of requiredGates) {
     const signed = c5.gates[key];
     const suffix =
       key === "P5" && c5.p5EngineeringOk && signed !== true

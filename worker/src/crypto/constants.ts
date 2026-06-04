@@ -21,6 +21,7 @@ export const PAYLOAD_TYPES = {
   STEWARD_ACCOUNT_LINK: "steward_account_link_v1",
   CHILD_OBJECT: "child_object",
   RELAY_OFFER_OWNER_QUERY: "relay_offer_owner_query",
+  DELEGATED_CAPABILITY: "delegated_capability",
 } as const;
 
 export type PayloadType = (typeof PAYLOAD_TYPES)[keyof typeof PAYLOAD_TYPES];

@@ -17,12 +17,14 @@ import {
   buildInstallQaWalkKitHtml,
   formatInstallQaWalkKitReport,
   LOCAL_DEV_INSTALL_QA_WALK_REL,
+  installQaRegistryNodeIds,
   resolveInstallQaWalkNodes,
 } from "./city-game-install-qa-walk-core.mjs";
 import { INSTALL_QA_REQUIRED_NODE_COUNT } from "./city-game-smoke-local-core.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const seedPath = join(root, "worker/.local/city-game-seed.json");
+const seasonPath = join(root, "site/data/city-game-cr-season-01.json");
 const outPath = join(root, LOCAL_DEV_INSTALL_QA_WALK_REL);
 const lanMode = process.argv.includes("--lan");
 
@@ -40,9 +42,27 @@ function main() {
   }
 
   const seed = JSON.parse(readFileSync(seedPath, "utf8"));
-  const nodes = resolveInstallQaWalkNodes(seed.nodes ?? [], seed.profile_id, host);
+  const season = existsSync(seasonPath)
+    ? JSON.parse(readFileSync(seasonPath, "utf8"))
+    : null;
+  const registryNodeIds = installQaRegistryNodeIds(season);
+  const nodes = resolveInstallQaWalkNodes(
+    seed.nodes ?? [],
+    seed.profile_id,
+    host,
+    registryNodeIds
+  );
+  const linked = nodes.filter((n) => n.href).length;
   if (nodes.length < INSTALL_QA_REQUIRED_NODE_COUNT) {
-    console.error(`Seed has ${nodes.length}/${INSTALL_QA_REQUIRED_NODE_COUNT} nodes`);
+    console.error(
+      `Registry has ${nodes.length}/${INSTALL_QA_REQUIRED_NODE_COUNT} nodes — check season JSON + npm run city-game:seed-local`
+    );
+    process.exit(1);
+  }
+  if (linked < INSTALL_QA_REQUIRED_NODE_COUNT) {
+    console.error(
+      `Seed links ${linked}/${INSTALL_QA_REQUIRED_NODE_COUNT} registry nodes — re-seed missing QRs`
+    );
     process.exit(1);
   }
 

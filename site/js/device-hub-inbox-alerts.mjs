@@ -13,15 +13,16 @@ import { CARD_DISABLED_SINCE_VISIT_ALERT_TEXT } from "./wallet-network-baseline.
 import { openSaveKeysForThisTab } from "./device-notice-nav.mjs";
 import {
   formatLiveControlExpiry,
-  getLiveControlPending,
   liveProofInboxRowSubtitle,
   openLiveControlProof,
 } from "./device-live-control-inbox.mjs";
 import { relayOfferInboxRowSubtitle } from "./device-relay-offer-inbox-core.mjs";
 import {
-  getRelayOfferPending,
-  RELAY_OFFER_INBOX_CHANGED,
-} from "./device-relay-offer-inbox-loader.mjs";
+  hubInboxGroupVisibilityFromItems,
+  liveProofPendingFromInbox,
+  relayOfferPendingFromInbox,
+} from "./device-notification-delivery-core.mjs?v=93";
+import { RELAY_OFFER_INBOX_CHANGED } from "./device-relay-offer-inbox-loader.mjs";
 
 function escapeHtml(s) {
   return String(s)
@@ -56,26 +57,17 @@ export function renderHubInboxAlerts(ctx) {
     showLiveControlInbox,
   } = ctx;
   const items = getInboxItems();
+  const visibility = hubInboxGroupVisibilityFromItems(items, {
+    showLiveControlInbox,
+  });
 
-  renderLiveProofHubGroup(
-    liveControlGroup,
-    liveControlList,
-    showLiveControlInbox && inboxItemsIncludeKind(items, "live_proof")
-  );
-  renderRelayOfferHubGroup(
-    relayOfferGroup,
-    relayOfferList,
-    inboxItemsIncludeKind(items, "relay_offer")
-  );
-  renderTabKeysHubNotice(
-    noticeGroup,
-    inboxItemsIncludeKind(items, "tab_keys_unsaved"),
-    noticeMode
-  );
+  renderLiveProofHubGroup(liveControlGroup, liveControlList, visibility.live_proof, items);
+  renderRelayOfferHubGroup(relayOfferGroup, relayOfferList, visibility.relay_offer, items);
+  renderTabKeysHubNotice(noticeGroup, visibility.tab_keys_unsaved, noticeMode);
   renderCardDisabledHubGroup(
     cardDisabledGroup,
     cardDisabledList,
-    inboxItemsIncludeKind(items, "card_disabled_since_visit"),
+    visibility.card_disabled_since_visit,
     items
   );
 }
@@ -177,7 +169,7 @@ function renderCardDisabledHubGroup(group, list, show, items) {
  * @param {HTMLElement | null} liveControlList
  * @param {boolean} show
  */
-function renderLiveProofHubGroup(liveControlGroup, liveControlList, show) {
+function renderLiveProofHubGroup(liveControlGroup, liveControlList, show, items) {
   if (!liveControlGroup || !liveControlList) {
     if (liveControlGroup) liveControlGroup.hidden = true;
     return;
@@ -189,7 +181,7 @@ function renderLiveProofHubGroup(liveControlGroup, liveControlList, show) {
     return;
   }
 
-  const pending = getLiveControlPending();
+  const pending = liveProofPendingFromInbox(items);
   if (pending.length === 0) {
     liveControlGroup.hidden = true;
     const summaryEl = liveControlGroup.querySelector("#device-hub-live-control-summary");
@@ -259,7 +251,7 @@ function openRelayOfferManagement(profileId) {
  * @param {HTMLElement | null} relayOfferList
  * @param {boolean} show
  */
-function renderRelayOfferHubGroup(relayOfferGroup, relayOfferList, show) {
+function renderRelayOfferHubGroup(relayOfferGroup, relayOfferList, show, items) {
   if (!relayOfferGroup || !relayOfferList) {
     if (relayOfferGroup) relayOfferGroup.hidden = true;
     return;
@@ -271,7 +263,7 @@ function renderRelayOfferHubGroup(relayOfferGroup, relayOfferList, show) {
     return;
   }
 
-  const pending = getRelayOfferPending();
+  const pending = relayOfferPendingFromInbox(items);
   const total = pending.reduce((sum, item) => sum + item.pendingCount, 0);
   if (total === 0) {
     relayOfferGroup.hidden = true;

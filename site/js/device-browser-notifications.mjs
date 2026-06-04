@@ -5,7 +5,7 @@
 import {
   browserAlertBackgroundCopy,
   browserAlertWhileOpenCopy,
-  shellSurfaceFromStandalone,
+  readShellCopyContext,
 } from "./device-shell-copy-core.mjs";
 import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
 import {
@@ -13,24 +13,31 @@ import {
   browserNotifToggleSub,
 } from "./device-prefs-boot-core.mjs";
 import {
-  inboxKindAllowsOsNotification,
   isBrowserNotifEnabled as readBrowserNotifEnabled,
-  osNotificationContentForLiveProof,
   shouldShowBrowserNotifPrompt,
   STORAGE_BROWSER_NOTIF,
   STORAGE_PROMPT_DISMISS,
-} from "./device-browser-notifications-core.mjs?v=91";
-import { buildLiveControlProofHref } from "./device-live-control-inbox-core.mjs";
-import { getLiveControlPending, getLiveControlPendingCount } from "./device-live-control-inbox.mjs";
-import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=91";
+} from "./device-browser-notifications-core.mjs?v=94";
+import { getLiveControlPendingCount } from "./device-live-control-inbox.mjs";
+import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=94";
+import { applyOsNotificationsFromInbox } from "./device-notification-delivery.mjs?v=94";
+import { probeLiveControlInboxForBackgroundAlerts } from "./device-live-control-inbox.mjs?v=94";
+import {
+  LIVE_CONTROL_BACKGROUND_ALERT_POLL_MS,
+  LIVE_CONTROL_POLL_MS_ACTIVE,
+  liveControlBackgroundAlertPollShouldRun,
+} from "./device-live-control-poll-scheduler.mjs";
+import { bindLiveProofNotificationNavListener } from "./device-live-proof-notification-nav.mjs";
+import { getResolverHealthStatus } from "./device-wallet-since-visit-gate.mjs";
+import { isStewardPushHealthy } from "./device-steward-push.mjs";
 import {
   registerLiveProofServiceWorker,
   syncLiveProofServiceWorkerState,
   teardownLiveProofServiceWorker,
 } from "./device-browser-notifications-sw.mjs";
 
-const TAG_LIVE_PROOF = "hc-live-proof";
 const SESSION_OS_INTERACT = "hc_browser_notif_os_interact";
+const SW_POLL_NOW_DEFER_MS = 400;
 
 /** @returns {boolean} */
 export function isBrowserNotifEnabled() {
@@ -46,8 +53,10 @@ export function setBrowserNotifEnabled(on) {
   }
   if (on) {
     void registerLiveProofServiceWorker();
+    syncBackgroundAlertPollTimer();
   } else {
     void teardownLiveProofServiceWorker();
+    clearBackgroundAlertPollTimer();
   }
   syncBrowserNotifToggleButtons();
   syncBrowserNotifPrompts();
@@ -99,6 +108,10 @@ export async function enableBrowserAlerts() {
     setBrowserNotifEnabled(true);
     await registerLiveProofServiceWorker();
     await syncLiveProofServiceWorkerState({ pollNow: false });
+    syncBackgroundAlertPollTimer();
+    if (document.visibilityState === "hidden") {
+      void probeAndDeliverBackgroundAlerts();
+    }
     logInboxDiagnostic({ type: "browser_alert_opt_in" });
     return true;
   }
@@ -139,11 +152,12 @@ export function renderBrowserNotifPrompt(host, opts = {}) {
   if (!host) return;
   host.dataset.deviceBrowserNotifPrompt = "1";
   const compact = Boolean(opts.compact);
-  const surface = shellSurfaceFromStandalone(readStandaloneModeFromWindow(window));
+  const { surface, companionBrowser } = readShellCopyContext(window);
+  const copyOpts = { companionBrowser };
   const perm = notificationPermission();
   const show = shouldShowLiveProofNotifPrompt();
   const pending = getLiveControlPendingCount() > 0;
-  const whileOpen = browserAlertWhileOpenCopy(surface);
+  const whileOpen = browserAlertWhileOpenCopy(surface, copyOpts);
 
   if (
     perm === "denied" &&
@@ -165,7 +179,7 @@ export function renderBrowserNotifPrompt(host, opts = {}) {
   }
 
   host.hidden = false;
-  const copy = browserAlertBackgroundCopy(compact, surface);
+  const copy = browserAlertBackgroundCopy(compact, surface, copyOpts);
 
   host.innerHTML = `
     <div class="device-browser-notif-prompt hc-notice hc-notice--info" role="region" aria-label="Background alerts">
@@ -245,57 +259,129 @@ function syncBrowserNotifToggleButtons() {
   });
 }
 
-let lastLiveProofSig = "";
+function readOsInteractShown() {
+  try {
+    return sessionStorage.getItem(SESSION_OS_INTERACT) === "1";
+  } catch {
+    return false;
+  }
+}
 
-export function maybeNotifyLiveProof() {
-  if (!inboxKindAllowsOsNotification("live_proof")) return;
-  if (!isBrowserNotifEnabled()) return;
-  if (!notificationSupported() || notificationPermission() !== "granted") return;
-  if (document.visibilityState === "visible") return;
+let backgroundProbeInFlight = false;
+/** @type {ReturnType<typeof setInterval> | null} */
+let backgroundAlertPollTimer = null;
 
-  const pending = getLiveControlPending();
-  const n = pending.length;
-  const sig = n > 0 ? pending.map((p) => p.challenge_id).join("|") : "";
-  if (n === 0) {
-    lastLiveProofSig = "";
+function readBackgroundAlertPollContext() {
+  return {
+    alertsEnabled: isBrowserNotifEnabled(),
+    permissionGranted: notificationPermission() === "granted",
+    tabHidden: document.visibilityState === "hidden",
+    resolverHealth: getResolverHealthStatus(),
+    stewardPushHealthy: isStewardPushHealthy(),
+  };
+}
+
+function clearBackgroundAlertPollTimer() {
+  if (backgroundAlertPollTimer != null) {
+    clearTimeout(backgroundAlertPollTimer);
+    backgroundAlertPollTimer = null;
+  }
+}
+
+function backgroundAlertPollIntervalMs() {
+  return getLiveControlPendingCount() > 0
+    ? LIVE_CONTROL_POLL_MS_ACTIVE
+    : LIVE_CONTROL_BACKGROUND_ALERT_POLL_MS;
+}
+
+function armBackgroundAlertPollTimer() {
+  clearBackgroundAlertPollTimer();
+  const ctx = readBackgroundAlertPollContext();
+  if (!liveControlBackgroundAlertPollShouldRun(ctx)) return;
+
+  const tick = () => {
+    if (!liveControlBackgroundAlertPollShouldRun(readBackgroundAlertPollContext())) {
+      clearBackgroundAlertPollTimer();
+      return;
+    }
+    void probeAndDeliverBackgroundAlerts().finally(() => {
+      if (!liveControlBackgroundAlertPollShouldRun(readBackgroundAlertPollContext())) {
+        clearBackgroundAlertPollTimer();
+        return;
+      }
+      backgroundAlertPollTimer = setTimeout(tick, backgroundAlertPollIntervalMs());
+    });
+  };
+
+  backgroundAlertPollTimer = setTimeout(tick, backgroundAlertPollIntervalMs());
+}
+
+function syncBackgroundAlertPollTimer() {
+  const ctx = readBackgroundAlertPollContext();
+  if (!liveControlBackgroundAlertPollShouldRun(ctx)) {
+    clearBackgroundAlertPollTimer();
     return;
   }
-  if (sig === lastLiveProofSig) return;
-  lastLiveProofSig = sig;
+  if (backgroundAlertPollTimer != null) return;
+  armBackgroundAlertPollTimer();
+}
 
-  const first = pending[0];
-  const { title, body } = osNotificationContentForLiveProof(first);
-  const href = buildLiveControlProofHref(first, location.origin);
-
-  const requireInteraction =
-    typeof sessionStorage !== "undefined" &&
-    sessionStorage.getItem(SESSION_OS_INTERACT) !== "1";
-
-  try {
-    const ntf = new Notification(title, {
-      body,
-      tag: TAG_LIVE_PROOF,
-      requireInteraction,
-    });
-    if (requireInteraction) {
-      try {
-        sessionStorage.setItem(SESSION_OS_INTERACT, "1");
-      } catch {
-        /* ignore */
-      }
+function scheduleServiceWorkerPollNow() {
+  void syncLiveProofServiceWorkerState({ pollNow: true });
+  setTimeout(() => {
+    if (document.visibilityState === "hidden") {
+      void syncLiveProofServiceWorkerState({ pollNow: true });
     }
-    ntf.onclick = () => {
+  }, SW_POLL_NOW_DEFER_MS);
+}
+
+async function probeAndDeliverBackgroundAlerts() {
+  if (backgroundProbeInFlight) return;
+  if (!isBrowserNotifEnabled() || notificationPermission() !== "granted") {
+    void runOsDeliveryFromInbox();
+    return;
+  }
+  backgroundProbeInFlight = true;
+  try {
+    await probeLiveControlInboxForBackgroundAlerts();
+    await runOsDeliveryFromInbox();
+  } finally {
+    backgroundProbeInFlight = false;
+  }
+}
+
+async function runOsDeliveryFromInbox() {
+  const result = await applyOsNotificationsFromInbox({
+    supported: notificationSupported(),
+    permissionGranted: notificationPermission() === "granted",
+    browserAlertsEnabled: isBrowserNotifEnabled(),
+    tabVisible: document.visibilityState === "visible",
+    interactShown: readOsInteractShown(),
+    pageOrigin: location.origin,
+    onLiveProofClick: () => {
       logInboxDiagnostic({ type: "os_notification_click" });
-      window.focus();
-      ntf.close();
-      location.href = href;
-    };
-  } catch {
-    /* ignore */
+    },
+  });
+  if (result.plans.some((p) => p.kind === "live_proof" && p.requireInteraction)) {
+    try {
+      sessionStorage.setItem(SESSION_OS_INTERACT, "1");
+    } catch {
+      /* ignore */
+    }
   }
   if (document.visibilityState === "hidden") {
-    void syncLiveProofServiceWorkerState({ pollNow: true });
+    scheduleServiceWorkerPollNow();
   }
+}
+
+/** @deprecated Use applyOsNotificationsFromInbox via runOsDeliveryFromInbox */
+export function maybeNotifyRelayOffer() {
+  void runOsDeliveryFromInbox();
+}
+
+/** @deprecated Use applyOsNotificationsFromInbox via runOsDeliveryFromInbox */
+export function maybeNotifyLiveProof() {
+  void runOsDeliveryFromInbox();
 }
 
 export function mountBrowserNotifToggles() {
@@ -316,6 +402,7 @@ export function mountBrowserNotifToggles() {
 let browserNotifListenersBound = false;
 
 export function initBrowserNotifications() {
+  bindLiveProofNotificationNavListener();
   if (browserNotifListenersBound) {
     mountBrowserNotifToggles();
     syncBrowserNotifPrompts();
@@ -324,29 +411,43 @@ export function initBrowserNotifications() {
   browserNotifListenersBound = true;
   mountBrowserNotifToggles();
   syncBrowserNotifPrompts();
+  window.addEventListener("hc-device-hub-changed", () => {
+    void runOsDeliveryFromInbox();
+    syncBrowserNotifPrompts();
+  });
   window.addEventListener("hc-live-control-inbox-changed", () => {
-    maybeNotifyLiveProof();
+    void runOsDeliveryFromInbox();
     syncBrowserNotifPrompts();
     if (document.visibilityState === "hidden") {
-      void syncLiveProofServiceWorkerState({ pollNow: true });
+      scheduleServiceWorkerPollNow();
     }
+  });
+  window.addEventListener("hc-relay-offer-inbox-changed", () => {
+    void runOsDeliveryFromInbox();
+    syncBrowserNotifPrompts();
   });
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "hidden") {
-      maybeNotifyLiveProof();
-      void syncLiveProofServiceWorkerState({ pollNow: true });
+      syncBackgroundAlertPollTimer();
+      void probeAndDeliverBackgroundAlerts();
+      scheduleServiceWorkerPollNow();
     } else {
+      clearBackgroundAlertPollTimer();
       syncBrowserNotifPrompts();
     }
   });
   window.addEventListener("pagehide", () => {
-    void syncLiveProofServiceWorkerState({ pollNow: true });
+    syncBackgroundAlertPollTimer();
+    void probeAndDeliverBackgroundAlerts();
+    scheduleServiceWorkerPollNow();
   });
   window.addEventListener("hc-resolver-health-changed", () => {
+    syncBackgroundAlertPollTimer();
     if (isBrowserNotifEnabled() && notificationPermission() === "granted") {
       void syncLiveProofServiceWorkerState({ pollNow: false });
     }
   });
+  syncBackgroundAlertPollTimer();
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => {
       mountBrowserNotifToggles();

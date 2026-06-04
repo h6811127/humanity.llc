@@ -3,7 +3,10 @@
  * @see docs/CITY_GAME_INSTALL_QA.md
  */
 
-import { resolveKitScanUrls } from "./city-game-comprehension-kit-core.mjs";
+import {
+  buildLanScanUrl,
+  rewriteScanUrlForLan,
+} from "./city-game-lan-hub-core.mjs";
 import { INSTALL_QA_REQUIRED_NODE_COUNT } from "./city-game-smoke-local-core.mjs";
 
 export const LOCAL_DEV_INSTALL_QA_WALK_REL = "site/dev/city-game-install-qa-walk.html";
@@ -75,17 +78,52 @@ export function buildInstallQaWalkKitHtml(nodes, opts = {}) {
 }
 
 /**
- * @param {Array<{ node_id?: string; public_label?: string; local_scan_url?: string; scan_url?: string }>} seedNodes
+ * Pilot / launch registry order (node_01 …) from season JSON.
+ * @param {Record<string, unknown> | null | undefined} season
+ * @returns {string[] | null}
+ */
+export function installQaRegistryNodeIds(season) {
+  const ids = (Array.isArray(season?.nodes) ? season.nodes : [])
+    .map((row) => (row && typeof row === "object" ? row.node_id : null))
+    .filter((id) => typeof id === "string" && id.length > 0);
+  return ids.length ? ids : null;
+}
+
+/**
+ * @param {Array<{ node_id?: string; qr_id?: string; public_label?: string; local_scan_url?: string; scan_url?: string }>} seedNodes
  * @param {string} profileId
  * @param {string} host
+ * @param {string[] | null} [registryNodeIds] Season registry (15 pilot nodes); omit to use all seeded node_* rows.
  */
-export function resolveInstallQaWalkNodes(seedNodes, profileId, host) {
-  const kitNodes = resolveKitScanUrls(seedNodes, profileId, host);
-  return kitNodes.map((node) => ({
-    node_id: node.node_id,
-    label: node.label,
-    href: node.href,
-  }));
+export function resolveInstallQaWalkNodes(seedNodes, profileId, host, registryNodeIds = null) {
+  const byId = new Map(
+    seedNodes
+      .filter((n) => n.node_id && n.qr_id)
+      .map((n) => [n.node_id, n])
+  );
+
+  const order =
+    registryNodeIds?.length ?
+      registryNodeIds
+    : [...byId.keys()]
+        .filter((id) => /^node_\d+$/.test(id))
+        .sort((a, b) => Number.parseInt(a.slice(5), 10) - Number.parseInt(b.slice(5), 10));
+
+  return order.map((node_id) => {
+    const row = byId.get(node_id);
+    if (!row?.qr_id) {
+      return { node_id, label: node_id, href: null };
+    }
+    const href =
+      rewriteScanUrlForLan(row.local_scan_url ?? "", host) ||
+      rewriteScanUrlForLan(row.scan_url ?? "", host) ||
+      buildLanScanUrl(profileId, row.qr_id, host);
+    return {
+      node_id,
+      label: row.public_label ?? node_id,
+      href,
+    };
+  });
 }
 
 /**

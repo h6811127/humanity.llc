@@ -2,6 +2,14 @@ import { getCardJsonUrl } from "./hc-sign.mjs";
 import { postCardUpdate, signCardUpdate } from "./created-update.mjs";
 import { inferPilotTemplate } from "./manifesto-display.mjs";
 import { buildObjectStreamsFromFormRows } from "./object-streams-core.mjs";
+import {
+  countFilledObjectStreams,
+  countFilledStreamFormRows,
+  formatScanDetailsSummaryMeta,
+  readScanDetailsOnboardingDone,
+  shouldOpenScanDetailsDisclosure,
+  writeScanDetailsOnboardingDone,
+} from "./created-scan-details-disclosure-core.mjs";
 
 /**
  * @param {{
@@ -21,19 +29,20 @@ export function initManifestoUpdate(ctx) {
   const generalField = document.getElementById("update-manifesto-general");
   const plateFields = document.getElementById("update-fields-status-plate");
   const relayFields = document.getElementById("update-fields-lost-item");
-  const streamFields = document.getElementById("update-fields-object-streams");
+  const streamDetails = document.getElementById("update-object-streams-details");
+  const streamSummaryMeta = document.getElementById("update-streams-summary-meta");
   if (!form) return;
 
   const session = ctx.getSession();
   const pilot =
     session?.pilot_template ||
     (session?.manifesto_line ? inferPilotTemplate(session.manifesto_line) : "general");
+  const showsStreamDetails = pilot === "status_plate" || pilot === "general";
+
   if (generalFields) generalFields.hidden = pilot !== "general";
   if (plateFields) plateFields.hidden = pilot !== "status_plate";
   if (relayFields) relayFields.hidden = pilot !== "lost_item_relay";
-  if (streamFields) {
-    streamFields.hidden = pilot !== "status_plate" && pilot !== "general";
-  }
+  if (streamDetails) streamDetails.hidden = !showsStreamDetails;
 
   if (pilot === "status_plate" && session?.manifesto_line) {
     const lines = String(session.manifesto_line).split("\n");
@@ -42,7 +51,7 @@ export function initManifestoUpdate(ctx) {
     if (objectEl && lines[0]) objectEl.value = lines[0];
     if (statusEl2 && lines[1]) statusEl2.value = lines[1];
   }
-  if (pilot === "status_plate" || pilot === "general") {
+  if (showsStreamDetails) {
     fillObjectStreamFields(session?.object_streams);
   }
   if (pilot === "lost_item_relay" && session?.manifesto_line) {
@@ -57,6 +66,79 @@ export function initManifestoUpdate(ctx) {
   }
   if (pilot === "general" && generalField && session?.manifesto_line) {
     generalField.value = String(session.manifesto_line);
+  }
+
+  /** @type {string} */
+  let publishedStreamsKey = JSON.stringify(buildObjectStreamsFromFormRows(readStreamFormRows()));
+
+  function readStreamFormRows() {
+    return [
+      {
+        label: document.getElementById("update-stream-1-label")?.value,
+        value: document.getElementById("update-stream-1-value")?.value,
+        class: "place",
+      },
+      {
+        label: document.getElementById("update-stream-2-label")?.value,
+        value: document.getElementById("update-stream-2-value")?.value,
+        class: "care",
+      },
+    ];
+  }
+
+  function syncStreamDetailsDisclosure() {
+    if (!streamDetails || !showsStreamDetails) return;
+    const formRows = readStreamFormRows();
+    const filledCount = countFilledStreamFormRows(
+      formRows.map((r) => ({
+        label: String(r.label ?? "").trim(),
+        value: String(r.value ?? "").trim(),
+      }))
+    );
+    let dirty = false;
+    try {
+      dirty =
+        JSON.stringify(buildObjectStreamsFromFormRows(formRows)) !== publishedStreamsKey;
+    } catch {
+      dirty = true;
+    }
+
+    if (streamSummaryMeta) {
+      const meta = formatScanDetailsSummaryMeta({ filledCount, dirty });
+      streamSummaryMeta.textContent = meta;
+      streamSummaryMeta.hidden = !meta;
+    }
+  }
+
+  function applyInitialStreamDetailsOpen() {
+    if (!streamDetails || !showsStreamDetails) return;
+    const onboardingDone = readScanDetailsOnboardingDone(localStorage, ctx.profileId);
+    const filledFromSession = countFilledObjectStreams(session?.object_streams);
+    streamDetails.open = shouldOpenScanDetailsDisclosure({
+      onboardingDone,
+      filledStreamCount: filledFromSession,
+    });
+    syncStreamDetailsDisclosure();
+  }
+
+  applyInitialStreamDetailsOpen();
+
+  if (streamDetails) {
+    streamDetails.addEventListener("toggle", () => {
+      if (!streamDetails.open) {
+        writeScanDetailsOnboardingDone(localStorage, ctx.profileId);
+      }
+      syncStreamDetailsDisclosure();
+    });
+  }
+
+  for (const id of [
+    "update-stream-1-label",
+    "update-stream-1-value",
+    "update-stream-2-label",
+    "update-stream-2-value",
+  ]) {
+    document.getElementById(id)?.addEventListener("input", syncStreamDetailsDisclosure);
   }
 
   async function resolveCreatedAt() {
@@ -99,19 +181,8 @@ export function initManifestoUpdate(ctx) {
   }
 
   function buildObjectStreamsForUpdate(sessionNow) {
-    if (pilot === "status_plate" || pilot === "general") {
-      return buildObjectStreamsFromFormRows([
-        {
-          label: document.getElementById("update-stream-1-label")?.value,
-          value: document.getElementById("update-stream-1-value")?.value,
-          class: "place",
-        },
-        {
-          label: document.getElementById("update-stream-2-label")?.value,
-          value: document.getElementById("update-stream-2-value")?.value,
-          class: "care",
-        },
-      ]);
+    if (showsStreamDetails) {
+      return buildObjectStreamsFromFormRows(readStreamFormRows());
     }
     return Array.isArray(sessionNow?.object_streams) ? sessionNow.object_streams : [];
   }
@@ -178,6 +249,9 @@ export function initManifestoUpdate(ctx) {
       if (!objectStreams.length) delete next.object_streams;
       ctx.setSession(next);
       ctx.onUpdated(manifestoLine);
+      writeScanDetailsOnboardingDone(localStorage, ctx.profileId);
+      publishedStreamsKey = JSON.stringify(objectStreams);
+      syncStreamDetailsDisclosure();
       if (statusEl) statusEl.textContent = "Updated. Next scan shows the new line.";
     } catch (err) {
       if (statusEl) statusEl.textContent = err.message || String(err);

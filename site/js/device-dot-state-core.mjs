@@ -17,9 +17,9 @@ import {
   UNLOCK_TO_MANAGE_HERE,
   UNLOCK_TO_MANAGE_IN_THIS_TAB,
   UNLOCK_TO_MANAGE_PROMPT,
-} from "./device-ownership-copy-core.mjs?v=91";
-import { walletOwnershipNotInTab } from "./device-ownership-not-in-tab-core.mjs?v=91";
-import { dotOverlayCrossTabPhrase } from "./device-shell-copy-core.mjs?v=91";
+} from "./device-ownership-copy-core.mjs?v=94";
+import { walletOwnershipNotInTab } from "./device-ownership-not-in-tab-core.mjs?v=94";
+import { dotOverlayCrossTabPhrase } from "./device-shell-copy-core.mjs?v=94";
 
 /** @typedef {import("./device-shell-copy-core.mjs").ShellSurface} ShellSurface */
 
@@ -87,9 +87,9 @@ export function dotOverlayFromCounts({
  * @param {DotInboxOverlay} overlay
  * @param {ShellSurface} [surface]
  */
-export function overlayAriaText(overlay, surface = "browser") {
+export function overlayAriaText(overlay, surface = "browser", opts = {}) {
   if (overlay === "proof_waiting") return "live proof waiting";
-  if (overlay === "cross_tab_keys") return dotOverlayCrossTabPhrase(surface);
+  if (overlay === "cross_tab_keys") return dotOverlayCrossTabPhrase(surface, opts);
   if (overlay === "card_disabled_since_visit") return "card disabled since last visit";
   return "";
 }
@@ -132,12 +132,13 @@ function overlayQuickActionForPage(overlay, pageKind) {
  * @param {"ok" | "degraded" | "offline"} network
  * @param {"none" | "keys" | "unsaved" | "steward"} device
  * @param {DotInboxOverlay} overlay
- * @param {{ pageKind?: string }} [opts]
+ * @param {{ pageKind?: string, surface?: ShellSurface, walletKeysNotInTab?: boolean, companionBrowser?: string | null }} [opts]
  */
 export function statusAriaLabel(network, device, overlay, opts = {}) {
   const pageKind = opts.pageKind || "landing";
   const surface = opts.surface ?? "browser";
   const walletKeysNotInTab = opts.walletKeysNotInTab === true;
+  const copyOpts = { companionBrowser: opts.companionBrowser ?? "Safari" };
   const networkText =
     network === "ok"
       ? "resolver online"
@@ -152,7 +153,7 @@ export function statusAriaLabel(network, device, overlay, opts = {}) {
         : device === "keys"
           ? "ownership saved on device"
           : "no ownership saved on device";
-  const overlayText = overlayAriaText(overlay, surface);
+  const overlayText = overlayAriaText(overlay, surface, copyOpts);
   if (walletKeysNotInTab && device === "none") {
     const tabDeviceText = "ownership saved on device, not in this tab";
     const honestBase = overlayText

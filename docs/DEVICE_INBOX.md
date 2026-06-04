@@ -1,8 +1,10 @@
 # Device inbox & background alerts
 
-**Status:** Unified inbox shipped (phases 1–14) · browser alerts v2 A–D shipped (contextual opt-in, sign deep link, OS policy matrix, live-proof service worker)  
+**Status:** v1 layers shipped (phases 1–14) · **v2 in-app delivery shipped** — [`NOTIFICATION_SYSTEM_V2.md`](NOTIFICATION_SYSTEM_V2.md) · **Background OS alerts: non-functional** (Android Chrome PWA, 2026-06-04)  
 **Audience:** Product, frontend  
-**Related:** [`STEWARD_DEVICE_ROADMAP.md`](STEWARD_DEVICE_ROADMAP.md) (index) · [`DEVICE_OS.md`](DEVICE_OS.md) · [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) · [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md`](KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md)
+**Related:** [`NOTIFICATION_SYSTEM_V2.md`](NOTIFICATION_SYSTEM_V2.md) · [`STEWARD_DEVICE_ROADMAP.md`](STEWARD_DEVICE_ROADMAP.md) (index) · [`DEVICE_OS.md`](DEVICE_OS.md) · [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) · [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md`](KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md)
+
+> **Active engineering:** New work belongs to **WS-NOTIF** until exit criteria in [`NOTIFICATION_SYSTEM_V2.md`](NOTIFICATION_SYSTEM_V2.md) § Phases. Do not add parallel hub-only alert groups or OS notify paths without an inbox `kind` and urgency tier.
 
 ---
 
@@ -34,6 +36,7 @@ Treat actionable device state as a single **Device inbox** with three presentati
 flowchart TB
   subgraph sources [Inbox sources - device only]
     LP[live_proof]
+    RO[relay_offer]
     TK[tab_keys_unsaved]
     CT[cross_tab_keys]
     RV[card_disabled_since_visit]
@@ -75,8 +78,9 @@ Canonical `kind` values (target: one module `device-inbox-core.mjs`, Vitest-cove
 
 | `kind` | Urgency | Badge count? | Dot overlay? | Browser alert? | Primary CTA |
 |--------|---------|--------------|--------------|----------------|-------------|
-| `live_proof` | **High** (time-sensitive) | Yes (pending count) | `proof_waiting` (highest overlay) | Yes (opt-in) | Open `/created/` to sign (`live_challenge`) |
-| `tab_keys_unsaved` | Medium | Yes (0 or 1) | Via device axis (`unsaved` pulsing red), not overlay | No | Save keys on device |
+| `live_proof` | **U0** (time-sensitive) | Yes (pending count) | `proof_waiting` (highest overlay) | Yes (opt-in) | Open `/created/` to sign (`live_challenge`) |
+| `relay_offer` | **U0** (finder message on lost-item relay) | Yes (pending message count) | No dedicated dot overlay (N2) | Yes (opt-in; `inboxKindAllowsOsNotification`) | Open relay on Now (`/created/`) |
+| `tab_keys_unsaved` | **U1** | Yes (0 or 1) | Via device axis (`unsaved` pulsing red), not overlay | No | Save keys on device |
 | `cross_tab_keys` | Medium | Yes when tab notice = 0 | `cross_tab_keys` | No | Focus other tab / save here |
 | `orphan_keys_removed` | Medium | Yes when tab notice = 0 | `cross_tab_keys` (same notch) | No | Open other tab / clear keys on device |
 | `card_disabled_since_visit` | Medium | **Yes** (resolver-confirmed since-visit cards) | `card_disabled_since_visit` (soft notch; below proof/cross-tab) | No | Open card from inbox sheet |
@@ -180,7 +184,7 @@ See [Background alerts roadmap](#background-alerts-roadmap) (v2 phases A–B shi
 
 ### v2 Phase C - Policy matrix (shipped)
 
-`inboxKindAllowsOsNotification()` in `device-browser-notifications-core.mjs`; `maybeNotifyLiveProof()` in `device-browser-notifications.mjs` gates OS alerts on `live_proof` only.
+`inboxTier(kind)` and `inboxKindAllowsOsNotification()` in `device-browser-notifications-core.mjs` — **U0** kinds `live_proof` and `relay_offer`. Page `maybeNotify*` calls remain until **N2** delivery router.
 
 | Event | OS alert | Rationale |
 |-------|----------|-----------|
@@ -191,16 +195,18 @@ See [Background alerts roadmap](#background-alerts-roadmap) (v2 phases A–B shi
 | Card disabled since visit | No (defer digest) | Batch/digest, not instant |
 | Resolver offline/degraded | No | `#device-system-banner` |
 
-### v2 Phase D - Service Worker (shipped)
+### v2 Phase D - Service Worker (code shipped — **away-tab OS non-functional**)
+
+> **Product status:** Background tray notifications and reliable tap-through on **Android Chrome PWA** are **not field-functional** (2026-06-04). Treat Phase D as **implementation only**; stewards should use **foreground strip + inbox** while the app is open. See [`NOTIFICATION_SYSTEM_V2.md`](NOTIFICATION_SYSTEM_V2.md) § Known limitations.
 
 - **`/sw-live-proof.mjs`** - polls pending live-proof challenges when **no visible Humanity tab** and background alerts are on.
 - Page sync: `device-browser-notifications-sw.mjs` mirrors wallet poll targets + resolver origin via `postMessage`; triggers poll on tab hide / `pagehide` and **Background Sync** / **Periodic Background Sync** when the browser grants them.
 - OS notification via `registration.showNotification()` (same copy + sign deep link as Phase B); click handled in the SW.
-- **No server push (shipped)** - device-only polling, `live_proof` policy only (Phase C). **Hosted paid (planning):** server SSE push per [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md); SW remains fallback.
-- **Limits:** Browsers may throttle or deny periodic sync; fully force-quit browsers may not wake the SW. Hidden-tab alerts still use the page path first (`maybeNotifyLiveProof`).
-- **Request budget Phase 4:** SW polls only when alerts are on + permission granted + resolver health is `ok`; **one** challenge GET per wake (round-robin); **15 min** minimum `periodicSync` interval ([`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md)).
+- **Free tier:** device-only polling, `live_proof` OS policy (Phase C). **Hosted (E4 shipped, rollout gated):** SSE `live_proof.pending` is **transport only** → same inbox queue → [`NOTIFICATION_SYSTEM_V2.md`](NOTIFICATION_SYSTEM_V2.md) § N5 · [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md); SW remains fallback.
+- **Limits:** Browsers may throttle or deny periodic sync; fully force-quit browsers may not wake the SW. Hidden-tab alerts probe the server on hide/`pagehide`, then every **60s** while hidden (background alerts on; Watch not required). Live-proof OS uses `registration.showNotification` when the SW is registered (Android PWA-friendly).
+- **Request budget Phase 4:** SW polls when alerts are on + permission granted + resolver health is `ok`; **one** challenge GET per wake (round-robin); **15 min** minimum `periodicSync` when alerts on. Page hidden probe fetches all pollable cards once per tick (same as manual hub verify).
 
-**Request budget (ops):** Live proof was the main Worker cost driver (**legacy:** N cards × 5s × parallel `GET`). **Shipped mitigations:** hub/inbox scope, round-robin **one GET per tick**, 60s idle / 5s pending, watch **default off**, SW 15 min + alerts-only + **watch on** (Phase 8c), visible-row-first network refresh (Phase 8c). Residual risk: large wallets + watch on + long hub sessions + parallel **Check network** fan-out. See **[`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md)** for math, operating modes, and Phases 7–9.
+**Request budget (ops):** Live proof was the main Worker cost driver (**legacy:** N cards × 5s × parallel `GET`). **Shipped mitigations:** hub/inbox scope, round-robin **one GET per tick**, 60s idle / 5s pending, watch **default off**, SW 15 min + **background alerts on**, visible-row-first network refresh (Phase 8c). Residual risk: large wallets + background alerts + long hidden sessions. See **[`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md)** for math, operating modes, and Phases 7–9.
 
 ---
 
@@ -210,7 +216,7 @@ See [Background alerts roadmap](#background-alerts-roadmap) (v2 phases A–B shi
 
 1. Amber **proof_waiting** notch on dot.
 2. Inbox badge shows count (e.g. `1`).
-3. Tab hidden + background alerts on → OS notification with card label.
+3. Tab hidden + background alerts on → OS notification with card label (**non-functional — deferred**; use foreground strip when app is open).
 4. User returns to tab → no OS spam; hub row + badge sufficient.
 5. Tap badge or inbox sheet row → sign on `/created/`.
 

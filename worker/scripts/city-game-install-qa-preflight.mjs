@@ -15,10 +15,18 @@ import {
 } from "./city-game-install-qa-core.mjs";
 import { assessInstallMapReady, INSTALL_MAP_REL } from "./city-game-install-map-core.mjs";
 import { installQaDocHasE2Pass } from "./city-game-install-qa-core.mjs";
+import {
+  installQaRegistryNodeIds,
+  LOCAL_DEV_INSTALL_QA_WALK_REL,
+  resolveInstallQaWalkNodes,
+} from "./city-game-install-qa-walk-core.mjs";
+import { INSTALL_QA_REQUIRED_NODE_COUNT } from "./city-game-smoke-local-core.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const installQaPath = join(root, INSTALL_QA_REL);
 const installMapPath = join(root, INSTALL_MAP_REL);
+const seasonPath = join(root, "site/data/city-game-cr-season-01.json");
+const walkKitPath = join(root, LOCAL_DEV_INSTALL_QA_WALK_REL);
 const localSeedPath = join(root, "worker/.local/city-game-seed.json");
 const prodSeedPath = join(root, "worker/.local/city-game-production-seed.json");
 
@@ -42,10 +50,39 @@ function main() {
   });
   const installMap = assessInstallMapReady({ installMapDoc, localSeed });
 
+  let walkKit = { ready: false, linked: 0, registry: 0 };
+  if (localSeed?.profile_id) {
+    const season = readJsonOptional(seasonPath);
+    const registryNodeIds = installQaRegistryNodeIds(season);
+    const nodes = resolveInstallQaWalkNodes(
+      localSeed.nodes ?? [],
+      localSeed.profile_id,
+      "127.0.0.1",
+      registryNodeIds
+    );
+    walkKit = {
+      registry: nodes.length,
+      linked: nodes.filter((n) => n.href).length,
+      ready: false,
+    };
+    walkKit.ready =
+      existsSync(walkKitPath) &&
+      walkKit.registry >= INSTALL_QA_REQUIRED_NODE_COUNT &&
+      walkKit.linked >= INSTALL_QA_REQUIRED_NODE_COUNT;
+    if (!walkKit.ready && walkKit.linked >= INSTALL_QA_REQUIRED_NODE_COUNT) {
+      c3.warnings.push("LAN walk HTML missing or stale — npm run city-game:install-qa-walk -- --lan");
+    } else if (walkKit.linked < INSTALL_QA_REQUIRED_NODE_COUNT) {
+      c3.warnings.push(
+        `LAN walk resolver ${walkKit.linked}/${INSTALL_QA_REQUIRED_NODE_COUNT} linked — npm run city-game:seed-local`
+      );
+    }
+  }
+
   console.log(
     formatInstallQaPreflightReport({
       ...c3,
       humanSignedOff: humanSignedOff(installQaDoc),
+      walkKit,
       installMap: {
         qrReady: installMap.qrReady,
         installedReady: installMap.installedReady,

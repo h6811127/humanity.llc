@@ -16,12 +16,12 @@ const seasonJson = JSON.parse(
 );
 
 describe("Signal War SW-S1", () => {
-  it("disables player relay capture in bundled season until S2", () => {
-    expect(seasonJson.automation?.relay_capture_player_enabled).toBe(false);
-    expect(seasonRelayCapturePlayerEnabled(CR_SEASON_01)).toBe(false);
+  it("enables player relay capture on the pilot season (SW-S2 shipped)", () => {
+    expect(seasonJson.automation?.relay_capture_player_enabled).toBe(true);
+    expect(seasonRelayCapturePlayerEnabled(CR_SEASON_01)).toBe(true);
     expect(
       gameNodeContributeMode("node_05", { compromised: false } as never, "relay_gate")
-    ).toBe(null);
+    ).toBe("capture");
   });
 
   it("allows relay capture when env override is set (S2 dev)", () => {

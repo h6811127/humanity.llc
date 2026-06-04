@@ -19,6 +19,36 @@ export function escapeDebriefHtml(value) {
 /**
  * @param {Record<string, unknown>} season
  */
+/**
+ * @param {Record<string, unknown>} season
+ */
+export function resolveDebriefPath(season) {
+  const explicit = String(season.debrief_path ?? "").trim();
+  if (explicit) return explicit;
+  const sw = season.signal_war;
+  if (sw && typeof sw === "object") {
+    const s6 = /** @type {Record<string, unknown>} */ (sw).summer_s6;
+    if (s6 && typeof s6 === "object") {
+      const path = String(/** @type {Record<string, unknown>} */ (s6).debrief_path ?? "").trim();
+      if (path) return path;
+    }
+  }
+  return "/play/cedar-rapids/debrief/";
+}
+
+/**
+ * Hide pattern bodies during live play; show after window close.
+ * @param {string} phase
+ * @param {Record<string, unknown>} season
+ */
+export function shouldGateDebriefPatterns(phase, season) {
+  if (phase === "after" || season.status === "ended") return false;
+  return phase === "open" && season.status === "active";
+}
+
+/**
+ * @param {Record<string, unknown>} season
+ */
 export function resolveDebriefCopy(season) {
   const debrief =
     season.debrief && typeof season.debrief === "object"

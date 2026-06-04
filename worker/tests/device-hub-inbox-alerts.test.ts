@@ -24,7 +24,18 @@ describe("inboxItemsIncludeKind", () => {
       crossTabEntries: [],
     });
     expect(inboxItemsIncludeKind(items, "live_proof")).toBe(false);
+    expect(inboxItemsIncludeKind(items, "relay_offer")).toBe(false);
     expect(inboxItemsIncludeKind(items, "card_disabled_since_visit")).toBe(false);
+  });
+
+  it("includes relay_offer when relay pending count is in gather input", () => {
+    const items = buildInboxItems({
+      tabNoticeCount: 0,
+      liveProofCount: 0,
+      relayOfferCount: 2,
+      crossTabEntries: [],
+    });
+    expect(inboxItemsIncludeKind(items, "relay_offer")).toBe(true);
   });
 
   it("includes cross_tab_keys only when tab keys notice is not active", () => {

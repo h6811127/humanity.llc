@@ -16,6 +16,11 @@ import {
   trySoleSigningRowRehydrateForScan,
 } from "./device-quiet-tab-rehydrate.mjs";
 import {
+  multiWalletScanAutoActivateAllowed,
+  walletEntriesWithSigningKeys,
+} from "./device-quiet-tab-rehydrate-core.mjs";
+import { isQuietTabRehydrateEnabled } from "./device-quiet-tab-rehydrate-prefs.mjs";
+import {
   DEFAULT_VOUCH_STATEMENT,
   getCardStatusUrl,
   postVouchUrl,
@@ -32,6 +37,7 @@ import {
   isDefaultVouchProfile,
   isVouchAutoActivateEnabled,
 } from "./vouch-ready-keys.mjs";
+import { isSigningAutoLoadBlockedByPwaSessionMismatch } from "./device-pwa-session-mismatch.mjs";
 import { soleSigningVouchActivateEntry } from "./vouch-scan-sole-signing-activate-core.mjs";
 import {
   VOUCH_PWA_CAMERA_HANDOFF_LEAD,
@@ -565,6 +571,16 @@ async function tryAutoActivateDefaultVouchKeys(voucheeProfileId, opts = {}) {
 async function tryAutoActivateEligibleVouchProfile(voucheeProfileId, opts = {}) {
   if (opts.skipAutoActivate || userSkippedAutoActivateOnThisScan()) return false;
 
+  const signingCount = walletEntriesWithSigningKeys(loadWallet()).length;
+  if (
+    !multiWalletScanAutoActivateAllowed(
+      signingCount,
+      isQuietTabRehydrateEnabled()
+    )
+  ) {
+    return false;
+  }
+
   const eligible = await findEligibleWalletVouchers(voucheeProfileId);
   const skipProfileId =
     typeof opts.skipProfileId === "string" ? opts.skipProfileId.trim() : "";
@@ -914,6 +930,9 @@ async function runVouchFlow(opts = {}) {
     session?.owner_public_key_b58;
 
   if (!hasKeys && !opts.autoActivateAttempted && !opts.skipAutoActivate) {
+    if (isSigningAutoLoadBlockedByPwaSessionMismatch()) {
+      return;
+    }
     const activated = await tryAutoActivateDefaultVouchKeys(voucheeProfileId, opts);
     if (activated) {
       return runVouchFlow({ autoActivateAttempted: true });

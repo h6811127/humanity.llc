@@ -191,6 +191,30 @@ test.describe("/created/ control mode (Live · Manage)", () => {
     await expect(page.locator("#revoke-details")).toHaveAttribute("open");
   });
 
+  test("publish update appears before collapsed extra scan lines", async ({ page }) => {
+    await page.addInitScript((profileId) => {
+      sessionStorage.setItem(
+        "hc_created_first_qr_revoke",
+        JSON.stringify({ [profileId]: true })
+      );
+    }, SAMPLE.profile_id);
+
+    await page.goto(`/created/?profile_id=${SAMPLE.profile_id}&qr_id=${SAMPLE.qr_id}`);
+
+    const submit = page.locator("#manifesto-update-submit");
+    const details = page.locator("#update-object-streams-details");
+    await expect(submit).toBeVisible();
+    await expect(details).toBeVisible();
+
+    const order = await page.evaluate(() => {
+      const form = document.getElementById("manifesto-update-form");
+      if (!form) return null;
+      const nodes = [...form.querySelectorAll("#manifesto-update-submit, #update-object-streams-details")];
+      return nodes.map((n) => n.id);
+    });
+    expect(order).toEqual(["manifesto-update-submit", "update-object-streams-details"]);
+  });
+
   test("#update-status deep link focuses Live scanners-see form", async ({ page }) => {
     await page.addInitScript((profileId) => {
       sessionStorage.setItem(

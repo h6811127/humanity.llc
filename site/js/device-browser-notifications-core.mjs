@@ -2,7 +2,7 @@
  * Pure browser-alert helpers (testable).
  * @see docs/DEVICE_INBOX.md - background alerts v2
  */
-import { inboxWalletEntryLabel } from "./device-inbox-core.mjs?v=91";
+import { inboxWalletEntryLabel } from "./device-inbox-core.mjs?v=94";
 
 export const STORAGE_BROWSER_NOTIF = "hc_browser_notif";
 export const STORAGE_PROMPT_DISMISS = "hc_browser_notif_prompt_dismissed";
@@ -24,14 +24,14 @@ export function isBrowserNotifEnabled(readStorage) {
   return read() === "on";
 }
 
-/** @typedef {'live_proof' | 'tab_keys_unsaved' | 'cross_tab_keys' | 'card_disabled_since_visit'} InboxAlertKind */
+/** @typedef {'live_proof' | 'relay_offer' | 'tab_keys_unsaved' | 'cross_tab_keys' | 'card_disabled_since_visit'} InboxAlertKind */
 
 /**
- * v2 Phase C policy - only live proof may trigger OS notifications when the tab is hidden.
+ * v2 OS policy — U0 kinds only (WS-NOTIF N1). Delivery router dedupes in N2.
  * @param {InboxAlertKind} kind
  */
 export function inboxKindAllowsOsNotification(kind) {
-  return kind === "live_proof";
+  return kind === "live_proof" || kind === "relay_offer";
 }
 
 /**

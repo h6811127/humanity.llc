@@ -1,4 +1,7 @@
 import { mergeOwnershipSeatbeltFields } from "./created-first-session-gate-core.mjs";
+import { sanitizeCreatedReturnUrl } from "./device-created-return-url-core.mjs";
+
+export { sanitizeCreatedReturnUrl } from "./device-created-return-url-core.mjs";
 import { logDeviceActivity, walletEntryForActivity } from "./device-activity.mjs";
 import { navigateTo } from "./device-shell-motion.mjs";
 import { setLastActiveProfileId } from "./device-quiet-tab-rehydrate-prefs.mjs";
@@ -142,10 +145,12 @@ export function createdUrlForEntry(entry) {
 export function buildCreatedPageUrl(entry, opts = {}) {
   if (!entry?.profile_id) return null;
   const url = new URL(createdUrlForEntry(entry));
-  let returnUrl = opts.returnUrl ?? null;
+  let returnUrl = sanitizeCreatedReturnUrl(opts.returnUrl ?? null);
   if (!returnUrl) {
     try {
-      returnUrl = sessionStorage.getItem("hc_vouch_return_url");
+      returnUrl = sanitizeCreatedReturnUrl(
+        sessionStorage.getItem("hc_vouch_return_url")
+      );
     } catch {
       /* ignore */
     }
@@ -190,7 +195,7 @@ export function openCardNowPage(entry, opts = {}) {
         result = await openCardNowPageGated(entry, { ...opts, pin });
       }
     }
-    if (!result.ok && result.error) {
+    if (!result.ok && result.error && !result.viewOnly) {
       window.alert(result.error);
     }
   });

@@ -2,11 +2,10 @@
  * Compact inbox bottom sheet — badge tap and open_notifications.
  * @see docs/DEVICE_INBOX.md phase 3
  */
-import { buildInboxItems, buildInboxSheetRows } from "./device-inbox-core.mjs?v=91";
-import { gatherInboxInput, getInboxItems, notificationCount } from "./device-inbox.mjs?v=91";
+import { buildInboxItems, buildInboxSheetRows } from "./device-inbox-core.mjs?v=94";
+import { gatherInboxInput, getInboxItems, notificationCount } from "./device-inbox.mjs?v=94";
 import {
   formatLiveControlExpiry,
-  getLiveControlPending,
   LIVE_CONTROL_POLL_SCOPE_CHANGED,
   openLiveControlProof,
 } from "./device-live-control-inbox.mjs";
@@ -16,24 +15,24 @@ import {
   actOnOrphanRemovedTabKeys,
 } from "./device-orphan-keys-nav.mjs";
 import { actOnOtherTabKeys, openSaveKeysForThisTab } from "./device-notice-nav.mjs";
-import { gatherCardDisabledSinceVisitForInbox } from "./device-inbox-card-disabled.mjs?v=91";
+import { gatherCardDisabledSinceVisitForInbox } from "./device-inbox-card-disabled.mjs?v=94";
 import {
   NETWORK_BASELINE_CHANGED,
   NETWORK_REFRESHED,
-} from "./device-wallet-network.mjs?v=91";
+} from "./device-wallet-network.mjs?v=94";
 import { prefersReducedMotion } from "./device-shell-motion.mjs";
 import { closeGlancePopover } from "./device-hub-glance-popover.mjs";
-import { syncBrowserNotifPrompts } from "./device-browser-notifications-loader.mjs?v=91";
-import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=91";
+import { syncBrowserNotifPrompts } from "./device-browser-notifications-loader.mjs?v=94";
+import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=94";
 import {
   inboxSheetMountAllowed,
   inboxSheetReconcileAction,
-} from "./device-inbox-sheet-core.mjs?v=91";
+} from "./device-inbox-sheet-core.mjs?v=94";
 import {
   bindSheetLifecycleReconcile,
   syncInboxBackdropForOpenHub,
   syncSheetBackdropClosed,
-} from "./device-sheet-backdrop-sync.mjs?v=91";
+} from "./device-sheet-backdrop-sync.mjs?v=94";
 
 const SHEET_ID = "device-inbox-sheet";
 const LIST_ID = "device-inbox-sheet-list";
@@ -175,11 +174,14 @@ function sheetRows() {
     handle: entry.handle,
   }));
   return buildInboxSheetRows(buildInboxItems(input), {
-    liveProofPending: getLiveControlPending(),
+    liveProofPending: input.liveProofPending ?? [],
+    relayOfferPending: input.relayOfferPending ?? [],
     crossTabEntries: input.crossTabEntries,
     orphanRemovedEntries: input.orphanRemovedEntries,
     cardDisabledSinceVisit: cardDisabled,
     formatProofExpiry: formatLiveControlExpiry,
+    standalone: input.standalone,
+    companionBrowser: input.companionBrowser,
   });
 }
 
@@ -192,6 +194,9 @@ function toneClass(tone) {
 function rowIconSvg(kind) {
   if (kind === "live_proof") {
     return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v4"/><path d="M12 18v4"/><circle cx="12" cy="12" r="4"/></svg>`;
+  }
+  if (kind === "relay_offer") {
+    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
   }
   if (kind === "cross_tab_keys" || kind === "other_tabs_unsaved_keys" || kind === "orphan_keys_removed") {
     return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>`;
@@ -241,6 +246,18 @@ export function renderInboxSheet() {
       if (row.kind === "live_proof" && row.proofItem) {
         logInboxDiagnostic({ type: "inbox_item_action", kind: row.kind, outcome: "open_sign" });
         openLiveControlProof(row.proofItem);
+        return;
+      }
+      if (row.kind === "relay_offer" && row.relayOfferItem) {
+        logInboxDiagnostic({ type: "inbox_item_action", kind: row.kind, outcome: "open_relay" });
+        const entry = findWalletEntryByProfileId(row.relayOfferItem.profileId);
+        if (entry) {
+          openCardNowPage(entry);
+        } else {
+          const url = new URL("/created/", location.origin);
+          url.searchParams.set("profile_id", row.relayOfferItem.profileId);
+          location.href = url.href;
+        }
         return;
       }
       if (

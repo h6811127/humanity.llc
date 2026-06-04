@@ -1,6 +1,7 @@
 # Live object architecture
 
 **Status:** Canonical engineering companion — implementation map for expanded design space  
+**Workstream:** **WS-LIVE** — [`PRODUCT_WORKSTREAM_COORDINATION.md`](PRODUCT_WORKSTREAM_COORDINATION.md) § [WS-LIVE — Physical software objects + evolving five-layer stack](PRODUCT_WORKSTREAM_COORDINATION.md#ws-live--physical-software-objects--evolving-five-layer-stack) owns completing **Orders 1–6** exit criteria and **LO-1–LO-5** MVP gates  
 **Audience:** Product, resolver, frontend, operators, agents  
 **Public catalog (research):** [`QR_DESIGN_SPACE.md`](QR_DESIGN_SPACE.md) · [`site/what-can-a-qr-do/design-space/`](../site/what-can-a-qr-do/design-space/index.html)  
 **Trust boundaries:** [`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md) · [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md)  
@@ -392,7 +393,7 @@ Code: `worker/src/live-object/succession-spec.ts` — `scan.succession` on statu
 
 ## Recommended build sequence
 
-Aligned with [`PRODUCT_WORKSTREAM_COORDINATION.md`](PRODUCT_WORKSTREAM_COORDINATION.md) and Phase A:
+Aligned with **[WS-LIVE](PRODUCT_WORKSTREAM_COORDINATION.md#ws-live--physical-software-objects--evolving-five-layer-stack)** and Phase A. Mark **LO-1–LO-5** in [`PRODUCT_WORKSTREAM_COORDINATION.md`](PRODUCT_WORKSTREAM_COORDINATION.md) when exit rows below pass.
 
 | Order | Work | Proves verb / blind spot |
 |-------|------|--------------------------|

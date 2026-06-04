@@ -16,3 +16,10 @@ OPERATOR_AUDIT_TOKEN=dev-only-change-me
 # Merch / Printify catalog lookup (npm run printify:lookup-blueprint)
 # PRINTIFY_API_TOKEN=
 # PRINTIFY_SHOP_ID=
+
+# WS-REV — Stripe test checkout (local worker:dev only; production uses wrangler secrets)
+# Create test products/prices in Stripe Dashboard, then:
+# STRIPE_SECRET_KEY=sk_test_…
+# STRIPE_PRICE_HOSTED_STEWARD_V1=price_…
+# STRIPE_PRICE_HOSTED_GAME_SEASON_V1=price_…
+# STRIPE_WEBHOOK_SECRET=whsec_…   # stripe listen --forward-to localhost:8787/.well-known/hc/v1/operator/billing/webhook

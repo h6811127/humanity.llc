@@ -4,6 +4,9 @@
  * @see docs/UI_UX_SAFE_REBUILD_IMPLEMENTATION.md Step 2 (inbox loader pattern)
  */
 import { DEVICE_SHELL_ASSET_VERSION } from "./device-status-shell-modules.mjs";
+import { bindLiveProofNotificationNavListener } from "./device-live-proof-notification-nav.mjs";
+
+bindLiveProofNotificationNavListener();
 
 /** @type {Promise<typeof import("./device-browser-notifications.mjs")> | null} */
 let browserNotificationsModulePromise = null;

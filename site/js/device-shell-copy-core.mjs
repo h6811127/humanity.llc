@@ -32,17 +32,21 @@ export function controlHereDetail(surface) {
 /**
  * @param {ShellSurface} surface
  */
-export function keysInOtherContextEyebrow(surface) {
-  return surface === "standalone" ? "Keys in Safari" : "Keys in another tab";
+export function keysInOtherContextEyebrow(surface, opts = {}) {
+  if (surface !== "standalone") return "Keys in another tab";
+  const name = opts.companionBrowser ?? "Safari";
+  return `Keys in ${name}`;
 }
 
 /**
  * @param {ShellSurface} surface
  */
-export function keysInOtherContextDetail(surface) {
-  return surface === "standalone"
-    ? "Save or manage in Safari, or open controls here on this page."
-    : "Save or manage in that tab’s card workspace, or open controls here on this page.";
+export function keysInOtherContextDetail(surface, opts = {}) {
+  if (surface !== "standalone") {
+    return "Save or manage in that tab’s card workspace, or open controls here on this page.";
+  }
+  const name = opts.companionBrowser ?? "Safari";
+  return `Save or manage in ${name}, or open controls here on this page.`;
 }
 
 /**
@@ -58,11 +62,13 @@ export function otherContextPresenceExtra(extraCount, surface) {
 /**
  * @param {number} count
  * @param {ShellSurface} surface
+ * @param {{ companionBrowser?: string | null }} [opts]
  */
-export function crossTabAggregateTitle(count, surface) {
+export function crossTabAggregateTitle(count, surface, opts = {}) {
   if (count <= 0) return "";
+  const companion = opts.companionBrowser ?? "Safari";
   if (surface === "standalone") {
-    if (count === 1) return "Managing in Safari";
+    if (count === 1) return `Managing in ${companion}`;
     return `Managing in ${count} other windows`;
   }
   if (count === 1) return "Managing in 1 other tab";
@@ -104,26 +110,68 @@ export function inboxAriaOrphanManagingElsewhere(who = "", surface = "browser") 
 
 /**
  * @param {ShellSurface} surface
+ * @param {{ companionBrowser?: string | null }} [opts]
  */
-export function statusKeyCrossTabLine(surface) {
-  return surface === "standalone"
-    ? "Blue notch - keys in Safari"
-    : "Blue notch - keys in another tab";
+export function statusKeyCrossTabLine(surface, opts = {}) {
+  if (surface !== "standalone") return "Blue notch - keys in another tab";
+  const name = opts.companionBrowser ?? "Safari";
+  return `Blue notch - keys in ${name}`;
 }
 
 /**
  * @param {ShellSurface} surface
+ * @param {{ companionBrowser?: string | null }} [opts]
  */
-export function dotOverlayCrossTabPhrase(surface) {
-  return surface === "standalone" ? "managing in Safari" : "managing in another tab";
+export function dotOverlayCrossTabPhrase(surface, opts = {}) {
+  if (surface !== "standalone") return "managing in another tab";
+  const name = opts.companionBrowser ?? "Safari";
+  return `managing in ${name}`;
+}
+
+/**
+ * Standalone PWA companion browser label (P1-MOTO-08 — not Safari on Chrome Android).
+ * @param {{ standalone?: boolean, userAgent?: string }} ctx
+ */
+export function companionBrowserLabel(ctx = {}) {
+  if (!ctx.standalone) return null;
+  const ua = ctx.userAgent ?? "";
+  if (/iPhone|iPad|iPod/i.test(ua)) return "Safari";
+  if (/Android/i.test(ua)) return "Chrome";
+  return "your browser";
+}
+
+/**
+ * @param {Window | { navigator?: { userAgent?: string } }} [win]
+ */
+export function readShellCopyContext(win = typeof window !== "undefined" ? window : undefined) {
+  const ua = win?.navigator?.userAgent ?? "";
+  const standalone =
+    typeof win !== "undefined" &&
+    typeof win.matchMedia === "function" &&
+    win.matchMedia("(display-mode: standalone)").matches;
+  const surface = shellSurfaceFromStandalone(standalone);
+  const companionBrowser = companionBrowserLabel({ standalone, userAgent: ua });
+  return { surface, companionBrowser, standalone, userAgent: ua };
 }
 
 /**
  * @param {boolean} compact
  * @param {ShellSurface} surface
+ * @param {{ companionBrowser?: string | null }} [opts]
  */
-export function browserAlertBackgroundCopy(compact, surface) {
+export function browserAlertBackgroundCopy(compact, surface, opts = {}) {
+  const companion = opts.companionBrowser ?? null;
   if (surface === "standalone") {
+    if (companion === "Chrome") {
+      return compact
+        ? "Get a Chrome notification when this app is in the background."
+        : "Someone is waiting for live proof. Get a Chrome notification when this app is in the background?";
+    }
+    if (companion === "Safari") {
+      return compact
+        ? "Get a Safari notification when this app is in the background."
+        : "Someone is waiting for live proof. Get a Safari notification when this app is in the background?";
+    }
     return compact
       ? "Get an alert when this app is in the background."
       : "Someone is waiting for live proof. Get an alert when this app is in the background?";
@@ -135,9 +183,18 @@ export function browserAlertBackgroundCopy(compact, surface) {
 
 /**
  * @param {ShellSurface} surface
+ * @param {{ companionBrowser?: string | null }} [opts]
  */
-export function browserAlertWhileOpenCopy(surface) {
-  return surface === "standalone"
-    ? "use the inbox badge while this app is open"
-    : "use the inbox badge while this tab is open";
+export function browserAlertWhileOpenCopy(surface, opts = {}) {
+  if (surface === "standalone") {
+    const companion = opts.companionBrowser ?? null;
+    if (companion === "Chrome") {
+      return "use the inbox badge or foreground strip while this app is open (Chrome handles background alerts)";
+    }
+    if (companion === "Safari") {
+      return "use the inbox badge or foreground strip while this app is open";
+    }
+    return "use the inbox badge while this app is open";
+  }
+  return "use the inbox badge while this tab is open";
 }

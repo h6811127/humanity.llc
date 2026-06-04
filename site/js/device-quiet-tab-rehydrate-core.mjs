@@ -119,6 +119,18 @@ export function quietRehydrateBlockedForUrlProfile(targetEntry, urlProfileId) {
  *   urlProfileId?: string | null,
  * }} input
  */
+/**
+ * Multi-wallet vouch auto-activate must follow Tier 2 quiet rehydrate (D10).
+ * @see docs/QUIET_TAB_REHYDRATE.md § When Tier 2 is skipped
+ */
+export function multiWalletScanAutoActivateAllowed(
+  signingWalletCount,
+  quietRehydrateEnabled
+) {
+  if (signingWalletCount <= 1) return true;
+  return quietRehydrateEnabled;
+}
+
 export function shouldQuietTabRehydrate(input) {
   const {
     hasTabControl = false,

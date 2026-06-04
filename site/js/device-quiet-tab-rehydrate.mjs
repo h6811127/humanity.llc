@@ -21,6 +21,7 @@ import {
   isQuietTabRehydrateEnabled,
   setQuietTabRehydratedProfile,
 } from "./device-quiet-tab-rehydrate-prefs.mjs";
+import { isSigningAutoLoadBlockedByPwaSessionMismatch } from "./device-pwa-session-mismatch.mjs";
 import { invalidateCrossTabNotificationState } from "./device-cross-tab-state.mjs";
 import { resetPresenceInboxGatherCache } from "./device-inbox.mjs";
 import {
@@ -50,6 +51,10 @@ export function applyQuietRehydrateCrossTabDemotion(profileId) {
  * @returns {Promise<{ ok: true, profileId: string } | { skipped: string }>}
  */
 export async function maybeQuietTabRehydrate(opts = {}) {
+  if (isSigningAutoLoadBlockedByPwaSessionMismatch()) {
+    return { skipped: "pwa_session_mismatch" };
+  }
+
   const session = getTabSession();
   const hasTabControl = Boolean(session?.owner_private_key_b58);
   const wallet = loadWallet();

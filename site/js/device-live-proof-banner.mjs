@@ -11,7 +11,7 @@ import {
 } from "./device-emphasis-card-html.mjs";
 import { inboxWalletEntryLabel } from "./device-inbox-core.mjs";
 import {
-  getLiveControlPending,
+  getLiveControlPendingForDisplay,
   getLiveControlPendingCount,
   openLiveControlProof,
 } from "./device-live-control-inbox.mjs";
@@ -29,13 +29,22 @@ function shouldSkipLiveProofBanner() {
   return document.body?.classList.contains("device-shell-created");
 }
 
+function foregroundAttentionStripShowing() {
+  const strip = document.getElementById("device-foreground-attention");
+  return strip instanceof HTMLElement && !strip.hidden && strip.innerHTML.trim() !== "";
+}
+
 export function renderLiveProofBanner() {
+  if (foregroundAttentionStripShowing()) {
+    clearLiveProofBanner();
+    return;
+  }
   if (!banner || shouldSkipLiveProofBanner()) {
     clearLiveProofBanner();
     return;
   }
 
-  const pending = getLiveControlPending();
+  const pending = getLiveControlPendingForDisplay();
   if (getLiveControlPendingCount() === 0 || pending.length === 0) {
     clearLiveProofBanner();
     return;

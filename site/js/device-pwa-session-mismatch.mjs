@@ -73,3 +73,11 @@ export function gatherPwaSessionMismatch(win) {
     canRestoreInThisTab: false,
   };
 }
+
+/**
+ * Quiet rehydrate and vouch auto-activate must not load keys across PWA/browser split (P2-2 · S3).
+ * @param {Window | null | undefined} [win]
+ */
+export function isSigningAutoLoadBlockedByPwaSessionMismatch(win) {
+  return gatherPwaSessionMismatch(win) !== null;
+}

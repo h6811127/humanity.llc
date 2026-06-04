@@ -3,6 +3,8 @@
  * Used by city-game:mint-node and season registry tests.
  */
 
+import { summerS2TemplateOverride } from "./city-game-summer-s2-core.mjs";
+
 /** @typedef {{ node_id: string; object_id: string; role: string; district: string; label: string }} SeasonNodeRow */
 
 const ROLE_DEFAULTS = {
@@ -216,7 +218,7 @@ export function buildGameNodeMintTemplate(row, seasonId) {
   const objectId =
     row.object_id ?? SEASON_OBJECT_IDS[row.node_id] ?? `obj_cr_${row.node_id}`;
 
-  return {
+  const template = {
     node_id: row.node_id,
     object_id: objectId,
     public_label: row.label,
@@ -229,6 +231,19 @@ export function buildGameNodeMintTemplate(row, seasonId) {
       ...EMPTY_GAME_META,
       ...(roleDefaults.game_meta ?? {}),
       ...(override.game_meta ?? {}),
+    },
+  };
+
+  const s2 = summerS2TemplateOverride(row.node_id);
+  if (!s2) return template;
+
+  return {
+    ...template,
+    ...(typeof s2.public_state === "string" ? { public_state: s2.public_state } : {}),
+    ...(Array.isArray(s2.streams) ? { object_streams: s2.streams } : {}),
+    game_meta: {
+      ...template.game_meta,
+      ...(s2.game_meta && typeof s2.game_meta === "object" ? s2.game_meta : {}),
     },
   };
 }

@@ -130,6 +130,71 @@ Run on **production** (or staging with full Pages deploy) after `site/` ships. M
 
 **Automated gate:** device shell E2E in CI — `npm run device-shell:e2e` (see [`DEVICE_SHELL_E2E_CI_REMEDIATION.md`](DEVICE_SHELL_E2E_CI_REMEDIATION.md)). **P0-W** sign-off is still manual on real WebKit devices.
 
+### P0-N · Notifications v2 — Android Chrome PWA (WS-NOTIF N4)
+
+**Spec:** [`NOTIFICATION_SYSTEM_V2.md`](NOTIFICATION_SYSTEM_V2.md) · Automated guards: `npm run notify:field-signoff` · Vitest/e2e belt: `npm run notify:verify` · `npm run notify:foreground:e2e`
+
+**Device:** Physical **Android phone** with **Chrome** (not Samsung Internet / Firefox). Install Humanity from Chrome (**Add to Home screen** / installed PWA). Do **not** use iOS Safari for this matrix — use **P0-W** for WebKit.
+
+**Prerequisites**
+
+| Item | Setup |
+|------|--------|
+| Worker + Pages | Local `npm run worker:dev` + `npm run pages:dev`, or production HTTPS |
+| Saved card | At least one card with signing keys on device |
+| Live proof | Second device or incognito scan → request live proof on saved card |
+| Relay (optional) | Active lost-item relay on that card + finder message on network |
+| Background alerts | `hc_browser_notif=on` and Chrome notification permission **Allowed** for the site |
+
+#### P0-N1 · Foreground strip vs badge (tab visible, live proof U0)
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Open installed PWA (or Chrome tab) → `/wallet/` with pending live proof | `#shell-notif-badge` visible; `data-inbox-chroma="live_proof"` |
+| 2 | Same screen, tab/app **foreground** | `#device-foreground-attention` **visible** with **Prove live control**; `#device-live-proof-banner` **hidden** |
+| 3 | Tap strip **Prove control now** | Opens `/created/` sign URL with `live_challenge` |
+| 4 | Return to `/wallet/`; tap badge | Inbox sheet opens; live proof row present; **no duplicate** full-page prove banner |
+
+**Fail signals:** Legacy `#device-live-proof-banner` shows alongside strip; strip missing while badge counts proof; strip CTA dead.
+
+#### P0-N2 · Background OS alert (tab/app away, live proof U0) — **NON-FUNCTIONAL (deferred)**
+
+**Status (2026-06-04):** **Do not run for sign-off.** Repeated Android Chrome PWA field attempts failed (no reliable tray alert; tap-through regressed). Documented in [`NOTIFICATION_SYSTEM_V2.md`](NOTIFICATION_SYSTEM_V2.md) § Known limitations. **WS-NOTIF N4** does **not** require P0-N2 pass.
+
+**When reopened:** Use the matrix below.
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Pending live proof; **Background alerts** on | Opt-in copy on Android PWA mentions **Chrome** (not Safari) when offered |
+| 2 | Send PWA to background (Home) or switch to another app ~30s | **One** Chrome system notification (live proof); title ≈ card label |
+| 3 | Tap notification | Humanity foregrounds; opens `/created/` sign flow |
+| 4 | Foreground again with proof still pending | Strip visible; **no** spam of duplicate OS notifications for unchanged challenge |
+
+**Fail signals:** Copy says Safari on Android; no OS alert when hidden; duplicate notifications every poll tick.
+
+#### P0-N3 · Finder relay message (relay_offer U0, when testable)
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Card with active lost-item relay; finder message on network | Badge count includes relay; hub **Finder message** group visible |
+| 2 | Tab/app **foreground** | If no live proof: strip shows **Reply on your relay** / **Open inbox**; if live proof pending: strip stays **live proof** (priority) |
+| 3 | Background + alerts on | OS notification for finder message (relay tag); tap opens inbox (badge path) |
+| 4 | Inbox sheet | Relay row opens Now / card for that relay |
+
+**Fail signals:** Relay OS alert but badge count 0; hub relay group never appears; relay only in parallel path (no inbox kind).
+
+#### P0-N4 · Copy and chrome sanity (Android Chrome PWA)
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Installed PWA; cross-tab keys in **Chrome** (another tab) | Glance/hub copy says **Chrome** / **Managing in Chrome** — **not** Safari |
+| 2 | Background alerts opt-in (denied or prompt) | No instruction to “enable in Safari” on Android |
+| 3 | `/created/` with `device-shell-created` | **No** `#device-foreground-attention` host (signing on Now tab only) |
+
+**Fail signals:** Safari named on Android standalone; user told to use Safari for notifications.
+
+**Sign-off:** Log pass/fail per row in § Bug triage log (`P0-N1` … `P0-N4`). **WS-NOTIF N4** exits when **P0-N1, P0-N3 (if testable), P0-N4** pass on one Android Chrome PWA session — **P0-N2 excluded** (non-functional).
+
 ### P0-SMOOTH · Smooth mode Phase 0 lab matrix (standard tier baseline)
 
 **Spec:** [`DEVICE_LITE_MOBILE_PLAN.md`](DEVICE_LITE_MOBILE_PLAN.md) § Phase 0 · **Gate:** [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md)

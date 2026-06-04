@@ -3,13 +3,14 @@
  * Click handler for Open controls: `bindWalletActiveOpenControls()` from wallet-page.mjs.
  */
 
-import { gatherInboxInput } from "./device-inbox.mjs?v=91";
+import { gatherInboxInput } from "./device-inbox.mjs?v=94";
 import {
   controlHereDetail,
   controlHereEyebrow,
   keysInOtherContextDetail,
   keysInOtherContextEyebrow,
   otherContextPresenceExtra,
+  readShellCopyContext,
   shellSurfaceFromStandalone,
 } from "./device-shell-copy-core.mjs";
 import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
@@ -117,6 +118,7 @@ function setTabHint(tabHint, input) {
   const crossTabCount = input.crossTabEntries.length;
   const standalone = input.standalone === true;
   const surface = shellSurfaceFromStandalone(standalone);
+  const copyOpts = { companionBrowser: input.companionBrowser ?? "Safari" };
 
   const eyebrow = document.getElementById("wallet-tab-hint-eyebrow");
   const title = document.getElementById("wallet-tab-hint-title");
@@ -266,13 +268,13 @@ function setTabHint(tabHint, input) {
     const walletEntry = walletEntryForProfile(entry.profile_id);
 
     setTabHintModifier(tabHint, "info");
-    if (eyebrow) eyebrow.textContent = keysInOtherContextEyebrow(surface);
+    if (eyebrow) eyebrow.textContent = keysInOtherContextEyebrow(surface, copyOpts);
     if (title) {
       title.hidden = false;
       title.innerHTML = `${label}${extra}`;
     }
     if (detail) {
-      detail.textContent = keysInOtherContextDetail(surface);
+      detail.textContent = keysInOtherContextDetail(surface, copyOpts);
     }
     if (focusBtn) focusBtn.hidden = false;
     if (useKeysBtn) useKeysBtn.hidden = !walletEntry?.owner_private_key_b58;

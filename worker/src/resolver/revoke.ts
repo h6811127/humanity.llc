@@ -15,6 +15,7 @@ import { QR_ID_REGEX } from "./scan-state";
 import type { RevocationTargetKind } from "../db/types";
 import { REVOCATION_TARGET_KINDS } from "../db/types";
 import { parseRevocationDisplayFields } from "./revocation-display";
+import { authorizeDelegatedChildRoute } from "./delegated-child-signer";
 
 const OWNER_REASONS = new Set(["owner_revoked"]);
 const ORGANIZER_REASONS = new Set(["organizer_revoked"]);
@@ -110,16 +111,6 @@ export async function handlePostRevoke(
     return errorResponse(verify.code, verify.message, status);
   }
 
-  const signerKey = verify.signature.public_key;
-  const signerRole = resolveRevokeSigner(signerKey, owner);
-  if (!signerRole) {
-    return errorResponse(
-      CRYPTO_ERROR.INVALID_SIGNATURE,
-      "Revocation must be signed by the card owner, recovery key, or registered organizer key.",
-      401
-    );
-  }
-
   const unsigned = verify.unsigned;
   const profileId = unsigned.profile_id as string;
   if (profileId !== pathProfileId) {
@@ -127,6 +118,63 @@ export async function handlePostRevoke(
       "PROFILE_MISMATCH",
       "Revocation profile_id must match URL.",
       422
+    );
+  }
+
+  const targetKind = unsigned.target_kind;
+  if (!isTargetKind(targetKind)) {
+    return errorResponse(
+      "MALFORMED_REQUEST",
+      "target_kind must be card or qr_credential.",
+      422
+    );
+  }
+
+  const targetQrId =
+    typeof unsigned.target_qr_id === "string" ? unsigned.target_qr_id : null;
+
+  const signerKey = verify.signature.public_key;
+  let signerRole = resolveRevokeSigner(signerKey, owner);
+
+  if (
+    !signerRole &&
+    targetKind === "qr_credential" &&
+    targetQrId &&
+    QR_ID_REGEX.test(targetQrId)
+  ) {
+    const qrForAuth = await getQrCredential(db, targetQrId);
+    if (
+      qrForAuth &&
+      qrForAuth.profile_id === profileId &&
+      qrForAuth.scope === "child_object" &&
+      typeof qrForAuth.object_id === "string" &&
+      qrForAuth.object_id
+    ) {
+      const auth = await authorizeDelegatedChildRoute(
+        db,
+        pathProfileId,
+        {
+          public_key: owner.public_key,
+          recovery_public_key: owner.recovery_public_key,
+          status: owner.status,
+        },
+        signerKey,
+        "child_object.revoke_qr",
+        { objectId: qrForAuth.object_id }
+      );
+      if (auth.ok) {
+        signerRole = "owner";
+      } else {
+        return errorResponse(auth.code, auth.message, auth.httpStatus);
+      }
+    }
+  }
+
+  if (!signerRole) {
+    return errorResponse(
+      CRYPTO_ERROR.INVALID_SIGNATURE,
+      "Revocation must be signed by the card owner, recovery key, or registered organizer key.",
+      401
     );
   }
 
@@ -145,18 +193,6 @@ export async function handlePostRevoke(
       422
     );
   }
-
-  const targetKind = unsigned.target_kind;
-  if (!isTargetKind(targetKind)) {
-    return errorResponse(
-      "MALFORMED_REQUEST",
-      "target_kind must be card or qr_credential.",
-      422
-    );
-  }
-
-  const targetQrId =
-    typeof unsigned.target_qr_id === "string" ? unsigned.target_qr_id : null;
 
   if (targetKind === "card" && targetQrId) {
     return errorResponse(

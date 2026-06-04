@@ -52,16 +52,27 @@ export function isShellHubBootRevealPath(pathname = "") {
 }
 
 /**
+ * Landing `#device-hub` or wallet `#wallet-page` hub root.
+ * @param {Document | undefined} doc
+ */
+export function shellHubRootPresent(doc = typeof document !== "undefined" ? document : undefined) {
+  if (!doc) return false;
+  return Boolean(doc.getElementById("device-hub") || doc.getElementById("wallet-page"));
+}
+
+/**
  * @param {{
  *   pathname?: string;
  *   hasDeviceHub?: boolean;
+ *   hasShellHubRoot?: boolean;
  *   bootBefore?: string;
  *   healthSettled?: boolean;
  * }} input
  */
 export function shouldPrepareShellHubBootReveal(input) {
   const path = input.pathname ?? "";
-  if (!input.hasDeviceHub) return false;
+  const hasHub = input.hasShellHubRoot ?? input.hasDeviceHub;
+  if (!hasHub) return false;
   if (!isShellHubBootRevealPath(path)) return false;
   if (!input.healthSettled) return false;
   return !isDeviceBootReadyState(input.bootBefore);

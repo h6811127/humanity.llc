@@ -1,10 +1,10 @@
 {
   "version": 1,
-  "generated_at": "2026-06-03T19:40:57.900Z",
+  "generated_at": "2026-06-04T20:10:56.996Z",
   "seasons": [
     {
       "season_id": "cr_season_01_wake",
-      "title": "Wake the city",
+      "title": "Wake the city · Signal War",
       "city": "Cedar Rapids, Iowa",
       "status": "active",
       "rules_path": "/play/cedar-rapids/",

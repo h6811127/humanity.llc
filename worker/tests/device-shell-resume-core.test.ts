@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   isDeviceShellResumePagePath,
   shouldHandleShellBfcacheRestore,
+  shouldRefreshNetworkBeforeShellBfcacheChrome,
   SHELL_BFCACHE_RESTORE_EVENT,
 } from "../../site/js/device-shell-resume-core.mjs";
 
@@ -35,5 +36,12 @@ describe("device-shell-resume-core (RC-12)", () => {
     expect(
       shouldHandleShellBfcacheRestore({ persisted: true, pathname: "/c/demo" })
     ).toBe(false);
+  });
+
+  it("requires network refresh before chrome on landing/wallet/create bfcache resume", () => {
+    expect(shouldRefreshNetworkBeforeShellBfcacheChrome("/")).toBe(true);
+    expect(shouldRefreshNetworkBeforeShellBfcacheChrome("/wallet/")).toBe(true);
+    expect(shouldRefreshNetworkBeforeShellBfcacheChrome("/create/")).toBe(true);
+    expect(shouldRefreshNetworkBeforeShellBfcacheChrome("/created/")).toBe(false);
   });
 });

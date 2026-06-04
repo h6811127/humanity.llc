@@ -25,6 +25,8 @@ npm run verify:desk         # before merge: adds core Playwright E2E
 
 Optional flags: `npm run verify:desk -- --custody` · `npm run verify:desk -- --city-game` · `npm run verify:desk -- --full`
 
+**WS-QUALITY:** Core-loop PRs only — see [`docs/CORE_PRODUCT_LOOP.md`](../docs/CORE_PRODUCT_LOOP.md). Avoid new city-game nodes / Signal War / custody C1 unless fixing an **L1–L8** row.
+
 Surface-specific blocks below if you touched only one area. See [`docs/PRODUCT_WORKSTREAM_COORDINATION.md`](../docs/PRODUCT_WORKSTREAM_COORDINATION.md).
 
 **Device shell (status graph):**

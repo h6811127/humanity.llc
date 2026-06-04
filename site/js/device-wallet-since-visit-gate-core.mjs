@@ -18,6 +18,16 @@ export function normalizeResolverHealthForSinceVisit(status) {
 }
 
 /**
+ * Per-card wallet status GETs may run when health is ok or not yet settled this visit.
+ * (Live-proof polls use {@link liveControlPollAllowedByResolverHealth} — stricter.)
+ *
+ * @param {ResolverHealthForSinceVisit} resolverHealth
+ */
+export function walletNetworkFetchAllowedByResolverHealth(resolverHealth) {
+  return resolverHealth === "ok" || resolverHealth === RESOLVER_HEALTH_UNSET;
+}
+
+/**
  * True when hub/inbox/dot since-visit surfaces must stay hidden.
  *
  * @param {{

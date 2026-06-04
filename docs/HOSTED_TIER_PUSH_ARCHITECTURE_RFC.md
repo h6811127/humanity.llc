@@ -1,10 +1,11 @@
 # Hosted tier — live proof push architecture (M3 RFC)
 
-**Status:** **Planning RFC** — threat model, flows, and wire protocol; **no implementation**  
+**Status:** **RFC + partial implementation (E4)** — worker SSE + client transport shipped in repo; production rollout gated **M4/M8**  
 **Milestone:** M3 of [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md)  
+**WS-NOTIF:** **N5 ☑** — TIF contract below; guards `npm run notify:hosted-push`  
 **Depends on:** M2 [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md) · M6 [`HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md`](HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md) (link proof)  
 **Audience:** Engineering, security review, ops  
-**Related:** [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) · [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md)
+**Related:** [`NOTIFICATION_SYSTEM_V2.md`](NOTIFICATION_SYSTEM_V2.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) · [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md)
 
 ---
 
@@ -16,6 +17,33 @@ Today, stewards discover pending live proof via **client polling** (tab inbox + 
 
 **Recommendation:** ship **Phase P1 (SSE subscribe)** on the reference operator, design **Phase P2 (Durable Object fan-out)** for federation scale, and **keep SW polling as fallback** when push is unavailable.
 
+**WS-NOTIF rule (N5):** push events are **transport only** — they must land in the **tiered inbox** (`live_proof` U0 today) and pass through **`device-notification-delivery*.mjs`** for badge, foreground strip, hub rows, and OS. No parallel notify channel.
+
+---
+
+## WS-NOTIF integration (N5 — normative)
+
+Canonical product spec: [`NOTIFICATION_SYSTEM_V2.md`](NOTIFICATION_SYSTEM_V2.md) § N5.
+
+| Step | Component | Behavior |
+|------|-----------|----------|
+| 1 | `notifyLiveProofPending` (worker `steward/push.ts`) | Fan-out SSE after challenge insert; **must not** block stranger `201` |
+| 2 | `device-steward-push.mjs` | Parse `live_proof.pending` / `connection.ack`; dispatch `hc-steward-push-live-proof` only |
+| 3 | `applyLiveProofPendingFromPush` (`device-live-control-inbox.mjs`) | **One** `GET …/challenges?qr_id=` per event; update pending store |
+| 4 | `hc-live-control-inbox-changed` | Triggers `gatherInboxItems` → `buildInboxItems` (`kind: live_proof`) |
+| 5 | `device-notification-delivery*.mjs` | Badge, `#device-foreground-attention`, hub meta, `runOsDeliveryFromInbox` |
+| 6 | `forwardLiveProofPushToServiceWorker` (E4d) | Optional SW nudge when tab hidden; **not** a second badge path |
+
+**Forbidden client patterns (enforced by `notify:hosted-push` Vitest):**
+
+- `Notification(` or `showNotification` inside `device-steward-push.mjs`
+- New SSE `type` values without matching inbox `kind` in `device-inbox-core.mjs`
+- Hub-only live-proof alerts that skip `getInboxItems()`
+
+**Free tier:** no SSE subscribe; polling + SW unchanged — same inbox/TIF path.
+
+**Future `relay_offer` push:** requires explicit RFC amendment + WS-NOTIF tier row + gather + OS policy in one PR; not in v1 SSE allowlist.
+
 ---
 
 ## Goals
@@ -24,7 +52,7 @@ Today, stewards discover pending live proof via **client polling** (tab inbox + 
 |---|------|
 | G1 | Cut steward-side poll volume for hosted accounts when strangers wait |
 | G2 | Preserve **stranger pays urgency** — scan page still polls its one challenge |
-| G3 | Same **inbox policy** as today — only `live_proof`; no new notification kinds |
+| G3 | Same **inbox policy** as today — server events map to existing inbox kinds (`live_proof` U0); **no** parallel notify kinds |
 | G4 | No new operator-held PII; no scan analytics in payloads |
 | G5 | Work with M2 `steward_session` + linked `profile_id` |
 | G6 | Degrade to shipped SW/tab behavior on disconnect or free tier |
@@ -197,11 +225,12 @@ Only these types may be sent on the steward push channel:
 
 **Intentionally omitted:** stranger IP, user-agent, geo, scan URL with verifier identity, private keys.
 
-**Client actions on `live_proof.pending`:**
+**Client actions on `live_proof.pending` (WS-NOTIF N5):**
 
-1. If tab visible → update inbox via `device-live-control-inbox` path (same as poll discovery).
-2. If tab hidden + browser alerts on → OS notification (existing copy from `osNotificationContentForLiveProof`).
-3. Deep link → existing `buildLiveControlProofHref` / `/created/?profile_id&qr_id&live_challenge`.
+1. `applyLiveProofPendingFromPush` → pending store → `hc-live-control-inbox-changed` (same as poll discovery).
+2. `getInboxItems()` / delivery router → badge, hub, foreground strip when tab visible.
+3. If tab hidden + browser alerts on → OS via `runOsDeliveryFromInbox` (not direct from SSE parser).
+4. Deep link → existing `buildLiveControlProofHref` / `/created/?profile_id&qr_id&live_challenge`.
 
 ### SSE framing example
 
@@ -267,11 +296,11 @@ notifyLiveProofPending({ profile_id, qr_id, challenge_id, expires_at })
 
 ---
 
-## Client integration (planning)
+## Client integration (E4c shipped; N5 TIF)
 
 | Surface | Behavior |
 |---------|----------|
-| **New module** | `device-steward-push.mjs` (name TBD) — connects SSE when entitled + watch on + alerts on |
+| **Module** | `device-steward-push.mjs` — connects SSE when entitled + watch on + alerts on + leader tab |
 | **Gating** | Same as SW: `isWatchLiveProofEnabled`, `isBrowserNotifEnabled`, `notify.push.live_proof` from entitlements |
 | **Leader tab** | Only **leader** tab holds SSE (reuse `device-live-control-poll-leader` pattern) |
 | **Poll fallback** | If SSE down > 60s: resume shipped round-robin at **hosted** intervals from entitlements |
@@ -379,17 +408,17 @@ notifyLiveProofPending({ profile_id, qr_id, challenge_id, expires_at })
 
 ---
 
-## Implementation map (do not start until M4 sign-off + M8)
+## Implementation map
 
-**Canonical:** [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) (E1–E6, E4a–e).
+**Canonical:** [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) (E1–E6, E4a–e). **Production rollout** still waits M4 sign-off + M8 gates.
 
-| Epic | Deliverable |
-|------|-------------|
-| E4a | `notifyLiveProofPending` hook on challenge POST |
-| E4b | SSE endpoint + connection registry |
-| E4c | `device-steward-push.mjs` + leader tab |
-| E4d | SW bridge (P1b) |
-| E4e | DO migration (P2) |
+| Epic | Deliverable | Repo status |
+|------|-------------|-------------|
+| E4a | `notifyLiveProofPending` hook on challenge POST | **Shipped** (`live-control.ts`) |
+| E4b | SSE endpoint + connection registry | **Shipped** (`steward/push.ts`, `steward-hosted.ts`) |
+| E4c | `device-steward-push.mjs` + leader tab | **Shipped** — TIF guards `notify:hosted-push` |
+| E4d | SW bridge (P1b) | **Shipped** (`forwardLiveProofPushToServiceWorker`) |
+| E4e | DO migration (P2) | **Open** |
 
 ---
 
@@ -398,3 +427,4 @@ notifyLiveProofPending({ profile_id, qr_id, challenge_id, expires_at })
 | Date | Note |
 |------|------|
 | 2026-05-26 | M3 initial RFC (planning only) |
+| 2026-06-04 | WS-NOTIF N5 — TIF integration §; E4 repo status; cross-link `NOTIFICATION_SYSTEM_V2.md` |

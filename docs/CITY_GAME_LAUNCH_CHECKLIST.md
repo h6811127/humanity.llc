@@ -39,6 +39,13 @@ Local E5: [`CITY_GAME_LOCAL_DEV.md`](CITY_GAME_LOCAL_DEV.md) · `npm run city-ga
 | P5 | Confirm scan analytics still off — [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md) | ☑ **2026-06-03** |
 | P6 | If marketing promises a **live city board**: **B13–B14** signed — [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) (optional at S1 **M1** static; required before **M2** snapshot) | ☐ |
 
+**P6 automation (live board marketed on rules/research pages):**
+
+```bash
+npm run city-game:map-board-b13-preflight    # B14 + GT-7 log + privacy row
+npm run city-game:map-board-b13-sign-off -- --pass --apply --reviewer "Name"
+```
+
 **P3 + P4 automation (Phase D public surfaces):** After season root + window dates are set and human gates P1–P2 / O1–O3 are signed:
 
 ```bash

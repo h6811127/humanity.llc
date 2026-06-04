@@ -19,12 +19,47 @@ import {
   inboxAriaManagingInOtherTab,
   inboxAriaOrphanManagingOtherTab,
   inboxAriaOwnershipNotSaved,
-} from "./device-ownership-copy-core.mjs?v=91";
-import { shellSurfaceFromStandalone } from "./device-shell-copy-core.mjs?v=91";
-import { dotOverlayFromCounts } from "./device-dot-state-core.mjs?v=91";
+} from "./device-ownership-copy-core.mjs?v=94";
+import { shellSurfaceFromStandalone } from "./device-shell-copy-core.mjs?v=94";
+import { dotOverlayFromCounts } from "./device-dot-state-core.mjs?v=94";
 import { liveProofInboxAggregateTitle, liveProofInboxRowSubtitle } from "./device-live-control-inbox-core.mjs";
+import {
+  relayOfferInboxAggregateTitle,
+  relayOfferInboxRowSubtitle,
+} from "./device-relay-offer-inbox-core.mjs";
 
-/** @typedef {'live_proof' | 'tab_keys_unsaved' | 'cross_tab_keys' | 'other_tabs_unsaved_keys' | 'orphan_keys_removed' | 'card_disabled_since_visit'} InboxKind */
+/** @typedef {'live_proof' | 'relay_offer' | 'tab_keys_unsaved' | 'cross_tab_keys' | 'other_tabs_unsaved_keys' | 'orphan_keys_removed' | 'card_disabled_since_visit'} InboxKind */
+
+/** @typedef {'U0' | 'U1' | 'U2' | 'U3'} InboxTier */
+
+/** @type {Record<InboxKind, InboxTier>} */
+export const INBOX_KIND_TIER = {
+  live_proof: "U0",
+  relay_offer: "U0",
+  tab_keys_unsaved: "U1",
+  cross_tab_keys: "U1",
+  other_tabs_unsaved_keys: "U1",
+  orphan_keys_removed: "U1",
+  card_disabled_since_visit: "U1",
+};
+
+/**
+ * WS-NOTIF urgency tier for an inbox kind (see docs/NOTIFICATION_SYSTEM_V2.md).
+ * @param {InboxKind} kind
+ * @returns {InboxTier}
+ */
+export function inboxTier(kind) {
+  return INBOX_KIND_TIER[kind];
+}
+
+/**
+ * Whether this kind contributes to shell badge / inbox count (U0 + U1 only).
+ * @param {InboxKind} kind
+ */
+export function inboxKindCountsTowardBadge(kind) {
+  const tier = inboxTier(kind);
+  return tier === "U0" || tier === "U1";
+}
 
 /**
  * @param {InboxItem[]} items
@@ -56,18 +91,22 @@ export function inboxItemsIncludeKind(items, kind) {
  * @property {string} title Glance / inbox sheet headline
  * @property {string} [subtitle]
  * @property {string} [hubScrollTarget] Hub element id to scroll into view
- * @property {{ crossTabEntry?: InboxCrossTabEntry, crossTabExtra?: number, cardDisabledEntries?: InboxCardDisabledEntry[] }} [meta]
+ * @property {{ crossTabEntry?: InboxCrossTabEntry, crossTabExtra?: number, cardDisabledEntries?: InboxCardDisabledEntry[], relayOfferPending?: import("./device-relay-offer-inbox-core.mjs").RelayOfferPendingItem[], liveProofPending?: Array<{ entry: Record<string, unknown>, challenge_id: string, expires_at?: string }> }} [meta]
  */
 
 /**
  * @param {{
  *   tabNoticeCount: number,
  *   liveProofCount: number,
+ *   liveProofPending?: Array<{ entry: Record<string, unknown>, challenge_id: string, expires_at?: string }>,
+ *   relayOfferCount?: number,
+ *   relayOfferPending?: import("./device-relay-offer-inbox-core.mjs").RelayOfferPendingItem[],
  *   crossTabEntries?: InboxCrossTabEntry[],
  *   orphanRemovedEntries?: InboxCrossTabEntry[],
  *   tabSessionLabel?: string,
  *   cardDisabledSinceVisit?: InboxCardDisabledEntry[],
  *   standalone?: boolean,
+ *   companionBrowser?: string | null,
  * }} input
  * @returns {InboxItem[]}
  */
@@ -75,13 +114,18 @@ export function buildInboxItems(input) {
   const {
     tabNoticeCount = 0,
     liveProofCount = 0,
+    liveProofPending = [],
+    relayOfferCount = 0,
+    relayOfferPending = [],
     crossTabEntries = [],
     orphanRemovedEntries = [],
     tabSessionLabel = "This tab",
     cardDisabledSinceVisit = [],
     standalone = false,
+    companionBrowser = null,
   } = input;
   const surface = shellSurfaceFromStandalone(standalone);
+  const crossTabCopyOpts = { companionBrowser: companionBrowser ?? "Safari" };
 
   /** @type {InboxItem[]} */
   const items = [];
@@ -94,6 +138,19 @@ export function buildInboxItems(input) {
       count: n,
       title: liveProofInboxAggregateTitle(n),
       hubScrollTarget: "device-hub-live-control-group",
+      meta: { liveProofPending: [...liveProofPending] },
+    });
+  }
+
+  if (relayOfferCount > 0) {
+    const n = relayOfferCount;
+    items.push({
+      kind: "relay_offer",
+      urgency: "high",
+      count: n,
+      title: relayOfferInboxAggregateTitle(n),
+      hubScrollTarget: "device-hub-relay-offer-group",
+      meta: { relayOfferPending: [...relayOfferPending] },
     });
   }
 
@@ -112,7 +169,7 @@ export function buildInboxItems(input) {
         kind: "other_tabs_unsaved_keys",
         urgency: "medium",
         count: crossTabCount,
-        title: crossTabAggregateTitle(crossTabCount, surface),
+        title: crossTabAggregateTitle(crossTabCount, surface, crossTabCopyOpts),
         subtitle: crossTabAggregateSubtitle(crossTabEntries, { surface }),
         hubScrollTarget: "device-hub-keys-custody",
         meta: { crossTabEntry: entry, crossTabExtra: crossTabCount - 1 },
@@ -122,7 +179,7 @@ export function buildInboxItems(input) {
         kind: "cross_tab_keys",
         urgency: "medium",
         count: crossTabCount,
-        title: crossTabAggregateTitle(1, surface),
+        title: crossTabAggregateTitle(1, surface, crossTabCopyOpts),
         subtitle: crossTabPresenceLabel(entry, surface),
         hubScrollTarget: "device-hub-keys-custody",
         meta: { crossTabEntry: entry, crossTabExtra: 0 },
@@ -240,6 +297,7 @@ export function cardDisabledProfileIdsFromInbox(items) {
  *   crossTabEntries?: InboxCrossTabEntry[],
  *   orphanRemovedEntries?: InboxCrossTabEntry[],
  *   standalone?: boolean,
+ *   companionBrowser?: string | null,
  * }} [ctx]
  * @returns {InboxItem[]}
  */
@@ -248,8 +306,10 @@ export function expandInboxItemsForChrome(items, ctx = {}) {
     crossTabEntries = [],
     orphanRemovedEntries = [],
     standalone = false,
+    companionBrowser = null,
   } = ctx;
   const surface = shellSurfaceFromStandalone(standalone);
+  const crossTabCopyOpts = { companionBrowser: companionBrowser ?? "Safari" };
 
   /** @type {InboxItem[]} */
   const expanded = [];
@@ -273,7 +333,7 @@ export function expandInboxItemsForChrome(items, ctx = {}) {
           kind: "cross_tab_keys",
           count: 1,
           urgency: item.urgency,
-          title: crossTabAggregateTitle(1, surface),
+          title: crossTabAggregateTitle(1, surface, crossTabCopyOpts),
           subtitle: inboxCrossTabLabel(entry),
           hubScrollTarget: item.hubScrollTarget,
           meta: { crossTabEntry: entry },
@@ -311,6 +371,7 @@ export function expandInboxItemsForChrome(items, ctx = {}) {
  *   crossTabEntries?: InboxCrossTabEntry[],
  *   orphanRemovedEntries?: InboxCrossTabEntry[],
  *   standalone?: boolean,
+ *   companionBrowser?: string | null,
  * }} [options]
  * @returns {GlanceRowPlanEntry[]}
  */
@@ -324,6 +385,7 @@ export function buildGlanceRowPlan(inboxItems, walletEntries, options = {}) {
     crossTabEntries: options.crossTabEntries,
     orphanRemovedEntries: options.orphanRemovedEntries,
     standalone: options.standalone,
+    companionBrowser: options.companionBrowser,
   });
 
   /** @type {GlanceRowPlanEntry[]} */
@@ -368,6 +430,7 @@ export function inboxCountFromItems(items) {
  */
 export function topInboxKind(items) {
   if (items.some((i) => i.kind === "live_proof")) return "live_proof";
+  if (items.some((i) => i.kind === "relay_offer")) return "relay_offer";
   if (items.some((i) => i.kind === "cross_tab_keys" || i.kind === "other_tabs_unsaved_keys")) {
     return "cross_tab_keys";
   }
@@ -401,7 +464,7 @@ const BADGE_CHROMA_CLASSES = {
  */
 export function inboxBadgeChromaKind(items) {
   const top = topInboxKind(items);
-  if (top === "live_proof") return "live_proof";
+  if (top === "live_proof" || top === "relay_offer") return "live_proof";
   if (top === "cross_tab_keys" || top === "orphan_keys_removed") return "cross_tab_keys";
   return "default";
 }
@@ -445,6 +508,9 @@ export function inboxOverlayCountsFromItems(items) {
 function describeItemForAria(item, surface = "browser") {
   if (item.kind === "live_proof") {
     return `${item.count} live proof${item.count === 1 ? "" : "s"}`;
+  }
+  if (item.kind === "relay_offer") {
+    return `${item.count} finder message${item.count === 1 ? "" : "s"} waiting`;
   }
   if (item.kind === "tab_keys_unsaved") {
     return inboxAriaOwnershipNotSaved(item.subtitle ?? "");
@@ -513,11 +579,12 @@ export function inboxBadgeTitle(items, ctx) {
         crossTabEntries: ctx.crossTabEntries,
         orphanRemovedEntries: ctx.orphanRemovedEntries,
         standalone: ctx.standalone,
+        companionBrowser: ctx.companionBrowser,
       })
     : items;
 
   const parts = displayItems.map((item) => {
-    if (item.kind === "live_proof") return item.title;
+    if (item.kind === "live_proof" || item.kind === "relay_offer") return item.title;
     if (item.kind === "cross_tab_keys" || item.kind === "orphan_keys_removed") {
       return item.subtitle
         ? `${item.title} · ${item.subtitle}`
@@ -554,6 +621,7 @@ export function inboxBadgeCountText(n) {
  * @property {{ entry: Record<string, unknown>, challenge_id: string, expires_at?: string }} [proofItem]
  * @property {InboxCrossTabEntry} [crossTabEntry]
  * @property {InboxCardDisabledEntry} [cardDisabledEntry]
+ * @property {import("./device-relay-offer-inbox-core.mjs").RelayOfferPendingItem} [relayOfferItem]
  */
 
 /**
@@ -581,7 +649,10 @@ export function inboxCrossTabLabel(entry) {
  *   crossTabEntries?: InboxCrossTabEntry[],
  *   orphanRemovedEntries?: InboxCrossTabEntry[],
  *   cardDisabledSinceVisit?: InboxCardDisabledEntry[],
+ *   relayOfferPending?: import("./device-relay-offer-inbox-core.mjs").RelayOfferPendingItem[],
  *   formatProofExpiry?: (iso: string) => string,
+ *   standalone?: boolean,
+ *   companionBrowser?: string | null,
  * }} ctx
  * @returns {InboxSheetRow[]}
  */
@@ -591,8 +662,13 @@ export function buildInboxSheetRows(items, ctx = {}) {
     crossTabEntries = [],
     orphanRemovedEntries = [],
     cardDisabledSinceVisit = [],
+    relayOfferPending = [],
     formatProofExpiry = (iso) => iso,
+    standalone = false,
+    companionBrowser = null,
   } = ctx;
+  const surface = shellSurfaceFromStandalone(standalone);
+  const crossTabCopyOpts = { companionBrowser: companionBrowser ?? "Safari" };
 
   /** @type {InboxSheetRow[]} */
   const rows = [];
@@ -616,11 +692,29 @@ export function buildInboxSheetRows(items, ctx = {}) {
       continue;
     }
 
+    if (item.kind === "relay_offer") {
+      const offers =
+        item.meta?.relayOfferPending?.length > 0
+          ? item.meta.relayOfferPending
+          : relayOfferPending;
+      for (const offer of offers) {
+        const label = offer.publicLabel || "Return relay";
+        rows.push({
+          kind: "relay_offer",
+          title: label,
+          subtitle: relayOfferInboxRowSubtitle(label, offer.pendingCount),
+          tone: "gold",
+          relayOfferItem: offer,
+        });
+      }
+      continue;
+    }
+
     if (item.kind === "cross_tab_keys" || item.kind === "other_tabs_unsaved_keys") {
       for (const entry of crossTabEntries) {
         rows.push({
           kind: item.kind === "other_tabs_unsaved_keys" ? "other_tabs_unsaved_keys" : "cross_tab_keys",
-          title: crossTabAggregateTitle(1),
+          title: crossTabAggregateTitle(1, surface, crossTabCopyOpts),
           subtitle: inboxCrossTabLabel(entry),
           tone: "blue",
           crossTabEntry: entry,

@@ -3,7 +3,7 @@
  * @see docs/DEVICE_TAB_RESOLVER_SYNC.md
  */
 
-import { pruneWalletNetworkCache } from "./device-wallet-network-core.mjs?v=91";
+import { pruneWalletNetworkCache } from "./device-wallet-network-core.mjs?v=94";
 
 export const RESOLVER_SYNC_PREF_KEY = "hc_resolver_sync_tabs";
 

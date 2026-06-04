@@ -570,7 +570,8 @@ function escapeHtml(value) {
  *   engineering: { verify: boolean; proofLocal?: boolean; testCount?: number; requireLaunch?: boolean; c1?: boolean | null };
  *   season: { issues: string[]; warnings: string[]; ready: boolean };
  *   surfaces: { ok: boolean; issues: string[] };
- *   gates?: { b1?: boolean; b2?: boolean; b5?: boolean | null; b14?: boolean };
+ *   gates?: { b1?: boolean; b2?: boolean; b5?: boolean | null; b13?: boolean | null; b14?: boolean };
+ *   mapBoardB13?: { required: boolean; ready: boolean; gt7?: { met: boolean; passCount: number; required: number } };
  *   local?: { seed: boolean; worker?: boolean };
  *   c2?: { ready: boolean; localOk: boolean; productionOk: boolean; humanSignedOff?: boolean };
  *   c3?: { ready: boolean; localSeedReady: boolean; productionSeedReady: boolean; humanSignedOff?: boolean };
@@ -636,6 +637,17 @@ export function formatLaunchPreflightReport(report) {
       }`
     );
     lines.push(`  B14 scan analytics off: ${report.gates.b14 ? "☑" : "☐"}`);
+    if (report.gates.b13 != null) {
+      lines.push(`  B13 live city board: ${report.gates.b13 ? "☑" : "☐"} (GT-7 + privacy when marketed)`);
+    }
+  }
+  if (report.mapBoardB13?.required) {
+    lines.push(
+      `Map board B13: ${report.mapBoardB13.ready ? "☑" : "☐"} GT-7 ${report.mapBoardB13.gt7?.passCount ?? 0}/${report.mapBoardB13.gt7?.required ?? 5}`
+    );
+    if (!report.mapBoardB13.ready) {
+      lines.push("  npm run city-game:map-board-b13-preflight");
+    }
   }
   lines.push(`Season config: ${report.season.ready ? "☑ structure" : "☐ issues"}`);
   for (const w of report.season.warnings) lines.push(`  ⚠ ${w}`);

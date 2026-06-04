@@ -6,6 +6,9 @@
 export const LIVE_CONTROL_POLL_MS_ACTIVE = 5000;
 export const LIVE_CONTROL_POLL_MS_IDLE = 60_000;
 
+/** Hidden tab + background alerts: full-wallet probe interval (no Watch). */
+export const LIVE_CONTROL_BACKGROUND_ALERT_POLL_MS = LIVE_CONTROL_POLL_MS_IDLE;
+
 /** Minimum gap between wallet network refreshes on tab visibility (Phase 2). */
 export const WALLET_NETWORK_VISIBILITY_REFRESH_MS = 60_000;
 
@@ -50,6 +53,28 @@ export function liveControlPollTickShouldFetch(input) {
   if (!input.documentVisible) return false;
   if (now < input.backoffUntil) return false;
   return true;
+}
+
+/**
+ * Hidden-tab background alerts: probe server while app is backgrounded (alerts on, not Watch).
+ *
+ * @param {{
+ *   alertsEnabled: boolean,
+ *   permissionGranted: boolean,
+ *   tabHidden: boolean,
+ *   resolverHealth: 'ok' | 'degraded' | 'offline',
+ *   backoffUntil?: number,
+ *   stewardPushHealthy?: boolean,
+ *   now?: number,
+ * }} input
+ */
+export function liveControlBackgroundAlertPollShouldRun(input) {
+  if (!input.alertsEnabled || !input.permissionGranted) return false;
+  if (!input.tabHidden) return false;
+  if (input.stewardPushHealthy === true) return false;
+  const now = input.now ?? Date.now();
+  if (now < (input.backoffUntil ?? 0)) return false;
+  return liveControlPollAllowedByResolverHealth(input.resolverHealth);
 }
 
 /**

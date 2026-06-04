@@ -78,6 +78,7 @@ if (!skipTests) {
     "worker/tests/city-game-install-map-core.test.ts",
     "worker/tests/city-game-operator-ops-core.test.ts",
     "worker/tests/city-game-launch-checklist-core.test.ts",
+    "worker/tests/city-game-map-board-b13-core.test.ts",
     "worker/tests/city-game-smoke-production-core.test.ts",
     "worker/tests/city-game-bulletin-schedule.test.ts",
     "worker/tests/city-game-route-window-schedule.test.ts",

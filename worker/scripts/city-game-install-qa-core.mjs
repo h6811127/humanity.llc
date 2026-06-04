@@ -210,6 +210,7 @@ export function assessInstallQaEngineeringReady(input) {
  *     readyForPhysicalQa: boolean;
  *   };
  *   e2SignedOff?: boolean;
+ *   walkKit?: { ready: boolean; linked: number; registry: number };
  * }} c3
  * @returns {string}
  */
@@ -229,6 +230,11 @@ export function formatInstallQaPreflightReport(c3) {
     );
   }
   lines.push(`  E2 scenario spot-checks: ${c3.e2SignedOff ? "☑" : "☐"}`);
+  if (c3.walkKit) {
+    lines.push(
+      `  LAN walk kit: ${c3.walkKit.ready ? "☑" : "☐"} ${c3.walkKit.linked}/${c3.walkKit.registry} linked · npm run city-game:install-qa-walk -- --lan`
+    );
+  }
   if (c3.warnings.length) {
     lines.push("");
     lines.push("Warnings:");
@@ -245,8 +251,8 @@ export function formatInstallQaPreflightReport(c3) {
   );
   lines.push("");
   lines.push("Before stickers / LAN walk (3 phones):");
-  lines.push("  npm run city-game:dev -- --lan");
   lines.push("  npm run city-game:install-qa-walk -- --lan");
+  lines.push("  npm run city-game:dev -- --lan");
   lines.push("  npm run city-game:install-map-preflight");
   lines.push("  npm run city-game:smoke-local");
   lines.push("  npm run city-game:install-qa-scenario -- --sign-off --apply");
@@ -258,6 +264,19 @@ export function formatInstallQaPreflightReport(c3) {
     "  npm run city-game:install-qa-sign-off -- --pass --apply --phones 3 --nodes 15"
   );
   return lines.join("\n");
+}
+
+/**
+ * @param {string} content
+ * @param {{ dateIso: string; phones?: string; nodes?: string }} opts
+ */
+/**
+ * @param {string} content
+ * @param {number} [_registryNodeCount]
+ */
+export function installQaDocHasPhysicalPass(content, _registryNodeCount = 15) {
+  if (!content || typeof content !== "string") return false;
+  return /Physical install \(≥3 phones × \d+ nodes\) \| ☑/.test(content);
 }
 
 /**

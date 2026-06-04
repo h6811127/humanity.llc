@@ -1,3 +1,4 @@
+import { isLargeWallet, selectLiveControlPollEntries } from "./device-wallet-scale-core.mjs";
 import { walletEntryQrId } from "./device-wallet.mjs";
 
 /** @typedef {'none' | 'pending' | 'unchanged' | 'unreachable' | 'rate_limited'} LiveControlPollKind */
@@ -171,6 +172,103 @@ export function liveControlPendingSignature(items) {
  */
 export function liveControlInboxChanged(prev, next) {
   return liveControlPendingSignature(prev) !== liveControlPendingSignature(next);
+}
+
+/**
+ * True when expires_at is in the past (client-side stale guard).
+ *
+ * @param {LiveControlPendingItem} item
+ * @param {number} [now]
+ */
+export function isLiveControlPendingExpired(item, now = Date.now()) {
+  if (!item.expires_at) return false;
+  const exp = Date.parse(item.expires_at);
+  return Number.isFinite(exp) && exp <= now;
+}
+
+/**
+ * Pending rows the shell may show — server-confirmed challenge ids only.
+ *
+ * @param {LiveControlPendingItem[]} items
+ * @param {Set<string> | ReadonlySet<string>} confirmedChallengeIds
+ * @param {number} [now]
+ */
+export function filterConfirmedLiveControlPending(
+  items,
+  confirmedChallengeIds,
+  now = Date.now()
+) {
+  return items.filter(
+    (item) =>
+      typeof item.challenge_id === "string" &&
+      item.challenge_id &&
+      confirmedChallengeIds.has(item.challenge_id) &&
+      !isLiveControlPendingExpired(item, now)
+  );
+}
+
+/**
+ * Record server GET confirmation for one poll tick.
+ *
+ * @param {Set<string>} confirmedIds
+ * @param {WalletPollEntry} entry
+ * @param {Map<string, LiveControlPendingItem | null>} slots
+ * @param {{ kind: LiveControlPollKind, item?: LiveControlPendingItem }} result
+ */
+export function applyLiveControlPollConfirmation(confirmedIds, entry, slots, result) {
+  const key = liveControlPollEntryKey(entry);
+  const existing = key ? slots.get(key) : undefined;
+
+  if (result.kind === "pending" && result.item?.challenge_id) {
+    if (existing?.challenge_id && existing.challenge_id !== result.item.challenge_id) {
+      confirmedIds.delete(existing.challenge_id);
+    }
+    confirmedIds.add(result.item.challenge_id);
+    return;
+  }
+  if (result.kind === "none" && existing?.challenge_id) {
+    confirmedIds.delete(existing.challenge_id);
+  }
+}
+
+/**
+ * Wallet rows to GET when the hub expands (Fix 1 step 2).
+ * Small wallets: verify all pollable cards once. Large wallets: active + cached pending only.
+ *
+ * @template {{ profile_id?: unknown }} T
+ * @param {T[]} allPollable
+ * @param {LiveControlPendingItem[]} cachedPending
+ * @param {string | null | undefined} activeProfileId
+ * @param {import("./device-steward-entitlements-core.mjs").StewardEntitlementsPolicy} [policy]
+ * @returns {T[]}
+ */
+export function entriesForHubExpandLiveProofVerification(
+  allPollable,
+  cachedPending,
+  activeProfileId,
+  policy
+) {
+  if (allPollable.length === 0) return [];
+  if (!isLargeWallet(allPollable.length, policy)) {
+    return [...allPollable];
+  }
+
+  /** @type {string[]} */
+  const pendingProfileIds = [];
+  for (const item of cachedPending) {
+    const profileId = item?.entry?.profile_id;
+    if (typeof profileId === "string" && profileId) pendingProfileIds.push(profileId);
+  }
+
+  return selectLiveControlPollEntries(
+    allPollable,
+    {
+      walletSize: allPollable.length,
+      activeProfileId: activeProfileId ?? null,
+      pendingProfileIds,
+    },
+    policy
+  );
 }
 
 /** @see docs/LIVE_CONTROL_USABILITY_HARDENING.md H-07 */

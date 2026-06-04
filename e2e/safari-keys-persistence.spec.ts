@@ -154,6 +154,7 @@ test.describe("Scan quiet rehydrate wiring (P0-1 · WebKit)", () => {
         localStorage.setItem("hc_wallet", JSON.stringify([sole, second]));
         localStorage.setItem("hc_quiet_tab_rehydrate", "0");
         localStorage.removeItem("hc_last_active_profile_id");
+        localStorage.removeItem("hc_last_signing_shell_mode");
       },
       { sole: SOLE_VOUCHER_ENTRY, second: secondEntry }
     );
@@ -173,6 +174,7 @@ test.describe("Safari keys persistence (P2-3)", () => {
       sessionStorage.clear();
       localStorage.removeItem("hc_default_vouch_profile_id");
       localStorage.removeItem("hc_vouch_auto_activate");
+      localStorage.removeItem("hc_last_signing_shell_mode");
       localStorage.setItem("hc_device_hub_intro_dismissed", "1");
     });
   });
@@ -231,7 +233,7 @@ test.describe("Safari keys persistence (P2-3)", () => {
     await expect(tabHint).toBeVisible({ timeout: 15_000 });
     await expect(tabHint).toContainText(/home screen/i);
     await expect(page.locator("#wallet-tab-hint-title")).toContainText(
-      /ownership may be in your home screen app/i
+      /Use your Home Screen app on iPhone/i
     );
     const useKeysHidden = await page
       .locator("#wallet-tab-hint-use-keys")
@@ -274,7 +276,7 @@ test.describe("Safari keys persistence (P2-3)", () => {
 
     const restoreBtn = page.locator("#scan-actor-band-restore");
     await expect(restoreBtn).toBeVisible();
-    await expect(restoreBtn).toHaveText(/restore control in this app/i);
+    await expect(restoreBtn).toHaveText(/Open controls/i);
     await expect(page.locator("#scan-actor-band-vouch")).toBeHidden();
 
     const sessionRaw = await page.evaluate(() => sessionStorage.getItem("hc_created"));

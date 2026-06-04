@@ -23,11 +23,11 @@ import {
   shouldUseCachedNetworkStatus,
   verificationRecordFromLabelState,
   WALLET_NETWORK_CACHE_TTL_MS,
-} from "./device-wallet-network-core.mjs?v=93";
+} from "./device-wallet-network-core.mjs?v=94";
 import {
   getWalletStatusPollHealth,
   setWalletStatusPollHealthForSinceVisit,
-} from "./device-wallet-since-visit-gate.mjs?v=93";
+} from "./device-wallet-since-visit-gate.mjs?v=94";
 import {
   buildSinceVisitPollMapsFromTruth,
   clearWalletNetworkTruthForProfile,
@@ -41,7 +41,7 @@ import {
   setWalletNetworkTruthFromCacheOnly,
   setWalletNetworkTruthFromPoll,
   shouldSuppressCardDisabledSinceVisitFromTruth,
-} from "./device-wallet-network-truth.mjs?v=93";
+} from "./device-wallet-network-truth.mjs?v=94";
 
 export { readCachedVerification };
 export {
@@ -49,7 +49,7 @@ export {
   isSinceVisitBlockedChipStatus,
   listWalletNetworkTruthPollProfileIds,
   shouldSuppressCardDisabledSinceVisitFromTruth,
-} from "./device-wallet-network-truth.mjs?v=93";
+} from "./device-wallet-network-truth.mjs?v=94";
 
 const CACHE_KEY = "hc_wallet_network_cache";
 const LAST_SEEN_KEY = "hc_wallet_last_seen_network";
@@ -460,6 +460,7 @@ export function listWalletEntriesNeedingNetworkFetch(entries, now = Date.now()) 
   return entries.filter((entry) => {
     const pid = entry.profile_id;
     if (!pid) return false;
+    if (!isResolverConfirmedProfile(pid)) return true;
     const cached = cache[pid];
     return !shouldUseCachedNetworkStatus(
       lastSeen,

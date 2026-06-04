@@ -16,6 +16,7 @@ import {
   parseLaunchChecklistSignOffArgs,
   resolveLaunchChecklistSignOffResult,
 } from "../scripts/city-game-launch-checklist-core.mjs";
+import { htmlMarketsLiveCityBoard } from "../scripts/city-game-map-board-b13-core.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const launchChecklistSample = readFileSync(
@@ -42,6 +43,19 @@ describe("city-game-launch-checklist-core", () => {
     expect(result.pending).not.toContain("O1");
     expect(result.readyForLaunchDay).toBe(false);
     expect(result.blockers.some((b) => b.includes("pending"))).toBe(true);
+  });
+
+  it("includes P6 when live city board is marketed", () => {
+    const rulesHtml = readFileSync(join(root, "site/play/cedar-rapids/index.html"), "utf8");
+    expect(htmlMarketsLiveCityBoard(rulesHtml)).toBe(true);
+    const result = assessLaunchChecklistReady({
+      launchChecklistDoc: launchChecklistSample,
+      scanAnalyticsGateOk: true,
+      marketsLiveCityBoard: true,
+      mapBoardB13Ready: false,
+    });
+    expect(result.pending).toContain("P6");
+    expect(result.readyForLaunchDay).toBe(false);
   });
 
   it("marks individual ops rows", () => {

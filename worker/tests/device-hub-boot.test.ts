@@ -69,6 +69,14 @@ describe("RC-18 shell hub boot reveal", () => {
     ).toBe(true);
     expect(
       shouldPrepareShellHubBootReveal({
+        pathname: "/wallet/",
+        hasShellHubRoot: true,
+        bootBefore: DEVICE_BOOT_PENDING,
+        healthSettled: true,
+      })
+    ).toBe(true);
+    expect(
+      shouldPrepareShellHubBootReveal({
         pathname: "/",
         hasDeviceHub: false,
         bootBefore: DEVICE_BOOT_PENDING,

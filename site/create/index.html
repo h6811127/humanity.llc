@@ -34,7 +34,7 @@
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=5" />
     <link rel="stylesheet" href="/styles.css?v=146" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=92" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=94" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=30" />
   </head>
   <body class="page-flow has-shell-chrome has-device-hub-search flow-shell flow-shell-create" data-boot="pending">
@@ -78,6 +78,14 @@
           <p class="shell-status-line" id="shell-status-line" role="status" hidden></p>
         </div>
     </div>
+
+      <div
+        class="device-foreground-attention"
+        id="device-foreground-attention"
+        role="status"
+        aria-live="polite"
+        hidden
+      ></div>
 
       <div
         class="device-live-proof-banner"
@@ -789,7 +797,7 @@
         <p class="form-status" id="device-hub-qr-scanner-status" role="status" hidden></p>
       </div>
     </dialog>
-    <script src="/js/device-status-bootstrap.mjs?v=91" type="module"></script>
+    <script src="/js/device-status-bootstrap.mjs?v=94" type="module"></script>
     <script src="/js/create-hub.mjs?v=1" type="module"></script>
     <script type="module" src="/js/create-card.mjs?v=20"></script>
   </body>

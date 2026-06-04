@@ -19,9 +19,13 @@ import {
   LAUNCH_CHECKLIST_REL,
   parseComprehensionSignOffArgs,
   resolveComprehensionSignOffResult,
+  validateComprehensionSignOffPass,
 } from "./city-game-comprehension-sign-off-core.mjs";
+import { surfacesMarketLiveCityBoard } from "./city-game-map-board-b13-core.mjs";
+import { RESEARCH_LAUNCH_PAGE_RELS } from "./city-game-launch-surfaces-core.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
+const rulesPath = join(root, "site/play/cedar-rapids/index.html");
 
 function main() {
   const parsed = parseComprehensionSignOffArgs(process.argv.slice(2));
@@ -37,10 +41,24 @@ function main() {
   }
 
   if (result === "pass") {
+    const rulesHtml = readFileSync(rulesPath, "utf8");
+    const researchHtmlByRel = Object.fromEntries(
+      RESEARCH_LAUNCH_PAGE_RELS.map((rel) => [rel, readFileSync(join(root, rel), "utf8")])
+    );
     const runbookPath = join(root, COMPREHENSION_RUNBOOK_REL);
+    const runbook = readFileSync(runbookPath, "utf8");
+    const validation = validateComprehensionSignOffPass({
+      marketsLiveCityBoard: surfacesMarketLiveCityBoard({ rulesHtml, researchHtmlByRel }),
+      runbook,
+    });
+    if (!validation.ok) {
+      for (const issue of validation.issues) console.error(issue);
+      process.exit(1);
+    }
+
     writeFileSync(
       runbookPath,
-      applyComprehensionRunbookPass(readFileSync(runbookPath, "utf8"), parsed),
+      applyComprehensionRunbookPass(runbook, parsed),
       "utf8"
     );
     console.log("Updated:", COMPREHENSION_RUNBOOK_REL);

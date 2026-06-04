@@ -3,6 +3,8 @@
  * @see docs/SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md RC-12
  */
 
+import { pageOwnsDeviceBootReady } from "./device-shell-boot-core.mjs";
+
 export const SHELL_BFCACHE_RESTORE_EVENT = "hc-shell-bfcache-resume";
 
 /**
@@ -24,4 +26,13 @@ export function isDeviceShellResumePagePath(pathname = "") {
 export function shouldHandleShellBfcacheRestore(input) {
   if (input.persisted !== true) return false;
   return isDeviceShellResumePagePath(input.pathname ?? "");
+}
+
+/**
+ * Landing, wallet, and create must re-fetch resolver health after bfcache restore
+ * before chrome refresh can mark `data-boot=ready` (/created/ owns its own poll).
+ * @param {string} [pathname]
+ */
+export function shouldRefreshNetworkBeforeShellBfcacheChrome(pathname = "") {
+  return !pageOwnsDeviceBootReady(pathname);
 }

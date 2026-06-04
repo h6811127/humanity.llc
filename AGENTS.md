@@ -23,6 +23,9 @@ npm run worker:test          # Vitest — all worker/tests/
 npm run e2e:install          # once per machine
 npm run e2e                  # Playwright (starts pages:dev unless PLAYWRIGHT_SKIP_WEBSERVER=1)
 npm run build                # validate static site
+npm run notify:inventory     # WS-NOTIF N0 notification path registry
+npm run notify:verify        # WS-NOTIF N1+ inbox / dot / browser-notify belt
+npm run notify:foreground:e2e # WS-NOTIF N3 foreground U0 strip (Playwright)
 ```
 
 Worker health: `GET /.well-known/hc/v1/health` — if `database: schema_missing`, run `npm run worker:migrate:local`.
@@ -37,7 +40,9 @@ Card creation needs Ed25519-signed JSON (fixtures in `worker/tests/fixtures/`). 
 | **Live object architecture** | [`docs/LIVE_OBJECT_ARCHITECTURE.md`](docs/LIVE_OBJECT_ARCHITECTURE.md) · catalog [`docs/QR_DESIGN_SPACE.md`](docs/QR_DESIGN_SPACE.md) |
 | **Safari keys custody** | [`docs/SAFARI_KEYS_CUSTODY.md`](docs/SAFARI_KEYS_CUSTODY.md) |
 | **Hybrid custody (easy + keys)** | [`docs/CUSTODY_EASY_MODE.md`](docs/CUSTODY_EASY_MODE.md) · [`docs/CUSTODY_PHASE0_RUNBOOK.md`](docs/CUSTODY_PHASE0_RUNBOOK.md) · [`docs/OWNERSHIP_AND_CONTROL_MODEL.md`](docs/OWNERSHIP_AND_CONTROL_MODEL.md) |
-| **Active work + regression gates** | [`docs/PRODUCT_WORKSTREAM_COORDINATION.md`](docs/PRODUCT_WORKSTREAM_COORDINATION.md) · Phase 1: **WS-DOC / WS-REV / WS-CR / WS-E** · Phase 2: **WS-SCALE / WS-SW / WS-CUSTODY** |
+| **Core loop quality + UX** | [`docs/CORE_PRODUCT_LOOP.md`](docs/CORE_PRODUCT_LOOP.md) · **WS-QUALITY** · `npm run verify:desk` |
+| **Notifications v2 (active)** | [`docs/NOTIFICATION_SYSTEM_V2.md`](docs/NOTIFICATION_SYSTEM_V2.md) · **WS-NOTIF** · inbox + delivery router |
+| **Active work + regression gates** | [`docs/PRODUCT_WORKSTREAM_COORDINATION.md`](docs/PRODUCT_WORKSTREAM_COORDINATION.md) · **WS-NOTIF** · **WS-QUALITY** · Phase 2 **WS-SCALE / WS-SW / WS-CUSTODY** paused until Q3 + N4 |
 | **Feature map / roadmap** | [`docs/STEWARD_DEVICE_ROADMAP.md`](docs/STEWARD_DEVICE_ROADMAP.md) |
 | **Doc policy + archive** | [`docs/DOC_MAINTENANCE.md`](docs/DOC_MAINTENANCE.md) |
 

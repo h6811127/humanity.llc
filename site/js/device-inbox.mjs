@@ -16,16 +16,27 @@ import {
   inboxBadgeChromaKind,
   inboxBadgeChromaClass,
   inboxBadgeChromaClassNames,
-} from "./device-inbox-core.mjs?v=91";
+  inboxTier,
+  inboxKindCountsTowardBadge,
+  INBOX_KIND_TIER,
+} from "./device-inbox-core.mjs?v=94";
 import { tabNoticeCount } from "./device-counts.mjs";
+import {
+  getRelayOfferPending,
+  getRelayOfferPendingCount,
+} from "./device-relay-offer-inbox-loader.mjs";
 import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
-import { getLiveControlPendingCount } from "./device-live-control-inbox.mjs";
+import { companionBrowserLabel } from "./device-shell-copy-core.mjs?v=94";
+import {
+  getLiveControlPendingCount,
+  getLiveControlPendingForDisplay,
+} from "./device-live-control-inbox.mjs";
 import { getTabSession } from "./device-keys.mjs";
 import {
   getCrossTabNotificationState,
   invalidateCrossTabNotificationState,
 } from "./device-cross-tab-state.mjs";
-import { gatherCardDisabledSinceVisitForInbox } from "./device-inbox-card-disabled.mjs?v=91";
+import { gatherCardDisabledSinceVisitForInbox } from "./device-inbox-card-disabled.mjs?v=94";
 
 /** Coalesce gather reads outside a chrome refresh tick (Path G). */
 const GATHER_COALESCE_MS = 50;
@@ -59,7 +70,10 @@ export {
   inboxBadgeChromaKind,
   inboxBadgeChromaClass,
   inboxBadgeChromaClassNames,
-} from "./device-inbox-core.mjs?v=91";
+  inboxTier,
+  inboxKindCountsTowardBadge,
+  INBOX_KIND_TIER,
+} from "./device-inbox-core.mjs?v=94";
 
 function tabSessionLabel() {
   const session = getTabSession();
@@ -104,14 +118,24 @@ export function gatherInboxInput() {
   const notices = tabNoticeCount();
   const crossTab = getCrossTabNotificationState();
 
+  const relayOfferPending = getRelayOfferPending();
+  const liveProofPending = getLiveControlPendingForDisplay();
+  const standalone = readStandaloneModeFromWindow(window);
   gatherCache = {
     tabNoticeCount: notices,
     liveProofCount: getLiveControlPendingCount(),
+    liveProofPending,
+    relayOfferCount: getRelayOfferPendingCount(),
+    relayOfferPending,
     crossTabEntries: crossTab.genericEntries,
     orphanRemovedEntries: crossTab.orphanEntries,
     tabSessionLabel: tabSessionLabel(),
     cardDisabledSinceVisit: cardDisabled,
-    standalone: readStandaloneModeFromWindow(window),
+    standalone,
+    companionBrowser: companionBrowserLabel({
+      standalone,
+      userAgent: typeof navigator !== "undefined" ? navigator.userAgent : "",
+    }),
   };
   lastGatherMs = now;
   return gatherCache;

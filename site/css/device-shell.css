@@ -3401,3 +3401,9 @@ html[data-prefs-boot="ready"] .device-prefs-boot-gated {
 #brand-status-dot-btn[data-dot-boot="ready"] .shell-status-dot {
   visibility: visible;
 }
+
+/* WS-NOTIF N3 — foreground U0 attention strip (shell pages) */
+.device-foreground-attention {
+  margin: 0.75rem 1rem 0;
+  max-width: 42rem;
+}

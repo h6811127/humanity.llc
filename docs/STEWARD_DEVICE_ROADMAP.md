@@ -20,7 +20,10 @@ Use this page when you need **one map** of steward-facing device work. Detailed 
 | **4** | **Billing checkout → `hc_account_id` URL** (Stripe return) | **Shipped** — pending link + hub line; wire `success_url` in Stripe Dashboard | `npm run hosted:stripe-return-url -- acc_…` · `device-steward-billing-return-core.mjs` · `device-steward-session.mjs` |
 | **5** | **Child object UI** under one root (beyond `print_artifact` bridge) | **Shipped** — status plate + lost-item relay: register, update, issue scan QR, disable on `/created/` Live | [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) · `created-child-object.mjs` · `created-child-object-lost-item.mjs` |
 | **6** | **M5.5 key import** on new device | **Hub import shipped** — backup → wallet + tab session + **Open card controls** → `/created/` | [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) · `device-hub-import.mjs` |
-| **7** | **Engineering Phase 2 (summer 2026)** — Cedar Rapids scale + Signal War + custody C0 | **Open** — assign **WS-SCALE / WS-SW / WS-CUSTODY** after Phase 1 launch gates | [`PRODUCT_WORKSTREAM_COORDINATION.md`](PRODUCT_WORKSTREAM_COORDINATION.md) § Engineering Phase 2 · [`CUSTODY_PHASE0_RUNBOOK.md`](CUSTODY_PHASE0_RUNBOOK.md) |
+| **7b** | **Notifications v2 (WS-NOTIF)** — tiered inbox + foreground strip + router | **In-app shipped** · **background OS non-functional** | [`NOTIFICATION_SYSTEM_V2.md`](NOTIFICATION_SYSTEM_V2.md) § Known limitations |
+| **7** | **Live objects MVP (WS-LIVE)** — five-layer stack + Cedar Rapids field | **Active** — LO-1–LO-5 | [`PRODUCT_WORKSTREAM_COORDINATION.md`](PRODUCT_WORKSTREAM_COORDINATION.md) § WS-LIVE · [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) |
+| **7b** | **Core product loop (WS-QUALITY)** — WS-LIVE sub-track · steward belt | **Active — Q2–Q3** | [`CORE_PRODUCT_LOOP.md`](CORE_PRODUCT_LOOP.md) · `npm run verify:desk` |
+| **8** | **Engineering Phase 2 (summer 2026)** — Cedar Rapids scale + Signal War + custody C0 | **Active under WS-LIVE** (WS-CR / WS-SCALE / WS-SW) | [`PRODUCT_WORKSTREAM_COORDINATION.md`](PRODUCT_WORKSTREAM_COORDINATION.md) § Engineering Phase 2 |
 
 **Free tier unchanged:** no session, no SSE, 400 auto-poll/day — steps 2–3 must not regress H1–H6 ([`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Phase 10).
 
@@ -28,7 +31,7 @@ Use this page when you need **one map** of steward-facing device work. Detailed 
 
 ## Product sentence
 
-> **Strangers stay in the browser with no install.** **Stewards** use a **browser device shell** (hub + inbox + optional home-screen icon) with **keys on device**, **intent-based polling**, and **opt-in OS alerts for live proof only** — upgraded on the hosted tier by **server push**, not by replacing the web shell with an app store app.
+> **Strangers stay in the browser with no install.** **Stewards** use a **browser device shell** (hub + inbox + optional home-screen icon) with **keys on device** and **intent-based polling** — **foreground strip + inbox** for urgent live proof while the app is open; **background OS alerts are not field-functional** (2026-06-04). Hosted tier may add **server push** later (E4), not an app-store app.
 
 ---
 
@@ -47,17 +50,18 @@ Use this page when you need **one map** of steward-facing device work. Detailed 
 
 ## Notification & delivery stack (steward)
 
-Three **channels** answer different questions — do not merge them ([`DEVICE_INBOX.md`](DEVICE_INBOX.md) § North star).
+**Canonical (v2):** [`NOTIFICATION_SYSTEM_V2.md`](NOTIFICATION_SYSTEM_V2.md) — **WS-NOTIF** · tiered inbox-first + foreground interrupt for time-critical events.
 
-| Channel | When | Live proof? | OS push? |
+**v1 reference (still true):** [`DEVICE_INBOX.md`](DEVICE_INBOX.md) — dot / inbox / background alerts are three layers; v2 **consolidates delivery** into one inbox queue + router.
+
+| Channel | When | U0 examples | OS push? |
 |---------|------|-------------|----------|
-| **Status dot** | Always (shell) | Overlay when pending | No |
-| **Inbox badge / hub rows / sheet** | Tab visible | Yes | No |
-| **Browser alerts** (`hc_browser_notif`) | Tab **hidden** + permission | **Only** `live_proof` | Yes (opt-in) |
+| **Status dot** | Always (shell) | Live proof overlay | No |
+| **Inbox badge / hub / sheet** | Tab visible | Live proof, relay (target), U1 rows | No |
+| **Foreground strip** (v2 N3) | Tab visible | U0 only | No |
+| **Browser alerts** | Tab **hidden** + opt-in | U0 kinds in policy matrix | **No (non-functional)** — use foreground strip |
 
-**In-app only (never OS):** cross-tab keys, unsaved tab keys, card-disabled-since-visit — [`DEVICE_INBOX.md`](DEVICE_INBOX.md) § v2 Phase C policy matrix · [`KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md`](KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md).
-
-**Homepage toggle copy:** “On · live proof in background” = Browser alerts enabled for that narrow case (`site/js/device-browser-notifications.mjs`).
+**Engineering:** `npm run notify:verify` when wired (see WS-NOTIF doc) · `e2e/device-inbox.spec.ts`.
 
 ---
 

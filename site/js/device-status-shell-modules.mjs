@@ -10,7 +10,7 @@
  * Bump on all shell HTML (`device-status-bootstrap.mjs?v=N`) and on every
  * `./peer.mjs?v=N` import between files in DEVICE_STATUS_SHELL_JS_FILES.
  */
-export const DEVICE_SHELL_ASSET_VERSION = 91;
+export const DEVICE_SHELL_ASSET_VERSION = 94;
 
 /** Cache-bust for shell CSS on Pages HTML (keep in sync with asset version bumps). */
 export const DEVICE_SHELL_CSS_VERSION = DEVICE_SHELL_ASSET_VERSION;
@@ -42,6 +42,8 @@ export const DEVICE_STATUS_SHELL_JS_FILES = [
   "device-ownership-not-in-tab-core.mjs",
   "device-chrome-refresh-core.mjs",
   "device-chrome-refresh.mjs",
+  "device-foreground-attention-core.mjs",
+  "device-foreground-attention.mjs",
   "device-live-proof-banner.mjs",
   "device-shell-boot-core.mjs",
   "device-hub-boot-core.mjs",
@@ -53,12 +55,16 @@ export const DEVICE_STATUS_SHELL_JS_FILES = [
   "device-inbox-loader.mjs",
   "device-relay-offer-inbox-loader.mjs",
   "device-relay-offer-inbox-core.mjs",
+  "device-notification-delivery.mjs",
   "device-browser-notifications-loader.mjs",
+  "device-live-proof-notification-nav.mjs",
+  "device-live-proof-notification-nav-core.mjs",
   "device-inbox-sheet.mjs",
   "device-inbox-sheet-core.mjs",
   "device-inbox-card-disabled.mjs",
   "device-inbox-diagnostics.mjs",
   "device-inbox-diagnostics-core.mjs",
+  "device-notification-delivery-core.mjs",
   "device-inbox-core.mjs",
   "device-cross-tab-state-core.mjs",
   "device-cross-tab-boot-core.mjs",

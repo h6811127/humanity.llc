@@ -37,6 +37,12 @@ import {
   auditGameScanAnalyticsGate,
 } from "./city-game-scan-analytics-gate-core.mjs";
 import { auditRulesPageVouchCopy } from "./city-game-vouch-copy-core.mjs";
+import {
+  assessMapBoardB13Ready,
+  COMPREHENSION_RUNBOOK_REL,
+  MAP_DASHBOARD_REL,
+  surfacesMarketLiveCityBoard,
+} from "./city-game-map-board-b13-core.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const seasonPath = join(root, "site/data/city-game-cr-season-01.json");
@@ -167,9 +173,27 @@ async function main() {
 
   const c4Engineering = assessProductionSmokePreflight({ productionSeed });
   const c4SignedOff = launchChecklistE5Signed(launchChecklistDoc);
+  const marketsLiveCityBoard = surfacesMarketLiveCityBoard({
+    rulesHtml,
+    researchHtmlByRel,
+  });
+  const mapBoardB13 = assessMapBoardB13Ready({
+    marketsLiveCityBoard,
+    b14Ok: b14.ok,
+    comprehensionRunbook: existsSync(join(root, COMPREHENSION_RUNBOOK_REL))
+      ? readFileSync(join(root, COMPREHENSION_RUNBOOK_REL), "utf8")
+      : "",
+    mapDashboardDoc: existsSync(join(root, MAP_DASHBOARD_REL))
+      ? readFileSync(join(root, MAP_DASHBOARD_REL), "utf8")
+      : "",
+    launchChecklistDoc,
+  });
+
   const c5 = assessLaunchChecklistReady({
     launchChecklistDoc,
     scanAnalyticsGateOk: b14.ok,
+    marketsLiveCityBoard,
+    mapBoardB13Ready: mapBoardB13.ready,
   });
 
   const blockers = [];
@@ -197,6 +221,11 @@ async function main() {
   for (const blocker of c5.blockers) {
     blockers.push(`C5 ${blocker}`);
   }
+  if (mapBoardB13.required && !mapBoardB13.ready) {
+    blockers.push(
+      "P6 / B13 live city board — npm run city-game:map-board-b13-preflight (GT-7 + privacy + B14)"
+    );
+  }
 
   const report = formatLaunchPreflightReport({
     engineering: { verify: verifyOk, requireLaunch: launchReady, c1: launchReady ? verifyOk : null },
@@ -204,8 +233,10 @@ async function main() {
       b1: b1.ok,
       b2: b2.ok,
       b5: b5.skipped ? null : b5.ok,
+      b13: mapBoardB13.required ? mapBoardB13.ready : null,
       b14: b14.ok,
     },
+    mapBoardB13,
     season: {
       ready: readiness.issues.length === 0,
       issues: readiness.issues,
@@ -239,12 +270,22 @@ async function main() {
       allRequiredSigned: c5.allRequiredSigned,
       c5Signed: c5.c5Signed,
       pending: c5.pending,
+      requiredGates: c5.requiredGates,
+      marketsLiveCityBoard,
+      mapBoardB13Ready: mapBoardB13.ready,
     },
     blockers,
   });
 
   console.log(report);
-  if (!verifyOk || readiness.issues.length > 0 || !b1.ok || !b2.ok || !b14.ok) {
+  if (
+    !verifyOk ||
+    readiness.issues.length > 0 ||
+    !b1.ok ||
+    !b2.ok ||
+    !b14.ok ||
+    (mapBoardB13.required && !mapBoardB13.ready)
+  ) {
     process.exit(1);
   }
 }

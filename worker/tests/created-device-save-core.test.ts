@@ -92,8 +92,8 @@ describe("create-card P0-2 wiring", () => {
   it("sync-saves to wallet before navigating to /created/", () => {
     const src = readFileSync(join(root, "site/js/create-card.mjs"), "utf8");
     expect(src).toContain("shouldSyncAutoSaveBeforeCreateNavigate");
-    expect(src).toContain("saveSessionToWallet(session");
-    expect(src).toMatch(/saveSessionToWallet\(session[\s\S]*location\.replace/);
+    expect(src).toContain("saveSessionToWalletWithCustody");
+    expect(src).toMatch(/saveSessionToWalletWithCustody\([\s\S]*location\.replace/);
     expect(src).not.toContain("queueMicrotask");
   });
 

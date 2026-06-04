@@ -55,9 +55,10 @@ describe("shouldShowBrowserNotifPrompt", () => {
   });
 });
 
-describe("inboxKindAllowsOsNotification (v2 Phase C)", () => {
-  it("allows only live_proof", () => {
+describe("inboxKindAllowsOsNotification (WS-NOTIF N1)", () => {
+  it("allows U0 kinds live_proof and relay_offer", () => {
     expect(inboxKindAllowsOsNotification("live_proof")).toBe(true);
+    expect(inboxKindAllowsOsNotification("relay_offer")).toBe(true);
     expect(inboxKindAllowsOsNotification("tab_keys_unsaved")).toBe(false);
     expect(inboxKindAllowsOsNotification("cross_tab_keys")).toBe(false);
     expect(inboxKindAllowsOsNotification("card_disabled_since_visit")).toBe(false);

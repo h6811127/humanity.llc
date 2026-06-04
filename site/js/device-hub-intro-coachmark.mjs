@@ -6,7 +6,7 @@
 import { isAutoSaveEnabled, isAutoSaveFailed } from "./device-auto-save.mjs";
 import { tabNoticeCountFromState } from "./device-counts-core.mjs";
 import { isHubStrangerEmptyState } from "./device-hub-stranger-empty-core.mjs";
-import { HUB_INTRO_BODY_STRANGER } from "./device-ownership-copy-core.mjs?v=91";
+import { HUB_INTRO_BODY_STRANGER } from "./device-ownership-copy-core.mjs?v=94";
 import { loadPins } from "./device-pins.mjs";
 import { getWalletCount, isWalletSaved } from "./device-wallet.mjs";
 

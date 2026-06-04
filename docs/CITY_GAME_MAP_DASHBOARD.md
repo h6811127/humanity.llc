@@ -289,7 +289,7 @@ Align with rollout **S1 → S2 → S3** in the parent spec. Map work is **not** 
 
 - [x] Update [`CITY_GAME_SUPPORT_MACROS.md`](CITY_GAME_SUPPORT_MACROS.md) — “where is the city board?”
 - [x] [`CITY_GAME_COMPREHENSION_RUNBOOK.md`](CITY_GAME_COMPREHENSION_RUNBOOK.md) — GT-7 row
-- [ ] Launch checklist **P6** (optional gate until marketing promotes live board)
+- [x] Launch checklist **P6** wired — `city-game:map-board-b13-preflight` when live board marketed
 
 ### Explicit non-goals (all phases)
 
@@ -338,6 +338,19 @@ npm run e2e:city-game-map-board   # rules page board + snapshot poll (mock API)
 npm run city-game:launch-preflight
 npm run build                     # Pages board assets
 ```
+
+---
+
+## Launch sign-off (B13 / P6)
+
+When launch surfaces market a **live** city board (`#city-state` + live chips copy), complete before `launch-checklist-sign-off -- --pass`:
+
+| Gate | Status | Date |
+|------|--------|------|
+| B13 privacy review (snapshot JSON shape + no visit/player fields) | ☐ Pending | |
+
+**Engineering:** `npm run city-game:map-board-b13-preflight` (B14 + GT-7 log + row above)  
+**Record:** `npm run city-game:map-board-b13-sign-off -- --pass --apply --reviewer "Name"`
 
 ---
 

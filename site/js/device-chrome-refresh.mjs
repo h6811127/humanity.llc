@@ -19,7 +19,7 @@ import {
 } from "./device-cross-tab-visibility.mjs";
 import { renderCrossTabKeysBanner } from "./device-cross-tab-banner.mjs";
 import { renderLiveProofBanner } from "./device-live-proof-banner.mjs";
-import { renderForegroundAttentionStrip } from "./device-foreground-attention.mjs?v=93";
+import { renderForegroundAttentionStrip } from "./device-foreground-attention.mjs?v=94";
 import { refreshHubGlance } from "./device-hub-glance.mjs";
 import { prepareShellHubBootReveal, refreshHubInboxAlertsFromChrome } from "./device-hub-ui.mjs";
 import { shouldPrepareShellHubBootReveal } from "./device-hub-boot-core.mjs";
@@ -27,7 +27,7 @@ import { loadInboxSheetModule } from "./device-inbox-sheet-loader.mjs";
 import {
   loadInboxModule,
   resetPresenceInboxGatherCache,
-} from "./device-inbox-loader.mjs?v=93";
+} from "./device-inbox-loader.mjs?v=94";
 import { getOrphanRemovedTabsWithKeys, getOtherTabsWithKeys } from "./device-tab-presence.mjs";
 import { primeCrossTabNotificationState } from "./device-cross-tab-state.mjs";
 import { refreshWalletContextFromChrome } from "./wallet-page-chrome.mjs";
@@ -43,7 +43,7 @@ import { shouldSuppressCrossTabChromeUntilShellBoot } from "./device-cross-tab-b
 import {
   NETWORK_BASELINE_CHANGED,
   NETWORK_REFRESHED,
-} from "./device-wallet-network.mjs?v=93";
+} from "./device-wallet-network.mjs?v=94";
 
 /** @type {(() => void) | null} */
 let refreshStatusSurfaces = null;

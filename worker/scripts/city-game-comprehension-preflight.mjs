@@ -17,6 +17,11 @@ import {
   LOCAL_DEV_COMPREHENSION_REL,
   productionScanProfileId,
 } from "./city-game-comprehension-kit-core.mjs";
+import {
+  comprehensionGt7GateMet,
+  surfacesMarketLiveCityBoard,
+} from "./city-game-map-board-b13-core.mjs";
+import { RESEARCH_LAUNCH_PAGE_RELS } from "./city-game-launch-surfaces-core.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const seasonPath = join(root, "site/data/city-game-cr-season-01.json");
@@ -53,13 +58,29 @@ function main() {
     productionScanProfileId: productionSeed ? productionScanProfileId(productionSeed) : null,
   });
   const runbook = existsSync(runbookPath) ? readFileSync(runbookPath, "utf8") : "";
-
-  console.log(
-    formatComprehensionPreflightReport({
-      ...c2,
-      humanSignedOff: humanSignedOff(runbook),
-    })
+  const rulesHtml = readFileSync(join(root, "site/play/cedar-rapids/index.html"), "utf8");
+  const researchHtmlByRel = Object.fromEntries(
+    RESEARCH_LAUNCH_PAGE_RELS.map((rel) => [rel, readFileSync(join(root, rel), "utf8")])
   );
+  const marketsLiveCityBoard = surfacesMarketLiveCityBoard({
+    rulesHtml,
+    researchHtmlByRel,
+  });
+  const gt7 = comprehensionGt7GateMet(runbook);
+  const c2Report = { ...c2, humanSignedOff: humanSignedOff(runbook), warnings: [...c2.warnings] };
+  if (marketsLiveCityBoard && !gt7.met) {
+    c2Report.warnings.push(
+      `GT-7 required for live board (B13): ${gt7.passCount}/${gt7.required} testers ☑ in per-tester log`
+    );
+  }
+
+  console.log(formatComprehensionPreflightReport(c2Report));
+  if (marketsLiveCityBoard) {
+    console.log("");
+    console.log(
+      `B13 GT-7: ${gt7.met ? "☑" : "☐"} ${gt7.passCount}/${gt7.required} · npm run city-game:map-board-b13-preflight`
+    );
+  }
 
   if (!c2.ready) {
     process.exit(1);

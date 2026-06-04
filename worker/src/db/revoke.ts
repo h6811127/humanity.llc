@@ -39,10 +39,17 @@ export async function revocationNonceUsed(
 export async function getQrCredential(
   db: D1Database,
   qrId: string
-): Promise<{ qr_id: string; profile_id: string; status: string } | null> {
+): Promise<{
+  qr_id: string;
+  profile_id: string;
+  status: string;
+  scope?: string;
+  object_id?: string | null;
+  print_artifact_id?: string | null;
+} | null> {
   return db
     .prepare(
-      `SELECT qr_id, profile_id, status FROM qr_credentials WHERE qr_id = ?`
+      `SELECT qr_id, profile_id, status, scope, object_id, print_artifact_id FROM qr_credentials WHERE qr_id = ?`
     )
     .bind(qrId)
     .first();

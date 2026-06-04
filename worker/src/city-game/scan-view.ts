@@ -207,6 +207,15 @@ export function gameNodeCoopHint(
   if (meta.compromised) {
     return "Relay compromised — teams recover by public rekey, not by reading scan logs.";
   }
+  if (meta.artifact_id === "hidden_relay") {
+    return "Hidden relay — capture once to reveal this relay on the public board.";
+  }
+  if (meta.overharvest_limit != null && meta.overharvest_count != null) {
+    const remaining = meta.overharvest_limit - meta.overharvest_count;
+    if (remaining > 0 && remaining <= 4) {
+      return `Commons pressure — ${remaining} captures left before this relay compromises for every faction.`;
+    }
+  }
   if (role === "relay_gate") {
     const hold = meta.held_by_faction;
     if (hold && hold !== "neutral") {

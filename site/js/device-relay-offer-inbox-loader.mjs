@@ -36,6 +36,11 @@ export function getRelayOfferPending() {
   return [];
 }
 
+export function getRelayOfferPendingCount() {
+  if (relayOfferModule) return relayOfferModule.getRelayOfferPendingCount();
+  return 0;
+}
+
 export function relayOfferInboxEligible() {
   if (relayOfferModule) return relayOfferModule.relayOfferInboxEligible();
   return false;

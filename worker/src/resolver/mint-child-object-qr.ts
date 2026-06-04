@@ -15,6 +15,10 @@ import {
   validateItemScopedMintExpiry,
 } from "./merch-qr-policy";
 import { QR_ID_REGEX } from "./scan-state";
+import {
+  authorizeDelegatedChildRoute,
+  qrCredentialMustMatchOwnerKey,
+} from "./delegated-child-signer";
 
 export interface MintChildObjectQrSuccess {
   ok: true;
@@ -61,17 +65,6 @@ function expectedQrOrigin(request: Request, payload: unknown): string {
     }
   }
   return origin;
-}
-
-function resolveIssueSigner(
-  signerKey: string,
-  row: { public_key: string; recovery_public_key: string | null }
-): boolean {
-  if (signerKey === row.public_key) return true;
-  if (row.recovery_public_key && signerKey === row.recovery_public_key) {
-    return true;
-  }
-  return false;
 }
 
 function fail(
@@ -134,18 +127,37 @@ export async function mintChildObjectFromSignedCredential(
     return fail(qrVerify.code, qrVerify.message, 401);
   }
 
-  if (!resolveIssueSigner(qrVerify.signature.public_key, existing)) {
+  const issueAuth = await authorizeDelegatedChildRoute(
+    db,
+    pathProfileId,
+    {
+      public_key: existing.public_key,
+      recovery_public_key: existing.recovery_public_key,
+      status: existing.status,
+    },
+    qrVerify.signature.public_key,
+    "child_object.issue_qr",
+    { objectId: pathObjectId }
+  );
+  if (!issueAuth.ok) {
+    return fail(issueAuth.code, issueAuth.message, issueAuth.httpStatus);
+  }
+  if (
+    !qrCredentialMustMatchOwnerKey(
+      issueAuth.kind,
+      qrVerify.signature.public_key,
+      existing.public_key
+    )
+  ) {
     return fail(
       CRYPTO_ERROR.INVALID_SIGNATURE,
-      "QR credential must be signed by the card owner or recovery key.",
-      401
+      "QR credential must be signed by the card owner key.",
+      422
     );
   }
 
   const qr = qrVerify.unsigned;
-  const qrSig = qrVerify.signature;
   const profileId = qr.profile_id as string;
-  const publicKey = existing.public_key;
 
   if (profileId !== pathProfileId) {
     return fail("PROFILE_MISMATCH", "QR profile_id mismatch.", 422);
@@ -177,14 +189,6 @@ export async function mintChildObjectFromSignedCredential(
 
   if (qr.status !== "active") {
     return fail("INVALID_QR_STATUS", "New QR must have status active.", 422);
-  }
-
-  if (qrSig.public_key !== publicKey) {
-    return fail(
-      CRYPTO_ERROR.INVALID_SIGNATURE,
-      "QR credential must be signed by the card owner key.",
-      422
-    );
   }
 
   const expectedPayload = qrPayload(

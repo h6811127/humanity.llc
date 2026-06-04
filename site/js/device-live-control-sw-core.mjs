@@ -86,8 +86,8 @@ export function liveProofPollTargetsFromWallet(wallet) {
  * }} input
  */
 export function swLiveProofPollingShouldRun(input) {
+  /** `enabled` = background alerts on (synced from page), not Watch. */
   if (!input.enabled) return false;
-  if (input.watchLiveProofEnabled === false) return false;
   if (input.stewardPushEntitled === true && input.stewardPushHealthy === true) {
     return false;
   }
@@ -216,10 +216,21 @@ export function buildLiveProofSwNotificationFromPushHint(hint, entries, pageOrig
 }
 
 /**
- * @param {Array<{ visibilityState?: string }>} clients
+ * Whether a window client should defer SW polling to the page (foreground use).
+ *
+ * @param {{ visibilityState?: string, focused?: boolean }} client
+ */
+export function clientDefersSwLiveProofPolling(client) {
+  if (client.visibilityState !== "visible") return false;
+  if ("focused" in client && client.focused === false) return false;
+  return true;
+}
+
+/**
+ * @param {Array<{ visibilityState?: string, focused?: boolean }>} clients
  */
 export function anyClientVisible(clients) {
-  return clients.some((c) => c.visibilityState === "visible");
+  return clients.some((c) => clientDefersSwLiveProofPolling(c));
 }
 
 /**

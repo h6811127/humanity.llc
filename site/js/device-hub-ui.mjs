@@ -77,7 +77,7 @@ import {
 import {
   getResolverHealthStatus,
   shouldSuppressCardDisabledSinceVisitAlerts,
-} from "./device-wallet-since-visit-gate.mjs?v=93";
+} from "./device-wallet-since-visit-gate.mjs?v=94";
 import {
   getCachedNetworkSeenAt,
   getCachedNetworkScanKind,
@@ -98,12 +98,12 @@ import {
   snapshotNetworkSeenOnExit,
   syncLastSeenFromNetworkMap,
   NETWORK_REFRESHED,
-} from "./device-wallet-network.mjs?v=93";
-import { clearWalletNetworkTruthForProfile } from "./device-wallet-network-truth.mjs?v=93";
+} from "./device-wallet-network.mjs?v=94";
+import { clearWalletNetworkTruthForProfile } from "./device-wallet-network-truth.mjs?v=94";
 import {
   hubNetworkChipStatusForProfile,
   shouldShowHubNetworkCheckingChip,
-} from "./device-wallet-network-core.mjs?v=93";
+} from "./device-wallet-network-core.mjs?v=94";
 import {
   broadcastNetworkSnapshotIfEligible,
   shouldFollowerSkipAutoNetworkFetch,
@@ -117,7 +117,7 @@ import {
   hubCardIdentityLine,
   hubCardStatusLine,
   hubCardTitle,
-} from "./device-hub-card-row-core.mjs?v=93";
+} from "./device-hub-card-row-core.mjs?v=94";
 import {
   childObjectHubFocusHash,
   hubChildObjectIconHtml,
@@ -167,7 +167,7 @@ import {
 import { tabNoticeCount } from "./device-counts.mjs";
 import { mountHubBuildStamp } from "./device-hub-build-stamp.mjs";
 import { mountHubNetworkTools } from "./device-hub-network-tools.mjs";
-import { syncInboxBackdropForOpenHub } from "./device-sheet-backdrop-sync.mjs?v=93";
+import { syncInboxBackdropForOpenHub } from "./device-sheet-backdrop-sync.mjs?v=94";
 import {
   HUB_STRANGER_EMPTY_CLASS,
   isHubStrangerEmptyState,
@@ -212,9 +212,9 @@ import {
 } from "./device-hub-network-tools-core.mjs";
 import {
   isDeviceHubExpanded,
-  liveControlPollAllowedByResolverHealth,
   walletNetworkVisibilityRefreshAllowed,
 } from "./device-live-control-poll-scheduler.mjs";
+import { walletNetworkFetchAllowedByResolverHealth } from "./device-wallet-since-visit-gate.mjs";
 import {
   expandSummaryRowLimitForVisible,
   isScrollNearBottom,
@@ -1226,7 +1226,7 @@ async function fetchAndApplyNetworkChips(opts = {}) {
   const manual = opts.manual === true;
   if (manual) {
     claimLiveControlPollLeader();
-  } else if (!liveControlPollAllowedByResolverHealth(getResolverHealthStatus())) {
+  } else if (!walletNetworkFetchAllowedByResolverHealth(getResolverHealthStatus())) {
     const { entries } = normalizeWalletQrIds(stored);
     applyNetworkChipsToDom(
       Object.fromEntries(
@@ -2666,6 +2666,12 @@ export function initDeviceHub(config = {}) {
     reapplyRevokedSinceVisitFromLatestResolved();
     syncHubInboxAlertGroups();
     notifyHubChanged();
+    const hubEl = document.getElementById("device-hub");
+    const expanded =
+      document.body.classList.contains("page-wallet") || isDeviceHubExpanded(hubEl);
+    if (expanded && hubConfig.fetchNetworkStatus) {
+      scheduleWalletNetworkFetch();
+    }
   });
 
   // A3/A5: chip + row banner apply together in fetchAndApplyNetworkChips onDone only.

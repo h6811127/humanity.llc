@@ -3,11 +3,42 @@ import { describe, expect, it } from "vitest";
 import {
   buildInstallQaWalkKitHtml,
   formatInstallQaWalkKitReport,
+  installQaRegistryNodeIds,
   INSTALL_QA_PER_NODE_CHECKS,
   resolveInstallQaWalkNodes,
 } from "../scripts/city-game-install-qa-walk-core.mjs";
+import { INSTALL_QA_REQUIRED_NODE_COUNT } from "../scripts/city-game-smoke-local-core.mjs";
 
 describe("city-game-install-qa-walk-core", () => {
+  it("installQaRegistryNodeIds reads season registry order", () => {
+    const ids = installQaRegistryNodeIds({
+      nodes: [{ node_id: "node_02" }, { node_id: "node_01" }],
+    });
+    expect(ids).toEqual(["node_02", "node_01"]);
+  });
+
+  it("resolves all 15 pilot registry nodes (not comprehension probes only)", () => {
+    const registry = Array.from({ length: INSTALL_QA_REQUIRED_NODE_COUNT }, (_, i) => {
+      const n = i + 1;
+      const node_id = `node_${String(n).padStart(2, "0")}`;
+      return { node_id };
+    });
+    const seedNodes = registry.map((row) => ({
+      node_id: row.node_id,
+      public_label: row.node_id,
+      qr_id: `qr_${row.node_id}`,
+      local_scan_url: `http://127.0.0.1:8787/c/prof?q=qr_${row.node_id}`,
+    }));
+    const nodes = resolveInstallQaWalkNodes(
+      seedNodes,
+      "prof1",
+      "192.168.1.42",
+      installQaRegistryNodeIds({ nodes: registry })
+    );
+    expect(nodes).toHaveLength(INSTALL_QA_REQUIRED_NODE_COUNT);
+    expect(nodes.every((n) => n.href?.includes("192.168.1.42"))).toBe(true);
+  });
+
   it("resolves walk nodes from seed with LAN host", () => {
     const nodes = resolveInstallQaWalkNodes(
       [
@@ -22,6 +53,7 @@ describe("city-game-install-qa-walk-core", () => {
       "prof1",
       "192.168.1.42"
     );
+    expect(nodes).toHaveLength(2);
     expect(nodes.find((n) => n.node_id === "node_04")?.href).toBe(
       "http://192.168.1.42:8787/c/prof1?q=qr_river"
     );

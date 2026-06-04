@@ -53,3 +53,21 @@ export function custodyFormDefaults(row) {
     note: typeof custody?.note === "string" ? custody.note : "",
   };
 }
+
+/**
+ * @param {Record<string, unknown> | null | undefined} custody
+ * @param {Date} [now]
+ * @returns {string | null}
+ */
+export function custodyHubHint(custody, now = new Date()) {
+  if (!custody || typeof custody !== "object") return null;
+  const holder =
+    typeof custody.holder_label === "string" ? custody.holder_label.trim() : "";
+  if (!holder) return null;
+  const untilRaw = custody.until;
+  if (typeof untilRaw === "string" && untilRaw.trim()) {
+    const untilMs = Date.parse(untilRaw);
+    if (!Number.isNaN(untilMs) && untilMs <= now.getTime()) return null;
+  }
+  return `Held by ${holder}`;
+}

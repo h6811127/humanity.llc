@@ -17,6 +17,10 @@ import {
   SW_STATE_CACHE_KEY,
   SW_SYNC_TAG,
 } from "./js/device-live-control-sw-core.mjs";
+import {
+  notificationNavigateMessage,
+  pickNotificationNavigateClient,
+} from "./js/device-live-proof-notification-nav-core.mjs";
 
 /** @typedef {{
  *   enabled: boolean,
@@ -66,7 +70,7 @@ async function pollAndMaybeNotify() {
     !state.pageOrigin ||
     !swLiveProofPollingShouldRun({
       enabled: state.enabled,
-      watchLiveProofEnabled: state.watchLiveProofEnabled !== false,
+      watchLiveProofEnabled: state.watchLiveProofEnabled === true,
       resolverHealth: state.resolverHealth,
       stewardPushEntitled: state.stewardPushEntitled === true,
       stewardPushHealthy: state.stewardPushHealthy === true,
@@ -192,7 +196,7 @@ self.addEventListener("message", (event) => {
     (async () => {
       const prev = await readState();
       const enabled = !!msg.enabled;
-      const watchLiveProofEnabled = msg.watchLiveProofEnabled !== false && enabled;
+      const watchLiveProofEnabled = msg.watchLiveProofEnabled === true;
       const state = {
         enabled,
         watchLiveProofEnabled,
@@ -255,10 +259,15 @@ self.addEventListener("notificationclick", (event) => {
         type: "window",
         includeUncontrolled: true,
       });
-      for (const client of clients) {
-        if (!("focus" in client)) continue;
-        await client.navigate(href);
-        return client.focus();
+      const target = pickNotificationNavigateClient(clients, href);
+      if (target && "focus" in target) {
+        await target.focus();
+        try {
+          target.postMessage(notificationNavigateMessage(href));
+          return;
+        } catch {
+          /* fall through to openWindow */
+        }
       }
       if (self.clients.openWindow) {
         return self.clients.openWindow(href);

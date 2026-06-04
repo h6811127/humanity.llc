@@ -2,9 +2,9 @@
  * Suppress card-disabled-since-visit UI when resolver polls are not trustworthy.
  * @see docs/CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md
  */
-import { getLiveControlPollHealth } from "./device-live-control-inbox-core.mjs?v=93";
+import { getLiveControlPollHealth } from "./device-live-control-inbox-core.mjs?v=94";
 import { isDeviceBootReadyState } from "./device-shell-boot-core.mjs";
-import { hasWalletNetworkTruthPoll } from "./device-wallet-network-truth.mjs?v=93";
+import { hasWalletNetworkTruthPoll } from "./device-wallet-network-truth.mjs?v=94";
 import {
   normalizeResolverHealthForSinceVisit,
   RESOLVER_HEALTH_UNSET,
@@ -71,4 +71,5 @@ export {
   normalizeResolverHealthForSinceVisit,
   RESOLVER_HEALTH_UNSET,
   shouldSuppressCardDisabledSinceVisitAlertsCore,
+  walletNetworkFetchAllowedByResolverHealth,
 } from "./device-wallet-since-visit-gate-core.mjs";

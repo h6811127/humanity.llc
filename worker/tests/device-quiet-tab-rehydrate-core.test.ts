@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   filterCrossTabEntriesAfterQuietRehydrate,
+  multiWalletScanAutoActivateAllowed,
   quietRehydrateBlockedByOtherTabPresence,
   quietRehydrateBlockedOnScanForDifferentCard,
   quietRehydrateBlockedForUrlProfile,
@@ -258,6 +259,12 @@ describe("device-quiet-tab-rehydrate-core", () => {
   it("keeps all entries when no quiet rehydrate context", () => {
     const entries = [{ tabId: "t1", profile_id: "a" }];
     expect(filterCrossTabEntriesAfterQuietRehydrate(entries, {})).toEqual(entries);
+  });
+
+  it("blocks multi-wallet scan auto-activate when quiet rehydrate is off", () => {
+    expect(multiWalletScanAutoActivateAllowed(1, false)).toBe(true);
+    expect(multiWalletScanAutoActivateAllowed(2, true)).toBe(true);
+    expect(multiWalletScanAutoActivateAllowed(2, false)).toBe(false);
   });
 });
 

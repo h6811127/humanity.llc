@@ -97,7 +97,10 @@ export function syncCreatedPilotStewardCopy(pilot) {
   const copy = stewardCopyForPilot(pilot);
 
   setText(document.getElementById("created-live-scanners-see-title"), copy.scannersSeeTitle);
-  setText(document.querySelector("#created-live-scanners-see .created-live-scanners-see-lead"), copy.scannersSeeLead);
+  setText(
+    document.getElementById("created-live-scanners-see-post-publish"),
+    copy.scannersSeeLead
+  );
   setText(document.getElementById("manifesto-update-submit"), copy.publishBtn);
   setText(document.getElementById("revoke-summary-title"), copy.revokeSummaryTitle);
   setText(document.getElementById("revoke-qr-btn"), copy.revokeQrBtn);

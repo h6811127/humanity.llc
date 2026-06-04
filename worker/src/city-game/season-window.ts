@@ -47,6 +47,17 @@ export function isLocalSeasonPlayOverride(env: {
   return env.CITY_GAME_LOCAL_PLAY_OPEN === "1";
 }
 
+/** worker:dev only — raise season node cap for local wave-open seeding. */
+export function localSummerNodeCapOverride(env: {
+  CITY_GAME_LOCAL_NODE_CAP?: string;
+}): number | null {
+  const raw = env.CITY_GAME_LOCAL_NODE_CAP?.trim();
+  if (!raw) return null;
+  const cap = Number.parseInt(raw, 10);
+  if (!Number.isFinite(cap) || cap < 1) return null;
+  return cap;
+}
+
 /** Contribute gate: production window, unset pre-launch, or local override before open. */
 export function isSeasonContributeOpen(
   phase: SeasonWindowPhase,

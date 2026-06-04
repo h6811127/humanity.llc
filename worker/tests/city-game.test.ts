@@ -178,6 +178,13 @@ describe("city game game_meta", () => {
       vouch_active_for: [],
       scarcity_remaining: null,
       fragment_id: null,
+      held_by_faction: null,
+      held_until: null,
+      points_per_hour: null,
+      artifact_id: null,
+      evolution_week: null,
+      overharvest_count: null,
+      overharvest_limit: null,
     });
   });
 

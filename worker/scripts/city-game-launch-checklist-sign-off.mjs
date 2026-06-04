@@ -18,8 +18,48 @@ import {
   parseLaunchChecklistSignOffArgs,
   resolveLaunchChecklistSignOffResult,
 } from "./city-game-launch-checklist-core.mjs";
+import {
+  assessMapBoardB13Ready,
+  COMPREHENSION_RUNBOOK_REL,
+  MAP_DASHBOARD_REL,
+  surfacesMarketLiveCityBoard,
+} from "./city-game-map-board-b13-core.mjs";
+import {
+  auditGameScanAnalyticsGate,
+  SCAN_ANALYTICS_SOURCE_GUARD,
+} from "./city-game-scan-analytics-gate-core.mjs";
+import { RESEARCH_LAUNCH_PAGE_RELS } from "./city-game-launch-surfaces-core.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
+
+function loadB13Context(checklistDoc) {
+  const rulesHtml = readFileSync(join(root, "site/play/cedar-rapids/index.html"), "utf8");
+  const researchHtmlByRel = Object.fromEntries(
+    RESEARCH_LAUNCH_PAGE_RELS.map((rel) => [rel, readFileSync(join(root, rel), "utf8")])
+  );
+  const sourceByRel = Object.fromEntries(
+    [
+      ...SCAN_ANALYTICS_SOURCE_GUARD.map((row) => row.rel),
+      "worker/src/resolver/game-contribute.ts",
+    ].map((rel) => [rel, readFileSync(join(root, rel), "utf8")])
+  );
+  const b14 = auditGameScanAnalyticsGate({
+    policyMarkdown: readFileSync(join(root, "docs/REFERENCE_OPERATOR_DATA_POLICY.md"), "utf8"),
+    sourceByRel,
+  });
+  const marketsLiveCityBoard = surfacesMarketLiveCityBoard({
+    rulesHtml,
+    researchHtmlByRel,
+  });
+  const mapBoardB13 = assessMapBoardB13Ready({
+    marketsLiveCityBoard,
+    b14Ok: b14.ok,
+    comprehensionRunbook: readFileSync(join(root, COMPREHENSION_RUNBOOK_REL), "utf8"),
+    mapDashboardDoc: readFileSync(join(root, MAP_DASHBOARD_REL), "utf8"),
+    launchChecklistDoc: checklistDoc,
+  });
+  return { marketsLiveCityBoard, mapBoardB13 };
+}
 
 function main() {
   const parsed = parseLaunchChecklistSignOffArgs(process.argv.slice(2));
@@ -38,6 +78,12 @@ function main() {
   let content = readFileSync(checklistPath, "utf8");
 
   if (result === "mark") {
+    const { marketsLiveCityBoard, mapBoardB13 } = loadB13Context(content);
+    if (parsed.mark.includes("P6") && marketsLiveCityBoard && !mapBoardB13.ready) {
+      console.error("\nCannot mark P6 — B13 not ready:");
+      for (const issue of mapBoardB13.issues) console.error(`  ✗ ${issue}`);
+      process.exit(1);
+    }
     for (const gate of parsed.mark) {
       content = applyLaunchChecklistRowPass(content, gate, {
         dateIso: parsed.dateIso,
@@ -55,7 +101,12 @@ function main() {
     return;
   }
 
-  const assessment = assessLaunchChecklistReady({ launchChecklistDoc: content });
+  const { marketsLiveCityBoard, mapBoardB13 } = loadB13Context(content);
+  const assessment = assessLaunchChecklistReady({
+    launchChecklistDoc: content,
+    marketsLiveCityBoard,
+    mapBoardB13Ready: mapBoardB13.ready,
+  });
   if (!assessment.allRequiredSigned) {
     console.error("\nCannot sign C5 — pending gates:", assessment.pending.join(", "));
     console.error("Run npm run city-game:launch-checklist-preflight");

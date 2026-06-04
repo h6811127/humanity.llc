@@ -77,6 +77,14 @@ export function shouldOfferAddGameNode(session) {
 }
 
 /**
+ * General root without organizer key yet — show game setup row only.
+ * @param {Record<string, unknown> | null | undefined} session
+ */
+export function shouldShowGameNodeAddRow(session) {
+  return isGeneralRootCardSession(session) && !shouldOfferAddGameNode(session);
+}
+
+/**
  * @param {Record<string, unknown>} row
  */
 export function isActiveGameNodeRow(row) {

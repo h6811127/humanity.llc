@@ -3,7 +3,9 @@
 **Purpose:** Single reference for parallel agents and humans — active work, regression gates, file ownership.  
 **Also read:** [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) (rules that must stay true) · [`DOC_MAINTENANCE.md`](DOC_MAINTENANCE.md) (doc policy)
 
-**Last updated:** 2026-06-03
+**Last updated:** 2026-06-04
+
+**Changelog (2026-06-04):** **WS-LIVE opened** — umbrella MVP program: physical software objects + Cedar Rapids + [**five-layer evolving objects plan**](#ws-live--physical-software-objects--evolving-five-layer-stack) ([`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md)). Sub-tracks: **WS-QUALITY** (steward belt), **WS-CR** / **WS-SCALE** / **WS-SW** (field + network). **WS-NOTIF closed** (in-app) — **P0-N2 OS deferred**. **Desk belt** — `npm run verify:desk:fast` (CI) · `npm run verify:desk` (pre-merge).
 
 **Changelog (2026-06-03):** **Engineering Phase 2** — summer program § [Engineering Phase 2](#engineering-phase-2--summer-2026-program) (**WS-SCALE**, **WS-SW**, **WS-CUSTODY** parallel with Phase 1 closeout). **WS-CUSTODY** — [`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md) + [`CUSTODY_PHASE0_RUNBOOK.md`](CUSTODY_PHASE0_RUNBOOK.md). **Summer footprint** — Cedar Rapids **40 at open → 60** · **Wake the city · Signal War** **SW-01–SW-15**. **Live object layer** — [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) five-layer map.
 
@@ -13,6 +15,7 @@
 
 | Stream | Canonical doc | Engineering tracker | Primary surfaces |
 |--------|---------------|---------------------|------------------|
+| **Live objects MVP (umbrella)** | [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) · § [WS-LIVE](#ws-live--physical-software-objects--evolving-five-layer-stack) | **WS-LIVE** — five-layer Orders **1–6** · PSO + Cedar Rapids field | `worker/src/live-object/**` · scan composition · child objects · city game on same resolver |
 | **Steward scan handoff / PWA vouch** | [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) | **S1–S7 shipped** · **`steward-scan-handoff:verify`** | § Incident history (dual-QR RC-1) |
 | **Hub card Safari reliability** | [`HUB_CARD_SAFARI_RELIABILITY.md`](HUB_CARD_SAFARI_RELIABILITY.md) | **Closed — monitoring** · **`hub-card-disappeared:verify`** | RC-1–RC-16 shipped |
 | **Shell page load flash** | [`SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md`](SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md) | **RC-1–RC-17 shipped** · **RC-18 in progress** (landing hub pre-render v83) · **`worker:test:shell-boot`** · **`device-smooth:phase0`** | Nord N200 cold S1 re-verify after deploy |
@@ -25,12 +28,96 @@
 | **Summer node scale (40→60)** | [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) § Node scale · [`CITY_GAME_NODE_INSTALL_MAP.md`](CITY_GAME_NODE_INSTALL_MAP.md) | **SC-1–SC-2b ☑ local** · **SC-3** prod seed · **SC-4–SC-5** · B7 physical open | Season JSON, mint waves, install QA at ~40 open |
 | **Signal War (contest layer)** | [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) § Wake the city · Signal War · [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) | **WS-SW** — **SW-S1–S3** shipped · debrief/badge tail | `game-contribute`, snapshot, fog, faction totals |
 | **Smooth mode (low-end mobile)** | [`DEVICE_LITE_MOBILE_PLAN.md`](DEVICE_LITE_MOBILE_PLAN.md) | **Phase 0 lab 3/3 ☑** · Phase 1 **deferred** (Nord cold boot → boot graph) · [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md) | Boot graph investigation for Nord cold open |
+| **Notifications v2 (tiered inbox)** | [`NOTIFICATION_SYSTEM_V2.md`](NOTIFICATION_SYSTEM_V2.md) | **WS-NOTIF closed** — N0–N5 ☑ · **P0-N2 OS deferred** · in-app N4 only | **No new notify engineering** — `notify:verify` guards only |
+| **Core product loop (quality + UX)** | [`CORE_PRODUCT_LOOP.md`](CORE_PRODUCT_LOOP.md) | **WS-QUALITY** — WS-LIVE sub-track · Q0 ☑ · **Q2–Q3** | `npm run verify:desk` · P1-MOTO-* repair · L1–L8 |
+
+---
+
+## WS-LIVE — Physical software objects + evolving five-layer stack
+
+**Workstream ID:** **WS-LIVE** (umbrella MVP program)  
+**Canonical engineering map:** [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) — **evolving objects in five layers**, bottom-up; Orders **1–6** exit criteria in that doc § Recommended build sequence  
+**Public category:** [`site/what-can-a-qr-do/physical-software-objects/`](../site/what-can-a-qr-do/physical-software-objects/) · Cedar Rapids [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) · design space [`QR_DESIGN_SPACE.md`](QR_DESIGN_SPACE.md)
+
+**Mission:** Ship the integrated product — **physical software objects** as the foundation and **Cedar Rapids** as the network-layer proof on the **same resolver** — by completing the five-layer plan without forking parallel scan products.
+
+> The QR is not the game. The QR is the **physical handle** for live public object state. City game nodes are Layer 5 deployments of the same primitive as door plates and lost-item relays.
+
+**One-sentence model** ([`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md)):
+
+> A **live object** is an HTTPS endpoint (usually reached via QR) that returns **current, revocable, signed public state** — composed from a root card, optional child object, streams, time policy, and optional network overlay.
+
+### Five layers — evolve bottom-up (do not skip)
+
+Higher layers depend on lower layers. Composition entry: `worker/src/resolver/scan-state.ts` → `buildScanViewModel()`.
+
+| Layer | Responsibility | Primary modules | Build order |
+|-------|----------------|-----------------|-------------|
+| **L1 — Object graph** | Root → child → QR; types; custody | `child-objects.ts`, `live-object/custody.ts`, `created-child-object*` | Order **1** |
+| **L2 — Verbs** | read · request · offer · contribute · archive | `scan-capabilities.ts`, `scan-live-control*`, `game-contribute.ts`, `lost-item-offer.ts` | Order **3** |
+| **L3 — Streams + precedence** | Multi-signer public fields; care mutes game | `stream-policy.ts`, `object-streams.ts`, `compose-child-object-scan.ts` | Order **4** |
+| **L4 — Time policy** | Schedules, expiry, dormancy, grace | `time-policy.ts`, `season-window.ts`, `/created/` editors | Order **4** |
+| **L5 — Network graph** | Quorum, routes, season, Signal War | `network-graph.ts`, `season-config.ts`, `game-contribute*.ts` | Orders **2** + **5** |
+| **L6 — Spec tail** (post-MVP defer) | Staleness, succession hints, delegation gates | `staleness-contract.ts`, `succession-spec.ts`, `delegation-spec.ts` | Order **6** |
+
+```text
+L1 Object graph  →  L2 Verbs  →  L3 Streams  →  L4 Time  →  L5 Network
+     (printable endpoints)              (evolving state)      (city season)
+```
+
+**Evolving objects** (public combining-ideas / Cedar Rapids traceability **CR-E01–E03**): temporary 48h objects, rotating bulletins, weather-aware copy, steward revoke/pause when physical space changes — implemented via **L4 time policy** + **L3 care streams** + **L1 lifecycle**, not a separate product.
+
+### WS-LIVE sub-tracks (assign one agent per ID)
+
+| ID | Role under WS-LIVE | Mission | File ownership (typical) |
+|----|-------------------|---------|--------------------------|
+| **WS-QUALITY** | L1 steward path + belt | L1–L8 green; create/scan/revoke reliability on real devices | `site/create/**`, `site/created/**`, `device-hub*`, `device-status*` — **not** season JSON |
+| **WS-CR** | Field launch (Order 2 ops) | C3–C5 · prod smoke · `launch-surfaces --apply` · install QA | `site/play/cedar-rapids/**`, `city-game-launch-*`, production season values |
+| **WS-SCALE** | L5 footprint | SC-1–SC-5 · **40 open → ~60** · mint waves · B7 each wave | `site/data/city-game-cr-season-01.json`, mint scripts, `constants.ts` |
+| **WS-SW** | L5 contest layer | SW-01–15 maintenance · comprehension when copy changes | `game-contribute*.ts`, `map-node-snapshot.ts`, `site/js/city-game-*` |
+
+**Parallel — do not disturb:** **WS-REV** (Stripe), **WS-CUSTODY** (C0 comprehension), **WS-E** (self-serve after E1), shell-boot **RC-18**, **WS-NOTIF** (closed).
+
+### Gating (revised)
+
+| Rule | Detail |
+|------|--------|
+| **WS-QUALITY gates the steward path** | L1–L4, L6–L7 must stay green before marketing “create and manage live objects” broadly |
+| **WS-LIVE game tracks proceed in parallel** | Work on `worker/src/city-game/**`, `site/data/city-game-*`, `site/play/**` when **`verify:city-game`** + **`verify:desk:fast`** stay green — not blocked by WS-QUALITY Q3 |
+| **No cross-stream file fights** | Game agents do not touch `device-hub*.mjs` unless fixing a red **L*** row. Quality agents do not touch season JSON unless scan/revoke regression |
+| **Layer discipline** | Do not ship Layer 5 marketing before Layer 1–4 composition is honest on scan (capabilities + time + streams) |
+
+### WS-LIVE MVP exit criteria
+
+Mark ☑ in [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) § Recommended build sequence when met.
+
+| Gate | Proof | Owner |
+|------|-------|-------|
+| **LO-1** Order 1 pilot sign-off | Printed status plate + lost-item relay — [`STATUS_PLATE_PILOT.md`](STATUS_PLATE_PILOT.md), [`LOST_ITEM_RELAY_PILOT.md`](LOST_ITEM_RELAY_PILOT.md) | WS-QUALITY |
+| **LO-2** Order 2 field launch | WS-CR **C5** signed · prod season mint · `city-game:smoke-production` | WS-CR |
+| **LO-3** L5 opening footprint | **~40 nodes** installed · B7 at open · honest launch surfaces | WS-SCALE + WS-CR |
+| **LO-4** Integrated stranger comprehension | Scan **game node** (contribute/read) + **non-game object** (status plate) — same primitive, &lt;30s trust read | WS-CR + WS-QUALITY |
+| **LO-5** Public copy honesty | PSO + features pages reflect live vs research **after** LO-2 | WS-CR |
+
+**Deferred post-MVP (Order 6 implementation):** mesh/cache `freshness.source`, delegated child routes (G1–G5), `inherit` verb — spec-only until LO-1–LO-4 pass.
+
+### WS-LIVE regression block
+
+```bash
+npm run verify:desk:fast
+npm run verify:city-game
+npm run worker:test -- worker/tests/live-object-*.test.ts worker/tests/scan-status.test.ts worker/tests/network-graph-core.test.ts
+```
+
+Pre-merge integrator: also run **`npm run verify:desk`** when touching steward shell or `/created/`.
+
+**Composition ownership:** `worker/src/live-object/**`, `worker/src/resolver/scan-state.ts`, `scan-html.ts`, `scan-status.ts`, `worker/src/resolver/child-objects.ts` — coordinate in **Active branches**; one PR should not span live-object composition **and** hub wallet unless fixing a named red **L*** row.
 
 ---
 
 ## Multi-agent program: Product + revenue + Cedar Rapids
 
-**Purpose:** One **dedicated agent per workstream** below. Shippable product today = **printable QR live objects** (cards, scan, live proof, child objects). **Revenue gap** = paid plans not wired to checkout/UI. **Scale gap** = Phase E browser setup (post-pilot). This is **not an MVP cut** — server enforcement and entitlements already exist; remaining work is **truth in docs**, **money path**, **pilot launch**, then **self-serve**.
+**Purpose:** One **dedicated agent per workstream** below. Shippable MVP = **[WS-LIVE](#ws-live--physical-software-objects--evolving-five-layer-stack)** — physical software objects (five-layer stack) **plus** Cedar Rapids on the same resolver. **Revenue gap** = paid plans not wired to checkout/UI. **Scale gap** = Phase E browser setup (post-pilot). This is **not an MVP cut** — server enforcement and entitlements already exist; remaining work is **layer exit criteria**, **field launch**, **money path**, then **self-serve**.
 
 ### Strategic frame
 
@@ -67,8 +154,13 @@ WS-E (Phase E /created/ setup — needs WS-REV entitlements UI)
 | **WS-CUSTODY** | Hybrid custody (easy + keys) | Phases C0–C4 per [`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md) | C0 metrics; optional before broad consumer launch |
 | **WS-SCALE** | Summer 40→60 footprint | SC-1–SC-5 per § [Engineering Phase 2](#engineering-phase-2--summer-2026-program) | WS-CR C5; B7 at opening ~40 |
 | **WS-SW** | Signal War mechanics | SW-S1–S3 · **SW-01–SW-15** | WS-SCALE relay registry; map B13–B15 if promised |
+| **WS-LIVE** | Live objects MVP (umbrella) | Five-layer Orders **1–6** · **LO-1–LO-5** exit gates · PSO + Cedar Rapids | Sub-tracks below; [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) |
+| **WS-QUALITY** | Core loop verify · fix · UX (WS-LIVE sub-track) | Q0 belt ☑ · Q1 loop inventory · Q2 P0 repair · Q3 polish · Q4 custody deprecation ☑ | Gates **steward path** (L1–L4, L6–L7) — see [WS-LIVE gating](#gating-revised) |
+| **WS-NOTIF** | Unified notifications (TIF) | **Closed** — in-app shipped; **P0-N2 OS non-functional** | **No agent** — reopen only with explicit transport workstream |
 
 **Do not duplicate:** city-game local dev bundle on branch `#109` / uncommitted WIP (`city-game:dev`, `launch-preflight`, comprehension kit) — coordinate in **Active branches** before overlapping scripts.
+
+**Priority (2026-06-04):** **WS-LIVE** is the **active MVP program**. **WS-QUALITY** runs the steward belt in parallel. **WS-CR** / **WS-SCALE** / **WS-SW** advance Layer 5 field launch under WS-LIVE — not blocked by Q3 when `verify:city-game` + `verify:desk:fast` stay green and agents respect file ownership (§ [WS-LIVE](#ws-live--physical-software-objects--evolving-five-layer-stack)). **WS-NOTIF** is closed (background OS deferred).
 
 ### Normative verbs (all agents — implement in WS-DOC, consume elsewhere)
 
@@ -168,7 +260,43 @@ WS-E (Phase E /created/ setup — needs WS-REV entitlements UI)
 
 ---
 
+### WS-QUALITY — Core product loop (verify · fix · UX)
+
+| | |
+|--|--|
+| **Parent program** | **[WS-LIVE](#ws-live--physical-software-objects--evolving-five-layer-stack)** — Layer **L1** steward path + **LO-1** pilot sign-off |
+| **Canonical doc** | [`CORE_PRODUCT_LOOP.md`](CORE_PRODUCT_LOOP.md) |
+| **Mission** | Make the **shipped** steward + stranger loop reliable and understandable — **WS-LIVE sub-track**; does not own city-game field launch |
+| **In scope** | `verify:desk` belt; **L1–L8** loop inventory; **P0** rows in [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md); sad-path fixes from [`SAD_PATH_COVERAGE_AND_BACKLOG.md`](SAD_PATH_COVERAGE_AND_BACKLOG.md); emphasis-card + ownership copy polish; status plate + lost-item **printed** pilots (**LO-1**) |
+| **Out of scope** | 40→60 nodes (**WS-SCALE** under WS-LIVE); Signal War maintenance (**WS-SW**); device_unlock C1+ (**WS-CUSTODY**); Stripe (**WS-REV**); greenfield shell rewrite without Q4 gate; `worker/src/live-object/**` composition unless sad-path regression |
+| **Milestones** | **Q0** belt ☑ · **Q1** loop table complete · **Q2** P0 green local · **Q3** comprehension (5 steward / 3 stranger) · **Q4** rearchitecture decision (default **no**) |
+| **Regression** | `npm run verify:desk:fast` (CI) · `npm run verify:desk` (pre-merge) · per-row gates in [`CORE_PRODUCT_LOOP.md`](CORE_PRODUCT_LOOP.md) § Core loop inventory |
+| **File ownership** | `site/create/**` · `site/created/**` · `site/js/device-{hub,status,wallet,ownership}*` · `site/js/create-*` · targeted `e2e/*` · resolver sad-path fixes |
+| **Status** | **Q0 shipped** · **Q1–Q3 open** — rearchitecture **deferred** until measured friction |
+| **Hub/inbox mutex** | **WS-NOTIF closed** — WS-QUALITY owns **P1-MOTO-06/10/21** and mutex hub/inbox/network files (see WS-NOTIF § Mutex) |
+| **Blocks** | **Steward-path marketing** and **LO-1** until L1–L4, L6–L7 green — **not** WS-LIVE game field work when § [Gating (revised)](#gating-revised) rules hold |
+
+### WS-NOTIF — Notifications v2 (tiered inbox-first)
+
+| | |
+|--|--|
+| **Canonical doc** | [`NOTIFICATION_SYSTEM_V2.md`](NOTIFICATION_SYSTEM_V2.md) |
+| **Selected approach** | **TIF** — one inbox queue with urgency tiers **U0–U3**; delivery router; **foreground strip** for U0 when tab visible; OS only for opt-in U0 when hidden |
+| **Mission** | End fragmented notify paths (relay hub group, live-proof-only OS, duplicate polls); stewards get one ordered inbox and predictable away-tab behavior |
+| **In scope** | `device-inbox-core.mjs` kinds/tiers · `device-notification-delivery*.mjs` · fold `relay_offer` into inbox · **N3** foreground strip · **P1-MOTO-06** hub network poll / RC-4 checking exit · **P1-MOTO-08/10/21** delivery + browser-aware copy · Android Chrome PWA **P0-N** QA |
+| **Out of scope** | Scan/hoodie alerts · email/SMS · generic push platform · second SPA · re-litigating custody restore-in-tab UX (shipped) |
+| **Milestones** | **N0–N5 ☑** · **N4 field pass** manual · hosted push TIF contract (`notify:hosted-push`) · **P1-MOTO-06** device re-verify |
+| **Regression** | `npm run notify:verify` · `e2e/device-inbox.spec.ts` · `e2e/device-os-wallet.spec.ts` · `verify:desk:fast` |
+| **File ownership** | See [`NOTIFICATION_SYSTEM_V2.md`](NOTIFICATION_SYSTEM_V2.md) § File ownership · **P1-MOTO-06:** `device-hub-ui.mjs`, `device-wallet-network*.mjs`, `device-hub-network-tools*.mjs` |
+| **Status** | **☑ Closed (2026-06-04)** — N0–N5 in repo · **P0-N2 background OS deferred (non-functional)** |
+| **Handoff** | **WS-QUALITY** owns **P1-MOTO-06/10/21** (foreground/in-app) and hub/network mutex files |
+| **Mutex (WS-QUALITY hands off)** | `device-hub-ui.mjs` · `device-chrome-refresh.mjs` · `device-wallet-network*.mjs` · `device-live-control-inbox*.mjs` · `device-inbox*.mjs` · `device-browser-notifications*.mjs` · `device-hub-inbox-alerts.mjs` · `device-foreground-attention*.mjs` |
+
+---
+
 ## Engineering Phase 2 — Summer 2026 program
+
+**Parent:** **[WS-LIVE](#ws-live--physical-software-objects--evolving-five-layer-stack)** — Layer **L5** field launch + contest layer on the five-layer stack.
 
 **Purpose:** Next engineering phase after the **Phase 1 multi-agent program** (WS-DOC / WS-REV / WS-CR / WS-E) — parallel tracks for **Cedar Rapids summer launch**, **Signal War**, **consumer custody de-risk**, and **revenue closeout**.  
 **Doc audit (2026-06-03):** New canon — [`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md), [`CUSTODY_PHASE0_RUNBOOK.md`](CUSTODY_PHASE0_RUNBOOK.md). Major updates — [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) (unified **Wake the city · Signal War**, **40→60** waves, **SW-01–SW-15**), [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) (fog **SW-08**), [`OWNERSHIP_AND_CONTROL_MODEL.md`](OWNERSHIP_AND_CONTROL_MODEL.md) (hybrid custody pointer), [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) (five-layer resolver map). Cross-links in Safari keys, key-loss matrix, steward roadmap, operator runbooks.
@@ -316,7 +444,8 @@ WS-REV or WS-E touching `/created/` shell: also run **Ownership restore** block 
 | **#107** | `cursor/ownership-restore-phase3-ab8a` / `pr-107-merge` | **Merged** to `main` | `/created/` view Live readonly, Protect setup memory chip, P1-RESTORE QA |
 | **#108** | `cursor/cloud-agent-1780082490008-1q2uv` | Merged — P0-6/P0-7 + PWA | Consolidated onto `main` |
 | **#109** | `cursor/city-game-local-dev` (local WIP) | **In progress** — uncommitted on disk | `city-game:dev`, `local-env`, `comprehension-kit`, `launch-preflight`, `sync-season-root`, `hosted:steward-session-local` · **do not duplicate** |
-| **WS-CR** | Assign per [Multi-agent program](#multi-agent-program-product--revenue--cedar-rapids) | **C3/C4** — `install-qa-preflight`, `smoke-production`; C2 human + custody drift open | See stream file ownership; avoid `#109` overlap without merge plan |
+| **WS-CR** | Assign per [Multi-agent program](#multi-agent-program-product--revenue--cedar-rapids) | **C3** — LAN walk kit 15/15 ☑ · human P2 physical gate open | See stream file ownership; avoid `#109` overlap without merge plan |
+| **WS-NOTIF** | `cursor/ws-notif-network-notify` | **In progress** — N3 foreground strip · P1-MOTO-06/08/10/21 | Mutex hub/inbox/network files; WS-QUALITY defers same rows |
 | **main** | `main` | Safari steps 1–21 shipped · RC-18 v83 | Source of truth |
 
 Update this table when new PRs open.
@@ -370,6 +499,7 @@ npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts
 
 | Area | Likely owner stream | Files |
 |------|---------------------|-------|
+| Live-object composition (L1–L4) | **WS-LIVE** · WS-QUALITY (sad-path only) | `worker/src/live-object/**`, `worker/src/resolver/scan-state.ts`, `scan-html.ts`, `scan-status.ts`, `worker/src/resolver/child-objects.ts`, `created-child-object*` |
 | View-only `/created/` | Ownership restore | `created-view-mode.mjs`, `created-view-live-readonly*.mjs`, `site/created/index.html` |
 | Hub restore / import | Ownership restore · steward handoff | `device-hub-import.mjs`, `device-hub-import-recovery.mjs`, `device-hub-open-scan.mjs`, `device-hub-qr-scanner.mjs`, `device-hub-stranger-empty*` |
 | Wallet summary / corrupt | Safari P3-3 / P1-4 | `device-wallet-summary-core.mjs`, `device-wallet-parse-core.mjs` |
@@ -383,6 +513,7 @@ npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts
 | Custody C0 copy + setup | WS-CUSTODY | `device-ownership-copy-core.mjs`, `/created/` setup panel, `custody-phase0-*` scripts |
 | Phase E `/created/` game setup | WS-E | `site/created/index.html`, `site/js/created-*.mjs` (new game modules), `site/play/*/index.html` generator paths |
 | Doc status + verbs | WS-DOC | `docs/HOSTED_TIER_*.md`, `docs/PAID_TIER_*.md`, `docs/CITY_GAME_LOCAL_DEV.md`, `docs/LIVE_OBJECT_ARCHITECTURE.md`, `docs/QR_DESIGN_SPACE.md`, `docs/SYSTEM_INVARIANTS.md` |
+| Notifications v2 + hub network status | WS-NOTIF | `device-inbox-core.mjs`, `device-notification-delivery*.mjs`, `device-hub-inbox-alerts.mjs`, `device-relay-offer-inbox*.mjs`, `device-browser-notifications*.mjs`, `device-foreground-attention*.mjs`, `device-hub-ui.mjs`, `device-wallet-network*.mjs`, `device-hub-network-tools*.mjs` |
 
 ---
 
@@ -390,6 +521,11 @@ npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts
 
 | Date | Event |
 |------|--------|
+| 2026-06-04 | **WS-LIVE opened** — umbrella MVP: physical software objects + Cedar Rapids + five-layer evolving objects plan ([`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) Orders 1–6, **LO-1–LO-5**); WS-QUALITY demoted to sub-track; revised gating for WS-CR/SCALE/SW |
+| 2026-06-04 | **WS-NOTIF N3 + P1-MOTO cluster** — foreground U0 strip · Check network refreshes resolver health first · Chrome-aware companion copy on Android PWA |
+| 2026-06-04 | **WS-NOTIF** — notification v2 workstream (TIF) — [`NOTIFICATION_SYSTEM_V2.md`](NOTIFICATION_SYSTEM_V2.md) |
+| 2026-06-04 | **WS-CR B13/P6** — `map-board-b13-preflight` + sign-off; P6 required when live board marketed; comprehension-sign-off enforces GT-7 |
+| 2026-06-04 | **WS-CR C3** — install QA LAN walk kit lists all **15** season registry nodes (was 4 comprehension probes) · `install-qa-preflight` reports walk kit |
 | 2026-06-04 | **WS-SCALE C3 walk fix** — `install-qa-walk` uses full seed (40 nodes, not comprehension probes) · `city-game:scale-sc3` · season JSON re-merged to 40 |
 | 2026-06-04 | **WS-SCALE SC-2b ☑** — `city-game:smoke-local -- --all` (40 scans) · `city-game:scale-sc2b` · `seed-production-wave-open` script |
 | 2026-06-04 | **WS-SCALE SC-2 ☑** — `city-game:seed-wave-open` (25 nodes) · local seed 40/40 · install map QR ☑ · `city-game:scale-sc2` exit 0 |
@@ -473,8 +609,8 @@ npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts
 ## Agent handoff checklist
 
 1. Read [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) + this file + the stream's canonical doc.
-2. Confirm your **workstream ID** — Phase 1: WS-DOC, WS-REV, WS-CR, WS-E · Phase 2: **WS-SCALE**, **WS-SW**, **WS-CUSTODY** (§ [Engineering Phase 2](#engineering-phase-2--summer-2026-program)) — stay inside that stream's **In scope** / **Out of scope**.
+2. Confirm your **workstream ID** — **WS-LIVE** umbrella: sub-tracks **WS-QUALITY**, **WS-CR**, **WS-SCALE**, **WS-SW** (§ [WS-LIVE](#ws-live--physical-software-objects--evolving-five-layer-stack)) · Phase 1: WS-DOC, WS-REV, WS-E · parallel: **WS-CUSTODY** (§ [Engineering Phase 2](#engineering-phase-2--summer-2026-program)) — stay inside **In scope** / **Out of scope**.
 3. `git fetch` and check **Active branches** — do not re-implement open PR scope.
-4. Run the **Regression commands** for your stream (and **Multi-agent regression block** if touching shared surfaces).
+4. Run the **Regression commands** for your stream (WS-LIVE integrator: § [WS-LIVE regression block](#ws-live-regression-block)).
 5. Append one line to **Changelog** when you merge or ship.
 6. Do **not** add new investigation docs — update invariants or canonical spec ([`DOC_MAINTENANCE.md`](DOC_MAINTENANCE.md)).

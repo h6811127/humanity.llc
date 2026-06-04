@@ -195,6 +195,8 @@ Today, **Manage → Update public line** (`created-manifesto-update.mjs`) switch
 
 Place this block **inside or directly under** the hero card so edit + preview feel connected. Use `settings-disclosure` styling only if the block would push primary CTA below the fold - otherwise always expanded.
 
+**Shipped (Live tab):** Primary fields → **Publish update** → post-publish hint → collapsed **Extra lines on scan card** (`<details>`). First visit per profile auto-expands optional rows (`hc_created_scan_details_onboarding` in `localStorage`); ack on publish or manual collapse. Logic: `site/js/created-scan-details-disclosure-core.mjs` · `site/js/created-manifesto-update.mjs`.
+
 **Validation:** Reuse existing rules from `buildManifesto()` in `created-manifesto-update.mjs` (required pairs, 280 combined for plate, relay prefix handling).
 
 ---

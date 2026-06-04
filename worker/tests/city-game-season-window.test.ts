@@ -4,6 +4,7 @@ import {
   isLocalSeasonPlayOverride,
   isSeasonContributeOpen,
   isSeasonPlayOpen,
+  localSummerNodeCapOverride,
   resolveSeasonWindowPhase,
   seasonWindowChip,
   seasonWindowContributeMessage,
@@ -59,5 +60,12 @@ describe("season-window", () => {
     expect(isSeasonContributeOpen("before", {})).toBe(false);
     expect(isSeasonContributeOpen("after", { CITY_GAME_LOCAL_PLAY_OPEN: "1" })).toBe(false);
     expect(isLocalSeasonPlayOverride({ CITY_GAME_LOCAL_PLAY_OPEN: "1" })).toBe(true);
+  });
+
+  it("parses local node cap override for worker:dev seeding", () => {
+    expect(localSummerNodeCapOverride({})).toBeNull();
+    expect(localSummerNodeCapOverride({ CITY_GAME_LOCAL_NODE_CAP: "60" })).toBe(60);
+    expect(localSummerNodeCapOverride({ CITY_GAME_LOCAL_NODE_CAP: "0" })).toBeNull();
+    expect(localSummerNodeCapOverride({ CITY_GAME_LOCAL_NODE_CAP: "abc" })).toBeNull();
   });
 });

@@ -148,3 +148,6 @@ export function applyLaunchChecklistP1Pass(content, opts) {
 }
 
 export { COMPREHENSION_RUNBOOK_REL } from "./city-game-comprehension-kit-core.mjs";
+export {
+  validateComprehensionSignOffPass,
+} from "./city-game-map-board-b13-core.mjs";
