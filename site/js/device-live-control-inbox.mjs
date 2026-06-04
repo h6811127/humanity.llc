@@ -43,7 +43,7 @@ import {
   isLiveControlPollLeaderTab,
   touchLiveControlPollLeader,
 } from "./device-live-control-poll-leader.mjs";
-import { getResolverHealthStatus } from "./device-wallet-since-visit-gate.mjs";
+import { getResolverHealthStatus } from "./device-wallet-since-visit-gate.mjs?v=93";
 import { selectLiveControlPollEntries } from "./device-wallet-scale-core.mjs";
 import {
   forwardLiveProofPushToServiceWorker,
@@ -62,6 +62,9 @@ import {
   getLiveControlPollHealth,
   setLiveControlPollHealth,
   applySingleCardPollHealth,
+  applyLiveControlPollConfirmation,
+  entriesForHubExpandLiveProofVerification,
+  filterConfirmedLiveControlPending,
   pendingItemsFromPollSlots,
   pruneLiveControlPollSlots,
   updateLiveControlPollSlot,
@@ -130,8 +133,17 @@ let scheduledIntervalMs = 0;
 /** @type {Map<string, import("./device-live-control-inbox-core.mjs").LiveControlPendingItem | null>} */
 const pollSlots = new Map();
 
+/** Challenge ids confirmed by a successful GET in this tab (display gate). */
+const confirmedChallengeIds = new Set();
+
 let roundRobinCursor = 0;
 let pollSyncInFlight = false;
+/** Hub-expand verification sweep (Fix 1 step 2). */
+let hubExpandVerifyInFlight = false;
+/** Edge-trigger: verify once when poll scope opens, not on every scope-changed tick. */
+let pollScopeWasActive = false;
+/** Resolver health from device-status health fetch (detail.networkStatus), not wallet poll health. */
+let resolverHealthForExpandVerify = "unset";
 /** Tracks SSE push suppressing auto poll so we restart the loop when push drops. */
 let stewardPushWasSuppressingAutoPoll = false;
 
@@ -174,13 +186,28 @@ export function getLastLiveProofCheckAt() {
   return lastLiveProofCheckAt;
 }
 
-export function getLiveControlPending() {
+function mergeLiveControlPendingCache() {
   if (!scanPageLiveProofPending) return [...pending];
   const profileId = scanPageLiveProofPending.entry?.profile_id;
   const withoutScanDup = pending.filter(
     (item) => item.entry?.profile_id !== profileId
   );
   return [...withoutScanDup, scanPageLiveProofPending];
+}
+
+/** Cached pending from polls, snapshots, or scan-page watch (may be unconfirmed). */
+export function getLiveControlPending() {
+  return mergeLiveControlPendingCache();
+}
+
+/**
+ * Pending the shell may surface — only server-confirmed challenges (Fix 1 gate).
+ */
+export function getLiveControlPendingForDisplay() {
+  return filterConfirmedLiveControlPending(
+    mergeLiveControlPendingCache(),
+    confirmedChallengeIds
+  );
 }
 
 /**
@@ -191,13 +218,48 @@ export function setScanPageLiveProofPending(item) {
   const prevId = scanPageLiveProofPending?.challenge_id ?? null;
   const nextId = item?.challenge_id ?? null;
   scanPageLiveProofPending = item;
+  if (item?.challenge_id) {
+    confirmedChallengeIds.add(item.challenge_id);
+  } else if (prevId) {
+    confirmedChallengeIds.delete(prevId);
+  }
   if (prevId !== nextId) {
     window.dispatchEvent(new Event("hc-live-control-inbox-changed"));
   }
 }
 
 export function getLiveControlPendingCount() {
-  return getLiveControlPending().length;
+  return getLiveControlPendingForDisplay().length;
+}
+
+/**
+ * Clear cached live-proof inbox state after shell bfcache resume.
+ * Display stays empty until a fresh GET confirms pending (Fix 1 step 1).
+ */
+export function resetLiveControlInboxOnShellResume() {
+  const hadCache =
+    pending.length > 0 ||
+    pollSlots.size > 0 ||
+    scanPageLiveProofPending != null ||
+    confirmedChallengeIds.size > 0;
+
+  pending = [];
+  pollSlots.clear();
+  scanPageLiveProofPending = null;
+  confirmedChallengeIds.clear();
+
+  if (typeof window !== "undefined" && hadCache) {
+    window.dispatchEvent(new Event("hc-live-control-inbox-changed"));
+  }
+}
+
+/**
+ * @param {Record<string, unknown>} entry
+ * @param {{ kind: import("./device-live-control-inbox-core.mjs").LiveControlPollKind, item?: import("./device-live-control-inbox-core.mjs").LiveControlPendingItem }} result
+ */
+function applyPollResultToSlots(entry, result) {
+  applyLiveControlPollConfirmation(confirmedChallengeIds, entry, pollSlots, result);
+  updateLiveControlPollSlot(pollSlots, entry, result);
 }
 
 export function isLiveControlInboxPollingActive() {
@@ -357,7 +419,7 @@ function broadcastLiveControlSnapshotToPeers() {
   const tabId = getLiveControlPollTabId();
   if (!tabId) return;
   broadcastLiveControlPollSnapshot({
-    pending: getLiveControlPending(),
+    pending: getLiveControlPendingForDisplay(),
     health: getLiveControlPollHealth(),
     at: lastLiveProofCheckAt,
     tabId,
@@ -500,6 +562,7 @@ export async function refreshLiveControlInbox(opts = {}) {
 
   if (entries.length === 0) {
     pollSlots.clear();
+    confirmedChallengeIds.clear();
     roundRobinCursor = 0;
     const prevHealth = getLiveControlPollHealth();
     const changed =
@@ -524,7 +587,7 @@ export async function refreshLiveControlInbox(opts = {}) {
   if (result.kind === "rate_limited") {
     pollBackoffUntil = Date.now() + RATE_LIMIT_BACKOFF_MS;
   } else {
-    updateLiveControlPollSlot(pollSlots, entry, result);
+    applyPollResultToSlots(entry, result);
   }
 
   const next = pendingItemsFromPollSlots(entries, pollSlots);
@@ -566,7 +629,7 @@ export async function applyLiveProofPendingFromPush(hint) {
 
   const result = await fetchPendingForEntry(entry, { pushTriggered: true });
   const allPollable = listPollableWalletEntries();
-  updateLiveControlPollSlot(pollSlots, entry, result);
+  applyPollResultToSlots(entry, result);
   const next = pendingItemsFromPollSlots(allPollable, pollSlots);
   const prevHealth = getLiveControlPollHealth();
   setLiveControlPollHealth(applySingleCardPollHealth(prevHealth, result.kind));
@@ -586,6 +649,150 @@ export async function applyLiveProofPendingFromPush(hint) {
 /** One live-proof round-robin check (manual hub control when watch is off). */
 export async function checkLiveProofNow() {
   return refreshLiveControlInbox({ manual: true });
+}
+
+/**
+ * Background alerts: probe all pollable cards once before OS notify (tab hidden).
+ * Does not require Watch; bounded by wallet size + resolver health.
+ */
+export async function probeLiveControlInboxForBackgroundAlerts() {
+  if (!liveControlPollAllowedByResolverHealth(getResolverHealthStatus())) {
+    return getLiveControlPendingForDisplay();
+  }
+  if (Date.now() < pollBackoffUntil) {
+    return getLiveControlPendingForDisplay();
+  }
+
+  const allPollable = listPollableWalletEntries();
+  pruneLiveControlPollSlots(pollSlots, allPollable);
+  if (allPollable.length === 0) {
+    return getLiveControlPendingForDisplay();
+  }
+
+  const entries = resolvePollEntries(allPollable);
+  let rateLimited = false;
+  for (const entry of entries) {
+    const result = await fetchPendingForEntry(entry, { manual: true });
+    if (result.kind === "rate_limited") {
+      rateLimited = true;
+      break;
+    }
+    applyPollResultToSlots(entry, result);
+  }
+
+  if (rateLimited) {
+    pollBackoffUntil = Date.now() + RATE_LIMIT_BACKOFF_MS;
+  }
+
+  const next = pendingItemsFromPollSlots(entries, pollSlots);
+  const prevHealth = getLiveControlPollHealth();
+  const displayBefore = getLiveControlPendingForDisplay();
+  setLiveControlPollHealth(rateLimited ? prevHealth : "ok");
+  pending = next;
+  const displayAfter = getLiveControlPendingForDisplay();
+  const changed =
+    liveControlInboxChanged(displayBefore, displayAfter) ||
+    prevHealth !== getLiveControlPollHealth();
+  persistLiveProofCheckedAt(Date.now());
+  if (changed) {
+    window.dispatchEvent(new Event("hc-live-control-inbox-changed"));
+  }
+  window.dispatchEvent(new Event(LIVE_PROOF_CHECKED_EVENT));
+  if (isLiveControlPollLeaderTab()) publishLeaderSnapshot();
+  else broadcastLiveControlSnapshotToPeers();
+  return displayAfter;
+}
+
+/**
+ * Hub expand / inbox open: verify cached pending and discover real pending via manual GETs.
+ * Runs when watch is off; does not start the auto-poll loop.
+ */
+export async function verifyLiveControlInboxOnHubExpand() {
+  if (!pollFeatureEnabled || hubExpandVerifyInFlight) {
+    return getLiveControlPendingForDisplay();
+  }
+  if (isWatchLiveProofEnabled()) {
+    return getLiveControlPendingForDisplay();
+  }
+  if (!readPollScope()) {
+    return getLiveControlPendingForDisplay();
+  }
+  if (!liveControlPollAllowedByResolverHealth(getResolverHealthStatus())) {
+    return getLiveControlPendingForDisplay();
+  }
+  if (Date.now() < pollBackoffUntil) {
+    return getLiveControlPendingForDisplay();
+  }
+
+  hubExpandVerifyInFlight = true;
+  try {
+    const allPollable = listPollableWalletEntries();
+    pruneLiveControlPollSlots(pollSlots, allPollable);
+
+    if (allPollable.length === 0) {
+      pollSlots.clear();
+      confirmedChallengeIds.clear();
+      roundRobinCursor = 0;
+      const prevHealth = getLiveControlPollHealth();
+      const changed =
+        liveControlInboxChanged(pending, []) || prevHealth !== "ok";
+      pending = [];
+      setLiveControlPollHealth("ok");
+      if (changed) {
+        window.dispatchEvent(new Event("hc-live-control-inbox-changed"));
+      }
+      persistLiveProofCheckedAt(Date.now());
+      window.dispatchEvent(new Event(LIVE_PROOF_CHECKED_EVENT));
+      publishLiveControlSnapshotAfterPoll({ manual: true });
+      return getLiveControlPendingForDisplay();
+    }
+
+    const session = getTabSession();
+    const activeProfileId =
+      session && typeof session.profile_id === "string" ? session.profile_id : null;
+    const policy = getStewardEntitlementsPolicy();
+    const cachedPending = mergeLiveControlPendingCache();
+    const toVerify = entriesForHubExpandLiveProofVerification(
+      allPollable,
+      cachedPending,
+      activeProfileId,
+      policy
+    );
+
+    let rateLimited = false;
+    for (const entry of toVerify) {
+      const result = await fetchPendingForEntry(entry, { manual: true });
+      if (result.kind === "rate_limited") {
+        rateLimited = true;
+        break;
+      }
+      applyPollResultToSlots(entry, result);
+    }
+
+    if (rateLimited) {
+      pollBackoffUntil = Date.now() + RATE_LIMIT_BACKOFF_MS;
+    }
+
+    const entries = resolvePollEntries(allPollable);
+    const next = pendingItemsFromPollSlots(entries, pollSlots);
+    const prevHealth = getLiveControlPollHealth();
+    const displayBefore = getLiveControlPendingForDisplay();
+    setLiveControlPollHealth(rateLimited ? prevHealth : "ok");
+    pending = next;
+    const displayAfter = getLiveControlPendingForDisplay();
+    const changed =
+      liveControlInboxChanged(displayBefore, displayAfter) ||
+      prevHealth !== getLiveControlPollHealth();
+    persistLiveProofCheckedAt(Date.now());
+    if (changed) {
+      window.dispatchEvent(new Event("hc-live-control-inbox-changed"));
+    }
+    window.dispatchEvent(new Event(LIVE_PROOF_CHECKED_EVENT));
+    publishLiveControlSnapshotAfterPoll({ manual: true });
+    return getLiveControlPendingForDisplay();
+  } finally {
+    hubExpandVerifyInFlight = false;
+  }
 }
 
 /** Apply watch toggle without re-registering listeners. */
@@ -647,10 +854,38 @@ function bindLiveControlPollScopeListeners() {
   scopeListenersBound = true;
 
   window.addEventListener(LIVE_CONTROL_POLL_SCOPE_CHANGED, () => {
+    const scopeActive = readPollScope();
+    const scopeBecameActive = scopeActive && !pollScopeWasActive;
+    pollScopeWasActive = scopeActive;
+    if (scopeBecameActive && !isWatchLiveProofEnabled()) {
+      void verifyLiveControlInboxOnHubExpand().finally(() => {
+        syncLiveControlInboxPolling();
+      });
+      return;
+    }
     syncLiveControlInboxPolling();
   });
 
-  window.addEventListener(RESOLVER_HEALTH_CHANGED, () => {
+  window.addEventListener(RESOLVER_HEALTH_CHANGED, (e) => {
+    const detail =
+      e instanceof CustomEvent && e.detail && typeof e.detail === "object" ? e.detail : null;
+    const networkStatus = detail?.networkStatus;
+    if (
+      networkStatus === "ok" ||
+      networkStatus === "degraded" ||
+      networkStatus === "offline"
+    ) {
+      const prev = resolverHealthForExpandVerify;
+      resolverHealthForExpandVerify = networkStatus;
+      const recoveredToOk =
+        networkStatus === "ok" && (prev === "degraded" || prev === "offline");
+      if (recoveredToOk && readPollScope() && !isWatchLiveProofEnabled()) {
+        void verifyLiveControlInboxOnHubExpand().finally(() => {
+          syncLiveControlInboxPolling();
+        });
+        return;
+      }
+    }
     syncLiveControlInboxPolling();
   });
 

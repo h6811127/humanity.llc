@@ -26,7 +26,7 @@ import { mountThemeToggles } from "./device-theme.mjs";
 import { syncBrowserNotifPrompts } from "./device-browser-notifications-loader.mjs";
 import { renderHubInboxAlerts, inboxItemsIncludeKind, RELAY_OFFER_INBOX_CHANGED } from "./device-hub-inbox-alerts.mjs";
 import { renderHubKeysCustodyPanel } from "./device-hub-keys-custody.mjs";
-import { getInboxItems, notificationCount } from "./device-inbox.mjs";
+import { getInboxItems, notificationCount, resetPresenceInboxGatherCache } from "./device-inbox.mjs";
 import {
   buildHubCardControls,
   partitionHubCardControls,
@@ -77,7 +77,7 @@ import {
 import {
   getResolverHealthStatus,
   shouldSuppressCardDisabledSinceVisitAlerts,
-} from "./device-wallet-since-visit-gate.mjs";
+} from "./device-wallet-since-visit-gate.mjs?v=93";
 import {
   getCachedNetworkSeenAt,
   getCachedNetworkScanKind,
@@ -98,12 +98,12 @@ import {
   snapshotNetworkSeenOnExit,
   syncLastSeenFromNetworkMap,
   NETWORK_REFRESHED,
-} from "./device-wallet-network.mjs?v=91";
-import { clearWalletNetworkTruthForProfile } from "./device-wallet-network-truth.mjs?v=91";
+} from "./device-wallet-network.mjs?v=93";
+import { clearWalletNetworkTruthForProfile } from "./device-wallet-network-truth.mjs?v=93";
 import {
   hubNetworkChipStatusForProfile,
   shouldShowHubNetworkCheckingChip,
-} from "./device-wallet-network-core.mjs?v=91";
+} from "./device-wallet-network-core.mjs?v=93";
 import {
   broadcastNetworkSnapshotIfEligible,
   shouldFollowerSkipAutoNetworkFetch,
@@ -117,7 +117,7 @@ import {
   hubCardIdentityLine,
   hubCardStatusLine,
   hubCardTitle,
-} from "./device-hub-card-row-core.mjs?v=91";
+} from "./device-hub-card-row-core.mjs?v=93";
 import {
   childObjectHubFocusHash,
   hubChildObjectIconHtml,
@@ -167,14 +167,14 @@ import {
 import { tabNoticeCount } from "./device-counts.mjs";
 import { mountHubBuildStamp } from "./device-hub-build-stamp.mjs";
 import { mountHubNetworkTools } from "./device-hub-network-tools.mjs";
-import { syncInboxBackdropForOpenHub } from "./device-sheet-backdrop-sync.mjs?v=91";
+import { syncInboxBackdropForOpenHub } from "./device-sheet-backdrop-sync.mjs?v=93";
 import {
   HUB_STRANGER_EMPTY_CLASS,
   isHubStrangerEmptyState,
 } from "./device-hub-stranger-empty-core.mjs";
 import { renderHubWalletCorruptCard } from "./device-hub-wallet-corrupt.mjs";
 import {
-  getLiveControlPending,
+  getLiveControlPendingForDisplay,
   openLiveControlProof,
   refreshLiveControlInbox,
   checkLiveProofNow,
@@ -793,7 +793,7 @@ function hubCardIconHtml(profileId, { checking = false } = {}) {
 }
 
 function liveControlPendingForEntry(entry) {
-  return getLiveControlPending().find((p) => p.entry.profile_id === entry.profile_id) ?? null;
+  return getLiveControlPendingForDisplay().find((p) => p.entry.profile_id === entry.profile_id) ?? null;
 }
 
 /** @param {import("./device-hub-controls-core.mjs").HubCardControl[]} controls */
@@ -1344,6 +1344,7 @@ async function fetchAndApplyNetworkChips(opts = {}) {
         return e;
       });
       if (changed) saveWallet(next);
+      resetPresenceInboxGatherCache();
       syncHubInboxAlertGroups();
       notifyHubChanged();
       window.dispatchEvent(
@@ -1369,8 +1370,17 @@ async function fetchAndApplyNetworkChips(opts = {}) {
   );
 }
 
+/** Manual hub Check network — refresh resolver health first (P1-MOTO-06). */
+export async function checkNetworkFromHub() {
+  const { refreshResolverHealthManual } = await import("./device-status.mjs");
+  await refreshResolverHealthManual();
+  await fetchAndApplyNetworkChips({ manual: true });
+}
+
 /** Manual Shortcuts action: one leader check, then broadcast to open tabs. @see docs/DEVICE_TAB_RESOLVER_SYNC.md § Manual refresh */
 export async function refreshResolverChecksFromHub() {
+  const { refreshResolverHealthManual } = await import("./device-status.mjs");
+  await refreshResolverHealthManual();
   if (hubConfig.fetchNetworkStatus) {
     if (getWalletCount() > 0) {
       await fetchAndApplyNetworkChips({ manual: true });
@@ -2451,7 +2461,7 @@ export function refreshDeviceHub() {
  * @see docs/SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md RC-17 · RC-18
  */
 export function prepareShellHubBootReveal() {
-  if (!document.getElementById("device-hub")) return;
+  if (!document.getElementById("device-hub") && !document.getElementById("wallet-page")) return;
   renderActivityRows();
   applyHubStrangerEmptyChrome();
   renderSavedRows();
@@ -2545,7 +2555,7 @@ export function initDeviceHub(config = {}) {
       getHostedTierLine: () =>
         hostedTierHubIndicatorLine(getStewardEntitlementsPolicy()),
       getStewardBillingPendingLine: () => getStewardBillingReturnPendingLine(),
-      onCheckNetwork: () => fetchAndApplyNetworkChips({ manual: true }),
+      onCheckNetwork: () => void checkNetworkFromHub(),
       onCheckLiveProof: () => checkLiveProofNow(),
       onWatchChange: () => applyLiveControlWatchPreference(),
     });

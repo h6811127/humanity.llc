@@ -4,11 +4,11 @@
   "phase": "smooth_mode_phase_0",
   "asset_version": 93,
   "module_count": 84,
-  "js_bytes_total": 546991,
+  "js_bytes_total": 549439,
   "shell_css_bytes_total": 77438,
   "landing_css_bytes_total": 326348,
-  "transfer_bytes_shell_graph": 624429,
-  "transfer_bytes_landing_first_paint": 873339,
+  "transfer_bytes_shell_graph": 626877,
+  "transfer_bytes_landing_first_paint": 875787,
   "js_modules": [
     {
       "file": "js/device-status-bootstrap.mjs",
@@ -48,7 +48,7 @@
     },
     {
       "file": "js/device-status.mjs",
-      "bytes": 23670
+      "bytes": 23675
     },
     {
       "file": "js/device-hub-intro-coachmark.mjs",
@@ -84,7 +84,7 @@
     },
     {
       "file": "js/device-chrome-refresh.mjs",
-      "bytes": 9044
+      "bytes": 10115
     },
     {
       "file": "js/device-foreground-attention-core.mjs",
@@ -96,7 +96,7 @@
     },
     {
       "file": "js/device-live-proof-banner.mjs",
-      "bytes": 2407
+      "bytes": 2595
     },
     {
       "file": "js/device-shell-boot-core.mjs",
@@ -104,7 +104,7 @@
     },
     {
       "file": "js/device-hub-boot-core.mjs",
-      "bytes": 2201
+      "bytes": 2606
     },
     {
       "file": "js/device-shell-boot.mjs",
@@ -116,7 +116,7 @@
     },
     {
       "file": "js/device-shell-resume.mjs",
-      "bytes": 1927
+      "bytes": 1932
     },
     {
       "file": "js/device-inbox-sheet-loader.mjs",
@@ -140,7 +140,7 @@
     },
     {
       "file": "js/device-notification-delivery.mjs",
-      "bytes": 3356
+      "bytes": 3413
     },
     {
       "file": "js/device-browser-notifications-loader.mjs",
@@ -156,7 +156,7 @@
     },
     {
       "file": "js/device-inbox-card-disabled.mjs",
-      "bytes": 1672
+      "bytes": 1677
     },
     {
       "file": "js/device-inbox-diagnostics.mjs",
@@ -276,7 +276,7 @@
     },
     {
       "file": "js/device-hub-ui.mjs",
-      "bytes": 93460
+      "bytes": 93578
     },
     {
       "file": "js/device-hub-card-row-core.mjs",
@@ -292,7 +292,7 @@
     },
     {
       "file": "js/device-wallet-network.mjs",
-      "bytes": 26504
+      "bytes": 26509
     },
     {
       "file": "js/device-hub-build-stamp.mjs",
@@ -340,7 +340,7 @@
     },
     {
       "file": "js/device-browser-notifications.mjs",
-      "bytes": 11101
+      "bytes": 11690
     },
     {
       "file": "js/device-browser-notifications-core.mjs",

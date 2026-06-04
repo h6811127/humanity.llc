@@ -6,12 +6,14 @@
 import { readChildObjectRows } from "./child-object-store-core.mjs";
 import { isActiveLostItemRelayRow } from "./created-child-object-core.mjs";
 import { getTabSession } from "./device-keys.mjs";
+import { signingKeysForProfile } from "./device-signing-keys-for-profile.mjs";
+import { loadWallet } from "./device-wallet.mjs";
 import {
   parseRelayOfferProfileSummaryBody,
   relayOfferInboxChanged,
 } from "./device-relay-offer-inbox-core.mjs";
 import { fetchRelayOfferProfileSummary } from "./lost-item-offer-owner.mjs";
-import { getResolverHealthStatus } from "./device-wallet-since-visit-gate.mjs";
+import { getResolverHealthStatus } from "./device-wallet-since-visit-gate.mjs?v=93";
 
 export {
   relayOfferInboxAggregateTitle,
@@ -95,7 +97,15 @@ export async function refreshRelayOfferInbox(opts = {}) {
     if (now - lastRefreshAt < AUTO_REFRESH_COALESCE_MS) return pending;
   }
 
-  const keys = signingKeysFromTabSession();
+  let keys = signingKeysFromTabSession();
+  if (!keys) {
+    for (const entry of loadWallet()) {
+      const pid = typeof entry.profile_id === "string" ? entry.profile_id : "";
+      if (!pid || !hasLocalActiveLostItemRelays(pid)) continue;
+      keys = await signingKeysForProfile(pid, { promptUnlock: manual });
+      if (keys) break;
+    }
+  }
   if (!keys || !hasLocalActiveLostItemRelays(keys.profileId)) {
     const changed = relayOfferInboxChanged(pending, []);
     pending = [];

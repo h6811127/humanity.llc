@@ -11,7 +11,7 @@ import {
   shouldAutoRefreshWalletNetwork,
   shouldRefreshLiveControlInbox,
 } from "./device-os-coordinator-core.mjs";
-import { setResolverHealthStatusForSinceVisit } from "./device-wallet-since-visit-gate.mjs";
+import { setResolverHealthStatusForSinceVisit } from "./device-wallet-since-visit-gate.mjs?v=93";
 import { listPollableWalletEntries } from "./device-wallet.mjs";
 import {
   refreshWalletNetworkStatuses,

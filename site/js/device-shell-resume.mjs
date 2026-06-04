@@ -7,7 +7,8 @@ import { markDotBootPending } from "./device-status-dot-boot.mjs";
 import { resetDotBootstrapSettledForResume } from "./device-status-dot-boot-core.mjs";
 import { resetResolverHealthBootSettled } from "./device-resolver-health-boot-core.mjs";
 import { markDeviceBootPending } from "./device-shell-boot.mjs";
-import { resetSinceVisitGateOnShellResume } from "./device-wallet-since-visit-gate.mjs";
+import { resetSinceVisitGateOnShellResume } from "./device-wallet-since-visit-gate.mjs?v=93";
+import { resetLiveControlInboxOnShellResume } from "./device-live-control-inbox.mjs";
 import {
   shouldHandleShellBfcacheRestore,
   SHELL_BFCACHE_RESTORE_EVENT,
@@ -27,6 +28,7 @@ export function handleShellBfcacheRestore(doc = document) {
   markDotBootPending(doc);
   resetDotBootstrapSettledForResume();
   resetSinceVisitGateOnShellResume();
+  resetLiveControlInboxOnShellResume();
   invalidateCrossTabNotificationState();
   doc?.defaultView?.dispatchEvent(new Event(SHELL_BFCACHE_RESTORE_EVENT));
 }

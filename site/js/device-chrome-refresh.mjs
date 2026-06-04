@@ -19,6 +19,7 @@ import {
 } from "./device-cross-tab-visibility.mjs";
 import { renderCrossTabKeysBanner } from "./device-cross-tab-banner.mjs";
 import { renderLiveProofBanner } from "./device-live-proof-banner.mjs";
+import { renderForegroundAttentionStrip } from "./device-foreground-attention.mjs?v=93";
 import { refreshHubGlance } from "./device-hub-glance.mjs";
 import { prepareShellHubBootReveal, refreshHubInboxAlertsFromChrome } from "./device-hub-ui.mjs";
 import { shouldPrepareShellHubBootReveal } from "./device-hub-boot-core.mjs";
@@ -26,21 +27,29 @@ import { loadInboxSheetModule } from "./device-inbox-sheet-loader.mjs";
 import {
   loadInboxModule,
   resetPresenceInboxGatherCache,
-} from "./device-inbox-loader.mjs?v=91";
+} from "./device-inbox-loader.mjs?v=93";
 import { getOrphanRemovedTabsWithKeys, getOtherTabsWithKeys } from "./device-tab-presence.mjs";
 import { primeCrossTabNotificationState } from "./device-cross-tab-state.mjs";
 import { refreshWalletContextFromChrome } from "./wallet-page-chrome.mjs";
-import { markDeviceBootReadyIfShellPage } from "./device-shell-boot.mjs";
+import { DEVICE_BOOT_READY_EVENT, markDeviceBootReadyIfShellPage } from "./device-shell-boot.mjs";
 import { isDeviceBootReadyState } from "./device-shell-boot-core.mjs";
 import { isResolverHealthBootSettled } from "./device-resolver-health-boot-core.mjs";
 import {
   initShellBfcacheResumeGate,
   SHELL_BFCACHE_RESTORE_EVENT,
 } from "./device-shell-resume.mjs";
+import { shouldRefreshNetworkBeforeShellBfcacheChrome } from "./device-shell-resume-core.mjs";
 import { shouldSuppressCrossTabChromeUntilShellBoot } from "./device-cross-tab-boot-core.mjs";
+import {
+  NETWORK_BASELINE_CHANGED,
+  NETWORK_REFRESHED,
+} from "./device-wallet-network.mjs?v=93";
 
 /** @type {(() => void) | null} */
 let refreshStatusSurfaces = null;
+
+/** @type {(() => Promise<void>) | null} */
+let shellBfcacheNetworkRefresh = null;
 
 let presenceDebounceTimer = null;
 /** @type {ReturnType<typeof setTimeout> | null} */
@@ -65,6 +74,30 @@ function readPresenceChromeFingerprint() {
  */
 export function setRefreshStatusSurfaces(fn) {
   refreshStatusSurfaces = fn;
+}
+
+/**
+ * Register resolver health refresh before chrome refresh on bfcache resume (device-status.mjs).
+ * @param {() => Promise<void>} fn
+ */
+export function setShellBfcacheNetworkRefresh(fn) {
+  shellBfcacheNetworkRefresh = fn;
+}
+
+async function onShellBfcacheRestore() {
+  resetPresenceInboxGatherCache();
+  const path = document.location?.pathname ?? "";
+  if (
+    shouldRefreshNetworkBeforeShellBfcacheChrome(path) &&
+    shellBfcacheNetworkRefresh
+  ) {
+    try {
+      await shellBfcacheNetworkRefresh();
+    } catch {
+      /* health fetch failed — still attempt chrome + boot reveal */
+    }
+  }
+  refreshDeviceChrome({ immediate: true });
 }
 
 /** Raw presence before fingerprint streak - used for immediate hide. */
@@ -131,8 +164,11 @@ async function runChromeRefreshAsync() {
   inbox.beginDeviceChromeRefreshTick();
   try {
     refreshStatusSurfaces?.();
+    renderForegroundAttentionStrip();
     renderLiveProofBanner();
     renderCrossTabKeysBanner();
+    // Second pass: scan snapshot streak advances on banner read; dot must refresh after (RC-6).
+    refreshStatusSurfaces?.();
     refreshHubGlance();
     refreshHubInboxAlertsFromChrome();
     const sheetMod = await loadInboxSheetModule();
@@ -145,7 +181,9 @@ async function runChromeRefreshAsync() {
     if (
       shouldPrepareShellHubBootReveal({
         pathname: path,
-        hasDeviceHub: !!document.getElementById("device-hub"),
+        hasShellHubRoot: !!(
+          document.getElementById("device-hub") || document.getElementById("wallet-page")
+        ),
         bootBefore,
         healthSettled: isResolverHealthBootSettled(),
       })
@@ -158,9 +196,14 @@ async function runChromeRefreshAsync() {
       !isDeviceBootReadyState(bootBefore) &&
       isDeviceBootReadyState(document.body?.dataset?.boot);
     if (bootJustReady) {
+      // Drop inbox gather pinned while boot was pending/local (RC-11 since-visit gate).
+      resetPresenceInboxGatherCache();
       refreshStatusSurfaces?.();
+      renderForegroundAttentionStrip();
       renderLiveProofBanner();
       renderCrossTabKeysBanner();
+      refreshStatusSurfaces?.();
+      refreshHubInboxAlertsFromChrome();
     }
   } finally {
     lastPresenceChromeFingerprint = readPresenceChromeFingerprint();
@@ -229,11 +272,30 @@ export function startDeviceChromeRefresh() {
     resetPresenceInboxGatherCache();
     onImmediateChromeEvent();
   });
+  window.addEventListener("hc-relay-offer-inbox-changed", () => {
+    resetPresenceInboxGatherCache();
+    onImmediateChromeEvent();
+  });
+  const invalidateInboxGatherAndRefresh = () => {
+    resetPresenceInboxGatherCache();
+    onImmediateChromeEvent();
+  };
+  window.addEventListener(NETWORK_REFRESHED, invalidateInboxGatherAndRefresh);
+  window.addEventListener(NETWORK_BASELINE_CHANGED, invalidateInboxGatherAndRefresh);
+  window.addEventListener(DEVICE_BOOT_READY_EVENT, invalidateInboxGatherAndRefresh);
+  window.addEventListener("hc-resolver-health-changed", (e) => {
+    const status =
+      e instanceof CustomEvent && e.detail && typeof e.detail === "object"
+        ? e.detail.networkStatus
+        : null;
+    if (status === "ok" || status === "degraded" || status === "offline") {
+      invalidateInboxGatherAndRefresh();
+    }
+  });
   window.addEventListener("hc-wallet-removed-profiles-changed", onImmediateChromeEvent);
   window.addEventListener("storage", onStorageKey);
   initShellBfcacheResumeGate();
   window.addEventListener(SHELL_BFCACHE_RESTORE_EVENT, () => {
-    resetPresenceInboxGatherCache();
-    refreshDeviceChrome({ immediate: true });
+    void onShellBfcacheRestore();
   });
 }

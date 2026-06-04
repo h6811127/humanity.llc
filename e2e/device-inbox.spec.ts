@@ -174,13 +174,17 @@ test.describe("device inbox - live proof", () => {
   test("hub shows live proof waiting group", async ({ page }) => {
     await page.goto("/wallet/");
     await waitForLiveProofChrome(page);
-    await expect(page.locator("#device-hub-live-control-group")).toBeVisible();
-    await expect(
-      page.locator("#device-hub-live-control-group").getByText("Live proof waiting")
-    ).toBeVisible();
-    await expect(
-      page.locator("#device-hub-live-control-group").getByText("E2E Test Card")
-    ).toBeVisible();
+    await expect(page.locator("body")).toHaveAttribute("data-boot", "ready", {
+      timeout: 15_000,
+    });
+    const group = page.locator("#device-hub-live-control-group");
+    await expect(group).toBeVisible();
+    await expect(page.locator("#device-hub-live-control-eyebrow")).toHaveText(
+      "Live proof waiting"
+    );
+    await expect(group.locator(".device-hub-live-control-list .list-title")).toHaveText(
+      "E2E Test Card"
+    );
   });
 
   test("inbox sheet footer shows contextual background alerts prompt", async ({ page }) => {
@@ -344,6 +348,10 @@ test.describe("device inbox - card disabled since visit", () => {
 
   test("badge and inbox sheet surface card disabled since last visit", async ({ page }) => {
     await page.goto("/wallet/");
+    await expect(page.getByText(/Network checked/i)).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator("body")).toHaveAttribute("data-boot", "ready", {
+      timeout: 15_000,
+    });
     const badge = page.locator("#shell-notif-badge");
     await expect(badge).toBeVisible({ timeout: 15_000 });
     await expect(badge).toHaveAttribute("data-inbox-chroma", "default");
@@ -569,7 +577,7 @@ test.describe("device inbox - live proof poll scope (request budget phases 1–3
     expect(challengeFetches).toBe(1);
   });
 
-  test("expanded hub does not auto-poll when Watch for live proof is off", async ({
+  test("expanded hub verifies once on expand when watch is off but does not auto-poll", async ({
     page,
   }) => {
     await page.addInitScript(() => {
@@ -586,8 +594,9 @@ test.describe("device inbox - live proof poll scope (request budget phases 1–3
     await openHubViaStatusDot(page);
     await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/, { timeout: 15_000 });
     await expect(page.locator("#device-hub-check-live-proof-btn")).toBeVisible({ timeout: 15_000 });
+    await expect.poll(() => challengeFetches, { timeout: 15_000 }).toBe(1);
     await page.waitForTimeout(10_000);
-    expect(challengeFetches).toBe(0);
+    expect(challengeFetches).toBe(1);
   });
 
   test("expanded hub does not poll live-control when resolver health is degraded", async ({
@@ -612,7 +621,7 @@ test.describe("device inbox - live proof poll scope (request budget phases 1–3
 });
 
 test.describe("device inbox - live proof watch toggle (request budget phase 5)", () => {
-  test("expanded hub does not auto-poll until watch is enabled (default off)", async ({
+  test("expanded hub verifies on expand but does not auto-poll until watch is enabled (default off)", async ({
     page,
   }) => {
     await page.addInitScript((entry) => {
@@ -632,8 +641,9 @@ test.describe("device inbox - live proof watch toggle (request budget phase 5)",
     await openHubViaStatusDot(page);
     await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/, { timeout: 15_000 });
     await expect(page.locator("#device-hub-watch-live-proof")).not.toBeChecked();
+    await expect.poll(() => challengeFetches, { timeout: 15_000 }).toBe(1);
     await page.waitForTimeout(10_000);
-    expect(challengeFetches).toBe(0);
+    expect(challengeFetches).toBe(1);
   });
 
   test.beforeEach(async ({ page, context }) => {
@@ -659,7 +669,8 @@ test.describe("device inbox - live proof watch toggle (request budget phase 5)",
     await openHubViaStatusDot(page);
     await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/, { timeout: 15_000 });
     await expect(page.locator("#device-hub-check-live-proof-btn")).toBeVisible({ timeout: 15_000 });
+    await expect.poll(() => challengeFetches, { timeout: 15_000 }).toBe(1);
     await page.locator("#device-hub-check-live-proof-btn").click();
-    await expect.poll(() => challengeFetches, { timeout: 10_000 }).toBe(1);
+    await expect.poll(() => challengeFetches, { timeout: 10_000 }).toBe(2);
   });
 });

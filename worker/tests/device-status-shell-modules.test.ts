@@ -65,6 +65,21 @@ describe("device status shell module manifest", () => {
     }
   });
 
+  it("since-visit gate reads versioned wallet network truth (singleton regression)", () => {
+    const v = DEVICE_SHELL_ASSET_VERSION;
+    const read = (name) =>
+      fs.readFileSync(path.join(siteJsDir, name), "utf8");
+    expect(read("device-wallet-since-visit-gate.mjs")).toContain(
+      `device-wallet-network-truth.mjs?v=${v}`
+    );
+    expect(read("device-inbox-card-disabled.mjs")).toContain(
+      `device-wallet-since-visit-gate.mjs?v=${v}`
+    );
+    expect(read("device-wallet-network.mjs")).toContain(
+      `device-wallet-since-visit-gate.mjs?v=${v}`
+    );
+  });
+
   it("custody status graph cache-busts copy chain (partial-load regression)", () => {
     const v = DEVICE_SHELL_ASSET_VERSION;
     const read = (name) =>

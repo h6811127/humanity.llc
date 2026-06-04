@@ -2,11 +2,12 @@
  * Floating status dot, notification badge, hub sheet host.
  * @see docs/STATUS_INDICATOR_STEWARD_GREEN.md
  */
-import { closeInboxSheet, openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=91";
+import { closeInboxSheet, openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=93";
 import {
   shellSurfaceFromStandalone,
   statusKeyCrossTabLine,
-} from "./device-shell-copy-core.mjs?v=91";
+  readShellCopyContext,
+} from "./device-shell-copy-core.mjs?v=93";
 import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
 import { buildStatusSegments } from "./device-counts.mjs";
 import { loadPins } from "./device-pins.mjs";
@@ -17,14 +18,14 @@ import {
 } from "./device-hub-stranger-empty-core.mjs";
 import { shouldSkipDotViewTransition } from "./device-status-dot-view-transition-core.mjs";
 import { fetchResolverHealth } from "./device-network-health.mjs";
-import { setResolverHealthStatusForSinceVisit } from "./device-wallet-since-visit-gate.mjs";
+import { setResolverHealthStatusForSinceVisit } from "./device-wallet-since-visit-gate.mjs?v=93";
 
 export const RESOLVER_HEALTH_CHANGED = "hc-resolver-health-changed";
 import { ensureQuietTabRehydrateBootstrap } from "./device-quiet-tab-rehydrate-bootstrap.mjs";
 import {
   savedControlNeedsDeviceUnlockCopy,
   savedControlNeedsDeviceUnlockReenrollCopy,
-} from "./device-custody-mode-core.mjs?v=91";
+} from "./device-custody-mode-core.mjs?v=93";
 import { scheduleStoragePersistRequest } from "./device-storage-persist.mjs";
 import { resolverApiOrigin } from "./hc-sign.mjs";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
@@ -39,38 +40,31 @@ import {
   getInboxDotOverlay,
   notificationCount,
   preloadInboxModule,
-} from "./device-inbox-loader.mjs?v=91";
-import {
-  inboxBadgeAriaLabel,
-  inboxBadgeTitle,
-  inboxBadgeChromaClass,
-  inboxBadgeChromaClassNames,
-  inboxBadgeChromaKind,
-  inboxBadgeCountText,
-  inboxCountFromItems,
-} from "./device-inbox-core.mjs?v=91";
+} from "./device-inbox-loader.mjs?v=93";
+import { buildShellBadgeDeliveryPlan } from "./device-notification-delivery-core.mjs?v=93";
 import { closeGlancePopover, isGlancePopoverOpen } from "./device-hub-glance-popover.mjs";
 import {
   initHubIntroCoachmark,
   onHubOpenedFromIntro,
 } from "./device-hub-intro-coachmark.mjs";
 import { logDotDiagnostic } from "./device-dot-diagnostics.mjs";
-import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=91";
+import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=93";
 import {
   NETWORK_BASELINE_CHANGED,
   NETWORK_REFRESHED,
-} from "./device-wallet-network.mjs?v=91";
+} from "./device-wallet-network.mjs?v=93";
 import "./device-shell-motion.mjs";
-import "./device-shell-chrome.mjs?v=91";
+import "./device-shell-chrome.mjs?v=93";
 import "./device-theme.mjs";
-import { initBrowserNotifications } from "./device-browser-notifications-loader.mjs?v=91";
-import { reconcileHubSheetState } from "./device-hub-sheet-loader.mjs?v=91";
+import { initBrowserNotifications } from "./device-browser-notifications-loader.mjs?v=93";
+import { reconcileHubSheetState } from "./device-hub-sheet-loader.mjs?v=93";
 import { startCrossTabNotificationState } from "./device-cross-tab-state.mjs";
 import {
   refreshDeviceChrome,
   setRefreshStatusSurfaces,
+  setShellBfcacheNetworkRefresh,
   startDeviceChromeRefresh,
-} from "./device-chrome-refresh.mjs?v=91";
+} from "./device-chrome-refresh.mjs?v=93";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
 import {
   broadcastHealthSnapshotIfEligible,
@@ -93,11 +87,11 @@ import {
   shellDotUsesNeutralEmptyWallet,
   shouldCelebrateStewardTransition,
   statusAriaLabel,
-} from "./device-dot-state-core.mjs?v=91";
+} from "./device-dot-state-core.mjs?v=93";
 import {
   markResolverHealthBootSettled,
 } from "./device-resolver-health-boot-core.mjs";
-import { scrollToHubImportForm } from "./device-wallet-corrupt-core.mjs?v=91";
+import { scrollToHubImportForm } from "./device-wallet-corrupt-core.mjs?v=93";
 import {
   DOT_STATE_CHANGED,
   getNetworkStatus,
@@ -107,7 +101,7 @@ import {
   setHubExpandedHook,
   setHubExpanded as setHubExpandedCore,
   setNetworkStatus,
-} from "./device-status-core.mjs?v=91";
+} from "./device-status-core.mjs?v=93";
 import {
   markDotBootstrapSettled,
   markDotBootReadyIfSettled,
@@ -313,12 +307,14 @@ function applyDot() {
     dotBtn?.setAttribute("data-dot-state", dotState);
     dotBtn?.setAttribute("data-dot-overlay", overlay);
     const signing = shellDotSigningContext();
+    const shellCopy = readShellCopyContext(window);
     dotBtn?.setAttribute(
       "aria-label",
       statusAriaLabel(networkStatus, device, overlay, {
         pageKind: dotPageKind(),
         walletKeysNotInTab: signing.walletKeysNotInTab,
-        surface: shellSurfaceFromStandalone(readStandaloneModeFromWindow(window)),
+        surface: shellCopy.surface,
+        companionBrowser: shellCopy.companionBrowser,
       })
     );
     renderDotExplainability(networkStatus, device, overlay);
@@ -428,8 +424,8 @@ function renderDotExplainability(network, device, overlay) {
 function renderStatusKey() {
   const el = document.getElementById("device-hub-status-key");
   if (!el) return;
-  const surface = shellSurfaceFromStandalone(readStandaloneModeFromWindow(window));
-  const crossTabLine = statusKeyCrossTabLine(surface);
+  const { surface, companionBrowser } = readShellCopyContext(window);
+  const crossTabLine = statusKeyCrossTabLine(surface, { companionBrowser });
   el.innerHTML = `
     <p class="device-hub-status-key-label">Status dot reference</p>
     <ul class="device-hub-status-key-list">
@@ -492,20 +488,16 @@ function renderHubStatusPanel(segments) {
 
 function renderNotifBadge() {
   if (!notifBtn) return;
-  const items = getInboxItems();
-  const n = inboxCountFromItems(items);
-  const ctx = gatherInboxInput();
-  notifBtn.hidden = n === 0;
-  notifBtn.setAttribute("aria-label", inboxBadgeAriaLabel(items, ctx));
-  const title = inboxBadgeTitle(items, ctx);
-  if (title) notifBtn.setAttribute("title", title);
+  const plan = buildShellBadgeDeliveryPlan(getInboxItems(), gatherInboxInput());
+  notifBtn.hidden = plan.hidden;
+  notifBtn.setAttribute("aria-label", plan.ariaLabel);
+  if (plan.title) notifBtn.setAttribute("title", plan.title);
   else notifBtn.removeAttribute("title");
-  notifBtn.classList.remove(...inboxBadgeChromaClassNames());
-  const chroma = inboxBadgeChromaKind(items);
-  notifBtn.classList.add(inboxBadgeChromaClass(chroma));
-  notifBtn.setAttribute("data-inbox-chroma", chroma);
+  notifBtn.classList.remove(...plan.chromaClassNames);
+  notifBtn.classList.add(plan.chromaClass);
+  notifBtn.setAttribute("data-inbox-chroma", plan.chromaKind);
   if (notifCountEl) {
-    notifCountEl.textContent = inboxBadgeCountText(n);
+    notifCountEl.textContent = plan.countText;
   }
 }
 
@@ -557,6 +549,11 @@ function refreshSummary() {
 /**
  * @param {{ manual?: boolean }} [opts] Manual dot retry bypasses follower health skip.
  */
+/** Manual resolver health refresh (hub Check network). */
+export function refreshResolverHealthManual() {
+  return refreshNetwork({ manual: true });
+}
+
 async function refreshNetwork(opts = {}) {
   const manual = opts.manual === true;
   if (!manual && shouldFollowerSkipAutoHealthFetch()) {
@@ -640,6 +637,7 @@ async function bootDeviceStatusShell() {
   setRefreshStatusSurfaces(() => {
     refreshSummary();
   });
+  setShellBfcacheNetworkRefresh(refreshNetwork);
   startDeviceChromeRefresh();
   await refreshNetwork();
   refreshDeviceChrome({ immediate: true });
