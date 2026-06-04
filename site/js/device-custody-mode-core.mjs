@@ -77,6 +77,7 @@ export function walletEntryNeedsDeviceUnlockReenroll(entry) {
  *   custodyMode?: string,
  *   webAuthnAvailable?: boolean,
  *   organizerEnabled?: boolean,
+ *   gameSeasonFlow?: boolean,
  *   ephemeralBrowsing?: boolean,
  * }} input
  */
@@ -85,13 +86,15 @@ export function shouldDefaultDeviceUnlockAtCreate(input) {
     custodyMode,
     webAuthnAvailable = false,
     organizerEnabled = false,
+    gameSeasonFlow = false,
     ephemeralBrowsing = false,
   } = input;
+  const blocksDeviceUnlock = organizerEnabled || gameSeasonFlow;
   if (custodyMode === CUSTODY_MODE_FULL_KEYS) return false;
   if (custodyMode === CUSTODY_MODE_DEVICE_UNLOCK) {
-    return webAuthnAvailable && !organizerEnabled && !ephemeralBrowsing;
+    return webAuthnAvailable && !blocksDeviceUnlock && !ephemeralBrowsing;
   }
-  return webAuthnAvailable && !organizerEnabled && !ephemeralBrowsing;
+  return webAuthnAvailable && !blocksDeviceUnlock && !ephemeralBrowsing;
 }
 
 /**

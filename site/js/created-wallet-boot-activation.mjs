@@ -3,9 +3,8 @@
  * @see docs/CORE_PRODUCT_LOOP.md § View-only deprecation (step 1)
  */
 import { activateWalletEntryGatedWithPinPrompt } from "./device-control-activation.mjs";
-import { walletEntryNeedsDeviceUnlock } from "./device-custody-mode-core.mjs";
 import { findWalletEntryByProfileId } from "./device-wallet.mjs";
-import { walletEntryHasSigningMaterial } from "./device-tab-session-core.mjs";
+import { shouldAttemptCreatedBootActivation } from "./created-wallet-boot-activation-core.mjs";
 
 /**
  * @param {string | null | undefined} profileId
@@ -20,13 +19,9 @@ export async function tryActivateWalletForCreatedPage(profileId) {
   if (!pid) return { skipped: true, reason: "no_profile" };
 
   const entry = findWalletEntryByProfileId(pid);
-  if (!entry) return { skipped: true, reason: "no_wallet" };
-
-  if (
-    !walletEntryHasSigningMaterial(entry) &&
-    !walletEntryNeedsDeviceUnlock(entry)
-  ) {
-    return { skipped: true, reason: "no_signing_material" };
+  const boot = shouldAttemptCreatedBootActivation(entry);
+  if (!boot.attempt) {
+    return { skipped: true, reason: boot.reason ?? "no_wallet" };
   }
 
   const result = await activateWalletEntryGatedWithPinPrompt(entry);

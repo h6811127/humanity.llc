@@ -2,7 +2,7 @@
  * Focus routing for /created/?focus=game-season-setup (step 14).
  */
 
-import { GAME_SEASON_SETUP_FOCUS } from "./create-organizer-season-core.mjs";
+import { GAME_SEASON_SETUP_FOCUS, markGameSeasonSetupFlow } from "./create-organizer-season-core.mjs";
 import { CREATED_PANEL_FOCUS } from "./created-tabs.mjs";
 
 /**
@@ -22,6 +22,7 @@ export function applyGameSeasonSetupFocus(select, searchParams, hash = location.
         : null;
   if (!focusKey || !CREATED_PANEL_FOCUS[focusKey]) return false;
 
+  markGameSeasonSetupFlow();
   select("now");
   requestAnimationFrame(() => {
     const panelId = CREATED_PANEL_FOCUS[focusKey];

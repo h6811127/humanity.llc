@@ -1,21 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { walletEntryHasSigningMaterial } from "../../site/js/device-tab-session-core.mjs";
-import { walletEntryNeedsDeviceUnlock } from "../../site/js/device-custody-mode-core.mjs";
+import {
+  shouldActivateWalletForCreatedPage,
+  shouldAttemptCreatedBootActivation,
+} from "../../site/js/created-wallet-boot-activation-core.mjs";
 
-/** Mirrors skip rules in created-wallet-boot-activation.mjs (no DOM). */
-function shouldAttemptCreatedBootActivation(entry: Record<string, unknown> | null) {
-  if (!entry) return { attempt: false, reason: "no_wallet" };
-  if (
-    !walletEntryHasSigningMaterial(entry) &&
-    !walletEntryNeedsDeviceUnlock(entry)
-  ) {
-    return { attempt: false, reason: "no_signing_material" };
-  }
-  return { attempt: true };
-}
-
-describe("created-wallet-boot-activation", () => {
+describe("created-wallet-boot-activation-core", () => {
   it("attempts activation when wallet row has signing material", () => {
     expect(
       shouldAttemptCreatedBootActivation({
@@ -45,5 +35,31 @@ describe("created-wallet-boot-activation", () => {
     expect(
       shouldAttemptCreatedBootActivation({ profile_id: "p1", label: "My card" })
     ).toEqual({ attempt: false, reason: "no_signing_material" });
+  });
+
+  it("activates when URL profile differs from tab session (redirect_live handoff)", () => {
+    expect(
+      shouldActivateWalletForCreatedPage("profile_url", {
+        profile_id: "profile_tab",
+        owner_private_key_b58: "k",
+      })
+    ).toBe(true);
+  });
+
+  it("skips activation when tab session already matches URL with keys", () => {
+    expect(
+      shouldActivateWalletForCreatedPage("profile_a", {
+        profile_id: "profile_a",
+        owner_private_key_b58: "k",
+      })
+    ).toBe(false);
+  });
+
+  it("activates when URL profile matches but tab has no signing keys", () => {
+    expect(
+      shouldActivateWalletForCreatedPage("profile_a", {
+        profile_id: "profile_a",
+      })
+    ).toBe(true);
   });
 });

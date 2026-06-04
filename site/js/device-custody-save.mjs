@@ -16,6 +16,10 @@ import {
   persistWalletEntry,
   saveSessionToWallet,
 } from "./device-wallet.mjs";
+import {
+  gameSeasonBlocksDeviceUnlock,
+  isGameSeasonSetupFlowActive,
+} from "./create-organizer-season-core.mjs";
 import { isLocalStorageEphemeral } from "./private-browsing-detect-core.mjs";
 
 /**
@@ -38,10 +42,15 @@ export async function saveSessionToWalletWithCustody(session, label = "", opts =
     return persistWalletEntry(merged);
   }
 
+  const gameSeasonFlow = gameSeasonBlocksDeviceUnlock({
+    session,
+    setupFlowActive: isGameSeasonSetupFlowActive(),
+  });
   const useDeviceUnlock = shouldDefaultDeviceUnlockAtCreate({
     custodyMode: mode,
     webAuthnAvailable: isDeviceUnlockWebAuthnAvailable(),
     organizerEnabled: Boolean(session?.organizer_private_key_b58),
+    gameSeasonFlow,
     ephemeralBrowsing: isLocalStorageEphemeral(),
   });
 

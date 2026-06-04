@@ -12,6 +12,14 @@ import {
   isWalletSaved,
 } from "./device-wallet.mjs";
 import { saveSessionToWalletWithCustody } from "./device-custody-save.mjs";
+import {
+  gameSeasonBlocksDeviceUnlock,
+  isGameSeasonSetupFlowActive,
+} from "./create-organizer-season-core.mjs";
+import { shouldDefaultDeviceUnlockAtCreate } from "./device-custody-mode-core.mjs";
+import { isDeviceUnlockWebAuthnAvailable } from "./device-custody-webauthn-core.mjs";
+import { GAME_SEASON_FACE_ID_SAVE_BLOCKED_MESSAGE } from "./device-ownership-copy-core.mjs";
+import { isLocalStorageEphemeral } from "./private-browsing-detect-core.mjs";
 
 /**
  * @param {() => Record<string, unknown> | null} getSession
@@ -95,11 +103,37 @@ export function initCreatedDeviceSave(getSession) {
   /**
    * @param {{ quiet?: boolean }} [opts]
    */
+  function wouldAttemptDeviceUnlockSave(session) {
+    return shouldDefaultDeviceUnlockAtCreate({
+      custodyMode: session?.custody_mode,
+      webAuthnAvailable: isDeviceUnlockWebAuthnAvailable(),
+      organizerEnabled: Boolean(session?.organizer_private_key_b58),
+      gameSeasonFlow: gameSeasonBlocksDeviceUnlock({
+        session,
+        setupFlowActive: isGameSeasonSetupFlowActive(),
+      }),
+      ephemeralBrowsing: isLocalStorageEphemeral(),
+    });
+  }
+
   async function runSave(opts = {}) {
     const session = getSession();
     if (!session?.profile_id || !session?.owner_private_key_b58) {
       if (!opts.quiet) {
         setStatus("Ownership not loaded in this tab.", true);
+      }
+      return false;
+    }
+    if (
+      gameSeasonBlocksDeviceUnlock({
+        session,
+        setupFlowActive: isGameSeasonSetupFlowActive(),
+      }) &&
+      wouldAttemptDeviceUnlockSave(session)
+    ) {
+      if (!opts.quiet && typeof window !== "undefined") {
+        window.alert(GAME_SEASON_FACE_ID_SAVE_BLOCKED_MESSAGE);
+        setStatus(GAME_SEASON_FACE_ID_SAVE_BLOCKED_MESSAGE, true);
       }
       return false;
     }

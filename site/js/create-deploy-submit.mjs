@@ -12,6 +12,7 @@ import {
   parseDeployChildFields,
 } from "./create-deploy-wizard-core.mjs";
 import { pickPreferredGeneralRoot, listGeneralRootsWithKeys } from "./create-flow-convergence-core.mjs";
+import { handoffToCreatedForWalletEntry } from "./create-live-handoff.mjs";
 import { loadWallet } from "./device-wallet.mjs";
 
 /**
@@ -84,7 +85,7 @@ export async function runDeployRootAndChildCreate(template, fields, ctx) {
 /**
  * @param {string} template
  */
-export function redirectDeployToLiveAddObject(template) {
+export async function redirectDeployToLiveAddObject(template) {
   const preferredRoot = pickPreferredGeneralRoot(listGeneralRootsWithKeys(loadWallet()));
   if (!preferredRoot) {
     throw new Error("No saved account with keys on this device — create a root card first.");
@@ -93,5 +94,5 @@ export function redirectDeployToLiveAddObject(template) {
   if (!href) {
     throw new Error("Could not open Live — open controls on your saved card first.");
   }
-  location.href = href;
+  await handoffToCreatedForWalletEntry(preferredRoot, href);
 }

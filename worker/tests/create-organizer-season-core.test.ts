@@ -3,12 +3,15 @@ import { describe, expect, it } from "vitest";
 import {
   GAME_SEASON_SETUP_FOCUS,
   createdGameSeasonSetupHref,
+  gameSeasonBlocksDeviceUnlock,
   gameSeasonRootManifesto,
   gameSeasonSubmitButtonLabel,
   isGameSeasonCreateIntent,
+  isGameSeasonCustodySession,
   isGameSeasonSetupFocus,
   parseGameSeasonIdField,
   resolveGameSeasonSubmitStrategy,
+  walletEntryHasOrganizerIssuerKey,
 } from "../../site/js/create-organizer-season-core.mjs";
 
 describe("isGameSeasonCreateIntent", () => {
@@ -27,7 +30,23 @@ describe("isGameSeasonSetupFocus", () => {
 });
 
 describe("resolveGameSeasonSubmitStrategy", () => {
-  it("redirects when a general root with keys exists", () => {
+  it("redirects when a season root with organizer key exists", () => {
+    expect(
+      resolveGameSeasonSubmitStrategy({
+        searchParams: new URLSearchParams("intent=game"),
+        walletEntries: [
+          {
+            pilot_template: "general",
+            profile_id: "p1",
+            owner_private_key_b58: "priv",
+            issuer_public_key: "org_pub",
+          },
+        ],
+      })
+    ).toBe("redirect_live");
+  });
+
+  it("creates season root when only a deploy general root exists", () => {
     expect(
       resolveGameSeasonSubmitStrategy({
         searchParams: new URLSearchParams("intent=game"),
@@ -39,7 +58,7 @@ describe("resolveGameSeasonSubmitStrategy", () => {
           },
         ],
       })
-    ).toBe("redirect_live");
+    ).toBe("create_season_root");
   });
 
   it("creates season root when no saved general root", () => {
@@ -85,5 +104,42 @@ describe("gameSeasonSubmitButtonLabel", () => {
   it("labels redirect and create paths", () => {
     expect(gameSeasonSubmitButtonLabel("redirect_live")).toContain("Continue");
     expect(gameSeasonSubmitButtonLabel("create_season_root")).toContain("Create season root");
+  });
+});
+
+describe("gameSeasonBlocksDeviceUnlock", () => {
+  it("blocks for intent=game and season custody sessions", () => {
+    expect(gameSeasonBlocksDeviceUnlock({ gameSeasonCreateIntent: true })).toBe(true);
+    expect(
+      gameSeasonBlocksDeviceUnlock({
+        session: { manifesto_line: "City game season · cr_01 · @demo" },
+      })
+    ).toBe(true);
+    expect(
+      gameSeasonBlocksDeviceUnlock({
+        session: { pilot_template: "general", issuer_public_key: "org" },
+      })
+    ).toBe(true);
+    expect(
+      gameSeasonBlocksDeviceUnlock({
+        session: { pilot_template: "general", manifesto_line: "My deploy card" },
+      })
+    ).toBe(false);
+  });
+});
+
+describe("walletEntryHasOrganizerIssuerKey", () => {
+  it("detects issuer or organizer public key", () => {
+    expect(walletEntryHasOrganizerIssuerKey({ issuer_public_key: "abc" })).toBe(true);
+    expect(walletEntryHasOrganizerIssuerKey({ organizer_public_key_b58: "xyz" })).toBe(true);
+    expect(walletEntryHasOrganizerIssuerKey({ pilot_template: "general" })).toBe(false);
+  });
+});
+
+describe("isGameSeasonCustodySession", () => {
+  it("detects season manifesto prefix", () => {
+    expect(
+      isGameSeasonCustodySession({ manifesto_line: "City game season · s1 · @a" })
+    ).toBe(true);
   });
 });

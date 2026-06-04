@@ -19,6 +19,10 @@ import {
 import { resolveGameSeasonSubmitStrategy } from "./create-organizer-season-core.mjs";
 import { syncCreateOrganizerSeasonWizardUi } from "./create-organizer-season-wizard.mjs";
 import {
+  isGameSeasonCreateIntent,
+  gameSeasonBlocksDeviceUnlock,
+} from "./create-organizer-season-core.mjs";
+import {
   redirectToGameSeasonSetup,
   runGameSeasonRootCreate,
 } from "./create-organizer-season-submit.mjs";
@@ -54,6 +58,10 @@ import {
   createCustodyModePanelState,
 } from "./device-custody-create-core.mjs";
 import {
+  CREATE_CUSTODY_GAME_SEASON_FACE_ID_CALLOUT_ACTION,
+  CREATE_CUSTODY_GAME_SEASON_FACE_ID_CALLOUT_DETAIL,
+  CREATE_CUSTODY_GAME_SEASON_FACE_ID_CALLOUT_EYEBROW,
+  CREATE_CUSTODY_GAME_SEASON_FACE_ID_CALLOUT_TITLE,
   CREATE_CUSTODY_ORGANIZER_FACE_ID_CALLOUT_ACTION,
   CREATE_CUSTODY_ORGANIZER_FACE_ID_CALLOUT_DETAIL,
   CREATE_CUSTODY_ORGANIZER_FACE_ID_CALLOUT_EYEBROW,
@@ -151,6 +159,7 @@ function setTemplate(template) {
   const searchParams = new URLSearchParams(location.search);
   syncCreateDeployWizardUi(searchParams, template);
   syncCreateOrganizerSeasonWizardUi(searchParams);
+  syncCreateCustodyModeUi({ scrollOrganizerCallout: isGameSeasonCreateIntent(searchParams) });
 }
 
 templateBtns.forEach((btn) => {
@@ -261,19 +270,35 @@ function focusOrganizerRevokeSetting() {
   if (checkbox instanceof HTMLInputElement) checkbox.focus();
 }
 
-function syncCreateCustodyOrganizerCallout(show) {
+function syncCreateCustodyOrganizerCallout(reason) {
   const callout = document.getElementById("create-custody-organizer-callout");
   if (!callout) return;
-  callout.hidden = !show;
-  if (!show) return;
+  callout.hidden = !reason;
+  if (!reason) return;
   const eyebrow = document.getElementById("create-custody-organizer-callout-eyebrow");
   const title = document.getElementById("create-custody-organizer-callout-title");
   const detail = document.getElementById("create-custody-organizer-callout-detail");
   const action = document.getElementById("create-custody-organizer-callout-action");
+  if (reason === "game_season") {
+    if (eyebrow) eyebrow.textContent = CREATE_CUSTODY_GAME_SEASON_FACE_ID_CALLOUT_EYEBROW;
+    if (title) title.textContent = CREATE_CUSTODY_GAME_SEASON_FACE_ID_CALLOUT_TITLE;
+    if (detail) detail.textContent = CREATE_CUSTODY_GAME_SEASON_FACE_ID_CALLOUT_DETAIL;
+    if (action) action.textContent = CREATE_CUSTODY_GAME_SEASON_FACE_ID_CALLOUT_ACTION;
+    return;
+  }
   if (eyebrow) eyebrow.textContent = CREATE_CUSTODY_ORGANIZER_FACE_ID_CALLOUT_EYEBROW;
   if (title) title.textContent = CREATE_CUSTODY_ORGANIZER_FACE_ID_CALLOUT_TITLE;
   if (detail) detail.textContent = CREATE_CUSTODY_ORGANIZER_FACE_ID_CALLOUT_DETAIL;
   if (action) action.textContent = CREATE_CUSTODY_ORGANIZER_FACE_ID_CALLOUT_ACTION;
+}
+
+function focusFullKeysCustodyRadio() {
+  const fullRadio = document.querySelector('input[name="custody_mode"][value="full_keys"]');
+  if (fullRadio instanceof HTMLInputElement) {
+    fullRadio.checked = true;
+    fullRadio.focus();
+  }
+  syncCreateCustodyModeUi();
 }
 
 function syncCreateCustodyModeUi(opts = {}) {
@@ -286,10 +311,12 @@ function syncCreateCustodyModeUi(opts = {}) {
   if (!fieldset) return;
 
   const organizerOn = enableOrganizerEl?.checked ?? false;
+  const gameSeasonIntent = isGameSeasonCreateIntent(new URLSearchParams(location.search));
   const webAuthnAvailable = isDeviceUnlockWebAuthnAvailable();
   const panel = createCustodyModePanelState({
     webAuthnAvailable,
     organizerEnabled: organizerOn,
+    gameSeasonIntent,
     ephemeralBrowsing,
     urlCustodyParam: new URLSearchParams(location.search).get("custody"),
     selectedCustodyMode: document.querySelector('input[name="custody_mode"]:checked')?.value ?? null,
@@ -308,7 +335,7 @@ function syncCreateCustodyModeUi(opts = {}) {
   if (hint) {
     hint.textContent = createCustodyModeHintForKey(panel.hintKey);
   }
-  syncCreateCustodyOrganizerCallout(panel.showOrganizerBlocksFaceIdCallout);
+  syncCreateCustodyOrganizerCallout(panel.faceIdBlockedReason);
 
   if (opts.scrollOrganizerCallout && panel.showOrganizerBlocksFaceIdCallout) {
     document
@@ -482,6 +509,9 @@ export async function runCreateCard(input) {
     custodyMode,
     webAuthnAvailable: isDeviceUnlockWebAuthnAvailable(),
     organizerEnabled: Boolean(organizerPrivateKey),
+    gameSeasonFlow: gameSeasonBlocksDeviceUnlock({
+      gameSeasonCreateIntent: isGameSeasonCreateIntent(new URLSearchParams(location.search)),
+    }),
     ephemeralBrowsing,
   });
   session.custody_mode = useDeviceUnlock
@@ -629,7 +659,7 @@ async function submitCreate(e, opts = {}) {
 
     if (gameStrategy === "redirect_live") {
       setStatus("Opening season setup on Live…");
-      redirectToGameSeasonSetup();
+      await redirectToGameSeasonSetup();
       return;
     }
 
@@ -655,7 +685,7 @@ async function submitCreate(e, opts = {}) {
 
     if (strategy === "redirect_live") {
       setStatus("Opening Live…");
-      redirectDeployToLiveAddObject(activeTemplate);
+      await redirectDeployToLiveAddObject(activeTemplate);
       return;
     }
 
@@ -722,7 +752,14 @@ enableOrganizerEl?.addEventListener("change", () => {
 
 document
   .getElementById("create-custody-organizer-callout-action")
-  ?.addEventListener("click", focusOrganizerRevokeSetting);
+  ?.addEventListener("click", () => {
+    const gameSeasonIntent = isGameSeasonCreateIntent(new URLSearchParams(location.search));
+    if (gameSeasonIntent) {
+      focusFullKeysCustodyRadio();
+      return;
+    }
+    focusOrganizerRevokeSetting();
+  });
 
 document.querySelectorAll('input[name="organizer_key_mode"]').forEach((el) => {
   el.addEventListener("change", syncOrganizerFieldsUi);

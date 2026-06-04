@@ -11,6 +11,7 @@ import {
 import { createRecoveryRequiredForCustody } from "./device-custody-recovery-gate-core.mjs";
 import {
   CREATE_CUSTODY_DEVICE_UNLOCK_DEFAULT_HINT,
+  CREATE_CUSTODY_GAME_SEASON_FULL_KEYS_HINT,
   CREATE_CUSTODY_ORGANIZER_FULL_KEYS_HINT,
   CREATE_CUSTODY_WEBAUTHN_UNAVAILABLE_HINT,
 } from "./device-ownership-copy-core.mjs";
@@ -19,6 +20,7 @@ import {
  * @param {{
  *   webAuthnAvailable?: boolean,
  *   organizerEnabled?: boolean,
+ *   gameSeasonIntent?: boolean,
  *   ephemeralBrowsing?: boolean,
  *   urlCustodyParam?: string | null,
  *   selectedCustodyMode?: string | null,
@@ -28,14 +30,16 @@ export function createCustodyModePanelState(input) {
   const {
     webAuthnAvailable = false,
     organizerEnabled = false,
+    gameSeasonIntent = false,
     ephemeralBrowsing = false,
     urlCustodyParam = null,
     selectedCustodyMode = null,
   } = input;
 
+  const blocksDeviceUnlock = organizerEnabled || gameSeasonIntent;
   const showFieldset = !ephemeralBrowsing;
   const deviceUnlockSelectable =
-    webAuthnAvailable && !organizerEnabled && !ephemeralBrowsing;
+    webAuthnAvailable && !blocksDeviceUnlock && !ephemeralBrowsing;
 
   let effectiveMode = CUSTODY_MODE_FULL_KEYS;
   if (deviceUnlockSelectable) {
@@ -63,22 +67,35 @@ export function createCustodyModePanelState(input) {
     preferDeviceRadio,
     effectiveMode,
     recoveryMandatory,
+    faceIdBlockedReason:
+      webAuthnAvailable && !ephemeralBrowsing
+        ? gameSeasonIntent
+          ? "game_season"
+          : organizerEnabled
+            ? "organizer"
+            : null
+        : null,
     showOrganizerBlocksFaceIdCallout:
-      webAuthnAvailable && organizerEnabled && !ephemeralBrowsing,
+      webAuthnAvailable && blocksDeviceUnlock && !ephemeralBrowsing,
     hintKey: !webAuthnAvailable
       ? "webauthn_unavailable"
-      : organizerEnabled
-        ? "organizer_requires_full_keys"
-        : "device_unlock_default",
+      : gameSeasonIntent
+        ? "game_season_requires_full_keys"
+        : organizerEnabled
+          ? "organizer_requires_full_keys"
+          : "device_unlock_default",
   };
 }
 
 /**
- * @param {"webauthn_unavailable" | "organizer_requires_full_keys" | "device_unlock_default"} hintKey
+ * @param {"webauthn_unavailable" | "organizer_requires_full_keys" | "game_season_requires_full_keys" | "device_unlock_default"} hintKey
  */
 export function createCustodyModeHintForKey(hintKey) {
   if (hintKey === "webauthn_unavailable") {
     return CREATE_CUSTODY_WEBAUTHN_UNAVAILABLE_HINT;
+  }
+  if (hintKey === "game_season_requires_full_keys") {
+    return CREATE_CUSTODY_GAME_SEASON_FULL_KEYS_HINT;
   }
   if (hintKey === "organizer_requires_full_keys") {
     return CREATE_CUSTODY_ORGANIZER_FULL_KEYS_HINT;
@@ -92,6 +109,7 @@ export function createCustodyModeHintForKey(hintKey) {
  *   custodyModeFromForm: string,
  *   webAuthnAvailable?: boolean,
  *   organizerEnabled?: boolean,
+ *   gameSeasonFlow?: boolean,
  *   ephemeralBrowsing?: boolean,
  * }} input
  */
@@ -100,6 +118,7 @@ export function resolveCreateCustodyModeAtSubmit(input) {
     custodyMode: input.custodyModeFromForm,
     webAuthnAvailable: input.webAuthnAvailable === true,
     organizerEnabled: input.organizerEnabled === true,
+    gameSeasonFlow: input.gameSeasonFlow === true,
     ephemeralBrowsing: input.ephemeralBrowsing === true,
   });
   return useDeviceUnlock ? CUSTODY_MODE_DEVICE_UNLOCK : CUSTODY_MODE_FULL_KEYS;

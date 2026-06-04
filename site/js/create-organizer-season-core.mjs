@@ -12,6 +12,9 @@ import { parseGameNodeSeasonId } from "./created-child-object-game-node-core.mjs
 
 export const GAME_SEASON_SETUP_FOCUS = "game-season-setup";
 export const GAME_SEASON_ID_SESSION_PREFIX = "hc_game_season_id:";
+export const GAME_SEASON_SETUP_FLOW_KEY = "hc_game_season_setup_flow";
+
+const GAME_SEASON_MANIFESTO_PREFIX = "City game season";
 
 /** @typedef {"standard" | "redirect_live" | "create_season_root"} GameSeasonSubmitStrategy */
 
@@ -80,6 +83,80 @@ export function readRememberedGameSeasonId(profileId) {
 }
 
 /**
+ * @param {Record<string, unknown> | null | undefined} entry
+ */
+export function walletEntryHasOrganizerIssuerKey(entry) {
+  const issuer =
+    typeof entry?.issuer_public_key === "string" ? entry.issuer_public_key.trim() : "";
+  const organizerPub =
+    typeof entry?.organizer_public_key_b58 === "string"
+      ? entry.organizer_public_key_b58.trim()
+      : "";
+  return issuer.length > 0 || organizerPub.length > 0;
+}
+
+/**
+ * Saved general root with organizer / game-operator key (season root).
+ * @param {unknown[]} walletEntries
+ */
+export function pickPreferredGameSeasonRoot(walletEntries) {
+  return (
+    listGeneralRootsWithKeys(walletEntries).find((entry) =>
+      walletEntryHasOrganizerIssuerKey(entry)
+    ) ?? null
+  );
+}
+
+/**
+ * @param {Record<string, unknown> | null | undefined} session
+ */
+export function isGameSeasonCustodySession(session) {
+  if (!session || typeof session !== "object") return false;
+  if (walletEntryHasOrganizerIssuerKey(session)) return true;
+  const manifesto =
+    typeof session.manifesto_line === "string" ? session.manifesto_line.trim() : "";
+  return manifesto.startsWith(GAME_SEASON_MANIFESTO_PREFIX);
+}
+
+export function markGameSeasonSetupFlow() {
+  try {
+    sessionStorage.setItem(GAME_SEASON_SETUP_FLOW_KEY, "1");
+  } catch {
+    /* ignore */
+  }
+}
+
+export function isGameSeasonSetupFlowActive() {
+  try {
+    return sessionStorage.getItem(GAME_SEASON_SETUP_FLOW_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+export function clearGameSeasonSetupFlow() {
+  try {
+    sessionStorage.removeItem(GAME_SEASON_SETUP_FLOW_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
+/**
+ * Face ID / device_unlock is incompatible with game season setup (organizer key custody).
+ * @param {{
+ *   session?: Record<string, unknown> | null,
+ *   gameSeasonCreateIntent?: boolean,
+ *   setupFlowActive?: boolean,
+ * }} input
+ */
+export function gameSeasonBlocksDeviceUnlock(input = {}) {
+  if (input.gameSeasonCreateIntent === true) return true;
+  if (input.setupFlowActive === true) return true;
+  return isGameSeasonCustodySession(input.session);
+}
+
+/**
  * @param {Record<string, unknown>} entry
  */
 function walletEntryQrId(entry) {
@@ -120,8 +197,8 @@ export function createdGameSeasonSetupHref(entry, origin = "https://humanity.llc
  */
 export function resolveGameSeasonSubmitStrategy(ctx) {
   if (!isGameSeasonCreateIntent(ctx.searchParams)) return "standard";
-  const root = pickPreferredGeneralRoot(listGeneralRootsWithKeys(ctx.walletEntries));
-  if (root) return "redirect_live";
+  const seasonRoot = pickPreferredGameSeasonRoot(ctx.walletEntries);
+  if (seasonRoot) return "redirect_live";
   return "create_season_root";
 }
 

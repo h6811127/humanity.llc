@@ -41,6 +41,7 @@ import {
 import { openHubQrScanner } from "./device-hub-qr-scanner.mjs";
 import { shouldShowSetupIosSafariCustodyNotice } from "./created-setup-ios-custody-core.mjs";
 import { syncCreatedSetupGameSeasonCustody } from "./created-child-object-game-node-setup.mjs";
+import { clearGameSeasonSetupFlow } from "./create-organizer-season-core.mjs";
 import { isIosWebKitUserAgent } from "./safari-itp-storage-notice-core.mjs";
 import { stewardScanOpenedFeedback } from "./pwa-scan-handoff-core.mjs";
 import { openStewardScanPreviewFromWindow } from "./pwa-scan-handoff.mjs";
@@ -435,6 +436,7 @@ export function initCreatedSetup(opts) {
       goToStep(STEPS.indexOf("save"));
       return;
     }
+    clearGameSeasonSetupFlow();
     void import("./created-setup-pwa-handoff.mjs").then((mod) => {
       mod.runCreatedSetupPwaInstallHandoff();
     });

@@ -10,6 +10,7 @@ import {
 } from "../../site/js/device-custody-create-core.mjs";
 import {
   CREATE_CUSTODY_DEVICE_UNLOCK_DEFAULT_HINT,
+  CREATE_CUSTODY_GAME_SEASON_FULL_KEYS_HINT,
   CREATE_CUSTODY_ORGANIZER_FULL_KEYS_HINT,
   CREATE_CUSTODY_WEBAUTHN_UNAVAILABLE_HINT,
 } from "../../site/js/device-ownership-copy-core.mjs";
@@ -47,6 +48,19 @@ describe("createCustodyModePanelState", () => {
     expect(state.forceFullKeysRadio).toBe(true);
     expect(state.effectiveMode).toBe(CUSTODY_MODE_FULL_KEYS);
     expect(state.hintKey).toBe("organizer_requires_full_keys");
+    expect(state.faceIdBlockedReason).toBe("organizer");
+    expect(state.showOrganizerBlocksFaceIdCallout).toBe(true);
+  });
+
+  it("requires full_keys for city game season create intent", () => {
+    const state = createCustodyModePanelState({
+      webAuthnAvailable: true,
+      gameSeasonIntent: true,
+    });
+    expect(state.deviceUnlockSelectable).toBe(false);
+    expect(state.forceFullKeysRadio).toBe(true);
+    expect(state.hintKey).toBe("game_season_requires_full_keys");
+    expect(state.faceIdBlockedReason).toBe("game_season");
     expect(state.showOrganizerBlocksFaceIdCallout).toBe(true);
   });
 
@@ -84,6 +98,9 @@ describe("createCustodyModeHintForKey", () => {
     );
     expect(createCustodyModeHintForKey("organizer_requires_full_keys")).toBe(
       CREATE_CUSTODY_ORGANIZER_FULL_KEYS_HINT
+    );
+    expect(createCustodyModeHintForKey("game_season_requires_full_keys")).toBe(
+      CREATE_CUSTODY_GAME_SEASON_FULL_KEYS_HINT
     );
     expect(createCustodyModeHintForKey("device_unlock_default")).toBe(
       CREATE_CUSTODY_DEVICE_UNLOCK_DEFAULT_HINT

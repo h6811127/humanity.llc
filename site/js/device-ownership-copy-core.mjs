@@ -97,8 +97,15 @@ export const CREATE_CUSTODY_DEVICE_UNLOCK_DEFAULT_HINT =
 export const CREATE_CUSTODY_ORGANIZER_FULL_KEYS_HINT =
   "Organizer revoke requires full control keys on this device.";
 
+export const CREATE_CUSTODY_GAME_SEASON_FULL_KEYS_HINT =
+  "City game seasons need full control keys so your game-operator key stays available for node registration.";
+
 export const CREATE_CUSTODY_WEBAUTHN_UNAVAILABLE_HINT =
   "This browser cannot use Face ID / Touch ID device unlock. Full control keys will be used.";
+
+/** Alert when /created/ setup save would enroll Face ID during game season flow. */
+export const GAME_SEASON_FACE_ID_SAVE_BLOCKED_MESSAGE =
+  "City game seasons can't use Face ID only. Choose full control keys when you save — you need the game-operator key for registering nodes on Live.";
 
 /** /create/ — when organizer revoke blocks Face ID (organizer + WebAuthn available). */
 export const CREATE_CUSTODY_ORGANIZER_FACE_ID_CALLOUT_EYEBROW = "Face ID unavailable";
@@ -111,6 +118,18 @@ export const CREATE_CUSTODY_ORGANIZER_FACE_ID_CALLOUT_DETAIL =
 
 export const CREATE_CUSTODY_ORGANIZER_FACE_ID_CALLOUT_ACTION =
   "Go to organizer revoke setting";
+
+/** /create/?intent=game — Face ID blocked for season organizer flow. */
+export const CREATE_CUSTODY_GAME_SEASON_FACE_ID_CALLOUT_EYEBROW = "Face ID unavailable";
+
+export const CREATE_CUSTODY_GAME_SEASON_FACE_ID_CALLOUT_TITLE =
+  "City game seasons use full control keys";
+
+export const CREATE_CUSTODY_GAME_SEASON_FACE_ID_CALLOUT_DETAIL =
+  "Organizing a live season registers a game-operator key with your owner keys. Face ID only wraps the owner key and hides the operator key you need on Live.";
+
+export const CREATE_CUSTODY_GAME_SEASON_FACE_ID_CALLOUT_ACTION =
+  "Use full control keys";
 
 export const HUB_RECOVERY_DEVICE_UNLOCK_REENROLL_HINT =
   "Recovery saved. Import your encrypted backup, then set up Face ID on this device in Manage.";

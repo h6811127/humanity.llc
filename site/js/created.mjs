@@ -93,6 +93,7 @@ import {
   setTabSession,
   tabSessionHasSigningKeys,
 } from "./device-keys.mjs";
+import { shouldActivateWalletForCreatedPage } from "./created-wallet-boot-activation-core.mjs";
 import { tryActivateWalletForCreatedPage } from "./created-wallet-boot-activation.mjs";
 import {
   mountChildObjectAddHubSections,
@@ -209,7 +210,7 @@ await ensureQuietTabRehydrateBootstrap(
 
 let data = loadSession();
 
-if (profileIdParam && !data?.owner_private_key_b58) {
+if (profileIdParam && shouldActivateWalletForCreatedPage(profileIdParam, data)) {
   const activation = await tryActivateWalletForCreatedPage(profileIdParam);
   if (activation.ok) {
     data = loadSession();

@@ -5,16 +5,18 @@
 import {
   createdGameSeasonSetupHref,
   gameSeasonRootManifesto,
+  markGameSeasonSetupFlow,
   parseGameSeasonIdField,
   rememberGameSeasonIdForProfile,
 } from "./create-organizer-season-core.mjs";
 import { pickPreferredGeneralRoot, listGeneralRootsWithKeys } from "./create-flow-convergence-core.mjs";
+import { handoffToCreatedForWalletEntry } from "./create-live-handoff.mjs";
 import { loadWallet } from "./device-wallet.mjs";
 
 /**
  * Open /created/ focused on game season setup for an existing root.
  */
-export function redirectToGameSeasonSetup() {
+export async function redirectToGameSeasonSetup() {
   const preferredRoot = pickPreferredGeneralRoot(listGeneralRootsWithKeys(loadWallet()));
   if (!preferredRoot) {
     throw new Error("No saved account with keys on this device — create a season root first.");
@@ -23,7 +25,8 @@ export function redirectToGameSeasonSetup() {
   if (!href) {
     throw new Error("Could not open Live season setup — open controls on your saved card first.");
   }
-  location.href = href;
+  markGameSeasonSetupFlow();
+  await handoffToCreatedForWalletEntry(preferredRoot, href);
 }
 
 /**
@@ -66,5 +69,6 @@ export async function runGameSeasonRootCreate(ctx) {
   if (!href) {
     throw new Error("Season root created but Live handoff failed — open /created/ from My objects.");
   }
+  markGameSeasonSetupFlow();
   location.replace(href);
 }
