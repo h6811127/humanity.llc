@@ -152,8 +152,8 @@ test.describe("Safari / WebKit shell smoke", () => {
     await expect(page.locator("body")).not.toHaveClass(/device-hub-sheet-open/);
     await expectHubBackdropClosed(page);
 
-    await page.locator("a.landing-hero-btn-primary").click();
-    await expect(page).toHaveURL(/\/create\/?/);
+    await page.getByRole("link", { name: /Live status on something/i }).click();
+    await expect(page).toHaveURL(/\/create\/\?template=status_plate/);
   });
 
   test("touch profile skips document scroll-edge chrome", async ({ page, isMobile }) => {

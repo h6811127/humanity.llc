@@ -76,7 +76,7 @@
       })();
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=5" />
-    <link rel="stylesheet" href="/styles.css?v=146" />
+    <link rel="stylesheet" href="/styles.css?v=151" />
     <link rel="stylesheet" href="/css/device-shell.css?v=91" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=32" />
     <meta property="og:title" content="humanity.llc · Live objects on physical tags" />
@@ -499,33 +499,89 @@
         </div>
       </section>
 
+      <!-- landing-copy-contract: sticker hero + #launch-doors — see site/js/landing-copy-contract.mjs -->
       <main class="screen screen-landing">
         <section class="hero hero-tight" data-landing-tutorial>
           <h1>
             <span class="hero-headline-kicker">Public programmable objects</span>
-            Live state<br />on real objects.
+            The sticker stays.<br />The status changes.
           </h1>
           <p class="hero-tagline">
-            Print once. Scanners see whether it’s <strong>Active</strong>, <strong>Revoked</strong>, or <strong>Limited</strong>.
-            Control stays on your device.
+            Print once on a plate, hoodie, or city sticker. Scanners read
+            <strong>today’s signed state</strong> — you update or revoke from your phone without
+            reprinting.
           </p>
-          <div class="landing-hero-actions" aria-label="Get started">
-            <a class="hc-emphasis-card__cta landing-hero-btn-primary" href="/create/"
-              >Create a live object</a
-            >
-            <div class="landing-hero-sub-links" aria-label="More options">
-              <a class="landing-hero-sub-link" href="/shop/">Shop</a>
-              <a class="landing-hero-sub-link landing-hero-sub-link--muted" href="/case-study/"
-                >See the full loop</a
-              >
-            </div>
-          </div>
           <ul class="landing-trust-chips" aria-label="Trust at a glance">
             <li class="landing-trust-chip">No account</li>
             <li class="landing-trust-chip">Control on your device</li>
             <li class="landing-trust-chip">No scan surveillance</li>
           </ul>
-          <div class="landing-privacy-split" role="group" aria-label="Scan privacy">
+        </section>
+
+        <section
+          class="landing-launch-doors"
+          id="launch-doors"
+          aria-labelledby="landing-launch-doors-title"
+          data-landing-tutorial
+        >
+          <h2 class="landing-launch-doors-title" id="landing-launch-doors-title">
+            Three ways in
+          </h2>
+          <p class="landing-launch-doors-lead">
+            Same primitive — live state on a physical thing. Pick how you want to start.
+          </p>
+          <ul class="list list-compact landing-launch-doors-list">
+            <li class="list-row list-action">
+              <a href="/create/?template=status_plate">
+                <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Live status on something</span>
+                  <span class="list-sub"
+                    >Door plate, desk tag, lost-item relay — open, closed, return message</span
+                  >
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/shop/customize/?product=glitch_hoodie_v1">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><path d="M7 7h.01"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Live status on you</span>
+                  <span class="list-sub"
+                    >Glitch hoodie — your QR, your line, change it from Live without reprinting</span
+                  >
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/play/cedar-rapids/">
+                <span class="list-icon list-icon-tone-gold" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Play the city game</span>
+                  <span class="list-sub"
+                    >Cedar Rapids — scan stickers around town, unlock shared world state together</span
+                  >
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+          <p class="landing-launch-doors-note">
+            <a href="/case-study/">See the full loop</a> ·
+            <a href="/what-can-a-qr-do.html">More use cases</a>
+          </p>
+        </section>
+
+        <section class="hero hero-tight landing-hero-privacy" data-landing-tutorial aria-label="Scan privacy">
+          <div class="landing-privacy-split" role="group">
             <div class="landing-privacy-grid">
               <article
                 class="hc-emphasis-card hc-emphasis-card--active landing-framing landing-framing--compact landing-privacy-card"
@@ -796,12 +852,11 @@
           aria-labelledby="one-use-title"
           data-landing-tutorial
         >
-          <p class="section-kicker">Studio</p>
-          <h2 class="group-label" id="one-use-title">One use · status plate</h2>
+          <p class="section-kicker">Launch</p>
+          <h2 class="group-label" id="one-use-title">Live status objects</h2>
           <p class="group-intro short">
-            Our first deployed object is a <strong>studio door plate</strong>: a QR that answers
-            with live hours, open/closed, and “done for the night,” updatable without reprinting.
-            The same primitive works on shops, booths, and rehearsal rooms.
+            Start with a <strong>door plate or tag</strong> — open, closed, return message — or add
+            more objects under one root card. Same primitive as the hoodie and city game stickers.
           </p>
 
           <details class="landing-disclosure-card studio-use-cases-disclosure">

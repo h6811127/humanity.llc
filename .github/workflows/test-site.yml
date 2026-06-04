@@ -41,6 +41,12 @@ on:
       - "site/js/shop-config-rollout-core.mjs"
       - "worker/tests/shop-config-rollout.test.ts"
       - "worker/tests/merch-funnel-rollout.test.ts"
+      - "worker/tests/landing-messaging.test.ts"
+      - "worker/tests/landing-copy-contract.test.ts"
+      - "site/js/landing-copy-contract.mjs"
+      - "worker/scripts/verify-landing-copy.mjs"
+      - "e2e/landing-copy.spec.ts"
+      - "e2e/safari-shell-scroll.spec.ts"
       - "package.json"
       - "package-lock.json"
       - "playwright.config.ts"
@@ -83,6 +89,12 @@ on:
       - "site/js/shop-config-rollout-core.mjs"
       - "worker/tests/shop-config-rollout.test.ts"
       - "worker/tests/merch-funnel-rollout.test.ts"
+      - "worker/tests/landing-messaging.test.ts"
+      - "worker/tests/landing-copy-contract.test.ts"
+      - "site/js/landing-copy-contract.mjs"
+      - "worker/scripts/verify-landing-copy.mjs"
+      - "e2e/landing-copy.spec.ts"
+      - "e2e/safari-shell-scroll.spec.ts"
       - "package.json"
       - "package-lock.json"
       - "playwright.config.ts"
@@ -99,6 +111,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run worker:test
+      - name: Landing copy contract
+        run: npm run verify:landing
       - name: Hub card disappeared RC gate (monitoring)
         run: npm run hub-card-disappeared:verify:fast
       # @see docs/OWNERSHIP_RESTORE_UX_PLAN.md Phase 4 step 3
@@ -142,5 +156,9 @@ jobs:
           CI: "true"
       - name: Merch funnel E2E
         run: npm run e2e:merch-funnel
+        env:
+          CI: "true"
+      - name: Landing copy E2E
+        run: npm run e2e:landing-copy
         env:
           CI: "true"

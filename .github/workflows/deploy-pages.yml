@@ -8,6 +8,9 @@ on:
     paths:
       - "site/**"
       - "package.json"
+      - "worker/tests/landing-*.test.ts"
+      - "worker/scripts/verify-landing-copy.mjs"
+      - "e2e/landing-copy.spec.ts"
       - ".github/workflows/deploy-pages.yml"
 
 jobs:
@@ -21,10 +24,16 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+      - name: Landing copy contract (pre-deploy)
+        run: npm run verify:landing
       - name: Deploy Pages
         run: npm run pages:deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      - name: Post-deploy landing copy verify
+        run: npm run verify:landing:production
+        env:
+          SITE_ORIGIN: https://humanity.llc
       - name: Post-deploy merch funnel verify (step 2)
         run: npm run merch-funnel:rollout:post-deploy -- --pages
         env:

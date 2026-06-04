@@ -16,7 +16,16 @@
 
 ## Regression (required before merge)
 
-Read [`docs/PRODUCT_WORKSTREAM_COORDINATION.md`](../docs/PRODUCT_WORKSTREAM_COORDINATION.md) and run the block for your surface. Paste pass/fail below.
+**Desk belt (all PRs — CI runs fast; you run full before merge):**
+
+```bash
+npm run verify:desk:fast    # matches CI (Vitest + verify exits + build)
+npm run verify:desk         # before merge: adds core Playwright E2E
+```
+
+Optional flags: `npm run verify:desk -- --custody` · `npm run verify:desk -- --city-game` · `npm run verify:desk -- --full`
+
+Surface-specific blocks below if you touched only one area. See [`docs/PRODUCT_WORKSTREAM_COORDINATION.md`](../docs/PRODUCT_WORKSTREAM_COORDINATION.md).
 
 **Device shell (status graph):**
 
@@ -36,6 +45,15 @@ npm run ownership-restore:verify
 ```bash
 npm run e2e:live-control-loop
 ```
+
+**Landing `/` (hero + launch doors):**
+
+```bash
+npm run verify:landing
+npm run e2e:landing-copy
+```
+
+Do **not** change `site/index.html` hero without updating `site/js/landing-copy-contract.mjs` and tests.
 
 **Merch funnel:**
 

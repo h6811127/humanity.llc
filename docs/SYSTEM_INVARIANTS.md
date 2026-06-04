@@ -85,6 +85,19 @@ Canonical inbox taxonomy: [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
 
 ---
 
+## Landing homepage (`/`)
+
+| Invariant | Detail |
+|-----------|--------|
+| Hero H1 | **“The sticker stays. The status changes.”** (kicker: Public programmable objects). |
+| Entry | **`#launch-doors`** — three list rows (status plate · Glitch hoodie · Cedar Rapids game), not a single hero Create CTA. |
+| Forbidden | “Live state on real objects”, hero `landing-hero-btn-primary`, “One use · status plate”. |
+| Contract | `site/js/landing-copy-contract.mjs` — bump version + tests when copy changes intentionally. |
+
+**Regression:** `npm run verify:landing` · `npm run e2e:landing-copy` · CI: `.github/workflows/deploy-pages.yml` post-deploy `verify:landing:production`.
+
+---
+
 ## Safari / PWA custody
 
 | Invariant | Detail |

@@ -1,0 +1,35 @@
+# Cross-surface desk belt on every PR to main (path-filter independent).
+# @see worker/scripts/verify-desk.mjs · docs/PRODUCT_WORKSTREAM_COORDINATION.md
+name: Verify desk
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+    paths:
+      - "worker/**"
+      - "site/**"
+      - "e2e/**"
+      - "package.json"
+      - "package-lock.json"
+      - "playwright.config.ts"
+      - "worker/scripts/verify-desk.mjs"
+      - "worker/scripts/verify-landing-copy.mjs"
+      - "worker/tests/landing-messaging.test.ts"
+      - "worker/tests/landing-copy-contract.test.ts"
+      - "site/js/landing-copy-contract.mjs"
+      - ".github/workflows/verify-desk.yml"
+
+jobs:
+  desk-fast:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - name: Desk regression belt (fast)
+        run: npm run verify:desk:fast

@@ -52,7 +52,7 @@ Pages serves `404.html` with HTTP **404** for paths that do not match a file whe
 
 | File | Purpose |
 |------|---------|
-| `index.html` | Landing (hero, **How it works**, device hub; status plate pilot — no pass demo) |
+| `index.html` | Landing — sticker hero + **Three ways in** (`#launch-doors`), privacy cards, **How it works**, device hub. Copy contract: `js/landing-copy-contract.mjs` · gate: `npm run verify:landing` |
 | `created/index.html` | Post-create owner UI + shared device hub |
 | `wallet/index.html` | My objects on this device (`/wallet/`, alias `/objects/`) |
 | `shop/index.html` | Tier 0 drop  -  config-driven Shopify checkout handoff |

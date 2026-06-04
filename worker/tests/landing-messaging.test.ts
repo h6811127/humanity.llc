@@ -29,8 +29,21 @@ describe("landing messaging (Step 3)", () => {
   it("landing hero uses hook H1 and public programmable kicker", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
     expect(html).toContain("Public programmable objects");
-    expect(html).toContain("Live state<br />on real objects.");
+    expect(html).toContain("The sticker stays.<br />The status changes.");
+    expect(html).not.toContain("Live state<br />on real objects.");
     expect(html).not.toContain("A network OS for physical objects");
+  });
+
+  it("landing three-door launch section links status, hoodie, and city game", () => {
+    const html = readFileSync(join(root, "site/index.html"), "utf8");
+    expect(html).toContain('id="launch-doors"');
+    expect(html).toContain("Three ways in");
+    expect(html).toContain("/create/?template=status_plate");
+    expect(html).toContain("/shop/customize/?product=glitch_hoodie_v1");
+    expect(html).toContain("/play/cedar-rapids/");
+    expect(html).toContain("Live status on something");
+    expect(html).toContain("Live status on you");
+    expect(html).toContain("Play the city game");
   });
 
   it("landing title and founder note bridge mission and what ships today", () => {
@@ -86,9 +99,8 @@ describe("public marketing clarity (AI step 5)", () => {
     const publicCopy = `${landing}\n${create}`;
 
     expect(publicCopy).toContain("Public programmable objects");
-    expect(publicCopy).toContain("Live state<br />on real objects.");
-    expect(publicCopy).toContain("Active");
-    expect(publicCopy).toContain("Revoked");
+    expect(publicCopy).toContain("The sticker stays.<br />The status changes.");
+    expect(publicCopy).toContain("today\u2019s signed state");
     expect(publicCopy).toContain("No passive scan tracking by default.");
     expect(publicCopy).not.toMatch(/\bAI\b|artificial intelligence|AI profiles|we have AI/i);
   });
