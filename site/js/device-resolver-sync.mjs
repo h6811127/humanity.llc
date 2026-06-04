@@ -31,8 +31,8 @@ import {
   applyResolverNetworkSnapshot,
   loadWalletNetworkCacheForSync,
   saveWalletNetworkCacheForSync,
-} from "./device-wallet-network.mjs?v=90";
-import { verificationRecordFromLabelState } from "./device-wallet-network-core.mjs?v=90";
+} from "./device-wallet-network.mjs?v=91";
+import { verificationRecordFromLabelState } from "./device-wallet-network-core.mjs?v=91";
 
 const CHANNEL_NAME = RESOLVER_SYNC_CHANNEL;
 

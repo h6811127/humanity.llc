@@ -2,9 +2,9 @@
  * Status dot View Transitions policy — skip cross-fade when it reads as load flash.
  * @see docs/SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md RC-14
  */
-import { dotTransitionKey } from "./device-dot-state-core.mjs?v=90";
-import { isDeviceBootReadyState } from "./device-shell-boot-core.mjs?v=90";
-import { shouldSkipCrossTabOverlayViewTransition } from "./device-presence-inbox-stability-core.mjs?v=90";
+import { dotTransitionKey } from "./device-dot-state-core.mjs?v=91";
+import { isDeviceBootReadyState } from "./device-shell-boot-core.mjs?v=91";
+import { shouldSkipCrossTabOverlayViewTransition } from "./device-presence-inbox-stability-core.mjs?v=91";
 
 /**
  * @param {{

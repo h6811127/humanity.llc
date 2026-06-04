@@ -2979,17 +2979,32 @@ body.device-shell-created .created-screen {
   text-decoration: none;
 }
 
-.created-object-streams-fieldset.flow-inset-fields {
+.created-object-streams-fieldset.flow-inset-fields,
+.create-custody-mode.flow-inset-fields {
   margin: 16px 0 0;
   min-width: 0;
 }
 
-.created-object-streams-fieldset.flow-inset-fields legend.form-label {
+.create-custody-mode.flow-inset-fields {
+  margin-top: 12px;
+}
+
+.created-object-streams-fieldset.flow-inset-fields legend.form-label,
+.create-custody-mode.flow-inset-fields legend.form-label {
   display: block;
   width: 100%;
   padding: 0;
   margin-bottom: 0;
   float: none;
+}
+
+.create-custody-mode.flow-inset-fields .flow-inset-check:first-of-type {
+  margin-top: 8px;
+  padding-top: 4px;
+}
+
+.create-custody-mode.flow-inset-fields .form-hint {
+  margin-bottom: 4px;
 }
 
 .flow-disclosure.create-organizer-opt {
