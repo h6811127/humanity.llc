@@ -88,9 +88,13 @@ export const VIEW_ONLY_RESTORE_LEAD = VIEW_ONLY_RESTORE_LEAD_EMPTY;
 export const VIEW_ONLY_LIVE_TAB_LEAD =
   "Read-only view of your live object. Use the QR and deploy tasks below, or open Manage to restore ownership and update.";
 
-/** Setup wizard protect step (Phase 2 · K7). */
+/** Setup wizard protect step (Phase 2 · K7 · WS-CUSTODY C0). */
 export const SETUP_SEATBELT_PANEL_LEAD =
-  "Before your object goes live, save a recovery path. humanity.llc cannot restore your card if you lose this browser tab.";
+  "Before your object goes live, save a recovery method. Your phone holds control — humanity.llc cannot restore it if this device is lost.";
+
+/** Protect step — passkey / platform sync is not operator recovery (C0). */
+export const CUSTODY_RECOVERY_NOT_PLATFORM_SYNC =
+  "Face ID, passkeys, and iCloud or Google sync are not a Humanity recovery path. Save the recovery code below or download an encrypted backup.";
 
 export const SETUP_SEATBELT_RECOVERY_HINT =
   "Copy your recovery code and check the box when you have saved it somewhere safe (password manager or paper).";
@@ -116,6 +120,23 @@ export const SETUP_DONE_IOS_HOME_SCREEN_TITLE =
 
 export const SETUP_DONE_IOS_HOME_SCREEN_DETAIL =
   "Tap Share → Add to Home Screen, then manage your cards only from that icon. Never remove it to refresh — pull down in the app instead. Keep your recovery backup. For printed QRs, tap the scan icon in the app — not your camera alone.";
+
+/** Setup QR step — prefer in-app scan after print (WS-CUSTODY C0). */
+export const SETUP_PRINT_IN_APP_HINT =
+  "After you print: use the scan icon in this app to test your sticker. On iPhone, the Camera app opens a new Safari tab and can break control.";
+
+/** Setup test-scan step (WS-CUSTODY C0). */
+export const SETUP_TEST_SCAN_PANEL_TITLE = "Test your QR";
+
+export const SETUP_TEST_SCAN_PANEL_LEAD =
+  "See what scanners see. On this phone, scan with the app first so you stay in one place with your saved control.";
+
+export const SETUP_TEST_SCAN_IN_APP_LABEL = "Scan with this app";
+
+export const SETUP_TEST_SCAN_EXTERNAL_LABEL = "Preview in browser tab";
+
+export const SETUP_TEST_SCAN_HINT =
+  "Optional preview. Tap Continue when you are ready to save recovery — you do not need to scan first.";
 
 export const DEFAULT_FOR_ATTESTATION = "Default for attestation";
 

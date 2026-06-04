@@ -31,7 +31,14 @@ import {
   SETUP_DONE_IOS_HOME_SCREEN_EYEBROW,
   SETUP_DONE_IOS_HOME_SCREEN_TITLE,
   SETUP_DONE_IOS_HOME_SCREEN_DETAIL,
+  SETUP_PRINT_IN_APP_HINT,
+  SETUP_TEST_SCAN_HINT,
+  SETUP_TEST_SCAN_IN_APP_LABEL,
+  SETUP_TEST_SCAN_EXTERNAL_LABEL,
+  SETUP_TEST_SCAN_PANEL_LEAD,
+  SETUP_TEST_SCAN_PANEL_TITLE,
 } from "./device-ownership-copy-core.mjs";
+import { openHubQrScanner } from "./device-hub-qr-scanner.mjs";
 import { shouldShowSetupIosSafariCustodyNotice } from "./created-setup-ios-custody-core.mjs";
 import { syncCreatedSetupGameSeasonCustody } from "./created-child-object-game-node-setup.mjs";
 import { isIosWebKitUserAgent } from "./safari-itp-storage-notice-core.mjs";
@@ -100,6 +107,23 @@ export function initCreatedSetup(opts) {
   const iosHomeScreenDetailEl = document.getElementById("created-setup-ios-home-screen-detail");
   const progressKicker = root.querySelector(".created-setup-kicker");
   const saveProgressItem = root.querySelector('[data-setup-step="save"]');
+  const printHintEl = document.getElementById("created-setup-print-hint");
+  const testTitleEl = document.getElementById("created-setup-test-title");
+  const testLeadEl = document.getElementById("created-setup-test-lead");
+  const testHintEl = document.getElementById("created-setup-test-hint");
+  const scanInAppBtn = root.querySelector('[data-setup-action="scan-in-app"]');
+  const testScanBtn = root.querySelector('[data-setup-action="test-scan"]');
+
+  function syncSetupPhase0Copy() {
+    if (printHintEl) printHintEl.textContent = SETUP_PRINT_IN_APP_HINT;
+    if (testTitleEl) testTitleEl.textContent = SETUP_TEST_SCAN_PANEL_TITLE;
+    if (testLeadEl) testLeadEl.textContent = SETUP_TEST_SCAN_PANEL_LEAD;
+    if (testHintEl) testHintEl.textContent = SETUP_TEST_SCAN_HINT;
+    if (scanInAppBtn) scanInAppBtn.textContent = SETUP_TEST_SCAN_IN_APP_LABEL;
+    if (testScanBtn) testScanBtn.textContent = SETUP_TEST_SCAN_EXTERNAL_LABEL;
+  }
+
+  syncSetupPhase0Copy();
 
   function omitSaveStepNow() {
     return shouldOmitSetupSaveStep({
@@ -490,6 +514,11 @@ export function initCreatedSetup(opts) {
       return;
     }
     showFeedback(stewardScanOpenedFeedback(standalone, { setupWizard: true }));
+  });
+
+  root.querySelector("[data-setup-action=scan-in-app]")?.addEventListener("click", () => {
+    openHubQrScanner();
+    showFeedback("Point your camera at the QR — you will stay in this app.");
   });
 
   window.addEventListener("hc-device-hub-changed", () => {

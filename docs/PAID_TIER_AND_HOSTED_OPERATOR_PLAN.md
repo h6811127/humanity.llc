@@ -64,6 +64,7 @@ Inherited from [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) and 
 3. **Data minimization** — paid features must not require new operator-held PII or scan analytics ([`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md)).
 4. **Federation-ready** — entitlements and push should be definable per **operator** (`hc/v1`), not hard-coded to one Cloudflare account.
 5. **Free reference stays usable** — card create, scan, vouch, revoke, manual hub checks, and `/created/` signing remain available without subscription.
+6. **Consumer custody gate** — broad paid/consumer positioning for nontechnical users should wait for **WS-CUSTODY** launch gates **G-C1–G-C3** ([`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md)) — checkout copy must state operator non-recovery regardless of tier.
 
 ---
 

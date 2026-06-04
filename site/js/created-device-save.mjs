@@ -10,8 +10,8 @@ import { shouldSyncAutoSaveOnCreatedLoad } from "./created-device-save-core.mjs"
 import {
   defaultWalletLabel,
   isWalletSaved,
-  saveSessionToWallet,
 } from "./device-wallet.mjs";
+import { saveSessionToWalletWithCustody } from "./device-custody-save.mjs";
 
 /**
  * @param {() => Record<string, unknown> | null} getSession
@@ -66,13 +66,14 @@ export function initCreatedDeviceSave(getSession) {
       }
     }
     if (saved) {
-      const sync = saveSessionToWallet(session, labelInput?.value ?? "");
-      if ("error" in sync) {
-        markAutoSaveFailed(session.profile_id);
-        setStatus(sync.error, true);
-      } else if (sync.ok && sync.updated) {
-        window.dispatchEvent(new Event("hc-device-hub-changed"));
-      }
+      void saveSessionToWalletWithCustody(session, labelInput?.value ?? "").then((sync) => {
+        if ("error" in sync) {
+          markAutoSaveFailed(session.profile_id);
+          setStatus(sync.error, true);
+        } else if (sync.ok && sync.updated) {
+          window.dispatchEvent(new Event("hc-device-hub-changed"));
+        }
+      });
     }
     if (saved && form && doneEl) {
       form.hidden = true;
@@ -94,7 +95,7 @@ export function initCreatedDeviceSave(getSession) {
   /**
    * @param {{ quiet?: boolean }} [opts]
    */
-  function runSave(opts = {}) {
+  async function runSave(opts = {}) {
     const session = getSession();
     if (!session?.profile_id || !session?.owner_private_key_b58) {
       if (!opts.quiet) {
@@ -102,7 +103,7 @@ export function initCreatedDeviceSave(getSession) {
       }
       return false;
     }
-    const result = saveSessionToWallet(session, labelInput?.value ?? "");
+    const result = await saveSessionToWalletWithCustody(session, labelInput?.value ?? "");
     if ("error" in result) {
       markAutoSaveFailed(session.profile_id);
       refresh();
@@ -136,12 +137,12 @@ export function initCreatedDeviceSave(getSession) {
 
   form?.addEventListener("submit", (e) => {
     e.preventDefault();
-    runSave();
+    void runSave();
   });
 
   saveBtn?.addEventListener("click", (e) => {
     e.preventDefault();
-    runSave();
+    void runSave();
   });
 
   refresh();

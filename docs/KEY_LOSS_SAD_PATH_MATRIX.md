@@ -3,7 +3,7 @@
 **Status:** Active — product copy + gates audit (no operator key recovery)  
 **Date:** 2026-05-29  
 **Audience:** Product, engineering, QA  
-**Related:** [`SAD_PATH_COVERAGE_AND_BACKLOG.md`](SAD_PATH_COVERAGE_AND_BACKLOG.md) § Key custody · [`HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md`](HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md) · [`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md) · [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) · [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md)
+**Related:** [`SAD_PATH_COVERAGE_AND_BACKLOG.md`](SAD_PATH_COVERAGE_AND_BACKLOG.md) § Key custody · [`HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md`](HUB_CARD_DISAPPEARED_SAFARI_INVESTIGATION.md) · [`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md) · [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) · [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) · [`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md)
 
 ---
 
@@ -38,8 +38,12 @@ This matrix inventories unhappy custody paths, expected UX, and automated regres
 | **K7** | Setup protect skipped | `fresh=1` without recovery ack or backup export | Step **Protect** hard gate; block Live / **Open card controls** | `npm run worker:test:setup-protect` | P1 create QA |
 | **K8** | PWA vs Safari tab | Standalone vs browser session | [`PWA_INSTALL.md`](PWA_INSTALL.md) semantics | `e2e/device-pwa-install.spec.ts` | P1-PWA |
 | **K9** | Camera → Safari, keys in PWA | Steward scans print with Camera app | S1 handoff copy + hub Open scan link; **S3** in-app scanner | `npm run worker:test:steward-scan-handoff` | **P1-PWA-V** in [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) |
+| **K10** | device_unlock — WebAuthn canceled | Scan/shell with wrapped row, user dismisses Face ID | **Unlock to manage** retry; no silent fail to view-only without explanation | TBD `e2e:custody-device-unlock` | Comprehension: cancel ≠ wipe |
+| **K11** | device_unlock — passkey lost (no sync) | New phone, no iCloud/Google passkey | Recovery code path only; operator cannot help | TBD + manual | **G-C2** gate |
+| **K12** | device_unlock — WebAuthn unavailable | In-app browser or desktop without platform auth | Fallback create as **full_keys** with honest copy | TBD | Environment matrix |
+| **K13** | Skipped recovery on easy path | User skipped Protect; passkey sync failed later | Same as K11 — card may be unmanageable; **block at create** when C0/C1 ships | Policy + gate tests | Worse sad path if recovery optional |
 
----
+**Planned custody modes:** [`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md) · K10–K13 apply when **WS-CUSTODY** Phase 1+ ships. Until then, all rows behave as **full_keys** (K1–K9).
 
 ## Copy module (Layer 2)
 
@@ -61,7 +65,9 @@ Central strings: `site/js/device-ownership-copy-core.mjs`
 | `HUB_RESTORE_RECOVERY_*` / `HUB_OPEN_SCAN_*` / `VOUCH_PWA_CAMERA_HANDOFF_*` | Steward scan handoff S1–S2 · [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) |
 | `HUB_SCAN_QR_*` | In-app hub QR scanner S3 |
 | `WALLET_CORRUPT_*` | Corrupt `hc_wallet` hub + `/wallet/` tab hint (P1-4 · R7) |
-| `PWA_MISMATCH_*` / `RESTORE_CONTROL_IN_THIS_APP` | PWA vs Safari session split (P2-2 · R5) |
+| `CUSTODY_RECOVERY_NOT_PLATFORM_SYNC` | Protect step — platform sync ≠ recovery (C0) |
+| `SETUP_PRINT_IN_APP_HINT` / `SETUP_TEST_SCAN_*` | Setup wizard print + test scan (C0) |
+| `UNLOCK_TO_MANAGE` (planned C1) | device_unlock — primary CTA replacing restore jargon on scan/shell |
 
 Automated guards: `npm run worker:test:key-loss-copy`
 
@@ -80,6 +86,7 @@ Automated guards: `npm run worker:test:key-loss-copy`
 | S2, S3 (Safari keys) | `npm run e2e:safari-keys-persistence` |
 | Copy | `npm run worker:test:key-loss-copy` |
 | Hub card disappeared (RC-1–RC-16) | `npm run hub-card-disappeared:verify` · `npm run e2e:hub-wallet-debug-monitor` (P2-RC-MON) |
+| K10–K13 (device_unlock) | TBD when WS-CUSTODY Phase 1+ — [`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md) |
 
 ---
 

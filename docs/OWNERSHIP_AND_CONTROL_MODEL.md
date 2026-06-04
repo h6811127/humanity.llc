@@ -15,6 +15,8 @@ Today’s shipped UI often speaks in Layer 1 (engineer) terms — *keys*, *signi
 
 **Target philosophy:** Users should not worry about keys. They should worry about whether they **own**, can **share**, **transfer**, **revoke**, or **recover** an object. Advanced users and integrators can still inspect export material; the default path should feel closer to passkeys or TLS certificates than to a crypto wallet.
 
+**Hybrid custody (planned):** One protocol, two unlock paths — **`device_unlock`** (“This device”, WebAuthn-wrapped keys, default for consumer create) and **`full_keys`** (“Full control”, today’s raw-key model for stewards and operators). Canonical spec: [`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md). **Not implemented** — D6 sign-lock is a gate on plaintext keys, not wrapped custody.
+
 This document defines the three-layer model, maps current code and storage to it, and specifies how user-facing ownership language should replace key language over time **without** changing protocol invariants.
 
 ---
@@ -226,6 +228,32 @@ Priority surfaces to migrate to Layer 2 copy:
 | Multi-tab control | User must understand tab isolation | **Quiet tab rehydrate** (D10): copy saved ownership into new tabs silently when safe; cross-tab chrome only when rehydrate cannot run | **Tier 1–3 shipped** — see [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) |
 | “My cards” naming | Protocol term | **My objects** or **What I control** when object tree is primary |
 | Advanced export | Mixed into primary `/created/` | Collapse under **Advanced → Export for developers** | **D8** ✅ |
+| Consumer vs steward custody | Single raw-key model for all users | **`device_unlock`** default at consumer create; **`full_keys`** for ops/dev — separate entry points, not one confusing toggle | **Planned** — [`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md) |
+| Passkey-wrapped keys | D6 WebAuthn gates plaintext copy | Wrap at create; no plaintext in `hc_wallet` for device_unlock | **Planned** Phase 1 |
+| Recovery seatbelt | Optional / Advanced for some users | **Mandatory** for device_unlock; gate paid print before commerce | **Phase 0** policy — extend backup gate |
+
+---
+
+## Hybrid custody strategy (summary)
+
+Full detail: [`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md).
+
+| Principle | Implication |
+|-----------|-------------|
+| **One signing pipeline** | Same `hc_created` session and Ed25519 signatures once unlocked — revoke, vouch, live proof unchanged |
+| **Two unlock paths** | `device_unlock` = WebAuthn unwrap; `full_keys` = quiet rehydrate + restore CTAs (shipped) |
+| **Max functionality** | Keys-only extras: raw export, terminal paste, headless — not consumer-exclusive features |
+| **Recovery is the product** | Passkey sync ≠ operator recovery; mandatory recovery for easy mode |
+| **Comprehension parallel** | Custody fixes “how to sign”; D9 fixes “what am I signing for” |
+| **UX-only alternative** | Smooth-mode pattern: same keys, guided consumer UX — Phase 0 may prove enough before wrap crypto |
+
+**Audience defaults:**
+
+| Entry | Default `custody_mode` |
+|-------|------------------------|
+| Consumer live object (sticker, member) | `device_unlock` |
+| Steward / hosted / city game operator | `full_keys` |
+| WebAuthn unavailable at create | `full_keys` with honest fallback copy |
 
 ---
 
@@ -375,8 +403,13 @@ Hosted steward accounts ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMP
 | **D10** | Quiet tab rehydrate — Tier 1–3: single/last-active rehydrate + cross-tab demotion | Medium — multi-tab UX | **Shipped** — [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) |
 | **D11** | Durable origin storage — `navigator.storage.persist()` after wallet save + shell bootstrap when signing keys exist | Low — browser may deny; no UI | **Shipped** — `device-storage-persist*.mjs` |
 | **D11b** | Setup wizard — omit Save progress step when auto-save already saved ownership (`created-setup-core.mjs`) | Low — `fresh=1` only | **Shipped** — [`CREATED_TASKS_TAB_REDESIGN.md`](CREATED_TASKS_TAB_REDESIGN.md) § Wizard hangover |
+| **C0** | De-risk: nontechnical comprehension metrics, mandatory recovery UX on keys model, in-app scan as print default | Process + product | **In progress** — [`CUSTODY_PHASE0_RUNBOOK.md`](CUSTODY_PHASE0_RUNBOOK.md) · `npm run custody:phase0-preflight` |
+| **C1** | `device_unlock` MVP: passkey-at-create, wrap keys, WebAuthn unlock → session; new cards only | High — crypto + tests | **Planned** — WS-CUSTODY |
+| **C2** | Mode-aware quiet rehydrate; Layer 2 “Unlock to manage” | Medium | **Planned** |
+| **C3** | Migration bridges easy ↔ full keys | Medium | **Planned** |
+| **C4** | Cross-device device_unlock (passkey sync + recovery re-enroll; P3-2 threat model) | High | **Planned** |
 
-**Do not migrate:** resolver APIs, document types, storage key names, or test fixture terminology without a dedicated protocol PR.
+**Do not migrate:** resolver APIs, document types, storage key names, or test fixture terminology without a dedicated protocol PR. **`custody_mode` on wallet rows** is a client-only extension — protocol documents unchanged.
 
 ---
 
@@ -424,6 +457,7 @@ Hosted steward accounts ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMP
 | [`KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md`](KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md) | Shipped custody panel + inbox semantics |
 | [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md) | Attestation without wallet detour |
 | [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) | Passkey-like tab rehydrate from wallet |
+| [`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md) | Hybrid device_unlock + full_keys — planning canonical |
 | [`DEVICE_OS.md`](DEVICE_OS.md) | Shell placement rules |
 | [`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md) | Trust labels vs ownership |
 
@@ -447,6 +481,7 @@ Hosted steward accounts ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMP
 | 2026-05-29 | **D9h shipped** — [`FOUNDING_COPY_COMPREHENSION_RUNBOOK.md`](FOUNDING_COPY_COMPREHENSION_RUNBOOK.md); shop FAQ F1–F3 guards |
 | 2026-05-29 | **D9i shipped** — full LAUNCH_LANGUAGE_KIT Sticker FAQ on `/shop/founding/` (revoke, campaign end, misprint) |
 | 2026-05-29 | **D10 Tier 3 shipped** — demote cross-tab chrome after quiet rehydrate |
+| 2026-06-03 | **Hybrid custody spec** — `device_unlock` + `full_keys`; recovery mandatory for easy path; WS-CUSTODY — [`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md) |
 | 2026-05-29 | **D10 Tier 2 shipped** — last-active profile + hub toggle for multi-card quiet rehydrate |
 | 2026-05-29 | **D10 Tier 1 shipped** — quiet tab rehydrate for single saved card; [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) |
 | 2026-05-29 | **D11 shipped** — request `navigator.storage.persist()` after `hc_wallet` save and on shell bootstrap when signing keys exist; flag `hc_storage_persist_requested_v1` |

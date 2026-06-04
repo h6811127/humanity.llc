@@ -72,7 +72,7 @@ Recommended copy pattern:
 
 > Your Humanity Card key controls your public objects. Save a backup once, and you keep control of the whole tree.
 
----
+**Hybrid custody (planned):** Consumer create defaults to **`device_unlock`** (WebAuthn); stewards/operators keep **`full_keys`**. Recovery is **mandatory** for device_unlock — passkey platform sync is not operator recovery. Spec: [`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md).
 
 ## Resolution model
 

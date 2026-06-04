@@ -93,7 +93,8 @@ import {
   tabSessionHasSigningKeys,
 } from "./device-keys.mjs";
 import { activateWalletEntryGated } from "./device-control-activation.mjs";
-import { isWalletSaved, loadWallet, getWalletSigningKeyCount, saveSessionToWallet } from "./device-wallet.mjs";
+import { isWalletSaved, loadWallet, getWalletSigningKeyCount } from "./device-wallet.mjs";
+import { saveSessionToWalletWithCustody } from "./device-custody-save.mjs";
 import { applyHumanTrustIconToElement } from "./human-trust-ui.mjs";
 import {
   applyCreatedRoutePendingShell,
@@ -849,6 +850,9 @@ if (gate.card?.handle && gate.card?.manifesto_line) {
       status: gate.card.status || existing.status || "active",
       pilot_template:
         existing.pilot_template || inferPilotTemplate(String(gate.card.manifesto_line)),
+      ...(typeof gate.card.issuer_public_key === "string"
+        ? { issuer_public_key: gate.card.issuer_public_key }
+        : {}),
     };
     applyCreatedSessionState(next);
   }
@@ -999,7 +1003,7 @@ async function refreshNetworkStatus() {
           saveSession(next);
           data = next;
           if (profileId && isWalletSaved(profileId)) {
-            saveSessionToWallet(data, "");
+            void saveSessionToWalletWithCustody(data, "");
           }
           deviceSaveCtl?.refresh?.();
         } else {

@@ -3,6 +3,8 @@
  * @see docs/SAFARI_KEYS_CUSTODY.md P0-6
  */
 
+import { walletEntryCountsAsSigning } from "./device-custody-mode-core.mjs";
+
 /**
  * @param {Record<string, unknown> | null | undefined} session
  */
@@ -14,12 +16,12 @@ export function tabSessionHasSigningKeys(session) {
 }
 
 /**
- * Wallet row or hub public view — owner key, recovery key, or summary flag.
+ * Wallet row or hub public view — plaintext keys or device_unlock wrap.
  * @param {Record<string, unknown> | null | undefined} entry
  */
 export function walletEntryHasSigningMaterial(entry) {
   if (!entry || typeof entry !== "object") return false;
-  if (entry.has_signing_key === true) return true;
+  if (walletEntryCountsAsSigning(entry)) return true;
   return tabSessionHasSigningKeys(entry);
 }
 

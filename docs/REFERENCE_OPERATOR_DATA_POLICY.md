@@ -48,6 +48,8 @@ Saved card rows on `/wallet/` and the device hub may show **checked … ago**. T
 - The reference operator cannot recover lost passphrases, restore lost private keys, or revoke on a user's behalf. Revocation requires a valid owner, recovery, or registered organizer signature.
 - If a user closes the tab and loses both backup/passphrase and recovery key, they cannot revoke from the web UI without creating a new card.
 
+**Planned device_unlock (easy mode):** Platform passkey unlocks wrapped keys on device; **iCloud Keychain / Google passkey sync is vendor-controlled** — not a substitute for saving a recovery method. humanity.llc still cannot restore lost recovery secrets. See [`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md) § Recovery is the product.
+
 ## Commerce firewall
 
 - QR payloads MUST NOT embed order IDs, emails, or shipping fields.

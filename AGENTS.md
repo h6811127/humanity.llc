@@ -36,7 +36,8 @@ Card creation needs Ed25519-signed JSON (fixtures in `worker/tests/fixtures/`). 
 | **Engineering invariants** | [`docs/SYSTEM_INVARIANTS.md`](docs/SYSTEM_INVARIANTS.md) |
 | **Live object architecture** | [`docs/LIVE_OBJECT_ARCHITECTURE.md`](docs/LIVE_OBJECT_ARCHITECTURE.md) · catalog [`docs/QR_DESIGN_SPACE.md`](docs/QR_DESIGN_SPACE.md) |
 | **Safari keys custody** | [`docs/SAFARI_KEYS_CUSTODY.md`](docs/SAFARI_KEYS_CUSTODY.md) |
-| **Active work + regression gates** | [`docs/PRODUCT_WORKSTREAM_COORDINATION.md`](docs/PRODUCT_WORKSTREAM_COORDINATION.md) · multi-agent: **WS-DOC / WS-REV / WS-CR / WS-E** |
+| **Hybrid custody (easy + keys)** | [`docs/CUSTODY_EASY_MODE.md`](docs/CUSTODY_EASY_MODE.md) · [`docs/CUSTODY_PHASE0_RUNBOOK.md`](docs/CUSTODY_PHASE0_RUNBOOK.md) · [`docs/OWNERSHIP_AND_CONTROL_MODEL.md`](docs/OWNERSHIP_AND_CONTROL_MODEL.md) |
+| **Active work + regression gates** | [`docs/PRODUCT_WORKSTREAM_COORDINATION.md`](docs/PRODUCT_WORKSTREAM_COORDINATION.md) · Phase 1: **WS-DOC / WS-REV / WS-CR / WS-E** · Phase 2: **WS-SCALE / WS-SW / WS-CUSTODY** |
 | **Feature map / roadmap** | [`docs/STEWARD_DEVICE_ROADMAP.md`](docs/STEWARD_DEVICE_ROADMAP.md) |
 | **Doc policy + archive** | [`docs/DOC_MAINTENANCE.md`](docs/DOC_MAINTENANCE.md) |
 

@@ -34,6 +34,8 @@ Two complementary paths (ship both; user may use one or both):
 
 Neither path uploads plaintext private keys to the resolver.
 
+**Hybrid custody (planned):** **`full_keys`** continues paths A and B unchanged. **`device_unlock`** adds platform passkey unlock on device; recovery remains mandatory — passkey sync is not path B. See [`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md).
+
 ---
 
 ## Threat model (export/import  -  Phase 1)

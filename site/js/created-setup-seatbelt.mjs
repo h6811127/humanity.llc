@@ -11,6 +11,7 @@ import {
 } from "./key-backup.mjs";
 import { rootHasChildObjectBackupSeatbelt } from "./child-object-backup-gate-core.mjs";
 import {
+  CUSTODY_RECOVERY_NOT_PLATFORM_SYNC,
   SETUP_SEATBELT_BACKUP_HINT,
   SETUP_SEATBELT_BLOCK_CONTINUE,
   SETUP_SEATBELT_PANEL_LEAD,
@@ -37,10 +38,12 @@ export function initCreatedSetupSeatbelt(opts) {
   const copyRecoveryBtn = document.getElementById("created-setup-copy-recovery");
   const recoveryStatus = document.getElementById("created-setup-recovery-status");
   const backupHint = document.getElementById("created-setup-seatbelt-backup-hint");
+  const platformSyncEl = document.getElementById("created-setup-platform-sync-disclaimer");
   const exportForm = document.getElementById("created-setup-export-backup-form");
   const exportStatus = document.getElementById("created-setup-export-backup-status");
 
   if (leadEl) leadEl.textContent = SETUP_SEATBELT_PANEL_LEAD;
+  if (platformSyncEl) platformSyncEl.textContent = CUSTODY_RECOVERY_NOT_PLATFORM_SYNC;
   if (backupHint) backupHint.textContent = SETUP_SEATBELT_BACKUP_HINT;
 
   function notify() {

@@ -11,6 +11,7 @@ export const WALLET_SUMMARY_VERSION = 3;
 export const WALLET_SUMMARY_FORBIDDEN_JSON_SUBSTRINGS = [
   "owner_private_key_b58",
   "recovery_private_key_b58",
+  "wrapped_owner_key",
 ];
 
 /** Keys allowed on each summary row object. */

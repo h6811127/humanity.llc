@@ -26,6 +26,8 @@ Storage: `localStorage.hc_setup_done` - map of `profile_id → true` after wizar
 
 Kicker copy in setup: **"Four steps · keys stay in this browser"** to reinforce local-first key custody.
 
+**Planned (WS-CUSTODY):** Consumer create defaults to **This device** (`device_unlock`); setup kicker becomes Layer 2 unlock language — see [`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md). Steward/operator create keeps **Full control keys**.
+
 | Step | User action | Gate |
 |------|-------------|------|
 | 1 Save | Save control key to this device | Cannot continue until `isWalletSaved(profile_id)` |

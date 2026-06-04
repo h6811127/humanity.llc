@@ -2,7 +2,7 @@
 
 **Status:** Canonical — P0–P2 **shipped** (rollout steps 1–22 on `main`) · P3-1 / P3-2 not scheduled  
 **Audience:** Engineering, support, QA  
-**Related:** [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) · [`HUB_CARD_SAFARI_RELIABILITY.md`](HUB_CARD_SAFARI_RELIABILITY.md) · [`KEY_LOSS_SAD_PATH_MATRIX.md`](KEY_LOSS_SAD_PATH_MATRIX.md) · [`PWA_INSTALL.md`](PWA_INSTALL.md) · [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md)
+**Related:** [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) · [`HUB_CARD_SAFARI_RELIABILITY.md`](HUB_CARD_SAFARI_RELIABILITY.md) · [`KEY_LOSS_SAD_PATH_MATRIX.md`](KEY_LOSS_SAD_PATH_MATRIX.md) · [`PWA_INSTALL.md`](PWA_INSTALL.md) · [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) · [`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md)
 
 Full investigation (prod walkthrough, changelog): [`archive/SAFARI_KEYS_WIPE_INVESTIGATION.md`](archive/SAFARI_KEYS_WIPE_INVESTIGATION.md)
 
@@ -163,12 +163,19 @@ Manual QA: **P1-P0b-1**, **P1-PWA-V**, **P1-QTR**, **P0-W** in [`DEVICE_OS_QA.md
 
 ---
 
-## Open backlog (P3 only)
+## Open backlog (P3 → hybrid custody)
 
-| Item | Notes |
-|------|-------|
-| **P3-1** | WebAuthn / Secure Enclave wrapping — reduce sessionStorage dependence |
-| **P3-2** | Optional encrypted persistence outside ITP window (consent + threat model) |
+Canonical planning spec: [`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md) · workstream **WS-CUSTODY** in [`PRODUCT_WORKSTREAM_COORDINATION.md`](PRODUCT_WORKSTREAM_COORDINATION.md).
+
+| Item | Notes | Phase |
+|------|-------|-------|
+| **P3-1 / device_unlock** | WebAuthn-wrapped owner keys; no plaintext in `hc_wallet`; unlock → `hc_created` | C1 — extends D6 (gate-only today) |
+| **P3-2** | Optional encrypted persistence outside ITP window (consent + threat model) | C4 |
+| **Mode-aware rehydrate** | `device_unlock`: WebAuthn prompt; `full_keys`: current D10 | C2 |
+
+**Shipped foundation (not vault):** D6 optional WebAuthn **sign-lock** before copying **plaintext** keys (`vouch-sign-lock.mjs`) — different from wrapped custody.
+
+**Explicit non-fix:** Server-side key custody — contradicts product trust model ([`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md)).
 
 ---
 

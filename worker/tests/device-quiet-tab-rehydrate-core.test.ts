@@ -18,8 +18,20 @@ describe("device-quiet-tab-rehydrate-core", () => {
       { profile_id: "a", owner_private_key_b58: "k1" },
       { profile_id: "b" },
       { profile_id: "c", owner_private_key_b58: "k2" },
+      {
+        profile_id: "d",
+        custody_mode: "device_unlock",
+        wrapped_owner_key: {
+          version: 1,
+          credential_id: "cred",
+          prf_salt: "salt",
+          iv: "iv",
+          ciphertext: "cipher",
+        },
+      },
     ]);
     expect(entries).toHaveLength(2);
+    expect(entries.map((entry) => entry.profile_id)).toEqual(["a", "c"]);
   });
 
   it("returns sole entry only when exactly one signing row", () => {

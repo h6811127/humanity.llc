@@ -34,7 +34,7 @@
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=5" />
     <link rel="stylesheet" href="/styles.css?v=146" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=87" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=88" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=30" />
   </head>
   <body class="page-flow has-shell-chrome has-device-hub-search flow-shell flow-shell-create" data-boot="pending">
@@ -116,6 +116,24 @@
                   </div>
                 </div>
                 <ul class="list list-compact device-hub-live-control-list" id="device-hub-live-control-list"></ul>
+              </div>
+            </div>
+            <div
+              class="device-hub-group device-hub-alert-card"
+              id="device-hub-relay-offer-group"
+              hidden
+              data-hub-group="relay-offer"
+              role="status"
+            >
+              <div class="hc-emphasis-card hc-emphasis-card--info device-hub-relay-offer-card">
+                <div class="hc-emphasis-card__main">
+                  <span class="hc-emphasis-card__dot hc-emphasis-card__dot--info" aria-hidden="true"></span>
+                  <div class="hc-emphasis-card__copy">
+                    <p class="hc-emphasis-card__eyebrow" id="device-hub-relay-offer-eyebrow">Finder message waiting</p>
+                    <p class="hc-emphasis-card__detail" id="device-hub-relay-offer-summary" hidden></p>
+                  </div>
+                </div>
+                <ul class="list list-compact device-hub-relay-offer-list" id="device-hub-relay-offer-list"></ul>
               </div>
             </div>
             <div
@@ -659,6 +677,27 @@
           </label>
           </section>
 
+          <fieldset class="create-custody-mode flow-form-section" id="create-custody-mode">
+            <legend class="form-label">Device control</legend>
+            <label class="revoke-confirm create-custody-opt flow-inset-check">
+              <input
+                type="radio"
+                name="custody_mode"
+                value="device_unlock"
+                checked
+              />
+              <span>This device (Face ID / Touch ID) — recommended</span>
+            </label>
+            <label class="revoke-confirm create-custody-opt flow-inset-check">
+              <input type="radio" name="custody_mode" value="full_keys" />
+              <span>Full control keys (advanced)</span>
+            </label>
+            <p class="form-hint" id="create-custody-mode-hint">
+              This device locks your signing key behind your passkey. You won't manage raw keys in
+              normal use.
+            </p>
+          </fieldset>
+
           <div
             class="hc-emphasis-card hc-emphasis-card--warn flow-form-warning"
             id="create-public-card-notice"
@@ -724,7 +763,7 @@
         <p class="form-status" id="device-hub-qr-scanner-status" role="status" hidden></p>
       </div>
     </dialog>
-    <script src="/js/device-status-bootstrap.mjs?v=87" type="module"></script>
+    <script src="/js/device-status-bootstrap.mjs?v=88" type="module"></script>
     <script src="/js/create-hub.mjs?v=1" type="module"></script>
     <script type="module" src="/js/create-card.mjs?v=19"></script>
   </body>

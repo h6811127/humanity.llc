@@ -17,6 +17,11 @@ import { EPHEMERAL_BROWSING_SAVE_BLOCKED } from "./device-ownership-copy-core.mj
 import { isLocalStorageEphemeral } from "./private-browsing-detect-core.mjs";
 import { mergeOwnershipSeatbeltFields } from "./created-first-session-gate-core.mjs";
 import { classifyWalletStorageRaw } from "./device-wallet-parse-core.mjs";
+import {
+  CUSTODY_MODE_DEVICE_UNLOCK,
+  resolveEntryCustodyMode,
+  stripPrivateKeysForDeviceUnlockWallet,
+} from "./device-custody-mode-core.mjs";
 import { walletEntryHasSigningMaterial } from "./device-tab-session-core.mjs";
 import {
   WALLET_SUMMARY_VERSION,
@@ -794,7 +799,40 @@ export function mergeWalletEntryFromSession(existing, session, label = "") {
     has_organizer_revoke: session.has_organizer_revoke ?? existing.has_organizer_revoke,
     saved_at: new Date().toISOString(),
   };
-  return mergeOwnershipSeatbeltFields(merged, session);
+  const withSeatbelt = mergeOwnershipSeatbeltFields(merged, session);
+  if (resolveEntryCustodyMode(existing) === CUSTODY_MODE_DEVICE_UNLOCK) {
+    return stripPrivateKeysForDeviceUnlockWallet(withSeatbelt);
+  }
+  return withSeatbelt;
+}
+
+/**
+ * Insert or replace one wallet row (used by device_unlock enroll).
+ * @param {Record<string, unknown>} entry
+ * @returns {{ ok: true, already?: boolean, updated?: boolean } | { error: string }}
+ */
+export function persistWalletEntry(entry) {
+  if (!entry?.profile_id) {
+    return { error: "Missing profile id." };
+  }
+  const entries = loadWallet();
+  const idx = entries.findIndex((row) => row.profile_id === entry.profile_id);
+  if (idx >= 0) {
+    const before = walletEntrySyncSignature(entries[idx]);
+    if (walletEntrySyncSignature(entry) === before) {
+      scheduleStoragePersistRequest({ reason: "ownership_save" });
+      return { ok: true, already: true };
+    }
+    entries[idx] = entry;
+  } else {
+    entries.unshift(entry);
+  }
+  const saved = saveWallet(entries);
+  if ("error" in saved) return saved;
+  setLastActiveProfileId(entry.profile_id);
+  notifyWalletProfileSaved(entry.profile_id);
+  scheduleStoragePersistRequest({ reason: "ownership_save" });
+  return { ok: true, updated: idx >= 0 };
 }
 
 /**

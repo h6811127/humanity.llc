@@ -91,6 +91,8 @@ Auto-loading keys into the tab is **not a new trust claim**. It is the same oper
 
 **E** shipped as opt-in per saved card: PIN or device WebAuthn unlock required before taking control in a tab and before `Sign and submit` (`device-control-activation.mjs`, `vouch-sign-lock.mjs`).
 
+**Planned extension (WS-CUSTODY):** **`device_unlock`** custody mode uses WebAuthn as the **primary wrap/unlock** at create — not only a gate on plaintext keys. D6 is foundation; see [`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md) § D6 vs device_unlock.
+
 ---
 
 ## Proposed feature: Vouch-ready keys

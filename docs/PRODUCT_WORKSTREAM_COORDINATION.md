@@ -5,6 +5,8 @@
 
 **Last updated:** 2026-06-03
 
+**Changelog (2026-06-03):** **Engineering Phase 2** — summer program § [Engineering Phase 2](#engineering-phase-2--summer-2026-program) (**WS-SCALE**, **WS-SW**, **WS-CUSTODY** parallel with Phase 1 closeout). **WS-CUSTODY** — [`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md) + [`CUSTODY_PHASE0_RUNBOOK.md`](CUSTODY_PHASE0_RUNBOOK.md). **Summer footprint** — Cedar Rapids **40 at open → 60** · **Wake the city · Signal War** **SW-01–SW-15**. **Live object layer** — [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) five-layer map.
+
 ---
 
 ## Workstreams at a glance
@@ -15,10 +17,13 @@
 | **Hub card Safari reliability** | [`HUB_CARD_SAFARI_RELIABILITY.md`](HUB_CARD_SAFARI_RELIABILITY.md) | **Closed — monitoring** · **`hub-card-disappeared:verify`** | RC-1–RC-16 shipped |
 | **Shell page load flash** | [`SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md`](SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md) | **RC-1–RC-17 shipped** · **RC-18 in progress** (landing hub pre-render v83) · **`worker:test:shell-boot`** · **`device-smooth:phase0`** | Nord N200 cold S1 re-verify after deploy |
 | **Safari keys / ITP** | [`SAFARI_KEYS_CUSTODY.md`](SAFARI_KEYS_CUSTODY.md) | P0–P2 **shipped** (steps 1–22) | `device-quiet-tab-rehydrate*`, `scan-tab-keys`, `safari-itp-storage-notice*`, `safari-storage-persist-denied-notice*` |
+| **Custody hybrid (easy + keys)** | [`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md) · [`CUSTODY_PHASE0_RUNBOOK.md`](CUSTODY_PHASE0_RUNBOOK.md) | **WS-CUSTODY C0 in progress** | Create setup UX, recovery copy, phase0 preflight |
 | **Ownership restore UX** | [`OWNERSHIP_RESTORE_UX_PLAN.md`](OWNERSHIP_RESTORE_UX_PLAN.md) | Phases 1–4 + Safari cross-refs | `/created/` view mode, hub import, `device-ownership-*` |
 | **H-12 printed live-control QA** | [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md) | H-09–H-13 · sad-path S10–S12 | Scan live proof, `e2e/live-control-loop.spec.ts`, operator scripts |
-| **Cedar Rapids city game** | [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) § Feature page traceability · [`CITY_GAME_AUTONOMOUS_V1.md`](CITY_GAME_AUTONOMOUS_V1.md) | Phase C human gates open · **Phase D surfaces ready** · footprint **S1 15 → S3 50** · **Phase E self-serve setup** (post-pilot) | Install QA, GT comprehension, custody · launch `--apply` after gates |
-| **Commercial + revenue (multi-agent)** | **This file § [Multi-agent program](#multi-agent-program-product--revenue--cedar-rapids)** · [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md) · [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md) | **WS-DOC / WS-REV / WS-CR / WS-E** — metering shipped · Stripe + `/created/` UI open | Steward session, entitlements, game season caps, checkout |
+| **Cedar Rapids city game** | [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) § Node scale · § Feature page traceability · § **Wake the city · Signal War** · [`CITY_GAME_AUTONOMOUS_V1.md`](CITY_GAME_AUTONOMOUS_V1.md) | Phase C human gates open · **Phase D surfaces ready** · **summer 40→60** (15-row JSON = scaffold) · **SW-*** Signal War rows · weekly GM cadence | Install QA at **~40 open**, comprehension, custody · extend season JSON + mint before field wave 1 |
+| **Commercial + revenue (multi-agent)** | **This file § [Multi-agent program](#multi-agent-program-product--revenue--cedar-rapids)** · [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md) · [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md) | **WS-DOC ☑** · **WS-REV / WS-CR / WS-E** — Phase 1 closeout · § [Phase 2](#engineering-phase-2--summer-2026-program) | Steward session, entitlements, game season caps, checkout |
+| **Summer node scale (40→60)** | [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) § Node scale · [`CITY_GAME_NODE_INSTALL_MAP.md`](CITY_GAME_NODE_INSTALL_MAP.md) | **WS-SCALE** — **blocked on Phase 1 C5** · **SC-1–SC-5** | Season JSON, mint waves, install QA at ~40 open |
+| **Signal War (contest layer)** | [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) § Wake the city · Signal War · [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) | **WS-SW** — **SW-S1** at open · **SW-S2** mid-season | `game-contribute`, snapshot, fog, faction totals |
 | **Smooth mode (low-end mobile)** | [`DEVICE_LITE_MOBILE_PLAN.md`](DEVICE_LITE_MOBILE_PLAN.md) | **Phase 0 lab 3/3 ☑** · Phase 1 **deferred** (Nord cold boot → boot graph) · [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md) | Boot graph investigation for Nord cold open |
 
 ---
@@ -59,6 +64,9 @@ WS-E (Phase E /created/ setup — needs WS-REV entitlements UI)
 | **WS-REV** | Revenue & metering UX | Stripe checkout + plan assignment + `/created/` shows caps/usage | WS-DOC for API vocabulary; M4 pricing sign-off for copy/prices |
 | **WS-CR** | Cedar Rapids pilot launch | Phase D checklist, human QA, deploy, `launch-surfaces` | WS-DOC for runbook accuracy; deploy ops (Pages token) |
 | **WS-E** | Phase E self-serve | Browser season setup on `/created/` (no terminal for new seasons) | WS-REV entitlements UI; WS-CR pilot signed (E1 gate) |
+| **WS-CUSTODY** | Hybrid custody (easy + keys) | Phases C0–C4 per [`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md) | C0 metrics; optional before broad consumer launch |
+| **WS-SCALE** | Summer 40→60 footprint | SC-1–SC-5 per § [Engineering Phase 2](#engineering-phase-2--summer-2026-program) | WS-CR C5; B7 at opening ~40 |
+| **WS-SW** | Signal War mechanics | SW-S1–S3 · **SW-01–SW-15** | WS-SCALE relay registry; map B13–B15 if promised |
 
 **Do not duplicate:** city-game local dev bundle on branch `#109` / uncommitted WIP (`city-game:dev`, `launch-preflight`, comprehension kit) — coordinate in **Active branches** before overlapping scripts.
 
@@ -139,6 +147,125 @@ WS-E (Phase E /created/ setup — needs WS-REV entitlements UI)
 
 ---
 
+### WS-CUSTODY — Hybrid custody (device unlock + full keys)
+
+| | |
+|--|--|
+| **Canonical doc** | [`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md) |
+| **Mission** | General-user accessibility **without** server key custody or feature fork on the network — one protocol, two unlock paths |
+| **In scope** | Phase **C0** de-risk (comprehension metrics, mandatory recovery UX on keys model, consumer print → in-app scan default) · **C1** passkey-at-create + wrap + unlock → session · **C2** mode-aware quiet rehydrate · **C3** migration bridges · **C4** cross-device + P3-2 threat model · launch gates **G-C0–G-C5** |
+| **Out of scope** | Server-side key custody · operator “reset my account” · replacing steward `full_keys` default for ops · delegated child keys (step 17) |
+| **Depends on** | D6 / `vouch-sign-lock.mjs` (gate foundation) · D10 quiet rehydrate · `child-object-backup-gate` · D9 comprehension infrastructure |
+| **Blocks** | Broad **consumer / paying** launch positioning until **G-C1–G-C3** pass — WS-REV checkout copy should reference non-recoverable operator |
+| **File ownership (when coding)** | `create-card.mjs`, `device-wallet*.mjs`, `device-keys.mjs`, `device-quiet-tab-rehydrate*.mjs`, `scan-tab-keys.mjs`, `device-control-activation*.mjs`, `vouch-sign-lock.mjs`, new wrap module TBD, `device-ownership-copy-core.mjs` |
+| **Regression (existing — must not break full_keys)** | `npm run e2e:key-loss-sad-path` · `npm run e2e:safari-keys-persistence` · `npm run ownership-restore:verify` · `worker/tests/device-quiet-tab-rehydrate.test.ts` |
+| **Regression (TBD Phase 1+)** | `e2e:custody-device-unlock` · `worker:test:custody-wrap` — add when implemented |
+| **Regression (C0)** | `npm run custody:phase0-preflight` · `npm run custody:phase0-kit` · `worker/tests/custody-phase0-*.test.ts` |
+| **Human gate (C0-5/6)** | `npm run custody:phase0-kit` → ≥5 testers → `npm run custody:phase0-sign-off -- --pass --apply` |
+| **Status** | **C0 in progress** — engineering complete; **G-C0 human comprehension open** |
+
+**Do not duplicate:** Safari P0–P2 mitigations (shipped) — WS-CUSTODY **extends**, not replaces, [`SAFARI_KEYS_CUSTODY.md`](SAFARI_KEYS_CUSTODY.md).
+
+---
+
+## Engineering Phase 2 — Summer 2026 program
+
+**Purpose:** Next engineering phase after the **Phase 1 multi-agent program** (WS-DOC / WS-REV / WS-CR / WS-E) — parallel tracks for **Cedar Rapids summer launch**, **Signal War**, **consumer custody de-risk**, and **revenue closeout**.  
+**Doc audit (2026-06-03):** New canon — [`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md), [`CUSTODY_PHASE0_RUNBOOK.md`](CUSTODY_PHASE0_RUNBOOK.md). Major updates — [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) (unified **Wake the city · Signal War**, **40→60** waves, **SW-01–SW-15**), [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) (fog **SW-08**), [`OWNERSHIP_AND_CONTROL_MODEL.md`](OWNERSHIP_AND_CONTROL_MODEL.md) (hybrid custody pointer), [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) (five-layer resolver map). Cross-links in Safari keys, key-loss matrix, steward roadmap, operator runbooks.
+
+### Phase 1 exit (do not start Phase 2 field waves until)
+
+| Gate | Owner | Proof |
+|------|-------|-------|
+| **WS-CR C5** | WS-CR | [`CITY_GAME_LAUNCH_CHECKLIST.md`](CITY_GAME_LAUNCH_CHECKLIST.md) signed · `city-game:launch-surfaces --apply` on production |
+| **WS-REV R5** | WS-REV / ops | Stripe prices + secrets · `hosted:rev:rollout -- --post-deploy` · optional `hosted:rev:prod-smoke -- --paid` |
+| **B7 at ~40** | WS-SCALE + WS-CR | Install QA + comprehension at **opening footprint**, not 15-node scaffold count |
+| **G-C0** (parallel) | WS-CUSTODY | `custody:phase0-sign-off -- --pass` — **not** a city-game blocker; **is** a broad consumer-launch blocker |
+
+Phase 1 human gates still open: **WS-CR C2** comprehension ≥5 · **WS-E E3** staging walkthrough (15-node scaffold OK for E3; summer open needs **SC-2**).
+
+### Phase 2 critical path
+
+```text
+Phase 1 exit (C5 + B7 plan for ~40)
+    ↓
+WS-SCALE SC-1–SC-2 (JSON → ~40 nodes + mint wave 1) — blocks launch-surfaces honesty
+    ↓ parallel at season open
+WS-SW SW-S1 (copy + operator flips on relays; cooperative spine L)
+WS-CR ops (install wave 1, GM cadence doc)
+WS-CUSTODY C0 sign-off (parallel)
+    ↓ mid-summer
+WS-SCALE SC-3–SC-4 (+10–20 nodes, B7 per wave)
+WS-SW SW-S2 (SW-03–SW-07 L: capture, reinforce, decay, faction totals)
+WS-SW SW-S3 (SW-08–SW-13: fog, artifacts, dual victory — map B13–B15)
+    ↓ after E1
+WS-E self-serve marketing (organizers; not Cedar Rapids field)
+WS-CUSTODY C1+ only if G-C0 pass
+```
+
+### Phase 2 agent index
+
+| ID | Workstream | Agent mission | Blocks |
+|----|------------|---------------|--------|
+| **WS-SCALE** | Summer node footprint | Extend season registry **15 → ~40 open → ~60 full**; `node_role` mix; mint/install waves; **B7** each wave | Public open · honest `verify:city-game` count |
+| **WS-SW** | Signal War mechanics | **SW-01–SW-15** per delivery column in implementation brief; S1 = doc/copy/O; S2 = player **L** on relays | Faction contest truth on scan + board |
+| **WS-CUSTODY** | Hybrid custody | C0 de-risk → C1 wrap (gated on **G-C0**) | Consumer + paid positioning |
+| **WS-REV** | Revenue closeout | Finish R5 prod Stripe smoke (Phase 1 tail) | Paid organizer caps UI truth |
+| **WS-CR** | Launch + GM ops | C2–C5, weekly bulletin/decay operator cadence | Summer “living city” ops |
+| **WS-E** | Self-serve seasons | E3 human → E1 gate for marketing | New organizers (post-pilot) |
+
+**Assign one agent per ID.** WS-SCALE and WS-SW may share `worker/src/city-game/**` — coordinate in **Active branches**; prefer WS-SCALE owns JSON/registry, WS-SW owns contribute evaluators + snapshot fields.
+
+---
+
+### WS-SCALE — Summer node footprint (40 → 60)
+
+| | |
+|--|--|
+| **Canonical docs** | [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) § Node scale · § Rollout phases · [`CITY_GAME_NODE_INSTALL_MAP.md`](CITY_GAME_NODE_INSTALL_MAP.md) · [`CITY_GAME_INSTALL_QA.md`](CITY_GAME_INSTALL_QA.md) · [`CITY_GAME_OPERATOR_RUNBOOK.md`](CITY_GAME_OPERATOR_RUNBOOK.md) |
+| **Product canon** | **~40 heterogeneous nodes at open** (not 15 clones): ~30 relays, 4 HQ, 5–10 resource/artifact, 1–3 world events · grow to **~60** in install waves |
+| **In scope** | Clone spine rows to full mix · `node_role` extensions in [`worker/src/city-game/constants.ts`](../worker/src/city-game/constants.ts) · `/created/` picker (with WS-E) · mint batches · **B7** + `city-game:install-qa-preflight` at **40** before `--apply` · mid/late waves + bulletin for new installs |
+| **Out of scope** | Signal War **L** logic (WS-SW) · Stripe · custody wrap · new investigation docs |
+| **Milestones** | **SC-1** registry + JSON ~40 rows · **SC-2** mint wave 1 + install map signed · **SC-3** mid wave (+10) · **SC-4** full ~60 · **SC-5** `verify:city-game` + launch preflight at each count |
+| **Regression** | `npm run city-game:scale-sc1` · `npm run verify:city-game` · `npm run city-game:verify-season -- --require-launch` · `npm run city-game:install-qa-preflight` |
+| **File ownership** | `site/data/city-game-cr-season-01.json` · `worker/src/city-game/constants.ts` · `worker/scripts/city-game-*mint*` · install map doc · season registry codegen |
+| **Status** | **SC-1 ☑ engineering** — 40-node registry in `city-game-cr-season-01.json` · `npm run city-game:scale-sc1` · **SC-2** mint wave 1 + install map QR (blocked on local/production seed) |
+| **Blocked by** | Phase 1 launch sign-off; ops custody for production season root |
+
+**Honest default:** Committed **15-row JSON** remains CI/scaffold until SC-1 lands — do not market 40-node summer until SC-2 mint completes.
+
+---
+
+### WS-SW — Wake the city · Signal War
+
+| | |
+|--|--|
+| **Canonical docs** | [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) § Wake the city · Signal War · **SW-*** table · [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) · [`CITY_GAME_AUTONOMOUS_V1.md`](CITY_GAME_AUTONOMOUS_V1.md) · game theory **GT-8–GT-10** |
+| **Product sentence** | One season, two layers — **cooperative awakening** on lore nodes + **faction network contest** on relays (capture, reinforce, decay, fog, dual victory) |
+| **In scope** | Traceability **SW-01–SW-15** · **SW-S1:** SW-02 pledge copy, relay **O** flips, season rules framing (**SW-01** doc ☑) · **SW-S2:** **SW-03–SW-07** `game-contribute` capture/reinforce/decay, `held_by_faction` / `held_until`, faction totals on snapshot · **SW-S3:** **SW-08** fog filter, **SW-09–SW-12** artifacts/overharvest, **SW-13–SW-15** finale + badge scan · map **B13–B15** when marketing promises live contest board |
+| **Out of scope** | Node count / mint (WS-SCALE) · Player accounts / GPS · **SW-16** strategy votes (later) · B8 RFC unless product pulls S2 earlier |
+| **S1 honest default** | Signal War **copy + operator flips** ship at open; player-initiated **SW-03–SW-05** target **S2 L** unless B8 merges earlier — cooperative **CR-G01/G07** stays **L** at S1 |
+| **Regression** | `npm run verify:city-game` · `worker/tests/city-game-contribute*.test.ts` · `worker/tests/map-node-snapshot*.test.ts` · comprehension **GT-8–GT-10** when SW-S2 ships |
+| **File ownership** | `worker/src/city-game/game-contribute*.ts` · `season-snapshot*` / `map-node-snapshot.ts` · `site/js/city-game-*` · scan templates for `relay_gate` · [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) fog section |
+| **Status** | **SW-S1 not started** (doc ☑) · depends on SC-1 relay node IDs for SW-03 targets |
+| **Parallel with** | WS-SCALE (registry must list relay roles before capture **L**) |
+
+---
+
+### Phase 2 regression block
+
+```bash
+npm run verify:city-game
+npm run city-game:launch-preflight
+npm run custody:phase0-preflight
+npm run worker:test -- worker/tests/city-game-contribute*.test.ts worker/tests/map-node-snapshot*.test.ts
+npm run build
+```
+
+Add **WS-REV** multi-agent block when touching `/created/` or steward billing. Add **WS-CUSTODY** key-loss / Safari E2E when touching create/setup shell.
+
+---
+
 ### Multi-agent regression block (lead / integrator)
 
 Before any cross-stream merge to `main`:
@@ -200,7 +327,7 @@ Update this table when new PRs open.
 | P0b-1 prod WebKit | Card disabled since visit — **re-verify on humanity.llc** after Pages deploy | Human QA | Desk ☑ `card-disabled-since-visit:desk-gate` (2026-06-02) · manual **P1-P0b-1** · `card-disabled-since-visit:sign-off -- --pass --apply` |
 | P1-PWA-V prod WebKit | Vouch from printed QR — **PWA + Camera on humanity.llc** | Human QA | Desk ☑ `steward-scan-handoff:verify` (2026-06-02) · manual **P1-PWA-V** · changelog line in this doc |
 | H-12 human § A–C | ~~Printed QR camera QA on ≥3 phones~~ **Passed 2026-05-30** | Human QA | Sign-off: `live-control:printed-qa:sign-off -- --pass --apply` |
-| P3-1 / P3-2 | WebAuthn / optional encrypted persistence | Architecture | Not scheduled |
+| P3-1 / P3-2 | Hybrid custody **C1–C4** — see WS-CUSTODY | Architecture | [`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md) — **C0** de-risk before wrap crypto |
 | **Smooth mode Phase 0–1** | UX + quiet defaults on same bootstrap | **Phase 0 complete 3/3** · Phase 1 **deferred** — **RC-18** Nord cold hub | [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md) · [`SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md`](SHELL_PAGE_LOAD_CONTENT_FLASH_INVESTIGATION.md) § RC-18 |
 | **RC-18 boot graph** | Nord cold first hub open (Smooth Phase 0 outlier) | **Desk fix shipped v83** · Nord S1 re-verify after deploy | § RC-18 · `device-smooth:phase0 -- --e2e` |
 | **Pages deploy** | Production updates blocked | Ops | Fix `CLOUDFLARE_API_TOKEN` (Pages Edit) on Deploy Pages workflow |
@@ -248,6 +375,9 @@ npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts
 | Steward session + entitlements API | WS-REV | `worker/src/resolver/steward-hosted.ts`, `worker/src/steward/**`, `site/js/device-steward-session*.mjs`, `site/js/device-steward-entitlements*.mjs` |
 | Game season metering | WS-REV | `worker/src/city-game/season-entitlements*.ts`, `worker/src/city-game/season-quota.ts`, `worker/migrations/0031_*`, `site/js/city-game-season-entitlements-core.mjs` |
 | Cedar Rapids launch surfaces | WS-CR | `worker/scripts/city-game-launch-surfaces*.mjs`, `site/play/cedar-rapids/`, `site/data/city-game-cr-season-01.json` |
+| Summer season JSON + mint waves | WS-SCALE | `site/data/city-game-cr-season-01.json`, `worker/src/city-game/constants.ts`, mint/install scripts — coordinate with WS-SW |
+| Signal War contribute + snapshot | WS-SW | `worker/src/city-game/game-contribute*.ts`, `map-node-snapshot.ts`, `site/js/city-game-*` |
+| Custody C0 copy + setup | WS-CUSTODY | `device-ownership-copy-core.mjs`, `/created/` setup panel, `custody-phase0-*` scripts |
 | Phase E `/created/` game setup | WS-E | `site/created/index.html`, `site/js/created-*.mjs` (new game modules), `site/play/*/index.html` generator paths |
 | Doc status + verbs | WS-DOC | `docs/HOSTED_TIER_*.md`, `docs/PAID_TIER_*.md`, `docs/CITY_GAME_LOCAL_DEV.md`, `docs/LIVE_OBJECT_ARCHITECTURE.md`, `docs/QR_DESIGN_SPACE.md`, `docs/SYSTEM_INVARIANTS.md` |
 
@@ -257,6 +387,8 @@ npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts
 
 | Date | Event |
 |------|--------|
+| 2026-06-03 | **WS-SCALE SC-1 ☑** — 40-node summer registry + `city-game:scale-sc1` preflight · next SC-2 mint/install |
+| 2026-06-03 | **Engineering Phase 2** — summer program: **WS-SCALE** (40→60), **WS-SW** (Signal War SW-01–15), Phase 1 exit gates; doc audit of custody + city-game canon |
 | 2026-06-03 | **WS-REV M5/E2.5** — hub monitoring line uses entitlements body (plan + auto-check usage / at-limit) |
 | 2026-06-03 | **WS-REV R5** — `/created/` Usage & limits on Manage tab; production HTML smoke green |
 | 2026-06-03 | **WS-REV R5** — rollout tooling + prod `0031` + worker deploy; API smoke green · `hosted:rev:step1-remote` · `hosted:rev:deploy` |
@@ -335,7 +467,7 @@ npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts
 ## Agent handoff checklist
 
 1. Read [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) + this file + the stream's canonical doc.
-2. Confirm your **workstream ID** (WS-DOC, WS-REV, WS-CR, or WS-E) — stay inside § [Multi-agent program](#multi-agent-program-product--revenue--cedar-rapids) **In scope** / **Out of scope**.
+2. Confirm your **workstream ID** — Phase 1: WS-DOC, WS-REV, WS-CR, WS-E · Phase 2: **WS-SCALE**, **WS-SW**, **WS-CUSTODY** (§ [Engineering Phase 2](#engineering-phase-2--summer-2026-program)) — stay inside that stream's **In scope** / **Out of scope**.
 3. `git fetch` and check **Active branches** — do not re-implement open PR scope.
 4. Run the **Regression commands** for your stream (and **Multi-agent regression block** if touching shared surfaces).
 5. Append one line to **Changelog** when you merge or ship.

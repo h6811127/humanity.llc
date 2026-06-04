@@ -19,7 +19,14 @@ import {
   applySyncAutoSaveResult,
   shouldSyncAutoSaveBeforeCreateNavigate,
 } from "./created-device-save-core.mjs";
-import { defaultWalletLabel, saveSessionToWallet } from "./device-wallet.mjs";
+import { defaultWalletLabel } from "./device-wallet.mjs";
+import { saveSessionToWalletWithCustody } from "./device-custody-save.mjs";
+import {
+  CUSTODY_MODE_DEVICE_UNLOCK,
+  CUSTODY_MODE_FULL_KEYS,
+  shouldDefaultDeviceUnlockAtCreate,
+} from "./device-custody-mode-core.mjs";
+import { isDeviceUnlockWebAuthnAvailable } from "./device-custody-webauthn-core.mjs";
 import {
   EPHEMERAL_BROWSING_CREATE_BLOCKED,
   EPHEMERAL_BROWSING_DETAIL,
@@ -198,6 +205,55 @@ function readQrValidityDays() {
   return days;
 }
 
+function readCreateCustodyMode() {
+  const urlParam = new URLSearchParams(location.search).get("custody");
+  if (urlParam === CUSTODY_MODE_FULL_KEYS) return CUSTODY_MODE_FULL_KEYS;
+  const selected = document.querySelector('input[name="custody_mode"]:checked')?.value;
+  if (selected === CUSTODY_MODE_FULL_KEYS || selected === CUSTODY_MODE_DEVICE_UNLOCK) {
+    return selected;
+  }
+  return CUSTODY_MODE_DEVICE_UNLOCK;
+}
+
+function syncCreateCustodyModeUi() {
+  const fieldset = document.getElementById("create-custody-mode");
+  const hint = document.getElementById("create-custody-mode-hint");
+  const deviceRadio = document.querySelector(
+    'input[name="custody_mode"][value="device_unlock"]'
+  );
+  const fullRadio = document.querySelector('input[name="custody_mode"][value="full_keys"]');
+  if (!fieldset) return;
+
+  const organizerOn = enableOrganizerEl?.checked ?? false;
+  const webAuthnAvailable = isDeviceUnlockWebAuthnAvailable();
+  const deviceAllowed = webAuthnAvailable && !organizerOn && !ephemeralBrowsing;
+
+  fieldset.hidden = ephemeralBrowsing;
+  if (deviceRadio instanceof HTMLInputElement) {
+    deviceRadio.disabled = !deviceAllowed;
+  }
+  if (fullRadio instanceof HTMLInputElement && !deviceAllowed) {
+    fullRadio.checked = true;
+  } else if (deviceRadio instanceof HTMLInputElement && deviceAllowed) {
+    const urlParam = new URLSearchParams(location.search).get("custody");
+    if (urlParam !== CUSTODY_MODE_FULL_KEYS) {
+      deviceRadio.checked = true;
+    }
+  }
+
+  if (hint) {
+    if (!webAuthnAvailable) {
+      hint.textContent =
+        "This browser cannot use Face ID / Touch ID device unlock. Full control keys will be used.";
+    } else if (organizerOn) {
+      hint.textContent = "Organizer revoke requires full control keys on this device.";
+    } else {
+      hint.textContent =
+        "This device locks your signing key behind your passkey. You won't manage raw keys in normal use.";
+    }
+  }
+}
+
 export async function runCreateCard(input) {
   const {
     handle,
@@ -357,8 +413,24 @@ export async function runCreateCard(input) {
   sessionStorage.setItem("hc_created", JSON.stringify(session));
   setLastActiveProfileId(profileId);
 
+  const custodyMode = readCreateCustodyMode();
+  const useDeviceUnlock = shouldDefaultDeviceUnlockAtCreate({
+    custodyMode,
+    webAuthnAvailable: isDeviceUnlockWebAuthnAvailable(),
+    organizerEnabled: Boolean(organizerPrivateKey),
+    ephemeralBrowsing,
+  });
+  session.custody_mode = useDeviceUnlock
+    ? CUSTODY_MODE_DEVICE_UNLOCK
+    : CUSTODY_MODE_FULL_KEYS;
+  sessionStorage.setItem("hc_created", JSON.stringify(session));
+
   if (shouldSyncAutoSaveBeforeCreateNavigate({ autoSaveEnabled: isAutoSaveEnabled(), session })) {
-    const saveResult = saveSessionToWallet(session, defaultWalletLabel(session));
+    const saveResult = await saveSessionToWalletWithCustody(
+      session,
+      defaultWalletLabel(session),
+      { custodyMode: session.custody_mode }
+    );
     applySyncAutoSaveResult(session, saveResult, {
       markFailed: markAutoSaveFailed,
       clearFailed: clearAutoSaveFailed,
@@ -476,11 +548,15 @@ function syncOrganizerFieldsUi() {
   if (organizerPublicKeyEl) organizerPublicKeyEl.disabled = !on || !pasteMode;
 }
 
-enableOrganizerEl?.addEventListener("change", syncOrganizerFieldsUi);
+enableOrganizerEl?.addEventListener("change", () => {
+  syncOrganizerFieldsUi();
+  syncCreateCustodyModeUi();
+});
 document.querySelectorAll('input[name="organizer_key_mode"]').forEach((el) => {
   el.addEventListener("change", syncOrganizerFieldsUi);
 });
 syncOrganizerFieldsUi();
+syncCreateCustodyModeUi();
 
 const urlTemplate = new URLSearchParams(location.search).get("template");
 if (urlTemplate === "status_plate") {

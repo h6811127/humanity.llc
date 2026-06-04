@@ -20,6 +20,7 @@ Use this page when you need **one map** of steward-facing device work. Detailed 
 | **4** | **Billing checkout → `hc_account_id` URL** (Stripe return) | **Shipped** — pending link + hub line; wire `success_url` in Stripe Dashboard | `npm run hosted:stripe-return-url -- acc_…` · `device-steward-billing-return-core.mjs` · `device-steward-session.mjs` |
 | **5** | **Child object UI** under one root (beyond `print_artifact` bridge) | **Shipped** — status plate + lost-item relay: register, update, issue scan QR, disable on `/created/` Live | [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) · `created-child-object.mjs` · `created-child-object-lost-item.mjs` |
 | **6** | **M5.5 key import** on new device | **Hub import shipped** — backup → wallet + tab session + **Open card controls** → `/created/` | [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) · `device-hub-import.mjs` |
+| **7** | **Engineering Phase 2 (summer 2026)** — Cedar Rapids scale + Signal War + custody C0 | **Open** — assign **WS-SCALE / WS-SW / WS-CUSTODY** after Phase 1 launch gates | [`PRODUCT_WORKSTREAM_COORDINATION.md`](PRODUCT_WORKSTREAM_COORDINATION.md) § Engineering Phase 2 · [`CUSTODY_PHASE0_RUNBOOK.md`](CUSTODY_PHASE0_RUNBOOK.md) |
 
 **Free tier unchanged:** no session, no SSE, 400 auto-poll/day — steps 2–3 must not regress H1–H6 ([`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Phase 10).
 
@@ -35,7 +36,7 @@ Use this page when you need **one map** of steward-facing device work. Detailed 
 
 | Layer | User question | Canonical doc |
 |-------|---------------|---------------|
-| **Ownership & control** | Do I own this object? Save, recover, multi-device? (user language) | [`OWNERSHIP_AND_CONTROL_MODEL.md`](OWNERSHIP_AND_CONTROL_MODEL.md) |
+| **Ownership & control** | Do I own this object? Save, recover, multi-device? (user language) | [`OWNERSHIP_AND_CONTROL_MODEL.md`](OWNERSHIP_AND_CONTROL_MODEL.md) · [`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md) (hybrid planning) |
 | **Custody & keys** | Where are my signing keys? One root vs many objects? Multi-device? (engineering) | [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) · [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) |
 | **In-app chrome** | What should I do on this device right now? | [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md`](KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md) · [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) |
 | **Network work & cost** | When does this device hit the resolver? Who pays? | [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) · [`DEVICE_OS.md`](DEVICE_OS.md) |
@@ -121,6 +122,8 @@ flowchart LR
 | “PWA on home screen auto-reloads every open” | **No.** **Soft refresh** on resume + optional pull — not `location.reload()` every time ([`PWA_INSTALL.md`](PWA_INSTALL.md) § Standalone refresh & resume). |
 | “PWA has browser tabs like Safari” | **No.** `window.open` / `target="_blank"` for scan preview leaves the installed app — [`PWA_STANDALONE_EXTERNAL_NAVIGATION.md`](PWA_STANDALONE_EXTERNAL_NAVIGATION.md). Tab-native shortcuts hidden in standalone — [`PWA_INSTALL.md`](PWA_INSTALL.md) § Browser context vs PWA context. |
 | “Cross-tab keys should OS-notify me” | **Never** — inbox/chrome only ([`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md)). |
+| “Easy mode means operator can reset my keys” | **No.** device_unlock uses platform passkey + **mandatory user recovery** — same no-custody trust model ([`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md)). |
+| “Consumers and stewards share one custody UX” | **No.** Separate create entry defaults: **This device** vs **Full control keys** — reduces support confusion. |
 
 ---
 
@@ -129,7 +132,8 @@ flowchart LR
 | Area | Shipped (reference / free) | Next / hosted | Canonical detail |
 |------|----------------------------|---------------|------------------|
 | **Key model** | Root + child object API; nested hub/My cards rows; resolver list reconcile; create convergence; register+QR; backup gate (steps 13–16) | Delegated child keys (step 17, product-gated) | [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) · [`DELEGATED_CHILD_CAPABILITIES_GATE.md`](DELEGATED_CHILD_CAPABILITIES_GATE.md) |
-| **Safari keys custody** | P0–P2 shipped: scan rehydrate, tab-honest dot, keyless session guard, ITP notice, PWA mismatch | P3 WebAuthn / optional persistence (not scheduled) | [`SAFARI_KEYS_CUSTODY.md`](SAFARI_KEYS_CUSTODY.md) · [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) |
+| **Safari keys custody** | P0–P2 shipped: scan rehydrate, tab-honest dot, keyless session guard, ITP notice, PWA mismatch | **Hybrid custody** C0–C4 planned — [`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md) | [`SAFARI_KEYS_CUSTODY.md`](SAFARI_KEYS_CUSTODY.md) · [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) |
+| **Custody hybrid (easy + keys)** | D6 sign-lock (gate on plaintext keys) | **WS-CUSTODY** — device_unlock wrap, mode-aware rehydrate, recovery gates | [`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md) |
 | **Portability** | Owner revoke path; backup/recovery; hub import → `/created/` | Shipped in repo; manual second-device QA | [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) |
 | **Inbox + custody panel** | Phases 1–14 inbox; custody plan 1–7 | Per-card watch flags (catalog L9+) | [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md`](KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md) |
 | **Browser alerts** | v2 A–D + `sw-live-proof.mjs` | Same UX; less polling when SSE healthy | [`DEVICE_INBOX.md`](DEVICE_INBOX.md) § Background alerts roadmap |

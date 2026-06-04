@@ -2,9 +2,22 @@
 
 **Status:** Tier 1–3 shipped  
 **Audience:** Product, frontend, security review  
-**Companions:** [`OWNERSHIP_AND_CONTROL_MODEL.md`](OWNERSHIP_AND_CONTROL_MODEL.md) · [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md) · [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md)
+**Companions:** [`OWNERSHIP_AND_CONTROL_MODEL.md`](OWNERSHIP_AND_CONTROL_MODEL.md) · [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md) · [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md) · [`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md) (mode-aware rehydrate — planned C2)
 
 ---
+
+## Planned: mode-aware rehydrate (WS-CUSTODY C2)
+
+Today (shipped), quiet rehydrate copies **plaintext** `full_keys` wallet rows into `hc_created` when gates pass.
+
+When **`device_unlock`** ships ([`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md)):
+
+| `custody_mode` | Empty session on shell / scan |
+|----------------|-------------------------------|
+| `full_keys` | Current D10 behavior (silent rehydrate when safe) |
+| `device_unlock` | **No silent copy** — WebAuthn **Unlock to manage** before populate `hc_created` |
+
+Scan order invariant unchanged: unlock gate completes **before** vouch / live-control scripts.
 
 ## Problem
 

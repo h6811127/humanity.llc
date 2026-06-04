@@ -1,9 +1,14 @@
 /**
  * Gated activation of saved ownership into hc_created (D6).
  */
-import { activateWalletEntry, buildCreatedPageUrl } from "./device-keys.mjs";
+import { walletEntryNeedsDeviceUnlock } from "./device-custody-mode-core.mjs";
+import { unlockWalletEntryToSession } from "./device-custody-unlock.mjs";
+import { activateWalletEntry, buildCreatedPageUrl, getTabSession } from "./device-keys.mjs";
 import { navigateTo } from "./device-shell-motion.mjs";
-import { tabSessionHasSigningKeys } from "./device-tab-session-core.mjs";
+import {
+  tabSessionHasSigningKeys,
+  walletEntryHasSigningMaterial,
+} from "./device-tab-session-core.mjs";
 import { loadWallet } from "./device-wallet.mjs";
 import { controlActivationRequiresUnlock } from "./device-control-activation-core.mjs";
 import {
@@ -42,9 +47,17 @@ export async function ensureControlActivationUnlocked(profileId, pin) {
 export async function activateWalletEntryGated(entry, opts = {}) {
   const profileId = typeof entry?.profile_id === "string" ? entry.profile_id : "";
   if (!profileId) return { error: "Missing profile id." };
+
+  let activationEntry = entry;
+  if (walletEntryNeedsDeviceUnlock(entry)) {
+    const unlocked = await unlockWalletEntryToSession(entry);
+    if (!unlocked.ok) return unlocked;
+    activationEntry = unlocked.session;
+  }
+
   const unlock = await ensureControlActivationUnlocked(profileId, opts.pin);
   if (!unlock.ok) return unlock;
-  activateWalletEntry(entry);
+  activateWalletEntry(activationEntry);
   return { ok: true };
 }
 
@@ -55,17 +68,25 @@ export async function activateWalletEntryGated(entry, opts = {}) {
 export async function openCardNowPageGated(entry, opts = {}) {
   if (!entry?.profile_id) return { error: "Missing profile id." };
 
-  const saved = tabSessionHasSigningKeys(entry)
-    ? entry
-    : loadWallet().find((w) => w.profile_id === entry.profile_id) ?? null;
-
+  const saved =
+    loadWallet().find((w) => w.profile_id === entry.profile_id) ?? entry;
   const target = saved ?? entry;
-  if (target && tabSessionHasSigningKeys(target)) {
+  const session = getTabSession();
+  const sessionHasTargetKeys =
+    tabSessionHasSigningKeys(session) && session?.profile_id === target.profile_id;
+
+  if (
+    target &&
+    !sessionHasTargetKeys &&
+    (tabSessionHasSigningKeys(target) ||
+      walletEntryNeedsDeviceUnlock(target) ||
+      walletEntryHasSigningMaterial(target))
+  ) {
     const result = await activateWalletEntryGated(target, { pin: opts.pin });
     if (!result.ok) return result;
   }
 
-  const url = buildCreatedPageUrl(target, opts);
+  const url = buildCreatedPageUrl(getTabSession() ?? target, opts);
   if (!url) return { error: "Could not open card." };
   navigateTo(url.href);
   return { ok: true };
