@@ -12,7 +12,7 @@
 |------|----------------|---------|------------|
 | **1** | Pages dev (`site/_redirects`) | `Infinite loop detected` for `/shop/products/*` | **Fixed 2026-05-28:** splat rewrite targets `/shop/product-detail/` (shell outside splat; `.html` under splat strips and loops) |
 | **2** | `e2e/device-os-wallet.spec.ts` · `e2e/keys-custody-emphasis-webkit.spec.ts` | `detail` ↔ **Acknowledge** gap **66–68px** (limit **&lt; 56**) | **Fixed 2026-05-28:** wallet `.hc-notice-foot` moved below Acknowledge (`afterActionsHtml`) |
-| **3** | `e2e/merch-funnel-customize.spec.ts` | Stays on `/created/?…&hc_ref=scan_customize` | **Fixed 2026-05-28:** `created-merch-funnel.mjs` auto-redirects fresh customize handoffs when `hc_created` is readable |
+| **3** | `e2e/merch-funnel-customize.spec.ts` | Fresh create with `hc_ref=scan_customize` stays on `/created/`; optional customize CTA (no auto-redirect) | **Fixed 2026-06-04:** removed auto-redirect; explicit `hc_ref` only |
 | — | Wrangler / workerd stderr | `Broken pipe` on Playwright teardown | Benign shutdown noise when Pages dev stops worker; not a product failure |
 
 **Passing:** 87 specs in the Device shell E2E bundle (1 skipped WebKit touch profile on desktop); worker Vitest gate runs before Playwright in the same workflow.
@@ -65,16 +65,16 @@ npm run e2e -- e2e/device-os-wallet.spec.ts -g "keys custody"
 
 ---
 
-### Step 3 — Merch funnel `scan_customize` auto-redirect ✅
+### Step 3 — Merch funnel `scan_customize` CTA (no auto-redirect) ✅
 
-**Intent:** Match [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) exit checklist (“Create card → `/shop/customize/` detects session”) and `e2e/merch-funnel-customize.spec.ts`.
+**Intent:** Match [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) — user chooses customize after create; `e2e/merch-funnel-customize.spec.ts`.
 
 | Action | File |
 |--------|------|
-| On fresh create with `scan_customize` (or other `CUSTOMIZE_HANDOFF_REFS`), `location.replace()` to customize URL after session is readable | `site/js/created-merch-funnel.mjs` |
-| Keep customize CTA card as fallback when redirect blocked / no session | same |
+| On fresh create with explicit `hc_ref` in `CUSTOMIZE_HANDOFF_REFS`, show **Get yours on wear** CTA on `/created/` — **no** `location.replace` | `site/js/created-merch-funnel.mjs` |
+| Direct `/create/` without `hc_ref` clears stale funnel session refs | `site/js/create-card.mjs` · `clearMerchCustomizeHandoff` |
 
-**Shipped:** `shouldAutoRedirectCreatedToCustomize` in `merch-funnel-core.mjs`; redirect when `hc_created` has signing keys, else show CTA card.
+**Shipped:** `shouldShowCreatedMerchCustomizeCard` when URL carries `hc_ref`; stale `customize_glitch` session no longer hijacks LO-1 create.
 
 **Verify:**
 
@@ -109,7 +109,7 @@ Spec list: `worker/scripts/device-shell-e2e-specs.mjs` · Vitest guard: `npm run
 | 2026-05-28 | **Step 4 tooling:** `device-shell:e2e` / `device-shell:e2e:signoff` + shared spec list; CI uses `npm run device-shell:e2e` |
 | 2026-05-28 | **Step 1 shipped:** product detail shell → `/shop/product-detail/`; `_redirects` splat target outside `/shop/products/*` |
 | 2026-05-28 | **Step 2 shipped:** wallet keys custody foot below Acknowledge (`afterActionsHtml`) |
-| 2026-05-28 | **Step 3 shipped:** fresh customize handoff auto-redirect from `/created/` |
+| 2026-06-04 | **Step 3 corrected:** removed auto-redirect; `/created/` CTA only when `hc_ref` explicit on create URL |
 | 2026-05-28 | **Step 4 shipped:** full Device shell E2E bundle — 87 passed, 1 skipped (WebKit touch profile); doc **Closed** |
 | 2026-05-28 | **P1-LW / S12:** `e2e/device-hub-large-wallet-summary.spec.ts` added to bundle (90 specs with new file) |
 | 2026-05-28 | **Step 1 regression:** `e2e/shop-product-detail.spec.ts` (Glitch drop + hub CTA; no `/shop/products/detail` loop) |

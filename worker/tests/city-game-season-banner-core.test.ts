@@ -29,7 +29,7 @@ describe("city-game-season-banner-core", () => {
       "before"
     );
     expect(resolveSeasonWindowPhase(new Date("2026-06-07T12:00:00-05:00"), season)).toBe("open");
-    expect(resolveSeasonWindowPhase(new Date("2026-06-09T08:00:00-05:00"), season)).toBe("after");
+    expect(resolveSeasonWindowPhase(new Date("2026-09-02T08:00:00-05:00"), season)).toBe("after");
   });
 
   it("uses phase-aware headlines and body copy", () => {

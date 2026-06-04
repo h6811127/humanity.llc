@@ -8,7 +8,10 @@ import { spawnSync } from "node:child_process";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { SUMMER_OPEN_NODE_COUNT } from "./city-game-summer-scale-core.mjs";
+import {
+  SUMMER_OPEN_NODE_COUNT,
+  SUMMER_WAVE_OPEN_NODE_COUNT,
+} from "./city-game-summer-scale-core.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const seasonPath = join(root, "site/data/city-game-cr-season-01.json");
@@ -23,12 +26,17 @@ function run(cmd, args) {
 
 const season = JSON.parse(readFileSync(seasonPath, "utf8"));
 const nodeCount = Array.isArray(season.nodes) ? season.nodes.length : 0;
-if (nodeCount !== SUMMER_OPEN_NODE_COUNT) {
+const allowedCounts = new Set([SUMMER_OPEN_NODE_COUNT, SUMMER_WAVE_OPEN_NODE_COUNT]);
+if (!allowedCounts.has(nodeCount)) {
   console.error(
-    `\nSeason JSON has ${nodeCount}/${SUMMER_OPEN_NODE_COUNT} nodes in ${seasonPath}.`
+    `\nSeason JSON has ${nodeCount} nodes in ${seasonPath} (expected ${SUMMER_OPEN_NODE_COUNT} pilot or ${SUMMER_WAVE_OPEN_NODE_COUNT} wave-open).`
   );
-  console.error("Run: npm run city-game:merge-wave-open");
-  console.error("Then: npm run city-game:spread-map-layout -- --write\n");
+  if (nodeCount === SUMMER_OPEN_NODE_COUNT) {
+    console.error("Run: npm run city-game:merge-wave-open -- --write");
+    console.error("Then: npm run city-game:build-registry\n");
+  } else {
+    console.error("Fix season registry or restore pilot spine before continuing.\n");
+  }
   process.exit(1);
 }
 

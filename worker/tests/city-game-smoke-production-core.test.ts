@@ -10,6 +10,7 @@ import {
   resolveProductionSmokeSignOffResult,
   selectProductionSmokeNodes,
   spotExpectationsForProductionProbe,
+  productionSmokeExpectationsForNode,
 } from "../scripts/city-game-smoke-production-core.mjs";
 
 function prodSeed(nodeCount: number) {
@@ -103,6 +104,22 @@ ${LAUNCH_CHECKLIST_E5_PENDING}`;
     expect(spotExpectationsForProductionProbe(season, new Date("2026-06-03T12:00:00Z")).node_04).toEqual({
       requireCoopHint: true,
       requireContributeBlock: true,
+    });
+  });
+
+  it("expects dormant for any node when season window is pre-launch (--all)", () => {
+    const season = {
+      window: {
+        starts_at: "2099-06-06T18:00:00-05:00",
+        ends_at: "2099-06-08T22:00:00-05:00",
+      },
+    };
+    const now = new Date("2026-06-03T12:00:00Z");
+    expect(productionSmokeExpectationsForNode(season, "node_16", now)).toEqual({
+      expectDormant: true,
+    });
+    expect(productionSmokeExpectationsForNode(season, "node_02", now)).toEqual({
+      expectDormant: true,
     });
   });
 });

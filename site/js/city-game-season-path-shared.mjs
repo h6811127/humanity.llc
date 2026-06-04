@@ -37,6 +37,16 @@ export function seasonSlugFromRulesPath(rulesPath) {
 }
 
 /**
+ * Canonical city board URL for a season (shareable, no hash).
+ * @param {string | null | undefined} rulesPath e.g. /play/cedar-rapids/
+ * @returns {string | null}
+ */
+export function seasonBoardPath(rulesPath) {
+  const slug = seasonSlugFromRulesPath(rulesPath);
+  return slug ? `/play/${slug}/map/` : null;
+}
+
+/**
  * @param {string} basename
  */
 export function seasonJsonPublicUrl(basename) {
@@ -77,10 +87,13 @@ export function seasonLaunchContext(season, jsonBasename) {
     throw new Error("season.rules_path must be /play/{slug}/ for launch surfaces.");
   }
   const rulesPath = String(season.rules_path).trim().replace(/\/?$/, "/");
+  const boardPath = seasonBoardPath(rulesPath) ?? `/play/${slug}/map/`;
   return {
     slug,
     rulesPath,
+    boardPath,
     rulesPageRel: `site/play/${slug}/index.html`,
+    boardPageRel: `site/play/${slug}/map/index.html`,
     seasonJsonUrl: seasonJsonPublicUrl(jsonBasename),
     comprehensionPageRel: `site/play/${slug}/comprehension/index.html`,
   };

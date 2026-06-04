@@ -94,6 +94,16 @@ export function clearMerchCreateRef() {
   }
 }
 
+/** Drop create + post-create customize handoff refs (direct /create/ without hc_ref). */
+export function clearMerchCustomizeHandoff() {
+  clearMerchCreateRef();
+  try {
+    sessionStorage.removeItem(MERCH_FUNNEL_POST_CREATE_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
 /**
  * @param {unknown} ref
  * @returns {boolean}
@@ -239,22 +249,13 @@ export function merchCustomizeUrlFromRef(ref, origin = "https://humanity.llc") {
 }
 
 /**
+ * Fresh create with explicit customize handoff ref → show CTA on /created/ (never auto-redirect).
+ *
  * @param {{ fresh?: boolean, merchRef?: string | null }} input
  * @returns {boolean}
  */
 export function shouldShowCreatedMerchCustomizeCard(input) {
   return input.fresh === true && shouldHandoffToCustomize(input.merchRef);
-}
-
-/**
- * Fresh create with customize handoff ref and signing session ready → auto-redirect.
- *
- * @param {{ fresh?: boolean, merchRef?: string | null, sessionHasSigningKeys?: boolean }} input
- * @returns {boolean}
- */
-export function shouldAutoRedirectCreatedToCustomize(input) {
-  if (!shouldShowCreatedMerchCustomizeCard(input)) return false;
-  return input.sessionHasSigningKeys === true;
 }
 
 /**

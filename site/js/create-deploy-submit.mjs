@@ -1,0 +1,97 @@
+/**
+ * Deploy wizard submit — bundled root + child object create.
+ */
+
+import { appendChildObjectRow } from "./child-object-store-core.mjs";
+import { registerChildObjectAndIssueScanLink } from "./child-object-register-issue.mjs";
+import {
+  childObjectTypeForDeployTemplate,
+  createdLiveAddObjectHref,
+  deployCreatedFocusHash,
+  generalRootManifestoForDeploy,
+  parseDeployChildFields,
+} from "./create-deploy-wizard-core.mjs";
+import { pickPreferredGeneralRoot, listGeneralRootsWithKeys } from "./create-flow-convergence-core.mjs";
+import { loadWallet } from "./device-wallet.mjs";
+
+/**
+ * @param {string} template
+ * @param {ReturnType<typeof import("./create-form-validation-core.mjs").validateCreateFormFields> extends { ok: true } ? never : any} fields
+ * @param {{
+ *   handle: string;
+ *   wantRecovery: boolean;
+ *   qrValidityDays: number;
+ *   organizer: ReturnType<typeof import("./create-card.mjs").readOrganizerKeyConfig>;
+ *   runCreateCard: (input: Record<string, unknown>) => Promise<{ session: Record<string, unknown>, profileId: string, qrId: string }>;
+ * }} ctx
+ */
+export async function runDeployRootAndChildCreate(template, fields, ctx) {
+  const { publicLabel, publicState } = parseDeployChildFields(template, fields);
+  const objectType = childObjectTypeForDeployTemplate(template);
+
+  const createResult = await ctx.runCreateCard({
+    handle: ctx.handle,
+    manifesto: generalRootManifestoForDeploy(ctx.handle),
+    wantRecovery: ctx.wantRecovery,
+    pilotTemplate: "general",
+    qrValidityDays: ctx.qrValidityDays,
+    organizer: ctx.organizer,
+    objectStreams: [],
+    navigate: false,
+  });
+
+  const session = createResult.session;
+  const profileId = createResult.profileId;
+  const ownerPrivateKey = String(session.owner_private_key_b58 || "");
+  const ownerPublicKey = String(session.owner_public_key_b58 || "");
+  if (!ownerPrivateKey || !ownerPublicKey) {
+    throw new Error("Signing keys missing after create — reload and try again.");
+  }
+
+  const childResult = await registerChildObjectAndIssueScanLink({
+    profileId,
+    objectType,
+    publicLabel,
+    publicState,
+    privateKeyBase58: ownerPrivateKey,
+    publicKeyBase58: ownerPublicKey,
+  });
+
+  appendChildObjectRow(localStorage, profileId, {
+    object_id: childResult.objectId,
+    object_type: childResult.objectType,
+    public_label: childResult.publicLabel,
+    public_state: childResult.publicState,
+    created_at: childResult.createdAt,
+    ...(childResult.scanUrl && childResult.qrId
+      ? { qr_id: childResult.qrId, scan_url: childResult.scanUrl }
+      : {}),
+  });
+
+  const created = new URL("/created/", location.origin);
+  created.searchParams.set("profile_id", profileId);
+  if (childResult.qrId) {
+    created.searchParams.set("qr_id", childResult.qrId);
+  } else if (createResult.qrId) {
+    created.searchParams.set("qr_id", createResult.qrId);
+  }
+  created.searchParams.set("fresh", "1");
+  const focus = deployCreatedFocusHash(template);
+  if (focus) created.hash = focus;
+  location.replace(created.href);
+}
+
+/**
+ * @param {string} template
+ */
+export function redirectDeployToLiveAddObject(template) {
+  const preferredRoot = pickPreferredGeneralRoot(listGeneralRootsWithKeys(loadWallet()));
+  if (!preferredRoot) {
+    throw new Error("No saved account with keys on this device — create a root card first.");
+  }
+  const href = createdLiveAddObjectHref(preferredRoot, template, location.origin);
+  if (!href) {
+    throw new Error("Could not open Live — open controls on your saved card first.");
+  }
+  location.href = href;
+}

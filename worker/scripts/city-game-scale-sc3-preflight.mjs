@@ -15,8 +15,10 @@ import {
   LOCAL_DEV_INSTALL_QA_WALK_REL,
   resolveInstallQaWalkNodes,
 } from "./city-game-install-qa-walk-core.mjs";
-import { validateSummerOpenFootprint } from "./city-game-summer-scale-core.mjs";
-import { INSTALL_QA_REQUIRED_NODE_COUNT } from "./city-game-smoke-local-core.mjs";
+import {
+  SUMMER_WAVE_OPEN_NODE_COUNT,
+  validateSummerWaveOpenFootprint,
+} from "./city-game-summer-scale-core.mjs";
 import { planProductionWaveOpenMint } from "./city-game-production-wave-open-core.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
@@ -32,14 +34,14 @@ function countSeedUrls(nodes) {
 function main() {
   const season = JSON.parse(readFileSync(seasonPath, "utf8"));
   const onDiskCount = Array.isArray(season.nodes) ? season.nodes.length : 0;
-  if (onDiskCount !== INSTALL_QA_REQUIRED_NODE_COUNT) {
+  if (onDiskCount !== SUMMER_WAVE_OPEN_NODE_COUNT) {
     console.error(
-      `Season JSON has ${onDiskCount}/${INSTALL_QA_REQUIRED_NODE_COUNT} nodes — npm run city-game:merge-wave-open`
+      `Season JSON has ${onDiskCount}/${SUMMER_WAVE_OPEN_NODE_COUNT} nodes — npm run city-game:merge-wave-open -- --write`
     );
     process.exit(1);
   }
 
-  const scale = validateSummerOpenFootprint(season);
+  const scale = validateSummerWaveOpenFootprint(season);
 
   /** @type {string[]} */
   const issues = [...scale.issues];
@@ -50,9 +52,9 @@ function main() {
     localSeed = JSON.parse(readFileSync(localSeedPath, "utf8"));
   }
   const localUrlCount = countSeedUrls(localSeed?.nodes);
-  if (localUrlCount < INSTALL_QA_REQUIRED_NODE_COUNT) {
+  if (localUrlCount < SUMMER_WAVE_OPEN_NODE_COUNT) {
     issues.push(
-      `Local seed ${localUrlCount}/${INSTALL_QA_REQUIRED_NODE_COUNT} — npm run city-game:seed-wave-open`
+      `Local seed ${localUrlCount}/${SUMMER_WAVE_OPEN_NODE_COUNT} — npm run city-game:seed-wave-open`
     );
   }
 
@@ -79,33 +81,33 @@ function main() {
   }
   if (!existsSync(walkPath)) {
     warnings.push("Walk kit missing — npm run city-game:install-qa-walk");
-  } else if (walkNodeCount < INSTALL_QA_REQUIRED_NODE_COUNT) {
+  } else if (walkNodeCount < SUMMER_WAVE_OPEN_NODE_COUNT) {
     issues.push(
-      `Walk kit resolver ${walkNodeCount}/${INSTALL_QA_REQUIRED_NODE_COUNT} — regenerate install-qa-walk`
+      `Walk kit resolver ${walkNodeCount}/${SUMMER_WAVE_OPEN_NODE_COUNT} — regenerate install-qa-walk`
     );
   }
 
   console.log("WS-SCALE SC-3 — production 40/40 + C3 walk");
   console.log("  Season nodes:", scale.summary.nodeCount);
-  console.log("  Local seed URLs:", localUrlCount, `/${INSTALL_QA_REQUIRED_NODE_COUNT}`);
+  console.log("  Local seed URLs:", localUrlCount, `/${SUMMER_WAVE_OPEN_NODE_COUNT}`);
   console.log(
     "  Production seed:",
     existsSync(prodSeedPath)
       ? `${prodCount} nodes · ${prodUrlCount} URLs`
       : "not on disk"
   );
-  console.log("  C3 walk kit nodes:", walkNodeCount, `/${INSTALL_QA_REQUIRED_NODE_COUNT}`);
+  console.log("  C3 walk kit nodes:", walkNodeCount, `/${SUMMER_WAVE_OPEN_NODE_COUNT}`);
 
   for (const w of warnings) console.warn("  warn:", w);
   for (const i of issues) console.error("  fail:", i);
 
   const localEngineeringReady =
     scale.ok &&
-    localUrlCount >= INSTALL_QA_REQUIRED_NODE_COUNT &&
-    walkNodeCount >= INSTALL_QA_REQUIRED_NODE_COUNT;
+    localUrlCount >= SUMMER_WAVE_OPEN_NODE_COUNT &&
+    walkNodeCount >= SUMMER_WAVE_OPEN_NODE_COUNT;
   const prodReady =
-    prodUrlCount >= INSTALL_QA_REQUIRED_NODE_COUNT &&
-    prodCount >= INSTALL_QA_REQUIRED_NODE_COUNT;
+    prodUrlCount >= SUMMER_WAVE_OPEN_NODE_COUNT &&
+    prodCount >= SUMMER_WAVE_OPEN_NODE_COUNT;
 
   if (!localEngineeringReady) {
     console.error("\n✗ SC-3 failed — local/C3 engineering not ready.");

@@ -3,6 +3,8 @@
  * @see worker/src/city-game/season-window.ts (keep in sync)
  */
 
+import { seasonBoardPath } from "./city-game-season-path-shared.mjs";
+
 const ISO_RE =
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/;
 
@@ -85,6 +87,16 @@ function seasonRulesHref(season, hash = "") {
   const path = String(season.rules_path ?? "/play/cedar-rapids/").trim() || "/play/cedar-rapids/";
   const base = path.replace(/\/?$/, "/");
   return hash ? `${base}${hash.replace(/^#?/, "#")}` : base;
+}
+
+/**
+ * @param {Record<string, unknown>} season
+ */
+function seasonBoardHref(season) {
+  return (
+    seasonBoardPath(String(season.rules_path ?? "")) ??
+    seasonRulesHref(season, "#city-state")
+  );
 }
 
 /**

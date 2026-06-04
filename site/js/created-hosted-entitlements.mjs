@@ -2,6 +2,11 @@
  * /created/ Live tab — render steward + game_season entitlements (WS-REV R2).
  */
 import { getTabSession } from "./device-keys.mjs";
+import { loadWallet } from "./device-wallet.mjs";
+import {
+  countGeneralRootWalletEntries,
+  hasExplicitGameSeasonContext,
+} from "./hub-objects-presentation-core.mjs";
 import {
   captureStewardAccountIdFromUrl,
   linkStewardAccountWithActiveKeys,
@@ -109,6 +114,8 @@ function renderHostedPlanPanel(model) {
   const lead = document.getElementById("created-hosted-plan-lead");
   const metricsEl = document.getElementById("created-hosted-plan-metrics");
   const atLimit = document.getElementById("created-hosted-plan-at-limit");
+  const gameDisclosure = document.getElementById("created-hosted-game-season-disclosure");
+  const gameSummary = document.getElementById("created-hosted-game-season-summary");
   const gameSection = document.getElementById("created-hosted-game-season");
   const gameTitle = document.getElementById("created-hosted-game-season-title");
   const gameMetrics = document.getElementById("created-hosted-game-season-metrics");
@@ -155,11 +162,24 @@ function renderHostedPlanPanel(model) {
     if (model.multiSeasonHint) multiHint.textContent = model.multiSeasonHint;
   }
 
+  const showGame =
+    !!model.gameSeasonTitle ||
+    (model.gameSeasonMetrics?.length ?? 0) > 0 ||
+    !!model.multiSeasonHint;
+
+  if (gameDisclosure instanceof HTMLDetailsElement) {
+    gameDisclosure.hidden = !showGame;
+    gameDisclosure.open = !!model.gameSeasonExpanded;
+  }
+
+  if (gameSummary) {
+    gameSummary.hidden = !model.gameSeasonCollapsedSummary;
+    if (model.gameSeasonCollapsedSummary) {
+      gameSummary.textContent = model.gameSeasonCollapsedSummary;
+    }
+  }
+
   if (gameSection) {
-    const showGame =
-      !!model.gameSeasonTitle ||
-      (model.gameSeasonMetrics?.length ?? 0) > 0 ||
-      !!model.multiSeasonHint;
     gameSection.hidden = !showGame;
   }
 
@@ -345,6 +365,8 @@ export function syncCreatedHostedPlanPanel() {
   const model = buildCreatedHostedPlanPanelModel(policy, body, {
     hasSession: !!readStewardSessionToken(),
     hasSigningKeys: !!getTabSession()?.owner_private_key_b58,
+    generalRootCount: countGeneralRootWalletEntries(loadWallet()),
+    explicitSeasonContext: hasExplicitGameSeasonContext(location.search, location.hash),
   });
   renderHostedPlanPanel(model);
 }

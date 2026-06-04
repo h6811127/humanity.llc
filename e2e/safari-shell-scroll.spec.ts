@@ -153,7 +153,7 @@ test.describe("Safari / WebKit shell smoke", () => {
     await expectHubBackdropClosed(page);
 
     await page.getByRole("link", { name: /Live status on something/i }).click();
-    await expect(page).toHaveURL(/\/create\/\?template=status_plate/);
+    await expect(page).toHaveURL(/\/create\/\?intent=deploy/);
   });
 
   test("touch profile skips document scroll-edge chrome", async ({ page, isMobile }) => {

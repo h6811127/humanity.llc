@@ -1,9 +1,11 @@
 # Product positioning and loop strategy
 
 **Status:** Active  
-**Purpose:** Positioning synthesis, narrative sequencing, and phased implementation plan.  
+**Purpose:** Positioning synthesis, narrative sequencing, front-door entry strategy, and phased implementation plan.  
 **Parent:** `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` · `docs/STATUS_PLATE_PILOT.md`  
-**Language policy:** [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md)
+**Language policy:** [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md)  
+**Object model (protocol):** [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md)  
+**Last updated:** 2026-06-04 — front-door strategy (Option A + create chooser B)
 
 ---
 
@@ -11,10 +13,101 @@
 
 | Layer | Message | Where |
 |-------|---------|--------|
-| Hook | Live state on real objects | Landing hero H1 |
-| Mechanism | Print once · change or revoke later | Landing hero tagline · how-it-works |
-| Category | Public programmable objects / physical software objects | Landing kicker · framing card |
-| Catalog | What else can a QR do? | `site/what-can-a-qr-do.html` |
+| Hook | **The sticker stays. The status changes.** | Landing hero H1 ([`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) § Landing) |
+| Mechanism | Print once · scanners read today’s signed state · update or revoke without reprint | Landing hero tagline · how-it-works |
+| Category | Public programmable objects / **physical software objects** | Landing kicker · framing card · [`site/what-can-a-qr-do/physical-software-objects/`](../site/what-can-a-qr-do/physical-software-objects/) |
+| Summer wedge | Hoodie (wear) · deploy on surfaces · Cedar Rapids (place) | `#launch-doors` · [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) · [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) |
+| Catalog | Research, portfolio depth, internal way-finder — **not** the front door | `site/what-can-a-qr-do.html` · [`QR_DESIGN_SPACE.md`](QR_DESIGN_SPACE.md) § Catalog roles |
+
+**Forbidden on `/`:** “Live state on real objects” as hero H1, single hero Create CTA, leading with lost-item relay as company identity ([`landing-copy-contract.mjs`](../site/js/landing-copy-contract.mjs)).
+
+---
+
+## Front door strategy (June 2026)
+
+**Decision:** **Option A** — keep landing **Three ways in** as the primary public entry. **Option B** — top-nav **Create** opens the same three-door chooser (not a protocol form). Engineering targets: Steps 10–14 below.
+
+### Three user jobs (not twelve catalog pages)
+
+| Job | User question | Primary door | Protocol (unchanged) |
+|-----|---------------|--------------|----------------------|
+| **Wear live state** | “What I wear should mean something *today*.” | Door 2 → `/shop/customize/` | `scope: print_artifact` on garment; steward updates from `/created/` |
+| **Deploy on something** | “Something in the world should stay *true*.” | Door 1 → create (BYOP) | Root + child object or flat pilot bridge; per [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) |
+| **Activate a place** | “Many scan points should share one world.” | Door 3 → play; organizers → season setup | `game_node` children + Layer 5 season overlay · [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) |
+
+Lost-item relay, status plate, menus, crisis cards, etc. are **catalog instances** of job #2 — field pilots and portfolio depth, **not** homepage nouns.
+
+### Launch doors (Option A — shipped copy)
+
+| Door | Title (user-facing) | Route | Role |
+|------|---------------------|-------|------|
+| 1 | Live status on something | `/create/?intent=deploy` (target) · today `/create/?template=status_plate` | Free deploy tool (BYOP) |
+| 2 | Live status on you | `/shop/customize/?product=glitch_hoodie_v1` | Commerce + distribution |
+| 3 | Play the city game | `/play/cedar-rapids/` | Player entry; network proof |
+
+**Secondary (shipped):** “Organize a live season” → `/create/?intent=game` or `/created/?focus=game-season-setup` for stewards who run games (not players). Footer / studio — not a fourth hero row.
+
+**Architecture alignment:** Doors are **routing and copy only**. Resolver composition (`buildScanViewModel`), custody, and child-object APIs do not fork per door. `verify:landing` + [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) § Landing lock hero + `#launch-doors` structure.
+
+### Create vs buy hoodie (carrier split, not capability split)
+
+| Path | User gets | Revenue | Primitive |
+|------|-----------|---------|-----------|
+| **Buy (door 2)** | Curated carrier — print quality, Glitch brand, fulfillment | Product margin | Same live object on fabric |
+| **Create (door 1)** | BYOP — sign, print own sticker/sign | Free today; habit + upsell | Same signing + revoke stack |
+
+**Rules:**
+
+1. **Never paywall** the core primitive — sign, one live object, publish, revoke ([`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md)).
+2. **Charge for carriers** — hoodie, sticker sheets, print packs ([`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md)).
+3. **Create is step 4 of the merch funnel** — scan → want → **create card** → customize → checkout; not a competitor to commerce.
+4. Under door 2 (planned): honest BYOP link — “Or print your own wear” → create with wear intent.
+
+**Architecture alignment:** Merch webhook mint path (`print_artifact`) and steward create path share resolver scan routes. Commerce does not grant vouch or bypass custody gates ([`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) rules). `personalize.checkout_open` gating unchanged.
+
+### Top-nav Create (Option B — shipped)
+
+Bare `/create/` is a **two-row steward chooser**: deploy on something + wear carrier (shop). **Not** a mirror of landing door 3 — **Play the city game** stays on `/` and `/play/`; **Organize a live season** is a footnote link (`?intent=game`). No **General / Status plate / Lost item** tabs as the first screen.
+
+**Architecture alignment:** Chooser is static HTML/JS routing — no new Worker routes. Deep links (`?template=`, `?intent=`) remain for pilots, merch handoff (`hc_ref`), and E2E ([`e2e/create-flow-convergence.spec.ts`](../e2e/create-flow-convergence.spec.ts)).
+
+### General Humanity Card (internal — not user-facing)
+
+**General / root Humanity Card** = signing identity (`profile_id`, owner key, trust, cascade revoke). Users see **@handle**, **My objects**, and **what scanners read** — not “general card” or “root node.”
+
+| Internal (protocol/docs) | User-facing (target) |
+|------------------------|----------------------|
+| Root Humanity Card | Your account · @handle |
+| Child object | Tag · plate · scan point · hoodie QR |
+| `hc_wallet` row | Account (one key controls many objects) |
+| Object graph (L1) | My objects (nested management view) |
+| Network graph (L5) | Live game · season · place |
+
+Flat-card pilots (plate/relay **is** the root) remain valid for strangers and legacy; new surfaces prefer root + child without exposing topology ([`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) § Bridge vs target).
+
+**Architecture alignment:** No rename of `profile_id`, `object_type`, or document types. UI copy migration only. `isGeneralRootWalletEntry` and child-object endpoints unchanged.
+
+### Abstract create (door 1 target — planned)
+
+Lead with **deployment + what scanners read**, not taxonomy tabs:
+
+1. **What should scanners see right now?** (headline + optional detail)
+2. System maps to `status_plate`, `lost_item_relay`, or future types behind the scenes.
+3. Pilot presets (hours, return message, campaign line) live in collapsed **Examples** — not top-level create types.
+
+**Architecture alignment:** Reuses `registerChildObjectAndIssueScanLink` ([`child-object-register-issue.mjs`](../site/js/child-object-register-issue.mjs)) and flat pilot POST for strangers. Optional bundled root+child wizard is sequential client calls — **no resolver fork required for v1 doc target**.
+
+### Catalog role (portfolio + way-finder)
+
+[`site/what-can-a-qr-do.html`](../site/what-can-a-qr-do.html) and walkthroughs are for **team prioritization**, **portfolio narrative**, and **curious builders** — linked from “More use cases,” not onboarding.
+
+| Tag | Meaning | Front door? | Examples |
+|-----|---------|-------------|----------|
+| **wedge** | Summer program / revenue / proof | Yes (via doors) | Hoodie, Cedar Rapids, physical software objects |
+| **pilot** | Field QA + LO gates | No | Status plate, lost-item relay |
+| **research** | Design space / not shipped | No | Crisis cards, mesh, healthcare-adjacent |
+
+See [`QR_DESIGN_SPACE.md`](QR_DESIGN_SPACE.md) § Catalog roles.
 
 ---
 
@@ -22,19 +115,23 @@
 
 | Surface | Lead copy |
 |---------|-----------|
-| Landing hero H1 | Live state on real objects |
+| Landing hero H1 | **The sticker stays. The status changes.** |
 | Landing hero kicker | Public programmable objects |
 | Landing meta / OG | Public programmable objects. Live, revocable status on physical tags — browser-native. No scan tracking. |
-| Instagram bio (external) | Public programmable objects. / Live · revocable · browser-native. |
-| Create (general) | Create a live card — signed QR, live status, keys in this browser tab |
-| Create (status plate) | One plate · one question · open or closed right now |
-| Create (lost item) | Tag the item — finders see a live return path, not your phone number |
-| Scan (status plate) | Object name + status line + honest limit |
-| `/created/` (status plate) | Same QR · publish status updates on Live |
+| Launch door 1 | Live status on something — deploy on a plate, sticker, or sign |
+| Launch door 2 | Live status on you — Glitch hoodie; your line, change from Live without reprinting |
+| Launch door 3 | Play the city game — Cedar Rapids; scan stickers, shared world state |
+| Top-nav Create (target) | Same three rows as launch doors — pick how you want to start |
+| Create (deploy intent, target) | Deploy on something — what should scanners see right now? |
+| Create chooser / deploy | Keys stay in this tab until you save on this device or add recovery |
+| Scan (any object) | Object name + live state + honest limit |
+| `/created/` (steward) | Publish updates on Live · same QR, no reprint |
+| Pilot: status plate (field/catalog only) | One plate · one question · open or closed right now |
+| Pilot: lost item (field/catalog only) | Return path for finders — not your phone number on the tag |
 | Commons Pass (Phase D) | Membership infrastructure for communities that refuse surveillance |
 | Federation pitch | Democratic trust grammar · portable · federated operators |
 
-**Rule:** Hero hook and meta/OG must not contradict each other. Avoid leading public copy with “OS” — reserve device-shell language for stewards.
+**Rule:** Hero hook and meta/OG must not contradict each other. Avoid leading public copy with “OS” — reserve device-shell language for stewards. **Do not** lead company positioning with lost-item relay or status-plate pilot vocabulary.
 
 ---
 
@@ -131,13 +228,55 @@ Calm footer on lost-item relay scan template only — link to `/create/?template
 
 **Exit:** `worker/tests/pilot-summary-aggregate.test.ts`
 
+### Step 10 — Front-door doc alignment ✅
+
+**Shipped (2026-06-04):** Canonical front-door strategy in this doc; cross-links in [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) step 19, [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md), [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md), [`QR_DESIGN_SPACE.md`](QR_DESIGN_SPACE.md), [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md), [`CORE_PRODUCT_LOOP.md`](CORE_PRODUCT_LOOP.md) Q3 targets.
+
+### Step 11 — Create chooser (Option B) ✅
+
+**Shipped (2026-06-04):** Bare `/create/` → steward chooser — deploy + wear only (`create-entry-chooser-core.mjs`, `create-entry-chooser.mjs`). Player play and organizer season are footnote links, not create rows. Deep links (`?template=`, `?intent=`, `hc_ref`) skip chooser. Template tabs moved to collapsed **Examples and object types** on the form panel.
+
+**Exit:** `worker/tests/create-entry-chooser-core.test.ts` · `e2e/create-flow-convergence.spec.ts` § create entry chooser.
+
+**Architecture guardrails:** Keep `?template=` and `create-flow-convergence.mjs` for pilots; `verify:desk:fast` + `e2e:create-flow-convergence` green.
+
+### Step 12 — Deploy-intent create wizard ✅
+
+**Shipped (2026-06-04):** `?intent=deploy` (landing door 1) shows object-first **What scanners should see** fields (`#create-deploy-wizard`). Submit: **root+child** when no saved general root (`create-deploy-submit.mjs`); **Continue on Live** when root exists; **flat legacy** when standalone disclosure is open.
+
+**Exit:** `worker/tests/create-deploy-wizard-core.test.ts` · `e2e/create-flow-convergence.spec.ts` deploy wizard assertions.
+
+**Architecture guardrails:** Same child-object API + backup gate ([`child-object-backup-gate-core.mjs`](../site/js/child-object-backup-gate-core.mjs)); no new `object_type` without [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) promotion path.
+
+### Step 13 — Hub “My objects” presentation ✅
+
+**Shipped (2026-06-04):** Object-first hub groups — child object rows lead, compact **Your account** line follows (not @handle as title). `/wallet/` section **My objects**. Game season limits on Manage collapse until multi-root wallet or explicit season context (`hub-objects-presentation-core.mjs`).
+
+**Exit:** `worker/tests/hub-objects-presentation-core.test.ts` · `worker/tests/created-hosted-entitlements-core.test.ts` (game season collapse).
+
+**Architecture guardrails:** Children stay out of `hc_wallet` ([`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md)); nested rows still reconcile from `GET …/objects`.
+
+### Step 14 — Organizer season entry ✅
+
+**Shipped (2026-06-04):** `/create/?intent=game` → season-root wizard (organizer key on by default). Submit: **Continue season setup on Live** when a saved general root exists, else **Create season root & continue** → `/created/?focus=game-season-setup` (opens Live object hub + game node panel). Modules: `create-organizer-season-core.mjs`, `create-organizer-season-wizard.mjs`, `create-organizer-season-submit.mjs`, `created-game-season-setup-focus.mjs`.
+
+**Exit:** `worker/tests/create-organizer-season-core.test.ts` · `e2e/create-flow-convergence.spec.ts` § organizer season entry.
+
+**Architecture guardrails:** Self-serve seasons use browser mint only; terminal `city-game:mint-node` stays pilot/CI ([`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) § Cedar Rapids).
+
 ---
 
 ## Related
 
 | Doc | Role |
 |-----|------|
-| `docs/PRODUCT_LANGUAGE_STRATEGY.md` | Plain vs precise policy; audience layers; PR copy checklist |
+| `docs/PRODUCT_LANGUAGE_STRATEGY.md` | Plain vs precise policy; object model vocabulary |
+| `docs/ROOT_CARD_AND_CHILD_OBJECTS.md` | Protocol truth + step 19 presentation |
+| `docs/SYSTEM_INVARIANTS.md` | Landing + create entry invariants |
+| `docs/QR_DESIGN_SPACE.md` | Catalog roles (wedge · pilot · research) |
+| `docs/MERCH_FUNNEL_MVP.md` | Create vs buy (carrier split) |
+| `docs/LIVE_OBJECT_ARCHITECTURE.md` | Five layers — engineering map, not front door |
 | `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` | Vertical priorities + narrative stack |
-| `docs/STATUS_PLATE_PILOT.md` | Vertical #1 |
+| `docs/STATUS_PLATE_PILOT.md` | Pilot #1 (field QA — not homepage positioning) |
+| `docs/LOST_ITEM_RELAY_PILOT.md` | Pilot #2 (field QA — not homepage positioning) |
 | `docs/M5_STRANGER_TEST_RUNBOOK.md` | Proof loop exit gate (**passed** 2026-05-27) |

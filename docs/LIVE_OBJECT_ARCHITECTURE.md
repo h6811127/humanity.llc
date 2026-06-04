@@ -17,6 +17,8 @@
 
 **Operating constraint:** [`PHASE_A_STRANGER_PATH_PRIORITIES.md`](PHASE_A_STRANGER_PATH_PRIORITIES.md) — one vertical on real printed QRs beats expanding the public hub faster than pilots.
 
+**Front door (presentation):** Public entry is **Three ways in** — wear · deploy on something · play the city game ([`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md)). This five-layer map is **engineering composition**; stewards do not pick layers at create time. L1 object graph (root → child → QR) stays protocol truth; L5 network graph is **live game / season** for organizers only.
+
 ---
 
 ## One-sentence model

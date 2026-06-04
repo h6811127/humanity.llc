@@ -22,6 +22,8 @@ export const CREATED_PANEL_FOCUS = {
   /** Create flow convergence — scroll to Add object panels on Live. */
   "add-status-plate": "child-object-add-status-plate",
   "add-lost-item": "child-object-add-lost-item",
+  /** Organizer season setup — game nodes + rules on Live (step 14). */
+  "game-season-setup": "game-season-setup",
   /** Backup seatbelt nudges — scroll to recovery or encrypted backup on Manage. */
   recovery: "created-view-restore-tools",
   backup: "backup-details",
@@ -46,7 +48,8 @@ function focusCreatedPanel(select, focusKey) {
     panelId === "live-control-proof" ||
     panelId === "created-live-scanners-see" ||
     panelId === "child-object-add-status-plate" ||
-    panelId === "child-object-add-lost-item";
+    panelId === "child-object-add-lost-item" ||
+    panelId === "game-season-setup";
   if (livePanel) {
     select("now");
   } else if (CREATED_PANEL_FOCUS[focusKey] || document.getElementById(panelId)) {

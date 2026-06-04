@@ -79,8 +79,30 @@ The **terminology map** in [`OWNERSHIP_AND_CONTROL_MODEL.md`](OWNERSHIP_AND_CONT
 
 ### Landing and movement copy
 
-- Hero hook: category and outcome (“Live state on real objects”) — avoid leading with “OS” or wallet jargon ([`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) messaging matrix).
+- Hero H1: **“The sticker stays. The status changes.”** — kicker **Public programmable objects** ([`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) § Landing). Do not revert to “Live state on real objects” as H1.
+- Launch doors: **Live status on something / on you / Play the city game** — abstract deployment surfaces, not pilot template names ([`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) § Front door strategy).
+- Avoid leading with “OS”, wallet jargon, lost-item relay, or status-plate pilot vocabulary as **company identity**.
 - Movement energy may be louder; **scan page stays calm** ([`VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md)).
+
+### Object model vocabulary (steward UI — step 19)
+
+Protocol terms stay in APIs, storage keys, and Advanced panels. Default steward/landing copy uses the right column:
+
+| Internal (Layer 1 — keep in docs/API) | User-facing (Layer 2–3 — default UI) |
+|---------------------------------------|--------------------------------------|
+| Root Humanity Card · general card | Your account · @handle |
+| `profile_id` | Handle (opaque id in Details only) |
+| Child object | Tag · plate · scan point · hoodie QR |
+| `object_type: status_plate` | Status on [name] — or just the object name |
+| `object_type: lost_item_relay` | Return relay on [name] — catalog/pilot only, not hero |
+| `object_type: game_node` | Scan point · checkpoint (game context) |
+| `scope: print_artifact` | Live QR on your [hoodie/sticker] |
+| Object graph (L1) | My objects |
+| Network graph (L5) | Live game · season |
+| Add under this root | Add another object |
+| Create general Humanity Card | *(hide — use deploy chooser)* |
+
+**Two “networks”:** Do not say “network” for L1 custody trees. Reserve **live game / season** for L5 ([`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) five layers).
 
 ### Steward hub and `/created/`
 

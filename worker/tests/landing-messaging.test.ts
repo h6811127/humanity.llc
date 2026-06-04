@@ -38,7 +38,7 @@ describe("landing messaging (Step 3)", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
     expect(html).toContain('id="launch-doors"');
     expect(html).toContain("Three ways in");
-    expect(html).toContain("/create/?template=status_plate");
+    expect(html).toContain("/create/?intent=deploy");
     expect(html).toContain("/shop/customize/?product=glitch_hoodie_v1");
     expect(html).toContain("/play/cedar-rapids/");
     expect(html).toContain("Live status on something");
@@ -118,7 +118,7 @@ describe("create-template-copy", () => {
   it("status plate lead recommends Live add under root", () => {
     const copy = createHeroCopyForTemplate("status_plate");
     expect(copy.lead).toMatch(/Live/);
-    expect(CREATE_TEMPLATE_HERO.status_plate.title).toBe("Add a status plate");
+    expect(CREATE_TEMPLATE_HERO.status_plate.title).toBe("Deploy on something");
   });
 
   it("general template emphasizes live card first", () => {

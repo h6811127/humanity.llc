@@ -854,6 +854,64 @@ body.page-flow.has-shell-chrome .page > main.screen {
   height: 28px;
 }
 
+.hub-card-item--leading-object {
+  margin-left: 0;
+  width: 100%;
+}
+
+.hub-card-item--leading-object .list-title {
+  font-weight: 600;
+}
+
+.hub-card-item--account-line {
+  margin-top: 4px;
+  margin-left: 0;
+  width: 100%;
+  opacity: 0.92;
+  background: var(--hc-emphasis-card-fill-info);
+  box-shadow: none;
+}
+
+.hub-card-item--account-line .list-title {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-muted, #6b7280);
+}
+
+.hub-card-item--account-line .hub-card-identity {
+  font-size: 0.85rem;
+}
+
+.hub-card-item--account-line .list-icon {
+  width: 26px;
+  height: 26px;
+  opacity: 0.85;
+}
+
+.created-hosted-game-season-disclosure {
+  margin-top: 12px;
+}
+
+.created-hosted-game-season-disclosure[hidden] {
+  display: none;
+}
+
+.created-hosted-game-season-summary {
+  cursor: pointer;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--text-muted, #6b7280);
+  list-style: none;
+}
+
+.created-hosted-game-season-summary::-webkit-details-marker {
+  display: none;
+}
+
+.created-hosted-game-season-disclosure[open] .created-hosted-game-season-summary {
+  margin-bottom: 8px;
+}
+
 @supports not (
   (-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))
 ) {
@@ -7643,6 +7701,36 @@ html[data-theme="dark"] .landing-launch-doors-lead {
   color: inherit;
   text-decoration: underline;
   text-underline-offset: 2px;
+}
+
+.create-entry-back-wrap {
+  margin: 0 0 8px;
+}
+
+.create-entry-back {
+  padding: 0;
+  font-size: 14px;
+}
+
+.create-entry-chooser .list-action .create-entry-door-btn,
+.create-entry-chooser .list-action .create-entry-door-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.create-entry-chooser .list-action .create-entry-door-btn:active {
+  opacity: 0.85;
 }
 
 .landing-hero-privacy {

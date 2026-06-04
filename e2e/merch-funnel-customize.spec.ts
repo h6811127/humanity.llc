@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 /**
- * Merch funnel — create with scan_customize lands on /shop/customize/.
+ * Merch funnel — create with scan_customize stays on /created/; optional CTA to customize.
  * @see docs/MERCH_FUNNEL_MVP.md · exit checklist · priority stack item 1
  */
 
@@ -119,7 +119,45 @@ test.describe("merch funnel customize", () => {
     await stubCustomizeApis(page);
   });
 
-  test("scan_customize: create redirects to customize with session ready", async ({ page }) => {
+  test("direct create without hc_ref ignores stale customize_glitch session", async ({ page }) => {
+    await page.addInitScript(() => {
+      sessionStorage.setItem("hc_merch_customize_ref", "customize_glitch");
+      sessionStorage.setItem("hc_merch_create_ref", "customize_glitch");
+    });
+
+    const handle = `e2e_lo1_${Date.now().toString(36).slice(-8)}`;
+    await page.route(
+      (url) => url.href.includes("/.well-known/hc/v1/cards"),
+      async (route) => {
+        if (route.request().method() !== "POST") {
+          await route.fulfill({ status: 405, body: "METHOD_NOT_ALLOWED" });
+          return;
+        }
+        const body = route.request().postDataJSON() as { attribution_ref?: string };
+        expect(body.attribution_ref).toBeUndefined();
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            profile_id: "prof_e2e_lo1",
+            qr_id: "qr_e2e_lo1",
+            scan_url: "http://127.0.0.1:8787/c/prof_e2e_lo1?q=qr_e2e_lo1",
+            handle,
+          }),
+        });
+      }
+    );
+
+    await page.goto("/create/?template=general");
+    await page.locator("#handle").fill(handle);
+    await page.locator("#manifesto").fill("LO-1 studio door — open until 9");
+    await page.locator("#submit").click();
+
+    await page.waitForURL(/\/created\/\?.*fresh=1/, { timeout: 20_000 });
+    expect(page.url()).not.toContain("/shop/customize/");
+  });
+
+  test("scan_customize: create stays on /created/ with customize CTA", async ({ page }) => {
     const handle = `e2e_merch_${Date.now().toString(36).slice(-8)}`;
 
     await page.goto("/create/?hc_ref=scan_customize");
@@ -127,8 +165,17 @@ test.describe("merch funnel customize", () => {
     await page.locator("#manifesto").fill("E2E merch funnel — live object on a hoodie");
     await page.locator("#submit").click();
 
-    await page.waitForURL(/\/shop\/customize\/\?hc_ref=scan_customize/, {
+    await page.waitForURL(/\/created\/\?.*fresh=1.*hc_ref=scan_customize/, {
       timeout: 20_000,
+    });
+    expect(page.url()).not.toMatch(/\/shop\/customize\//);
+
+    await expect(page.locator("#created-merch-customize-card")).toBeVisible({
+      timeout: 15_000,
+    });
+    await page.locator("#created-merch-customize-link").click();
+    await page.waitForURL(/\/shop\/customize\/\?hc_ref=scan_customize/, {
+      timeout: 15_000,
     });
 
     await expect(page.locator("#shop-customize-card-ready")).toBeVisible({
@@ -147,7 +194,6 @@ test.describe("merch funnel customize", () => {
     expect(parsed.owner_private_key_b58).toMatch(/^[1-9A-HJ-NP-Za-km-z]+$/);
 
     await expect(page.locator("#shop-customize-handle")).toContainText(`@${handle}`);
-    await expect(page.getByRole("heading", { name: "Customize your live object" })).toBeVisible();
   });
 
   test("customizer shows card gate when no session exists", async ({ page }) => {

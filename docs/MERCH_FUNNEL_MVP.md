@@ -58,6 +58,27 @@ A stranger **scans live wear**, sees the wearer’s **signed profile** (optional
 
 ---
 
+## Front door alignment (create vs buy)
+
+Commerce and BYOP create are **carrier split**, not competing products ([`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) § Create vs buy hoodie).
+
+| Surface | Path | Revenue | Same primitive |
+|---------|------|---------|----------------|
+| Launch door 2 **Live status on you** | `/shop/customize/` → checkout → `print_artifact` mint | Yes | Live signed state on fabric |
+| Launch door 1 **Live status on something** | `/create/` deploy (BYOP) | No (today) | Sign · print own sticker/sign |
+| Merch funnel step 4 | Create card before customize | Keys for buyer | Required for owned QR on purchased garment |
+
+**Rules (do not break):**
+
+- Never paywall sign · publish · revoke ([`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) § Create entry).
+- Create in the funnel is **ownership**, not a substitute for buying the hoodie.
+- Planned: under door 2, honest **“Or print your own wear”** → create with wear intent (BYOP).
+- Commerce never grants vouch; webhook mint uses existing `print_artifact` scope — no parallel scan product.
+
+**Architecture alignment:** `POST /v1/store/artifact-intents`, Shopify webhook, and steward `/created/` Live share one resolver; [`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md) lifecycle unchanged.
+
+---
+
 ## Funnel (user journey)
 
 ```text

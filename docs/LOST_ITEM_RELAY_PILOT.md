@@ -1,5 +1,7 @@
 # Lost item relay pilot (Phase A vertical #2)
 
+**Front door:** This is a **pilot** (catalog tag `pilot`) — trust proof for revocable relay state, **not** homepage or company identity. Do not lead marketing with lost-item tags ([`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) · [`QR_DESIGN_SPACE.md`](QR_DESIGN_SPACE.md) § Catalog roles).
+
 **Status:** Active pilot  
 **Parent:** `docs/ROOT_CARD_AND_CHILD_OBJECTS.md` · `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md`  
 **Prerequisite:** ~~M5 stranger loop~~ **Satisfied** — M5 passed 2026-05-27 (`docs/M5_STRANGER_TEST_RUNBOOK.md`)
@@ -63,6 +65,8 @@ Deploy Worker with `X-HC-Scan-UI: pass-v8` for this layout.
 ---
 
 ## Pilot checklist (5–10 real tags)
+
+**Field walk (LO-1):** `npm run ws-live:lo1-kit` → open `site/dev/ws-live-lo1-comprehension.html` on phones (requires `pages:dev`).
 
 | Step | Pass? |
 |------|-------|

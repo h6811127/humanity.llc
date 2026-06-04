@@ -98,6 +98,8 @@ import {
   mountChildObjectAddHubSections,
   syncChildObjectAddHub,
 } from "./created-child-object-add-hub.mjs";
+import { applyGameSeasonSetupFocus } from "./created-game-season-setup-focus.mjs";
+import { syncGameSeasonSetupPanel } from "./created-game-season-setup-panel.mjs";
 import { isWalletSaved, loadWallet, getWalletSigningKeyCount } from "./device-wallet.mjs";
 import { saveSessionToWalletWithCustody } from "./device-custody-save.mjs";
 import { savedControlNeedsDeviceUnlockCopy } from "./device-custody-mode-core.mjs";
@@ -455,9 +457,11 @@ function enterControlWorkspace() {
   applyCreatedWorkspaceMode("control");
   restoreKeysStripToControlPanel();
   syncChildObjectAddHub(loadSession());
+  syncGameSeasonSetupPanel(loadSession(), profileId || "");
   if (!createdTabs) {
     createdTabs = initCreatedTabs();
   }
+  applyGameSeasonSetupFocus((id) => createdTabs.select(id), params);
   if (!dashboardWired) {
     setupCreatedDashboard();
     dashboardWired = true;
@@ -1158,6 +1162,7 @@ if (workspaceMode === "setup" && profileId && activeQrId) {
   });
 } else if (workspaceMode === "control" && profileId && activeQrId) {
   createdTabs = initCreatedTabs();
+  applyGameSeasonSetupFocus((id) => createdTabs.select(id), params);
   setupCreatedDashboard();
   dashboardWired = true;
   const session = loadSession();
@@ -1545,6 +1550,7 @@ async function bootstrapOwnerTools() {
 
   mountChildObjectAddHubSections();
   syncChildObjectAddHub(loadSession());
+  syncGameSeasonSetupPanel(loadSession(), profileId);
 
   const backup = initKeyBackupUi({
     profileId,

@@ -230,9 +230,9 @@ describe("device-emphasis-card-html", () => {
 
   it("shell pages bust styles and theme-dark for emphasis alignment", () => {
     const stylesBust = {
-      "site/wallet/index.html": "146",
-      "site/create/index.html": "146",
-      "site/created/index.html": "146",
+      "site/wallet/index.html": "147",
+      "site/create/index.html": "147",
+      "site/created/index.html": "147",
     };
     for (const [page, v] of Object.entries(stylesBust)) {
       const html = readFileSync(join(root, page), "utf8");

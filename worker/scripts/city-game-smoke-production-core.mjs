@@ -53,6 +53,22 @@ export function spotExpectationsForProductionProbe(season, now = new Date()) {
 }
 
 /**
+ * Per-node expectations for production smoke (spot + --all registry rows).
+ * Pre-launch: every game_node scan should show the dormant template.
+ * In-season: spot nodes get coop/contribute checks; others need only game foot copy.
+ *
+ * @param {{ window?: { starts_at?: string; ends_at?: string } } | null | undefined} season
+ * @param {string} nodeId
+ * @param {Date} [now]
+ */
+export function productionSmokeExpectationsForNode(season, nodeId, now = new Date()) {
+  if (!isSeasonPlayOpenForSmoke(season, now)) {
+    return { expectDormant: true };
+  }
+  return spotExpectationsForProductionProbe(season, now)[nodeId] ?? {};
+}
+
+/**
  * @param {string[]} argv
  */
 export function parseProductionSmokeSignOffArgs(argv) {

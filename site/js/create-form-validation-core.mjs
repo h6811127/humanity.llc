@@ -25,19 +25,32 @@ export function formatCreateRequiredFieldsMessage(labels) {
 export function listMissingCreatePilotFields(template, fields) {
   /** @type {Array<{ id: string, label: string }>} */
   const missing = [];
+  const useDeployFieldIds = fields.useDeployFieldIds === true;
   if (template === "status_plate") {
     if (!String(fields.objectLabel || "").trim()) {
-      missing.push({ id: "object-label", label: "Object name" });
+      missing.push({
+        id: useDeployFieldIds ? "deploy-object-label" : "object-label",
+        label: "Object name",
+      });
     }
     if (!String(fields.statusLine || "").trim()) {
-      missing.push({ id: "status-line", label: "Status line" });
+      missing.push({
+        id: useDeployFieldIds ? "deploy-scanner-line" : "status-line",
+        label: "Status line",
+      });
     }
   } else if (template === "lost_item_relay") {
     if (!String(fields.relayItem || "").trim()) {
-      missing.push({ id: "relay-item", label: "Item name" });
+      missing.push({
+        id: useDeployFieldIds ? "deploy-object-label" : "relay-item",
+        label: "Item name",
+      });
     }
     if (!String(fields.relayMessage || "").trim()) {
-      missing.push({ id: "relay-message", label: "Return message" });
+      missing.push({
+        id: useDeployFieldIds ? "deploy-scanner-line" : "relay-message",
+        label: "Return message",
+      });
     }
   } else if (!String(fields.manifesto || "").trim()) {
     missing.push({ id: "manifesto", label: "Public statement" });

@@ -21,6 +21,6 @@ test.describe("landing copy contract", () => {
   test("launch door opens status plate create", async ({ page }) => {
     await page.goto("/");
     await page.getByRole("link", { name: /Live status on something/i }).click();
-    await expect(page).toHaveURL(/\/create\/\?template=status_plate/);
+    await expect(page).toHaveURL(/\/create\/\?intent=deploy/);
   });
 });

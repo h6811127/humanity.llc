@@ -145,8 +145,8 @@ describe("buildScanCapabilities (Order 2 — Cedar Rapids verbs)", () => {
   });
 
   it("marks archive sleep after season ends", () => {
-    const vm = gameScanVm(new Date("2026-06-20T12:00:00.000Z"));
-    const caps = buildScanCapabilities(vm, new Date("2026-06-20T12:00:00.000Z"));
+    const vm = gameScanVm(new Date("2026-09-02T12:00:00.000Z"));
+    const caps = buildScanCapabilities(vm, new Date("2026-09-02T12:00:00.000Z"));
 
     expect(caps.find((c) => c.verb === "contribute")).toMatchObject({
       available: false,

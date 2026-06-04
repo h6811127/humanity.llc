@@ -143,6 +143,40 @@ Status plates and lost-item relays currently use full card templates in the crea
 4. **Shorter QR path** — register + first scan link in one Live action (shipped)
 5. **Backup seatbelt** — warn/block before more objects without backup or recovery acknowledged (shipped)
 
+### Product UX presentation (step 19 — protocol shipped, UI planned)
+
+Steps 1–16 fixed the **custody bridge** (one root key, many objects). Step 19 fixes **what users see first** — without changing resolver shape.
+
+**Canonical front-door spec:** [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) § Front door strategy.
+
+| Principle | User sees | Protocol (unchanged) |
+|-----------|-----------|----------------------|
+| Nouns, not topology | Lost item · door plate · hoodie QR · game node | `object_type` on `child_objects` row |
+| Account is invisible at first | @handle · My objects | `profile_id` root + `hc_wallet` |
+| General card is internal | Never “Create general card” on landing | `template=general` create POST |
+| Pilots are not the company | Status plate / lost item in catalog + field kits only | Flat-card bridge + child path both valid |
+| Games = place, not folder | Organize a live season | `game_node` + season config (L5) |
+
+**User-facing vocabulary** (full table: [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) § Object model vocabulary):
+
+| Stop saying (default UI) | Say instead |
+|--------------------------|-------------|
+| Root Humanity Card / general card | Your account · @handle |
+| Child object | Tag · plate · scan point |
+| Add under this root | Add another object · add a tag |
+| Network (L1 object graph) | My objects · collection (optional) |
+| Network (L5 game graph) | Live game · season |
+
+**Hub presentation (step 19b — shipped):** Section title **My objects** on `/wallet/` and expanded hub. When a general root has children, **object rows lead** and the root renders as a compact **Your account** line (`hub-objects-presentation-core.mjs`). Tree remains a **management view**, not the create metaphor.
+
+**Architecture alignment (must not break):**
+
+- One root key still controls children; children still must not become separate `hc_wallet` entries.
+- Human trust stays on root only; scan copy still object-first ([§ Public scan copy](#public-scan-copy)).
+- Backup gate thresholds (warn @ 2nd child, block @ 3rd+) unchanged.
+- Flat pilot create (`/create/?template=status_plate|lost_item`) remains for strangers and LO-1/LO-2 field kits.
+- Game self-serve (step 18) reuses steps 6–16 patterns — step 19 does not fork mint.
+
 ---
 
 ## Device storage (same phone, PWA, other devices)
@@ -302,5 +336,7 @@ Delegated capabilities must be root-signed, scoped, expiring, revocable, and cle
 
 18. **`game_node` self-serve UI (Phase E — post–Cedar Rapids pilot):** extend `/created/` Live with **Add game node** — register `object_type: game_node`, issue scan QR, season metadata editor, rules page publish. Reuses steps 6–16 signing and hub tree patterns. Terminal mint stays for CI/pilot only. Spec: [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) § Phase E.
 
-**Sequence status:** Steps **1–16 shipped** (May 2026). Step **17** is the next **product-gated** slice, not the next default engineering slice. Step **18** follows Cedar Rapids S1 launch (Phase D gates).
+19. **Object-first front door (presentation — planned):** landing Option A + top-nav Create Option B ([`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) steps 11–14). Deploy-intent create wizard; demote General/Status/Lost tabs; hub **My objects** copy; organizer season secondary entry. **No protocol changes** — UI routing and copy only.
+
+**Sequence status:** Steps **1–16 shipped** (May 2026). Step **17** is the next **product-gated** slice, not the next default engineering slice. Step **18** (game self-serve UI) largely shipped per Phase E; human E3 gate remains. Step **19** is the next **WS-QUALITY** presentation slice (Q3 UX coherence).
 

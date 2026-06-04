@@ -14,6 +14,10 @@ describe("create flow object_streams", () => {
     expect(html).toContain('id="create-fields-object-streams"');
     expect(html).toContain('id="create-stream-1-label"');
     expect(html).toContain('id="create-stream-2-value"');
+    expect(html).toContain('id="create-entry-chooser"');
+    expect(html).toContain('id="create-form-panel"');
+    expect(html).toContain('id="create-template-advanced"');
+    expect(html).toContain('id="create-deploy-wizard"');
   });
 
   it("create-card signs object_streams from form rows on create", () => {

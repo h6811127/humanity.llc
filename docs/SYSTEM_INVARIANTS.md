@@ -90,11 +90,26 @@ Canonical inbox taxonomy: [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
 | Invariant | Detail |
 |-----------|--------|
 | Hero H1 | **“The sticker stays. The status changes.”** (kicker: Public programmable objects). |
-| Entry | **`#launch-doors`** — three list rows (status plate · Glitch hoodie · Cedar Rapids game), not a single hero Create CTA. |
-| Forbidden | “Live state on real objects”, hero `landing-hero-btn-primary`, “One use · status plate”. |
+| Entry | **`#launch-doors`** — three list rows (**Live status on something** · **Live status on you** · **Play the city game**), not a single hero Create CTA. |
+| Door routes | Something → create/BYOP deploy; You → `/shop/customize/` (commerce); Game → `/play/cedar-rapids/` (player). Spec: [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) § Front door strategy. |
+| Forbidden | “Live state on real objects” as hero H1, hero `landing-hero-btn-primary`, “One use · status plate”, **leading with lost-item relay as company identity**. |
+| Catalog | `site/what-can-a-qr-do.html` is portfolio/way-finder — not the onboarding path. |
 | Contract | `site/js/landing-copy-contract.mjs` — bump version + tests when copy changes intentionally. |
 
 **Regression:** `npm run verify:landing` · `npm run e2e:landing-copy` · CI: `.github/workflows/deploy-pages.yml` post-deploy `verify:landing:production`.
+
+---
+
+## Create entry (`/create/`)
+
+| Invariant | Detail |
+|-----------|--------|
+| Shipped (step 11) | Top-nav **Create** → **three-door chooser** matching `#launch-doors` (Option B). Form panel: template tabs in collapsed **Examples and object types** — not the first screen. Modules: `create-entry-chooser-core.mjs`, `create-entry-chooser.mjs`. |
+| Shipped (step 12) | Door 1 → `?intent=deploy` · object-first `#create-deploy-wizard` · submit routes: `root_and_child` \| `redirect_live` \| `flat_legacy`. Modules: `create-deploy-wizard-core.mjs`, `create-deploy-submit.mjs`. |
+| Primitive free | Core sign · publish · revoke is never paywalled; revenue is **carriers** (hoodie, print packs). See [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md). |
+| Pilots | `?template=status_plate` and `?template=lost_item` remain for field kits and legacy; not front-door positioning. |
+| Protocol | Root + child object model unchanged ([`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md)); presentation-only UX may hide “general card” vocabulary. |
+| Game organizers | `/create/?intent=game` → season root + `/created/?focus=game-season-setup` (Phase E); terminal mint pilot/CI only ([`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md)). |
 
 ---
 

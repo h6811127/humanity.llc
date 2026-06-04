@@ -3,8 +3,8 @@
  * @see docs/SITE_BUILD_VERSIONING.md
  */
 export const SITE_BUILD_META = {
-  "gitSha": "00f3c1a0",
-  "builtAt": "2026-06-04T20:01:22.808Z",
+  "gitSha": "2cb6b534",
+  "builtAt": "2026-06-04T21:33:27.597Z",
   "shellAssetVersion": 94,
   "source": "deploy"
 };

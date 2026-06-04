@@ -90,6 +90,39 @@ describe("buildCreatedHostedPlanPanelModel", () => {
     );
   });
 
+  it("collapses game season panel for single-root stewards without season context", () => {
+    const model = buildCreatedHostedPlanPanelModel(
+      { ...REFERENCE_FREE_POLICY },
+      {
+        game_season: {
+          season_id: "cr_season_01_wake",
+          enabled: true,
+          limits: { "game.season.node_cap": 15 },
+          usage: { counters: {}, limits: {} },
+        },
+      },
+      { hasSession: true, generalRootCount: 1, explicitSeasonContext: false }
+    );
+    expect(model.gameSeasonExpanded).toBe(false);
+    expect(model.gameSeasonCollapsedSummary).toContain("cr_season_01_wake");
+  });
+
+  it("expands game season panel for multi-root wallets", () => {
+    const model = buildCreatedHostedPlanPanelModel(
+      { ...REFERENCE_FREE_POLICY },
+      {
+        game_season: {
+          season_id: "cr_season_01_wake",
+          enabled: true,
+          limits: { "game.season.node_cap": 15 },
+          usage: { counters: {}, limits: {} },
+        },
+      },
+      { hasSession: true, generalRootCount: 2 }
+    );
+    expect(model.gameSeasonExpanded).toBe(true);
+  });
+
   it("surfaces multi-season hint without parsing block", () => {
     const model = buildCreatedHostedPlanPanelModel(
       { ...REFERENCE_FREE_POLICY },

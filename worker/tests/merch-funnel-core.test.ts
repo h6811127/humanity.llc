@@ -8,6 +8,8 @@ import {
 import {
   appendMerchRefToCreateUrl,
   appendMerchRefToHref,
+  clearMerchCreateRef,
+  clearMerchCustomizeHandoff,
   handoffMerchRefAfterCreate,
   hasTier1EphemeralOwner,
   isGlitchCustomizeMerchRef,
@@ -19,7 +21,6 @@ import {
   normalizeMerchRef,
   peekMerchCustomizeRef,
   shouldHandoffToCustomize,
-  shouldAutoRedirectCreatedToCustomize,
   shouldShowCreatedMerchCustomizeCard,
 } from "../../site/js/merch-funnel-core.mjs";
 
@@ -68,6 +69,28 @@ describe("merch-funnel-core (client)", () => {
     ).toBe("/shop/customize/?product=hoodie&hc_ref=scan_customize");
   });
 
+  it("clears stale customize handoff refs", () => {
+    const storage: Record<string, string | null> = {
+      hc_merch_create_ref: "customize_glitch",
+      hc_merch_customize_ref: "customize_glitch",
+    };
+    globalThis.sessionStorage = {
+      getItem(key: string) {
+        return storage[key] ?? null;
+      },
+      setItem(key: string, value: string) {
+        storage[key] = value;
+      },
+      removeItem(key: string) {
+        storage[key] = null;
+      },
+    };
+    clearMerchCustomizeHandoff();
+    expect(storage.hc_merch_create_ref).toBeNull();
+    expect(storage.hc_merch_customize_ref).toBeNull();
+    expect(peekMerchCustomizeRef()).toBeNull();
+  });
+
   it("handoffs customize refs after create attribution", () => {
     const storage = {
       hc_merch_create_ref: "scan_customize",
@@ -108,34 +131,18 @@ describe("merch-funnel-core (client)", () => {
     ).toBe(false);
   });
 
-  it("auto-redirect only on fresh customize handoff with session keys", () => {
+  it("shows customize CTA on fresh create with explicit hc_ref only", () => {
     expect(
-      shouldAutoRedirectCreatedToCustomize({
-        fresh: true,
-        merchRef: "scan_customize",
-        sessionHasSigningKeys: true,
-      })
+      shouldShowCreatedMerchCustomizeCard({ fresh: true, merchRef: "scan_customize" })
     ).toBe(true);
     expect(
-      shouldAutoRedirectCreatedToCustomize({
-        fresh: true,
-        merchRef: "scan_customize",
-        sessionHasSigningKeys: false,
-      })
+      shouldShowCreatedMerchCustomizeCard({ fresh: false, merchRef: "scan_customize" })
     ).toBe(false);
     expect(
-      shouldAutoRedirectCreatedToCustomize({
-        fresh: false,
-        merchRef: "scan_customize",
-        sessionHasSigningKeys: true,
-      })
+      shouldShowCreatedMerchCustomizeCard({ fresh: true, merchRef: null })
     ).toBe(false);
     expect(
-      shouldAutoRedirectCreatedToCustomize({
-        fresh: true,
-        merchRef: "tier0_sticker",
-        sessionHasSigningKeys: true,
-      })
+      shouldShowCreatedMerchCustomizeCard({ fresh: true, merchRef: "tier0_sticker" })
     ).toBe(false);
   });
 

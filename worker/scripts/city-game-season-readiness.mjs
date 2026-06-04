@@ -102,8 +102,10 @@ export function cityGameSeasonReadiness(season, opts = {}) {
   if (s.season_id !== "cr_season_01_wake") {
     warnings.push(`Unexpected season_id: ${String(s.season_id)}`);
   }
-  if (!Array.isArray(s.nodes) || s.nodes.length !== 15) {
-    issues.push(`Expected 15 nodes, found ${Array.isArray(s.nodes) ? s.nodes.length : 0}.`);
+  const nodeCount = Array.isArray(s.nodes) ? s.nodes.length : 0;
+  const allowedNodeCounts = new Set([15, 40]);
+  if (!allowedNodeCounts.has(nodeCount)) {
+    issues.push(`Expected 15 (pilot) or 40 (wave-open) nodes, found ${nodeCount}.`);
   }
 
   const nodeIds = new Set();

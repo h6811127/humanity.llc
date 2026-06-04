@@ -13,9 +13,9 @@ export const CREATE_TEMPLATE_HERO = {
       "One general live card on the network — add status plates, lost-item relays, and more from Live after create. Signed QR, live status — not a frozen link.",
   },
   status_plate: {
-    title: "Add a status plate",
+    title: "Deploy on something",
     lead:
-      "Recommended: add under an existing live card on Live — one root key, nested in My objects. Standalone plate paths below stay available for legacy pilots.",
+      "What should scanners see right now? Recommended: add under an existing account on Live — one key, nested in My objects. Examples below for legacy pilots.",
   },
   lost_item_relay: {
     title: "Add a lost-item relay",

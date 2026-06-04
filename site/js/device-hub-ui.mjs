@@ -131,6 +131,12 @@ import {
   listHubChildObjectsForDisplay,
   shouldRenderHubChildObjectRows,
 } from "./hub-child-object-row-core.mjs";
+import {
+  hubAccountLineIdentity,
+  hubRootPresentationMode,
+  hubRootRowTitle,
+  shouldUseObjectFirstHubGroup,
+} from "./hub-objects-presentation-core.mjs";
 import { reconcileChildObjectsForProfileIds } from "./child-object-reconcile.mjs";
 import { CHILD_OBJECTS_STORAGE_KEY } from "./child-object-store-core.mjs";
 import {
@@ -1483,14 +1489,13 @@ function renderActivityRows() {
 /**
  * @param {Record<string, unknown>} parentEntry
  * @param {Record<string, unknown>} childRow
- * @param {{ fullRows: boolean, expandedRows: boolean }} ctx
+ * @param {{ fullRows: boolean, expandedRows: boolean, objectLeading?: boolean }} ctx
  */
 function buildHubChildObjectRowElement(parentEntry, childRow, ctx) {
   const meta = hubChildObjectTypeMeta(childRow.object_type);
-  const rootHandle = hubChildObjectRootHandle(parentEntry);
   const identity = hubChildObjectIdentityLine({
     objectTypeLabel: meta.label,
-    rootHandle,
+    rootHandle: hubChildObjectRootHandle(parentEntry),
   });
   const scanUrl = typeof childRow.scan_url === "string" ? childRow.scan_url : "";
   const status = hubChildObjectStatusLine({
@@ -1499,7 +1504,8 @@ function buildHubChildObjectRowElement(parentEntry, childRow, ctx) {
     status: childRow.status,
   });
   const li = document.createElement("li");
-  li.className = `hub-card-item hub-card-item--nested hub-card-item--${meta.tone}${
+  const layoutClass = ctx.objectLeading ? "hub-card-item--leading-object" : "hub-card-item--nested";
+  li.className = `hub-card-item ${layoutClass} hub-card-item--${meta.tone}${
     ctx.fullRows ? "" : " hub-card-item--summary"
   }`;
   li.dataset.hubSearchable = hubChildObjectSearchHaystack(parentEntry, childRow);
@@ -1540,14 +1546,13 @@ function buildHubChildObjectRowElement(parentEntry, childRow, ctx) {
  * @param {HTMLElement} li
  * @param {Record<string, unknown>} parentEntry
  * @param {Record<string, unknown>} childRow
- * @param {{ fullRows: boolean, expandedRows: boolean }} ctx
+ * @param {{ fullRows: boolean, expandedRows: boolean, objectLeading?: boolean }} ctx
  */
 function patchHubChildObjectRowElementInPlace(li, parentEntry, childRow, ctx) {
   const meta = hubChildObjectTypeMeta(childRow.object_type);
-  const rootHandle = hubChildObjectRootHandle(parentEntry);
   const identity = hubChildObjectIdentityLine({
     objectTypeLabel: meta.label,
-    rootHandle,
+    rootHandle: hubChildObjectRootHandle(parentEntry),
   });
   const scanUrl = typeof childRow.scan_url === "string" ? childRow.scan_url : "";
   const status = hubChildObjectStatusLine({
@@ -1555,7 +1560,8 @@ function patchHubChildObjectRowElementInPlace(li, parentEntry, childRow, ctx) {
     scanUrl,
     status: childRow.status,
   });
-  li.className = `hub-card-item hub-card-item--nested hub-card-item--${meta.tone}${
+  const layoutClass = ctx.objectLeading ? "hub-card-item--leading-object" : "hub-card-item--nested";
+  li.className = `hub-card-item ${layoutClass} hub-card-item--${meta.tone}${
     ctx.fullRows ? "" : " hub-card-item--summary"
   }`;
   li.dataset.hubSearchable = hubChildObjectSearchHaystack(parentEntry, childRow);
@@ -1646,7 +1652,11 @@ function patchHubChildObjectRowsForProfile(parentEntry, ctx) {
     ])
   );
 
-  let insertAfter = parentLi;
+  const objectFirst = parentLi.classList.contains("hub-card-item--account-line");
+  const childCtx = { ...ctx, objectLeading: objectFirst };
+  let insertAfter = objectFirst
+    ? hubChildObjectRowElementsForProfile(savedList, profileId).at(-1) ?? null
+    : parentLi;
   for (const childRow of nextRows) {
     const objectId = String(childRow.object_id ?? "").trim();
     if (!objectId) continue;
@@ -1655,18 +1665,19 @@ function patchHubChildObjectRowsForProfile(parentEntry, ctx) {
       const renderSig = childObjectRowRenderSignature(childRow);
       const prevSig = li.dataset.childRenderSig ?? "";
       if (prevSig !== renderSig) {
-        patchHubChildObjectRowElementInPlace(li, parentEntry, childRow, ctx);
+        patchHubChildObjectRowElementInPlace(li, parentEntry, childRow, childCtx);
         li.dataset.childRenderSig = renderSig;
       }
       keepById.set(objectId, li);
     } else {
-      li = buildHubChildObjectRowElement(parentEntry, childRow, {
-        fullRows: ctx.fullRows,
-        expandedRows: ctx.expandedRows,
-      });
+      li = buildHubChildObjectRowElement(parentEntry, childRow, childCtx);
       li.dataset.childRenderSig = childObjectRowRenderSignature(childRow);
     }
-    insertAfter.insertAdjacentElement("afterend", li);
+    if (objectFirst && !insertAfter) {
+      parentLi.insertAdjacentElement("beforebegin", li);
+    } else {
+      (insertAfter ?? parentLi).insertAdjacentElement("afterend", li);
+    }
     insertAfter = li;
   }
 
@@ -1836,6 +1847,28 @@ function renderSavedRows(opts = {}) {
 
   setHubSectionEmpty(savedGroup, savedList, savedEmptyEl, false, "");
   for (const entry of entries) {
+    const profileId =
+      typeof entry.profile_id === "string" ? entry.profile_id : "";
+    const hubChildRows =
+      profileId && isGeneralRootWalletEntry(entry)
+        ? listHubChildObjectsForDisplay(localStorage, profileId)
+        : [];
+    const objectFirst = shouldUseObjectFirstHubGroup(entry, hubChildRows.length);
+    const presentationMode = hubRootPresentationMode(entry, hubChildRows.length);
+    const renderChildRows = shouldRenderHubChildObjectRows(fullRows, previewRows);
+
+    if (objectFirst && renderChildRows) {
+      for (const childRow of hubChildRows) {
+        savedList.appendChild(
+          buildHubChildObjectRowElement(entry, childRow, {
+            fullRows,
+            expandedRows,
+            objectLeading: true,
+          })
+        );
+      }
+    }
+
     const li = document.createElement("li");
     const checkingChip = hubRowCheckingChip(entry.profile_id, rowChipOpts);
     const objectType = classifyObjectType(
@@ -1864,9 +1897,12 @@ function renderSavedRows(opts = {}) {
       partitionHubCardControls(cardControls);
     li.className = `hub-card-item hub-card-item--${objectType.tone}${
       inlineControls.length > 0 ? " hub-card-item--has-controls" : ""
-    }${fullRows ? "" : " hub-card-item--summary"}`;
+    }${presentationMode === "account_line" ? " hub-card-item--account-line" : ""}${
+      fullRows ? "" : " hub-card-item--summary"
+    }`;
     li.dataset.hubSearchable = walletHaystack(entry);
     li.dataset.profileId = entry.profile_id;
+    if (presentationMode === "account_line") li.dataset.hubAccountLine = "1";
     if (!fullRows) li.dataset.summaryRow = "1";
     const lastUsed = lastActivityForEntry(entry);
     const scan = scanUrlForEntry(entry);
@@ -1874,12 +1910,20 @@ function renderSavedRows(opts = {}) {
       hubConfig.fetchNetworkStatus && !checkingChip
         ? getCachedVerification(entry.profile_id)
         : null;
-    const identity = hubCardIdentityLine({
-      objectTypeLabel: objectType.label,
-      verificationLabel: cachedVerification?.label,
-      verificationState: cachedVerification?.state,
-      includeVerification: hubConfig.fetchNetworkStatus,
-    });
+    const identity =
+      presentationMode === "account_line"
+        ? hubAccountLineIdentity({
+            entry,
+            verificationLabel: cachedVerification?.label,
+            verificationState: cachedVerification?.state,
+            includeVerification: hubConfig.fetchNetworkStatus,
+          })
+        : hubCardIdentityLine({
+            objectTypeLabel: objectType.label,
+            verificationLabel: cachedVerification?.label,
+            verificationState: cachedVerification?.state,
+            includeVerification: hubConfig.fetchNetworkStatus,
+          });
     const statusHtml = hubCardStatusHtml(
       entry.profile_id,
       hubRowChipStatus(entry.profile_id, rowChipOpts),
@@ -1904,14 +1948,21 @@ function renderSavedRows(opts = {}) {
         </div>`
       : "";
 
-    const menuBlock = fullRows ? hubCardMenuHtml(entry, menuControls) : "";
-    const controlsHtml = fullRows ? hubCardControlsHtml(entry, inlineControls) : "";
+    const menuBlock = fullRows && presentationMode !== "account_line" ? hubCardMenuHtml(entry, menuControls) : "";
+    const controlsHtml =
+      fullRows && presentationMode !== "account_line"
+        ? hubCardControlsHtml(entry, inlineControls)
+        : "";
     const actionData = `data-id="${escapeHtml(entry.id ?? "")}" data-profile-id="${escapeHtml(entry.profile_id ?? "")}"`;
     const actionsHtml = fullRows || expandedRows
       ? `<div class="hub-card-actions">
         <div class="hub-card-actions-primary">
           <button type="button" class="hub-card-action hub-use-keys" ${actionData} title="Load saved ownership into this tab, then open your card page">Open controls</button>
-          <a class="hub-card-action hub-open-scan" href="${escapeHtml(stewardScanHref(scan))}"${stewardScanAnchorAttrs()}>Open scan</a>
+          ${
+            presentationMode === "account_line"
+              ? ""
+              : `<a class="hub-card-action hub-open-scan" href="${escapeHtml(stewardScanHref(scan))}"${stewardScanAnchorAttrs()}>Open scan</a>`
+          }
         </div>
       </div>`
       : "";
@@ -1920,10 +1971,10 @@ function renderSavedRows(opts = {}) {
       <div class="hub-card-head">
         ${cardIcon}
         <span class="list-content">
-          <span class="list-title">${escapeHtml(hubCardTitle(entry))}</span>
+          <span class="list-title">${escapeHtml(hubRootRowTitle(entry, hubChildRows.length))}</span>
           <span class="hub-card-identity hub-card-identity--${identity.verifyTone}">${escapeHtml(identity.text)}</span>
           ${statusHtml}
-          ${fullRows ? hubCardSubHtml(entry, lastUsed) : ""}
+          ${fullRows && presentationMode !== "account_line" ? hubCardSubHtml(entry, lastUsed) : ""}
         </span>
         <div class="hub-card-head-meta">
           ${menuBlock}
@@ -1933,7 +1984,9 @@ function renderSavedRows(opts = {}) {
       ${controlsHtml}
       ${actionsHtml}`;
     savedList.appendChild(li);
-    appendHubChildObjectRowsForRoot(entry, { fullRows, expandedRows, previewRows });
+    if (!objectFirst) {
+      appendHubChildObjectRowsForRoot(entry, { fullRows, expandedRows, previewRows });
+    }
   }
 
   if (previewRows && allEntries.length > entries.length) {

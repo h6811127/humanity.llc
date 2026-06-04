@@ -7,7 +7,7 @@
   "rules_path": "/play/cedar-rapids/",
   "window": {
     "starts_at": "2026-06-06T18:00:00-05:00",
-    "ends_at": "2026-06-08T22:00:00-05:00"
+    "ends_at": "2026-09-01T22:00:00-05:00"
   },
   "districts": [
     "newbo",
@@ -18,7 +18,7 @@
   ],
   "map_copy": {
     "title": "City state",
-    "subtitle": "Weekend board · read-only",
+    "subtitle": "Summer board · read-only",
     "live_hint": "Use the place list for names and directions. Scan the sticker when you arrive for live signed state — faction holds, quorum, fragments, and care pauses.",
     "wayfinding_intro": "Start anywhere — scan any game sticker you find. Planning from home? Search place names in your maps app; the sketch below is districts only, not streets.",
     "diagram_note": "District sketch only — not a street map. Names and Open in Maps links are how you find places.",
@@ -34,7 +34,7 @@
       },
       {
         "title": "Planning from home",
-        "body": "Search place names in Apple Maps or Google Maps. The weekend board is a district sketch, not turn-by-turn directions."
+        "body": "Search place names in Apple Maps or Google Maps. The city board is a district sketch, not turn-by-turn directions."
       }
     ],
     "quorum_spot": {
@@ -119,6 +119,106 @@
       "node_12": {
         "x": 0.405,
         "y": 0.74
+      },
+      "node_16": {
+        "x": 0.76,
+        "y": 0.18
+      },
+      "node_17": {
+        "x": 0.56,
+        "y": 0.26
+      },
+      "node_18": {
+        "x": 0.36,
+        "y": 0.74
+      },
+      "node_19": {
+        "x": 0.22,
+        "y": 0.48
+      },
+      "node_20": {
+        "x": 0.48,
+        "y": 0.58
+      },
+      "node_21": {
+        "x": 0.52,
+        "y": 0.18
+      },
+      "node_22": {
+        "x": 0.82,
+        "y": 0.28
+      },
+      "node_23": {
+        "x": 0.64,
+        "y": 0.34
+      },
+      "node_24": {
+        "x": 0.42,
+        "y": 0.54
+      },
+      "node_25": {
+        "x": 0.18,
+        "y": 0.4
+      },
+      "node_26": {
+        "x": 0.66,
+        "y": 0.28
+      },
+      "node_27": {
+        "x": 0.38,
+        "y": 0.68
+      },
+      "node_28": {
+        "x": 0.8,
+        "y": 0.36
+      },
+      "node_29": {
+        "x": 0.6,
+        "y": 0.24
+      },
+      "node_30": {
+        "x": 0.5,
+        "y": 0.64
+      },
+      "node_31": {
+        "x": 0.86,
+        "y": 0.2
+      },
+      "node_32": {
+        "x": 0.74,
+        "y": 0.38
+      },
+      "node_33": {
+        "x": 0.55,
+        "y": 0.2
+      },
+      "node_34": {
+        "x": 0.62,
+        "y": 0.36
+      },
+      "node_35": {
+        "x": 0.58,
+        "y": 0.32
+      },
+      "node_36": {
+        "x": 0.14,
+        "y": 0.32
+      },
+      "node_37": {
+        "x": 0.24,
+        "y": 0.56
+      },
+      "node_38": {
+        "x": 0.4,
+        "y": 0.62
+      },
+      "node_39": {
+        "x": 0.36,
+        "y": 0.56
+      },
+      "node_40": {
+        "x": 0.32,
+        "y": 0.78
       }
     },
     "district_zones": [
@@ -219,11 +319,63 @@
       "epoch": "cr_season_01_wake"
     },
     "node_08": {
-      "code": "CR-BENCH-8K",
+      "code": "CR-BENCH-08",
       "epoch": "cr_season_01_wake"
     },
     "node_15": {
       "code": "CR-MARKET-15",
+      "epoch": "cr_season_01_wake"
+    },
+    "node_20": {
+      "code": "CR-WARD-20",
+      "epoch": "cr_season_01_wake"
+    },
+    "node_21": {
+      "code": "CR-SGN-21",
+      "epoch": "cr_season_01_wake"
+    },
+    "node_22": {
+      "code": "CR-COIL-22",
+      "epoch": "cr_season_01_wake"
+    },
+    "node_23": {
+      "code": "CR-MUSM-23",
+      "epoch": "cr_season_01_wake"
+    },
+    "node_25": {
+      "code": "CR-HRTG-25",
+      "epoch": "cr_season_01_wake"
+    },
+    "node_27": {
+      "code": "CR-FEST-27",
+      "epoch": "cr_season_01_wake"
+    },
+    "node_31": {
+      "code": "CR-CSPS-31",
+      "epoch": "cr_season_01_wake"
+    },
+    "node_33": {
+      "code": "CR-PARA-33",
+      "epoch": "cr_season_01_wake"
+    },
+    "node_34": {
+      "code": "CR-3RD-34",
+      "epoch": "cr_season_01_wake"
+    },
+    "node_36": {
+      "code": "CR-NCSM-36",
+      "epoch": "cr_season_01_wake"
+    },
+    "node_38": {
+      "code": "CR-AMPH-38",
+      "epoch": "cr_season_01_wake"
+    },
+    "node_40": {
+      "code": "CR-STGE-40",
+      "epoch": "cr_season_01_wake"
+    },
+    "node_37": {
+      "code": "CR-BAKE-37",
       "epoch": "cr_season_01_wake"
     }
   },
@@ -241,7 +393,17 @@
     "relay_capture_nodes": [
       "node_05",
       "node_08",
-      "node_15"
+      "node_15",
+      "node_20",
+      "node_21",
+      "node_22",
+      "node_31",
+      "node_33",
+      "node_34",
+      "node_36",
+      "node_37",
+      "node_38",
+      "node_40"
     ],
     "relay_capture_player_enabled": true,
     "relay_decay_hours": 24,
@@ -520,6 +682,235 @@
       "role": "relay_gate",
       "district": "downtown",
       "label": "Downtown market steps"
+    },
+    {
+      "node_id": "node_16",
+      "object_id": "obj_cr_node_16_red_hq",
+      "role": "sanctuary",
+      "node_class": "faction_hq",
+      "faction": "red",
+      "install_wave": "open",
+      "district": "newbo",
+      "label": "Red treaty · NewBo depot wall"
+    },
+    {
+      "node_id": "node_17",
+      "object_id": "obj_cr_node_17_blue_hq",
+      "role": "sanctuary",
+      "node_class": "faction_hq",
+      "faction": "blue",
+      "install_wave": "open",
+      "district": "downtown",
+      "label": "Blue treaty · Downtown postcard row"
+    },
+    {
+      "node_id": "node_18",
+      "object_id": "obj_cr_node_18_green_hq",
+      "role": "sanctuary",
+      "node_class": "faction_hq",
+      "faction": "green",
+      "install_wave": "open",
+      "district": "greene_square",
+      "label": "Green treaty · Greene pavilion"
+    },
+    {
+      "node_id": "node_19",
+      "object_id": "obj_cr_node_19_yellow_hq",
+      "role": "sanctuary",
+      "node_class": "faction_hq",
+      "faction": "yellow",
+      "install_wave": "open",
+      "district": "czech_village",
+      "label": "Yellow treaty · heritage house stoop"
+    },
+    {
+      "node_id": "node_20",
+      "object_id": "obj_cr_node_20_ward_cache",
+      "role": "relay_gate",
+      "node_class": "artifact",
+      "install_wave": "open",
+      "district": "river_spine",
+      "label": "Ward cache · levee post"
+    },
+    {
+      "node_id": "node_21",
+      "object_id": "obj_cr_node_21_signal_stone",
+      "role": "relay_gate",
+      "node_class": "artifact",
+      "install_wave": "open",
+      "district": "downtown",
+      "label": "Signal stone · alley niche"
+    },
+    {
+      "node_id": "node_22",
+      "object_id": "obj_cr_node_22_glitch_coil",
+      "role": "relay_gate",
+      "node_class": "artifact",
+      "install_wave": "open",
+      "district": "newbo",
+      "label": "Glitch coil · market threshold"
+    },
+    {
+      "node_id": "node_23",
+      "object_id": "obj_cr_node_23_museum_intel",
+      "role": "lore_archive",
+      "node_class": "resource",
+      "install_wave": "open",
+      "district": "downtown",
+      "label": "Museum intel · study hall door"
+    },
+    {
+      "node_id": "node_24",
+      "object_id": "obj_cr_node_24_river_clue",
+      "role": "lore_archive",
+      "node_class": "resource",
+      "install_wave": "open",
+      "district": "river_spine",
+      "label": "River clue · amphitheater rail"
+    },
+    {
+      "node_id": "node_25",
+      "object_id": "obj_cr_node_25_heritage_clue",
+      "role": "lore_archive",
+      "node_class": "resource",
+      "install_wave": "open",
+      "district": "czech_village",
+      "label": "Heritage clue · museum walk"
+    },
+    {
+      "node_id": "node_26",
+      "object_id": "obj_cr_node_26_archives_scarcity",
+      "role": "witness",
+      "node_class": "resource",
+      "install_wave": "open",
+      "district": "downtown",
+      "label": "Archives scarcity · witness desk"
+    },
+    {
+      "node_id": "node_27",
+      "object_id": "obj_cr_node_27_fest_drop",
+      "role": "temp_drop",
+      "node_class": "resource",
+      "install_wave": "open",
+      "district": "greene_square",
+      "label": "Fest drop · square pop-up"
+    },
+    {
+      "node_id": "node_28",
+      "object_id": "obj_cr_node_28_courier_witness",
+      "role": "witness",
+      "node_class": "resource",
+      "install_wave": "open",
+      "district": "newbo",
+      "label": "Courier witness · chalk board"
+    },
+    {
+      "node_id": "node_29",
+      "object_id": "obj_cr_node_29_plaza_switch",
+      "role": "finale",
+      "node_class": "world_event",
+      "install_wave": "open",
+      "district": "downtown",
+      "label": "Plaza switch · dormant until mid-season"
+    },
+    {
+      "node_id": "node_30",
+      "object_id": "obj_cr_node_30_night_market",
+      "role": "lore_archive",
+      "node_class": "world_event",
+      "install_wave": "open",
+      "district": "river_spine",
+      "label": "Night market · dormant Friday beat"
+    },
+    {
+      "node_id": "node_31",
+      "object_id": "obj_cr_node_31_csps_gate",
+      "role": "relay_gate",
+      "node_class": "common_relay",
+      "install_wave": "open",
+      "district": "newbo",
+      "label": "CSPS hall relay gate"
+    },
+    {
+      "node_id": "node_32",
+      "object_id": "obj_cr_node_32_trail_head",
+      "role": "relay_gate",
+      "node_class": "common_relay",
+      "install_wave": "open",
+      "district": "newbo",
+      "label": "NewBo trailhead relay"
+    },
+    {
+      "node_id": "node_33",
+      "object_id": "obj_cr_node_33_paramount",
+      "role": "relay_gate",
+      "node_class": "common_relay",
+      "install_wave": "open",
+      "district": "downtown",
+      "label": "Paramount alley relay"
+    },
+    {
+      "node_id": "node_34",
+      "object_id": "obj_cr_node_34_3rd_corr",
+      "role": "relay_gate",
+      "node_class": "common_relay",
+      "install_wave": "open",
+      "district": "downtown",
+      "label": "Third Avenue corridor relay"
+    },
+    {
+      "node_id": "node_35",
+      "object_id": "obj_cr_node_35_transfer",
+      "role": "relay_gate",
+      "node_class": "common_relay",
+      "install_wave": "open",
+      "district": "downtown",
+      "label": "Ground transport hub relay"
+    },
+    {
+      "node_id": "node_36",
+      "object_id": "obj_cr_node_36_ncs",
+      "role": "relay_gate",
+      "node_class": "common_relay",
+      "install_wave": "open",
+      "district": "czech_village",
+      "label": "Czech Museum plaza relay"
+    },
+    {
+      "node_id": "node_37",
+      "object_id": "obj_cr_node_37_bakery",
+      "role": "relay_gate",
+      "node_class": "common_relay",
+      "install_wave": "open",
+      "district": "czech_village",
+      "label": "Village bakery window relay"
+    },
+    {
+      "node_id": "node_38",
+      "object_id": "obj_cr_node_38_amphitheater",
+      "role": "relay_gate",
+      "node_class": "common_relay",
+      "install_wave": "open",
+      "district": "river_spine",
+      "label": "McGrath amphitheater relay"
+    },
+    {
+      "node_id": "node_39",
+      "object_id": "obj_cr_node_39_trail_mile",
+      "role": "relay_gate",
+      "node_class": "common_relay",
+      "install_wave": "open",
+      "district": "river_spine",
+      "label": "River trail mile marker relay"
+    },
+    {
+      "node_id": "node_40",
+      "object_id": "obj_cr_node_40_stage",
+      "role": "relay_gate",
+      "node_class": "common_relay",
+      "install_wave": "open",
+      "district": "greene_square",
+      "label": "Greene summer stage relay"
     }
   ],
   "signal_war": {

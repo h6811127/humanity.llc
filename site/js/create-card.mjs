@@ -1,12 +1,34 @@
 import { validateCreateFormFields } from "./create-form-validation-core.mjs";
 import { syncCreateHeroCopy } from "./create-template-copy.mjs";
 import { syncCreateFlowConvergence } from "./create-flow-convergence.mjs";
+import {
+  defaultTemplateForCreateEntry,
+  shouldSkipCreateEntryChooser,
+} from "./create-entry-chooser-core.mjs";
+import {
+  initCreateEntryChooser,
+  showCreateEntryChooserPanel,
+  showCreateFormPanel,
+} from "./create-entry-chooser.mjs";
+import { isDeployWizardIntent, resolveDeploySubmitStrategy } from "./create-deploy-wizard-core.mjs";
+import { syncCreateDeployWizardUi } from "./create-deploy-wizard.mjs";
+import {
+  redirectDeployToLiveAddObject,
+  runDeployRootAndChildCreate,
+} from "./create-deploy-submit.mjs";
+import { resolveGameSeasonSubmitStrategy } from "./create-organizer-season-core.mjs";
+import { syncCreateOrganizerSeasonWizardUi } from "./create-organizer-season-wizard.mjs";
+import {
+  redirectToGameSeasonSetup,
+  runGameSeasonRootCreate,
+} from "./create-organizer-season-submit.mjs";
 import { formatCreateResolverError } from "./create-resolver-error-core.mjs";
 import {
   handoffMerchRefAfterCreate,
   peekMerchCreateRef,
   persistMerchCreateRef,
   readMerchRefFromUrl,
+  clearMerchCustomizeHandoff,
   shouldHandoffToCustomize,
 } from "./merch-funnel-core.mjs";
 import { setLastActiveProfileId } from "./device-quiet-tab-rehydrate-prefs.mjs";
@@ -19,7 +41,7 @@ import {
   applySyncAutoSaveResult,
   shouldSyncAutoSaveBeforeCreateNavigate,
 } from "./created-device-save-core.mjs";
-import { defaultWalletLabel } from "./device-wallet.mjs";
+import { defaultWalletLabel, loadWallet } from "./device-wallet.mjs";
 import { saveSessionToWalletWithCustody } from "./device-custody-save.mjs";
 import {
   CUSTODY_MODE_DEVICE_UNLOCK,
@@ -111,16 +133,24 @@ function setTemplate(template) {
     fieldsObjectStreams.hidden = !isPlate && template !== "general";
   }
   if (manifestoEl) manifestoEl.required = !isPilot;
+  const deployActive = isDeployWizardIntent(new URLSearchParams(location.search)) && isPilot;
+  const deployObjectLabel = document.getElementById("deploy-object-label");
+  const deployScannerLine = document.getElementById("deploy-scanner-line");
   const objectLabel = document.getElementById("object-label");
   const statusLine = document.getElementById("status-line");
   const relayItem = document.getElementById("relay-item");
   const relayMessage = document.getElementById("relay-message");
-  if (objectLabel) objectLabel.required = isPlate;
-  if (statusLine) statusLine.required = isPlate;
-  if (relayItem) relayItem.required = isRelay;
-  if (relayMessage) relayMessage.required = isRelay;
+  if (deployObjectLabel) deployObjectLabel.required = deployActive;
+  if (deployScannerLine) deployScannerLine.required = deployActive;
+  if (objectLabel) objectLabel.required = isPlate && !deployActive;
+  if (statusLine) statusLine.required = isPlate && !deployActive;
+  if (relayItem) relayItem.required = isRelay && !deployActive;
+  if (relayMessage) relayMessage.required = isRelay && !deployActive;
   syncCreateHeroCopy(template);
   syncCreateFlowConvergence(template);
+  const searchParams = new URLSearchParams(location.search);
+  syncCreateDeployWizardUi(searchParams, template);
+  syncCreateOrganizerSeasonWizardUi(searchParams);
 }
 
 templateBtns.forEach((btn) => {
@@ -297,6 +327,7 @@ export async function runCreateCard(input) {
     organizer = { enabled: false },
     objectStreams = [],
     sampleCard = false,
+    navigate = true,
   } = input;
   const { privateKey, publicKeyBase58 } = await generateKeypair();
   let recoveryPrivateKey = null;
@@ -470,6 +501,11 @@ export async function runCreateCard(input) {
     });
   }
 
+  const result = { session, profileId, qrId, attributionRef };
+  if (!navigate) {
+    return result;
+  }
+
   const created = new URL("/created/", location.origin);
   created.searchParams.set("profile_id", profileId);
   created.searchParams.set("qr_id", qrId);
@@ -478,21 +514,61 @@ export async function runCreateCard(input) {
     created.searchParams.set("hc_ref", attributionRef);
   }
   location.replace(created.href);
+  return result;
+}
+
+function deployWizardFieldsActive() {
+  const deployWizard = document.getElementById("create-deploy-wizard");
+  return Boolean(deployWizard && !deployWizard.hidden);
 }
 
 function readCreateFormFields() {
+  const legacyEl = document.getElementById("create-flat-pilot-compat");
+  const legacyOpen = legacyEl instanceof HTMLDetailsElement && legacyEl.open;
+  if (legacyOpen) {
+    return {
+      objectLabel: document.getElementById("object-label")?.value ?? "",
+      statusLine: document.getElementById("status-line")?.value ?? "",
+      relayItem: document.getElementById("relay-item")?.value ?? "",
+      relayMessage: document.getElementById("relay-message")?.value ?? "",
+      manifesto: manifestoEl?.value ?? "",
+      useDeployFieldIds: false,
+    };
+  }
+  if (deployWizardFieldsActive()) {
+    const objectName = document.getElementById("deploy-object-label")?.value ?? "";
+    const scannerLine = document.getElementById("deploy-scanner-line")?.value ?? "";
+    return {
+      objectLabel: objectName,
+      statusLine: scannerLine,
+      relayItem: objectName,
+      relayMessage: scannerLine,
+      manifesto: manifestoEl?.value ?? "",
+      useDeployFieldIds: true,
+    };
+  }
   return {
     objectLabel: document.getElementById("object-label")?.value ?? "",
     statusLine: document.getElementById("status-line")?.value ?? "",
     relayItem: document.getElementById("relay-item")?.value ?? "",
     relayMessage: document.getElementById("relay-message")?.value ?? "",
     manifesto: manifestoEl?.value ?? "",
+    useDeployFieldIds: false,
   };
 }
 
 function applyCreateFieldValidity(missingFieldIds, message) {
   const ids = new Set(missingFieldIds);
-  for (const id of ["handle", "object-label", "status-line", "relay-item", "relay-message", "manifesto"]) {
+  for (const id of [
+    "handle",
+    "deploy-object-label",
+    "deploy-scanner-line",
+    "object-label",
+    "status-line",
+    "relay-item",
+    "relay-message",
+    "manifesto",
+  ]) {
     const el = document.getElementById(id);
     if (!el || !(el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement)) {
       continue;
@@ -544,6 +620,58 @@ async function submitCreate(e, opts = {}) {
 
   try {
     const input = readValidatedCreateInput();
+    const searchParams = new URLSearchParams(location.search);
+    const legacyEl = document.getElementById("create-flat-pilot-compat");
+    const gameStrategy = resolveGameSeasonSubmitStrategy({
+      searchParams,
+      walletEntries: loadWallet(),
+    });
+
+    if (gameStrategy === "redirect_live") {
+      setStatus("Opening season setup on Live…");
+      redirectToGameSeasonSetup();
+      return;
+    }
+
+    if (gameStrategy === "create_season_root") {
+      setStatus("Creating season root…");
+      const seasonId = document.getElementById("game-season-id")?.value ?? "";
+      await runGameSeasonRootCreate({
+        handle: input.handle,
+        seasonId,
+        wantRecovery: input.wantRecovery,
+        qrValidityDays: input.qrValidityDays,
+        runCreateCard,
+      });
+      return;
+    }
+
+    const strategy = resolveDeploySubmitStrategy({
+      searchParams,
+      template: activeTemplate,
+      legacyFlatDetailsOpen: legacyEl instanceof HTMLDetailsElement && legacyEl.open,
+      walletEntries: loadWallet(),
+    });
+
+    if (strategy === "redirect_live") {
+      setStatus("Opening Live…");
+      redirectDeployToLiveAddObject(activeTemplate);
+      return;
+    }
+
+    if (strategy === "root_and_child") {
+      setStatus("Creating account and deploying object…");
+      const fields = readCreateFormFields();
+      await runDeployRootAndChildCreate(activeTemplate, fields, {
+        handle: input.handle,
+        wantRecovery: input.wantRecovery,
+        qrValidityDays: input.qrValidityDays,
+        organizer: input.organizer,
+        runCreateCard,
+      });
+      return;
+    }
+
     setStatus("Generating keys and signing…");
     await runCreateCard({
       handle: input.handle,
@@ -602,17 +730,44 @@ document.querySelectorAll('input[name="organizer_key_mode"]').forEach((el) => {
 syncOrganizerFieldsUi();
 syncCreateCustodyModeUi();
 
-const urlTemplate = new URLSearchParams(location.search).get("template");
-if (urlTemplate === "status_plate") {
-  setTemplate("status_plate");
-} else if (urlTemplate === "lost_item") {
-  setTemplate("lost_item_relay");
-}
+const createSearchParams = new URLSearchParams(location.search);
 
 const urlMerchRef = readMerchRefFromUrl();
-if (urlMerchRef) persistMerchCreateRef(urlMerchRef);
+if (urlMerchRef) {
+  persistMerchCreateRef(urlMerchRef);
+} else {
+  clearMerchCustomizeHandoff();
+}
 
-syncCreateFlowConvergence(activeTemplate);
+function openDeploySomethingForm() {
+  showCreateFormPanel();
+  const url = new URL(location.href);
+  url.searchParams.delete("template");
+  url.searchParams.set("intent", "deploy");
+  history.replaceState(null, "", `${url.pathname}${url.search}`);
+  setTemplate("status_plate");
+  syncCreateDeployWizardUi(new URLSearchParams(location.search), "status_plate");
+}
+
+document.getElementById("create-flat-pilot-compat")?.addEventListener("toggle", () => {
+  syncCreateDeployWizardUi(new URLSearchParams(location.search), activeTemplate);
+});
+
+function bootstrapCreateEntry() {
+  if (shouldSkipCreateEntryChooser(createSearchParams)) {
+    showCreateFormPanel();
+    setTemplate(defaultTemplateForCreateEntry(createSearchParams));
+    syncCreateOrganizerSeasonWizardUi(createSearchParams);
+    return;
+  }
+
+  showCreateEntryChooserPanel();
+  initCreateEntryChooser({
+    onDeploySomething: openDeploySomethingForm,
+  });
+}
+
+bootstrapCreateEntry();
 
 function initEphemeralBrowsingGate() {
   if (!ephemeralBrowsing) return;

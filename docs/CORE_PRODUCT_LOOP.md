@@ -89,7 +89,8 @@ Mark **☑** when automated + manual proof exist. Do not add nodes or game layer
 | When | Command |
 |------|---------|
 | Every PR (CI) | `npm run verify:desk:fast` |
-| Before merge | `npm run verify:desk` |
+| WS-LIVE integrator | `npm run verify:live:fast` |
+| Before merge | `npm run verify:desk` · `npm run verify:live` (full WS-LIVE belt) |
 | Touched create/custody | `npm run verify:desk -- --custody` |
 | Touched city game only | `npm run verify:desk -- --city-game` (not default for WS-QUALITY) |
 | Production WebKit sign-off | [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) **P0-W** after Pages deploy |
@@ -110,6 +111,18 @@ Prefer **surgical** changes aligned with existing patterns:
 | [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) error verbs | Marketing pages bulk rewrite |
 
 **Canonical UX surfaces:** [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) · [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md) · [`CREATED_TASKS_TAB_REDESIGN.md`](CREATED_TASKS_TAB_REDESIGN.md) (phone-first).
+
+**Q3 front-door targets (2026-06-04):** [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) steps 11–14 · [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) step 19.
+
+| Target | Comprehension pass signal |
+|--------|---------------------------|
+| Three launch doors stay abstract (not lost-item-led) | Strangers pick correct door in &lt;10s without protocol vocabulary |
+| Top-nav Create = three-door chooser (Option B) | No one asks why they must pick “General” before a plate |
+| Deploy create = “what scanners read” | Stewards never say “root” or “child” unprompted |
+| Hoodie path vs BYOP create | Buyers understand shop vs print-your-own as **carrier**, same live primitive |
+| Game players vs organizers | Players use door 3; organizers find season setup without terminal mint |
+
+**Architecture guardrails during Q3:** `verify:desk:fast` green; child objects stay out of `hc_wallet`; flat pilots remain for LO-1/LO-2 field kits; no landing hero revert.
 
 ---
 

@@ -189,7 +189,7 @@ const NODE_OVERRIDES = {
   },
 };
 
-/** Stable object_id slugs for the 15-node registry. */
+/** Stable object_id slugs for the 40-node wave-open registry. */
 export const SEASON_OBJECT_IDS = {
   node_01: "obj_cr_node_01_newbo",
   node_02: "obj_cr_node_02_cafe",
@@ -206,6 +206,31 @@ export const SEASON_OBJECT_IDS = {
   node_13: "obj_cr_node_13_finale",
   node_14: "obj_cr_node_14_fountain",
   node_15: "obj_cr_node_15_steps",
+  node_16: "obj_cr_node_16_red_hq",
+  node_17: "obj_cr_node_17_blue_hq",
+  node_18: "obj_cr_node_18_green_hq",
+  node_19: "obj_cr_node_19_yellow_hq",
+  node_20: "obj_cr_node_20_ward_cache",
+  node_21: "obj_cr_node_21_signal_stone",
+  node_22: "obj_cr_node_22_glitch_coil",
+  node_23: "obj_cr_node_23_museum_intel",
+  node_24: "obj_cr_node_24_river_clue",
+  node_25: "obj_cr_node_25_heritage_clue",
+  node_26: "obj_cr_node_26_archives_scarcity",
+  node_27: "obj_cr_node_27_fest_drop",
+  node_28: "obj_cr_node_28_courier_witness",
+  node_29: "obj_cr_node_29_plaza_switch",
+  node_30: "obj_cr_node_30_night_market",
+  node_31: "obj_cr_node_31_csps_gate",
+  node_32: "obj_cr_node_32_trail_head",
+  node_33: "obj_cr_node_33_paramount",
+  node_34: "obj_cr_node_34_3rd_corr",
+  node_35: "obj_cr_node_35_transfer",
+  node_36: "obj_cr_node_36_ncs",
+  node_37: "obj_cr_node_37_bakery",
+  node_38: "obj_cr_node_38_amphitheater",
+  node_39: "obj_cr_node_39_trail_mile",
+  node_40: "obj_cr_node_40_stage",
 };
 
 /**

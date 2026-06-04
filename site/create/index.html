@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Create a live card · humanity.llc</title>
+    <title>Create · humanity.llc</title>
     <meta
       name="description"
-      content="Create a live object — status plate, lost-item tag, or general card. Signed QR, browser-held keys, no scan tracking."
+      content="Deploy live state on something, customize live wear, or play the city game. Signed QR, browser-held keys, no scan tracking."
     />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
     <meta name="theme-color" content="#ffffff" />
@@ -33,7 +33,7 @@
       })();
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=5" />
-    <link rel="stylesheet" href="/styles.css?v=146" />
+    <link rel="stylesheet" href="/styles.css?v=147" />
     <link rel="stylesheet" href="/css/device-shell.css?v=94" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=30" />
   </head>
@@ -399,6 +399,39 @@
       </section>
 
       <main class="screen">
+        <section
+          class="create-entry-chooser landing-launch-doors flow-section"
+          id="create-entry-chooser"
+          aria-labelledby="create-entry-chooser-title"
+        >
+          <section class="hero hero-compact">
+            <p class="hero-eyebrow">Create</p>
+            <h1 id="create-chooser-hero-title">Pick how you want to start</h1>
+            <p class="hero-line" id="create-chooser-hero-lead">
+              Same primitive — live state on a physical thing.
+            </p>
+          </section>
+          <h2 class="landing-launch-doors-title group-label" id="create-entry-chooser-title">
+            Two ways to make live status
+          </h2>
+          <ul
+            class="list list-compact landing-launch-doors-list"
+            id="create-entry-chooser-list"
+            aria-labelledby="create-entry-chooser-title"
+          ></ul>
+          <p class="landing-launch-doors-note">
+            <a href="/play/cedar-rapids/">Play Cedar Rapids</a> ·
+            <a href="/create/?intent=game">Organize a live season</a> ·
+            <a href="/case-study/">See the full loop</a>
+          </p>
+        </section>
+
+        <div id="create-form-panel" hidden>
+        <p class="create-entry-back-wrap">
+          <button type="button" class="btn-text create-entry-back" id="create-entry-back">
+            ← All ways to start
+          </button>
+        </p>
         <section class="hero hero-compact">
           <p class="hero-eyebrow">Create</p>
           <h1 id="create-hero-title">Create a live card</h1>
@@ -412,7 +445,7 @@
           </p>
         </section>
 
-        <section class="flow-section" aria-labelledby="create-glossary-label">
+        <section class="flow-section" id="create-glossary-section" aria-labelledby="create-glossary-label">
           <h2 class="group-label" id="create-glossary-label">Card vs QR</h2>
           <ul class="list list-compact flow-glossary">
             <li class="list-row">
@@ -453,8 +486,8 @@
         </section>
 
         <form id="create-form" class="form-card flow-form-card" method="dialog" action="#" autocomplete="off" novalidate>
-          <section class="flow-form-section">
-            <h2 class="group-label">Card type</h2>
+          <details class="flow-disclosure create-template-advanced" id="create-template-advanced">
+            <summary class="form-label">Examples and object types</summary>
             <p class="form-hint" id="create-template-hint">
               Start with a general live card. Add status plates and lost-item relays from Live after
               create.
@@ -500,6 +533,68 @@
                 </button>
               </div>
             </div>
+          </details>
+
+          <section
+            class="flow-form-section flow-inset-fields create-game-season-wizard"
+            id="create-game-season-wizard"
+            hidden
+            aria-labelledby="create-game-season-wizard-title"
+          >
+            <h2 class="group-label" id="create-game-season-wizard-title">Season root card</h2>
+            <p class="form-hint">
+              Creates a general root with an organizer key. After create you will register game nodes,
+              publish rules, and export print packs from Live.
+            </p>
+            <label class="form-label" for="game-season-id">Season id</label>
+            <input
+              class="form-input"
+              id="game-season-id"
+              name="game_season_id"
+              maxlength="48"
+              placeholder="my_city_season_01"
+              autocomplete="off"
+              required
+            />
+            <p class="form-hint">
+              Lowercase slug (letters, numbers, underscores). Used when registering game nodes.
+            </p>
+          </section>
+
+          <section
+            class="flow-form-section flow-inset-fields create-deploy-wizard"
+            id="create-deploy-wizard"
+            hidden
+            aria-labelledby="create-deploy-wizard-title"
+          >
+            <h2 class="group-label" id="create-deploy-wizard-title">What scanners should see</h2>
+            <label class="form-label" for="deploy-object-label" id="deploy-object-label-title"
+              >What is this on?</label
+            >
+            <input
+              class="form-input"
+              id="deploy-object-label"
+              name="deploy_object_label"
+              maxlength="80"
+              placeholder="Studio door"
+            />
+            <p class="form-hint" id="deploy-object-label-hint">
+              Shown as the headline when someone scans.
+            </p>
+            <label class="form-label" for="deploy-scanner-line" id="deploy-scanner-line-label"
+              >What should scanners see?</label
+            >
+            <textarea
+              class="form-input form-textarea"
+              id="deploy-scanner-line"
+              name="deploy_scanner_line"
+              maxlength="199"
+              rows="2"
+              placeholder="Open · Thu–Sun until 9 PM"
+            ></textarea>
+            <p class="form-hint" id="deploy-scanner-line-hint">
+              Live status line — change it later on Live without reprinting the QR.
+            </p>
           </section>
 
           <section class="flow-form-section flow-inset-fields">
@@ -762,6 +857,7 @@
           <button type="submit" class="btn-primary flow-submit" id="submit">Create card &amp; QR</button>
           <p id="status" class="form-status" role="status"></p>
         </form>
+        </div>
       </main>
     </div>
     <dialog
@@ -799,6 +895,6 @@
     </dialog>
     <script src="/js/device-status-bootstrap.mjs?v=94" type="module"></script>
     <script src="/js/create-hub.mjs?v=1" type="module"></script>
-    <script type="module" src="/js/create-card.mjs?v=20"></script>
+    <script type="module" src="/js/create-card.mjs?v=22"></script>
   </body>
 </html>

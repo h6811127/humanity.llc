@@ -20,7 +20,7 @@ export const LANDING_REQUIRED_SNIPPETS = [
   "Live status on something",
   "Live status on you",
   "Play the city game",
-  "/create/?template=status_plate",
+  "/create/?intent=deploy",
   "/shop/customize/?product=glitch_hoodie_v1",
   "/play/cedar-rapids/",
   "landing-hero-privacy",

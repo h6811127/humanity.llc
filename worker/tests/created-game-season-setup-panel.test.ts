@@ -15,8 +15,12 @@ describe("created-game-season-setup-panel", () => {
     ).toBe(true);
   });
 
-  it("hides operator console without organizer key", () => {
-    expect(shouldShowGameSeasonSetupPanel({ pilot_template: "general" })).toBe(false);
+  it("shows setup path for general root without organizer key yet", () => {
+    expect(shouldShowGameSeasonSetupPanel({ pilot_template: "general" })).toBe(true);
+  });
+
+  it("hides setup for non-general pilots", () => {
+    expect(shouldShowGameSeasonSetupPanel({ pilot_template: "status_plate" })).toBe(false);
   });
 
   it("exports stable panel id and self-serve anchor on Manage", () => {

@@ -921,3 +921,85 @@ test.describe("P0b-1 fresh create hub row (R10)", () => {
     ).toBeHidden();
   });
 });
+
+test.describe("hub My objects presentation (step 13)", () => {
+  const GENERAL_ROOT = {
+    id: "e2e_obj_first_root",
+    label: "River studio",
+    saved_at: "2026-05-29T12:00:00.000Z",
+    profile_id: "profE2eObjFirstRoot1",
+    qr_id: "qr_e2e_obj_first_root",
+    handle: "river_studio",
+    manifesto_line: "General root",
+    pilot_template: "general",
+    owner_public_key_b58: "pubkeyfortestonlyxxxxxxxxxxxx",
+    owner_private_key_b58: "privkeyfortestonlyxxxxxxxxx",
+    scan_url: "http://127.0.0.1:8788/c/profE2eObjFirstRoot1?q=qr_e2e_obj_first_root",
+    status: "active",
+  };
+
+  test("general root with children leads with object rows and compact account line", async ({
+    page,
+  }) => {
+    const childObjectsKey = `hc_child_objects_v1:${GENERAL_ROOT.profile_id}`;
+    await page.addInitScript(
+      ({ root, key, children }) => {
+        localStorage.setItem("hc_wallet", JSON.stringify([root]));
+        localStorage.setItem(key, JSON.stringify(children));
+      },
+      {
+        root: GENERAL_ROOT,
+        key: childObjectsKey,
+        children: [
+          {
+            object_id: "obj_plate_01",
+            object_type: "status_plate",
+            public_label: "Studio door",
+            public_state: "Open until 9 PM",
+            scan_url: "http://127.0.0.1:8788/scan/qr_plate_01",
+            status: "active",
+          },
+        ],
+      }
+    );
+
+    await page.route("**/.well-known/hc/v1/health**", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ status: "ok", database: "ok" }),
+      })
+    );
+    await page.route(`**/.well-known/hc/v1/cards/${GENERAL_ROOT.profile_id}/objects**`, (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          objects: [
+            {
+              object_id: "obj_plate_01",
+              object_type: "status_plate",
+              public_label: "Studio door",
+              public_state: "Open until 9 PM",
+              status: "active",
+              active_qr_id: "qr_plate_01",
+            },
+          ],
+        }),
+      })
+    );
+
+    await page.goto("/wallet/");
+    await expect(page.locator("#device-hub-saved-items-title")).toHaveText("My objects");
+
+    const list = page.locator("#device-hub-wallet-list .hub-card-item");
+    await expect(list.first()).toHaveClass(/hub-card-item--leading-object/);
+    await expect(list.first()).toContainText("Studio door");
+    await expect(page.locator(".hub-card-item--account-line .list-title")).toHaveText(
+      "River studio"
+    );
+    await expect(page.locator(".hub-card-item--account-line .hub-card-identity")).toContainText(
+      "Account · @river_studio"
+    );
+  });
+});

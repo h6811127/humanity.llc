@@ -1,5 +1,7 @@
 # Status plate pilot (Phase A vertical #1)
 
+**Front door:** This is a **pilot** (catalog tag `pilot`) — field QA for deploy-on-something, not company positioning. Public entry is launch door 1 **Live status on something** ([`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md)).
+
 **Status:** Active pilot  
 **Parent:** `docs/ROOT_CARD_AND_CHILD_OBJECTS.md` · `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md`  
 **Prerequisite:** ~~M5 stranger loop~~ **Satisfied** — M5 passed 2026-05-27 (`docs/M5_STRANGER_TEST_RUNBOOK.md`)
@@ -62,6 +64,8 @@ Deploy Worker with `X-HC-Scan-UI: pass-v7` for this layout.
 ---
 
 ## Pilot checklist (5–10 real plates)
+
+**Field walk (LO-1):** `npm run ws-live:lo1-kit` → open `site/dev/ws-live-lo1-comprehension.html` on phones (requires `pages:dev`).
 
 | Step | Pass? |
 |------|-------|

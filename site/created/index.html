@@ -31,7 +31,7 @@
       })();
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=5" />
-    <link rel="stylesheet" href="/styles.css?v=146" />
+    <link rel="stylesheet" href="/styles.css?v=147" />
     <link rel="stylesheet" href="/css/device-shell.css?v=94" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=30" />
   </head>
@@ -1083,7 +1083,9 @@
             <p class="form-hint" id="child-object-add-hub-sub">
               Status plates · lost items · game nodes
             </p>
-            <div class="created-child-add-hub-body"></div>
+            <div class="created-child-add-hub-body">
+              <div id="game-season-setup" class="created-game-season-setup-anchor" hidden></div>
+            </div>
           </details>
 
           <section class="created-what-now created-what-now-compact" id="created-status-plate-tip" hidden>
@@ -1829,25 +1831,36 @@
                     hidden
                     role="status"
                   ></p>
-                  <section
-                    class="created-hosted-game-season"
-                    id="created-hosted-game-season"
+                  <details
+                    class="created-hosted-game-season-disclosure"
+                    id="created-hosted-game-season-disclosure"
                     hidden
-                    aria-label="City game season limits"
                   >
-                    <h4 class="created-hosted-game-season-title" id="created-hosted-game-season-title"></h4>
-                    <p class="form-hint" id="created-hosted-game-season-hint" hidden></p>
-                    <dl
-                      class="created-hosted-plan-metrics"
-                      id="created-hosted-game-season-metrics"
-                    ></dl>
-                    <p
-                      class="form-hint created-hosted-plan-at-limit"
-                      id="created-hosted-game-season-at-limit"
-                      hidden
-                      role="status"
-                    ></p>
-                  </section>
+                    <summary
+                      class="created-hosted-game-season-summary"
+                      id="created-hosted-game-season-summary"
+                    >
+                      Live season limits
+                    </summary>
+                    <section
+                      class="created-hosted-game-season"
+                      id="created-hosted-game-season"
+                      aria-label="City game season limits"
+                    >
+                      <h4 class="created-hosted-game-season-title" id="created-hosted-game-season-title"></h4>
+                      <p class="form-hint" id="created-hosted-game-season-hint" hidden></p>
+                      <dl
+                        class="created-hosted-plan-metrics"
+                        id="created-hosted-game-season-metrics"
+                      ></dl>
+                      <p
+                        class="form-hint created-hosted-plan-at-limit"
+                        id="created-hosted-game-season-at-limit"
+                        hidden
+                        role="status"
+                      ></p>
+                    </section>
+                  </details>
                   <div class="created-hosted-plan-upgrades" id="created-hosted-plan-upgrades" hidden></div>
                 </div>
               </div>

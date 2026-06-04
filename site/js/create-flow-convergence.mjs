@@ -22,6 +22,7 @@ export function syncCreateFlowConvergence(template) {
   const generalBtn = document.getElementById("create-add-object-nudge-general");
   const hintEl = document.getElementById("create-template-hint");
   const compatEl = document.getElementById("create-flat-pilot-compat");
+  const advancedEl = document.getElementById("create-template-advanced");
 
   const isPilot = isPilotObjectTemplate(template);
   if (hintEl) {
@@ -31,6 +32,10 @@ export function syncCreateFlowConvergence(template) {
     if (nudgeEl) nudgeEl.hidden = true;
     if (compatEl) compatEl.hidden = true;
     return;
+  }
+
+  if (advancedEl instanceof HTMLDetailsElement) {
+    advancedEl.open = true;
   }
 
   const roots = listGeneralRootsWithKeys(loadWallet());

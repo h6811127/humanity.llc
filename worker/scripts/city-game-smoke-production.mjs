@@ -18,7 +18,8 @@ import { fileURLToPath } from "node:url";
 import { assessGameScanHtml } from "./city-game-smoke-local-core.mjs";
 import {
   selectProductionSmokeNodes,
-  spotExpectationsForProductionProbe,
+  productionSmokeExpectationsForNode,
+  isSeasonPlayOpenForSmoke,
 } from "./city-game-smoke-production-core.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
@@ -46,8 +47,7 @@ async function main() {
   const season = existsSync(seasonJsonPath)
     ? JSON.parse(readFileSync(seasonJsonPath, "utf8"))
     : null;
-  const expectations = spotExpectationsForProductionProbe(season);
-  const preLaunch = !expectations.node_01?.requireCoopHint;
+  const preLaunch = !isSeasonPlayOpenForSmoke(season);
   const targets = selectProductionSmokeNodes({ productionSeed: seed, checkAll });
   if (!targets.length) {
     console.error("No nodes to smoke-test in production seed");
@@ -77,10 +77,10 @@ async function main() {
     }
 
     const html = await res.text();
-    const expect = expectations[node.node_id] ?? {};
+    const expect = productionSmokeExpectationsForNode(season, node.node_id);
     const result = assessGameScanHtml(html, {
       nodeId: node.node_id,
-      label: node.public_label,
+      label: preLaunch ? undefined : node.public_label,
       requireCoopHint: expect.requireCoopHint ?? false,
       requireContributeBlock: expect.requireContributeBlock ?? false,
       expectDormant: expect.expectDormant ?? false,

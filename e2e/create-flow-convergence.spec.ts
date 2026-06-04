@@ -38,6 +38,47 @@ async function seedGeneralRootWallet(page: Page) {
   }, GENERAL_ROOT);
 }
 
+test.describe("create entry chooser (step 11)", () => {
+  test.beforeEach(async ({ page }) => {
+    await stubCreateShellHealth(page);
+  });
+
+  test("bare /create/ shows steward chooser before the form (no play door)", async ({ page }) => {
+    await page.goto("/create/");
+
+    await expect(page.locator("#create-entry-chooser")).toBeVisible();
+    await expect(page.locator("#create-form-panel")).toBeHidden();
+    await expect(page.getByText("Live status on something")).toBeVisible();
+    await expect(page.getByText("Live status on you")).toBeVisible();
+    await expect(page.getByText("Play the city game")).toHaveCount(0);
+    await expect(page.getByRole("link", { name: /Play Cedar Rapids/i })).toBeVisible();
+  });
+
+  test("organize a live season link opens game intent wizard", async ({ page }) => {
+    await page.goto("/create/");
+
+    await page.getByRole("link", { name: /Organize a live season/i }).click();
+
+    await expect(page).toHaveURL(/intent=game/);
+    await expect(page.locator("#create-game-season-wizard")).toBeVisible();
+    await expect(page.locator("#create-hero-title")).toHaveText("Organize a live season");
+    await expect(page.locator("#enable-organizer-revoke")).toBeChecked();
+  });
+
+  test("deploy door opens form with intent=deploy", async ({ page }) => {
+    await page.goto("/create/");
+
+    await page.locator('[data-create-door="something"]').click();
+
+    await expect(page.locator("#create-form-panel")).toBeVisible();
+    await expect(page.locator("#create-entry-chooser")).toBeHidden();
+    await expect(page).toHaveURL(/intent=deploy/);
+    await expect(page.locator("#create-hero-title")).toHaveText("Deploy on something");
+    await expect(page.locator("#create-deploy-wizard")).toBeVisible();
+    await expect(page.locator("#create-glossary-section")).toBeHidden();
+  });
+});
+
 test.describe("create flow convergence nudge", () => {
   test.beforeEach(async ({ page }) => {
     await stubCreateShellHealth(page);
@@ -47,9 +88,7 @@ test.describe("create flow convergence nudge", () => {
     page,
   }) => {
     await seedGeneralRootWallet(page);
-    await page.goto("/create/");
-
-    await page.getByRole("button", { name: "Status plate" }).click();
+    await page.goto("/create/?template=status_plate");
 
     const nudge = page.locator("#create-add-object-nudge");
     await expect(nudge).toBeVisible();
@@ -72,9 +111,8 @@ test.describe("create flow convergence nudge", () => {
 
   test("Use general card switches back to general template", async ({ page }) => {
     await seedGeneralRootWallet(page);
-    await page.goto("/create/");
+    await page.goto("/create/?template=lost_item");
 
-    await page.getByRole("button", { name: "Lost item" }).click();
     await expect(page.locator("#create-add-object-nudge")).toBeVisible();
 
     await page.locator("#create-add-object-nudge-general").click();

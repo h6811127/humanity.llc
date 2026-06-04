@@ -42,6 +42,7 @@ import { initCreatedGameNodeRulesPublish } from "./created-child-object-game-nod
 import {
   initCreatedGameNodeSetupGuide,
 } from "./created-child-object-game-node-setup.mjs";
+import { readRememberedGameSeasonId } from "./create-organizer-season-core.mjs";
 
 /**
  * @param {string} profileId
@@ -193,6 +194,14 @@ export function initCreatedGameNode(ctx) {
         const city = typeof row.city === "string" ? row.city : seasonId;
         opt.textContent = `${city} · ${seasonId}`;
         seasonSelect.append(opt);
+      }
+      const remembered = readRememberedGameSeasonId(ctx.profileId);
+      if (remembered) {
+        const hasOption = [...seasonSelect.options].some((opt) => opt.value === remembered);
+        if (hasOption) {
+          seasonSelect.value = remembered;
+          await refreshDistrictsForSeason(remembered);
+        }
       }
     } catch {
       /* index optional offline */

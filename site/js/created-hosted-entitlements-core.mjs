@@ -12,6 +12,10 @@ import {
   stewardAutoPollUsageFromBody,
   stewardUsageAtLimit,
 } from "./device-steward-entitlements-core.mjs";
+import {
+  hasExplicitGameSeasonContext,
+  shouldExpandHostedGameSeasonPanel,
+} from "./hub-objects-presentation-core.mjs";
 
 export const HOSTED_STEWARD_PLAN_ID = "hosted_steward_v1";
 export const HOSTED_GAME_SEASON_PLAN_ID = "hosted_game_season_v1";
@@ -57,6 +61,8 @@ const GAME_METER_LABELS = {
  *   gameSeasonMetrics: HostedMetricRow[],
  *   gameSeasonAtLimitMessage: string | null,
  *   multiSeasonHint: string | null,
+ *   gameSeasonExpanded: boolean,
+ *   gameSeasonCollapsedSummary: string | null,
  * }} CreatedHostedPlanPanelModel
  */
 
@@ -82,7 +88,12 @@ export function hostedPlanLabel(planId) {
 /**
  * @param {import("./device-steward-entitlements-core.mjs").StewardEntitlementsPolicy} policy
  * @param {Record<string, unknown> | null} body
- * @param {{ hasSession: boolean, hasSigningKeys?: boolean }} ctx
+ * @param {{
+ *   hasSession: boolean,
+ *   hasSigningKeys?: boolean,
+ *   generalRootCount?: number,
+ *   explicitSeasonContext?: boolean,
+ * }} ctx
  * @returns {CreatedHostedPlanPanelModel}
  */
 export function buildCreatedHostedPlanPanelModel(policy, body, ctx) {
@@ -148,6 +159,10 @@ export function buildCreatedHostedPlanPanelModel(policy, body, ctx) {
   let gameSeasonAtLimitMessage = null;
   let gameSeasonTitle = null;
 
+  const generalRootCount = ctx.generalRootCount ?? 1;
+  const explicitSeasonContext =
+    ctx.explicitSeasonContext ?? hasExplicitGameSeasonContext("");
+
   if (multiHint && multiHint.seasonIds.length > 0) {
     return {
       visible: true,
@@ -160,6 +175,8 @@ export function buildCreatedHostedPlanPanelModel(policy, body, ctx) {
       gameSeasonMetrics: [],
       gameSeasonAtLimitMessage: null,
       multiSeasonHint: multiHint.hint || multiHint.seasonIds.join(", "),
+      gameSeasonExpanded: true,
+      gameSeasonCollapsedSummary: null,
     };
   }
 
@@ -213,6 +230,19 @@ export function buildCreatedHostedPlanPanelModel(policy, body, ctx) {
         ? "Keys are loaded on this tab. Use Connect steward account below, then optional paid checkout."
         : "Open the Live tab and load your card keys, then return here to connect a steward account.";
 
+  const hasGameSeasonContent =
+    !!gameSeasonTitle || gameSeasonMetrics.length > 0 || !!gameSeasonAtLimitMessage;
+  const gameSeasonExpanded = shouldExpandHostedGameSeasonPanel({
+    generalRootCount,
+    explicitSeasonContext,
+    hasGameSeasonContent,
+    multiSeasonHint: false,
+  });
+  const gameSeasonCollapsedSummary =
+    hasGameSeasonContent && !gameSeasonExpanded
+      ? gameSeasonTitle || "Live season limits"
+      : null;
+
   return {
     visible: true,
     title: "Usage & limits",
@@ -224,5 +254,7 @@ export function buildCreatedHostedPlanPanelModel(policy, body, ctx) {
     gameSeasonMetrics,
     gameSeasonAtLimitMessage,
     multiSeasonHint: null,
+    gameSeasonExpanded,
+    gameSeasonCollapsedSummary,
   };
 }

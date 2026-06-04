@@ -5,6 +5,8 @@
 
 **Last updated:** 2026-06-04
 
+**Changelog (2026-06-04):** **Front-door strategy documented** — Option A landing doors + Option B create chooser + carrier split (shop vs BYOP) · [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) steps 10–14 · [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) step 19 · invariants in [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md). **WS-QUALITY** owns presentation implementation (Q3); protocol unchanged.
+
 **Changelog (2026-06-04):** **WS-LIVE opened** — umbrella MVP program: physical software objects + Cedar Rapids + [**five-layer evolving objects plan**](#ws-live--physical-software-objects--evolving-five-layer-stack) ([`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md)). Sub-tracks: **WS-QUALITY** (steward belt), **WS-CR** / **WS-SCALE** / **WS-SW** (field + network). **WS-NOTIF closed** (in-app) — **P0-N2 OS deferred**. **Desk belt** — `npm run verify:desk:fast` (CI) · `npm run verify:desk` (pre-merge).
 
 **Changelog (2026-06-03):** **Engineering Phase 2** — summer program § [Engineering Phase 2](#engineering-phase-2--summer-2026-program) (**WS-SCALE**, **WS-SW**, **WS-CUSTODY** parallel with Phase 1 closeout). **WS-CUSTODY** — [`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md) + [`CUSTODY_PHASE0_RUNBOOK.md`](CUSTODY_PHASE0_RUNBOOK.md). **Summer footprint** — Cedar Rapids **40 at open → 60** · **Wake the city · Signal War** **SW-01–SW-15**. **Live object layer** — [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) five-layer map.
@@ -93,7 +95,7 @@ Mark ☑ in [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) § Reco
 
 | Gate | Proof | Owner |
 |------|-------|-------|
-| **LO-1** Order 1 pilot sign-off | Printed status plate + lost-item relay — [`STATUS_PLATE_PILOT.md`](STATUS_PLATE_PILOT.md), [`LOST_ITEM_RELAY_PILOT.md`](LOST_ITEM_RELAY_PILOT.md) | WS-QUALITY |
+| **LO-1** Order 1 pilot sign-off | Printed status plate + lost-item relay — [`STATUS_PLATE_PILOT.md`](STATUS_PLATE_PILOT.md), [`LOST_ITEM_RELAY_PILOT.md`](LOST_ITEM_RELAY_PILOT.md) · field kit: `npm run ws-live:lo1-kit` | WS-QUALITY |
 | **LO-2** Order 2 field launch | WS-CR **C5** signed · prod season mint · `city-game:smoke-production` | WS-CR |
 | **LO-3** L5 opening footprint | **~40 nodes** installed · B7 at open · honest launch surfaces | WS-SCALE + WS-CR |
 | **LO-4** Integrated stranger comprehension | Scan **game node** (contribute/read) + **non-game object** (status plate) — same primitive, &lt;30s trust read | WS-CR + WS-QUALITY |
@@ -104,9 +106,11 @@ Mark ☑ in [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) § Reco
 ### WS-LIVE regression block
 
 ```bash
-npm run verify:desk:fast
-npm run verify:city-game
-npm run worker:test -- worker/tests/live-object-*.test.ts worker/tests/scan-status.test.ts worker/tests/network-graph-core.test.ts
+npm run verify:live:fast          # CI / daily — desk fast + live-object + city-game + LO-1 kit
+npm run verify:live               # pre-merge — + scan/created/live-control e2e
+npm run ws-live:preflight           # status report (LO-1–LO-5 engineering vs human)
+npm run ws-live:preflight -- --strict
+npm run ws-live:lo1-kit             # regenerate LO-1 field walk → site/dev/ws-live-lo1-comprehension.html
 ```
 
 Pre-merge integrator: also run **`npm run verify:desk`** when touching steward shell or `/created/`.
@@ -521,7 +525,7 @@ npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts
 
 | Date | Event |
 |------|--------|
-| 2026-06-04 | **WS-LIVE opened** — umbrella MVP: physical software objects + Cedar Rapids + five-layer evolving objects plan ([`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) Orders 1–6, **LO-1–LO-5**); WS-QUALITY demoted to sub-track; revised gating for WS-CR/SCALE/SW |
+| 2026-06-04 | **WS-LIVE tooling** — `verify:live` / `verify:live:fast` belt · `ws-live:preflight` · `ws-live:lo1-kit` (LO-1 field walk) |
 | 2026-06-04 | **WS-NOTIF N3 + P1-MOTO cluster** — foreground U0 strip · Check network refreshes resolver health first · Chrome-aware companion copy on Android PWA |
 | 2026-06-04 | **WS-NOTIF** — notification v2 workstream (TIF) — [`NOTIFICATION_SYSTEM_V2.md`](NOTIFICATION_SYSTEM_V2.md) |
 | 2026-06-04 | **WS-CR B13/P6** — `map-board-b13-preflight` + sign-off; P6 required when live board marketed; comprehension-sign-off enforces GT-7 |

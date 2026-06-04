@@ -20,6 +20,10 @@ source ~/.nvm/nvm.sh && nvm use 20.18.1
 ```bash
 npm install
 npm run worker:test          # Vitest — all worker/tests/
+npm run verify:live:fast     # WS-LIVE belt — PSO five-layer + city game (CI)
+npm run verify:live          # WS-LIVE pre-merge (+ live-object e2e)
+npm run ws-live:preflight    # LO-1–LO-5 engineering status report
+npm run ws-live:lo1-kit      # LO-1 printed pilot field walk (site/dev/)
 npm run e2e:install          # once per machine
 npm run e2e                  # Playwright (starts pages:dev unless PLAYWRIGHT_SKIP_WEBSERVER=1)
 npm run build                # validate static site
@@ -41,6 +45,7 @@ Card creation needs Ed25519-signed JSON (fixtures in `worker/tests/fixtures/`). 
 | **Safari keys custody** | [`docs/SAFARI_KEYS_CUSTODY.md`](docs/SAFARI_KEYS_CUSTODY.md) |
 | **Hybrid custody (easy + keys)** | [`docs/CUSTODY_EASY_MODE.md`](docs/CUSTODY_EASY_MODE.md) · [`docs/CUSTODY_PHASE0_RUNBOOK.md`](docs/CUSTODY_PHASE0_RUNBOOK.md) · [`docs/OWNERSHIP_AND_CONTROL_MODEL.md`](docs/OWNERSHIP_AND_CONTROL_MODEL.md) |
 | **Core loop quality + UX** | [`docs/CORE_PRODUCT_LOOP.md`](docs/CORE_PRODUCT_LOOP.md) · **WS-QUALITY** · `npm run verify:desk` |
+| **Front door + positioning** | [`docs/PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](docs/PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) § Front door strategy |
 | **Notifications v2 (active)** | [`docs/NOTIFICATION_SYSTEM_V2.md`](docs/NOTIFICATION_SYSTEM_V2.md) · **WS-NOTIF** · inbox + delivery router |
 | **Active work + regression gates** | [`docs/PRODUCT_WORKSTREAM_COORDINATION.md`](docs/PRODUCT_WORKSTREAM_COORDINATION.md) · **WS-NOTIF** · **WS-QUALITY** · Phase 2 **WS-SCALE / WS-SW / WS-CUSTODY** paused until Q3 + N4 |
 | **Feature map / roadmap** | [`docs/STEWARD_DEVICE_ROADMAP.md`](docs/STEWARD_DEVICE_ROADMAP.md) |
