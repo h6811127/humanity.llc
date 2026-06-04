@@ -4,6 +4,8 @@ import {
   seasonFinaleNodeId,
   seasonFragmentNodeIds,
   seasonObjectIdForNode,
+  seasonRelayCaptureNodeIds,
+  seasonRelayCapturePlayerEnabled,
   seasonUnlockEdgesFrom,
   seasonVouchTargetsFrom,
   seasonWitnessScarcityNodeId,
@@ -11,7 +13,12 @@ import {
   type SeasonUnlockEdge,
 } from "./season-config";
 
-export type GameContributeMode = "quorum" | "fragment" | "scarcity";
+export type GameContributeMode =
+  | "quorum"
+  | "fragment"
+  | "scarcity"
+  | "capture"
+  | "reinforce";
 
 export type GameNodeDocumentPatch = {
   objectId: string;
@@ -189,10 +196,13 @@ export function gameNodeContributeMode(
   nodeId: string | null,
   meta: GameMeta,
   nodeRole: string,
-  season: CrSeasonConfig = CR_SEASON_01
+  season: CrSeasonConfig = CR_SEASON_01,
+  env?: { CITY_GAME_RELAY_CAPTURE_PLAYER?: string }
 ): GameContributeMode | null {
   if (nodeId && seasonFragmentNodeIds(season).includes(nodeId)) {
-    return meta.unlocked_by.includes(nodeId) ? null : "fragment";
+    if (!meta.unlocked_by.includes(nodeId)) {
+      return "fragment";
+    }
   }
   if (
     nodeId === seasonWitnessScarcityNodeId(season) &&
@@ -204,6 +214,15 @@ export function gameNodeContributeMode(
   if (nodeRole === "temp_drop" && meta.collective_target != null) {
     const progress = meta.collective_progress ?? 0;
     return progress < meta.collective_target ? "quorum" : null;
+  }
+  if (
+    nodeId &&
+    nodeRole === "relay_gate" &&
+    seasonRelayCapturePlayerEnabled(season, env) &&
+    seasonRelayCaptureNodeIds(season).includes(nodeId) &&
+    !meta.compromised
+  ) {
+    return "capture";
   }
   return null;
 }

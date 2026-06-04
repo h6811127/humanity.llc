@@ -45,6 +45,8 @@ function relayGameNode(overrides: Partial<GameNodeScanContext> = {}): GameNodeSc
       fragment_id: null,
     },
     coopHint: null,
+    showsPledge: false,
+    pledgeFaction: null,
     roleEyebrow: "NewBo · Relay · gate",
     showsContribute: false,
     contributeMode: null,

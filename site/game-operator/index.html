@@ -125,6 +125,26 @@
             spellcheck="false"
           />
 
+          <label class="form-label" for="go-held-faction">Relay hold (Signal War)</label>
+          <select class="form-input" id="go-held-faction">
+            <option value="">— unchanged —</option>
+            <option value="neutral">Unclaimed</option>
+            <option value="red">Red</option>
+            <option value="blue">Blue</option>
+            <option value="green">Green</option>
+            <option value="yellow">Yellow</option>
+          </select>
+
+          <label class="form-label" for="go-held-until">Held until (ISO 8601, optional)</label>
+          <input
+            class="form-input"
+            id="go-held-until"
+            placeholder="2026-07-01T18:00:00-05:00"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck="false"
+          />
+
           <label class="revoke-confirm">
             <input type="checkbox" id="go-confirm" />
             <span>I am publishing public object state — not player rewards or scores</span>

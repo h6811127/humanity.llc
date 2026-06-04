@@ -40,6 +40,15 @@ import {
   GAME_CONTRIBUTE_SUBMIT_LABEL,
   GAME_FRAGMENT_CONTRIBUTE_LEAD,
   GAME_FRAGMENT_CONTRIBUTE_SUBMIT_LABEL,
+  GAME_CAPTURE_CONTRIBUTE_LEAD,
+  GAME_CAPTURE_CONTRIBUTE_SUBMIT_LABEL,
+  GAME_CAPTURE_REINFORCE_SUBMIT_LABEL,
+  GAME_CAPTURE_FACTION_LABEL,
+  GAME_CAPTURE_HELD_LABEL,
+  GAME_PLEDGE_EYEBROW,
+  GAME_PLEDGE_LEAD,
+  GAME_PLEDGE_PRIVACY_NOTE,
+  GAME_PLEDGE_SUBMIT_LABEL,
   GAME_SCARCITY_CONTRIBUTE_LEAD,
   GAME_SCARCITY_CONTRIBUTE_PROGRESS_LABEL,
   GAME_SCARCITY_CONTRIBUTE_SUBMIT_LABEL,
@@ -48,6 +57,11 @@ import {
   gameNodeContributeEyebrow,
   type GameNodeScanContext,
 } from "../city-game/scan-view";
+import {
+  factionControllerLabel,
+  factionRelayStatusLabel,
+  isGameFactionHold,
+} from "../city-game/factions";
 import { seasonWindowChip, seasonWindowScanNote } from "../city-game/season-window";
 import { resolveSeasonById } from "../city-game/season-loader";
 import {
@@ -209,6 +223,7 @@ export async function renderScanPage(
   ${renderScanAiExplainScript(vm, pageOrigin, request, originEnv)}
   ${renderScanMerchFunnelScript(pageOrigin, request, originEnv)}
   ${renderScanGameContributeScript(vm, pageOrigin, request, originEnv)}
+  ${renderScanGamePledgeScript(vm, pageOrigin, request, originEnv)}
   ${renderScanLostItemOfferScript(vm, pageOrigin, request, originEnv)}
   ${renderScanOwnerRestoreCtaScript(vm, pageOrigin, request, originEnv)}
   ${renderScanStewardPreviewReturnScript(pageOrigin, request, originEnv)}
@@ -340,6 +355,11 @@ function renderScanHeroSection(
       : "";
   const merchFunnelHint = isMerchFunnelScan(vm) ? renderMerchFunnelHint(origin) : "";
   const gameContributeBlock = renderGameContributeBlock(vm);
+  const gamePledgeBlock = vm.gameNode ? renderGamePledgeBlock(vm.gameNode) : "";
+  const gamePledgeAttr =
+    vm.gameNode?.showsPledge
+      ? ` data-game-pledge="1" data-season-id="${escapeHtml(vm.gameNode.seasonId)}"`
+      : "";
   const lostItemOfferBlock = renderLostItemOfferBlock(vm);
   const ownerRestoreCta = renderScanOwnerRestoreCta(vm, origin);
   const qrBlock = scanHeroQrBlock(vm, qrMarkup);
@@ -351,7 +371,7 @@ function renderScanHeroSection(
     : "";
 
   return `<div class="scan-pass-layer">
-<article class="scan-hero scan-status-panel scan-safety-header scan-live-check--pending" id="scan-safety-header" aria-label="Live check"${profileAttr}${qrAttr}${objectAttr}${scanActiveAttr}${merchFunnelAttr}${gameContributeAttr}${lostItemOfferAttr}>
+<article class="scan-hero scan-status-panel scan-safety-header scan-live-check--pending" id="scan-safety-header" aria-label="Live check"${profileAttr}${qrAttr}${objectAttr}${scanActiveAttr}${merchFunnelAttr}${gameContributeAttr}${gamePledgeAttr}${lostItemOfferAttr}>
   <header class="scan-hero-head">
     ${renderScanHeroHost()}
     ${renderHeroStatusStrip(vm)}
@@ -365,6 +385,7 @@ function renderScanHeroSection(
   <p class="scan-safety-first-seen" id="scan-safety-first-seen" hidden></p>
   ${footBlock}
   ${gameContributeBlock}
+  ${gamePledgeBlock}
   ${lostItemOfferBlock}
   ${lostItemCreateHint}
   ${merchFunnelHint}
@@ -541,6 +562,13 @@ function renderGameNodeMetaChips(gameNode: GameNodeScanContext): string {
   if (meta.compromised) {
     chips.push("Compromised relay — rekey pending");
   }
+  if (
+    gameNode.nodeRole === "relay_gate" &&
+    meta.held_by_faction &&
+    isGameFactionHold(meta.held_by_faction)
+  ) {
+    chips.push(`Relay · ${factionRelayStatusLabel(meta.held_by_faction)}`);
+  }
   if (meta.collective_target != null && meta.collective_progress != null) {
     chips.push(
       `Collective ${meta.collective_progress}/${meta.collective_target}`
@@ -578,6 +606,31 @@ function renderGameNodeMetaChips(gameNode: GameNodeScanContext): string {
   return `<ul class="scan-game-chips" aria-label="Game state">${items}</ul>`;
 }
 
+function renderGamePledgeBlock(gameNode: GameNodeScanContext): string {
+  if (!gameNode.showsPledge) return "";
+  const hqFaction = gameNode.pledgeFaction?.trim().toLowerCase();
+  const factionOptions = ["red", "blue", "green", "yellow"] as const;
+  const options = factionOptions
+    .map((id) => {
+      const selected = hqFaction === id ? " selected" : "";
+      const label = id.charAt(0).toUpperCase() + id.slice(1);
+      return `<option value="${escapeHtml(id)}"${selected}>${escapeHtml(label)}</option>`;
+    })
+    .join("\n    ");
+  return `<section class="scan-game-pledge" id="scan-game-pledge" aria-labelledby="scan-game-pledge-label" data-season-id="${escapeHtml(gameNode.seasonId)}">
+  <p class="scan-game-pledge-eyebrow">${escapeHtml(GAME_PLEDGE_EYEBROW)}</p>
+  <p class="scan-game-pledge-lead" id="scan-game-pledge-label">${escapeHtml(GAME_PLEDGE_LEAD)}</p>
+  <label class="scan-game-pledge-field-label" for="scan-game-pledge-faction">Faction</label>
+  <select class="scan-game-contribute-input scan-game-contribute-select" id="scan-game-pledge-faction" name="pledge_faction">
+    <option value="">Choose faction</option>
+    ${options}
+  </select>
+  <p class="scan-game-pledge-note">${escapeHtml(GAME_PLEDGE_PRIVACY_NOTE)}</p>
+  <button type="button" class="scan-game-contribute-cta" id="scan-game-pledge-submit">${escapeHtml(GAME_PLEDGE_SUBMIT_LABEL)}</button>
+  <p class="scan-game-pledge-status" id="scan-game-pledge-status" hidden aria-live="polite"></p>
+</section>`;
+}
+
 function renderGameContributeBlock(vm: ScanViewModel): string {
   const gameNode = vm.gameNode;
   const contributeCap = findScanCapability(vm.capabilities, "contribute");
@@ -597,19 +650,29 @@ function renderGameContributeBlock(vm: ScanViewModel): string {
   const target = meta.collective_target ?? 0;
   const isFragment = contributeMode === "fragment";
   const isScarcity = contributeMode === "scarcity";
+  const isCapture = contributeMode === "capture" || contributeMode === "reinforce";
   const eyebrow = gameNodeContributeEyebrow(contributeMode, gameNode.district);
   const lead = isScarcity
     ? GAME_SCARCITY_CONTRIBUTE_LEAD
     : isFragment
       ? GAME_FRAGMENT_CONTRIBUTE_LEAD
-      : GAME_CONTRIBUTE_LEAD;
+      : isCapture
+        ? GAME_CAPTURE_CONTRIBUTE_LEAD
+        : GAME_CONTRIBUTE_LEAD;
   const submitLabel = isScarcity
     ? GAME_SCARCITY_CONTRIBUTE_SUBMIT_LABEL
     : isFragment
       ? GAME_FRAGMENT_CONTRIBUTE_SUBMIT_LABEL
-      : GAME_CONTRIBUTE_SUBMIT_LABEL;
+      : isCapture
+        ? GAME_CAPTURE_CONTRIBUTE_SUBMIT_LABEL
+        : GAME_CONTRIBUTE_SUBMIT_LABEL;
   const progressBlock = isFragment
     ? ""
+    : isCapture
+      ? `<p class="scan-game-contribute-progress">
+    <span class="scan-game-contribute-progress-label">${escapeHtml(GAME_CAPTURE_HELD_LABEL)}</span>
+    <span class="scan-game-contribute-progress-value" id="scan-game-contribute-progress">${escapeHtml(factionControllerLabel(meta.held_by_faction))}${meta.held_until ? ` · until ${escapeHtml(meta.held_until.slice(0, 16).replace("T", " "))}` : ""}</span>
+  </p>`
     : isScarcity
       ? `<p class="scan-game-contribute-progress">
     <span class="scan-game-contribute-progress-label">${escapeHtml(GAME_SCARCITY_CONTRIBUTE_PROGRESS_LABEL)}</span>
@@ -627,9 +690,26 @@ function renderGameContributeBlock(vm: ScanViewModel): string {
     ? " scan-game-contribute--scarcity"
     : isFragment
       ? " scan-game-contribute--fragment"
-      : "";
+      : isCapture
+        ? " scan-game-contribute--capture"
+        : "";
   const placeholder =
     gameNode.contributeSiteCodePlaceholder?.trim() || "From backing card";
+
+  const factionBlock = isCapture
+    ? `<label class="scan-game-contribute-field-label" for="scan-game-contribute-faction">${escapeHtml(GAME_CAPTURE_FACTION_LABEL)}</label>
+  <select class="scan-game-contribute-input scan-game-contribute-select" id="scan-game-contribute-faction" name="faction">
+    <option value="">Choose faction</option>
+    <option value="red">Red</option>
+    <option value="blue">Blue</option>
+    <option value="green">Green</option>
+    <option value="yellow">Yellow</option>
+  </select>
+  <div class="scan-game-contribute-actions">
+    <button type="button" class="scan-game-contribute-cta" id="scan-game-contribute-submit" data-relay-action="capture">${escapeHtml(submitLabel)}</button>
+    <button type="button" class="scan-game-contribute-cta scan-game-contribute-cta--secondary" id="scan-game-contribute-reinforce" data-relay-action="reinforce">${escapeHtml(GAME_CAPTURE_REINFORCE_SUBMIT_LABEL)}</button>
+  </div>`
+    : `<button type="button" class="scan-game-contribute-cta" id="scan-game-contribute-submit">${escapeHtml(submitLabel)}</button>`;
 
   return `<section class="scan-game-contribute${sectionClass}" id="scan-game-contribute" aria-labelledby="scan-game-contribute-label">
   <p class="scan-game-contribute-eyebrow">${escapeHtml(eyebrow)}</p>
@@ -638,7 +718,7 @@ function renderGameContributeBlock(vm: ScanViewModel): string {
   ${firstScanNote}
   <label class="scan-game-contribute-field-label" for="scan-game-contribute-code">${escapeHtml(GAME_CONTRIBUTE_SITE_CODE_LABEL)}</label>
   <input class="scan-game-contribute-input" id="scan-game-contribute-code" name="site_code" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="32" placeholder="${escapeHtml(placeholder)}" />
-  <button type="button" class="scan-game-contribute-cta" id="scan-game-contribute-submit">${escapeHtml(submitLabel)}</button>
+  ${factionBlock}
   <div class="scan-game-contribute-status-panel" id="scan-game-contribute-status-panel" hidden>
     <p class="scan-game-contribute-status" id="scan-game-contribute-status" aria-live="polite"></p>
   </div>
@@ -1504,7 +1584,19 @@ function renderScanGameContributeScript(
     return "";
   }
   const assetOrigin = pagesJsOrigin(origin, request, originEnv);
-  const mod = JSON.stringify(`${assetOrigin}/js/scan-game-contribute.mjs?v=2`);
+  const mod = JSON.stringify(`${assetOrigin}/js/scan-game-contribute.mjs?v=3`);
+  return `<script type="module" src=${mod}></script>`;
+}
+
+function renderScanGamePledgeScript(
+  vm: ScanViewModel,
+  origin: string,
+  request?: Request,
+  originEnv?: ScanPageOriginEnv
+): string {
+  if (!vm.gameNode?.showsPledge || !vm.profileId) return "";
+  const assetOrigin = pagesJsOrigin(origin, request, originEnv);
+  const mod = JSON.stringify(`${assetOrigin}/js/scan-game-signal-war-pledge.mjs?v=1`);
   return `<script type="module" src=${mod}></script>`;
 }
 

@@ -21,6 +21,11 @@ import { resolveSeasonForProfile } from "../city-game/season-loader";
 import { applyUnlockSideEffects } from "../city-game/unlock-evaluator";
 import { bumpQuorumProgressWithRetry } from "../city-game/quorum-contribute";
 import {
+  applyRelayContributeWithRetry,
+  type RelayContributeAction,
+} from "../city-game/relay-contribute";
+import { isGameFaction, type GameFaction } from "../city-game/factions";
+import {
   fragmentLatticeProgress,
   gameNodeContributeMode,
   issueWitnessSunsetPass,
@@ -46,7 +51,20 @@ import { CHILD_OBJECT_ID_REGEX } from "./child-objects";
 type ContributeBody = {
   qr_id?: string;
   site_code?: string;
+  action?: string;
+  faction?: string;
 };
+
+function parseRelayAction(raw: string | undefined): RelayContributeAction {
+  const action = typeof raw === "string" ? raw.trim().toLowerCase() : "";
+  if (action === "reinforce") return "reinforce";
+  return "capture";
+}
+
+function parseFaction(raw: string | undefined): GameFaction | null {
+  const faction = typeof raw === "string" ? raw.trim().toLowerCase() : "";
+  return isGameFaction(faction) ? faction : null;
+}
 
 function utcDateKey(now: Date): string {
   return now.toISOString().slice(0, 10);
@@ -119,7 +137,11 @@ async function persistGameNodeDocument(
 export async function handlePostGameContribute(
   request: Request,
   db: D1Database,
-  env: { CITY_GAME_ENABLED?: string; CITY_GAME_LOCAL_PLAY_OPEN?: string },
+  env: {
+    CITY_GAME_ENABLED?: string;
+    CITY_GAME_LOCAL_PLAY_OPEN?: string;
+    CITY_GAME_RELAY_CAPTURE_PLAYER?: string;
+  },
   pathProfileId: string,
   pathObjectId: string
 ): Promise<Response> {
@@ -232,7 +254,7 @@ export async function handlePostGameContribute(
     );
   }
 
-  const contributeMode = gameNodeContributeMode(nodeId, meta, fields.nodeRole, season);
+  const contributeMode = gameNodeContributeMode(nodeId, meta, fields.nodeRole, season, env);
   if (!contributeMode) {
     return errorResponse("NOT_CONTRIBUTABLE", "This object is not accepting contributions.", 422);
   }
@@ -359,6 +381,74 @@ export async function handlePostGameContribute(
       200,
       { "Cache-Control": "no-store" }
     );
+  }
+
+  if (contributeMode === "capture") {
+    const faction = parseFaction(body.faction);
+    if (!faction) {
+      return errorResponse(
+        "MALFORMED_REQUEST",
+        "faction is required (red, blue, green, or yellow).",
+        400
+      );
+    }
+    const relayAction = parseRelayAction(body.action);
+
+    try {
+      const relayResult = await applyRelayContributeWithRetry(db, {
+        objectId: pathObjectId,
+        parentProfileId: pathProfileId,
+        faction,
+        action: relayAction,
+        now,
+        season,
+      });
+      if (!relayResult) {
+        return errorResponse("NOT_FOUND", "Child object not found.", 404);
+      }
+
+      return jsonResponse(
+        {
+          object_id: pathObjectId,
+          node_id: nodeId,
+          contribute_mode: relayResult.actionApplied,
+          held_by_faction: relayResult.heldByFaction,
+          held_until: relayResult.heldUntil,
+          relay_compromised: relayResult.overharvestTriggered,
+        },
+        200,
+        { "Cache-Control": "no-store" }
+      );
+    } catch (e) {
+      if (e instanceof Error) {
+        if (e.message === "RELAY_WRITE_CONFLICT") {
+          return errorResponse(
+            "RELAY_WRITE_CONFLICT",
+            "Relay update conflict under load. Try again.",
+            409
+          );
+        }
+        if (e.message === "RELAY_COMPROMISED") {
+          return errorResponse(
+            "RELAY_COMPROMISED",
+            "This relay is compromised — rekey before capture.",
+            409
+          );
+        }
+        if (e.message === "REINFORCE_FACTION_MISMATCH") {
+          return errorResponse(
+            "REINFORCE_FACTION_MISMATCH",
+            "Reinforce only works when your faction already holds this relay.",
+            409
+          );
+        }
+      }
+      throw e;
+    }
+  }
+
+  if (contributeMode !== "fragment") {
+    return errorResponse("NOT_CONTRIBUTABLE", "This object is not accepting contributions.", 422);
   }
 
   doc = markFragmentNodeClaimed(doc, nodeId);

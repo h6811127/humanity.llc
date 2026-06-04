@@ -13,7 +13,10 @@ export type SeasonContributeCode = {
   epoch: string;
 };
 
-export type SeasonNodeRow = NetworkGraphNode;
+export type SeasonNodeRow = NetworkGraphNode & {
+  node_class?: string;
+  faction?: string;
+};
 export type SeasonUnlockEdge = NetworkGraphEdge;
 export type SeasonAutomation = NetworkGraphAutomation;
 
@@ -67,6 +70,23 @@ function graphFor(season: CrSeasonConfig) {
   return networkGraphFromConfig(season);
 }
 
+export function seasonNodeRow(
+  nodeId: string,
+  season: CrSeasonConfig = CR_SEASON_01
+): SeasonNodeRow | undefined {
+  return season.nodes.find((row) => row.node_id === nodeId);
+}
+
+export function seasonNodePledgeFaction(
+  nodeId: string | null,
+  season: CrSeasonConfig = CR_SEASON_01
+): string | null {
+  if (!nodeId) return null;
+  const row = seasonNodeRow(nodeId, season);
+  const faction = row?.faction?.trim();
+  return faction || null;
+}
+
 export function seasonNodeIdForObject(
   objectId: string,
   season: CrSeasonConfig = CR_SEASON_01
@@ -108,6 +128,23 @@ export function seasonWitnessScarcityNodeId(season: CrSeasonConfig = CR_SEASON_0
 
 export function seasonContributableNodeIds(season: CrSeasonConfig = CR_SEASON_01): string[] {
   return graphFor(season).contributableNodeIds();
+}
+
+export function seasonRelayCaptureNodeIds(season: CrSeasonConfig = CR_SEASON_01): string[] {
+  return graphFor(season).relayCaptureNodeIds();
+}
+
+/** False at SW-S1 — relays flip via /game-operator/ only until mid-season. */
+export function seasonRelayCapturePlayerEnabled(
+  season: CrSeasonConfig = CR_SEASON_01,
+  env?: { CITY_GAME_RELAY_CAPTURE_PLAYER?: string }
+): boolean {
+  if (env?.CITY_GAME_RELAY_CAPTURE_PLAYER === "1") return true;
+  return graphFor(season).relayCapturePlayerEnabled();
+}
+
+export function seasonRelayDecayHours(season: CrSeasonConfig = CR_SEASON_01): number {
+  return graphFor(season).relayDecayHours();
 }
 
 export function seasonVouchTargetsFrom(

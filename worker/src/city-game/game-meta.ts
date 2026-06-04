@@ -5,6 +5,7 @@ import {
   GAME_SEASON_ID_RE,
   isGameNodeRole,
 } from "./constants";
+import { isGameFaction, isGameFactionHold } from "./factions";
 
 export type GameMeta = {
   visible_until: string | null;
@@ -16,6 +17,14 @@ export type GameMeta = {
   vouch_active_for: string[];
   scarcity_remaining: number | null;
   fragment_id: string | null;
+  /** Signal War — SW-03–SW-07 */
+  held_by_faction: string | null;
+  held_until: string | null;
+  points_per_hour: number | null;
+  artifact_id: string | null;
+  evolution_week: number | null;
+  overharvest_count: number | null;
+  overharvest_limit: number | null;
 };
 
 const ISO_RE =
@@ -101,6 +110,13 @@ export function normalizeGameMeta(raw: unknown): GameMeta {
       vouch_active_for: [],
       scarcity_remaining: null,
       fragment_id: null,
+      held_by_faction: null,
+      held_until: null,
+      points_per_hour: null,
+      artifact_id: null,
+      evolution_week: null,
+      overharvest_count: null,
+      overharvest_limit: null,
     };
   }
   if (!raw || typeof raw !== "object") {
@@ -110,6 +126,14 @@ export function normalizeGameMeta(raw: unknown): GameMeta {
   const visibleUntil = readOptionalString(obj, "visible_until", 40);
   if (visibleUntil !== null && !ISO_RE.test(visibleUntil)) {
     throw new Error("game_meta.visible_until must be ISO 8601 or null.");
+  }
+  const heldUntil = readOptionalString(obj, "held_until", 40);
+  if (heldUntil !== null && !ISO_RE.test(heldUntil)) {
+    throw new Error("game_meta.held_until must be ISO 8601 or null.");
+  }
+  const heldByFaction = readOptionalString(obj, "held_by_faction", 16);
+  if (heldByFaction !== null && !isGameFactionHold(heldByFaction)) {
+    throw new Error("game_meta.held_by_faction must be red, blue, green, yellow, neutral, or null.");
   }
   return {
     visible_until: visibleUntil,
@@ -121,6 +145,13 @@ export function normalizeGameMeta(raw: unknown): GameMeta {
     vouch_active_for: readStringArray(obj, "vouch_active_for", 8),
     scarcity_remaining: readOptionalInt(obj, "scarcity_remaining", 0, 10_000),
     fragment_id: readOptionalString(obj, "fragment_id", 40),
+    held_by_faction: heldByFaction,
+    held_until: heldUntil,
+    points_per_hour: readOptionalInt(obj, "points_per_hour", 0, 10_000),
+    artifact_id: readOptionalString(obj, "artifact_id", 40),
+    evolution_week: readOptionalInt(obj, "evolution_week", 1, 52),
+    overharvest_count: readOptionalInt(obj, "overharvest_count", 0, 1_000_000),
+    overharvest_limit: readOptionalInt(obj, "overharvest_limit", 1, 1_000_000),
   };
 }
 

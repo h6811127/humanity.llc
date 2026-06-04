@@ -356,7 +356,7 @@ describe("city game scan view", () => {
     expect(html).toContain("Contribute to quorum");
     expect(html).toContain("First scan here?");
     expect(html).toContain("not your personal score");
-    expect(html).toContain("scan-game-contribute.mjs?v=2");
+    expect(html).toContain("scan-game-contribute.mjs?v=3");
     expect(html).toContain('placeholder="CR-LANTERN-7K"');
   });
 
@@ -450,7 +450,7 @@ describe("city game scan view", () => {
       env: { CITY_GAME_ENABLED: "1" },
       now: SEASON_OPEN_NOW,
     });
-    expect(ctx?.coopHint).toContain("sanctuary");
+    expect(ctx?.coopHint).toMatch(/sanctuar/i);
   });
 
   it("shows vouch pending on cabinet until library witness vouches", async () => {
@@ -585,7 +585,7 @@ describe("city game scan view", () => {
     expect(htmlOpen).toContain('data-game-contribute-mode="scarcity"');
     expect(htmlOpen).toContain('data-season-id="cr_season_01_wake"');
     expect(htmlOpen).toContain('placeholder="CR-WITNS-4P"');
-    expect(htmlOpen).toContain("scan-game-contribute.mjs?v=2");
+    expect(htmlOpen).toContain("scan-game-contribute.mjs?v=3");
 
     const vmClosed = buildScanViewModel(
       PROFILE,
@@ -646,7 +646,7 @@ describe("city game scan view", () => {
       headers: { Host: "127.0.0.1:8787" },
     });
     const html = await renderScanPage(vm, "https://humanity.llc", undefined, localRequest);
-    expect(html).toContain("http://127.0.0.1:8788/js/scan-game-contribute.mjs?v=2");
+    expect(html).toContain("http://127.0.0.1:8788/js/scan-game-contribute.mjs?v=3");
     expect(html).not.toContain("https://humanity.llc/js/scan-game-contribute.mjs");
   });
 
@@ -683,7 +683,7 @@ describe("city game scan view", () => {
       SCAN_PAGES_JS_ORIGIN: "http://127.0.0.1:8788",
       SCAN_RESOLVER_ORIGIN: "http://127.0.0.1:8787",
     });
-    expect(html).toContain("http://127.0.0.1:8788/js/scan-game-contribute.mjs?v=2");
+    expect(html).toContain("http://127.0.0.1:8788/js/scan-game-contribute.mjs?v=3");
     expect(html).toContain('href="http://127.0.0.1:8787/');
     expect(html).not.toContain("https://humanity.llc/js/scan-game-contribute.mjs");
   });

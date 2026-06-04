@@ -19,6 +19,7 @@ import {
   type GameNodeScanMode,
 } from "./scan-view";
 import { seasonWindowChip, type SeasonWindowPhase } from "./season-window";
+import { factionControllerLabel, isGameFactionHold } from "./factions";
 import { fragmentLatticeProgress } from "./unlock-engine";
 
 export type MapNodeChip = {
@@ -199,6 +200,19 @@ export function buildMapNodeChips(
       kind: "faction",
       label: "Relay",
       value: "Compromised · rekey pending",
+    });
+  }
+
+  if (
+    row.role === "relay_gate" &&
+    meta.held_by_faction &&
+    isGameFactionHold(meta.held_by_faction) &&
+    meta.held_by_faction !== "neutral"
+  ) {
+    chips.push({
+      kind: "faction",
+      label: "Hold",
+      value: factionControllerLabel(meta.held_by_faction),
     });
   }
 

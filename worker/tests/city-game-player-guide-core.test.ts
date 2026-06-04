@@ -24,7 +24,8 @@ const exampleSeason = JSON.parse(
 describe("city-game-player-guide-core", () => {
   it("resolves Cedar Rapids player guide from season JSON", () => {
     const guide = resolvePlayerGuide(crSeason);
-    expect(guide.steps).toHaveLength(2);
+    expect(guide.steps).toHaveLength(4);
+    expect(guide.steps[2]?.title).toMatch(/Signal War/i);
     expect(guide.quorumSpot?.title).toBe("Riverwalk River Lantern");
     expect(guide.heroSubline).toContain("#city-state");
   });

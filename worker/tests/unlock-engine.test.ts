@@ -95,6 +95,13 @@ describe("unlock-engine", () => {
       gameNodeShowsContribute(
         { unlocked_by: [] } as never,
         "relay_gate",
+        "node_35"
+      )
+    ).toBe(false);
+    expect(
+      gameNodeShowsContribute(
+        { unlocked_by: [] } as never,
+        "relay_gate",
         "node_08"
       )
     ).toBe(false);
@@ -120,6 +127,32 @@ describe("unlock-engine", () => {
         "node_09",
         { unlocked_by: ["node_09"] } as never,
         "lore_archive"
+      )
+    ).toBe(null);
+  });
+
+  it("shows capture contribute on relay_capture nodes when player capture enabled", () => {
+    expect(
+      gameNodeContributeMode(
+        "node_05",
+        { held_by_faction: null } as never,
+        "relay_gate"
+      )
+    ).toBe(null);
+    expect(
+      gameNodeContributeMode(
+        "node_05",
+        { held_by_faction: null } as never,
+        "relay_gate",
+        undefined,
+        { CITY_GAME_RELAY_CAPTURE_PLAYER: "1" }
+      )
+    ).toBe("capture");
+    expect(
+      gameNodeContributeMode(
+        "node_05",
+        { compromised: true } as never,
+        "relay_gate"
       )
     ).toBe(null);
   });

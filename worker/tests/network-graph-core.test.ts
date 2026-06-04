@@ -33,10 +33,14 @@ describe("network-graph-core.mjs (script + worker shared)", () => {
     expect(contributableNodeIds(graphConfig)).toEqual([
       "node_01",
       "node_04",
+      "node_05",
       "node_09",
       "node_10",
       "node_11",
+      "node_15",
     ]);
+    // SW-S1: player relay capture off — node_05 stays in relay_capture_nodes for operator flips only.
+    expect(contributeModeForNode(graphConfig, "node_05")).toBeNull();
     expect(contributeModeForNode(graphConfig, "node_04")).toBe("quorum");
     expect(contributeModeForNode(graphConfig, "node_10")).toBe("scarcity");
   });

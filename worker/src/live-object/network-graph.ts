@@ -12,6 +12,9 @@ import {
   isUnlockEdgeSatisfied as isUnlockEdgeSatisfiedCore,
   publicUnlockEdges as publicUnlockEdgesCore,
   quorumNodeIds as quorumNodeIdsCore,
+  relayCaptureNodeIds as relayCaptureNodeIdsCore,
+  relayCapturePlayerEnabled as relayCapturePlayerEnabledCore,
+  relayDecayHours as relayDecayHoursCore,
   validateNetworkGraph as validateNetworkGraphCore,
   witnessScarcityNodeId as witnessScarcityNodeIdCore,
 } from "../../scripts/network-graph-core.mjs";
@@ -35,6 +38,12 @@ export type NetworkGraphAutomation = {
   fragment_nodes?: string[];
   finale_node?: string;
   witness_scarcity_node?: string;
+  /** Signal War relay capture (**SW-03**) */
+  relay_capture_nodes?: string[];
+  /** Player-initiated capture on relay_capture_nodes — false at **SW-S1** (operator flips only). */
+  relay_capture_player_enabled?: boolean;
+  /** Hours until relay hold decays (**SW-05**) */
+  relay_decay_hours?: number;
 };
 
 export type NetworkGraphConfig = {
@@ -104,13 +113,25 @@ export class NetworkGraph {
     return witnessScarcityNodeIdCore(this.config.automation) ?? "";
   }
 
+  relayCaptureNodeIds(): string[] {
+    return relayCaptureNodeIdsCore(this.config.automation);
+  }
+
+  relayCapturePlayerEnabled(): boolean {
+    return relayCapturePlayerEnabledCore(this.config.automation);
+  }
+
+  relayDecayHours(): number {
+    return relayDecayHoursCore(this.config.automation);
+  }
+
   contributableNodeIds(): string[] {
     return contributableNodeIdsCore(this.config);
   }
 
   contributeModeForNode(
     nodeId: string
-  ): "quorum" | "fragment" | "scarcity" | null {
+  ): "quorum" | "fragment" | "scarcity" | "capture" | "reinforce" | null {
     return contributeModeForNodeCore(this.config, nodeId);
   }
 }

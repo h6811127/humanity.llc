@@ -19,6 +19,8 @@ const collectiveProgressInput = document.getElementById("go-collective-progress"
 const collectiveTargetInput = document.getElementById("go-collective-target");
 const scarcityInput = document.getElementById("go-scarcity");
 const unlockedByInput = document.getElementById("go-unlocked-by");
+const heldFactionInput = document.getElementById("go-held-faction");
+const heldUntilInput = document.getElementById("go-held-until");
 const confirmInput = document.getElementById("go-confirm");
 const loadBtn = document.getElementById("go-load-objects");
 const submitBtn = document.getElementById("go-submit");
@@ -65,6 +67,12 @@ function readGameMetaFromForm() {
     vouch_requires: activeDraft?.game_meta?.vouch_requires ?? [],
     visible_until: activeDraft?.game_meta?.visible_until ?? null,
     fragment_id: activeDraft?.game_meta?.fragment_id ?? null,
+    held_by_faction: heldFactionInput?.value?.trim()
+      ? heldFactionInput.value.trim()
+      : activeDraft?.game_meta?.held_by_faction ?? null,
+    held_until: heldUntilInput?.value?.trim()
+      ? heldUntilInput.value.trim()
+      : activeDraft?.game_meta?.held_until ?? null,
   };
 }
 
@@ -90,6 +98,14 @@ function applyDraftToForm(draft) {
     unlockedByInput.value = Array.isArray(meta.unlocked_by)
       ? meta.unlocked_by.join(", ")
       : "";
+  }
+  if (heldFactionInput) {
+    heldFactionInput.value =
+      typeof meta.held_by_faction === "string" ? meta.held_by_faction : "";
+  }
+  if (heldUntilInput) {
+    heldUntilInput.value =
+      typeof meta.held_until === "string" ? meta.held_until : "";
   }
   updateSubmitState();
 }
@@ -202,6 +218,8 @@ objectSelect?.addEventListener("change", () => {
   collectiveTargetInput,
   scarcityInput,
   unlockedByInput,
+  heldFactionInput,
+  heldUntilInput,
 ].forEach((el) => el?.addEventListener("input", updateSubmitState));
 confirmInput?.addEventListener("change", updateSubmitState);
 loadBtn?.addEventListener("click", () => void loadGameNodes());

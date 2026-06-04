@@ -91,6 +91,27 @@ export function witnessScarcityNodeId(automation) {
   return typeof id === "string" && id.trim() ? id.trim() : null;
 }
 
+/** @param {import("../../worker/src/live-object/network-graph.ts").NetworkGraphAutomation | undefined} automation */
+export function relayCaptureNodeIds(automation) {
+  return Array.isArray(automation?.relay_capture_nodes)
+    ? [...automation.relay_capture_nodes]
+    : [];
+}
+
+/** When false, relay_capture_nodes are operator-flip only (**SW-S1**). Default true if unset. */
+export function relayCapturePlayerEnabled(automation) {
+  return automation?.relay_capture_player_enabled !== false;
+}
+
+/** @param {import("../../worker/src/live-object/network-graph.ts").NetworkGraphAutomation | undefined} automation */
+export function relayDecayHours(automation) {
+  const hours = automation?.relay_decay_hours;
+  if (typeof hours === "number" && Number.isFinite(hours) && hours > 0) {
+    return Math.min(Math.floor(hours), 24 * 14);
+  }
+  return 24;
+}
+
 /**
  * @param {import("../../worker/src/live-object/network-graph.ts").NetworkGraphConfig} config
  */
@@ -98,6 +119,7 @@ export function contributableNodeIds(config) {
   const ids = new Set([
     ...quorumNodeIds(config.automation),
     ...fragmentNodeIds(config.automation),
+    ...relayCaptureNodeIds(config.automation),
   ]);
   const scarcity = witnessScarcityNodeId(config.automation);
   if (scarcity) ids.add(scarcity);
@@ -107,7 +129,7 @@ export function contributableNodeIds(config) {
 /**
  * @param {import("../../worker/src/live-object/network-graph.ts").NetworkGraphConfig} config
  * @param {string} nodeId
- * @returns {"quorum" | "fragment" | "scarcity" | null}
+ * @returns {"quorum" | "fragment" | "scarcity" | "capture" | "reinforce" | null}
  */
 export function contributeModeForNode(config, nodeId) {
   const auto = config.automation;
@@ -115,6 +137,12 @@ export function contributeModeForNode(config, nodeId) {
   if (auto.quorum_nodes?.includes(nodeId)) return "quorum";
   if (auto.fragment_nodes?.includes(nodeId)) return "fragment";
   if (auto.witness_scarcity_node === nodeId) return "scarcity";
+  if (
+    relayCapturePlayerEnabled(auto) &&
+    auto.relay_capture_nodes?.includes(nodeId)
+  ) {
+    return "capture";
+  }
   return null;
 }
 

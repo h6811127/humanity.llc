@@ -3,6 +3,7 @@
  */
 
 import { seasonSlugFromRulesPath } from "./city-game-season-path-shared.mjs";
+import { resolveSignalWarGuideSteps } from "./city-game-signal-war-core.mjs";
 
 const DEFAULT_STEPS = [
   {
@@ -45,12 +46,14 @@ export function resolvePlayerGuide(season) {
     ? /** @type {Record<string, unknown>} */ (season.player_guide)
     : {};
 
-  const steps = Array.isArray(guide.steps) && guide.steps.length
+  const baseSteps = Array.isArray(guide.steps) && guide.steps.length
     ? guide.steps.map((row) => ({
         title: String(row.title ?? "").trim(),
         body: String(row.body ?? "").trim(),
       })).filter((row) => row.title && row.body)
     : DEFAULT_STEPS.map((row) => ({ ...row }));
+  const signalWarSteps = resolveSignalWarGuideSteps(season);
+  const steps = [...baseSteps, ...signalWarSteps];
 
   let quorumSpot = null;
   if (guide.quorum_spot && typeof guide.quorum_spot === "object") {

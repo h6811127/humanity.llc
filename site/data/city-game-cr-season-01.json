@@ -1,6 +1,6 @@
 {
   "season_id": "cr_season_01_wake",
-  "title": "Wake the city",
+  "title": "Wake the city · Signal War",
   "city": "Cedar Rapids, Iowa",
   "status": "active",
   "season_root_profile_id": "CEenC57QN9qqnr2x5L89cbWt",
@@ -44,7 +44,12 @@
   },
   "comprehension_kit": {
     "primary_scan_node": "node_04",
-    "probe_nodes": ["node_04", "node_07", "node_02", "node_14"],
+    "probe_nodes": [
+      "node_04",
+      "node_07",
+      "node_02",
+      "node_14"
+    ],
     "blurbs": {
       "node_04": "GT-1 / GT-2 — collective unlock + seed clue",
       "node_07": "GT-4 — cabinet trust path (no account)",
@@ -117,11 +122,46 @@
       }
     },
     "district_zones": [
-      { "id": "newbo", "x": 68, "y": 8, "w": 30, "h": 28, "label": "NewBo" },
-      { "id": "czech_village", "x": 4, "y": 28, "w": 32, "h": 30, "label": "Czech Village" },
-      { "id": "greene_square", "x": 26, "y": 58, "w": 24, "h": 22, "label": "Greene Square" },
-      { "id": "river_spine", "x": 36, "y": 42, "w": 28, "h": 32, "label": "River spine" },
-      { "id": "downtown", "x": 48, "y": 12, "w": 28, "h": 38, "label": "Downtown" }
+      {
+        "id": "newbo",
+        "x": 68,
+        "y": 8,
+        "w": 30,
+        "h": 28,
+        "label": "NewBo"
+      },
+      {
+        "id": "czech_village",
+        "x": 4,
+        "y": 28,
+        "w": 32,
+        "h": 30,
+        "label": "Czech Village"
+      },
+      {
+        "id": "greene_square",
+        "x": 26,
+        "y": 58,
+        "w": 24,
+        "h": 22,
+        "label": "Greene Square"
+      },
+      {
+        "id": "river_spine",
+        "x": 36,
+        "y": 42,
+        "w": 28,
+        "h": 32,
+        "label": "River spine"
+      },
+      {
+        "id": "downtown",
+        "x": 48,
+        "y": 12,
+        "w": 28,
+        "h": 38,
+        "label": "Downtown"
+      }
     ],
     "svg_title": "Schematic Cedar Rapids season nodes and unlock paths"
   },
@@ -185,7 +225,13 @@
       "node_01"
     ],
     "finale_node": "node_13",
-    "witness_scarcity_node": "node_10"
+    "witness_scarcity_node": "node_10",
+    "relay_capture_nodes": [
+      "node_05",
+      "node_15"
+    ],
+    "relay_capture_player_enabled": false,
+    "relay_decay_hours": 24
   },
   "bulletin_schedule": {
     "entries": [
@@ -457,5 +503,17 @@
       "district": "downtown",
       "label": "Downtown market steps"
     }
-  ]
+  ],
+  "signal_war": {
+    "player_guide": [
+      {
+        "title": "Signal War — faction contest",
+        "body": "Four teams contest relay holds on the public board. Sanctuaries and faction treaty walls are regroup zones — pledge there, no capture grinding."
+      },
+      {
+        "title": "Relays at season open",
+        "body": "Relay holds update from public object state the operators publish — not your personal scan count. Player capture on relays opens mid-season when the season enables it."
+      }
+    ]
+  }
 }

@@ -159,10 +159,10 @@ WS-E (Phase E /created/ setup — needs WS-REV entitlements UI)
 | **Blocks** | Broad **consumer / paying** launch positioning until **G-C1–G-C3** pass — WS-REV checkout copy should reference non-recoverable operator |
 | **File ownership (when coding)** | `create-card.mjs`, `device-wallet*.mjs`, `device-keys.mjs`, `device-quiet-tab-rehydrate*.mjs`, `scan-tab-keys.mjs`, `device-control-activation*.mjs`, `vouch-sign-lock.mjs`, new wrap module TBD, `device-ownership-copy-core.mjs` |
 | **Regression (existing — must not break full_keys)** | `npm run e2e:key-loss-sad-path` · `npm run e2e:safari-keys-persistence` · `npm run ownership-restore:verify` · `worker/tests/device-quiet-tab-rehydrate.test.ts` |
-| **Regression (TBD Phase 1+)** | `e2e:custody-device-unlock` · `worker:test:custody-wrap` — add when implemented |
+| **Regression (TBD Phase 1+)** | `npm run worker:test:custody-wrap` · `npm run worker:test:custody` · `e2e:custody-device-unlock` (TBD) |
 | **Regression (C0)** | `npm run custody:phase0-preflight` · `npm run custody:phase0-kit` · `worker/tests/custody-phase0-*.test.ts` |
 | **Human gate (C0-5/6)** | `npm run custody:phase0-kit` → ≥5 testers → `npm run custody:phase0-sign-off -- --pass --apply` |
-| **Status** | **C0 in progress** — engineering complete; **G-C0 human comprehension open** |
+| **Status** | **C1 MVP in progress** — wrap/enroll/unlock + create UI wired; **G-C0** human comprehension open · C2 mode-aware rehydrate partial |
 
 **Do not duplicate:** Safari P0–P2 mitigations (shipped) — WS-CUSTODY **extends**, not replaces, [`SAFARI_KEYS_CUSTODY.md`](SAFARI_KEYS_CUSTODY.md).
 
@@ -227,9 +227,9 @@ WS-CUSTODY C1+ only if G-C0 pass
 | **In scope** | Clone spine rows to full mix · `node_role` extensions in [`worker/src/city-game/constants.ts`](../worker/src/city-game/constants.ts) · `/created/` picker (with WS-E) · mint batches · **B7** + `city-game:install-qa-preflight` at **40** before `--apply` · mid/late waves + bulletin for new installs |
 | **Out of scope** | Signal War **L** logic (WS-SW) · Stripe · custody wrap · new investigation docs |
 | **Milestones** | **SC-1** registry + JSON ~40 rows · **SC-2** mint wave 1 + install map signed · **SC-3** mid wave (+10) · **SC-4** full ~60 · **SC-5** `verify:city-game` + launch preflight at each count |
-| **Regression** | `npm run city-game:scale-sc1` · `npm run verify:city-game` · `npm run city-game:verify-season -- --require-launch` · `npm run city-game:install-qa-preflight` |
+| **Regression** | `npm run city-game:scale-sc1` · `npm run city-game:scale-sc2` · `npm run verify:city-game` · `npm run city-game:verify-season -- --require-launch` · `npm run city-game:install-qa-preflight` |
 | **File ownership** | `site/data/city-game-cr-season-01.json` · `worker/src/city-game/constants.ts` · `worker/scripts/city-game-*mint*` · install map doc · season registry codegen |
-| **Status** | **SC-1 ☑ engineering** — 40-node registry in `city-game-cr-season-01.json` · `npm run city-game:scale-sc1` · **SC-2** mint wave 1 + install map QR (blocked on local/production seed) |
+| **Status** | **SC-1 ☑ engineering** — 40-node registry · **SC-2** `npm run city-game:scale-sc2` (exit 2 until mint + QR column) · M4 map dense sketch preview fix shipped |
 | **Blocked by** | Phase 1 launch sign-off; ops custody for production season root |
 
 **Honest default:** Committed **15-row JSON** remains CI/scaffold until SC-1 lands — do not market 40-node summer until SC-2 mint completes.
@@ -247,7 +247,7 @@ WS-CUSTODY C1+ only if G-C0 pass
 | **S1 honest default** | Signal War **copy + operator flips** ship at open; player-initiated **SW-03–SW-05** target **S2 L** unless B8 merges earlier — cooperative **CR-G01/G07** stays **L** at S1 |
 | **Regression** | `npm run verify:city-game` · `worker/tests/city-game-contribute*.test.ts` · `worker/tests/map-node-snapshot*.test.ts` · comprehension **GT-8–GT-10** when SW-S2 ships |
 | **File ownership** | `worker/src/city-game/game-contribute*.ts` · `season-snapshot*` / `map-node-snapshot.ts` · `site/js/city-game-*` · scan templates for `relay_gate` · [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) fog section |
-| **Status** | **SW-S1 not started** (doc ☑) · depends on SC-1 relay node IDs for SW-03 targets |
+| **Status** | **SW-S1 in progress** — unified rules copy, sanctuary pledge (device-local), operator relay hold flips, `relay_capture_player_enabled: false` at open (doc ☑) |
 | **Parallel with** | WS-SCALE (registry must list relay roles before capture **L**) |
 
 ---

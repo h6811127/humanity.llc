@@ -10,6 +10,7 @@ import {
 import {
   seasonContributeCode,
   seasonNodeIdForObject,
+  seasonNodePledgeFaction,
   type CrSeasonConfig,
 } from "./season-config";
 import { defaultSeason } from "./season-loader";
@@ -32,6 +33,9 @@ export type GameNodeScanContext = {
   district: string | null;
   gameMeta: GameMeta;
   coopHint: string | null;
+  /** Sanctuary / faction HQ — device-local pledge block (**SW-02**). */
+  showsPledge: boolean;
+  pledgeFaction: string | null;
   roleEyebrow: string;
   /** Voluntary site-code quorum block on scan (temp_drop collective nodes). */
   showsContribute: boolean;
@@ -57,6 +61,7 @@ const ROLE_LABELS: Record<string, string> = {
   relay_gate: "Relay · gate",
   lore_archive: "Lore archive",
   sanctuary: "Sanctuary",
+  faction_hq: "Faction HQ",
   temp_drop: "Temp drop",
   witness: "Witness seal",
   route_splitter: "Route splitter",
@@ -92,6 +97,22 @@ export const GAME_SCARCITY_CONTRIBUTE_LEAD =
 export const GAME_SCARCITY_CONTRIBUTE_SUBMIT_LABEL = "Claim sunset pass";
 export const GAME_SCARCITY_CONTRIBUTE_PROGRESS_LABEL = "Passes remaining";
 
+export const GAME_CAPTURE_CONTRIBUTE_EYEBROW = "Relay capture";
+export const GAME_CAPTURE_CONTRIBUTE_LEAD =
+  "Choose your faction and enter the site code from the sticker. Capture updates who holds this relay on the public board — not your personal score.";
+export const GAME_CAPTURE_CONTRIBUTE_SUBMIT_LABEL = "Capture relay";
+export const GAME_CAPTURE_REINFORCE_SUBMIT_LABEL = "Reinforce hold";
+export const GAME_CAPTURE_FACTION_LABEL = "Faction";
+export const GAME_CAPTURE_HELD_LABEL = "Relay hold";
+
+export const GAME_PLEDGE_EYEBROW = "Faction pledge";
+export const GAME_PLEDGE_LEAD =
+  "Pick a team for Signal War on this device only — not a scoreboard entry and not stored on the server.";
+export const GAME_PLEDGE_SUBMIT_LABEL = "Save faction on this device";
+export const GAME_PLEDGE_SAVED_LABEL = "Saved on this device";
+export const GAME_PLEDGE_PRIVACY_NOTE =
+  "Optional. Clears when you clear site data. Relays still flip from public object state — operators set holds at season open.";
+
 export const GAME_NODE_FORBIDDEN_COPY = [
   "leaderboard",
   "xp",
@@ -126,6 +147,7 @@ export function gameNodeContributeEyebrow(
   district: string | null
 ): string {
   if (mode === "scarcity") return GAME_SCARCITY_CONTRIBUTE_EYEBROW;
+  if (mode === "capture" || mode === "reinforce") return GAME_CAPTURE_CONTRIBUTE_EYEBROW;
   if (mode === "fragment") {
     const place = formatGameDistrict(district);
     return place !== "Cedar Rapids" ? `${place} fragment` : GAME_FRAGMENT_CONTRIBUTE_EYEBROW;
@@ -143,9 +165,28 @@ export function isGameNodeExpired(meta: GameMeta, now: Date): boolean {
   return Number.isFinite(t) && t < now.getTime();
 }
 
-export function gameNodeCoopHint(role: string, meta: GameMeta): string | null {
-  if (role === "sanctuary") {
-    return "Regroup here — sanctuary nodes do not capture or rank players.";
+export function gameNodeShowsPledge(role: string): boolean {
+  return role === "sanctuary" || role === "faction_hq";
+}
+
+export function sanctuaryPledgeCoopHint(
+  role: string,
+  faction: string | null | undefined
+): string {
+  if (role === "faction_hq" && faction) {
+    const team = faction.charAt(0).toUpperCase() + faction.slice(1);
+    return `${team} treaty zone — pledge your team here. No capture on sanctuaries.`;
+  }
+  return "Regroup and pledge a faction here — sanctuaries never capture or rank players.";
+}
+
+export function gameNodeCoopHint(
+  role: string,
+  meta: GameMeta,
+  pledgeFaction?: string | null
+): string | null {
+  if (gameNodeShowsPledge(role)) {
+    return sanctuaryPledgeCoopHint(role, pledgeFaction);
   }
   if (role === "temp_drop" && meta.collective_target != null) {
     if (isCollectiveQuorumComplete(meta)) {
@@ -166,6 +207,11 @@ export function gameNodeCoopHint(role: string, meta: GameMeta): string | null {
     return "Relay compromised — teams recover by public rekey, not by reading scan logs.";
   }
   if (role === "relay_gate") {
+    const hold = meta.held_by_faction;
+    if (hold && hold !== "neutral") {
+      const team = hold.charAt(0).toUpperCase() + hold.slice(1);
+      return `${team} holds this relay on the public board — revisit to reinforce when capture opens.`;
+    }
     return "Relay holds change public bulletins — no personal scoreboard.";
   }
   if (role === "care_loop") {
@@ -218,7 +264,11 @@ export function resolveGameNodeScanContext(input: {
   objectId?: string | null;
   documentJson: string | null | undefined;
   objectStreams: ObjectPublicStream[];
-  env: { CITY_GAME_ENABLED?: string; CITY_GAME_LOCAL_PLAY_OPEN?: string };
+  env: {
+    CITY_GAME_ENABLED?: string;
+    CITY_GAME_LOCAL_PLAY_OPEN?: string;
+    CITY_GAME_RELAY_CAPTURE_PLAYER?: string;
+  };
   vouchWitnesses?: Record<string, GameMeta>;
   season?: CrSeasonConfig;
   now?: Date;
@@ -247,22 +297,30 @@ export function resolveGameNodeScanContext(input: {
 
   const nodeId =
     input.objectId != null ? seasonNodeIdForObject(input.objectId, season) : null;
+  const pledgeFaction = seasonNodePledgeFaction(nodeId, season);
   const contributeMode = gameNodeContributeMode(
     nodeId,
     fields.gameMeta,
     fields.nodeRole,
-    season
+    season,
+    input.env
   );
   const showsContribute = contributeMode != null;
+  const showsPledge =
+    gameNodeShowsPledge(fields.nodeRole) && isSeasonContributeOpen(seasonWindowPhase, input.env);
   const vouchGate = resolveGameVouchGate(
     nodeId,
     fields.gameMeta,
     input.vouchWitnesses ?? {}
   );
+  const roleEyebrow = gameNodeRoleEyebrow(fields.nodeRole, fields.district);
 
   const withVouchGate = {
     ...base,
     vouchGate,
+    showsPledge: false,
+    pledgeFaction,
+    roleEyebrow,
   };
 
   if (!enabled) {
@@ -271,7 +329,6 @@ export function resolveGameNodeScanContext(input: {
       enabled: false,
       mode: "fallback",
       coopHint: null,
-      roleEyebrow: gameNodeRoleEyebrow(fields.nodeRole, fields.district),
     };
   }
 
@@ -280,8 +337,7 @@ export function resolveGameNodeScanContext(input: {
       ...withVouchGate,
       enabled: true,
       mode: "care_pause",
-      coopHint: gameNodeCoopHint(fields.nodeRole, fields.gameMeta),
-      roleEyebrow: gameNodeRoleEyebrow(fields.nodeRole, fields.district),
+      coopHint: gameNodeCoopHint(fields.nodeRole, fields.gameMeta, pledgeFaction),
     };
   }
 
@@ -291,7 +347,6 @@ export function resolveGameNodeScanContext(input: {
       enabled: true,
       mode: "dormant",
       coopHint: null,
-      roleEyebrow: gameNodeRoleEyebrow(fields.nodeRole, fields.district),
     };
   }
 
@@ -301,7 +356,6 @@ export function resolveGameNodeScanContext(input: {
       enabled: true,
       mode: "dormant",
       coopHint: null,
-      roleEyebrow: gameNodeRoleEyebrow(fields.nodeRole, fields.district),
     };
   }
 
@@ -311,7 +365,6 @@ export function resolveGameNodeScanContext(input: {
       enabled: true,
       mode: "dormant",
       coopHint: null,
-      roleEyebrow: gameNodeRoleEyebrow(fields.nodeRole, fields.district),
     };
   }
 
@@ -319,8 +372,8 @@ export function resolveGameNodeScanContext(input: {
     ...withVouchGate,
     enabled: true,
     mode: "game",
-    coopHint: gameNodeCoopHint(fields.nodeRole, fields.gameMeta),
-    roleEyebrow: gameNodeRoleEyebrow(fields.nodeRole, fields.district),
+    coopHint: gameNodeCoopHint(fields.nodeRole, fields.gameMeta, pledgeFaction),
+    showsPledge,
     showsContribute,
     contributeMode,
     contributeSiteCodePlaceholder: showsContribute

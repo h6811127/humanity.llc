@@ -594,4 +594,92 @@ describe("game-contribute", () => {
     expect(res.status).toBe(200);
     vi.restoreAllMocks();
   });
+
+  it("captures a relay for a faction (SW-03)", async () => {
+    const BRIDGE_OBJECT = "obj_cr_node_05_bridge";
+    const BRIDGE_QR = "qr_cr_node_05_bridge01";
+    const bridgeJson = JSON.stringify({
+      object_id: BRIDGE_OBJECT,
+      parent_profile_id: PROFILE,
+      object_type: "game_node",
+      public_label: "16th Avenue bridge",
+      public_state: "Neutral relay edge",
+      status: "active",
+      season_id: "cr_season_01_wake",
+      node_role: "relay_gate",
+      district: "river_spine",
+      object_streams: [
+        { id: "territory", class: "place", label: "Controller", value: "Unclaimed" },
+        { id: "relay", class: "route", label: "Relay status", value: "Open" },
+        { id: "care", class: "care", label: "Site", value: "Clear" },
+      ],
+      game_meta: {
+        visible_until: null,
+        compromised: false,
+        collective_progress: null,
+        collective_target: null,
+        unlocked_by: [],
+        vouch_requires: [],
+        scarcity_remaining: null,
+        fragment_id: null,
+        held_by_faction: null,
+        held_until: null,
+      },
+      created_at: CREATED,
+      updated_at: CREATED,
+    });
+
+    const db = new ContributeDb();
+    db.qr = {
+      ...db.qr,
+      qr_id: BRIDGE_QR,
+      object_id: BRIDGE_OBJECT,
+      payload: `https://humanity.llc/c/${PROFILE}?q=${BRIDGE_QR}`,
+    };
+    db.objects.set(BRIDGE_OBJECT, {
+      object_id: BRIDGE_OBJECT,
+      parent_profile_id: PROFILE,
+      object_type: "game_node",
+      public_label: "16th Avenue bridge",
+      public_state: "Neutral relay edge",
+      status: "active",
+      child_object_document_json: bridgeJson,
+      created_at: CREATED,
+      updated_at: CREATED,
+    });
+
+    const res = await handlePostGameContribute(
+      new Request("https://humanity.llc/.well-known/hc/v1/cards/x/objects/y/game-contribute", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "CF-Connecting-IP": "203.0.113.40" },
+        body: JSON.stringify({
+          qr_id: BRIDGE_QR,
+          site_code: "CR-BRIDGE-5B",
+          faction: "red",
+          action: "capture",
+        }),
+      }),
+      db as unknown as D1Database,
+      {
+        CITY_GAME_ENABLED: "1",
+        CITY_GAME_RELAY_CAPTURE_PLAYER: "1",
+      },
+      PROFILE,
+      BRIDGE_OBJECT
+    );
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      contribute_mode: string;
+      held_by_faction: string;
+      held_until: string;
+    };
+    expect(body.contribute_mode).toBe("capture");
+    expect(body.held_by_faction).toBe("red");
+    expect(body.held_until).toBeTruthy();
+
+    const bridge = db.objects.get(BRIDGE_OBJECT)!;
+    const bridgeDoc = JSON.parse(bridge.child_object_document_json);
+    expect(bridgeDoc.game_meta.held_by_faction).toBe("red");
+    expect(bridge.public_state).toContain("Red team");
+  });
 });

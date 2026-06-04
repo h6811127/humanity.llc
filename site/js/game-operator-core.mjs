@@ -24,6 +24,36 @@ export const GAME_OPERATOR_PRESETS = [
     public_state: "Relay restored — new bulletin live",
     game_meta: { compromised: false },
   },
+  {
+    id: "relay_red",
+    label: "Relay · Red holds",
+    public_state: "Red team holds the relay",
+    game_meta: { held_by_faction: "red" },
+  },
+  {
+    id: "relay_blue",
+    label: "Relay · Blue holds",
+    public_state: "Blue team holds the relay",
+    game_meta: { held_by_faction: "blue" },
+  },
+  {
+    id: "relay_green",
+    label: "Relay · Green holds",
+    public_state: "Green team holds the relay",
+    game_meta: { held_by_faction: "green" },
+  },
+  {
+    id: "relay_yellow",
+    label: "Relay · Yellow holds",
+    public_state: "Yellow team holds the relay",
+    game_meta: { held_by_faction: "yellow" },
+  },
+  {
+    id: "relay_neutral",
+    label: "Relay · Unclaimed",
+    public_state: "Relay dormant — unclaimed",
+    game_meta: { held_by_faction: "neutral", held_until: null },
+  },
 ];
 
 /**
