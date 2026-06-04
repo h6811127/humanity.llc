@@ -50,6 +50,7 @@ export function runCustodyC1PreflightChecks(root) {
   checks.push(checkQuietRehydrateDeviceUnlockGate(root));
   checks.push(checkCustodyMigrateModule(root));
   checks.push(checkCustodyReenrollModule(root));
+  checks.push(checkCustodySupportMacros(root));
   checks.push(checkPackageScripts(root));
   return checks;
 }
@@ -201,6 +202,28 @@ function checkCustodyReenrollModule(root) {
           : !reenrollLogic
             ? "Re-enroll core logic missing"
             : "Recovery import stale-wrap strip missing",
+  };
+}
+
+/**
+ * @param {string} root
+ */
+function checkCustodySupportMacros(root) {
+  const path = join(root, "docs/CUSTODY_SUPPORT_MACROS.md");
+  let text = "";
+  try {
+    text = readFileSync(path, "utf8");
+  } catch {
+    return { id: "custody-support-g-c4", ok: false, detail: "Missing CUSTODY_SUPPORT_MACROS.md" };
+  }
+  const ok =
+    text.includes("device_unlock") &&
+    text.includes("K11") &&
+    text.includes("Unlock to manage");
+  return {
+    id: "custody-support-g-c4",
+    ok,
+    detail: ok ? "G-C4 support macros doc present" : "Support macros doc incomplete",
   };
 }
 

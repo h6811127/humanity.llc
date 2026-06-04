@@ -1,6 +1,6 @@
 # Custody hybrid — device unlock (easy) + full keys (steward)
 
-**Status:** C1–C4 shipped (engineering) · synced passkey / P3-2 threat model TBD · **G-C4** support macros draft  
+**Status:** C1–C4 shipped (engineering) · P3-2 documented (not implemented) · **G-C4** support macros draft  
 **Audience:** Product, engineering, support, QA  
 **Related:** [`OWNERSHIP_AND_CONTROL_MODEL.md`](OWNERSHIP_AND_CONTROL_MODEL.md) · [`SAFARI_KEYS_CUSTODY.md`](SAFARI_KEYS_CUSTODY.md) · [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) · [`KEY_LOSS_SAD_PATH_MATRIX.md`](KEY_LOSS_SAD_PATH_MATRIX.md) · [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) · [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md) · [`DEVICE_LITE_MOBILE_PLAN.md`](DEVICE_LITE_MOBILE_PLAN.md) · [`STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md`](STEWARD_SCAN_HANDOFF_AND_PWA_VOUCH.md) · [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md) · [`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md)
 
@@ -233,6 +233,26 @@ Phase 4 — Cross-device easy mode (hard)
 | **G-C5** | Checkout / paid copy — non-recoverable operator | Legal + shop |
 
 **Do not** position broad consumer launch until **G-C1–G-C3** pass.
+
+---
+
+## P3-2 — encrypted persistence threat model (decision record)
+
+**Scope:** Optional storage of `wrapped_owner_key` outside the Safari ITP window (IndexedDB / durable storage consent) so passkey-wrapped rows survive longer on iOS.
+
+**Not shipped in v1.** Wrapped keys remain in `localStorage` (`hc_wallet`) like steward rows today. Recovery re-enroll (C4) is the supported cross-device path when passkey sync fails.
+
+| Threat | `localStorage` wrap (shipped) | Durable encrypted blob (P3-2 future) |
+|--------|------------------------------|--------------------------------------|
+| XSS on origin | Attacker JS can trigger WebAuthn if user approves; same class once session populated | Same — blob ciphertext useless without passkey; XSS can still phish unlock |
+| Physical device access | Passkey + biometrics gate unlock | Same |
+| iOS ITP / tab eviction | Wallet row may survive; session still per-tab | May reduce “wallet empty after 7d” reports — needs consent UX |
+| Operator custody | Never holds plaintext or wrap keys | Unchanged |
+| Wrong mental model | Users may think Apple backs up Humanity keys | **Higher** false confidence if marketed as “cloud backup” |
+
+**Ship criteria (future):** explicit user consent copy; no plaintext fallback; regression block in `npm run e2e:safari-keys-persistence`; legal review of persistence claims; must not replace recovery mandatory gate.
+
+**Synced passkey:** Vendor-opaque (iCloud Keychain / Google Password Manager). Product treats as best-effort convenience only — [`KEY_LOSS_SAD_PATH_MATRIX.md`](KEY_LOSS_SAD_PATH_MATRIX.md) **K11** recovery path is canonical.
 
 ---
 

@@ -39,7 +39,7 @@ This matrix inventories unhappy custody paths, expected UX, and automated regres
 | **K8** | PWA vs Safari tab | Standalone vs browser session | [`PWA_INSTALL.md`](PWA_INSTALL.md) semantics | `e2e/device-pwa-install.spec.ts` | P1-PWA |
 | **K9** | Camera → Safari, keys in PWA | Steward scans print with Camera app | S1 handoff copy + hub Open scan link; **S3** in-app scanner | `npm run worker:test:steward-scan-handoff` | **P1-PWA-V** in [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) |
 | **K10** | device_unlock — WebAuthn canceled | Scan/shell with wrapped row, user dismisses Face ID | **Unlock to manage** retry; no silent fail to view-only without explanation | TBD `e2e:custody-device-unlock` | Comprehension: cancel ≠ wipe |
-| **K11** | device_unlock — passkey lost (no sync) | New phone, no iCloud/Google passkey | Recovery import strips stale wrap → import backup → re-enroll passkey on Manage | `worker/tests/device-custody-reenroll-core.test.ts` · `device-hub-import-recovery-core.test.ts` | **G-C2** gate |
+| **K11** | device_unlock — passkey lost (no sync) | New phone, no iCloud/Google passkey | Recovery import strips stale wrap → import backup → re-enroll passkey on Manage | `e2e:custody-device-unlock` (K11 block) · `device-custody-reenroll-core.test.ts` | **G-C2** gate |
 | **K12** | device_unlock — WebAuthn unavailable | In-app browser or desktop without platform auth | Fallback create as **full_keys** with honest copy | TBD | Environment matrix |
 | **K13** | Skipped recovery on easy path | User skipped Protect; passkey sync failed later | Same as K11 — card may be unmanageable; **block at create** when C0/C1 ships | Policy + gate tests | Worse sad path if recovery optional |
 

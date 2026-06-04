@@ -21,7 +21,7 @@ import {
   inboxAriaOwnershipNotSaved,
 } from "./device-ownership-copy-core.mjs";
 import { shellSurfaceFromStandalone } from "./device-shell-copy-core.mjs";
-import { dotOverlayFromCounts } from "./device-dot-state-core.mjs?v=87";
+import { dotOverlayFromCounts } from "./device-dot-state-core.mjs?v=88";
 import { liveProofInboxAggregateTitle, liveProofInboxRowSubtitle } from "./device-live-control-inbox-core.mjs";
 
 /** @typedef {'live_proof' | 'tab_keys_unsaved' | 'cross_tab_keys' | 'other_tabs_unsaved_keys' | 'orphan_keys_removed' | 'card_disabled_since_visit'} InboxKind */

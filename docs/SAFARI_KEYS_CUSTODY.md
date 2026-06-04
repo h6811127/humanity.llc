@@ -169,9 +169,9 @@ Canonical planning spec: [`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md) · works
 
 | Item | Notes | Phase |
 |------|-------|-------|
-| **P3-1 / device_unlock** | WebAuthn-wrapped owner keys; no plaintext in `hc_wallet`; unlock → `hc_created` | C1 — extends D6 (gate-only today) |
-| **P3-2** | Optional encrypted persistence outside ITP window (consent + threat model) | C4 |
-| **Mode-aware rehydrate** | `device_unlock`: WebAuthn prompt; `full_keys`: current D10 | C2 |
+| **P3-1 / device_unlock** | WebAuthn-wrapped owner keys; no plaintext in `hc_wallet`; unlock → `hc_created` | **C1 shipped** |
+| **P3-2** | Optional encrypted persistence outside ITP window (consent + threat model) | **Documented** — not implemented; see [`CUSTODY_EASY_MODE.md`](CUSTODY_EASY_MODE.md) § P3-2 |
+| **Mode-aware rehydrate** | `device_unlock`: WebAuthn prompt; `full_keys`: current D10 | **C2 shipped** |
 
 **Shipped foundation (not vault):** D6 optional WebAuthn **sign-lock** before copying **plaintext** keys (`vouch-sign-lock.mjs`) — different from wrapped custody.
 

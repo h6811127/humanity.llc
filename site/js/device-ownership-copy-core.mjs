@@ -3,7 +3,7 @@
  * @see docs/PRODUCT_LANGUAGE_STRATEGY.md
  * @see docs/OWNERSHIP_AND_CONTROL_MODEL.md § Terminology map · D7 · D9g
  */
-import { walletEntryNeedsDeviceUnlock } from "./device-custody-mode-core.mjs";
+import { walletEntryNeedsDeviceUnlock } from "./device-custody-mode-core.mjs?v=88";
 import {
   inboxAriaManagingInOtherContext,
   inboxAriaOrphanManagingElsewhere,

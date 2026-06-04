@@ -3,16 +3,27 @@
  * @see docs/SCAN_PAGE_TRUST_UI.md
  * @see docs/SAFARI_KEYS_CUSTODY.md P1-2 step 2
  */
+import {
+  savedControlNeedsDeviceUnlockCopy,
+  savedControlNeedsDeviceUnlockReenrollCopy,
+} from "./device-custody-mode-core.mjs";
 import { getTabSession } from "./device-keys.mjs";
 import {
   OWNERSHIP_NOT_IN_TAB_PROMPT,
   RESTORE_CONTROL_HERE,
   RESTORE_CONTROL_IN_THIS_APP,
+  DEVICE_UNLOCK_REENROLL_ON_SCAN,
+  DEVICE_UNLOCK_REENROLL_PROMPT,
+  UNLOCK_TO_MANAGE_HERE,
+  UNLOCK_TO_MANAGE_IN_THIS_APP,
+  UNLOCK_TO_MANAGE_PROMPT,
 } from "./device-ownership-copy-core.mjs";
 import { walletOwnershipNotInTab } from "./device-ownership-not-in-tab-core.mjs";
 import { gatherPwaSessionMismatch } from "./device-pwa-session-mismatch.mjs";
 import { activateRestoreControlInThisTab } from "./device-ownership-restore-in-tab.mjs";
-import { getWalletCount, loadWalletSummary } from "./device-wallet.mjs";
+import { openHubFromChrome } from "./device-status-core.mjs";
+import { scrollToHubImportForm } from "./device-wallet-corrupt-core.mjs";
+import { getWalletCount, loadWallet, loadWalletSummary } from "./device-wallet.mjs";
 import { getDefaultVouchProfileId } from "./vouch-ready-keys.mjs";
 import {
   SCAN_ACTOR_BAND_REVEAL_MS,
@@ -79,16 +90,33 @@ function syncActorBandCopy() {
 
   if (walletNotInTab) {
     const pwaMismatch = gatherPwaSessionMismatch();
+    const { profileId } = scanContext();
+    const needsReenroll = savedControlNeedsDeviceUnlockReenrollCopy(loadWallet(), profileId);
+    const needsUnlock = savedControlNeedsDeviceUnlockCopy(loadWallet(), profileId);
     root.classList.add("scan-actor-band--restore-prompt");
     if (title) title.textContent = "Ownership on this device";
     if (lead) {
-      lead.textContent = pwaMismatch?.detail ?? OWNERSHIP_NOT_IN_TAB_PROMPT;
+      lead.textContent =
+        pwaMismatch?.detail ??
+        (needsReenroll
+          ? DEVICE_UNLOCK_REENROLL_PROMPT
+          : needsUnlock
+            ? UNLOCK_TO_MANAGE_PROMPT
+            : OWNERSHIP_NOT_IN_TAB_PROMPT);
     }
     if (restoreBtn) {
       restoreBtn.hidden = Boolean(pwaMismatch && !pwaMismatch.canRestoreInThisTab);
-      restoreBtn.textContent = pwaMismatch?.canRestoreInThisTab
-        ? RESTORE_CONTROL_IN_THIS_APP
-        : RESTORE_CONTROL_HERE;
+      if (needsReenroll) {
+        restoreBtn.textContent = DEVICE_UNLOCK_REENROLL_ON_SCAN;
+      } else if (pwaMismatch?.canRestoreInThisTab) {
+        restoreBtn.textContent = needsUnlock
+          ? UNLOCK_TO_MANAGE_IN_THIS_APP
+          : RESTORE_CONTROL_IN_THIS_APP;
+      } else {
+        restoreBtn.textContent = needsUnlock
+          ? UNLOCK_TO_MANAGE_HERE
+          : RESTORE_CONTROL_HERE;
+      }
     }
     if (vouchBtn) vouchBtn.hidden = true;
     return;
@@ -124,6 +152,12 @@ function bindActions() {
     scrollToVouch();
   });
   root.querySelector("#scan-actor-band-restore")?.addEventListener("click", () => {
+    const { profileId } = scanContext();
+    if (savedControlNeedsDeviceUnlockReenrollCopy(loadWallet(), profileId)) {
+      openHubFromChrome();
+      scrollToHubImportForm();
+      return;
+    }
     void activateRestoreControlInThisTab({ afterActivate: scrollToVouch });
   });
 }

@@ -2,7 +2,7 @@
  * Floating status dot, notification badge, hub sheet host.
  * @see docs/STATUS_INDICATOR_STEWARD_GREEN.md
  */
-import { closeInboxSheet, openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=87";
+import { closeInboxSheet, openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=88";
 import {
   shellSurfaceFromStandalone,
   statusKeyCrossTabLine,
@@ -21,6 +21,10 @@ import { setResolverHealthStatusForSinceVisit } from "./device-wallet-since-visi
 
 export const RESOLVER_HEALTH_CHANGED = "hc-resolver-health-changed";
 import { ensureQuietTabRehydrateBootstrap } from "./device-quiet-tab-rehydrate-bootstrap.mjs";
+import {
+  savedControlNeedsDeviceUnlockCopy,
+  savedControlNeedsDeviceUnlockReenrollCopy,
+} from "./device-custody-mode-core.mjs?v=88";
 import { scheduleStoragePersistRequest } from "./device-storage-persist.mjs";
 import { resolverApiOrigin } from "./hc-sign.mjs";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
@@ -35,7 +39,7 @@ import {
   getInboxDotOverlay,
   notificationCount,
   preloadInboxModule,
-} from "./device-inbox-loader.mjs?v=87";
+} from "./device-inbox-loader.mjs?v=88";
 import {
   inboxBadgeAriaLabel,
   inboxBadgeTitle,
@@ -44,29 +48,29 @@ import {
   inboxBadgeChromaKind,
   inboxBadgeCountText,
   inboxCountFromItems,
-} from "./device-inbox-core.mjs?v=87";
+} from "./device-inbox-core.mjs?v=88";
 import { closeGlancePopover, isGlancePopoverOpen } from "./device-hub-glance-popover.mjs";
 import {
   initHubIntroCoachmark,
   onHubOpenedFromIntro,
 } from "./device-hub-intro-coachmark.mjs";
 import { logDotDiagnostic } from "./device-dot-diagnostics.mjs";
-import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=87";
+import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=88";
 import {
   NETWORK_BASELINE_CHANGED,
   NETWORK_REFRESHED,
-} from "./device-wallet-network.mjs?v=87";
+} from "./device-wallet-network.mjs?v=88";
 import "./device-shell-motion.mjs";
-import "./device-shell-chrome.mjs?v=87";
+import "./device-shell-chrome.mjs?v=88";
 import "./device-theme.mjs";
-import { initBrowserNotifications } from "./device-browser-notifications-loader.mjs?v=87";
-import { reconcileHubSheetState } from "./device-hub-sheet-loader.mjs?v=87";
+import { initBrowserNotifications } from "./device-browser-notifications-loader.mjs?v=88";
+import { reconcileHubSheetState } from "./device-hub-sheet-loader.mjs?v=88";
 import { startCrossTabNotificationState } from "./device-cross-tab-state.mjs";
 import {
   refreshDeviceChrome,
   setRefreshStatusSurfaces,
   startDeviceChromeRefresh,
-} from "./device-chrome-refresh.mjs?v=87";
+} from "./device-chrome-refresh.mjs?v=88";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
 import {
   broadcastHealthSnapshotIfEligible,
@@ -89,10 +93,11 @@ import {
   shellDotUsesNeutralEmptyWallet,
   shouldCelebrateStewardTransition,
   statusAriaLabel,
-} from "./device-dot-state-core.mjs?v=87";
+} from "./device-dot-state-core.mjs?v=88";
 import {
   markResolverHealthBootSettled,
 } from "./device-resolver-health-boot-core.mjs";
+import { scrollToHubImportForm } from "./device-wallet-corrupt-core.mjs";
 import {
   DOT_STATE_CHANGED,
   getNetworkStatus,
@@ -102,7 +107,7 @@ import {
   setHubExpandedHook,
   setHubExpanded as setHubExpandedCore,
   setNetworkStatus,
-} from "./device-status-core.mjs?v=87";
+} from "./device-status-core.mjs?v=88";
 import {
   markDotBootstrapSettled,
   markDotBootReadyIfSettled,
@@ -201,12 +206,21 @@ function shellDotSigningContext() {
   const session = getTabSession();
   const hasTabSigningKeys = Boolean(session?.owner_private_key_b58);
   const summary = loadWalletSummary();
+  const wallet = loadWallet();
   return {
     walletKeysNotInTab: scanWalletKeysNotInTab(
       summary.signingKeyCount,
       hasTabSigningKeys
     ),
     signingKeyCount: summary.signingKeyCount,
+    walletNeedsDeviceUnlock: savedControlNeedsDeviceUnlockCopy(
+      wallet,
+      session?.profile_id ?? null
+    ),
+    walletNeedsDeviceUnlockReenroll: savedControlNeedsDeviceUnlockReenrollCopy(
+      wallet,
+      session?.profile_id ?? null
+    ),
   };
 }
 
@@ -382,6 +396,8 @@ function renderDotExplainability(network, device, overlay) {
     pageKind: dotPageKind(),
     singleSavedCardWithKeys: signing.signingKeyCount === 1,
     walletKeysNotInTab: signing.walletKeysNotInTab,
+    walletNeedsDeviceUnlock: signing.walletNeedsDeviceUnlock,
+    walletNeedsDeviceUnlockReenroll: signing.walletNeedsDeviceUnlockReenroll,
   });
   const keyRoot = document.getElementById("device-hub-status-key");
   if (keyRoot) {
@@ -691,6 +707,11 @@ document.addEventListener("click", (e) => {
   }
   if (action === "open_controls") {
     openHubFromChrome();
+    return;
+  }
+  if (action === "import_backup") {
+    openHubFromChrome();
+    scrollToHubImportForm();
     return;
   }
   if (action === "open_card_controls") {
