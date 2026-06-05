@@ -15,10 +15,15 @@ async function wireShellHealth(page: import("@playwright/test").Page) {
   );
 }
 
+async function openCreateFormPanel(page: import("@playwright/test").Page) {
+  await page.goto("/create/?intent=general", { waitUntil: "domcontentloaded" });
+  await expect(page.locator("#create-form-panel")).toBeVisible({ timeout: 15_000 });
+}
+
 test.describe("create custody organizer Face ID callout", () => {
   test("shows callout when organizer revoke is enabled", async ({ page }) => {
     await wireShellHealth(page);
-    await page.goto("/create/", { waitUntil: "domcontentloaded" });
+    await openCreateFormPanel(page);
 
     const callout = page.locator("#create-custody-organizer-callout");
     await expect(callout).toBeHidden({ timeout: 15_000 });
@@ -41,7 +46,7 @@ test.describe("create custody organizer Face ID callout", () => {
 
   test("callout action opens organizer setting", async ({ page }) => {
     await wireShellHealth(page);
-    await page.goto("/create/", { waitUntil: "domcontentloaded" });
+    await openCreateFormPanel(page);
 
     await page.locator("#create-organizer-details summary").click();
     await page.locator("#enable-organizer-revoke").check();

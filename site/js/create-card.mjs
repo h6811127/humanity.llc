@@ -347,7 +347,11 @@ function syncCreateCustodyModeUi(opts = {}) {
   }
   if (fullRadio instanceof HTMLInputElement && panel.forceFullKeysRadio) {
     fullRadio.checked = true;
-  } else if (deviceRadio instanceof HTMLInputElement && panel.preferDeviceRadio) {
+  } else if (
+    deviceRadio instanceof HTMLInputElement &&
+    panel.preferDeviceRadio &&
+    !(fullRadio instanceof HTMLInputElement && fullRadio.checked)
+  ) {
     deviceRadio.checked = true;
   }
 

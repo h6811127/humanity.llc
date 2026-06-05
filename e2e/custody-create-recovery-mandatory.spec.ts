@@ -17,10 +17,15 @@ async function wireShellHealth(page: import("@playwright/test").Page) {
   );
 }
 
+async function openCreateFormPanel(page: import("@playwright/test").Page) {
+  await page.goto("/create/?intent=general", { waitUntil: "domcontentloaded" });
+  await expect(page.locator("#create-form-panel")).toBeVisible({ timeout: 15_000 });
+}
+
 test.describe("create recovery mandatory for device_unlock (G-C2 · K13)", () => {
   test("locks recovery checkbox when This device is selected", async ({ page }) => {
     await wireShellHealth(page);
-    await page.goto("/create/", { waitUntil: "domcontentloaded" });
+    await openCreateFormPanel(page);
 
     const deviceRadio = page.locator('input[name="custody_mode"][value="device_unlock"]');
     const recoveryCb = page.locator("#generate-recovery");
@@ -30,21 +35,15 @@ test.describe("create recovery mandatory for device_unlock (G-C2 · K13)", () =>
     await expect(recoveryCb).toBeDisabled();
     await expect(page.locator("#create-recovery-label")).toContainText(/required/i);
     await expect(page.locator("#create-recovery-hint")).toContainText(
-      /not backed up by humanity/i
+      /not stored by humanity/i
     );
   });
 
   test("allows optional recovery when full control keys selected", async ({ page }) => {
     await wireShellHealth(page);
-    await page.goto("/create/", { waitUntil: "domcontentloaded" });
+    await openCreateFormPanel(page);
 
-    await page.evaluate(() => {
-      const full = document.querySelector('input[name="custody_mode"][value="full_keys"]');
-      if (full instanceof HTMLInputElement) {
-        full.checked = true;
-        full.dispatchEvent(new Event("change", { bubbles: true }));
-      }
-    });
+    await page.locator('input[name="custody_mode"][value="full_keys"]').check();
 
     const fullRadio = page.locator('input[name="custody_mode"][value="full_keys"]');
     await expect(fullRadio).toBeChecked({ timeout: 15_000 });
