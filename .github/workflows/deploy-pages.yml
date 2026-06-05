@@ -10,6 +10,9 @@ on:
       - "package.json"
       - "worker/tests/landing-*.test.ts"
       - "worker/scripts/verify-landing-copy.mjs"
+      - "worker/scripts/ci-production-fetch.mjs"
+      - "worker/tests/ci-production-fetch.test.ts"
+      - "docs/CLOUDFLARE_CI_SECRETS.md"
       - "e2e/landing-copy.spec.ts"
       - ".github/workflows/deploy-pages.yml"
 
@@ -35,7 +38,11 @@ jobs:
         run: npm run verify:landing:production
         env:
           SITE_ORIGIN: https://humanity.llc
+          HC_CI_PAGES_ORIGIN: https://humanity-llc.pages.dev
+          HC_CI_VERIFY_SECRET: ${{ secrets.HC_CI_VERIFY_SECRET }}
       - name: Post-deploy merch funnel verify (step 2)
         run: npm run merch-funnel:rollout:post-deploy -- --pages
         env:
           SITE_ORIGIN: https://humanity.llc
+          HC_CI_PAGES_ORIGIN: https://humanity-llc.pages.dev
+          HC_CI_VERIFY_SECRET: ${{ secrets.HC_CI_VERIFY_SECRET }}

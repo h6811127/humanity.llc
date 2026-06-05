@@ -17,6 +17,7 @@ import {
   LANDING_FORBIDDEN_SNIPPETS,
   LANDING_REQUIRED_SNIPPETS,
 } from "../../site/js/landing-copy-contract.mjs";
+import { fetchCiProductionUrl } from "./ci-production-fetch.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const production = process.argv.includes("--production");
@@ -61,15 +62,16 @@ if (!production) {
 }
 
 console.log(`\n▶ Production HTML check: ${siteOrigin}/`);
-const res = await fetch(`${siteOrigin}/`, {
-  headers: { Accept: "text/html" },
-  redirect: "follow",
+const { res, text: html, url: fetchedUrl } = await fetchCiProductionUrl("/", {
+  accept: "text/html",
 });
 if (!res.ok) {
-  console.error(`✗ GET / failed: ${res.status} ${res.statusText}`);
+  console.error(`✗ GET / failed: ${res.status} ${res.statusText} (${fetchedUrl})`);
   process.exit(1);
 }
-const html = await res.text();
+if (fetchedUrl !== `${siteOrigin}/`) {
+  console.log(`  fetched: ${fetchedUrl}`);
+}
 
 let failed = false;
 for (const snippet of LANDING_REQUIRED_SNIPPETS) {

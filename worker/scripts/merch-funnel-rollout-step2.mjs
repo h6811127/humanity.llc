@@ -19,6 +19,7 @@ import {
   compareShopConfigDrift,
   validateShopConfig,
 } from "../../site/js/shop-config-rollout-core.mjs";
+import { fetchCiProductionUrl } from "./ci-production-fetch.mjs";
 import { runMerchRolloutPreflightVitest } from "./merch-funnel-rollout-preflight.mjs";
 import { smokeShopGlitchProductPage } from "./merch-rollout-shop-pdp-smoke.mjs";
 
@@ -80,11 +81,15 @@ function runPreflight() {
 async function fetchDeployedConfig() {
   const url = `${siteOrigin}/data/shop-config.json`;
   console.log(`\n▶ Fetch deployed config (${url})`);
-  const res = await fetch(url, { headers: { Accept: "application/json" } });
-  const text = await res.text();
+  const { res, text, url: fetchedUrl } = await fetchCiProductionUrl("/data/shop-config.json", {
+    accept: "application/json",
+  });
   if (!res.ok) {
-    console.error(`shop-config fetch failed (${res.status}): ${text.slice(0, 300)}`);
+    console.error(`shop-config fetch failed (${res.status}) at ${fetchedUrl}: ${text.slice(0, 300)}`);
     process.exit(1);
+  }
+  if (fetchedUrl !== url) {
+    console.log(`  fetched: ${fetchedUrl}`);
   }
   try {
     return JSON.parse(text);

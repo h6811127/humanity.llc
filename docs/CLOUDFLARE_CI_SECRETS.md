@@ -46,6 +46,32 @@ Local deploy still requires `CLOUDFLARE_API_TOKEN` in the environment — not ne
 
 ---
 
+## Post-deploy verify (WAF / GitHub Actions)
+
+**Symptom:** `Deploy Pages` uploads succeed but **Post-deploy landing copy verify** fails with `GET / failed: 403 Forbidden` from GitHub Actions. Local `curl https://humanity.llc/` returns 200.
+
+**Cause:** Cloudflare bot management / WAF on the custom domain blocks datacenter IPs (GitHub Actions runners).
+
+**CI behavior (code):** Post-deploy scripts use `worker/scripts/ci-production-fetch.mjs`:
+
+1. `User-Agent: humanity-llc-ci-deploy-verify/1`
+2. Optional header `X-HC-Deploy-Verify: <secret>` when `HC_CI_VERIFY_SECRET` is set in GitHub Actions secrets
+3. Fallback to `HC_CI_PAGES_ORIGIN` (`https://humanity-llc.pages.dev`) when the custom domain returns 403
+
+The Pages preview host serves the same static deploy and is not subject to the same custom-domain bot rules.
+
+### Optional: verify humanity.llc directly from CI
+
+1. Generate a long random secret; add **`HC_CI_VERIFY_SECRET`** in GitHub → Settings → Secrets → Actions.
+2. In Cloudflare → **Security** → **WAF** → **Custom rules**, add a **Skip** rule (evaluate first):
+
+   - **Expression:** `(http.request.headers["x-hc-deploy-verify"][0] eq "<your-secret>")`
+   - **Action:** Skip all remaining custom rules (or Skip → Bot Fight Mode / Super Bot Fight Mode as needed)
+
+3. Re-run **Deploy Pages** — verify should hit `humanity.llc` without fallback warning.
+
+---
+
 ## Related
 
 - Investigation history: [`archive/GITHUB_CI_FAILURE_INVESTIGATION.md`](archive/GITHUB_CI_FAILURE_INVESTIGATION.md)
