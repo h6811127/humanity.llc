@@ -12,7 +12,7 @@ import { fileURLToPath } from "node:url";
 
 import { assessInstallMapReady, INSTALL_MAP_REL } from "./city-game-install-map-core.mjs";
 import { cityGameSeasonReadiness } from "./city-game-season-readiness.mjs";
-import { validateSummerOpenFootprint } from "./city-game-summer-scale-core.mjs";
+import { validateSeasonFootprintFromRegistry } from "./city-game-summer-scale-core.mjs";
 import { INSTALL_QA_REQUIRED_NODE_COUNT } from "./city-game-smoke-local-core.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
@@ -22,7 +22,7 @@ const localSeedPath = join(root, "worker/.local/city-game-seed.json");
 
 function main() {
   const season = JSON.parse(readFileSync(seasonPath, "utf8"));
-  const scale = validateSummerOpenFootprint(season);
+  const scale = validateSeasonFootprintFromRegistry(season);
   const readiness = cityGameSeasonReadiness(season, { requireLaunch: false });
   const installMapDoc = readFileSync(installMapPath, "utf8");
   /** @type {{ nodes?: Array<{ node_id?: string; scan_url?: string; local_scan_url?: string }> } | null} */

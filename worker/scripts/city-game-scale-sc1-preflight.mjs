@@ -11,7 +11,7 @@ import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 
 import { cityGameSeasonReadiness } from "./city-game-season-readiness.mjs";
-import { validateSummerOpenFootprint } from "./city-game-summer-scale-core.mjs";
+import { validateSeasonFootprintFromRegistry } from "./city-game-summer-scale-core.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const seasonPath = join(root, "site/data/city-game-cr-season-01.json");
@@ -41,7 +41,7 @@ function main() {
   }
 
   season = JSON.parse(readFileSync(seasonPath, "utf8"));
-  const scale = validateSummerOpenFootprint(season);
+  const scale = validateSeasonFootprintFromRegistry(season);
   const readiness = cityGameSeasonReadiness(season, { requireLaunch: false });
 
   console.log("\nWS-SCALE SC-1 — summer-open footprint");

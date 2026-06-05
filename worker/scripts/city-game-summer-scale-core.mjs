@@ -179,3 +179,18 @@ export function validatePilotFootprint(season) {
 export function validateSummerWaveOpenFootprint(season) {
   return validateSummerOpenFootprint(season, SUMMER_WAVE_OPEN_NODE_COUNT);
 }
+
+/**
+ * Preflight helper — pick pilot (15) vs wave-open (40) validator from registry length.
+ * @param {Record<string, unknown>} season
+ */
+export function validateSeasonFootprintFromRegistry(season) {
+  const count = Array.isArray(season.nodes) ? season.nodes.length : 0;
+  if (count === SUMMER_WAVE_OPEN_NODE_COUNT) {
+    return validateSummerWaveOpenFootprint(season);
+  }
+  if (count === SUMMER_OPEN_NODE_COUNT) {
+    return validatePilotFootprint(season);
+  }
+  return validateSummerOpenFootprint(season, count);
+}

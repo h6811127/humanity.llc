@@ -9,6 +9,7 @@ import {
   SUMMER_OPEN_NODE_COUNT,
   SUMMER_WAVE_OPEN_NODE_COUNT,
   validatePilotFootprint,
+  validateSeasonFootprintFromRegistry,
   validateSummerWaveOpenFootprint,
 } from "../scripts/city-game-summer-scale-core.mjs";
 import {
@@ -51,6 +52,21 @@ describe("WS-SCALE SC-1 summer-open footprint", () => {
     expect(result.issues).toEqual([]);
     expect(result.ok).toBe(true);
     expect(result.summary.nodeCount).toBe(SUMMER_WAVE_OPEN_NODE_COUNT);
+  });
+
+  it("validateSeasonFootprintFromRegistry picks pilot vs wave-open by count", () => {
+    expect(validateSeasonFootprintFromRegistry(spineSeason).summary.nodeCount).toBe(
+      SUMMER_OPEN_NODE_COUNT
+    );
+    expect(validateSeasonFootprintFromRegistry(spineSeason).ok).toBe(true);
+    expect(validateSeasonFootprintFromRegistry(waveOpenSeason).summary.nodeCount).toBe(
+      SUMMER_WAVE_OPEN_NODE_COUNT
+    );
+    expect(validateSeasonFootprintFromRegistry(waveOpenSeason).ok).toBe(true);
+    expect(validateSeasonFootprintFromRegistry(season).summary.nodeCount).toBe(
+      SUMMER_WAVE_OPEN_NODE_COUNT
+    );
+    expect(validateSeasonFootprintFromRegistry(season).ok).toBe(true);
   });
 
   it("requires full map_layout coverage", () => {
