@@ -77,6 +77,7 @@ import {
   clearFreshUrlParam,
   restoreKeysStripToControlPanel,
 } from "./created-workspace.mjs";
+import { syncCreatedFreshPresentation } from "./created-fresh-presentation.mjs";
 import { createdViewRestoreHashKey } from "./created-view-mode-core.mjs";
 import { createdViewDefaultTabId } from "./created-view-live-core.mjs";
 import {
@@ -101,6 +102,7 @@ import {
 } from "./created-child-object-add-hub.mjs";
 import { applyGameSeasonSetupFocus } from "./created-game-season-setup-focus.mjs";
 import { syncGameSeasonSetupPanel } from "./created-game-season-setup-panel.mjs";
+import { isGameSeasonSetupFlowActive, isGameSeasonSetupFocus, markGameSeasonSetupFlow } from "./create-organizer-season-core.mjs";
 import { isWalletSaved, loadWallet, getWalletSigningKeyCount } from "./device-wallet.mjs";
 import { saveSessionToWalletWithCustody } from "./device-custody-save.mjs";
 import { savedControlNeedsDeviceUnlockCopy } from "./device-custody-mode-core.mjs";
@@ -438,6 +440,55 @@ let downloadQrClick = null;
 /** @type {ReturnType<typeof initCreatedLiveObjectCard> | null} */
 let liveObjectCardCtl = null;
 
+function prepareGameSeasonSetupLandingFromUrl() {
+  if (isGameSeasonSetupFocus(params)) {
+    markGameSeasonSetupFlow();
+  }
+}
+
+function refreshGameSeasonSetupPresentation() {
+  mountChildObjectAddHubSections();
+  syncChildObjectAddHub(loadSession());
+  syncGameSeasonSetupPanel(loadSession(), profileId || "");
+  if (!isGameSeasonSetupFlowActive()) return;
+  const gameSection = document.getElementById("child-object-add-game-node");
+  if (gameSection) gameSection.hidden = false;
+  const setup = document.getElementById("child-object-game-node-setup");
+  if (setup instanceof HTMLDetailsElement) {
+    setup.hidden = false;
+    setup.open = true;
+  }
+  const anchor = document.getElementById("game-season-setup");
+  if (anchor) anchor.hidden = false;
+}
+
+function applyStewardLandingFocus() {
+  if (!createdTabs) {
+    createdTabs = initCreatedTabs();
+  }
+  applyGameSeasonSetupFocus((id) => createdTabs.select(id), params, {
+    applyRoom: (room) => {
+      if (profileId) {
+        try {
+          sessionStorage.setItem(`hc_steward_active_room:${profileId}`, room);
+        } catch {
+          /* ignore */
+        }
+      }
+      const wrap = document.getElementById("created-room-switcher-wrap");
+      if (!wrap) return;
+      wrap.hidden = false;
+      for (const btn of wrap.querySelectorAll("[data-steward-room]")) {
+        if (!(btn instanceof HTMLButtonElement)) continue;
+        const selected = btn.dataset.stewardRoom === room;
+        btn.classList.toggle("is-active", selected);
+        btn.setAttribute("aria-pressed", selected ? "true" : "false");
+      }
+    },
+    refreshPresentation: () => refreshGameSeasonSetupPresentation(),
+  });
+}
+
 function getWorkspaceMode() {
   return modeFromPage(profileId, freshParam, loadSession);
 }
@@ -457,12 +508,12 @@ function enterControlWorkspace() {
   clearCreatedViewModeUi();
   applyCreatedWorkspaceMode("control");
   restoreKeysStripToControlPanel();
-  syncChildObjectAddHub(loadSession());
-  syncGameSeasonSetupPanel(loadSession(), profileId || "");
+  prepareGameSeasonSetupLandingFromUrl();
+  refreshGameSeasonSetupPresentation();
   if (!createdTabs) {
     createdTabs = initCreatedTabs();
   }
-  applyGameSeasonSetupFocus((id) => createdTabs.select(id), params);
+  applyStewardLandingFocus();
   if (!dashboardWired) {
     setupCreatedDashboard();
     dashboardWired = true;
@@ -502,13 +553,13 @@ function initLiveControlProof() {
 
   const PROVE_BTN_LABEL = "Prove control now";
   const LISTENING_LEAD =
-    "Someone nearby scanned your QR and asked for live proof. Sign once from this key-holding device  -  it does not reveal legal identity or create a badge.";
+    "Someone nearby scanned your QR and asked for live proof. Sign once from this device. It does not reveal legal identity or create a badge.";
   const LISTENING_STATUS =
     "Keep this tab open while someone scans. The next live proof request will appear here automatically.";
   const REQUESTED_STATUS =
     "Someone nearby is asking for live proof. Tap below to sign from this device.";
   const AFTER_PROOF_STATUS =
-    "Control proven. Keep this tab open  -  the next request will appear here automatically.";
+    "Control proven. Keep this tab open. The next request will appear here automatically.";
 
   let activeChallengeId = liveChallengeParam;
   let activeReturnUrl = liveReturnUrlParam;
@@ -1161,11 +1212,22 @@ if (workspaceMode === "setup" && profileId && activeQrId) {
     onStewardDeepLink: () => enterControlWorkspace(),
     triggerDownloadQr: () => downloadQrClick?.(),
   });
+  syncCreatedFreshPresentation({
+    freshParam,
+    mode: workspaceMode,
+    session: loadSession(),
+  });
 } else if (workspaceMode === "control" && profileId && activeQrId) {
-  createdTabs = initCreatedTabs();
-  applyGameSeasonSetupFocus((id) => createdTabs.select(id), params);
+  prepareGameSeasonSetupLandingFromUrl();
+  refreshGameSeasonSetupPresentation();
+  applyStewardLandingFocus();
   setupCreatedDashboard();
   dashboardWired = true;
+  syncCreatedFreshPresentation({
+    freshParam,
+    mode: workspaceMode,
+    session: loadSession(),
+  });
   const session = loadSession();
   if (session?.revoke_state?.target_kind) {
     markFirstRevokeDone(profileId);
@@ -1549,9 +1611,7 @@ async function bootstrapOwnerTools() {
     getSigningKeys: currentSigningKeys,
   });
 
-  mountChildObjectAddHubSections();
-  syncChildObjectAddHub(loadSession());
-  syncGameSeasonSetupPanel(loadSession(), profileId);
+  refreshGameSeasonSetupPresentation();
 
   const backup = initKeyBackupUi({
     profileId,
