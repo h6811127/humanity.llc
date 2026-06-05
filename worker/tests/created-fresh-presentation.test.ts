@@ -6,7 +6,9 @@ import {
   redirectOpenStatusForDeploy,
 } from "../../site/js/create-handoff-core.mjs";
 import {
+  controlHeroTitle,
   freshSetupHeroCopy,
+  resolveControlOutcomeKind,
   resolveCreatedFreshPresentation,
   resolveFreshOutcomeKind,
 } from "../../site/js/created-fresh-presentation-core.mjs";
@@ -42,6 +44,31 @@ describe("resolveFreshOutcomeKind", () => {
   });
 });
 
+describe("controlHeroTitle", () => {
+  it("uses contextual live titles and QR fallback", () => {
+    expect(controlHeroTitle("sign")).toBe("Your sign is live");
+    expect(controlHeroTitle("tag")).toBe("Your tag is live");
+    expect(controlHeroTitle("wear")).toBe("Your wearable QR is live");
+    expect(controlHeroTitle("season")).toBe("Your season is live");
+    expect(controlHeroTitle("account")).toBe("Your QR is live");
+  });
+
+  it("maps lost-item pilot sessions to tag hero", () => {
+    expect(
+      resolveControlOutcomeKind({
+        searchParams: new URLSearchParams(""),
+        session: { pilot_template: "lost_item_relay" },
+      })
+    ).toBe("tag");
+    expect(
+      resolveControlOutcomeKind({
+        searchParams: new URLSearchParams(""),
+        session: { pilot_template: "status_plate" },
+      })
+    ).toBe("sign");
+  });
+});
+
 describe("freshSetupHeroCopy", () => {
   it("uses path-aware titles and leads", () => {
     expect(freshSetupHeroCopy("sign", "setup").title).toBe("Your sign is ready.");
@@ -52,6 +79,16 @@ describe("freshSetupHeroCopy", () => {
 });
 
 describe("resolveCreatedFreshPresentation", () => {
+  it("uses control hero copy on first control visit", () => {
+    const presentation = resolveCreatedFreshPresentation({
+      freshParam: false,
+      mode: "control",
+      searchParams: new URLSearchParams(""),
+      session: { pilot_template: "status_plate" },
+    });
+    expect(presentation.hero?.title).toBe("Your sign is live");
+  });
+
   it("returns handoff banner for redirect paths", () => {
     const presentation = resolveCreatedFreshPresentation({
       freshParam: false,

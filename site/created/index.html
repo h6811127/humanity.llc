@@ -486,7 +486,7 @@
               </div>
             </div>
             <button type="button" class="btn-primary" id="created-setup-finish">
-              Open card controls
+              Continue
             </button>
             <p class="form-hint">
               <a href="/wallet/">My objects</a> ·
@@ -1043,7 +1043,7 @@
               <span class="created-advanced-summary-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
               </span>
-              <span class="created-advanced-summary-text">Network status &amp; IDs</span>
+              <span class="created-advanced-summary-text">Connection details</span>
             </summary>
             <div class="created-advanced-body">
           <section class="group created-status-group" aria-label="Live on network">
@@ -1166,7 +1166,7 @@
             hidden
           >
             <summary class="form-label created-child-object-add-hub-summary">
-              Your scan points
+              Add another…
             </summary>
             <p class="form-hint" id="child-object-add-hub-sub">
               Add or manage scan points for this account
@@ -1177,7 +1177,7 @@
           </details>
 
           <section class="created-what-now created-what-now-compact" id="created-status-plate-tip" hidden>
-            <h2 class="created-what-now-title">Status plate</h2>
+            <h2 class="created-what-now-title">Sign</h2>
             <p class="created-what-now-body">
               Mount on a door or wall. Scanners see <strong>object name</strong> and
               <strong>status line</strong>. Change both on the <strong>Live</strong> tab without
@@ -1196,11 +1196,11 @@
               id="child-object-add-status-plate-title"
               data-child-object-add-chrome
             >
-              Add status plate under this root
+              Add sign under this account
             </h2>
             <p class="created-what-now-body" data-child-object-add-chrome>
-              One root card controls additional public objects. Register a
-              <strong>status plate</strong> and issue its first scan link in one step (no new private
+              One account controls additional public objects. Register a
+              <strong>sign</strong> and issue its first scan link in one step (no new private
               key).
             </p>
             <div
@@ -1239,7 +1239,7 @@
                 class="btn-secondary"
                 id="child-object-status-plate-submit"
               >
-                Register &amp; issue scan link
+                Create QR
               </button>
             </form>
             <p class="form-hint" id="child-object-status-plate-status" hidden role="status"></p>
@@ -1247,7 +1247,7 @@
               class="list-rows"
               id="child-object-status-plate-list"
               hidden
-              aria-label="Status plates under this root on this device"
+              aria-label="Signs under this account on this device"
             ></ul>
           </section>
 
@@ -1262,11 +1262,11 @@
               id="child-object-add-lost-item-title"
               data-child-object-add-chrome
             >
-              Add lost-item relay under this root
+              Add lost-item tag under this account
             </h2>
             <p class="created-what-now-body" data-child-object-add-chrome>
-              One root card controls additional public objects. Register a
-              <strong>lost-item relay</strong> and issue its first scan link in one step (no new
+              One account controls additional public objects. Register a
+              <strong>lost-item tag</strong> and issue its first scan link in one step (no new
               private key).
             </p>
             <div
@@ -1305,7 +1305,7 @@
                 class="btn-secondary"
                 id="child-object-lost-item-submit"
               >
-                Register &amp; issue scan link
+                Create QR
               </button>
             </form>
             <p class="form-hint" id="child-object-lost-item-status" hidden role="status"></p>
@@ -1313,7 +1313,7 @@
               class="list-rows"
               id="child-object-lost-item-list"
               hidden
-              aria-label="Lost-item relays under this root on this device"
+              aria-label="Lost-item tags under this account on this device"
             ></ul>
           </section>
 
@@ -1328,11 +1328,11 @@
               id="child-object-add-game-node-title"
               data-child-object-add-chrome
             >
-              Add game node under this root
+              Add checkpoint under this account
             </h2>
             <p class="created-what-now-body" data-child-object-add-chrome>
-              Register a <strong>game node</strong> sticker object and issue its first scan link in one
-              step. Requires an organizer / game-operator public key on this card at create.
+              Register a <strong>checkpoint</strong> sticker object and issue its first scan link in one
+              step. Requires an organizer / game-operator public key on this account at create.
             </p>
             <div
               id="child-object-game-node-backup-gate"
@@ -1363,12 +1363,12 @@
               <label class="form-label" for="child-object-game-node-district">District</label>
               <select class="form-input" id="child-object-game-node-district"></select>
               <button type="submit" class="btn-secondary" id="child-object-game-node-submit">
-                Register &amp; issue scan link
+                Create QR
               </button>
             </form>
             <p class="form-hint" id="child-object-game-node-status" hidden role="status"></p>
 
-            <details class="created-game-node-setup" id="child-object-game-node-setup" open>
+            <details class="created-game-node-setup" id="child-object-game-node-setup">
               <summary>Setup checklist · custody &amp; comprehension</summary>
               <div
                 id="child-object-game-node-setup-terminal-notice"
@@ -1512,7 +1512,7 @@
               class="list-rows"
               id="child-object-game-node-list"
               hidden
-              aria-label="Game nodes under this root on this device"
+              aria-label="Checkpoints under this account on this device"
             ></ul>
           </section>
 
@@ -1557,7 +1557,7 @@
           </section>
 
           <section class="created-what-now created-what-now-compact" id="created-lost-item-tip" hidden>
-            <h2 class="created-what-now-title">Lost item relay</h2>
+            <h2 class="created-what-now-title">Lost-item tag</h2>
             <p class="created-what-now-body">
               Tag the item. Finders see what is lost and your return message: not your phone number.
               Update copy on <strong>Live</strong>; revoke when recovered under <strong>Manage</strong>.
@@ -2393,6 +2393,6 @@
     </dialog>
     <script src="/js/device-status-bootstrap.mjs?v=94" type="module"></script>
     <script src="/js/created-hub.mjs?v=5" type="module"></script>
-    <script type="module" src="/js/created.mjs?v=88"></script>
+    <script type="module" src="/js/created.mjs?v=89"></script>
   </body>
 </html>

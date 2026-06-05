@@ -16,6 +16,7 @@ import { WEAR_PRINT_FOCUS } from "./create-wear-wizard-core.mjs";
 import { STEWARD_ROOM_SEASON } from "./steward-active-room-core.mjs";
 
 /** @typedef {"account" | "sign" | "wear" | "season"} FreshOutcomeKind */
+/** @typedef {FreshOutcomeKind | "tag"} ControlOutcomeKind */
 /** @typedef {"setup" | "control" | "view"} CreatedMode */
 
 /**
@@ -51,6 +52,44 @@ export function resolveFreshOutcomeKind(ctx) {
     return "sign";
   }
   return "account";
+}
+
+/**
+ * @param {{
+ *   searchParams: URLSearchParams;
+ *   hash?: string;
+ *   session?: Record<string, unknown> | null;
+ * }} ctx
+ * @returns {ControlOutcomeKind}
+ */
+export function resolveControlOutcomeKind(ctx) {
+  const pilot =
+    typeof ctx.session?.pilot_template === "string"
+      ? ctx.session.pilot_template.trim().toLowerCase()
+      : "";
+  if (pilot === "lost_item_relay") return "tag";
+  if (pilot === "status_plate") return "sign";
+  return resolveFreshOutcomeKind(ctx);
+}
+
+/**
+ * @param {ControlOutcomeKind} kind
+ * @returns {string}
+ */
+export function controlHeroTitle(kind) {
+  if (kind === "sign") return "Your sign is live";
+  if (kind === "tag") return "Your tag is live";
+  if (kind === "wear") return "Your wearable QR is live";
+  if (kind === "season") return "Your season is live";
+  return "Your QR is live";
+}
+
+/**
+ * @param {ControlOutcomeKind} kind
+ * @returns {{ title: string; lead: string | null }}
+ */
+export function controlHeroCopy(kind) {
+  return { title: controlHeroTitle(kind), lead: null };
 }
 
 /**
@@ -153,6 +192,8 @@ export function resolveCreatedFreshPresentation(ctx) {
       title: "Continue on your account",
       lead: createHandoffDetailLine(handoff.kind, handoff.handle),
     };
+  } else if (ctx.mode === "control" && !isGameSeasonSetupFlowActive()) {
+    hero = controlHeroCopy(resolveControlOutcomeKind(ctx));
   }
 
   const setupKicker =

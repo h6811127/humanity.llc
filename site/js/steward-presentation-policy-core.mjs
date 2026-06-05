@@ -10,6 +10,9 @@ import {
   shouldOfferAddStatusPlate,
 } from "./created-child-object-core.mjs";
 import {
+  CREATED_ADD_HUB_SUMMARY,
+} from "./created-display-labels-core.mjs";
+import {
   shouldOfferAddGameNode,
   shouldShowGameNodeAddRow,
 } from "./created-child-object-game-node-core.mjs";
@@ -122,11 +125,8 @@ export function shouldShowChildObjectAddHubInDefaultUi(session, extras = {}) {
  * @param {Record<string, unknown> | null | undefined} session
  * @param {{ activeRoom?: string | null; walletEntry?: Record<string, unknown> | null }} [extras]
  */
-export function stewardChildObjectAddHubSummaryTitle(session, extras = {}) {
-  const kind = resolveStewardPresentationKind(session, extras);
-  if (kind === STEWARD_PRESENTATION_KIND_SEASON) return "Game season scan points";
-  if (kind === STEWARD_PRESENTATION_KIND_WEAR) return "Wear on this account";
-  return "Your scan points";
+export function stewardChildObjectAddHubSummaryTitle(_session, _extras = {}) {
+  return CREATED_ADD_HUB_SUMMARY;
 }
 
 /**
@@ -136,18 +136,22 @@ export function stewardChildObjectAddHubSummaryTitle(session, extras = {}) {
 export function stewardChildObjectAddHubSubcopy(session, extras = {}) {
   const kind = resolveStewardPresentationKind(session, extras);
   if (kind === STEWARD_PRESENTATION_KIND_SEASON) {
-    if (shouldOfferAddGameNodeInDefaultUi(session, extras)) return "Game season scan points";
+    if (shouldOfferAddGameNodeInDefaultUi(session, extras)) return "Season checkpoints";
     if (shouldShowGameNodeSetupRowInDefaultUi(session, extras)) {
-      return "Game season scan points (setup)";
+      return "Season checkpoints (setup)";
     }
-    return "Game season scan points";
+    return "Season checkpoints";
   }
   if (kind === STEWARD_PRESENTATION_KIND_WEAR) {
     return "Print QR for your garment";
   }
   /** @type {string[]} */
   const labels = [];
-  if (shouldOfferAddStatusPlateInDefaultUi(session, extras)) labels.push("status plates");
-  if (shouldOfferAddLostItemRelayInDefaultUi(session, extras)) labels.push("lost items");
+  if (shouldOfferAddStatusPlateInDefaultUi(session, extras)) labels.push("signs");
+  if (shouldOfferAddLostItemRelayInDefaultUi(session, extras)) labels.push("lost-item tags");
+  if (shouldOfferAddGameNodeInDefaultUi(session, extras)) labels.push("checkpoints");
+  else if (shouldShowGameNodeSetupRowInDefaultUi(session, extras)) {
+    labels.push("checkpoints (setup)");
+  }
   return labels.join(" · ");
 }

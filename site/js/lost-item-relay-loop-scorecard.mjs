@@ -5,6 +5,8 @@
  * @see docs/PHASE_A_STRANGER_PATH_PRIORITIES.md (vertical #2)
  */
 
+import { shouldSuppressPilotScorecards } from "./created-first-session-containment-core.mjs";
+
 export const STORAGE_KEY = "hc_lost_item_relay_loop_v1";
 
 /** Pilot habit target: one return-message update proves live path without reprint. */
@@ -247,6 +249,10 @@ export function syncLostItemRelayLoopScorecardDom(
 ) {
   const root = document.getElementById("lost-item-loop-scorecard");
   if (!root || !profileId) return;
+  if (shouldSuppressPilotScorecards(profileId, sessionStorage)) {
+    root.hidden = true;
+    return;
+  }
 
   const progressEl = document.getElementById("lost-item-loop-progress");
   const lastEl = document.getElementById("lost-item-loop-last");

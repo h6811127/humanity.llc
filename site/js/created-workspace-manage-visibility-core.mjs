@@ -6,7 +6,7 @@
 /** @typedef {"setup" | "control" | "view"} CreatedMode */
 
 /**
- * Show setup hint that Manage unlocks after Open card controls.
+ * Show setup hint that Manage unlocks after Continue.
  * @param {CreatedMode | string} mode
  */
 export function setupManageTabHintVisible(mode) {

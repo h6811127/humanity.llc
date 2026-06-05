@@ -6,8 +6,7 @@ import {
   shouldShowChildObjectAddHub,
 } from "./created-child-object-add-hub-core.mjs";
 import { stewardPresentationExtras } from "./steward-active-room-core.mjs";
-
-const ADD_HUB_OPENED_KEY_PREFIX = "hc_add_hub_opened:";
+import { CREATED_ADD_HUB_SUMMARY } from "./created-display-labels-core.mjs";
 
 const ADD_HUB_SECTION_IDS = [
   "child-object-add-status-plate",
@@ -52,20 +51,12 @@ export function syncChildObjectAddHub(session, opts = {}) {
   });
   if (hub) hub.hidden = !show;
   if (summary) {
-    summary.textContent = childObjectAddHubSummaryTitle(session, extras);
+    summary.textContent = childObjectAddHubSummaryTitle(session, extras) || CREATED_ADD_HUB_SUMMARY;
   }
   if (sub) {
     sub.textContent =
       childObjectAddHubSubcopy(session, extras) ||
-      "Register stickers — one root key, no new private key";
-  }
-  if (show && hub instanceof HTMLDetailsElement) {
-    const profileId = typeof session?.profile_id === "string" ? session.profile_id.trim() : "";
-    const openedKey = profileId ? `${ADD_HUB_OPENED_KEY_PREFIX}${profileId}` : "";
-    if (openedKey && !sessionStorage.getItem(openedKey)) {
-      hub.setAttribute("open", "");
-      sessionStorage.setItem(openedKey, "1");
-    }
+      "Add signs, tags, or checkpoints on this account";
   }
 }
 

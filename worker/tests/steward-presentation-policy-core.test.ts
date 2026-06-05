@@ -65,8 +65,8 @@ describe("presentation policy — deploy account", () => {
     expect(shouldOfferAddGameNodeInDefaultUi(deployRoot, extras)).toBe(false);
     expect(shouldShowGameNodeSetupRowInDefaultUi(deployRoot, extras)).toBe(false);
     expect(shouldShowChildObjectAddHubInDefaultUi(deployRoot, extras)).toBe(true);
-    expect(stewardChildObjectAddHubSubcopy(deployRoot, extras)).toBe("status plates · lost items");
-    expect(stewardChildObjectAddHubSummaryTitle(deployRoot, extras)).toBe("Your scan points");
+    expect(stewardChildObjectAddHubSubcopy(deployRoot, extras)).toBe("signs · lost-item tags");
+    expect(stewardChildObjectAddHubSummaryTitle(deployRoot, extras)).toBe("Add another…");
   });
 });
 
@@ -79,10 +79,10 @@ describe("presentation policy — season account", () => {
     expect(shouldShowGameNodeSetupRowInDefaultUi(seasonRootWithIssuer, extras)).toBe(false);
     expect(shouldShowChildObjectAddHubInDefaultUi(seasonRootWithIssuer, extras)).toBe(true);
     expect(stewardChildObjectAddHubSubcopy(seasonRootWithIssuer, extras)).toBe(
-      "Game season scan points"
+      "Season checkpoints"
     );
     expect(stewardChildObjectAddHubSummaryTitle(seasonRootWithIssuer, extras)).toBe(
-      "Game season scan points"
+      "Add another…"
     );
   });
 
@@ -90,7 +90,7 @@ describe("presentation policy — season account", () => {
     const extras = { activeRoom: STEWARD_ROOM_SEASON };
     expect(shouldShowGameNodeSetupRowInDefaultUi(seasonRootManifesto, extras)).toBe(true);
     expect(stewardChildObjectAddHubSubcopy(seasonRootManifesto, extras)).toBe(
-      "Game season scan points (setup)"
+      "Season checkpoints (setup)"
     );
   });
 });

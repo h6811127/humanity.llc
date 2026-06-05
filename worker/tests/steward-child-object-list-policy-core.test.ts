@@ -41,13 +41,13 @@ function makeStorage() {
 describe("steward-child-object-list-policy-core", () => {
   it("builds room badge copy per child type", () => {
     expect(childObjectListRoomBadgeText("status_plate")).toBe(
-      "Door plate · managed under Doors"
+      "Sign · managed under Doors"
     );
     expect(childObjectListRoomBadgeText("lost_item_relay")).toBe(
-      "Return tag · managed under Doors"
+      "Lost-item tag · managed under Doors"
     );
     expect(childObjectListRoomBadgeText("game_node")).toBe(
-      "Game scan point · managed under Season"
+      "Checkpoint · managed under Season"
     );
   });
 

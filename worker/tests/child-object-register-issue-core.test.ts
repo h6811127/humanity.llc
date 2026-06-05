@@ -14,7 +14,7 @@ describe("childObjectRegisterSuccessMessage", () => {
         scanUrl: "https://humanity.llc/c/p?q=qr_1",
         issueFailed: false,
       })
-    ).toMatch(/scan link ready/i);
+    ).toMatch(/QR ready/i);
   });
 
   it("falls back when issue-qr fails after create", () => {
@@ -23,19 +23,19 @@ describe("childObjectRegisterSuccessMessage", () => {
         objectType: "lost_item_relay",
         issueFailed: true,
       })
-    ).toMatch(/Issue scan link below/i);
+    ).toMatch(/Create QR below/i);
   });
 });
 
 describe("childObjectRegisterProgressLabel", () => {
-  it("mentions issuing scan link", () => {
-    expect(childObjectRegisterProgressLabel("status_plate")).toMatch(/issuing scan link/i);
-    expect(childObjectRegisterProgressLabel("lost_item_relay")).toMatch(/issuing scan link/i);
+  it("mentions creating QR", () => {
+    expect(childObjectRegisterProgressLabel("status_plate")).toMatch(/creating QR/i);
+    expect(childObjectRegisterProgressLabel("lost_item_relay")).toMatch(/creating QR/i);
   });
 });
 
 describe("CHILD_OBJECT_REGISTER_SUBMIT_LABEL", () => {
   it("matches /created/ submit buttons", () => {
-    expect(CHILD_OBJECT_REGISTER_SUBMIT_LABEL).toBe("Register & issue scan link");
+    expect(CHILD_OBJECT_REGISTER_SUBMIT_LABEL).toBe("Create QR");
   });
 });

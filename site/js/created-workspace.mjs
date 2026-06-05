@@ -5,6 +5,7 @@
 
 import { createdControlRootVisibleForMode } from "./created-view-mode-core.mjs";
 import { setupManageTabHintVisible } from "./created-workspace-manage-visibility-core.mjs";
+import { controlHeroTitle } from "./created-fresh-presentation-core.mjs";
 
 /** @typedef {"setup" | "control" | "view"} CreatedMode */
 
@@ -15,7 +16,7 @@ import { setupManageTabHintVisible } from "./created-workspace-manage-visibility
 export function createdHeroTitleForMode(mode) {
   if (mode === "setup") return "Set up your live QR";
   if (mode === "view") return "View this card";
-  return "Your object is live";
+  return controlHeroTitle("account");
 }
 
 /**

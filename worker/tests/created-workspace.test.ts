@@ -6,6 +6,6 @@ describe("createdHeroTitleForMode", () => {
   it("uses setup, view, and steward titles", () => {
     expect(createdHeroTitleForMode("setup")).toBe("Set up your live QR");
     expect(createdHeroTitleForMode("view")).toBe("View this card");
-    expect(createdHeroTitleForMode("control")).toBe("Your object is live");
+    expect(createdHeroTitleForMode("control")).toBe("Your QR is live");
   });
 });

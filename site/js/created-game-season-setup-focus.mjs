@@ -3,6 +3,7 @@
  */
 
 import { GAME_SEASON_SETUP_FOCUS, markGameSeasonSetupFlow } from "./create-organizer-season-core.mjs";
+import { isFirstControlSessionActive } from "./created-first-session-containment-core.mjs";
 import { CREATED_PANEL_FOCUS } from "./created-tabs.mjs";
 
 const STEWARD_ROOM_SEASON = "season";
@@ -46,6 +47,11 @@ export function applyGameSeasonSetupFocus(select, searchParams, opts = {}) {
   opts.refreshPresentation?.();
   applyGameSeasonSetupHeroCopy();
   select("now");
+
+  const profileId = new URLSearchParams(location.search).get("profile_id")?.trim() || "";
+  const containFirstSession =
+    profileId && isFirstControlSessionActive(profileId, sessionStorage);
+  if (containFirstSession) return true;
 
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {

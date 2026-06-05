@@ -32,11 +32,11 @@ export function shouldShowChildObjectAddHub(session, extras = {}) {
 export function childObjectAddHubTypeLabels(session, extras = {}) {
   /** @type {string[]} */
   const labels = [];
-  if (shouldOfferAddStatusPlateInDefaultUi(session, extras)) labels.push("status plates");
-  if (shouldOfferAddLostItemRelayInDefaultUi(session, extras)) labels.push("lost items");
-  if (shouldOfferAddGameNodeInDefaultUi(session, extras)) labels.push("game nodes");
+  if (shouldOfferAddStatusPlateInDefaultUi(session, extras)) labels.push("signs");
+  if (shouldOfferAddLostItemRelayInDefaultUi(session, extras)) labels.push("lost-item tags");
+  if (shouldOfferAddGameNodeInDefaultUi(session, extras)) labels.push("checkpoints");
   else if (shouldShowGameNodeSetupRowInDefaultUi(session, extras)) {
-    labels.push("game nodes (setup)");
+    labels.push("checkpoints (setup)");
   }
   return labels;
 }

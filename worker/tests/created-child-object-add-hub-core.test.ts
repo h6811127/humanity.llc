@@ -63,7 +63,7 @@ describe("created-child-object-add-hub-core", () => {
 
   it("builds deploy subcopy without game nodes", () => {
     expect(childObjectAddHubSubcopy({ pilot_template: "general" })).toBe(
-      "status plates · lost items"
+      "signs · lost-item tags"
     );
   });
 
@@ -73,7 +73,7 @@ describe("created-child-object-add-hub-core", () => {
         pilot_template: "general",
         issuer_public_key: "abc123",
       })
-    ).toBe("Game season scan points");
+    ).toBe("Season checkpoints");
   });
 
   it("formats registered count labels", () => {

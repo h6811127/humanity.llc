@@ -3,6 +3,7 @@
  */
 
 import { ownershipBackupSeatbeltSatisfied } from "./created-first-session-gate-core.mjs";
+import { shouldHideSetupMemoryProtectChip } from "./created-first-session-containment-core.mjs";
 import { isSetupDone } from "./created-mode.mjs";
 import { findWalletEntryByProfileId, isWalletSaved } from "./device-wallet.mjs";
 import {
@@ -62,6 +63,14 @@ export function initCreatedLiveSetupMemory(opts) {
 
     for (const item of items) {
       const step = item.getAttribute("data-memory-step");
+      if (
+        step === "protect" &&
+        shouldHideSetupMemoryProtectChip(profileId, sessionStorage)
+      ) {
+        item.hidden = true;
+        continue;
+      }
+      item.hidden = false;
       const isDone =
         step === "save" ||
         step === "print" ||

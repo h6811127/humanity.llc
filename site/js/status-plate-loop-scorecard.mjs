@@ -5,6 +5,8 @@
  * @see docs/STATUS_PLATE_PILOT.md § Habit loop scorecard
  */
 
+import { shouldSuppressPilotScorecards } from "./created-first-session-containment-core.mjs";
+
 export const STORAGE_KEY = "hc_status_plate_loop_v1";
 
 /** Pilot habit target: stewards who update ≥ this many times are closing the loop. */
@@ -243,6 +245,10 @@ export function syncStatusPlateLoopScorecardDom(
 ) {
   const root = document.getElementById("status-plate-loop-scorecard");
   if (!root || !profileId) return;
+  if (shouldSuppressPilotScorecards(profileId, sessionStorage)) {
+    root.hidden = true;
+    return;
+  }
 
   const progressEl = document.getElementById("status-plate-loop-progress");
   const lastEl = document.getElementById("status-plate-loop-last");

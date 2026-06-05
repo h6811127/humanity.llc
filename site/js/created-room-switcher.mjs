@@ -1,3 +1,4 @@
+import { shouldHideRoomSwitcherForFirstSession } from "./created-first-session-containment-core.mjs";
 import { findWalletEntryByProfileId } from "./device-wallet.mjs";
 import {
   STEWARD_ROOM_CHANGED_EVENT,
@@ -155,6 +156,10 @@ export function initCreatedRoomSwitcher(ctx) {
 export function syncCreatedRoomSwitcher(profileId, session) {
   const wrap = document.getElementById("created-room-switcher-wrap");
   if (!wrap) return;
+  if (shouldHideRoomSwitcherForFirstSession(profileId, sessionStorage)) {
+    wrap.hidden = true;
+    return;
+  }
   const show = shouldShowStewardRoomSwitcher(session);
   wrap.hidden = !show;
   if (!show) return;

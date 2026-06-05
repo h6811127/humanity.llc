@@ -37,9 +37,9 @@ export function childObjectTypeHomeRoom(objectType) {
  * @param {ChildObjectListType} objectType
  */
 export function childObjectTypeKindLabel(objectType) {
-  if (objectType === "lost_item_relay") return "Return tag";
-  if (objectType === "game_node") return "Game scan point";
-  return "Door plate";
+  if (objectType === "lost_item_relay") return "Lost-item tag";
+  if (objectType === "game_node") return "Checkpoint";
+  return "Sign";
 }
 
 /**

@@ -100,6 +100,12 @@ import {
   mountChildObjectAddHubSections,
   syncChildObjectAddHub,
 } from "./created-child-object-add-hub.mjs";
+import {
+  beginFirstControlSession,
+  isFirstControlSessionActive,
+} from "./created-first-session-containment-core.mjs";
+import { applyFirstSessionContainment } from "./created-first-session-containment.mjs";
+import { syncCreatedPageDisplayLabels } from "./created-display-labels.mjs";
 import { applyGameSeasonSetupFocus } from "./created-game-season-setup-focus.mjs";
 import { syncGameSeasonSetupPanel } from "./created-game-season-setup-panel.mjs";
 import { isGameSeasonSetupFlowActive, isGameSeasonSetupFocus, markGameSeasonSetupFlow } from "./create-organizer-season-core.mjs";
@@ -451,6 +457,9 @@ function refreshGameSeasonSetupPresentation() {
   syncChildObjectAddHub(loadSession());
   syncGameSeasonSetupPanel(loadSession(), profileId || "");
   if (!isGameSeasonSetupFlowActive()) return;
+  if (profileId && isFirstControlSessionActive(profileId, sessionStorage)) {
+    return;
+  }
   const gameSection = document.getElementById("child-object-add-game-node");
   if (gameSection) gameSection.hidden = false;
   const setup = document.getElementById("child-object-game-node-setup");
@@ -477,6 +486,10 @@ function applyStewardLandingFocus() {
       }
       const wrap = document.getElementById("created-room-switcher-wrap");
       if (!wrap) return;
+      if (profileId && isFirstControlSessionActive(profileId, sessionStorage)) {
+        wrap.hidden = true;
+        return;
+      }
       wrap.hidden = false;
       for (const btn of wrap.querySelectorAll("[data-steward-room]")) {
         if (!(btn instanceof HTMLButtonElement)) continue;
@@ -491,6 +504,24 @@ function applyStewardLandingFocus() {
 
 function getWorkspaceMode() {
   return modeFromPage(profileId, freshParam, loadSession);
+}
+
+function finalizeControlWorkspacePresentation() {
+  if (profileId) {
+    beginFirstControlSession(profileId, sessionStorage, localStorage);
+  }
+  syncCreatedPageDisplayLabels();
+  syncCreatedFreshPresentation({
+    freshParam,
+    mode: "control",
+    session: loadSession(),
+  });
+  applyStewardLandingFocus();
+  if (profileId) {
+    applyFirstSessionContainment(profileId);
+    syncChildObjectAddHub(loadSession(), { profileId });
+    window.dispatchEvent(new Event("hc-created-live-setup-memory-sync"));
+  }
 }
 
 function enterControlWorkspace() {
@@ -509,15 +540,14 @@ function enterControlWorkspace() {
   applyCreatedWorkspaceMode("control");
   restoreKeysStripToControlPanel();
   prepareGameSeasonSetupLandingFromUrl();
-  refreshGameSeasonSetupPresentation();
   if (!createdTabs) {
     createdTabs = initCreatedTabs();
   }
-  applyStewardLandingFocus();
   if (!dashboardWired) {
     setupCreatedDashboard();
     dashboardWired = true;
   }
+  finalizeControlWorkspacePresentation();
   void bootstrapOwnerTools();
   void liveObjectCardCtl?.maybeRunArrive();
 }
@@ -1219,15 +1249,9 @@ if (workspaceMode === "setup" && profileId && activeQrId) {
   });
 } else if (workspaceMode === "control" && profileId && activeQrId) {
   prepareGameSeasonSetupLandingFromUrl();
-  refreshGameSeasonSetupPresentation();
-  applyStewardLandingFocus();
   setupCreatedDashboard();
   dashboardWired = true;
-  syncCreatedFreshPresentation({
-    freshParam,
-    mode: workspaceMode,
-    session: loadSession(),
-  });
+  finalizeControlWorkspacePresentation();
   const session = loadSession();
   if (session?.revoke_state?.target_kind) {
     markFirstRevokeDone(profileId);
