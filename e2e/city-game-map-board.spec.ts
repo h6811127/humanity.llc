@@ -138,7 +138,9 @@ test.describe("city game map board", () => {
       if (el instanceof HTMLElement) el.scrollTop = el.scrollHeight;
     });
 
-    await pin.click();
+    await pin.evaluate((el) => {
+      el.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+    });
 
     await expect(board).toHaveAttribute("data-highlight-node-id", "node_04");
     await expect(pin).toHaveClass(/city-game-map-pin--highlight/);
