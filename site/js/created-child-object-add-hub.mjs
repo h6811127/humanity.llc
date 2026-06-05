@@ -5,6 +5,11 @@ import {
   childObjectAddHubSummaryTitle,
   shouldShowChildObjectAddHub,
 } from "./created-child-object-add-hub-core.mjs";
+import {
+  deploySuccessHubSubcopy,
+  deploySuccessHubSummaryTitle,
+  readDeploySuccessPresentationState,
+} from "./created-deploy-success-focus-core.mjs";
 import { stewardPresentationExtras } from "./steward-active-room-core.mjs";
 import { CREATED_ADD_HUB_SUMMARY } from "./created-display-labels-core.mjs";
 
@@ -50,13 +55,17 @@ export function syncChildObjectAddHub(session, opts = {}) {
     storage: localStorage,
   });
   if (hub) hub.hidden = !show;
+  const deploySuccess = readDeploySuccessPresentationState();
   if (summary) {
-    summary.textContent = childObjectAddHubSummaryTitle(session, extras) || CREATED_ADD_HUB_SUMMARY;
+    summary.textContent = deploySuccess
+      ? deploySuccessHubSummaryTitle(deploySuccess.endpointType)
+      : childObjectAddHubSummaryTitle(session, extras) || CREATED_ADD_HUB_SUMMARY;
   }
   if (sub) {
-    sub.textContent =
-      childObjectAddHubSubcopy(session, extras) ||
-      "Add signs, tags, or checkpoints on this account";
+    sub.textContent = deploySuccess
+      ? deploySuccessHubSubcopy(deploySuccess.endpointType)
+      : childObjectAddHubSubcopy(session, extras) ||
+        "Add signs, tags, or checkpoints on this account";
   }
 }
 

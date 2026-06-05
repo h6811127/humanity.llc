@@ -5,7 +5,10 @@ import {
   deployEndpointOutcomeFromParams,
   deployEndpointTypeFromParams,
   deploySuccessObjectIdFromParams,
+  deploySuccessSuppressesAddForm,
   isDeploySuccessLanding,
+  readDeploySuccessPresentationState,
+  writeDeploySuccessPresentationState,
 } from "../../site/js/created-deploy-success-focus-core.mjs";
 
 describe("created-deploy-success-focus-core", () => {
@@ -52,5 +55,28 @@ describe("created-deploy-success-focus-core", () => {
     expect(deployEndpointTypeFromParams(url.searchParams)).toBe("status_plate");
     expect(url.searchParams.get("object_id")).toBe("obj_door_01");
     expect(url.hash).toBe("#child-object-obj_door_01");
+  });
+
+  it("records presentation state for post-refresh add-form suppression", () => {
+    const storage = new Map<string, string>();
+    const sessionStorage = {
+      getItem: (key: string) => storage.get(key) ?? null,
+      setItem: (key: string, value: string) => {
+        storage.set(key, value);
+      },
+      removeItem: (key: string) => {
+        storage.delete(key);
+      },
+    };
+    writeDeploySuccessPresentationState(
+      {
+        profileId: "prof_abc",
+        objectId: "obj_door_01",
+        endpointType: "status_plate",
+      },
+      sessionStorage
+    );
+    expect(readDeploySuccessPresentationState(sessionStorage)?.objectId).toBe("obj_door_01");
+    expect(deploySuccessSuppressesAddForm("status_plate", sessionStorage)).toBe(true);
   });
 });

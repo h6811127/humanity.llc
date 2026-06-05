@@ -7,6 +7,10 @@ import {
   shouldHideRoomSwitcherForFirstSession,
 } from "./created-first-session-containment-core.mjs";
 import { CREATED_ADD_HUB_SUMMARY } from "./created-display-labels-core.mjs";
+import {
+  deploySuccessHubSummaryTitle,
+  readDeploySuccessPresentationState,
+} from "./created-deploy-success-focus-core.mjs";
 import { SEASON_SETUP_COLLAPSED_OPERATOR_IDS } from "./created-season-setup-cta-core.mjs";
 import { hideSeasonSetupAdvancedSections } from "./created-season-setup-cta.mjs";
 
@@ -34,7 +38,12 @@ export function applyFirstSessionContainment(profileId, opts = {}) {
     addHub.removeAttribute("open");
   }
   const addHubSummary = addHub?.querySelector(".created-child-object-add-hub-summary");
-  if (addHubSummary) addHubSummary.textContent = CREATED_ADD_HUB_SUMMARY;
+  const deploySuccess = deploySuccessLanding ? readDeploySuccessPresentationState() : null;
+  if (addHubSummary) {
+    addHubSummary.textContent = deploySuccess
+      ? deploySuccessHubSummaryTitle(deploySuccess.endpointType)
+      : CREATED_ADD_HUB_SUMMARY;
+  }
 
   if (seasonFirstSession) {
     for (const id of SEASON_SETUP_COLLAPSED_OPERATOR_IDS) {

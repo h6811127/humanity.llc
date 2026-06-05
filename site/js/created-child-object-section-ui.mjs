@@ -2,6 +2,7 @@
  * Shared add-vs-list section visibility for /created/ child object panels.
  */
 
+import { deploySuccessSuppressesAddForm } from "./created-deploy-success-focus-core.mjs";
 import {
   childObjectListRoomBadgeText,
   shouldShowChildObjectAddForm,
@@ -19,7 +20,11 @@ export function syncChildObjectSectionChrome(section, objectType, session, activ
   if (!section) return { showSection: false, showAddForm: false };
 
   const showSection = shouldShowChildObjectTypeSection(session, objectType, activeCount, extras);
-  const showAddForm = shouldShowChildObjectAddForm(session, objectType, extras);
+  let showAddForm =
+    showSection && shouldShowChildObjectAddForm(session, objectType, extras);
+  if (deploySuccessSuppressesAddForm(objectType)) {
+    showAddForm = false;
+  }
 
   section.hidden = !showSection;
 

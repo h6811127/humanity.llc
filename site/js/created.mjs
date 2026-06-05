@@ -120,8 +120,8 @@ import {
 } from "./created-room-switcher.mjs";
 import { STEWARD_ROOM_DOORS, STEWARD_ROOM_SEASON } from "./steward-active-room-core.mjs";
 import { applyGameSeasonSetupFocus } from "./created-game-season-setup-focus.mjs";
-import { applyDeploySuccessFocus } from "./created-deploy-success-focus.mjs";
-import { isDeploySuccessLanding } from "./created-deploy-success-focus-core.mjs";
+import { applyDeploySuccessFocus, reapplyDeploySuccessPresentationChrome } from "./created-deploy-success-focus.mjs";
+import { isDeploySuccessLanding, deployEndpointTypeFromParams, deploySuccessObjectIdFromParams, writeDeploySuccessPresentationState } from "./created-deploy-success-focus-core.mjs";
 import { syncGameSeasonSetupPanel } from "./created-game-season-setup-panel.mjs";
 import { isGameSeasonSetupFlowActive, isGameSeasonSetupFocus, markGameSeasonSetupFlow } from "./create-organizer-season-core.mjs";
 import { isWalletSaved, loadWallet, getWalletSigningKeyCount } from "./device-wallet.mjs";
@@ -509,12 +509,21 @@ function wireCreatedRoomSwitcher() {
   });
 }
 
+function ensureDeploySuccessPresentationState() {
+  if (!profileId || !isDeploySuccessLanding(params)) return;
+  const objectId = deploySuccessObjectIdFromParams(params);
+  const endpointType = deployEndpointTypeFromParams(params);
+  if (!objectId || !endpointType) return;
+  writeDeploySuccessPresentationState({ profileId, objectId, endpointType });
+}
+
 function applyStewardLandingFocus() {
   if (!createdTabs) {
     createdTabs = initCreatedTabs();
   }
   if (
     applyDeploySuccessFocus((id) => createdTabs.select(id), params, {
+      profileId,
       refreshEndpoints: async () => {
         await childObjectCtl?.refresh?.();
         await lostItemRelayCtl?.refresh?.();
@@ -546,6 +555,7 @@ function finalizeControlWorkspacePresentation() {
   if (profileId) {
     beginFirstControlSession(profileId, sessionStorage, localStorage);
   }
+  ensureDeploySuccessPresentationState();
   syncCreatedPageDisplayLabels();
   const presentation = syncCreatedFreshPresentation({
     freshParam,
@@ -565,6 +575,7 @@ function finalizeControlWorkspacePresentation() {
     syncCreatedRoomSwitcher(profileId, loadSession());
     syncChildObjectAddHub(loadSession(), { profileId });
     syncChildObjectAddSectionLabels(profileId, localStorage);
+    reapplyDeploySuccessPresentationChrome();
     window.dispatchEvent(new Event("hc-created-live-setup-memory-sync"));
   }
   wireCreatedAccountFirstSignCtaClick(() => {
