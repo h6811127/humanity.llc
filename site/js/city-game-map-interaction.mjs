@@ -2,6 +2,7 @@
  * M4 — district filter + list↔pin highlight on city state board.
  */
 import {
+  isDenseMapBoard,
   isMapPinInteractive,
   resolveMapNodeHighlight,
   shouldScrollSketchForRowFocus,
@@ -16,6 +17,7 @@ function setHighlightNode(boardRoot, nodeId) {
     boardRoot.dataset.highlightNodeId = nodeId;
   } else {
     delete boardRoot.dataset.highlightNodeId;
+    delete boardRoot.dataset.highlightSource;
   }
 
   for (const el of boardRoot.querySelectorAll(
@@ -85,9 +87,24 @@ function scrollListRowIntoView(boardRoot, nodeId) {
   const row = boardRoot.querySelector(
     `.city-game-map-node-row[data-node-id="${CSS.escape(nodeId)}"]`
   );
-  if (row instanceof HTMLElement) {
-    row.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  if (!(row instanceof HTMLElement)) return;
+
+  const panel = boardRoot.querySelector(".city-game-map-list-panel");
+  if (panel instanceof HTMLElement && panel.scrollHeight > panel.clientHeight + 1) {
+    const panelTop = panel.scrollTop;
+    const panelBottom = panelTop + panel.clientHeight;
+    const rowTop = row.offsetTop;
+    const rowBottom = rowTop + row.offsetHeight;
+    if (rowTop < panelTop || rowBottom > panelBottom) {
+      panel.scrollTo({
+        top: Math.max(0, rowTop - 12),
+        behavior: "smooth",
+      });
+      return;
+    }
   }
+
+  row.scrollIntoView({ block: "nearest", behavior: "smooth" });
 }
 
 /**
@@ -134,8 +151,37 @@ function selectMapNode(boardRoot, nodeId, opts = {}) {
   setHighlightNode(boardRoot, nextId);
   if (!nextId) return;
 
+  boardRoot.dataset.highlightSource = "row";
+
   if (opts.scrollList) scrollListRowIntoView(boardRoot, nextId);
   if (opts.scrollSketch) scrollSketchToPin(boardRoot, nextId);
+}
+
+/**
+ * Pin click: select + scroll list; second click on same pin clears (never toggle-off on first click).
+ * @param {HTMLElement} boardRoot
+ * @param {string} nodeId
+ */
+function selectMapPin(boardRoot, nodeId) {
+  const id = String(nodeId ?? "").trim();
+  if (!id) return;
+
+  const pin = boardRoot.querySelector(
+    `.city-game-map-pin[data-node-id="${CSS.escape(id)}"]`
+  );
+  if (pin && !isMapPinInteractive(pin)) return;
+
+  if (
+    boardRoot.dataset.highlightNodeId === id &&
+    boardRoot.dataset.highlightSource === "pin"
+  ) {
+    setHighlightNode(boardRoot, null);
+    return;
+  }
+
+  setHighlightNode(boardRoot, id);
+  boardRoot.dataset.highlightSource = "pin";
+  scrollListRowIntoView(boardRoot, id);
 }
 
 /**
@@ -161,6 +207,16 @@ export function bootCityGameMapInteraction(boardRoot, season) {
     });
   }
 
+  boardRoot.addEventListener(
+    "mousedown",
+    (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      if (target.closest(".city-game-map-pin")) event.preventDefault();
+    },
+    true
+  );
+
   boardRoot.addEventListener("click", (event) => {
     const target = event.target;
     if (!(target instanceof Element)) return;
@@ -168,7 +224,7 @@ export function bootCityGameMapInteraction(boardRoot, season) {
     const pin = target.closest(".city-game-map-pin");
     if (pin instanceof SVGGElement) {
       const nodeId = pin.getAttribute("data-node-id");
-      if (nodeId) selectMapNode(boardRoot, nodeId, { scrollList: true });
+      if (nodeId) selectMapPin(boardRoot, nodeId);
       return;
     }
 
@@ -199,6 +255,16 @@ export function bootCityGameMapInteraction(boardRoot, season) {
     },
     true
   );
+
+  if (isDenseMapBoard(season)) {
+    const sketch = boardRoot.querySelector(".city-game-map-sketch-details");
+    if (
+      sketch instanceof HTMLDetailsElement &&
+      window.matchMedia("(min-width: 720px)").matches
+    ) {
+      sketch.open = true;
+    }
+  }
 
   applyDistrictFilterVisibility(boardRoot, boardRoot.dataset.activeDistrict ?? "all");
 }

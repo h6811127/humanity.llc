@@ -51,7 +51,7 @@ describe("city-game-map-interaction-core", () => {
     const boardClick = src.slice(src.indexOf('boardRoot.addEventListener("click"'));
     expect(boardClick).toContain("if (!(target instanceof Element)) return;");
     expect(src).toContain('row.setAttribute("aria-current", "true")');
-    expect(src).toContain("resolveMapNodeHighlight");
+    expect(src).toContain("function selectMapPin(");
     expect(src).toContain("isMapPinInteractive");
   });
 

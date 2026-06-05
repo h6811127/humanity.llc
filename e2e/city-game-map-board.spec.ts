@@ -120,6 +120,28 @@ test.describe("city game map board", () => {
     await expect(pin).not.toHaveClass(/city-game-map-pin--highlight/);
   });
 
+  test("pin click scrolls list when matching row already focused", async ({ page }) => {
+    await mockSeasonSnapshot(page, mockSnapshotBody());
+
+    await page.goto("/play/cedar-rapids/map/");
+
+    const board = page.locator(".city-game-map-board");
+    await expect(board).toBeVisible({ timeout: 15_000 });
+
+    const pin = board.locator('.city-game-map-pin[data-node-id="node_04"]');
+    const row = board.locator('.city-game-map-node-row[data-node-id="node_04"]');
+    await board.locator("#district-sketch").evaluate((el) => {
+      if (el instanceof HTMLDetailsElement) el.open = true;
+    });
+
+    await row.focus();
+    await expect(row).toBeFocused();
+    await pin.click();
+
+    await expect(board).toHaveAttribute("data-highlight-node-id", "node_04");
+    await expect(pin).toHaveClass(/city-game-map-pin--highlight/);
+  });
+
   test("place row click highlights schematic pin", async ({ page }) => {
     await mockSeasonSnapshot(page, mockSnapshotBody());
 

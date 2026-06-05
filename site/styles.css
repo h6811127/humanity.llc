@@ -10891,6 +10891,22 @@ body.device-shell-created .flow-keys-group .list-row {
   margin-top: 4px;
 }
 
+.city-game-map-roles-details {
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  padding-top: 12px;
+}
+
+.city-game-map-roles-summary {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--grey);
+}
+
+.city-game-map-roles-details[open] .city-game-map-roles-summary {
+  margin-bottom: 8px;
+}
+
 .city-game-map-wayfinding {
   margin: 0;
   font-size: 14px;
@@ -10985,7 +11001,10 @@ body.device-shell-created .flow-keys-group .list-row {
   -webkit-tap-highlight-color: transparent;
 }
 
-.city-game-map-pin:focus {
+.city-game-map-pin:focus,
+.city-game-map-pin:focus-visible,
+.city-game-map-pin *:focus,
+.city-game-map-pin *:focus-visible {
   outline: none;
 }
 
