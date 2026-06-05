@@ -8,7 +8,8 @@ describe("scan-live-control-client-helpers", () => {
     expect(js).toContain("parseLiveControlJsonResponse");
     expect(js).toContain("liveControlChallengeCreateError");
     expect(js).toContain("stripResolverUrlsFromMessage");
-    expect(js).toContain("Live proof is temporarily unavailable. Try again shortly.");
-    expect(js).toContain("Could not create live proof request. Try again in a moment.");
+    expect(js).toContain("Control check is temporarily unavailable. Try again shortly.");
+    expect(js).toContain("Could not start control check. Try again in a moment.");
+    expect(js).toContain("Could not reach humanity.llc.");
   });
 });

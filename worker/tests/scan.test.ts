@@ -917,8 +917,8 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain("liveControlChallengeCreateError");
     expect(html).toContain("POLL_FAILURE_MAX");
     expect(html).toContain("Having trouble checking proof status. Tap to retry.");
-    expect(html).toContain("Could not create live proof request. Try again in a moment.");
-    expect(html).toContain("Live proof is temporarily unavailable. Try again shortly.");
+    expect(html).toContain("Could not start control check. Try again in a moment.");
+    expect(html).toContain("Control check is temporarily unavailable. Try again shortly.");
   });
 
   it("bundles in-person owner handoff markup (H-04–H-06)", async () => {

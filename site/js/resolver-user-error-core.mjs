@@ -45,7 +45,7 @@ export function resolverErrorMessage(payload, options = {}) {
   const stripped = stripResolverUrlsFromMessage(raw);
   if (stripped) return stripped;
   if (typeof status === "number" && status >= 500) {
-    return "Could not reach the resolver. Try again in a moment.";
+    return "Could not reach humanity.llc. Try again in a moment.";
   }
   return fallback || "Something went wrong. Try again.";
 }

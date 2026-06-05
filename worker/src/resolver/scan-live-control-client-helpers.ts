@@ -38,7 +38,7 @@ export function scanLiveControlClientHelpersJs(): string {
     var stripped = stripResolverUrlsFromMessage(raw);
     if (stripped) return stripped;
     if (typeof status === "number" && status >= 500) {
-      return "Could not reach the resolver. Try again in a moment.";
+      return "Could not reach humanity.llc.";
     }
     return fallback || "Something went wrong. Try again.";
   }
@@ -69,7 +69,7 @@ export function scanLiveControlClientHelpersJs(): string {
       message: body.message,
     });
     if (body.error === "RESOLVER_SCHEMA") {
-      return "Live proof is temporarily unavailable. Try again shortly.";
+      return "Control check is temporarily unavailable. Try again shortly.";
     }
     if (body.error === "LIVE_CONTROL_UNAVAILABLE") {
       return (
@@ -80,11 +80,11 @@ export function scanLiveControlClientHelpersJs(): string {
       );
     }
     if (result.status >= 500 || /error code:\\s*1101/i.test(result.text || "")) {
-      return "Could not create live proof request. Try again in a moment.";
+      return "Could not start control check. Try again in a moment.";
     }
     return liveControlUserErrorMessage(body, {
       status: result.status,
-      fallback: "Could not create live proof request.",
+      fallback: "Could not start control check.",
     });
   }
 `;

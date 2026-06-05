@@ -41,4 +41,10 @@ describe("resolver-user-error-core", () => {
     );
     expect(msg).toBe("Bad request");
   });
+
+  it("uses plain-language message for server errors", () => {
+    expect(resolverErrorMessage({}, { status: 500 })).toBe(
+      "Could not reach humanity.llc. Try again in a moment."
+    );
+  });
 });

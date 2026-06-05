@@ -29,6 +29,6 @@ export function formatCreateResolverError(payload, status, requestUrl) {
   }
   if (stripped) return stripped;
   if (status === 409) return "Handle is already taken.";
-  if (status >= 500) return "Could not reach the resolver. Try again in a moment.";
+  if (status >= 500) return "Could not reach humanity.llc. Try again in a moment.";
   return "Could not create card. Check your handle and try again.";
 }

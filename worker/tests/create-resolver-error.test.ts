@@ -28,4 +28,10 @@ describe("formatCreateResolverError", () => {
       )
     ).toBe("Handle is already taken.");
   });
+
+  it("uses plain-language message for server errors", () => {
+    expect(formatCreateResolverError({}, 502)).toBe(
+      "Could not reach humanity.llc. Try again in a moment."
+    );
+  });
 });
