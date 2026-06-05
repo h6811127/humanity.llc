@@ -100,6 +100,13 @@ import {
 } from "./device-ownership-copy-core.mjs";
 import { isEphemeralBrowsingStorage } from "./private-browsing-detect-core.mjs";
 import { buildObjectStreamsFromFormRows } from "./object-streams-core.mjs";
+
+/** @param {string} phase @param {Record<string, unknown>} [detail] */
+function logCreateSubmit(phase, detail = {}) {
+  if (typeof console !== "undefined" && typeof console.debug === "function") {
+    console.debug("[hc-create-submit]", phase, detail);
+  }
+}
 import {
   qrExpiryFromIssued,
   encodePrivateKeyBase58,
@@ -422,13 +429,20 @@ export async function runCreateCard(input) {
   const payload = { card, qr_credential };
   if (attributionRef) payload.attribution_ref = attributionRef;
 
-  const res = await fetch(postCardsUrl(), {
+  const cardsUrl = postCardsUrl();
+  logCreateSubmit("resolver:post:start", { url: cardsUrl });
+  const res = await fetch(cardsUrl, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
 
   const data = await res.json().catch(() => ({}));
+  logCreateSubmit("resolver:post:done", {
+    ok: res.ok,
+    status: res.status,
+    profileId: typeof data?.profile_id === "string" ? data.profile_id : undefined,
+  });
   if (!res.ok) {
     const msg = formatCreateResolverError(data, res.status, postCardsUrl());
     if (String(data.message || data.error || "").includes("recovery_public_key")) {
@@ -496,11 +510,19 @@ export async function runCreateCard(input) {
   sessionStorage.setItem("hc_created", JSON.stringify(session));
 
   if (shouldSyncAutoSaveBeforeCreateNavigate({ autoSaveEnabled: isAutoSaveEnabled(), session })) {
+    logCreateSubmit("autosave:before-navigate:start", {
+      sessionCustody: session.custody_mode,
+      saveCustody: CUSTODY_MODE_FULL_KEYS,
+    });
     const saveResult = await saveSessionToWalletWithCustody(
       session,
       defaultWalletLabel(session),
-      { custodyMode: session.custody_mode }
+      { custodyMode: CUSTODY_MODE_FULL_KEYS }
     );
+    logCreateSubmit("autosave:before-navigate:done", {
+      ok: !("error" in saveResult),
+      error: "error" in saveResult ? saveResult.error : undefined,
+    });
     applySyncAutoSaveResult(session, saveResult, {
       markFailed: markAutoSaveFailed,
       clearFailed: clearAutoSaveFailed,
@@ -509,6 +531,7 @@ export async function runCreateCard(input) {
 
   const result = { session, profileId, qrId, attributionRef };
   if (!navigate) {
+    logCreateSubmit("create:complete", { profileId, qrId, navigate: false });
     return result;
   }
 
@@ -519,6 +542,7 @@ export async function runCreateCard(input) {
   if (attributionRef && shouldHandoffToCustomize(attributionRef)) {
     created.searchParams.set("hc_ref", attributionRef);
   }
+  logCreateSubmit("navigate:created", { profileId, qrId, href: created.href });
   location.replace(created.href);
   return result;
 }
@@ -615,6 +639,7 @@ async function submitCreate(e, opts = {}) {
   if (demoBtn) demoBtn.disabled = true;
 
   try {
+    logCreateSubmit("submit:start", { path: location.pathname + location.search });
     const input = readValidatedCreateInput();
     const searchParams = new URLSearchParams(location.search);
     const gameStrategy = resolveGameSeasonSubmitStrategy({
@@ -727,6 +752,7 @@ async function submitCreate(e, opts = {}) {
     }
 
     setStatus("Creating…");
+    logCreateSubmit("submit:run-create-card", { pilotTemplate: input.pilotTemplate });
     await runCreateCard({
       handle: input.handle,
       manifesto: input.manifesto,
@@ -738,6 +764,9 @@ async function submitCreate(e, opts = {}) {
       sampleCard: !!opts.sampleCard,
     });
   } catch (err) {
+    logCreateSubmit("submit:error", {
+      message: err instanceof Error ? err.message : String(err),
+    });
     setStatus(err.message || String(err), true);
     if (submitBtn) submitBtn.disabled = false;
     if (demoBtn) demoBtn.disabled = false;

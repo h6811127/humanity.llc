@@ -178,6 +178,11 @@ html[data-theme="dark"] .created-print-steps {
 html[data-theme="dark"] .device-hub-title,
 html[data-theme="dark"] .wallet-page-title,
 html[data-theme="dark"] .landing-device-settings-group-label,
+html[data-theme="dark"] .created-manage-more {
+  border-color: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+}
+
 html[data-theme="dark"] .created-manage-group-label,
 html[data-theme="dark"] .landing-device-settings-title,
 html[data-theme="dark"] .created-loop-label {

@@ -63,7 +63,7 @@ describe("created-child-object-add-hub-core", () => {
 
   it("builds deploy subcopy without game nodes", () => {
     expect(childObjectAddHubSubcopy({ pilot_template: "general" })).toBe(
-      "signs · lost-item tags"
+      "sign · lost-item tag"
     );
   });
 

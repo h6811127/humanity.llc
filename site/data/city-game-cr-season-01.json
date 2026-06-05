@@ -19,7 +19,8 @@
   "map_copy": {
     "title": "Weekend city board",
     "subtitle": "Summer board · read-only",
-    "live_hint": "Use the place list for names and directions. Scan the sticker when you arrive for live signed state — faction holds, quorum, fragments, and care pauses.",
+    "hero_objective": "Find stickers around Cedar Rapids. Scan them to move the city board.",
+    "live_hint": "Find stickers. Scan them. Help unlock city goals.",
     "wayfinding_intro": "Start anywhere — scan any game sticker you find. Planning from home? Search place names in your maps app; the sketch below is districts only, not streets.",
     "diagram_note": "District sketch only — not a street map. Names and Open in Maps links are how you find places.",
     "privacy_note": "Same city truth for everyone. No account. No visit log. No GPS tracking.",

@@ -66,7 +66,8 @@ describe("created scan details disclosure", () => {
     const html = fs.readFileSync(createdHtmlPath, "utf8");
     expect(html).toContain('id="manifesto-update-submit"');
     expect(html).toContain('id="update-object-streams-details"');
-    expect(html).toContain("Extra lines on scan card");
+    expect(html).toContain("More info on scan page");
+    expect(html).toContain("Optional details shown under the main line");
     expect(html).toContain('id="created-live-scanners-see-post-publish"');
     const submitIdx = html.indexOf('id="manifesto-update-submit"');
     const detailsIdx = html.indexOf('id="update-object-streams-details"');

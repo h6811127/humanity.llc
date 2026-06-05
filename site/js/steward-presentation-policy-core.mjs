@@ -147,8 +147,8 @@ export function stewardChildObjectAddHubSubcopy(session, extras = {}) {
   }
   /** @type {string[]} */
   const labels = [];
-  if (shouldOfferAddStatusPlateInDefaultUi(session, extras)) labels.push("signs");
-  if (shouldOfferAddLostItemRelayInDefaultUi(session, extras)) labels.push("lost-item tags");
+  if (shouldOfferAddStatusPlateInDefaultUi(session, extras)) labels.push("sign");
+  if (shouldOfferAddLostItemRelayInDefaultUi(session, extras)) labels.push("lost-item tag");
   if (shouldOfferAddGameNodeInDefaultUi(session, extras)) labels.push("checkpoints");
   else if (shouldShowGameNodeSetupRowInDefaultUi(session, extras)) {
     labels.push("checkpoints (setup)");

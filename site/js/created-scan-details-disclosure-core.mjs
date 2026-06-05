@@ -5,6 +5,11 @@
 
 export const SCAN_DETAILS_ONBOARDING_STORAGE_KEY = "hc_created_scan_details_onboarding";
 
+export const SCAN_DETAILS_DISCLOSURE_TITLE = "More info on scan page";
+
+export const SCAN_DETAILS_DISCLOSURE_SUBTITLE =
+  "Optional details shown under the main line";
+
 /**
  * @param {Storage | null | undefined} storage
  * @param {string | null | undefined} profileId

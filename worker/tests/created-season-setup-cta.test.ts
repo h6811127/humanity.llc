@@ -112,17 +112,11 @@ describe("created-season-setup-cta", () => {
       textContent: "",
       dataset: {},
     });
-    const accountBtn = Object.assign(new HTMLButtonElement(), {
-      hidden: false,
-      textContent: "",
-      dataset: {},
-    });
     Object.defineProperty(globalThis, "document", {
       configurable: true,
       value: {
         getElementById: (id: string) => {
           if (id === "created-season-setup-cta") return btn;
-          if (id === "created-account-first-sign-cta") return accountBtn;
           return null;
         },
       },
@@ -136,7 +130,6 @@ describe("created-season-setup-cta", () => {
     });
     expect(btn.hidden).toBe(false);
     expect(btn.textContent).toBe(CREATED_SEASON_SETUP_CTA_LABEL);
-    expect(accountBtn.hidden).toBe(true);
     expect(CONTROL_SEASON_HERO_LEAD).toBe("Continue setup and add your first checkpoint.");
   });
 

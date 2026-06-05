@@ -211,14 +211,6 @@
           <p class="created-hero-meta device-boot-gated" id="created-hero-meta"></p>
           <button
             type="button"
-            class="btn-primary created-account-first-sign-cta"
-            id="created-account-first-sign-cta"
-            hidden
-          >
-            Add your first sign
-          </button>
-          <button
-            type="button"
             class="btn-primary created-season-setup-cta"
             id="created-season-setup-cta"
             hidden
@@ -268,29 +260,6 @@
             <button type="button" class="hc-emphasis-card__cta" id="live-control-proof-btn">
               Prove control now
             </button>
-          </div>
-        </section>
-
-        <section
-          class="hc-emphasis-card hc-emphasis-card--active"
-          id="created-vouch-return-banner"
-          role="status"
-          hidden
-        >
-          <div class="hc-emphasis-card__main">
-            <span class="hc-emphasis-card__dot hc-emphasis-card__dot--active" aria-hidden="true"></span>
-            <div class="hc-emphasis-card__copy">
-              <p class="hc-emphasis-card__eyebrow">Vouch ready</p>
-              <p class="hc-emphasis-card__title">Keys loaded in this tab</p>
-              <p class="hc-emphasis-card__detail">
-                You can manage this card here, then finish vouching on the scan you came from.
-              </p>
-            </div>
-          </div>
-          <div class="hc-emphasis-card__actions">
-            <a class="hc-emphasis-card__cta" id="created-vouch-return-link" href="#"
-              >Return to scan to vouch</a
-            >
           </div>
         </section>
 
@@ -812,10 +781,14 @@
                   hidden
                 >
                   <summary class="created-scan-details-summary">
-                    <span
-                      class="created-scan-details-summary-title"
-                      id="update-streams-summary-title"
-                      >Extra lines on scan card</span>
+                    <span class="created-scan-details-summary-copy">
+                      <span
+                        class="created-scan-details-summary-title"
+                        id="update-streams-summary-title"
+                        >More info on scan page</span>
+                      <span class="created-scan-details-summary-sub form-hint"
+                        >Optional details shown under the main line</span>
+                    </span>
                     <span
                       class="created-scan-details-summary-meta form-hint"
                       id="update-streams-summary-meta"
@@ -884,14 +857,37 @@
               hidden
               data-created-signing-only
             >
-              For signs and return tags: open <strong>Manage</strong> and try turning off this code
-              once so you know how revoke works. Then edit what opens on <strong>Live</strong>.
+              For signs and return tags: open <strong>Settings</strong> and try turning off this code
+              once so you know how revoke works. Then edit what opens on <strong>What opens</strong>.
             </p>
 
             <p class="created-live-footer form-hint">
               <a href="/wallet/">My objects</a> ·
               <a href="/case-study/">How the loop works</a>
             </p>
+          </section>
+
+          <section
+            class="hc-emphasis-card hc-emphasis-card--info created-vouch-return-banner"
+            id="created-vouch-return-banner"
+            role="status"
+            hidden
+          >
+            <div class="hc-emphasis-card__main">
+              <span class="hc-emphasis-card__dot hc-emphasis-card__dot--info" aria-hidden="true"></span>
+              <div class="hc-emphasis-card__copy">
+                <p class="hc-emphasis-card__eyebrow">Finishing a vouch</p>
+                <p class="hc-emphasis-card__title">Return to scan when ready</p>
+                <p class="hc-emphasis-card__detail">
+                  You opened this saved item from a vouch flow. Finish on the scan page you came from.
+                </p>
+              </div>
+            </div>
+            <div class="hc-emphasis-card__actions">
+              <a class="hc-emphasis-card__cta" id="created-vouch-return-link" href="#"
+                >Return to scan to vouch</a
+              >
+            </div>
           </section>
 
           <details class="created-advanced-block">
@@ -910,7 +906,7 @@
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
                 </span>
                 <span class="list-content">
-                  <span class="list-title">Card</span>
+                  <span class="list-title">QR</span>
                   <span class="list-sub" id="network-card-status">Checking…</span>
                 </span>
               </li>
@@ -1022,10 +1018,10 @@
             hidden
           >
             <summary class="form-label created-child-object-add-hub-summary">
-              Add another…
+              Add another QR
             </summary>
             <p class="form-hint" id="child-object-add-hub-sub">
-              Add or manage scan points for this account
+              sign · lost-item tag
             </p>
             <div class="created-child-add-hub-body">
               <div id="game-season-setup" class="created-game-season-setup-anchor" hidden></div>
@@ -1052,10 +1048,10 @@
               id="child-object-add-status-plate-title"
               data-child-object-add-chrome
             >
-              Add another sign
+              Add sign
             </h2>
             <p class="created-what-now-body" data-child-object-add-chrome>
-              Add another sign on this account. Create a QR in one step (no new private key).
+              Create a QR saved under this @name.
             </p>
             <div
               id="child-object-status-plate-backup-gate"
@@ -1101,7 +1097,7 @@
               class="list-rows"
               id="child-object-status-plate-list"
               hidden
-              aria-label="Signs under this account on this device"
+              aria-label="Signs on this device"
             ></ul>
           </section>
 
@@ -1116,10 +1112,10 @@
               id="child-object-add-lost-item-title"
               data-child-object-add-chrome
             >
-              Add another lost-item tag
+              Add lost-item tag
             </h2>
             <p class="created-what-now-body" data-child-object-add-chrome>
-              Add another lost-item tag on this account. Create a QR in one step (no new private key).
+              Create a return QR saved under this @name.
             </p>
             <div
               id="child-object-lost-item-backup-gate"
@@ -1165,7 +1161,7 @@
               class="list-rows"
               id="child-object-lost-item-list"
               hidden
-              aria-label="Lost-item tags under this account on this device"
+              aria-label="Lost-item tags on this device"
             ></ul>
           </section>
 
@@ -1740,7 +1736,7 @@
                   from this tab.
                 </p>
                 <ul class="list list-compact owner-network-status-rows">
-                  <li class="list-row">
+                  <li class="list-row" id="owner-status-card-row" hidden>
                     <span class="list-icon list-icon-tone-green" id="owner-status-card-icon" aria-hidden="true">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
                     </span>
@@ -1754,7 +1750,7 @@
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
                     </span>
                     <span class="list-content">
-                      <span class="list-title">This QR</span>
+                      <span class="list-title">QR</span>
                       <span class="list-sub" id="owner-status-qr">Checking…</span>
                     </span>
                   </li>
@@ -2016,7 +2012,14 @@
             </details>
           </div>
 
-          <div class="created-manage-group" data-created-signing-only>
+          <details class="created-manage-more" id="created-manage-more" data-created-signing-only>
+            <summary class="created-manage-more-summary">
+              <span class="created-manage-more-title">More settings</span>
+              <span class="created-manage-more-sub form-hint">Usage, export, and help</span>
+              <span class="list-chevron" aria-hidden="true">›</span>
+            </summary>
+            <div class="created-manage-more-body">
+          <div class="created-manage-group">
             <h2 class="created-manage-group-label">Advanced</h2>
 
 <div class="created-manage-tools" id="created-owner-actions">
@@ -2114,30 +2117,6 @@
               </div>
             </details>
 
-            <details class="settings-disclosure settings-disclosure-action" id="vouch-revoke-details" hidden>
-              <summary class="settings-summary">
-                <span class="list-icon list-icon-tone-orange" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                </span>
-                <span class="settings-summary-text">
-                  <span class="settings-summary-title">Vouches you gave</span>
-                  <span class="settings-summary-sub">Revoke a mistaken attestation</span>
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </summary>
-              <div class="settings-panel settings-panel-action">
-                <p class="form-hint">
-                  Vouches are public and revocable. Re-vouching still counts toward your yearly quota.
-                </p>
-                <p class="form-hint" id="vouch-revoke-no-key" hidden>
-                  Load ownership below to revoke a vouch from this session.
-                </p>
-                <p class="form-hint" id="issued-vouch-empty" hidden></p>
-                <ul class="issued-vouch-list" id="issued-vouch-list"></ul>
-                <p class="form-status" id="vouch-revoke-status" hidden></p>
-              </div>
-            </details>
-
             <details
               class="settings-disclosure settings-disclosure-info"
               id="created-developer-export-details"
@@ -2206,7 +2185,7 @@
                 <section class="group created-developer-export-section" id="network-details" aria-label="Inspect on network">
                   <h3 class="form-label">Inspect on network</h3>
                   <p class="form-hint">
-                    Status at a glance is on the <strong>Live</strong> tab. Each printed code is its own
+                    Status at a glance is on the <strong>What opens</strong> tab. Each printed code is its own
                     credential. Revoke one sticker without killing siblings.
                   </p>
                   <ul class="list list-compact">
@@ -2300,6 +2279,8 @@
             </details>
 
           </div>
+            </div>
+          </details>
 
         </div>
         </div>

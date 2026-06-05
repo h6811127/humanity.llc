@@ -10,6 +10,7 @@ import {
   revokeNetworkHintForPilot,
 } from "./pilot-steward-copy.mjs";
 import { inferPilotTemplate } from "./manifesto-display.mjs";
+import { formatCreatedQrStatusPhrase } from "./created-qr-status-copy-core.mjs";
 
 const ICON_TONE = {
   active: "green",
@@ -39,6 +40,7 @@ export function initOwnerRevoke(ctx) {
   const revokeQrBlock = document.getElementById("revoke-qr-block");
   const revokeCardBlock = document.getElementById("revoke-card-block");
   const revokeSummarySub = document.getElementById("revoke-summary-sub");
+  const statusCardRow = document.getElementById("owner-status-card-row");
   const statusCardEl = document.getElementById("owner-status-card");
   const statusQrEl = document.getElementById("owner-status-qr");
   const statusVerificationEl = document.getElementById("owner-status-verification");
@@ -128,6 +130,15 @@ export function initOwnerRevoke(ctx) {
     );
   }
 
+  function shouldShowCardStatusRow(cardStatus, qrStatus) {
+    const card = cardStatus?.toLowerCase?.() ?? "";
+    const qr = qrStatus?.toLowerCase?.() ?? "";
+    if (!card || !qr) return true;
+    if (card === qr) return false;
+    if (card === "active" && (qr === "active" || qr === "reachable")) return false;
+    return true;
+  }
+
   function applyNetworkStatus(body, scanKindOverride) {
     const scan = body?.scan ?? {};
     const cardStatus = scan.card?.status ?? "unknown";
@@ -136,14 +147,18 @@ export function initOwnerRevoke(ctx) {
     const verificationLabel = scan.verification?.label ?? "Unknown";
     const scanKind = scanKindOverride ?? scan.kind ?? "unknown";
 
+    if (statusCardRow) {
+      statusCardRow.hidden = !shouldShowCardStatusRow(cardStatus, qrStatus);
+    }
     if (statusCardEl) {
       statusCardEl.textContent = capitalize(cardStatus);
     }
     if (statusQrEl) {
       const expiry = scan.qr?.expires_at;
+      const phrase = formatCreatedQrStatusPhrase(qrStatus) ?? capitalize(qrStatus);
       statusQrEl.textContent = expiry
-        ? `${capitalize(qrStatus)} · valid until ${formatShortDate(expiry)}`
-        : capitalize(qrStatus);
+        ? `${phrase} · valid until ${formatShortDate(expiry)}`
+        : phrase;
     }
     if (statusVerificationEl) {
       statusVerificationEl.textContent = humanTrust

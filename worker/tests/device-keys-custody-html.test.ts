@@ -132,6 +132,8 @@ describe("device-keys-custody-html", () => {
     expect(html).toContain("Issue new code");
     expect(html).toContain("Preview item");
     expect(html).not.toContain("Issue new QR");
+    expect(html).toContain('id="created-manage-more"');
+    expect(html).toContain("More settings");
   });
 
   it("created Manage tab collapses developer export under Export for developers (D8)", () => {

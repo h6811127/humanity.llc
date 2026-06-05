@@ -9,8 +9,8 @@ import {
 
 describe("createdLiveObjectStatusChipLabel", () => {
   it("maps active network labels", () => {
-    expect(createdLiveObjectStatusChipLabel("Active")).toBe("Active");
-    expect(createdLiveObjectStatusChipLabel("reachable")).toBe("Active");
+    expect(createdLiveObjectStatusChipLabel("Active")).toBe("QR active");
+    expect(createdLiveObjectStatusChipLabel("reachable")).toBe("QR active");
   });
 
   it("returns null for empty placeholders", () => {
@@ -19,8 +19,8 @@ describe("createdLiveObjectStatusChipLabel", () => {
   });
 
   it("passes through revoked and expired", () => {
-    expect(createdLiveObjectStatusChipLabel("Revoked")).toBe("Revoked");
-    expect(createdLiveObjectStatusChipLabel("expired")).toBe("Expired");
+    expect(createdLiveObjectStatusChipLabel("Revoked")).toBe("QR revoked");
+    expect(createdLiveObjectStatusChipLabel("expired")).toBe("QR expired");
   });
 });
 

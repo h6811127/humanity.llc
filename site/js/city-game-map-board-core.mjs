@@ -35,8 +35,8 @@ export const CITY_GAME_ROLE_LABELS = {
 const DEFAULT_MAP_COPY = {
   title: "City state",
   subtitle: "Weekend board · read-only",
-  live_hint:
-    "Use the place list for names and directions. Scan the sticker when you arrive for live signed state. Faction holds, quorum, fragments, and care pauses.",
+  hero_objective: "Find stickers around town. Scan them to move the city board.",
+  live_hint: "Find stickers. Scan them. Help unlock city goals.",
   wayfinding_intro:
     "Start anywhere. Scan any game sticker you find. Planning from home? Search place names in your maps app; the sketch below is districts only, not streets.",
   diagram_note:
@@ -121,6 +121,7 @@ export function resolveMapCopy(season) {
   return {
     title: c.title?.trim() || DEFAULT_MAP_COPY.title,
     subtitle: c.subtitle?.trim() || DEFAULT_MAP_COPY.subtitle,
+    hero_objective: c.hero_objective?.trim() || DEFAULT_MAP_COPY.hero_objective,
     live_hint: c.live_hint?.trim() || DEFAULT_MAP_COPY.live_hint,
     wayfinding_intro: c.wayfinding_intro?.trim() || DEFAULT_MAP_COPY.wayfinding_intro,
     diagram_note: c.diagram_note?.trim() || DEFAULT_MAP_COPY.diagram_note,

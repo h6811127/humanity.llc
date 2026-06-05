@@ -139,10 +139,11 @@ describe("device-emphasis-card-html", () => {
     expect(html).not.toContain("live-control-notification-icon");
   });
 
-  it("created vouch return banner uses active emphasis card markup", () => {
+  it("created vouch return banner uses info emphasis card markup", () => {
     const html = readFileSync(join(root, "site/created/index.html"), "utf8");
     expect(html).toContain('id="created-vouch-return-banner"');
-    expect(html).toContain("hc-emphasis-card--active");
+    expect(html).toContain("hc-emphasis-card--info");
+    expect(html).toContain("Finishing a vouch");
     expect(html).toContain('class="hc-emphasis-card__cta" id="created-vouch-return-link"');
     expect(html).not.toContain("created-vouch-return-text");
     expect(html).not.toContain("btn-primary created-vouch-return-btn");

@@ -65,8 +65,8 @@ describe("presentation policy — deploy account", () => {
     expect(shouldOfferAddGameNodeInDefaultUi(deployRoot, extras)).toBe(false);
     expect(shouldShowGameNodeSetupRowInDefaultUi(deployRoot, extras)).toBe(false);
     expect(shouldShowChildObjectAddHubInDefaultUi(deployRoot, extras)).toBe(true);
-    expect(stewardChildObjectAddHubSubcopy(deployRoot, extras)).toBe("signs · lost-item tags");
-    expect(stewardChildObjectAddHubSummaryTitle(deployRoot, extras)).toBe("Add another…");
+    expect(stewardChildObjectAddHubSubcopy(deployRoot, extras)).toBe("sign · lost-item tag");
+    expect(stewardChildObjectAddHubSummaryTitle(deployRoot, extras)).toBe("Add another QR");
   });
 });
 
@@ -82,7 +82,7 @@ describe("presentation policy — season account", () => {
       "Season checkpoints"
     );
     expect(stewardChildObjectAddHubSummaryTitle(seasonRootWithOrganizer, extras)).toBe(
-      "Add another…"
+      "Add another QR"
     );
   });
 

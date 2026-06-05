@@ -90,13 +90,11 @@ export function focusSeasonSetupChecklist(profileId) {
  */
 export function syncCreatedSeasonSetupCta(ctx) {
   const btn = document.getElementById("created-season-setup-cta");
-  const accountBtn = document.getElementById("created-account-first-sign-cta");
   if (!(btn instanceof HTMLButtonElement)) return;
   const show = shouldShowSeasonSetupCta(ctx);
   btn.hidden = !show;
   if (show) {
     btn.textContent = CREATED_SEASON_SETUP_CTA_LABEL;
-    if (accountBtn instanceof HTMLButtonElement) accountBtn.hidden = true;
   }
 }
 

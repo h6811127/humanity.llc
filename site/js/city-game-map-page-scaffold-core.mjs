@@ -39,12 +39,14 @@ export function buildMapPageHtml(season, jsonBasename) {
     ? /** @type {Record<string, string>} */ (season.map_copy)
     : {};
   const boardTitle = mapCopy.title?.trim() || "Weekend city board";
+  const heroObjective =
+    mapCopy.hero_objective?.trim() ||
+    `Find stickers around ${city}. Scan them to move the city board.`;
   const isPlanned = season.status === "planned" || !formatSeasonWindowLabel(season);
   const robotsMeta = isPlanned
     ? '    <meta name="robots" content="noindex, nofollow" />\n'
     : "";
-  const metaDescription =
-    `Weekend city board for ${city} — every game spot, live public progress, and Open in Maps links. No app. No account.`;
+  const metaDescription = `${heroObjective} Open places, live board state, and maps links. No app. No account.`;
 
   const bannerOrHint = isPlanned
     ? `<div class="research-dev-hint" role="note">
@@ -86,10 +88,7 @@ ${robotsMeta}    <meta name="theme-color" content="#ffffff" />
         <section class="hero hero-compact">
           <p class="hero-eyebrow">${escapeHtml(city)}</p>
           <h1>${escapeHtml(boardTitle)}</h1>
-          <p class="hero-line">
-            See every game spot around town — <strong>live progress</strong>, districts, and
-            directions. The same view for everyone. No app. No account.
-          </p>
+          <p class="hero-line">${escapeHtml(heroObjective)}</p>
           <p class="hero-line hero-line-sub">
             <a href="${escapeHtml(ctx.rulesPath)}">How to play (rules)</a>
             · scan any sticker when you arrive for the latest state

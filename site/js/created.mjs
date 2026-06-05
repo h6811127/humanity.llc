@@ -106,14 +106,11 @@ import {
 } from "./created-first-session-containment-core.mjs";
 import { applyFirstSessionContainment } from "./created-first-session-containment.mjs";
 import {
-  focusSignAddSection,
-  wireCreatedAccountFirstSignCtaClick,
-} from "./created-account-first-sign-cta.mjs";
-import {
   focusSeasonSetupChecklist,
   wireCreatedSeasonSetupCtaClick,
 } from "./created-season-setup-cta.mjs";
 import { syncCreatedPageDisplayLabels, syncChildObjectAddSectionLabels } from "./created-display-labels.mjs";
+import { formatCreatedQrStatusPhrase } from "./created-qr-status-copy-core.mjs";
 import {
   initCreatedRoomSwitcher,
   syncCreatedRoomSwitcher,
@@ -212,10 +209,26 @@ function applyCreatedSessionState(next) {
 function initVouchReturnBanner() {
   const banner = document.getElementById("created-vouch-return-banner");
   const link = document.getElementById("created-vouch-return-link");
-  const returnUrl = liveReturnUrlParam;
-  if (!banner || !link || !returnUrl || liveChallengeParam) return;
+  if (!banner || !link || liveChallengeParam) return;
   if (!loadSession()?.owner_private_key_b58) return;
-  if (!vouchIntentParam && !returnUrl.includes("/c/")) return;
+  let returnUrl = liveReturnUrlParam;
+  if (!returnUrl) {
+    try {
+      returnUrl = sessionStorage.getItem("hc_vouch_return_url")?.trim() || null;
+    } catch {
+      returnUrl = null;
+    }
+  }
+  if (!returnUrl) return;
+  let fromVouchFlow = vouchIntentParam;
+  if (!fromVouchFlow) {
+    try {
+      fromVouchFlow = !!sessionStorage.getItem("hc_vouch_return_url");
+    } catch {
+      fromVouchFlow = false;
+    }
+  }
+  if (!fromVouchFlow) return;
   banner.hidden = false;
   link.href = returnUrl;
   link.addEventListener("click", () => {
@@ -384,9 +397,15 @@ function formatManifestoTeaser(manifestoLine) {
 
 function buildHeroMetaParts() {
   const parts = [];
-  const cardStatus = networkCardStatusEl?.textContent?.trim();
-  if (cardStatus && cardStatus !== " - ") {
-    parts.push(`Card ${cardStatus.toLowerCase()}`);
+  const qrStatus = networkCardStatusEl?.textContent?.trim();
+  const qrPhrase =
+    qrStatus && qrStatus !== " - " && qrStatus !== "Checking…"
+      ? formatCreatedQrStatusPhrase(qrStatus.toLowerCase())
+      : data?.status
+        ? formatCreatedQrStatusPhrase(String(data.status))
+        : null;
+  if (qrPhrase) {
+    parts.push(qrPhrase);
   }
   const qrExpiry = networkQrExpiresEl?.textContent?.trim();
   if (qrExpiry && qrExpiry !== " - " && qrExpiry !== "No expiry set") {
@@ -585,14 +604,10 @@ function finalizeControlWorkspacePresentation() {
   if (profileId) {
     syncCreatedRoomSwitcher(profileId, loadSession());
     syncChildObjectAddHub(loadSession(), { profileId });
-    syncChildObjectAddSectionLabels(profileId, localStorage);
+    syncChildObjectAddSectionLabels(profileId, localStorage, data?.handle ?? loadSession()?.handle);
     reapplyDeploySuccessPresentationChrome();
     window.dispatchEvent(new Event("hc-created-live-setup-memory-sync"));
   }
-  wireCreatedAccountFirstSignCtaClick(() => {
-    onStewardRoomApplied(STEWARD_ROOM_DOORS);
-    focusSignAddSection(profileId);
-  });
   wireCreatedSeasonSetupCtaClick(() => {
     focusSeasonSetupChecklist(profileId);
     onStewardRoomApplied(STEWARD_ROOM_SEASON);
@@ -1149,10 +1164,10 @@ async function refreshNetworkStatus() {
     setResolverReachable(true);
     const body = await res.json();
     const scan = body.scan ?? {};
-    const cardStatus = scan.card?.status;
+    const qrStatus = scan.qr?.status ?? scan.card?.status;
     const qrExpires = scan.qr?.expires_at;
-    if (networkCardStatusEl && cardStatus) {
-      networkCardStatusEl.textContent = capitalizeStatus(cardStatus);
+    if (networkCardStatusEl && qrStatus) {
+      networkCardStatusEl.textContent = capitalizeStatus(qrStatus);
     }
     if (networkQrExpiresEl) {
       if (qrExpires) {

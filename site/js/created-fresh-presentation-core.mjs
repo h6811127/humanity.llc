@@ -93,8 +93,9 @@ export function controlHeroTitle(kind) {
   return "Control this item";
 }
 
-/** Hero lead on first control visit for general accounts (P0.2). */
-export const CONTROL_ACCOUNT_HERO_LEAD = "Add your first sign or tag.";
+/** Hero lead on control visit for general roots — control-first, not add-another (P0.2). */
+export const CONTROL_ACCOUNT_HERO_LEAD =
+  "Update what scanners see, then print or test your QR.";
 
 /** Contextual next-step leads on control hero (P1.1). */
 export const CONTROL_SIGN_HERO_LEAD =
@@ -113,9 +114,6 @@ const CONTROL_HERO_LEADS = {
   wear: CONTROL_WEAR_HERO_LEAD,
   season: CONTROL_SEASON_HERO_LEAD,
 };
-
-/** Primary CTA label — scrolls to sign add section (P0.2). */
-export const CREATED_ACCOUNT_FIRST_SIGN_CTA_LABEL = "Add your first sign";
 
 /**
  * @param {ControlOutcomeKind} kind

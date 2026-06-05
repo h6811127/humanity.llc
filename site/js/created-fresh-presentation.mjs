@@ -3,7 +3,6 @@
  */
 
 import { clearCreateHandoff, readCreateHandoff } from "./create-handoff-core.mjs";
-import { syncCreatedAccountFirstSignCta } from "./created-account-first-sign-cta.mjs";
 import { syncCreatedSeasonSetupCta } from "./created-season-setup-cta.mjs";
 import {
   FRESH_SETUP_SAVE_LEAD,
@@ -83,12 +82,6 @@ export function syncCreatedFreshPresentation(ctx) {
   const profileId =
     (typeof ctx.profileId === "string" && ctx.profileId.trim()) ||
     (typeof ctx.session?.profile_id === "string" ? ctx.session.profile_id.trim() : "");
-  syncCreatedAccountFirstSignCta({
-    mode: ctx.mode,
-    outcomeKind: presentation.outcomeKind,
-    profileId: profileId || null,
-    sessionStorage,
-  });
   syncCreatedSeasonSetupCta({
     mode: ctx.mode,
     outcomeKind: presentation.outcomeKind,

@@ -202,7 +202,7 @@ export function initCreatedLostItemRelay(ctx) {
         submitId: "child-object-lost-item-submit",
       });
     }
-    syncChildObjectAddSectionLabels(ctx.profileId, localStorage);
+    syncChildObjectAddSectionLabels(ctx.profileId, localStorage, ctx.getSession()?.handle);
   }
 
   refreshVisibility();

@@ -98,7 +98,7 @@ export function syncChildObjectAddHub(session, opts = {}) {
     sub.textContent = deploySuccess
       ? deploySuccessHubSubcopy(deploySuccess.endpointType)
       : childObjectAddHubSubcopy(session, extras) ||
-        "Add signs, tags, or checkpoints on this account";
+        "sign · lost-item tag";
   }
 }
 

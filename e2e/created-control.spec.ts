@@ -146,7 +146,9 @@ test.describe("/created/ control mode (Live · Manage)", () => {
     await expect(page.locator("#created-setup-root")).toBeHidden();
     await expect(page.locator("#created-control-root")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Control this item" })).toBeVisible();
-    await expect(page.locator("#created-hero-meta")).toHaveText("Add your first sign or tag.");
+    await expect(page.locator("#created-hero-meta")).toHaveText(
+      "Update what scanners see, then print or test your QR."
+    );
     await expect(page.getByRole("tab", { name: "What opens", selected: true })).toBeVisible();
     await expect(page.getByRole("tab", { name: "Settings" })).toBeVisible();
     await expect(page.locator("#created-live-setup-memory-wrap")).toBeVisible();

@@ -10154,6 +10154,72 @@ body[data-created-mode="setup"] #created-setup-keys-mount .flow-keys-panel {
   color: var(--grey);
 }
 
+.created-manage-more {
+  margin-top: 4px;
+  border: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.08));
+  border-radius: 12px;
+  background: var(--surface-inset, rgba(0, 0, 0, 0.02));
+}
+
+.created-manage-more-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.created-manage-more-summary::-webkit-details-marker {
+  display: none;
+}
+
+.created-manage-more-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.created-manage-more-sub {
+  margin-left: auto;
+  margin-right: 4px;
+  font-size: 12px;
+}
+
+.created-manage-more-body {
+  padding: 0 10px 12px;
+}
+
+.created-manage-more-body .created-manage-group:first-child {
+  margin-top: 4px;
+}
+
+.created-vouch-return-banner {
+  margin-top: 12px;
+}
+
+.created-scan-details-summary {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.created-scan-details-summary-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.created-scan-details-summary-title {
+  font-weight: 600;
+}
+
+.created-scan-details-summary-sub {
+  margin: 0;
+  line-height: 1.35;
+}
+
 .created-manage-tools {
   display: flex;
   flex-direction: column;

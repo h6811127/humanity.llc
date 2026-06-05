@@ -3,6 +3,8 @@
  * @see docs/MERCH_VISUAL_CHOREOGRAPHY.md § Beat 4–5
  */
 
+import { formatCreatedQrStatusPhrase } from "./created-qr-status-copy-core.mjs";
+
 /** Level 0 limit teaser — mirrors scan hero, owner-facing. */
 export const CREATED_LIVE_OBJECT_LIMIT_TEASER =
   "Scanners see your live line. Not who holds the object.";
@@ -36,10 +38,5 @@ export function createdLiveObjectArriveSequenceMs(itemCount) {
  * @param {string | null | undefined} cardStatusText
  */
 export function createdLiveObjectStatusChipLabel(cardStatusText) {
-  const t = cardStatusText?.trim().toLowerCase();
-  if (!t || t === "-" || t === ", ") return null;
-  if (t === "active" || t === "reachable") return "Active";
-  if (t === "revoked") return "Revoked";
-  if (t === "expired") return "Expired";
-  return cardStatusText.trim();
+  return formatCreatedQrStatusPhrase(cardStatusText);
 }

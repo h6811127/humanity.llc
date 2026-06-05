@@ -197,7 +197,7 @@ export function initCreatedChildObject(ctx) {
         submitId: "child-object-status-plate-submit",
       });
     }
-    syncChildObjectAddSectionLabels(ctx.profileId, localStorage);
+    syncChildObjectAddSectionLabels(ctx.profileId, localStorage, ctx.getSession()?.handle);
   }
 
   refreshVisibility();
