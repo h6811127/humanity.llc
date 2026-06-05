@@ -117,7 +117,7 @@ async function openGameSeasonLive(page: Page) {
   const url = `/created/?profile_id=${GAME_SEASON_ROOT.profile_id}&qr_id=${GAME_SEASON_ROOT.qr_id}`;
   await page.goto(url);
   await expect(page.locator("#created-control-root")).toBeVisible();
-  await expect(page.getByRole("tab", { name: "Live", selected: true })).toBeVisible();
+  await expect(page.getByRole("tab", { name: "What opens", selected: true })).toBeVisible();
 }
 
 async function selectExampleSeason(page: Page) {

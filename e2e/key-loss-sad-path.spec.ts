@@ -136,14 +136,14 @@ test.describe("key-loss sad paths", () => {
     await expect(livePanel.locator("#created-view-live-banner")).toBeVisible();
     await expect(livePanel.locator("#created-view-live-lead")).toContainText(/read-only/i);
     await expect(livePanel.locator("#created-live-scanners-see")).toBeHidden();
-    await expect(livePanel.locator("#created-deploy-print")).toBeVisible();
     await expect(livePanel.locator("#created-view-live-qr-tasks")).toBeVisible({
       timeout: 15_000,
     });
 
-    await page.getByRole("tab", { name: "Manage" }).click();
+    await page.getByRole("tab", { name: "Settings" }).click();
+    await expect(page.locator("#created-tab-advanced #created-deploy-print")).toBeVisible();
     await expect(page.locator("#created-view-restore-tools")).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Recovery import" })).toBeVisible();
+    await expect(page.locator("#created-view-restore-tools summary")).toContainText("Recovery code");
     await expect(page.locator("#import-recovery-form")).toBeVisible();
     await expect(page.locator("#no-session")).toBeHidden();
     await expect(page.locator("#created-view-manage-lead")).toContainText(
@@ -211,7 +211,7 @@ test.describe("key-loss sad paths", () => {
     await expect(page.locator("#created-view-live-banner")).toBeVisible();
     await expect(page.locator("#revoke-qr-btn")).toBeHidden();
 
-    await page.getByRole("tab", { name: "Manage" }).click();
+    await page.getByRole("tab", { name: "Settings" }).click();
     await expect(page.locator("#created-view-manage-lead")).toBeVisible();
     await expect(page.locator("#import-recovery-form")).toBeVisible();
   });

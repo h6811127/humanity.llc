@@ -519,7 +519,7 @@
         </section>
 
         <div id="created-control-root" hidden>
-        <nav class="created-tabs" role="tablist" aria-label="Live object controls">
+        <nav class="created-tabs" role="tablist" aria-label="Saved item controls">
           <button
             type="button"
             class="created-tab-btn is-active"
@@ -528,7 +528,7 @@
             data-created-tab="now"
             id="created-tab-btn-now"
           >
-            Live
+            What opens
           </button>
           <button
             type="button"
@@ -538,7 +538,7 @@
             data-created-tab="advanced"
             id="created-tab-btn-advanced"
           >
-            Manage
+            Settings
           </button>
         </nav>
 
@@ -884,170 +884,8 @@
               hidden
               data-created-signing-only
             >
-              For signs and return tags: open <strong>Manage</strong> and try turning off this QR
-              once so you know how revoke works. Then edit what scanners see on <strong>Live</strong>.
-            </p>
-
-            <div class="created-live-deploy" role="group" aria-label="Deploy and verify">
-              <details
-                class="settings-disclosure settings-disclosure-action"
-                id="created-deploy-print"
-              >
-                <summary class="settings-summary">
-                  <span class="list-icon list-icon-tone-orange" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
-                  </span>
-                  <span class="settings-summary-text">
-                    <span class="settings-summary-title">Print &amp; share QR</span>
-                    <span class="settings-summary-sub">Save the image, then print from your phone</span>
-                  </span>
-                  <span class="list-chevron" aria-hidden="true">›</span>
-                </summary>
-                <div class="settings-panel settings-panel-action">
-                  <ol class="created-print-steps">
-                    <li>Download the QR image (button below or under Download QR).</li>
-                    <li>Open it in Photos or Files.</li>
-                    <li>
-                      Share → Print (iPhone) or ⋮ → Print (Android). For a sticker, use label paper or
-                      tape the printout.
-                    </li>
-                  </ol>
-                  <p
-                    class="form-hint created-print-steward-discovery"
-                    id="created-print-steward-discovery"
-                    hidden
-                  ></p>
-                  <button type="button" class="btn-secondary" data-created-action="download-qr">
-                    Download QR image
-                  </button>
-                  <button
-                    type="button"
-                    class="btn-secondary"
-                    id="created-print-steward-cta"
-                    data-created-action="scroll-qr"
-                    hidden
-                  >
-                    View steward handoff QR
-                  </button>
-                </div>
-              </details>
-
-              <details
-                class="settings-disclosure settings-disclosure-action"
-                id="created-deploy-test"
-              >
-                <summary class="settings-summary">
-                  <span class="list-icon list-icon-tone-blue" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
-                  </span>
-                  <span class="settings-summary-text">
-                    <span class="settings-summary-title">Test your QR</span>
-                    <span class="settings-summary-sub">Preview what scanners see when they scan</span>
-                  </span>
-                  <span class="list-chevron" aria-hidden="true">›</span>
-                </summary>
-                <div class="settings-panel settings-panel-action">
-                  <p class="form-hint">
-                    On this phone, use the scan icon in the top bar to preview without leaving the
-                    app. Or open the scan page in a new tab from another camera.
-                  </p>
-                  <button type="button" class="btn-primary" data-created-action="test-scan">
-                    Open scan page
-                  </button>
-                </div>
-              </details>
-
-              <details
-                class="settings-disclosure settings-disclosure-action"
-                id="created-deploy-download"
-              >
-                <summary class="settings-summary">
-                  <span class="list-icon list-icon-tone-green" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                  </span>
-                  <span class="settings-summary-text">
-                    <span class="settings-summary-title">Download QR image</span>
-                    <span class="settings-summary-sub">PNG for print, share, or full-size preview</span>
-                  </span>
-                  <span class="list-chevron" aria-hidden="true">›</span>
-                </summary>
-                <div class="settings-panel settings-panel-action">
-                  <p class="form-hint">Same code stays valid when you update public copy on the network.</p>
-                  <button type="button" class="btn-primary" data-created-action="download-qr">
-                    Download QR image
-                  </button>
-                  <button type="button" class="btn-secondary" data-created-action="scroll-qr">
-                    View full-size QR
-                  </button>
-                </div>
-              </details>
-            </div>
-
-            <details
-              class="settings-disclosure settings-disclosure-action"
-              id="created-custody-disclosure"
-            >
-              <summary class="settings-summary">
-                <span class="list-icon list-icon-tone-slate" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                </span>
-                <span class="settings-summary-text">
-                  <span class="settings-summary-title">Ownership on this device</span>
-                  <span class="settings-summary-sub" id="created-custody-summary-sub"
-                    >Save to manage and revoke later</span
-                  >
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </summary>
-              <div class="settings-panel settings-panel-action" id="created-custody-panel">
-                <section
-                  class="group flow-keys-group created-keys-strip"
-                  id="created-keys-strip"
-                  aria-label="Save ownership on this device"
-                >
-            <div class="flow-keys-panel">
-              <form
-                id="created-device-save-form"
-                class="created-keys-save-form flow-inset-form"
-                autocomplete="off"
-                novalidate
-              >
-                <label class="flow-field" for="created-device-save-label">
-                  <span class="flow-field-label">Name in My objects</span>
-                  <input
-                    class="flow-field-input"
-                    id="created-device-save-label"
-                    type="text"
-                    maxlength="48"
-                    placeholder="Personal card"
-                  />
-                </label>
-              </form>
-              <button
-                type="button"
-                class="btn-primary created-keys-save-btn"
-                id="created-device-save-btn"
-              >
-                Save ownership on this device
-              </button>
-              <p id="created-device-save-status" class="form-status" hidden role="status"></p>
-              <p class="created-keys-saved" id="created-device-save-done" hidden>
-                Saved ownership on this device.
-                <a href="/wallet/">My objects home</a> ·
-                <a href="/create/">Create another card</a>
-              </p>
-            </div>
-
-            <p class="created-keys-foot form-hint">
-              Recovery method and encrypted backup live under <strong>Manage</strong> and restore
-              control of this account plus its object QRs.
-            </p>
-                </section>
-              </div>
-            </details>
-
-            <p class="created-live-manage-hint form-hint">
-              Rotate or revoke this QR under <strong>Manage</strong>.
+              For signs and return tags: open <strong>Manage</strong> and try turning off this code
+              once so you know how revoke works. Then edit what opens on <strong>Live</strong>.
             </p>
 
             <p class="created-live-footer form-hint">
@@ -1623,35 +1461,46 @@
         <!--  -  -  -  Advanced: update, revoke, keys  -  -  -  -->
         <div class="created-tab-panel" data-created-panel="advanced" id="created-tab-advanced" role="tabpanel" aria-labelledby="created-tab-btn-advanced" hidden>
           <p class="created-tab-lead" id="created-control-manage-lead" data-created-signing-only>
-            Turn off QRs, rotate links, recovery, and backup. This @name controls every QR on it.
-            The sticker stays; you change live status on the network. Public copy publishes on
-            <strong>Live</strong>. Open controls on <strong>Live</strong> (or
-            <a href="/wallet/">My objects</a>) before switching tabs.
+            Manage this saved item. Update access, restore control, print or share its code, or
+            revoke it when needed.
           </p>
           <p class="created-tab-lead" id="created-view-manage-lead" hidden></p>
 
-          <section
-            class="created-view-restore-tools"
+          <div class="created-manage-group">
+            <h2 class="created-manage-group-label">Access &amp; recovery</h2>
+
+          <details
+            class="settings-disclosure settings-disclosure-action created-view-restore-tools"
             id="created-view-restore-tools"
-            aria-labelledby="created-view-restore-import-title"
           >
-            <h3 class="form-label" id="created-view-restore-import-title">Recovery import</h3>
-            <p class="form-hint">Paste the recovery code you saved at create.</p>
-            <form id="import-recovery-form" class="compact-form" novalidate>
-              <label class="form-label" for="import-recovery-key">Recovery code</label>
-              <textarea
-                class="form-input form-textarea"
-                id="import-recovery-key"
-                name="recovery_key"
-                rows="3"
-                placeholder="Paste recovery code"
-                autocomplete="off"
-                required
-              ></textarea>
-              <button type="submit" class="btn-secondary">Restore with recovery code</button>
-            </form>
-            <p class="form-status" id="import-recovery-status" hidden></p>
-          </section>
+            <summary class="settings-summary">
+              <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+              </span>
+              <span class="settings-summary-text">
+                <span class="settings-summary-title" id="created-view-restore-import-title">Recovery code</span>
+                <span class="settings-summary-sub">Paste the code you saved at create</span>
+              </span>
+              <span class="list-chevron" aria-hidden="true">›</span>
+            </summary>
+            <div class="settings-panel settings-panel-action">
+              <p class="form-hint">Restores control of this item on this device.</p>
+              <form id="import-recovery-form" class="compact-form" novalidate>
+                <label class="form-label" for="import-recovery-key">Recovery code</label>
+                <textarea
+                  class="form-input form-textarea"
+                  id="import-recovery-key"
+                  name="recovery_key"
+                  rows="3"
+                  placeholder="Paste recovery code"
+                  autocomplete="off"
+                  required
+                ></textarea>
+                <button type="submit" class="btn-secondary">Restore with recovery code</button>
+              </form>
+              <p class="form-status" id="import-recovery-status" hidden></p>
+            </div>
+          </details>
 
           <details class="settings-disclosure settings-disclosure-action" id="backup-details">
             <summary class="settings-summary">
@@ -1666,8 +1515,8 @@
             </summary>
             <div class="settings-panel settings-panel-action">
               <p class="form-hint">
-                Use a <code>.hcbackup</code> file you downloaded earlier. Restores ownership of this
-                card and its object QRs. Never uploaded to humanity.llc.
+                Use a <code>.hcbackup</code> file you downloaded earlier. Restores control of this
+                item and its codes. Never uploaded to humanity.llc.
               </p>
               <form id="import-backup-form" class="compact-form" novalidate>
                 <label class="form-label" for="import-backup-file">Backup file</label>
@@ -1701,6 +1550,106 @@
           </details>
 
           <details
+            class="settings-disclosure settings-disclosure-action created-recovery-details"
+            id="created-recovery-details"
+            hidden
+          >
+            <summary class="settings-summary">
+              <span class="list-icon list-icon-tone-slate" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+              </span>
+              <span class="settings-summary-text">
+                <span class="settings-summary-title">Recovery key from create</span>
+                <span class="settings-summary-sub">Copy once · restores control of this item</span>
+              </span>
+              <span class="list-chevron" aria-hidden="true">›</span>
+            </summary>
+            <div class="settings-panel settings-panel-action created-recovery-panel">
+              <p class="form-hint">
+                Does not add control to this device until you save it. Store offline before you close
+                this panel.
+              </p>
+              <p class="mono recovery-key-display" id="recovery-key-display"></p>
+              <button type="button" class="btn-secondary" id="copy-recovery-key">
+                Copy recovery code
+              </button>
+              <label class="revoke-confirm revoke-confirm-spaced">
+                <input type="checkbox" id="recovery-reveal-confirm" />
+                <span>I saved this recovery code</span>
+              </label>
+              <button type="button" class="btn-secondary" id="recovery-reveal-dismiss">
+                Mark saved &amp; close
+              </button>
+              <p class="form-status" id="created-recovery-status" hidden role="status"></p>
+            </div>
+          </details>
+          </div>
+
+          <details
+            class="settings-disclosure settings-disclosure-action"
+            id="created-custody-disclosure"
+            data-created-signing-only
+          >
+            <summary class="settings-summary">
+              <span class="list-icon list-icon-tone-slate" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </span>
+              <span class="settings-summary-text">
+                <span class="settings-summary-title">Saved control</span>
+                <span class="settings-summary-sub" id="created-custody-summary-sub"
+                  >Save to manage and revoke later</span
+                >
+              </span>
+              <span class="list-chevron" aria-hidden="true">›</span>
+            </summary>
+            <div class="settings-panel settings-panel-action" id="created-custody-panel">
+              <section
+                class="group flow-keys-group created-keys-strip"
+                id="created-keys-strip"
+                aria-label="Save control on this device"
+              >
+                <div class="flow-keys-panel">
+                  <form
+                    id="created-device-save-form"
+                    class="created-keys-save-form flow-inset-form"
+                    autocomplete="off"
+                    novalidate
+                  >
+                    <label class="flow-field" for="created-device-save-label">
+                      <span class="flow-field-label">Name in My objects</span>
+                      <input
+                        class="flow-field-input"
+                        id="created-device-save-label"
+                        type="text"
+                        maxlength="48"
+                        placeholder="Personal card"
+                      />
+                    </label>
+                  </form>
+                  <button
+                    type="button"
+                    class="btn-primary created-keys-save-btn"
+                    id="created-device-save-btn"
+                  >
+                    Save control on this device
+                  </button>
+                  <p id="created-device-save-status" class="form-status" hidden role="status"></p>
+                  <p class="created-keys-saved" id="created-device-save-done" hidden>
+                    Saved on this device.
+                    <a href="/wallet/">My objects home</a> ·
+                    <a href="/create/">Create another item</a>
+                  </p>
+                </div>
+                <p class="created-keys-foot form-hint">
+                  Recovery code and encrypted backup above restore control if you change devices.
+                </p>
+              </section>
+            </div>
+          </details>
+          <div class="created-manage-group" data-created-signing-only>
+            <h2 class="created-manage-group-label">Code lifecycle</h2>
+
+<details
             class="settings-disclosure settings-disclosure-action"
             id="qr-rotate-panel"
             hidden
@@ -1710,17 +1659,17 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
               </span>
               <span class="settings-summary-text">
-                <span class="settings-summary-title">Issue new QR</span>
-                <span class="settings-summary-sub">Old scan link shows “replaced” on the network</span>
+                <span class="settings-summary-title">Issue new code</span>
+                <span class="settings-summary-sub">Previous link stops working · print a new code</span>
               </span>
               <span class="list-chevron" aria-hidden="true">›</span>
             </summary>
             <div class="settings-panel settings-panel-action">
               <p class="form-hint">
-                Rotates the card-scoped QR credential (A.6). Your printed sticker still points at the
-                previous URL until you print or share a new code. Requires owner control or recovery method.
+                Issues a new code for this item. Your printed sticker still opens the previous link
+                until you print or share the new code.
               </p>
-              <label class="form-label" for="qr-rotate-validity">New QR validity</label>
+              <label class="form-label" for="qr-rotate-validity">New code validity</label>
               <select class="form-input" id="qr-rotate-validity">
                 <option value="7">7 days</option>
                 <option value="30">30 days</option>
@@ -1728,7 +1677,7 @@
                 <option value="365" selected>1 year</option>
               </select>
               <button type="button" class="btn-primary" id="qr-rotate-submit">
-                Issue new QR
+                Issue new code
               </button>
               <p class="form-status" id="qr-rotate-status" hidden role="status"></p>
             </div>
@@ -1744,15 +1693,15 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
               </span>
               <span class="settings-summary-text">
-                <span class="settings-summary-title">Extend QR validity</span>
-                <span class="settings-summary-sub">Same scan link · later expiry on the network</span>
+                <span class="settings-summary-title">Extend code validity</span>
+                <span class="settings-summary-sub">Keep the same link · extend expiry</span>
               </span>
               <span class="list-chevron" aria-hidden="true">›</span>
             </summary>
             <div class="settings-panel settings-panel-action">
               <p class="form-hint">
-                Extends <code>expires_at</code> on your active QR without reprinting (M4.6). Counts
-                from the later of now or your current expiry.
+                Extends when this code expires without reprinting. Counts from the later of now or
+                your current expiry.
               </p>
               <p class="form-hint">
                 Current expiry:
@@ -1778,8 +1727,8 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h4"/><path d="M7 13h6"/><path d="m4 4 16 16"/></svg>
               </span>
               <span class="settings-summary-text">
-                <span class="settings-summary-title" id="revoke-summary-title">Revoke this QR</span>
-                <span class="settings-summary-sub" id="revoke-summary-sub">Stop this QR from working</span>
+                <span class="settings-summary-title" id="revoke-summary-title">Revoke this code</span>
+                <span class="settings-summary-sub" id="revoke-summary-sub">Stop this code from working</span>
               </span>
               <span class="list-chevron" aria-hidden="true">›</span>
             </summary>
@@ -1860,10 +1809,10 @@
                   </div>
                   <label class="revoke-confirm">
                     <input type="checkbox" id="confirm-revoke-qr" />
-                    <span>I understand this turns off this QR only</span>
+                    <span>I understand this turns off this code only</span>
                   </label>
                   <button type="button" class="btn-danger" id="revoke-qr-btn" disabled>
-                    Revoke this QR
+                    Revoke this code
                   </button>
                 </div>
 
@@ -1927,7 +1876,150 @@
             </div>
           </details>
 
-          <div class="created-manage-tools" id="created-owner-actions">
+                    </div>
+          <div class="created-manage-group">
+            <h2 class="created-manage-group-label">Share &amp; preview</h2>
+
+            <details class="settings-disclosure settings-disclosure-action" id="created-deploy-preview">
+              <summary class="settings-summary">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
+                </span>
+                <span class="settings-summary-text">
+                  <span class="settings-summary-title" id="created-deploy-preview-title">Preview item</span>
+                  <span class="settings-summary-sub" id="created-deploy-preview-lead">See what someone sees when they open this item</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </summary>
+              <div class="settings-panel settings-panel-action">
+                <p class="form-hint">
+                  On this phone, use the scan icon in the top bar to preview without leaving the
+                  app. Or open the preview in a new tab from another device.
+                </p>
+                <button type="button" class="btn-primary" data-created-action="test-scan">
+                  Preview item
+                </button>
+              </div>
+            </details>
+
+            <details class="settings-disclosure settings-disclosure-action" id="created-deploy-print">
+              <summary class="settings-summary">
+                <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+                </span>
+                <span class="settings-summary-text">
+                  <span class="settings-summary-title">Print or share</span>
+                  <span class="settings-summary-sub">Save the image, then print from your phone</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </summary>
+              <div class="settings-panel settings-panel-action">
+                <ol class="created-print-steps">
+                  <li>Download the code image (button below or under Download code image).</li>
+                  <li>Open it in Photos or Files.</li>
+                  <li>
+                    Share → Print (iPhone) or ⋮ → Print (Android). For a sticker, use label paper or
+                    tape the printout.
+                  </li>
+                </ol>
+                <p class="form-hint created-print-steward-discovery" id="created-print-steward-discovery" hidden></p>
+                <button type="button" class="btn-secondary" data-created-action="download-qr">
+                  Download code image
+                </button>
+                <button type="button" class="btn-secondary" id="created-print-steward-cta" data-created-action="scroll-qr" hidden>
+                  View steward handoff QR
+                </button>
+              </div>
+            </details>
+
+            <details class="settings-disclosure settings-disclosure-action" id="created-deploy-download">
+              <summary class="settings-summary">
+                <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </span>
+                <span class="settings-summary-text">
+                  <span class="settings-summary-title">Download code image</span>
+                  <span class="settings-summary-sub">PNG for print, share, or full-size preview</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </summary>
+              <div class="settings-panel settings-panel-action">
+                <p class="form-hint">Same code stays valid when you update what opens.</p>
+                <button type="button" class="btn-primary" data-created-action="download-qr">
+                  Download code image
+                </button>
+                <button type="button" class="btn-secondary" data-created-action="scroll-qr">
+                  View full-size QR
+                </button>
+              </div>
+            </details>
+
+            <details class="settings-disclosure settings-disclosure-action" id="created-deploy-copy-link" hidden>
+              <summary class="settings-summary">
+                <span class="list-icon list-icon-tone-slate" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                </span>
+                <span class="settings-summary-text">
+                  <span class="settings-summary-title">Copy link</span>
+                  <span class="settings-summary-sub">Share the open link for this code</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </summary>
+              <div class="settings-panel settings-panel-action">
+                <button type="button" class="btn-secondary" id="created-live-copy-scan" disabled>
+                  Copy link
+                </button>
+              </div>
+            </details>
+          </div>
+          <div class="created-manage-group" data-created-signing-only>
+            <h2 class="created-manage-group-label">Trust</h2>
+
+<details class="settings-disclosure settings-disclosure-action" id="vouch-revoke-details" hidden>
+              <summary class="settings-summary">
+                <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </span>
+                <span class="settings-summary-text">
+                  <span class="settings-summary-title">Vouches you gave</span>
+                  <span class="settings-summary-sub">Revoke a mistaken attestation</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </summary>
+              <div class="settings-panel settings-panel-action">
+                <p class="form-hint">
+                  Vouches are public and revocable. Re-vouching still counts toward your yearly quota.
+                </p>
+                <p class="form-hint" id="vouch-revoke-no-key" hidden>
+                  Load control below to revoke a vouch from this session.
+                </p>
+                <p class="form-hint" id="issued-vouch-empty" hidden></p>
+                <ul class="issued-vouch-list" id="issued-vouch-list"></ul>
+                <p class="form-status" id="vouch-revoke-status" hidden></p>
+              </div>
+            </details>
+
+            <details class="settings-disclosure settings-disclosure-info" id="vouches-received-details" hidden>
+              <summary class="settings-summary">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </span>
+                <span class="settings-summary-text">
+                  <span class="settings-summary-title">Vouches received</span>
+                  <span class="settings-summary-sub" id="vouches-received-summary-sub">Trust on this item</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </summary>
+              <div class="settings-panel settings-panel-info">
+                <p class="form-hint" id="vouches-received-lead"></p>
+              </div>
+            </details>
+          </div>
+
+          <div class="created-manage-group" data-created-signing-only>
+            <h2 class="created-manage-group-label">Advanced</h2>
+
+<div class="created-manage-tools" id="created-owner-actions">
             <details
               class="settings-disclosure settings-disclosure-info created-hosted-plan"
               id="created-hosted-plan"
@@ -2047,135 +2139,6 @@
             </details>
 
             <details
-              class="settings-disclosure settings-disclosure-action created-recovery-details"
-              id="created-recovery-details"
-              hidden
-            >
-              <summary class="settings-summary">
-                <span class="list-icon list-icon-tone-slate" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
-                </span>
-                <span class="settings-summary-text">
-                  <span class="settings-summary-title">Recovery key from create</span>
-                  <span class="settings-summary-sub">Copy once · restores root and object QR control</span>
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </summary>
-              <div class="settings-panel settings-panel-action created-recovery-panel">
-                <p class="form-hint">
-                  Does not add keys to Saved on this device. Store offline before you close this panel;
-                  this key can restore control of this account and its object QRs.
-                </p>
-                <p class="mono recovery-key-display" id="recovery-key-display"></p>
-                <button type="button" class="btn-secondary" id="copy-recovery-key">
-                  Copy recovery code
-                </button>
-                <label class="revoke-confirm revoke-confirm-spaced">
-                  <input type="checkbox" id="recovery-reveal-confirm" />
-                  <span>I saved this recovery code</span>
-                </label>
-                <button type="button" class="btn-secondary" id="recovery-reveal-dismiss">
-                  Mark saved &amp; close
-                </button>
-                <p class="form-status" id="created-recovery-status" hidden role="status"></p>
-              </div>
-            </details>
-
-<details
-                class="settings-disclosure settings-disclosure-action"
-                id="created-deploy-print"
-              >
-                <summary class="settings-summary">
-                  <span class="list-icon list-icon-tone-orange" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
-                  </span>
-                  <span class="settings-summary-text">
-                    <span class="settings-summary-title">Print &amp; share QR</span>
-                    <span class="settings-summary-sub">Save the image, then print from your phone</span>
-                  </span>
-                  <span class="list-chevron" aria-hidden="true">›</span>
-                </summary>
-                <div class="settings-panel settings-panel-action">
-                  <ol class="created-print-steps">
-                    <li>Download the QR image (button below or under Download QR).</li>
-                    <li>Open it in Photos or Files.</li>
-                    <li>
-                      Share → Print (iPhone) or ⋮ → Print (Android). For a sticker, use label paper or
-                      tape the printout.
-                    </li>
-                  </ol>
-                  <p
-                    class="form-hint created-print-steward-discovery"
-                    id="created-print-steward-discovery"
-                    hidden
-                  ></p>
-                  <button type="button" class="btn-secondary" data-created-action="download-qr">
-                    Download QR image
-                  </button>
-                  <button
-                    type="button"
-                    class="btn-secondary"
-                    id="created-print-steward-cta"
-                    data-created-action="scroll-qr"
-                    hidden
-                  >
-                    View steward handoff QR
-                  </button>
-                </div>
-              </details>
-
-              <details
-                class="settings-disclosure settings-disclosure-action"
-                id="created-deploy-test"
-              >
-                <summary class="settings-summary">
-                  <span class="list-icon list-icon-tone-blue" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
-                  </span>
-                  <span class="settings-summary-text">
-                    <span class="settings-summary-title">Test your QR</span>
-                    <span class="settings-summary-sub">Preview what scanners see when they scan</span>
-                  </span>
-                  <span class="list-chevron" aria-hidden="true">›</span>
-                </summary>
-                <div class="settings-panel settings-panel-action">
-                  <p class="form-hint">
-                    On this phone, use the scan icon in the top bar to preview without leaving the
-                    app. Or open the scan page in a new tab from another camera.
-                  </p>
-                  <button type="button" class="btn-primary" data-created-action="test-scan">
-                    Open scan page
-                  </button>
-                </div>
-              </details>
-
-              <details
-                class="settings-disclosure settings-disclosure-action"
-                id="created-deploy-download"
-              >
-                <summary class="settings-summary">
-                  <span class="list-icon list-icon-tone-green" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                  </span>
-                  <span class="settings-summary-text">
-                    <span class="settings-summary-title">Download QR image</span>
-                    <span class="settings-summary-sub">PNG for print, share, or full-size preview</span>
-                  </span>
-                  <span class="list-chevron" aria-hidden="true">›</span>
-                </summary>
-                <div class="settings-panel settings-panel-action">
-                  <p class="form-hint">Same code stays valid when you update public copy on the network.</p>
-                  <button type="button" class="btn-primary" data-created-action="download-qr">
-                    Download QR image
-                  </button>
-                  <button type="button" class="btn-secondary" data-created-action="scroll-qr">
-                    View full-size QR
-                  </button>
-                </div>
-              </details>
-            </div>
-
-            <details
               class="settings-disclosure settings-disclosure-info"
               id="created-developer-export-details"
             >
@@ -2191,8 +2154,8 @@
               </summary>
               <div class="settings-panel settings-panel-info-body created-developer-export-panel">
                 <p class="settings-panel-lead">
-                  Layer 1 tools for integrators and power users. Most stewards only need recovery codes
-                  and encrypted backup above.
+                  Tools for integrators and power users. Most people only need recovery code and
+                  encrypted backup above.
                 </p>
 
                 <section
@@ -2211,8 +2174,8 @@
                 <div id="backup-export-block" class="created-developer-export-section" hidden>
                   <h3 class="form-label">Download encrypted backup</h3>
                   <p class="form-hint">
-                    Available while this tab still has your root owner key. This backup restores
-                    control of this card and its object QRs.
+                    Available while this tab still has your control key. This backup restores control
+                    of this item and its codes.
                   </p>
                   <form id="export-backup-form" class="compact-form" autocomplete="off" novalidate>
                     <label class="form-label" for="export-passphrase">New backup passphrase</label>
@@ -2243,7 +2206,7 @@
                 <section class="group created-developer-export-section" id="network-details" aria-label="Inspect on network">
                   <h3 class="form-label">Inspect on network</h3>
                   <p class="form-hint">
-                    Status at a glance is on the <strong>Live</strong> tab. Each printed QR is its own
+                    Status at a glance is on the <strong>Live</strong> tab. Each printed code is its own
                     credential. Revoke one sticker without killing siblings.
                   </p>
                   <ul class="list list-compact">
@@ -2287,27 +2250,31 @@
               </div>
             </details>
 
-            <details class="settings-disclosure settings-disclosure-info" id="revoke-rules">
+          </div>
+          <div class="created-manage-group">
+            <h2 class="created-manage-group-label">Lifecycle &amp; help</h2>
+
+<details class="settings-disclosure settings-disclosure-info" id="revoke-rules">
               <summary class="settings-summary">
                 <span class="list-icon list-icon-tone-blue" aria-hidden="true">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
                 </span>
                 <span class="settings-summary-text">
-                  <span class="settings-summary-title">Lifecycle & help</span>
-                  <span class="settings-summary-sub">How revoke, keys, and scan behavior work</span>
+                  <span class="settings-summary-title">Lifecycle &amp; help</span>
+                  <span class="settings-summary-sub">How revoke, backup, and codes work</span>
                 </span>
                 <span class="list-chevron" aria-hidden="true">›</span>
               </summary>
               <div class="settings-panel settings-panel-info-body">
                 <p class="settings-panel-lead">
-                  Revoke is a <strong>state transition</strong>, not deleting the sticker. Printed URLs keep
-                  profile ID and QR ID while transitions change what the resolver returns.
+                  Revoking turns off a code — it does not remove the sticker. The printed link stays
+                  the same; what opens when someone uses it changes.
                 </p>
                 <ul class="created-revoke-rules-list">
-                  <li><strong>Active</strong>: live manifesto or pilot layout.</li>
-                  <li><strong>Expiry</strong>: credential time runs out; scan shows expired.</li>
-                  <li><strong>Revoke this QR</strong>: one pointer off; siblings can stay active.</li>
-                  <li><strong>Disable card</strong>: whole profile offline.</li>
+                  <li><strong>Active</strong>: your live content opens when scanned.</li>
+                  <li><strong>Expiry</strong>: the code runs out; opens show expired.</li>
+                  <li><strong>Revoke this code</strong>: this code stops working; others can stay active.</li>
+                  <li><strong>Disable item</strong>: every code on this item stops working.</li>
                 </ul>
                 <ul class="list list-compact created-help-links">
                   <li class="list-row list-action">
@@ -2331,8 +2298,10 @@
                 </ul>
               </div>
             </details>
+
           </div>
 
+        </div>
         </div>
 
         </div><!-- /#created-control-root -->

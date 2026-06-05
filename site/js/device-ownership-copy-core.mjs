@@ -239,7 +239,7 @@ export const VIEW_ONLY_RESTORE_LEAD = VIEW_ONLY_RESTORE_LEAD_EMPTY;
 
 /** Live tab banner when viewing without signing keys (OWNERSHIP_RESTORE Phase 3). */
 export const VIEW_ONLY_LIVE_TAB_LEAD =
-  "Read-only view of your live object. Use the QR and deploy tasks below, or open Manage to import recovery and update.";
+  "Read-only view of this item. Open Manage to print, preview, import recovery, or update.";
 
 /** Setup wizard protect step (Phase 2 · K7 · WS-CUSTODY C0). */
 export const SETUP_SEATBELT_PANEL_LEAD =
@@ -493,15 +493,15 @@ export const SETUP_WALLET_SAVED_DONE_DETAIL =
 
 /** Setup wizard — Manage tab unlocks after setup (RC-13). */
 export const SETUP_MANAGE_TAB_HINT =
-  "Revoke, recovery, and steward tools unlock under the Manage tab after you tap Continue.";
+  "Revoke, recovery, and more tools unlock under the Manage tab after you tap Continue.";
 
 /** Setup done panel — Live vs Manage split (RC-13). */
 export const SETUP_DONE_PANEL_LEAD =
-  "Your QR is live. The same code stays valid when you change status. Update what scanners read on Live; turn off, backup, and advanced tools are under Manage.";
+  "This item is live. The same code stays valid when you change what opens. Update what people see on Live; turn off, backup, and more tools are under Manage.";
 
 /** Live control proof — keys missing in this tab (RC-13 copy alignment). */
 export const LIVE_CONTROL_SIGNING_KEYS_MISSING =
-  "Open this proof link in the original created tab, or unlock a saved recovery key or encrypted backup in Manage. humanity.llc cannot prove control for you.";
+  "Open this proof link in the original created tab, or unlock a saved recovery code or encrypted backup in Manage. humanity.llc cannot prove control for you.";
 
 /** Status dot steward queue pointer (RC-13 copy alignment). */
 export const STEWARD_REVIEW_QUEUE_MANAGE_HINT =

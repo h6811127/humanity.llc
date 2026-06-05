@@ -145,15 +145,17 @@ test.describe("/created/ control mode (Live · Manage)", () => {
 
     await expect(page.locator("#created-setup-root")).toBeHidden();
     await expect(page.locator("#created-control-root")).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Your account is live" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Control this item" })).toBeVisible();
     await expect(page.locator("#created-hero-meta")).toHaveText("Add your first sign or tag.");
-    await expect(page.getByRole("tab", { name: "Live", selected: true })).toBeVisible();
-    await expect(page.getByRole("tab", { name: "Manage" })).toBeVisible();
+    await expect(page.getByRole("tab", { name: "What opens", selected: true })).toBeVisible();
+    await expect(page.getByRole("tab", { name: "Settings" })).toBeVisible();
     await expect(page.locator("#created-live-setup-memory-wrap")).toBeVisible();
     await expect(page.locator("#created-live-primary-btn")).toBeVisible();
     await expect(page.locator("#created-live-scanners-see")).toBeVisible();
     await expect(page.locator("#created-scanners-see-gate-hint")).toBeHidden();
-    await expect(page.locator("#created-tab-now #created-deploy-print")).toBeVisible();
+    await expect(page.locator("#created-tab-advanced #created-deploy-print")).toBeHidden();
+    await page.getByRole("tab", { name: "Settings" }).click();
+    await expect(page.locator("#created-tab-advanced #created-deploy-print")).toBeVisible();
     await expect(page.locator("#manifesto-update-panel")).toHaveCount(0);
   });
 
@@ -234,7 +236,7 @@ test.describe("/created/ control mode (Live · Manage)", () => {
 
     await page.goto(`/created/?profile_id=${SAMPLE.profile_id}&qr_id=${SAMPLE.qr_id}`);
 
-    await expect(page.getByRole("tab", { name: "Live", selected: true })).toBeVisible();
+    await expect(page.getByRole("tab", { name: "What opens", selected: true })).toBeVisible();
     await expect(page.locator("#created-live-scanners-see")).toBeVisible();
     await expect(page.locator("#created-scanners-see-gate-hint")).toBeHidden();
     await expect(page.locator("#update-fields-status-plate")).toBeVisible();
@@ -246,7 +248,7 @@ test.describe("/created/ control mode (Live · Manage)", () => {
     await page.goto(
       `/created/?profile_id=${SAMPLE.profile_id}&qr_id=${SAMPLE.qr_id}#revoke`
     );
-    await expect(page.getByRole("tab", { name: "Manage", selected: true })).toBeVisible();
+    await expect(page.getByRole("tab", { name: "Settings", selected: true })).toBeVisible();
     await expect(page.locator("#revoke-details")).toBeVisible();
     await expect(page.locator("#revoke-details")).toHaveAttribute("open");
   });
@@ -286,7 +288,7 @@ test.describe("/created/ control mode (Live · Manage)", () => {
     await page.goto(
       `/created/?profile_id=${SAMPLE.profile_id}&qr_id=${SAMPLE.qr_id}#update-status`
     );
-    await expect(page.getByRole("tab", { name: "Live", selected: true })).toBeVisible();
+    await expect(page.getByRole("tab", { name: "What opens", selected: true })).toBeVisible();
     await expect(page.locator("#created-live-scanners-see")).toBeVisible();
     await expect(page.locator("#manifesto-update-form")).toBeVisible();
   });

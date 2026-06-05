@@ -27,9 +27,9 @@ export const PILOT_STEWARD_COPY = {
     scannersSeeTitle: "What scanners see",
     scannersSeeLead: "Same QR. Updates on the next scan.",
     publishBtn: "Publish update",
-    revokeSummaryTitle: "Revoke this QR",
-    revokeQrBtn: "Revoke this QR",
-    revokeConfirmQr: "I understand — revoke this scan QR only",
+    revokeSummaryTitle: "Revoke this code",
+    revokeQrBtn: "Revoke this code",
+    revokeConfirmQr: "I understand — revoke this code only",
     revokeNetworkLead:
       "What scanners see right now — fetched live, not guessed from this tab.",
     hubUpdateStatus: "Update status",

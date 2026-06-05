@@ -64,11 +64,11 @@ describe("resolveFreshOutcomeKind", () => {
 
 describe("controlHeroTitle", () => {
   it("uses contextual live titles and next-step leads (P1.1)", () => {
-    expect(controlHeroTitle("sign")).toBe("Your sign is live");
-    expect(controlHeroTitle("tag")).toBe("Your tag is live");
-    expect(controlHeroTitle("wear")).toBe("Your wearable QR is live");
-    expect(controlHeroTitle("season")).toBe("Your season is live");
-    expect(controlHeroTitle("account")).toBe("Your account is live");
+    expect(controlHeroTitle("sign")).toBe("Control this sign");
+    expect(controlHeroTitle("tag")).toBe("Control this tag");
+    expect(controlHeroTitle("wear")).toBe("Control this item");
+    expect(controlHeroTitle("season")).toBe("Control this season");
+    expect(controlHeroTitle("account")).toBe("Control this item");
     expect(controlHeroCopy("account").lead).toBe(CONTROL_ACCOUNT_HERO_LEAD);
     expect(controlHeroCopy("sign").lead).toBe(CONTROL_SIGN_HERO_LEAD);
     expect(controlHeroCopy("tag").lead).toBe(CONTROL_TAG_HERO_LEAD);
@@ -110,7 +110,7 @@ describe("resolveCreatedFreshPresentation", () => {
       searchParams: new URLSearchParams(""),
       session: { pilot_template: "status_plate" },
     });
-    expect(presentation.hero?.title).toBe("Your sign is live");
+    expect(presentation.hero?.title).toBe("Control this sign");
     expect(presentation.hero?.lead).toBe(CONTROL_SIGN_HERO_LEAD);
   });
 
@@ -121,7 +121,7 @@ describe("resolveCreatedFreshPresentation", () => {
       searchParams: new URLSearchParams(""),
       session: { pilot_template: "general" },
     });
-    expect(presentation.hero?.title).toBe("Your account is live");
+    expect(presentation.hero?.title).toBe("Control this item");
     expect(presentation.hero?.lead).toBe(CONTROL_ACCOUNT_HERO_LEAD);
   });
 
@@ -132,7 +132,7 @@ describe("resolveCreatedFreshPresentation", () => {
       searchParams: new URLSearchParams(""),
       session: { pilot_template: "lost_item_relay" },
     });
-    expect(presentation.hero?.title).toBe("Your tag is live");
+    expect(presentation.hero?.title).toBe("Control this tag");
     expect(presentation.hero?.lead).toBe(CONTROL_TAG_HERO_LEAD);
   });
 
@@ -143,7 +143,7 @@ describe("resolveCreatedFreshPresentation", () => {
       searchParams: new URLSearchParams(`focus=${WEAR_PRINT_FOCUS}`),
       session: { pilot_template: "general" },
     });
-    expect(presentation.hero?.title).toBe("Your wearable QR is live");
+    expect(presentation.hero?.title).toBe("Control this item");
     expect(presentation.hero?.lead).toBe(CONTROL_WEAR_HERO_LEAD);
   });
 
@@ -154,7 +154,7 @@ describe("resolveCreatedFreshPresentation", () => {
       searchParams: new URLSearchParams(`room=season&focus=${GAME_SEASON_SETUP_FOCUS}`),
       session: { pilot_template: "general" },
     });
-    expect(presentation.hero?.title).toBe("Your season is live");
+    expect(presentation.hero?.title).toBe("Control this season");
     expect(presentation.hero?.lead).toBe(CONTROL_SEASON_HERO_LEAD);
   });
 
@@ -186,7 +186,7 @@ describe("resolveCreatedFreshPresentation", () => {
       },
     });
     expect(presentation.outcomeKind).toBe("account");
-    expect(presentation.hero?.title).toBe("Your account is live");
+    expect(presentation.hero?.title).toBe("Control this item");
     expect(presentation.hero?.lead).toBe(CONTROL_ACCOUNT_HERO_LEAD);
   });
 
@@ -202,7 +202,7 @@ describe("resolveCreatedFreshPresentation", () => {
       },
       handoff: { kind: "season", handle: "@river_studio", at: 1 },
     });
-    expect(presentation.hero?.title).toBe("Your account is live");
+    expect(presentation.hero?.title).toBe("Control this item");
     expect(presentation.handoffBanner).toBeNull();
   });
 });

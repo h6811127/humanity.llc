@@ -52,8 +52,7 @@ function focusCreatedPanel(select, focusKey) {
     panelId === "created-live-scanners-see" ||
     panelId === "child-object-add-status-plate" ||
     panelId === "child-object-add-lost-item" ||
-    panelId === "game-season-setup" ||
-    panelId === "created-deploy-print";
+    panelId === "game-season-setup";
   if (livePanel) {
     select("now");
   } else if (CREATED_PANEL_FOCUS[focusKey] || document.getElementById(panelId)) {

@@ -116,7 +116,11 @@ export function clearCreatedViewModeUi() {
 export function focusCreatedViewRestore(selectTab) {
   selectTab("advanced");
   requestAnimationFrame(() => {
-    document.getElementById("created-view-restore-tools")?.scrollIntoView({
+    const restoreTools = document.getElementById("created-view-restore-tools");
+    if (restoreTools instanceof HTMLDetailsElement) {
+      restoreTools.open = true;
+    }
+    restoreTools?.scrollIntoView({
       behavior: "smooth",
       block: "start",
     });

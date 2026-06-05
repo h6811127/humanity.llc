@@ -173,6 +173,7 @@ test.describe("/created/ steward dual-QR (S7)", () => {
       timeout: 15_000,
     });
 
+    await page.getByRole("tab", { name: "Settings" }).click();
     await page.locator("#created-deploy-print summary").click();
     await expect(page.locator("#created-print-steward-discovery")).toBeVisible();
     await expect(page.locator("#created-print-steward-cta")).toBeVisible();

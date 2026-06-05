@@ -158,7 +158,7 @@ export function initCreatedDashboard({
   /** @type {Record<string, () => void>} */
   const actions = {
     "save-keys": () => {
-      selectTab("now");
+      selectTab("advanced");
       revealKeysStrip();
 
       if (!runSave) {
@@ -202,7 +202,7 @@ export function initCreatedDashboard({
       scrollToQr();
     },
     "download-qr": () => {
-      selectTab("now");
+      selectTab("advanced");
       if (downloadQrBtn && !downloadQrBtn.disabled) {
         downloadQrBtn.click();
         markDone("download-qr");
@@ -215,12 +215,12 @@ export function initCreatedDashboard({
       showFeedback("Open full-size QR below when the image is ready, then download.");
     },
     "print-qr": () => {
-      selectTab("now");
+      selectTab("advanced");
       openDisclosure("created-deploy-print");
       markDone("print-qr");
     },
     "test-scan": () => {
-      selectTab("now");
+      selectTab("advanced");
       openDisclosure("created-deploy-test");
       if (openScanUrl()) {
         markDone("test-scan");

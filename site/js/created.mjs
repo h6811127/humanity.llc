@@ -338,6 +338,10 @@ const liveQrImgEl = document.getElementById("created-live-qr-img");
 const liveManifestoTeaserEl = document.getElementById("created-live-manifesto-teaser");
 const liveObjectMetaEl = document.getElementById("created-live-object-meta");
 const liveCopyScanEl = document.getElementById("created-live-copy-scan");
+const copyLinkDetails = document.getElementById("created-deploy-copy-link");
+const vouchesReceivedDetails = document.getElementById("vouches-received-details");
+const vouchesReceivedLead = document.getElementById("vouches-received-lead");
+const vouchesReceivedSummarySub = document.getElementById("vouches-received-summary-sub");
 const qrPreviewWrap = document.getElementById("created-qr-preview-wrap");
 const qrPreviewImg = document.getElementById("created-qr-preview-img");
 const saveRequiredBadge = document.getElementById("created-save-required-badge");
@@ -424,6 +428,9 @@ function syncLiveCockpit() {
 
   if (liveCopyScanEl && copyBtn) {
     liveCopyScanEl.disabled = copyBtn.disabled;
+  }
+  if (copyLinkDetails) {
+    copyLinkDetails.hidden = !liveCopyScanEl || liveCopyScanEl.disabled;
   }
 
   syncQrPreview();
@@ -1090,6 +1097,17 @@ function applyHumanTrustDisplay(ht, verification, opts = {}) {
   const state = pollConfirmed ? verification?.state ?? null : null;
   if (stewardReviewDetails) {
     stewardReviewDetails.hidden = !shouldShowCreatedStewardReviewQueue(state, pollConfirmed);
+  }
+  const vouchCount = verification?.vouch_count ?? 0;
+  const hasReceivedVouches =
+    pollConfirmed &&
+    (vouchCount > 0 || (!!subtitle && subtitle !== "No accepted vouches yet."));
+  if (vouchesReceivedDetails) {
+    vouchesReceivedDetails.hidden = !hasReceivedVouches;
+  }
+  if (hasReceivedVouches) {
+    if (vouchesReceivedLead) vouchesReceivedLead.textContent = subtitle;
+    if (vouchesReceivedSummarySub) vouchesReceivedSummarySub.textContent = subtitle;
   }
   syncLiveCockpit();
 }

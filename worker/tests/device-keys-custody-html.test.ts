@@ -92,8 +92,9 @@ describe("device-keys-custody-html", () => {
     expect(html).toContain('id="device-keys-custody-created-setup"');
     expect(html).toContain('id="created-setup-keys-mount"');
     expect(html).toContain("Save ownership on this device");
-    expect(html).toContain("control of this account plus its object QRs");
-    expect(html).toContain("restores root and object QR control");
+    expect(html).toContain("Save control on this device");
+    expect(html).toContain("item and its codes");
+    expect(html).toContain("restores control of this item");
     expect(html).toContain("Restore ownership");
   });
 
@@ -122,6 +123,17 @@ describe("device-keys-custody-html", () => {
     expect(html).toContain("Printed QR and tagged the item");
   });
 
+  it("created Settings tab groups saved-item controls with plain intro (IA)", () => {
+    const html = readFileSync(join(root, "site/created/index.html"), "utf8");
+    expect(html).toContain("Manage this saved item");
+    expect(html).toContain("created-manage-group-label");
+    expect(html).toContain("Access &amp; recovery");
+    expect(html).toContain("Share &amp; preview");
+    expect(html).toContain("Issue new code");
+    expect(html).toContain("Preview item");
+    expect(html).not.toContain("Issue new QR");
+  });
+
   it("created Manage tab collapses developer export under Export for developers (D8)", () => {
     const html = readFileSync(join(root, "site/created/index.html"), "utf8");
     expect(html).toContain('id="created-developer-export-details"');
@@ -129,7 +141,7 @@ describe("device-keys-custody-html", () => {
     expect(html).toContain('id="owner-pubkey-preview-block"');
     expect(html).toContain('id="owner-pubkey-display"');
     expect(html).not.toContain("Unlock root controls");
-    expect(html).toContain("Recovery import");
+    expect(html).toContain("Recovery code");
     const restoreToolsIdx = html.indexOf('id="created-view-restore-tools"');
     const devIdx = html.indexOf("created-developer-export-details");
     const exportBlockIdx = html.indexOf('id="backup-export-block"');

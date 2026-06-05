@@ -86,11 +86,11 @@ export function resolveControlOutcomeKind(ctx) {
  * @returns {string}
  */
 export function controlHeroTitle(kind) {
-  if (kind === "sign") return "Your sign is live";
-  if (kind === "tag") return "Your tag is live";
-  if (kind === "wear") return "Your wearable QR is live";
-  if (kind === "season") return "Your season is live";
-  return "Your account is live";
+  if (kind === "sign") return "Control this sign";
+  if (kind === "tag") return "Control this tag";
+  if (kind === "wear") return "Control this item";
+  if (kind === "season") return "Control this season";
+  return "Control this item";
 }
 
 /** Hero lead on first control visit for general accounts (P0.2). */

@@ -33,7 +33,7 @@ describe("key-loss copy guards", () => {
   it("K1/K5: view mode title and no-session detail match workspace + HTML", () => {
     expect(createdHeroTitleForMode("view")).toBe(VIEW_ONLY_CARD_TITLE);
     const html = readFileSync(join(root, "site/created/index.html"), "utf8");
-    expect(html).toContain("Recovery import");
+    expect(html).toContain("Recovery code");
     expect(html).toContain("created-view-restore-tools");
     expect(html).not.toContain("created-view-restore-panel");
     expect(html).not.toContain("created-view-live-restore-btn");
