@@ -10835,9 +10835,15 @@ body.device-shell-created .flow-keys-group .list-row {
 }
 
 .city-game-map-board {
+  --map-ink: var(--black);
+  --map-ink-soft: rgba(0, 0, 0, 0.68);
+  --map-line: rgba(0, 0, 0, 0.1);
+  --map-surface: var(--white);
+  --map-red-soft: rgba(219, 27, 67, 0.08);
+  --map-red-line: rgba(219, 27, 67, 0.22);
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 12px;
   width: 100%;
   min-width: 0;
   overflow-x: clip;
@@ -10868,35 +10874,67 @@ body.device-shell-created .flow-keys-group .list-row {
 }
 
 .city-game-map-actions {
-  margin: 0 0 6px;
-  font-size: 15px;
-  font-weight: 700;
-  line-height: 1.4;
-  color: var(--black);
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--map-ink);
+}
+
+.city-game-map-action {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--map-red-line);
+  background: var(--map-red-soft);
+  color: var(--map-ink);
 }
 
 .city-game-map-code-hint {
-  margin: 0 0 12px;
+  margin: 0;
+  padding: 10px 12px;
+  border-left: 3px solid var(--red);
+  border-radius: 0 10px 10px 0;
+  background: rgba(219, 27, 67, 0.05);
   font-size: 14px;
-  line-height: 1.4;
-  color: var(--grey);
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--map-ink-soft);
 }
 
 .city-game-map-first-paint {
   display: flex;
   flex-direction: column;
-  gap: 0;
-  margin-bottom: 12px;
+  gap: 12px;
+  margin-bottom: 0;
+  padding: 16px 16px 14px;
 }
 
 .city-game-map-spotlight {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 14px 14px 12px;
-  border: 1px solid rgba(219, 27, 67, 0.22);
-  border-radius: 12px;
-  background: rgba(219, 27, 67, 0.04);
+  gap: 10px;
+  padding: 16px;
+  border: 2px solid var(--map-red-line);
+  border-radius: 16px;
+  background:
+    linear-gradient(155deg, rgba(219, 27, 67, 0.08) 0%, rgba(255, 255, 255, 0.98) 52%),
+    var(--white);
+  box-shadow: 0 8px 24px rgba(219, 27, 67, 0.08);
+}
+
+.city-game-map-spotlight--live {
+  border-color: rgba(219, 27, 67, 0.38);
+  box-shadow:
+    0 10px 28px rgba(219, 27, 67, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
 .city-game-map-spotlight-title {
@@ -10904,15 +10942,16 @@ body.device-shell-created .flow-keys-group .list-row {
   font-size: 20px;
   font-weight: 800;
   line-height: 1.2;
-  color: var(--black);
+  letter-spacing: -0.02em;
+  color: var(--map-ink);
 }
 
 .city-game-map-spotlight-count {
   margin: 0;
-  font-size: clamp(26px, 6.5vw, 36px);
+  font-size: clamp(30px, 8vw, 42px);
   font-weight: 800;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
   color: var(--red);
 }
 
@@ -10920,14 +10959,14 @@ body.device-shell-created .flow-keys-group .list-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 10px 14px;
+  gap: 10px;
   font-size: 14px;
   line-height: 1.35;
 }
 
 .city-game-map-spotlight-hint {
-  color: var(--grey);
-  font-weight: 600;
+  font-weight: 700;
+  color: var(--red);
 }
 
 .city-game-map-spotlight--maintenance {
@@ -10945,19 +10984,65 @@ body.device-shell-created .flow-keys-group .list-row {
 }
 
 .city-game-map-browse {
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
-  padding-top: 8px;
+  border-top: 1px solid var(--map-line);
+  padding-top: 0;
+  margin: 0;
 }
 
-.city-game-map-browse-summary {
+.city-game-map-browse-summary,
+.city-game-map-changed-summary,
+.city-game-map-advanced-summary {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  list-style: none;
   cursor: pointer;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--black);
+  padding: 15px 16px;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--map-ink);
+  background: var(--map-surface);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.city-game-map-browse-summary::-webkit-details-marker,
+.city-game-map-changed-summary::-webkit-details-marker,
+.city-game-map-advanced-summary::-webkit-details-marker {
+  display: none;
+}
+
+.city-game-map-browse-summary::marker,
+.city-game-map-changed-summary::marker,
+.city-game-map-advanced-summary::marker {
+  content: "";
+}
+
+.city-game-map-browse-summary::after,
+.city-game-map-changed-summary::after,
+.city-game-map-advanced-summary::after {
+  content: "";
+  flex-shrink: 0;
+  width: 9px;
+  height: 9px;
+  margin-left: auto;
+  border-right: 2px solid var(--map-ink);
+  border-bottom: 2px solid var(--map-ink);
+  transform: rotate(45deg);
+  transition: transform 0.2s ease;
+}
+
+.city-game-map-browse[open] > .city-game-map-browse-summary::after,
+.city-game-map-changed[open] > .city-game-map-changed-summary::after,
+.city-game-map-advanced[open] > .city-game-map-advanced-summary::after {
+  transform: rotate(-135deg) translateY(2px);
 }
 
 .city-game-map-browse-body {
-  padding-top: 10px;
+  padding: 0 16px 16px;
 }
 
 .city-game-map-browse:not([open]) .city-game-map-browse-body {
@@ -10965,27 +11050,25 @@ body.device-shell-created .flow-keys-group .list-row {
 }
 
 .city-game-map-privacy-inline {
-  margin: 0 0 10px;
+  margin: 0;
   font-size: 12px;
+  font-weight: 600;
   line-height: 1.35;
-  color: var(--grey);
+  color: var(--map-ink-soft);
 }
 
 .city-game-map-changed {
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
-  padding-top: 8px;
-  margin-top: 4px;
-}
-
-.city-game-map-changed-summary {
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--black);
+  border: 1px solid var(--map-line);
+  border-radius: 16px;
+  background: var(--map-surface);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  padding-top: 0;
+  margin-top: 0;
 }
 
 .city-game-map-changed-body {
-  padding-top: 10px;
+  padding: 0 16px 16px;
 }
 
 .city-game-map-changed:not([open]) .city-game-map-changed-body {
@@ -10993,14 +11076,16 @@ body.device-shell-created .flow-keys-group .list-row {
 }
 
 .city-game-map-action-sep {
-  opacity: 0.55;
+  display: none;
 }
 
 .city-game-map-places--primary {
-  padding: 14px 14px 12px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.72);
+  padding: 0;
+  border: 1px solid var(--map-line);
+  border-radius: 16px;
+  background: var(--map-surface);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
 }
 
 .city-game-map-places--primary .city-game-map-list-title {
@@ -11011,22 +11096,19 @@ body.device-shell-created .flow-keys-group .list-row {
 }
 
 .city-game-map-advanced {
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
-  padding-top: 8px;
-}
-
-.city-game-map-advanced-summary {
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--grey);
+  border: 1px solid var(--map-line);
+  border-radius: 16px;
+  background: var(--map-surface);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  padding-top: 0;
 }
 
 .city-game-map-advanced-body {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding-top: 12px;
+  padding: 0 16px 16px;
 }
 
 .city-game-map-advanced .city-game-map-privacy {
@@ -11116,7 +11198,9 @@ body.device-shell-created .flow-keys-group .list-row {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding-top: 4px;
+  margin-top: 4px;
+  padding-top: 14px;
+  border-top: 1px solid var(--map-line, rgba(0, 0, 0, 0.1));
 }
 
 .city-game-map-places {
@@ -11265,8 +11349,8 @@ body.device-shell-created .flow-keys-group .list-row {
 .city-game-map-sync {
   margin: 0;
   font-size: 13px;
-  font-weight: 500;
-  color: var(--grey);
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.55);
 }
 
 .city-game-map-sync--stale {
@@ -11593,7 +11677,8 @@ body.device-shell-created .flow-keys-group .list-row {
 
 .city-game-map-node-meta {
   font-size: 13px;
-  color: var(--grey);
+  font-weight: 500;
+  color: var(--map-ink-soft, rgba(0, 0, 0, 0.68));
 }
 
 .city-game-map-node-tags {
@@ -11612,30 +11697,75 @@ body.device-shell-created .flow-keys-group .list-row {
 }
 
 .city-game-map-live-hint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid rgba(219, 27, 67, 0.28);
+  background: rgba(219, 27, 67, 0.06);
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
   color: var(--red);
 }
 
 .city-game-map-node-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px 14px;
+  gap: 10px;
   align-items: center;
 }
 
-.city-game-map-maps-link {
+.city-game-map-maps-link,
+.city-game-map-scan-link,
+.city-game-map-spotlight-hint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 9px 16px;
+  border-radius: var(--radius-pill);
   font-size: 13px;
-  font-weight: 600;
-  color: var(--black);
-  text-decoration: underline;
-  text-underline-offset: 2px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform 0.1s ease,
+    opacity 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.city-game-map-maps-link {
+  color: var(--map-ink);
+  background: var(--white);
+  border: 1.5px solid rgba(0, 0, 0, 0.88);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
 }
 
 .city-game-map-scan-link {
-  font-size: 13px;
-  font-weight: 600;
+  color: var(--white);
+  background: var(--red);
+  border: 1.5px solid var(--red);
+  box-shadow: 0 2px 10px rgba(219, 27, 67, 0.24);
+}
+
+span.city-game-map-spotlight-hint {
   color: var(--red);
+  background: rgba(219, 27, 67, 0.08);
+  border: 1.5px solid rgba(219, 27, 67, 0.32);
+  box-shadow: none;
+}
+
+.city-game-map-maps-link:active,
+.city-game-map-scan-link:active,
+span.city-game-map-spotlight-hint:active {
+  transform: scale(0.98);
+  opacity: 0.92;
 }
 
 .city-game-map-unlock-list {
