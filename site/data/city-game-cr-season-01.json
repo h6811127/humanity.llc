@@ -50,7 +50,7 @@
       "steps": [
         "Find a sticker",
         "Scan it",
-        "Add your charge"
+        "Add to the city."
       ]
     },
     "wayfinding_intro": "Start anywhere — scan any game sticker you find. Planning from home? Search place names in your maps app; the sketch below is districts only, not streets.",
@@ -71,10 +71,10 @@
       "hero_steps": [
         "Find a sticker",
         "Scan it",
-        "Add your charge"
+        "Add to the city."
       ],
       "hero_aria_label": "How to play",
-      "code_hint": "Code is on the back of the sticker.",
+      "code_hint": "For this weekend: the code is on the back of the sticker.",
       "count_placeholder": "Scan for live count",
       "spotlight_scan_hint": "Scan sticker · enter code",
       "row_scan_hint": "Scan sticker there.",

@@ -40,7 +40,7 @@ export const CITY_GAME_ROLE_LABELS = {
 
 const DEFAULT_START_HERE = {
   title: "Start here",
-  steps: ["Find a sticker", "Scan it", "Add your charge"],
+  steps: ["Find a sticker", "Scan it", "Add to the city."],
 };
 
 const DEFAULT_MAP_COPY = {

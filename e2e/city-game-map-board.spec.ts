@@ -100,8 +100,10 @@ test.describe("city game map board", () => {
     await expect(page.getByRole("link", { name: "Rules", exact: true })).toBeVisible();
 
     await expect(board.getByText("Find a sticker")).toBeVisible();
-    await expect(board.getByText("Add your charge")).toBeVisible();
-    await expect(board.getByText("Code is on the back of the sticker.")).toBeVisible();
+    await expect(board.getByText("Add to the city.")).toBeVisible();
+    await expect(
+      board.getByText("For this weekend: the code is on the back of the sticker.")
+    ).toBeVisible();
     await expect(board.getByRole("heading", { name: "Riverwalk River Lantern" })).toBeVisible();
     await expect(board.getByText("Scan sticker · enter code")).toBeVisible();
     await expect(board.locator("#city-game-map-browse")).toHaveJSProperty("open", false);
