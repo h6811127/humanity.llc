@@ -11,6 +11,7 @@ on:
       - "worker/tests/landing-*.test.ts"
       - "worker/scripts/verify-landing-copy.mjs"
       - "worker/scripts/ci-production-fetch.mjs"
+      - "worker/scripts/merch-rollout-shop-pdp-smoke.mjs"
       - "worker/tests/ci-production-fetch.test.ts"
       - "docs/CLOUDFLARE_CI_SECRETS.md"
       - "e2e/landing-copy.spec.ts"

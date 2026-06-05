@@ -64,7 +64,7 @@ export function shouldRetryCiProductionFetch(res, text) {
 
 /**
  * @param {string} path
- * @param {{ accept?: string, origins?: string[] }} [opts]
+ * @param {{ accept?: string, origins?: string[], redirect?: RequestRedirect }} [opts]
  * @returns {Promise<{ res: Response, text: string, url: string, origin: string }>}
  */
 export async function fetchCiProductionUrl(path, opts = {}) {
@@ -81,7 +81,7 @@ export async function fetchCiProductionUrl(path, opts = {}) {
   for (let index = 0; index < origins.length; index += 1) {
     const origin = origins[index];
     const url = `${origin}${normalizedPath}`;
-    const res = await fetch(url, { headers, redirect: "follow" });
+    const res = await fetch(url, { headers, redirect: opts.redirect ?? "follow" });
     const text = await res.text();
 
     if (res.ok) {
