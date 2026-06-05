@@ -133,7 +133,7 @@ describe("create-template-copy", () => {
   it("general template emphasizes @handle control line", () => {
     expect(createHeroCopyForTemplate("general").title).toBe("Pick your @handle");
     expect(createHeroCopyForTemplate(undefined).title).toBe("Pick your @handle");
-    expect(createHeroCopyForTemplate("general").lead).toMatch(/control updates/i);
+    expect(createHeroCopyForTemplate("general").lead).toMatch(/control line/i);
     expect(createHeroCopyForTemplate("general").lead).not.toMatch(/\bnetwork\b/i);
     expect(createHeroCopyForTemplate("general").lead).not.toMatch(/signed qr/i);
   });
