@@ -58,7 +58,10 @@ describe("resolveInitialStewardActiveRoom", () => {
   it("infers season from custody session when no persisted room", () => {
     expect(
       resolveInitialStewardActiveRoom({
-        session: { pilot_template: "general", issuer_public_key: "abc" },
+        session: {
+          pilot_template: "general",
+          manifesto_line: "City game season spring-2026",
+        },
       })
     ).toBe(STEWARD_ROOM_SEASON);
   });
@@ -87,7 +90,7 @@ describe("stewardRoomCrosshint", () => {
   it("offers switch to Season when deploy skin on season root", () => {
     const hint = stewardRoomCrosshint(STEWARD_ROOM_DOORS, {
       pilot_template: "general",
-      issuer_public_key: "abc",
+      manifesto_line: "City game season spring-2026",
     });
     expect(hint?.switchRoom).toBe(STEWARD_ROOM_SEASON);
   });

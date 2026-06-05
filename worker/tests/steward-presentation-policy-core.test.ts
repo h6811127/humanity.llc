@@ -16,19 +16,19 @@ import {
 } from "../../site/js/steward-presentation-policy-core.mjs";
 
 const deployRoot = { pilot_template: "general" };
-const seasonRootWithIssuer = {
-  pilot_template: "general",
-  issuer_public_key: "abc123organizer",
-};
 const seasonRootManifesto = {
   pilot_template: "general",
   manifesto_line: "City game season spring-2026",
+};
+const seasonRootWithOrganizer = {
+  ...seasonRootManifesto,
+  issuer_public_key: "abc123organizer",
 };
 
 describe("inferStewardPresentationKind", () => {
   it("classifies deploy vs season roots", () => {
     expect(inferStewardPresentationKind(deployRoot)).toBe(STEWARD_PRESENTATION_KIND_DEPLOY);
-    expect(inferStewardPresentationKind(seasonRootWithIssuer)).toBe(
+    expect(inferStewardPresentationKind(seasonRootManifesto)).toBe(
       STEWARD_PRESENTATION_KIND_SEASON
     );
     expect(inferStewardPresentationKind(seasonRootManifesto)).toBe(
@@ -40,7 +40,7 @@ describe("inferStewardPresentationKind", () => {
   it("merges wallet entry for season detection", () => {
     expect(
       inferStewardPresentationKind(deployRoot, {
-        walletEntry: { issuer_public_key: "from-wallet" },
+        walletEntry: { manifesto_line: "City game season from-wallet" },
       })
     ).toBe(STEWARD_PRESENTATION_KIND_SEASON);
   });
@@ -49,7 +49,7 @@ describe("inferStewardPresentationKind", () => {
 describe("resolveStewardPresentationKind with active room", () => {
   it("uses switcher room over inference", () => {
     expect(
-      resolveStewardPresentationKind(seasonRootWithIssuer, { activeRoom: STEWARD_ROOM_DOORS })
+      resolveStewardPresentationKind(seasonRootManifesto, { activeRoom: STEWARD_ROOM_DOORS })
     ).toBe(STEWARD_PRESENTATION_KIND_DEPLOY);
     expect(
       resolveStewardPresentationKind(deployRoot, { activeRoom: STEWARD_ROOM_SEASON })
@@ -73,15 +73,15 @@ describe("presentation policy — deploy account", () => {
 describe("presentation policy — season account", () => {
   it("offers game nodes only", () => {
     const extras = { activeRoom: STEWARD_ROOM_SEASON };
-    expect(shouldOfferAddStatusPlateInDefaultUi(seasonRootWithIssuer, extras)).toBe(false);
-    expect(shouldOfferAddLostItemRelayInDefaultUi(seasonRootWithIssuer, extras)).toBe(false);
-    expect(shouldOfferAddGameNodeInDefaultUi(seasonRootWithIssuer, extras)).toBe(true);
-    expect(shouldShowGameNodeSetupRowInDefaultUi(seasonRootWithIssuer, extras)).toBe(false);
-    expect(shouldShowChildObjectAddHubInDefaultUi(seasonRootWithIssuer, extras)).toBe(true);
-    expect(stewardChildObjectAddHubSubcopy(seasonRootWithIssuer, extras)).toBe(
+    expect(shouldOfferAddStatusPlateInDefaultUi(seasonRootWithOrganizer, extras)).toBe(false);
+    expect(shouldOfferAddLostItemRelayInDefaultUi(seasonRootWithOrganizer, extras)).toBe(false);
+    expect(shouldOfferAddGameNodeInDefaultUi(seasonRootWithOrganizer, extras)).toBe(true);
+    expect(shouldShowGameNodeSetupRowInDefaultUi(seasonRootWithOrganizer, extras)).toBe(false);
+    expect(shouldShowChildObjectAddHubInDefaultUi(seasonRootWithOrganizer, extras)).toBe(true);
+    expect(stewardChildObjectAddHubSubcopy(seasonRootWithOrganizer, extras)).toBe(
       "Season checkpoints"
     );
-    expect(stewardChildObjectAddHubSummaryTitle(seasonRootWithIssuer, extras)).toBe(
+    expect(stewardChildObjectAddHubSummaryTitle(seasonRootWithOrganizer, extras)).toBe(
       "Add another…"
     );
   });

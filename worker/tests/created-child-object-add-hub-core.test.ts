@@ -69,10 +69,14 @@ describe("created-child-object-add-hub-core", () => {
 
   it("builds season subcopy for organizer roots", () => {
     expect(
-      childObjectAddHubSubcopy({
-        pilot_template: "general",
-        issuer_public_key: "abc123",
-      })
+      childObjectAddHubSubcopy(
+        {
+          pilot_template: "general",
+          manifesto_line: "City game season spring-2026",
+          issuer_public_key: "abc123",
+        },
+        { activeRoom: STEWARD_ROOM_SEASON }
+      )
     ).toBe("Season checkpoints");
   });
 
