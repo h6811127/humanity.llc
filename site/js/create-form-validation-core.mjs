@@ -80,3 +80,37 @@ export function validateCreateFormFields(template, handleRaw, fields) {
   }
   return { ok: true, handle: handleResult.normalized };
 }
+
+/**
+ * @param {string} template
+ * @param {Parameters<typeof listMissingCreatePilotFields>[1]} fields
+ */
+export function buildPilotManifestoLine(template, fields) {
+  if (template === "status_plate") {
+    const objectLabel = String(fields.objectLabel || "").trim();
+    const statusLine = String(fields.statusLine || "").trim();
+    if (!objectLabel || !statusLine) {
+      throw new Error("Object name and status line are required for a status plate.");
+    }
+    const combined = `${objectLabel}\n${statusLine}`;
+    if (combined.length > 280) {
+      throw new Error("Combined object name and status line must be 280 characters or fewer.");
+    }
+    return { manifesto: combined, pilotTemplate: "status_plate" };
+  }
+  if (template === "lost_item_relay") {
+    const item = String(fields.relayItem || "").trim();
+    const message = String(fields.relayMessage || "").trim();
+    if (!item || !message) {
+      throw new Error("Item name and return message are required for a lost item relay.");
+    }
+    const combined = `[relay] ${item}\n${message}`;
+    if (combined.length > 280) {
+      throw new Error("Combined item name and return message must be 280 characters or fewer.");
+    }
+    return { manifesto: combined, pilotTemplate: "lost_item_relay" };
+  }
+  const manifesto = String(fields.manifesto || "").trim();
+  if (!manifesto) throw new Error("Handle and public statement are required.");
+  return { manifesto, pilotTemplate: "general" };
+}

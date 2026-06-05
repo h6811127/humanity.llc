@@ -61,8 +61,8 @@ describe("createConvergenceNudgeCopy", () => {
       preferredRoot: { handle: "river_studio", profile_id: "p1" },
       rootCount: 1,
     });
-    expect(copy.title).toContain("existing card");
-    expect(copy.primaryLabel).toBe("Add status plate on Live");
+    expect(copy.title).toContain("existing account");
+    expect(copy.primaryLabel).toBe("Open @river_studio to add sign");
     expect(copy.collapseLegacyForm).toBe(true);
   });
 
@@ -71,7 +71,7 @@ describe("createConvergenceNudgeCopy", () => {
       preferredRoot: null,
       rootCount: 0,
     });
-    expect(copy.title).toContain("general live card");
+    expect(copy.title).toContain("account first");
     expect(copy.collapseLegacyForm).toBe(false);
   });
 });

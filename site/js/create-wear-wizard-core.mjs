@@ -6,6 +6,7 @@
 import {
   listGeneralRootsWithKeys,
   pickPreferredGeneralRoot,
+  generalRootDisplayLabel,
 } from "./create-flow-convergence-core.mjs";
 
 export const WEAR_PRINT_FOCUS = "wear-print";
@@ -47,9 +48,16 @@ export function resolveWearSubmitStrategy(ctx) {
 
 /**
  * @param {WearSubmitStrategy} strategy
+ * @param {Record<string, unknown> | null | undefined} [preferredRoot]
  */
-export function wearSubmitButtonLabel(strategy) {
-  if (strategy === "redirect_live") return "Continue on Live";
+export function wearSubmitButtonLabel(strategy, preferredRoot) {
+  const handle =
+    preferredRoot && typeof preferredRoot === "object"
+      ? generalRootDisplayLabel(preferredRoot)
+      : "";
+  if (strategy === "redirect_live") {
+    return handle ? `Open ${handle} to add wearable QR` : "Open your account to add wearable QR";
+  }
   if (strategy === "create_wear_card") return "Create card & print QR";
   return null;
 }

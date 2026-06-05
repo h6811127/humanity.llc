@@ -81,7 +81,7 @@ test.describe("create entry chooser (step 11)", () => {
     await page.goto("/create/?intent=game&season_account=existing");
 
     await expect(page.locator("#game-season-id-block")).toBeHidden();
-    await expect(page.locator("#submit")).toHaveText(/Continue season setup on Live/i);
+    await expect(page.locator("#submit")).toHaveText(/Open @river_studio to set up season/i);
   });
 
   test("wear BYOP link opens form with intent=wear", async ({ page }) => {
@@ -133,7 +133,7 @@ test.describe("create entry chooser (step 11)", () => {
     await expect(page.locator("#create-deploy-wizard")).toBeVisible();
     await expect(page.locator("#create-template-advanced")).toBeHidden();
     await expect(page.locator("#create-add-object-nudge")).toBeHidden();
-    await expect(page.locator("#submit")).toHaveText("Continue on Live");
+    await expect(page.locator("#submit")).toHaveText("Open @river_studio to add sign");
   });
 });
 
@@ -151,10 +151,10 @@ test.describe("create flow convergence nudge", () => {
     const nudge = page.locator("#create-add-object-nudge");
     await expect(nudge).toBeVisible();
     await expect(page.locator("#create-add-object-nudge-eyebrow")).toHaveText("Recommended path");
-    await expect(page.locator("#create-add-object-nudge-title")).toContainText("existing card");
+    await expect(page.locator("#create-add-object-nudge-title")).toContainText("existing account");
 
     const primary = page.locator("#create-add-object-nudge-primary");
-    await expect(primary).toHaveText("Add status plate on Live");
+    await expect(primary).toHaveText("Open @river_studio to add sign");
     await expect(primary).toHaveClass(/hc-emphasis-card__cta/);
     await expect(primary).not.toHaveClass(/hc-emphasis-card__cta--secondary/);
     await expect(primary).toHaveAttribute(
@@ -188,11 +188,11 @@ test.describe("create flow convergence nudge", () => {
     const nudge = page.locator("#create-add-object-nudge");
     await expect(nudge).toBeVisible();
     await expect(page.locator("#create-add-object-nudge-title")).toContainText(
-      "general live card"
+      "account first"
     );
 
     const primary = page.locator("#create-add-object-nudge-primary");
-    await expect(primary).toHaveText("Switch to general card");
+    await expect(primary).toHaveText("Switch to general account");
     await expect(primary).toHaveAttribute("role", "button");
 
     await primary.click();

@@ -2,6 +2,7 @@
  * Sync create-page convergence nudge (step 14).
  */
 
+import { isDeployRoomCreateIntent } from "./create-deploy-wizard-core.mjs";
 import { loadWallet } from "./device-wallet.mjs";
 import {
   createConvergenceNudgeCopy,
@@ -23,6 +24,13 @@ export function syncCreateFlowConvergence(template) {
   const hintEl = document.getElementById("create-template-hint");
   const compatEl = document.getElementById("create-flat-pilot-compat");
   const advancedEl = document.getElementById("create-template-advanced");
+
+  const searchParams = new URLSearchParams(location.search);
+  if (isDeployRoomCreateIntent(searchParams)) {
+    if (nudgeEl) nudgeEl.hidden = true;
+    if (compatEl) compatEl.hidden = true;
+    return;
+  }
 
   const isPilot = isPilotObjectTemplate(template);
   if (hintEl) {

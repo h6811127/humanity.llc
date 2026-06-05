@@ -6,6 +6,7 @@
 import {
   createdAddObjectFocus,
   createdAddObjectHref,
+  generalRootDisplayLabel,
   listGeneralRootsWithKeys,
   pickPreferredGeneralRoot,
 } from "./create-flow-convergence-core.mjs";
@@ -113,10 +114,18 @@ export function deployCreatedFocusHash(template) {
 /**
  * @param {string} template
  * @param {DeploySubmitStrategy} strategy
+ * @param {Record<string, unknown> | null | undefined} [preferredRoot]
  */
-export function deploySubmitButtonLabel(template, strategy) {
+export function deploySubmitButtonLabel(template, strategy, preferredRoot) {
+  const handle =
+    preferredRoot && typeof preferredRoot === "object"
+      ? generalRootDisplayLabel(preferredRoot)
+      : "";
   if (strategy === "redirect_live") {
-    return "Continue on Live";
+    if (template === "lost_item_relay") {
+      return handle ? `Open ${handle} to add return tag` : "Open your account to add return tag";
+    }
+    return handle ? `Open ${handle} to add sign` : "Open your account to add sign";
   }
   if (strategy === "root_and_child") {
     return "Deploy object & QR";

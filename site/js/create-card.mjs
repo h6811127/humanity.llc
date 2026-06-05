@@ -1,4 +1,4 @@
-import { validateCreateFormFields } from "./create-form-validation-core.mjs";
+import { validateCreateFormFields, buildPilotManifestoLine } from "./create-form-validation-core.mjs";
 import { syncCreateHeroCopy } from "./create-template-copy.mjs";
 import { syncCreateFlowConvergence } from "./create-flow-convergence.mjs";
 import {
@@ -21,7 +21,17 @@ import { syncCreateOrganizerSeasonWizardUi } from "./create-organizer-season-wiz
 import {
   isGameSeasonCreateIntent,
   gameSeasonBlocksDeviceUnlock,
+  pickPreferredGameSeasonRoot,
 } from "./create-organizer-season-core.mjs";
+import {
+  redirectOpenStatusForDeploy,
+  redirectOpenStatusForSeason,
+  redirectOpenStatusForWear,
+} from "./create-handoff-core.mjs";
+import {
+  listGeneralRootsWithKeys,
+  pickPreferredGeneralRoot,
+} from "./create-flow-convergence-core.mjs";
 import {
   redirectToDeployRootSeasonSetup,
   redirectToGameSeasonSetup,
@@ -199,33 +209,7 @@ document.getElementById("create-add-object-nudge-primary")?.addEventListener("cl
 });
 
 function buildManifestoLine() {
-  if (activeTemplate === "status_plate") {
-    const objectLabel = document.getElementById("object-label")?.value?.trim();
-    const statusLine = document.getElementById("status-line")?.value?.trim();
-    if (!objectLabel || !statusLine) {
-      throw new Error("Object name and status line are required for a status plate.");
-    }
-    const combined = `${objectLabel}\n${statusLine}`;
-    if (combined.length > 280) {
-      throw new Error("Combined object name and status line must be 280 characters or fewer.");
-    }
-    return { manifesto: combined, pilotTemplate: "status_plate" };
-  }
-  if (activeTemplate === "lost_item_relay") {
-    const item = document.getElementById("relay-item")?.value?.trim();
-    const message = document.getElementById("relay-message")?.value?.trim();
-    if (!item || !message) {
-      throw new Error("Item name and return message are required for a lost item relay.");
-    }
-    const combined = `[relay] ${item}\n${message}`;
-    if (combined.length > 280) {
-      throw new Error("Combined item name and return message must be 280 characters or fewer.");
-    }
-    return { manifesto: combined, pilotTemplate: "lost_item_relay" };
-  }
-  const manifesto = manifestoEl?.value?.trim();
-  if (!manifesto) throw new Error("Handle and public statement are required.");
-  return { manifesto, pilotTemplate: "general" };
+  return buildPilotManifestoLine(activeTemplate, readCreateFormFields());
 }
 
 function buildObjectStreamsForCreate() {
@@ -692,7 +676,12 @@ async function submitCreate(e, opts = {}) {
     }
 
     if (gameStrategy === "redirect_live" || gameStrategy === "use_existing_account") {
-      setStatus("Opening season setup on Live…");
+      const walletEntries = loadWallet();
+      const seasonRoot =
+        gameStrategy === "use_existing_account"
+          ? pickPreferredGeneralRoot(listGeneralRootsWithKeys(walletEntries))
+          : pickPreferredGameSeasonRoot(walletEntries);
+      setStatus(redirectOpenStatusForSeason(seasonRoot));
       if (gameStrategy === "use_existing_account") {
         await redirectToDeployRootSeasonSetup();
       } else {
@@ -731,7 +720,8 @@ async function submitCreate(e, opts = {}) {
     });
 
     if (wearStrategy === "redirect_live") {
-      setStatus("Opening Live…");
+      const wearRoot = pickPreferredGeneralRoot(listGeneralRootsWithKeys(loadWallet()));
+      setStatus(redirectOpenStatusForWear(wearRoot));
       await redirectToWearPrintOnLive();
       return;
     }
@@ -755,7 +745,8 @@ async function submitCreate(e, opts = {}) {
     });
 
     if (strategy === "redirect_live") {
-      setStatus("Opening Live…");
+      const deployRoot = pickPreferredGeneralRoot(listGeneralRootsWithKeys(loadWallet()));
+      setStatus(redirectOpenStatusForDeploy(activeTemplate, deployRoot));
       await redirectDeployToLiveAddObject(activeTemplate);
       return;
     }

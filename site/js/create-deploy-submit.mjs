@@ -11,6 +11,10 @@ import {
   generalRootManifestoForDeploy,
   parseDeployChildFields,
 } from "./create-deploy-wizard-core.mjs";
+import {
+  buildCreateHandoffPayload,
+  writeCreateHandoff,
+} from "./create-handoff-core.mjs";
 import { pickPreferredGeneralRoot, listGeneralRootsWithKeys } from "./create-flow-convergence-core.mjs";
 import { handoffToCreatedForWalletEntry } from "./create-live-handoff.mjs";
 import { loadWallet } from "./device-wallet.mjs";
@@ -78,7 +82,10 @@ export async function runDeployRootAndChildCreate(template, fields, ctx) {
   }
   created.searchParams.set("fresh", "1");
   const focus = deployCreatedFocusHash(template);
-  if (focus) created.hash = focus;
+  if (focus) {
+    created.searchParams.set("focus", focus);
+    created.hash = focus;
+  }
   location.replace(created.href);
 }
 
@@ -94,5 +101,7 @@ export async function redirectDeployToLiveAddObject(template) {
   if (!href) {
     throw new Error("Could not open Live — open controls on your saved card first.");
   }
+  const handoffKind = template === "lost_item_relay" ? "deploy_relay" : "deploy_sign";
+  writeCreateHandoff(buildCreateHandoffPayload(handoffKind, preferredRoot));
   await handoffToCreatedForWalletEntry(preferredRoot, href);
 }

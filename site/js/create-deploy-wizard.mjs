@@ -4,6 +4,10 @@
 
 import { loadWallet } from "./device-wallet.mjs";
 import {
+  listGeneralRootsWithKeys,
+  pickPreferredGeneralRoot,
+} from "./create-flow-convergence-core.mjs";
+import {
   deploySubmitButtonLabel,
   isCreateRoomIsolatedIntent,
   isDeployRoomCreateIntent,
@@ -81,6 +85,7 @@ export function syncCreateDeployWizardUi(searchParams, template) {
     template,
     walletEntries: loadWallet(),
   });
-  const label = deploySubmitButtonLabel(template, strategy);
+  const preferredRoot = pickPreferredGeneralRoot(listGeneralRootsWithKeys(loadWallet()));
+  const label = deploySubmitButtonLabel(template, strategy, preferredRoot);
   if (label) submitBtn.textContent = label;
 }

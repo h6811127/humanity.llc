@@ -2,7 +2,7 @@
 export const CREATE_HANDLE_REGEX = /^[a-z][a-z0-9_]{2,31}$/;
 
 export const CREATE_HANDLE_INVALID_MESSAGE =
-  "Handle must be 3–32 characters: start with a lowercase letter, then letters, digits, or underscores.";
+  "Handle must be 3 to 32 characters: start with a lowercase letter, then letters, digits, or underscores.";
 
 const RESERVED_HANDLES = new Set([
   "admin",

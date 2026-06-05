@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   formatCreateRequiredFieldsMessage,
   validateCreateFormFields,
+  buildPilotManifestoLine,
 } from "../../site/js/create-form-validation-core.mjs";
 
 describe("create-form-validation-core", () => {
@@ -51,5 +52,19 @@ describe("create-form-validation-core", () => {
     expect(formatCreateRequiredFieldsMessage(["Handle", "Public statement"])).toBe(
       "Handle and Public statement are required."
     );
+  });
+
+  it("builds status plate manifesto from deploy wizard field values", () => {
+    const fields = {
+      objectLabel: "Studio door",
+      statusLine: "Open until 9 PM",
+      useDeployFieldIds: true,
+    };
+    const validation = validateCreateFormFields("status_plate", "river_example", fields);
+    expect(validation.ok).toBe(true);
+    expect(buildPilotManifestoLine("status_plate", fields)).toEqual({
+      manifesto: "Studio door\nOpen until 9 PM",
+      pilotTemplate: "status_plate",
+    });
   });
 });

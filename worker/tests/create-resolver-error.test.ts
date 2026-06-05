@@ -13,7 +13,7 @@ describe("formatCreateResolverError", () => {
         400
       )
     ).toBe(
-      "Handle must be 3–32 characters: start with a lowercase letter, then letters, digits, or underscores."
+      "Handle must be 3 to 32 characters: start with a lowercase letter, then letters, digits, or underscores."
     );
   });
 

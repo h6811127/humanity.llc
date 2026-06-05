@@ -1,5 +1,5 @@
 /**
- * Create page steward chooser UI (deploy + wear carrier).
+ * Create page steward chooser UI (account + deploy + wear carrier).
  */
 
 import {
@@ -26,7 +26,7 @@ export function showCreateEntryChooserPanel() {
 }
 
 /**
- * @param {{ onDeploySomething?: () => void }} handlers
+ * @param {{ onDeploySomething?: () => void; onOpenGeneralAccount?: () => void }} handlers
  */
 export function initCreateEntryChooser(handlers = {}) {
   const listEl = document.getElementById("create-entry-chooser-list");
@@ -50,7 +50,9 @@ export function initCreateEntryChooser(handlers = {}) {
       btn.dataset.createDoor = door.id;
       btn.innerHTML = createEntryDoorInnerHtml(door);
       btn.addEventListener("click", () => {
-        if (door.id === "something") {
+        if (door.id === "account") {
+          handlers.onOpenGeneralAccount?.();
+        } else if (door.id === "something") {
           handlers.onDeploySomething?.();
         }
       });
@@ -87,6 +89,11 @@ function createEntryDoorInnerHtml(door) {
  * @param {string} doorId
  */
 function doorIconMarkup(doorId) {
+  if (doorId === "account") {
+    return `<span class="list-icon list-icon-tone-blue" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    </span>`;
+  }
   if (doorId === "something") {
     return `<span class="list-icon list-icon-tone-green" aria-hidden="true">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>

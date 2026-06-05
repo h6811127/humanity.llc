@@ -7,6 +7,10 @@ import {
   wearRootManifesto,
 } from "./create-wear-wizard-core.mjs";
 import { pickPreferredGeneralRoot, listGeneralRootsWithKeys } from "./create-flow-convergence-core.mjs";
+import {
+  buildCreateHandoffPayload,
+  writeCreateHandoff,
+} from "./create-handoff-core.mjs";
 import { handoffToCreatedForWalletEntry } from "./create-live-handoff.mjs";
 import { loadWallet } from "./device-wallet.mjs";
 
@@ -22,6 +26,7 @@ export async function redirectToWearPrintOnLive() {
   if (!href) {
     throw new Error("Could not open Live — open controls on your saved card first.");
   }
+  writeCreateHandoff(buildCreateHandoffPayload("wear", preferredRoot));
   await handoffToCreatedForWalletEntry(preferredRoot, href);
 }
 

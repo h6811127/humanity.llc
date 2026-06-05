@@ -48,6 +48,32 @@ async function stubCreateResolver(page: import("@playwright/test").Page) {
         return;
       }
 
+      if (method === "POST" && /\/objects\/[^/]+\/issue-qr/.test(url)) {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            qr_id: "qr_e2e_child_deploy",
+            scan_url: "http://127.0.0.1:8787/c/e2e_profile?q=qr_e2e_child_deploy",
+          }),
+        });
+        return;
+      }
+
+      if (method === "POST" && /\/objects\/?(\?|$)/.test(url)) {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            object_id: "obj_e2e_deploy_01",
+            object_type: "status_plate",
+            public_label: "Studio door",
+            public_state: "Open until 9 PM",
+          }),
+        });
+        return;
+      }
+
       if (method === "GET") {
         const profileMatch = url.match(/\/cards\/([^/?]+)/);
         if (!profileMatch) {
@@ -114,6 +140,7 @@ test.describe("create form submit", () => {
     const handle = `e2e_${Date.now().toString(36).slice(-8)}`;
 
     await page.goto("/create/");
+    await page.locator('[data-create-door="account"]').click();
     await page.locator("#handle").fill(handle);
     await page.locator("#manifesto").fill("E2E create submit regression");
     await page.locator("#submit").click();
@@ -124,7 +151,7 @@ test.describe("create form submit", () => {
 
     const session = await page.evaluate(() => sessionStorage.getItem("hc_created"));
     expect(session).toBeTruthy();
-    await expect(page.getByRole("heading", { name: "Set up your live QR" })).toBeVisible({
+    await expect(page.getByRole("heading", { name: "Your account is ready." })).toBeVisible({
       timeout: 15_000,
     });
     const parsed = JSON.parse(session!) as {
@@ -142,6 +169,26 @@ test.describe("create form submit", () => {
     await expect(page.getByRole("heading", { name: "Link not valid" })).toHaveCount(0);
   });
 
+  test("deploy intent submits deploy wizard fields and lands on /created/", async ({ page }) => {
+    await stubCreateResolver(page);
+    const handle = `e2e_deploy_${Date.now().toString(36).slice(-8)}`;
+
+    await page.goto("/create/?intent=deploy");
+    await page.locator("#handle").fill(handle);
+    await page.locator("#deploy-object-label").fill("Studio door");
+    await page.locator("#deploy-scanner-line").fill("Open until 9 PM");
+    await page.locator("#submit").click();
+
+    await page.waitForURL(/\/created\/\?.*profile_id=.*fresh=1/, {
+      timeout: 20_000,
+    });
+
+    await expect(page.getByRole("heading", { name: "Your sign is ready." })).toBeVisible({
+      timeout: 15_000,
+    });
+    expect(new URL(page.url()).searchParams.get("fresh")).toBe("1");
+  });
+
   test("P2-2: empty status plate lists all missing fields in one message", async ({
     page,
   }) => {
@@ -157,6 +204,7 @@ test.describe("create form submit", () => {
 
   test("P2-2: empty general form lists handle and public statement", async ({ page }) => {
     await page.goto("/create/");
+    await page.locator('[data-create-door="account"]').click();
     await page.locator("#submit").click();
 
     const status = page.locator("#status");

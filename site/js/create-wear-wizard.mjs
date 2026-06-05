@@ -5,6 +5,10 @@
 import { isCreateRoomIsolatedIntent } from "./create-deploy-wizard-core.mjs";
 import { loadWallet } from "./device-wallet.mjs";
 import {
+  listGeneralRootsWithKeys,
+  pickPreferredGeneralRoot,
+} from "./create-flow-convergence-core.mjs";
+import {
   isWearCreateIntent,
   resolveWearSubmitStrategy,
   wearSubmitButtonLabel,
@@ -58,6 +62,7 @@ export function syncCreateWearWizardUi(searchParams) {
     searchParams,
     walletEntries: loadWallet(),
   });
-  const label = wearSubmitButtonLabel(strategy);
+  const preferredRoot = pickPreferredGeneralRoot(listGeneralRootsWithKeys(loadWallet()));
+  const label = wearSubmitButtonLabel(strategy, preferredRoot);
   if (label) submitBtn.textContent = label;
 }

@@ -112,19 +112,24 @@ export function generalRootDisplayLabel(entry) {
  * @param {{ preferredRoot: Record<string, unknown> | null, rootCount: number }} ctx
  */
 export function createConvergenceNudgeCopy(template, ctx) {
-  const objectLabel = template === "status_plate" ? "status plate" : "lost-item relay";
-  const addVerb = template === "status_plate" ? "Add status plate" : "Add lost-item relay";
-  const focusLabel = template === "status_plate" ? "Add status plate under this root" : "Add lost-item relay under this root";
+  const objectLabel = template === "status_plate" ? "sign" : "return tag";
+  const addVerb = template === "status_plate" ? "Add sign" : "Add return tag";
+  const focusLabel =
+    template === "status_plate" ? "Add sign on your card page" : "Add return tag on your card page";
 
   if (ctx.preferredRoot) {
     const rootLabel = generalRootDisplayLabel(ctx.preferredRoot);
+    const openLabel =
+      template === "status_plate"
+        ? `Open ${rootLabel} to add sign`
+        : `Open ${rootLabel} to add return tag`;
     return {
-      title: `${addVerb} under your existing card`,
+      title: `${addVerb} under your existing account`,
       body:
         ctx.rootCount > 1
-          ? `Recommended: use ${rootLabel} on Live — one root key, no second card. Objects appear nested under your root in My objects.`
-          : `Recommended: use ${rootLabel} on Live — one root key, no second card. Objects appear nested under your root in My objects.`,
-      primaryLabel: `${addVerb} on Live`,
+          ? `Recommended: use ${rootLabel}. Add this ${objectLabel} on your card page instead of creating a second account.`
+          : `Recommended: use ${rootLabel}. Add this ${objectLabel} on your card page instead of creating again.`,
+      primaryLabel: openLabel,
       primaryHref: null,
       showGeneralSwitch: true,
       collapseLegacyForm: true,
@@ -133,9 +138,9 @@ export function createConvergenceNudgeCopy(template, ctx) {
   }
 
   return {
-    title: `Create a general live card first`,
-    body: `Then ${addVerb} from Live on /created/ under that root — no new private key. Standalone ${objectLabel} cards below remain for strangers and legacy pilots.`,
-    primaryLabel: "Switch to general card",
+    title: "Create your account first",
+    body: `Then ${addVerb.toLowerCase()} from your card page. Use the field-kit option below only if you need a separate account.`,
+    primaryLabel: "Switch to general account",
     primaryHref: null,
     showGeneralSwitch: true,
     collapseLegacyForm: false,
