@@ -26,7 +26,7 @@ const GAME_SEASON_FORK_HERO = {
   existing:
     "One @handle for door plates and season scan points. Add the season operator key on Live.",
   dedicated:
-    "New season-only @handle from day one. Best when door plates stay on another account.",
+    "New season @handle from day one. Best when signs use a different @name.",
 };
 
 /**

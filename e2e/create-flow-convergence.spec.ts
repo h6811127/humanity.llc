@@ -72,7 +72,7 @@ test.describe("create entry chooser (step 11)", () => {
     await expect(page.locator("#create-game-season-wizard")).toBeVisible();
     await expect(page.locator("#game-season-id-block")).toBeVisible();
     await expect(page.locator("#enable-organizer-revoke")).toBeChecked();
-    await expect(page.locator("#submit")).toHaveText(/season-only account/i);
+    await expect(page.locator("#submit")).toHaveText(/season @handle/i);
   });
 
   test("season fork existing path continues on saved deploy root", async ({ page }) => {
