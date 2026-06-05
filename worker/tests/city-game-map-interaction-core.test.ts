@@ -9,6 +9,9 @@ import {
   buildDistrictFilterOptions,
   CITY_GAME_MAP_DENSE_NODE_THRESHOLD,
   isDenseMapBoard,
+  isMapPinInteractive,
+  resolveMapNodeHighlight,
+  shouldScrollSketchForRowFocus,
 } from "../../site/js/city-game-map-interaction-core.mjs";
 import { validateMapLayout } from "../../site/js/city-game-map-board-core.mjs";
 import { spreadMapLayoutNodes } from "../scripts/spread-city-game-map-layout.mjs";
@@ -47,6 +50,35 @@ describe("city-game-map-interaction-core", () => {
     const src = readFileSync(join(root, "site/js/city-game-map-interaction.mjs"), "utf8");
     const boardClick = src.slice(src.indexOf('boardRoot.addEventListener("click"'));
     expect(boardClick).toContain("if (!(target instanceof Element)) return;");
+    expect(src).toContain('row.setAttribute("aria-current", "true")');
+    expect(src).toContain("resolveMapNodeHighlight");
+    expect(src).toContain("isMapPinInteractive");
+  });
+
+  it("resolveMapNodeHighlight toggles off repeat selection", () => {
+    expect(resolveMapNodeHighlight(null, "node_04")).toBe("node_04");
+    expect(resolveMapNodeHighlight("node_04", "node_04")).toBeNull();
+    expect(resolveMapNodeHighlight("node_04", "node_07")).toBe("node_07");
+  });
+
+  it("isMapPinInteractive rejects fog-hidden and hidden pins", () => {
+    expect(isMapPinInteractive({ hidden: true, classList: { contains: () => false } })).toBe(
+      false
+    );
+    expect(
+      isMapPinInteractive({
+        hidden: false,
+        classList: { contains: (name) => name === "city-game-map-pin--fog-hidden" },
+      })
+    ).toBe(false);
+    expect(isMapPinInteractive({ hidden: false, classList: { contains: () => false } })).toBe(
+      true
+    );
+  });
+
+  it("shouldScrollSketchForRowFocus matches mobile stack media", () => {
+    expect(shouldScrollSketchForRowFocus(() => true)).toBe(true);
+    expect(shouldScrollSketchForRowFocus(() => false)).toBe(false);
   });
 });
 

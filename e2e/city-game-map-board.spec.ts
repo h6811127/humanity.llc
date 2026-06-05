@@ -98,6 +98,45 @@ test.describe("city game map board", () => {
     await expect(board).toHaveAttribute("data-highlight-node-id", "node_04");
     await expect(pin).toHaveClass(/city-game-map-pin--highlight/);
     await expect(row).toHaveClass(/city-game-map-node-row--highlight/);
+    await expect(row).toHaveAttribute("aria-current", "true");
+  });
+
+  test("repeat pin click clears highlight", async ({ page }) => {
+    await mockSeasonSnapshot(page, mockSnapshotBody());
+
+    await page.goto("/play/cedar-rapids/map/");
+
+    const board = page.locator(".city-game-map-board");
+    await expect(board).toBeVisible({ timeout: 15_000 });
+
+    const pin = board.locator('.city-game-map-pin[data-node-id="node_04"]');
+    await board.locator("#district-sketch").evaluate((el) => {
+      if (el instanceof HTMLDetailsElement) el.open = true;
+    });
+    await pin.click();
+    await expect(board).toHaveAttribute("data-highlight-node-id", "node_04");
+    await pin.click();
+    await expect(board).not.toHaveAttribute("data-highlight-node-id", "node_04");
+    await expect(pin).not.toHaveClass(/city-game-map-pin--highlight/);
+  });
+
+  test("place row click highlights schematic pin", async ({ page }) => {
+    await mockSeasonSnapshot(page, mockSnapshotBody());
+
+    await page.goto("/play/cedar-rapids/map/");
+
+    const board = page.locator(".city-game-map-board");
+    await expect(board).toBeVisible({ timeout: 15_000 });
+
+    const pin = board.locator('.city-game-map-pin[data-node-id="node_04"]');
+    const row = board.locator('.city-game-map-node-row[data-node-id="node_04"]');
+    await board.locator("#district-sketch").evaluate((el) => {
+      if (el instanceof HTMLDetailsElement) el.open = true;
+    });
+    await row.locator(".city-game-map-node-title").click();
+    await expect(board).toHaveAttribute("data-highlight-node-id", "node_04");
+    await expect(pin).toHaveClass(/city-game-map-pin--highlight/);
+    await expect(row).toHaveAttribute("aria-current", "true");
   });
 
   test("legacy #city-state hash redirects to dedicated map page", async ({ page }) => {
@@ -111,7 +150,7 @@ test.describe("city game map board", () => {
     await expect(board.getByText("No visit log")).toBeVisible();
   });
 
-  test("mobile viewport keeps district sketch visible below capped place list", async ({ page }) => {
+  test("mobile viewport keeps collapsed sketch summary below capped place list", async ({ page }) => {
     await mockSeasonSnapshot(page, mockSnapshotBody());
     await page.setViewportSize({ width: 390, height: 844 });
 
@@ -119,29 +158,53 @@ test.describe("city game map board", () => {
 
     const board = page.locator(".city-game-map-board");
     await expect(board).toBeVisible({ timeout: 15_000 });
-    await expect(board.getByRole("heading", { name: "Places by district" })).toBeVisible();
-    await expect(board.getByRole("heading", { name: "District sketch" })).toBeVisible();
+    await expect(board.getByRole("heading", { name: "Current board state" })).toBeVisible();
+    await expect(board.getByRole("heading", { name: "Places" })).toBeVisible();
 
-    const shell = board.locator(".city-game-map-shell");
     const sketch = board.locator("#district-sketch");
+    await expect(sketch.getByText(/tap to expand schematic pins/i)).toBeVisible();
+    await expect(sketch).toHaveJSProperty("open", false);
+
+    const stateSection = board.locator(".city-game-map-state");
+    const placesSection = board.locator(".city-game-map-places");
     const list = board.locator(".city-game-map-list-panel");
 
-    const shellBox = await shell.boundingBox();
+    const stateBox = await stateSection.boundingBox();
+    const placesBox = await placesSection.boundingBox();
     const sketchBox = await sketch.boundingBox();
     const listBox = await list.boundingBox();
 
-    expect(shellBox?.width ?? 0).toBeGreaterThan(300);
+    expect(stateBox?.width ?? 0).toBeGreaterThan(280);
+    expect(placesBox?.width ?? 0).toBeGreaterThan(280);
     expect(sketchBox?.width ?? 0).toBeGreaterThan(280);
     expect(listBox?.width ?? 0).toBeGreaterThan(280);
 
-    // Place list precedes sketch; capped list height keeps sketch nearby on phone.
+    // Board state precedes places; capped list height keeps sketch summary nearby on phone.
+    expect((stateBox?.y ?? 0) + (stateBox?.height ?? 0)).toBeLessThanOrEqual(
+      (placesBox?.y ?? 0) + 24
+    );
     expect((listBox?.y ?? 0) + (listBox?.height ?? 0)).toBeLessThanOrEqual(
       (sketchBox?.y ?? 0) + 24
     );
     expect(listBox?.height ?? 0).toBeLessThanOrEqual(360);
-    expect(sketchBox?.height ?? 0).toBeGreaterThan(80);
     await sketch.scrollIntoViewIfNeeded();
     await expect(sketch).toBeInViewport({ ratio: 0.2 });
+  });
+
+  test("district sketch stays collapsed on desktop until expanded", async ({ page }) => {
+    await mockSeasonSnapshot(page, mockSnapshotBody());
+    await page.setViewportSize({ width: 1280, height: 900 });
+
+    await page.goto("/play/cedar-rapids/map/");
+
+    const sketch = page.locator("#district-sketch");
+    await expect(sketch).toBeVisible({ timeout: 15_000 });
+    await expect(sketch).toHaveJSProperty("open", false);
+    await expect(sketch.locator(".city-game-map-sketch-block")).toBeHidden();
+
+    await sketch.locator("summary").click();
+    await expect(sketch).toHaveJSProperty("open", true);
+    await expect(sketch.locator('.city-game-map-pin[data-node-id="node_04"]')).toBeVisible();
   });
 
   test("shows stale sync banner when snapshot fetch fails", async ({ page }) => {

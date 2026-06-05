@@ -5,6 +5,10 @@
 
 export const CITY_GAME_MAP_DENSE_NODE_THRESHOLD = 25;
 
+/** Match styles.css mobile stack — list above sketch, scroll sketch on row select. */
+export const CITY_GAME_MAP_MOBILE_SKETCH_MEDIA =
+  "(max-width: 959px), (hover: none), (pointer: coarse)";
+
 const DISTRICT_LABELS = {
   newbo: "NewBo",
   czech_village: "Czech Village",
@@ -76,4 +80,35 @@ export function buildDistrictFilterHtml(season) {
     ),
   ].join("");
   return `<div class="city-game-map-filter" role="toolbar" aria-label="Filter places by district">${chips}</div>`;
+}
+
+/**
+ * Toggle off when the same node is selected again.
+ * @param {string | null | undefined} currentNodeId
+ * @param {string | null | undefined} clickedNodeId
+ * @returns {string | null}
+ */
+export function resolveMapNodeHighlight(currentNodeId, clickedNodeId) {
+  const id = String(clickedNodeId ?? "").trim();
+  if (!id) return null;
+  if (currentNodeId === id) return null;
+  return id;
+}
+
+/**
+ * Fog-hidden and filtered pins must not drive list↔pin linking.
+ * @param {{ hidden?: boolean, classList?: { contains: (name: string) => boolean } } | null | undefined} pin
+ */
+export function isMapPinInteractive(pin) {
+  if (!pin) return false;
+  if (pin.hidden) return false;
+  if (pin.classList?.contains("city-game-map-pin--fog-hidden")) return false;
+  return true;
+}
+
+/**
+ * @param {(query: string) => boolean} matchMedia
+ */
+export function shouldScrollSketchForRowFocus(matchMedia) {
+  return matchMedia(CITY_GAME_MAP_MOBILE_SKETCH_MEDIA);
 }

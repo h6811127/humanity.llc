@@ -12,8 +12,21 @@
       content="Find stickers around Cedar Rapids. Scan them to move the city board. Open places, live board state, and maps links. No app. No account."
     />
     <meta name="theme-color" content="#ffffff" />
+    <script>
+      (function () {
+        try {
+          if (localStorage.getItem("hc_theme") === "dark") {
+            document.documentElement.dataset.theme = "dark";
+            document.documentElement.style.colorScheme = "dark";
+          }
+        } catch (e) {
+          /* ignore */
+        }
+      })();
+    </script>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
     <link rel="stylesheet" href="/styles.css?v=146" />
+    <link rel="stylesheet" href="/css/theme-dark.css?v=32" />
   </head>
   <body>
     <div class="page">
@@ -40,7 +53,7 @@
 
         <div class="research-live-banner hc-notice hc-notice--info" role="note" data-city-game-season-banner data-season-json="/data/city-game-cr-season-01.json" data-banner-variant="map">
   <p>
-    <strong data-city-game-season-banner-label>Season window</strong><span data-city-game-season-banner-dates> Wake the city · Signal War · 2026-06-06T18:00:00-05:00 → 2026-09-01T22:00:00-05:00</span>
+    <strong data-city-game-season-banner-label>Season window</strong><span data-city-game-season-banner-dates> Opens June 6 at 6 PM<br />Ends Sept 1 at 10 PM</span>
   </p>
   <p data-city-game-season-banner-body>Live updates appear on stickers around Cedar Rapids, Iowa and on this board. No account required.</p>
 </div>
