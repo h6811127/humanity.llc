@@ -51,6 +51,7 @@ describe("city-game-map-interaction-core", () => {
     expect(styles).toContain(".city-game-map-filter-btn");
     expect(styles).toContain(".city-game-map-filter-btn--active");
     expect(styles).toContain(".city-game-map-filter-summary");
+    expect(styles).toContain(".city-game-map-list-scroll");
     expect(styles).toContain(".city-game-map-filter-clear");
     expect(styles).toContain(".city-game-map-node-row[hidden]");
   });

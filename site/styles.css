@@ -11227,8 +11227,7 @@ body.device-shell-created .flow-keys-group .list-row {
 @media (min-width: 960px) and (hover: hover) and (pointer: fine) {
   .city-game-map-list-panel {
     max-height: min(520px, 70vh);
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    overflow: hidden;
   }
 }
 
@@ -11364,22 +11363,43 @@ body.device-shell-created .flow-keys-group .list-row {
 .city-game-map-list-panel {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 0;
   max-height: none;
   overflow: visible;
   padding-right: 0;
 }
 
+.city-game-map-list-head {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 0 1 auto;
+  max-height: min(220px, 58%);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.city-game-map-list-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-top: 10px;
+}
+
 @media (max-width: 959px), (hover: none), (pointer: coarse) {
   .city-game-map-list-panel {
     max-height: min(320px, 42vh);
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    overflow: hidden;
     padding: 12px;
     border-radius: var(--radius-lg);
     border: 1px solid rgba(0, 0, 0, 0.1);
     background: var(--white);
     box-sizing: border-box;
+  }
+
+  .city-game-map-list-head {
+    max-height: min(200px, 52%);
   }
 
   .city-game-map-sketch-block {
@@ -11501,7 +11521,8 @@ body.device-shell-created .flow-keys-group .list-row {
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  margin: 0 0 12px;
+  flex: 0 0 auto;
+  margin: 0;
   padding: 10px 12px;
   border-radius: var(--radius-md, 12px);
   border: 1px solid rgba(219, 27, 67, 0.28);

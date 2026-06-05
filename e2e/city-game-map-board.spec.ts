@@ -75,6 +75,22 @@ async function openBrowsePlaces(board: ReturnType<Page["locator"]>) {
   });
 }
 
+/** Viewing bar fully inside the scrollport of `.city-game-map-list-panel`. */
+async function expectFilterSummaryPinnedInListPanel(board: ReturnType<Page["locator"]>) {
+  const pinned = await board.locator(".city-game-map-list-panel").evaluate((panel) => {
+    if (!(panel instanceof HTMLElement)) return false;
+    const summary = panel.querySelector("#city-game-map-filter-summary");
+    if (!(summary instanceof HTMLElement) || summary.hidden) return false;
+    const panelRect = panel.getBoundingClientRect();
+    const summaryRect = summary.getBoundingClientRect();
+    return (
+      summaryRect.top >= panelRect.top - 1 &&
+      summaryRect.bottom <= panelRect.bottom + 1
+    );
+  });
+  expect(pinned).toBe(true);
+}
+
 async function openWhatChanged(board: ReturnType<Page["locator"]>) {
   await board.locator("#city-game-map-changed").evaluate((el) => {
     if (el instanceof HTMLDetailsElement) el.open = true;
@@ -234,6 +250,34 @@ test.describe("city game map board", () => {
     await expect(allKinds).not.toHaveClass(/city-game-map-filter-btn--active/);
   });
 
+  test("mobile filter summary stays pinned when scrolling place list", async ({ page }) => {
+    await mockSeasonSnapshot(page, mockSnapshotBody());
+    await page.setViewportSize({ width: 390, height: 844 });
+
+    await page.goto("/play/cedar-rapids/map/");
+
+    const board = page.locator(".city-game-map-board");
+    await expect(board).toBeVisible({ timeout: 15_000 });
+    await expect(board).toHaveAttribute("data-snapshot-loaded", "1");
+
+    await openBrowsePlaces(board);
+    const explore = board.locator(".city-game-map-explore-filter");
+    await explore.getByRole("button", { name: /Relay/ }).click();
+    await board.getByRole("button", { name: "NewBo", exact: true }).click();
+
+    const summary = board.locator("#city-game-map-filter-summary");
+    await expect(summary).toBeVisible();
+    await expectFilterSummaryPinnedInListPanel(board);
+
+    const listScroll = board.locator(".city-game-map-list-scroll");
+    await listScroll.evaluate((el) => {
+      el.scrollTop = el.scrollHeight;
+    });
+
+    await expectFilterSummaryPinnedInListPanel(board);
+    await expect(summary.locator("[data-filter-summary-scope]")).toContainText("NewBo · Relay");
+  });
+
   test("schematic pin click highlights matching place row", async ({ page }) => {
     await mockSeasonSnapshot(page, mockSnapshotBody());
 
@@ -280,7 +324,7 @@ test.describe("city game map board", () => {
 
     const pin = board.locator('.city-game-map-pin[data-node-id="node_07"]');
     const row = board.locator('.city-game-map-node-row[data-node-id="node_07"]');
-    const list = board.locator(".city-game-map-list-panel");
+    const list = board.locator(".city-game-map-list-scroll");
 
     await openBrowsePlaces(board);
     await openDistrictSketch(board);
@@ -305,11 +349,13 @@ test.describe("city game map board", () => {
       .poll(async () =>
         list.evaluate((el, rowEl) => {
           if (!(el instanceof HTMLElement) || !(rowEl instanceof HTMLElement)) return false;
-          const top = el.scrollTop;
-          const bottom = top + el.clientHeight;
-          const rowTop = rowEl.offsetTop;
-          const rowBottom = rowTop + rowEl.offsetHeight;
-          return rowTop >= top && rowBottom <= bottom;
+          const rowRect = rowEl.getBoundingClientRect();
+          const panelRect = el.getBoundingClientRect();
+          const rowOffset = el.scrollTop + (rowRect.top - panelRect.top);
+          const rowEnd = rowOffset + rowEl.offsetHeight;
+          const viewTop = el.scrollTop;
+          const viewBottom = viewTop + el.clientHeight;
+          return rowOffset >= viewTop && rowEnd <= viewBottom;
         }, await row.elementHandle())
       )
       .toBe(true);
@@ -430,7 +476,7 @@ test.describe("city game map board", () => {
     );
 
     await openBrowsePlaces(board);
-    const list = board.locator(".city-game-map-list-panel");
+    const list = board.locator(".city-game-map-list-scroll");
     const listBox = await list.boundingBox();
     expect(listBox?.height ?? 0).toBeLessThanOrEqual(360);
     await advanced.scrollIntoViewIfNeeded();

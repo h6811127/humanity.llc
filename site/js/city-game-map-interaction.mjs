@@ -61,15 +61,19 @@ function scrollListRowIntoView(boardRoot, nodeId) {
   );
   if (!(row instanceof HTMLElement)) return;
 
-  const panel = boardRoot.querySelector(".city-game-map-list-panel");
+  const panel =
+    boardRoot.querySelector(".city-game-map-list-scroll") ??
+    boardRoot.querySelector(".city-game-map-list-panel");
   if (panel instanceof HTMLElement && panel.scrollHeight > panel.clientHeight + 1) {
-    const panelTop = panel.scrollTop;
-    const panelBottom = panelTop + panel.clientHeight;
-    const rowTop = row.offsetTop;
-    const rowBottom = rowTop + row.offsetHeight;
-    if (rowTop < panelTop || rowBottom > panelBottom) {
+    const rowRect = row.getBoundingClientRect();
+    const panelRect = panel.getBoundingClientRect();
+    const rowOffset = panel.scrollTop + (rowRect.top - panelRect.top);
+    const rowEnd = rowOffset + row.offsetHeight;
+    const viewTop = panel.scrollTop;
+    const viewBottom = viewTop + panel.clientHeight;
+    if (rowOffset < viewTop || rowEnd > viewBottom) {
       panel.scrollTo({
-        top: Math.max(0, rowTop - 12),
+        top: Math.max(0, rowOffset - 12),
         behavior: "smooth",
       });
       return;

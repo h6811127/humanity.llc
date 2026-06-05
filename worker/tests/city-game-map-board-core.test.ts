@@ -103,6 +103,8 @@ describe("city-game map board render", () => {
     expect(html).toContain("Quest log");
     expect(html).toContain("city-game-map-state");
     expect(html).toContain("Places");
+    expect(html).toContain("city-game-map-list-head");
+    expect(html).toContain("city-game-map-list-scroll");
     expect(html).toContain("city-game-map-places--primary");
     expect(html).toContain('id="city-game-map-progress"');
     expect(html).toContain("The city is asleep.");

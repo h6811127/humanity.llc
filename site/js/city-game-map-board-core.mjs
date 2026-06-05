@@ -400,13 +400,17 @@ export function buildMapBrowseHtml(season, copy, launchCopy) {
   <summary class="city-game-map-browse-summary">${escapeMapHtml(launchCopy.browse_summary)}</summary>
   <div class="city-game-map-browse-body">
     <div class="city-game-map-list-panel">
-      <h2 class="city-game-map-list-title" id="city-game-map-list-title">${escapeMapHtml(copy.section_places_title)}</h2>
-      <div class="city-game-map-browse-filters">
-        ${buildDistrictFilterHtml(season)}
-        ${buildExploreFilterHtml(season)}
+      <div class="city-game-map-list-head">
+        <h2 class="city-game-map-list-title" id="city-game-map-list-title">${escapeMapHtml(copy.section_places_title)}</h2>
+        <div class="city-game-map-browse-filters">
+          ${buildDistrictFilterHtml(season)}
+          ${buildExploreFilterHtml(season)}
+        </div>
       </div>
       ${buildBoardFilterSummaryHtml()}
-      ${buildMapNodeListHtml(season, launchCopy)}
+      <div class="city-game-map-list-scroll">
+        ${buildMapNodeListHtml(season, launchCopy)}
+      </div>
     </div>
   </div>
 </details>`;
