@@ -55,6 +55,7 @@ describe("CREATE_ENTRY_DOORS", () => {
       "Live status on something",
       "Live status on you",
     ]);
+    expect(createEntryDoorById("account")?.sub).toMatch(/control updates/i);
     expect(createEntryDoorById("account")?.intent).toBe("general");
     expect(createEntryDoorById("wear")?.href).toContain("glitch_hoodie_v1");
     expect(createEntryDoorById("play")).toBeNull();

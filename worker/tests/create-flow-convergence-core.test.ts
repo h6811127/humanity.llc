@@ -61,7 +61,7 @@ describe("createConvergenceNudgeCopy", () => {
       preferredRoot: { handle: "river_studio", profile_id: "p1" },
       rootCount: 1,
     });
-    expect(copy.title).toContain("existing account");
+    expect(copy.title).toContain("saved @handle");
     expect(copy.primaryLabel).toBe("Open @river_studio to add sign");
     expect(copy.collapseLegacyForm).toBe(true);
   });
@@ -71,7 +71,7 @@ describe("createConvergenceNudgeCopy", () => {
       preferredRoot: null,
       rootCount: 0,
     });
-    expect(copy.title).toContain("@name first");
+    expect(copy.title).toContain("@handle first");
     expect(copy.collapseLegacyForm).toBe(false);
   });
 });

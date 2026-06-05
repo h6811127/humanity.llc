@@ -20,7 +20,7 @@ export const CREATE_ENTRY_DOORS = [
   {
     id: "account",
     title: "Your @handle",
-    sub: "One public line. Add door plates and tags from Live after create",
+    sub: "How you control updates. Add scan points from Live after create",
     href: null,
     intent: "general",
   },

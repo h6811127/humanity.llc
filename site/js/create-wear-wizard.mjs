@@ -16,7 +16,7 @@ import {
 const WEAR_HERO = {
   title: "Print your own QR wear",
   lead:
-    "Create an account, download the code, and print it on your own hoodie or sticker.",
+    "Pick a @handle, download the code, and print it on your own hoodie or sticker.",
 };
 
 /**

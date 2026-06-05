@@ -167,7 +167,7 @@ test.describe("create entry chooser (step 11)", () => {
     await expect(page.locator("#create-form-panel")).toBeVisible();
     await expect(page.locator("#create-entry-chooser")).toBeHidden();
     await expect(page).toHaveURL(/intent=general/);
-    await expect(page.locator("#create-hero-title")).toHaveText("Create your account");
+    await expect(page.locator("#create-hero-title")).toHaveText("Pick your @handle");
     await expect(page.locator("#manifesto")).toBeVisible();
     await expect(page.locator("#submit")).toHaveText("Create and get QR");
   });

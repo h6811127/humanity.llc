@@ -56,7 +56,7 @@ export function wearSubmitButtonLabel(strategy, preferredRoot) {
       ? generalRootDisplayLabel(preferredRoot)
       : "";
   if (strategy === "redirect_live") {
-    return handle ? `Open ${handle} to add wearable QR` : "Open your account to add wearable QR";
+    return handle ? `Open ${handle} to add wearable QR` : "Open Live to add wearable QR";
   }
   if (strategy === "create_wear_card") return "Create card & print QR";
   return null;

@@ -96,17 +96,17 @@ export function createHandoffAppliesToSession(handoff, session) {
  * @param {string} handle
  */
 export function createHandoffDetailLine(kind, handle) {
-  const onAccount = handle ? ` on ${handle}` : "";
+  const onHandle = handle ? ` on ${handle}` : "";
   if (kind === "deploy_sign") {
-    return `We'll open your existing account${onAccount} so you can add your sign there.`;
+    return `Continue on Live${onHandle} to add your sign there.`;
   }
   if (kind === "deploy_relay") {
-    return `We'll open your existing account${onAccount} so you can add your return tag there.`;
+    return `Continue on Live${onHandle} to add your return tag there.`;
   }
   if (kind === "wear") {
-    return `We'll open your existing account${onAccount} so you can continue to your wearable QR.`;
+    return `Continue on Live${onHandle} for your wearable QR.`;
   }
-  return `We'll open your existing account${onAccount} so you can continue season setup.`;
+  return `Continue on Live${onHandle} for season setup.`;
 }
 
 export const CREATE_HANDOFF_BANNER_TITLE = "You're already set up on this device.";
@@ -119,9 +119,9 @@ export function redirectOpenStatusForDeploy(template, entry) {
   if (template === "lost_item_relay") {
     return handle
       ? `Opening ${handle} to add your return tag…`
-      : "Opening your account to add your return tag…";
+      : "Opening Live to add your return tag…";
   }
-  return handle ? `Opening ${handle} to add your sign…` : "Opening your account to add your sign…";
+  return handle ? `Opening ${handle} to add your sign…` : "Opening Live to add your sign…";
 }
 
 /**
@@ -131,7 +131,7 @@ export function redirectOpenStatusForWear(entry) {
   const handle = entry ? generalRootDisplayLabel(entry) : "";
   return handle
     ? `Opening ${handle} for your wearable QR…`
-    : "Opening your account for your wearable QR…";
+    : "Opening Live for your wearable QR…";
 }
 
 /**
@@ -139,5 +139,5 @@ export function redirectOpenStatusForWear(entry) {
  */
 export function redirectOpenStatusForSeason(entry) {
   const handle = entry ? generalRootDisplayLabel(entry) : "";
-  return handle ? `Opening ${handle} for season setup…` : "Opening your account for season setup…";
+  return handle ? `Opening ${handle} for season setup…` : "Opening Live for season setup…";
 }
