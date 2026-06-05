@@ -82,6 +82,7 @@ step("Static site build check", ["run", "build"]);
 if (!fast) {
   step("Playwright — safari keys persistence", ["run", "e2e:safari-keys-persistence"]);
   step("Playwright — scan page dot", ["run", "e2e:scan-page-dot"]);
+  step("Playwright — scan revoke freshness (M3.6)", ["run", "e2e:scan-revoke-freshness"]);
   step("Playwright — key-loss sad path", ["run", "e2e:key-loss-sad-path"]);
   step("Playwright — status dot + inbox", [
     "run",

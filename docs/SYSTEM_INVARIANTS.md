@@ -231,9 +231,10 @@ Canonical architecture: [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE
 | Verbs are explicit (target) | New scanner/owner actions ship as documented capabilities on status JSON, not ad-hoc HTML-only blocks. |
 | Stream precedence | Care/maintenance streams mute game bulletin copy when in conflict — generalize via shared precedence, not one-off game checks. |
 | Status freshness | Every `GET …/status` body includes `scan.freshness` (`fetched_at`, `max_age_seconds`, `stale_disclosure`, `source`). Offline/mesh clients must set `source` ≠ `resolver` when serving cache. Scan HTML embeds the same block; `#scan-freshness-banner` reveals when age exceeds `max_age_seconds` or `source` is not `resolver`. |
+| Scan live truth | Public scan badge **must** come from a no-store `GET …/status` fetch on every page load. SSR HTML and CDN cache are presentation hints only — they must never be the sole source of active vs revoked. Revoke/update/rotate purges edge cache for scan URLs. |
 | Succession hints | `scan.succession` reports `live` \| `sunset` \| `archived` from revoke + archive capabilities — not human trust or vouch. |
 
-**Regression:** `npm run worker:test -- worker/tests/scan.test.ts worker/tests/scan-freshness-banner.test.ts worker/tests/update-card.test.ts worker/tests/live-object-staleness-contract.test.ts worker/tests/live-object-succession-spec.test.ts`
+**Regression:** `npm run worker:test -- worker/tests/scan.test.ts worker/tests/scan-freshness-banner.test.ts worker/tests/scan-revoke-truth-contract.test.ts worker/tests/scan-live-truth-core.test.ts worker/tests/scan-cache-purge.test.ts worker/tests/update-card.test.ts worker/tests/live-object-staleness-contract.test.ts worker/tests/live-object-succession-spec.test.ts` · E2E: `npm run e2e:scan-revoke-freshness`
 
 Touching `worker/src/resolver/scan-state.ts`, stream validation, or planned `live-object/*` modules requires updating [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) when layer behavior changes.
 

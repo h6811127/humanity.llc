@@ -219,10 +219,17 @@ npm run worker:test -- worker/tests/scan.test.ts worker/tests/scan-status.test.t
 npm run worker:test -- worker/tests/qr-metadata.test.ts  # new
 ```
 
+Automated (Phase 3 / M3.6):
+
+```bash
+npm run worker:test -- worker/tests/scan-revoke-truth-contract.test.ts
+npm run e2e:scan-revoke-freshness
+```
+
 Manual:
 
 1. Active card: phone scan `/c/{profile_id}?q={qr_id}` → trust blocks + bearer.
-2. Revoke card → rescan → 410 HTML + revoked copy (not generic crash).
+2. Revoke card → rescan → 410 HTML + revoked copy (not generic crash). Android PWA: same rescan within ~10s.
 3. Suspend (fixture/seed) → process link visible.
 4. Offline (browser) → stale banner on scan page.
 
