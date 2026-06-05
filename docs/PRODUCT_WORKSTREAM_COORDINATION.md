@@ -97,7 +97,7 @@ Mark ☑ in [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) § Reco
 
 | Gate | Proof | Owner |
 |------|-------|-------|
-| **LO-1** Order 1 pilot sign-off | Printed status plate + lost-item relay — [`STATUS_PLATE_PILOT.md`](STATUS_PLATE_PILOT.md), [`LOST_ITEM_RELAY_PILOT.md`](LOST_ITEM_RELAY_PILOT.md) · field kit: `npm run ws-live:lo1-kit` | WS-QUALITY |
+| **LO-1** Order 1 pilot sign-off | Printed status plate + lost-item relay via **deploy wizard** (`?intent=deploy`) — [`STATUS_PLATE_PILOT.md`](STATUS_PLATE_PILOT.md), [`LOST_ITEM_RELAY_PILOT.md`](LOST_ITEM_RELAY_PILOT.md) · field kit: `npm run ws-live:lo1-kit` (Path A deploy · Path B legacy regression) | WS-QUALITY |
 | **LO-2** Order 2 field launch | WS-CR **C5** signed · prod season mint · `city-game:smoke-production` | WS-CR |
 | **LO-3** L5 opening footprint | **~40 nodes** installed · B7 at open · honest launch surfaces | WS-SCALE + WS-CR |
 | **LO-4** Integrated stranger comprehension | Scan **game node** (contribute/read) + **non-game object** (status plate) — same primitive, &lt;30s trust read | WS-CR + WS-QUALITY |

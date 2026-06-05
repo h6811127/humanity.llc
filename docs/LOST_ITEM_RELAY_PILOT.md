@@ -21,25 +21,29 @@ Not proof of ownership. Not a phone number printed in plain sight. Item name + r
 
 ## How to create one
 
-**Current implementation (flat-card bridge):**
+**Current path (deploy wizard — Account → Endpoint → Scan link):**
 
-1. Go to **https://humanity.llc/create/**
-2. Choose **Lost item** under “Start from”
-3. Fill in:
-   - **Handle**  -  your card id (e.g. `keys_relay`)
+1. Go to **https://humanity.llc/create/?intent=deploy** (launch door 1 **Live status on something**; lost-item fields in deploy wizard)
+2. Fill in:
+   - **Handle**  -  your account id (e.g. `keys_relay`)
    - **What is lost?**  -  headline on scan (e.g. `House keys`)
    - **What should finders see?**  -  return message (e.g. `Lost  -  contact owner through relay`)
+3. Submit mints **Account** (general root) + **Endpoint** (`lost_item_relay` child) + **Scan link** in one action when no saved general root exists; **Continue on Live** when an account already exists.
 4. Save recovery key on `/created/`, print QR, scan from another phone, revoke when recovered.
 
-**Target model (shipped):** From an existing **general** root Humanity Card, choose **Add lost-item relay under this root** on `/created/` Live or manage nested rows under the root in **My cards** / hub. See [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) § Product UX maturity (steps 13–16).
+**Returning steward:** From an existing account, open `/created/` Live → **Add lost-item relay** (register + first scan link in one action) or manage nested rows under the root in **My cards** / hub. See [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) § Product UX maturity (steps 13–16).
+
+**Legacy flat account (read/scan compatibility only):** `?template=lost_item` mints a root whose `[relay]`-prefixed `manifesto_line` encodes the relay. Scans, updates, and revoke still work — field-kit regression path only; not the front-door create path.
 
 **Same iPhone note:** Same device storage rules as status plates — local child index reconciled from resolver list; nested hub/My cards rows shipped (step 13); PWA install does not add extra storage.
 
 Public showcase scan (homepage pilot): see `site/data/showcase-lost-item.json` - refresh with `npm run site:seed-showcase-lost-item`.
 
-### Storage format (no new API field)
+### Storage format
 
-The resolver stores one `manifesto_line` with **two lines** and a line-1 prefix:
+**Current creates (child endpoint):** `public_label` + `public_state` on the `child_objects` row; scan reads these first-class (`[relay]` prefix applied at compose time for lost-item type).
+
+**Legacy flat accounts:** one root `manifesto_line` with **two lines** and a line-1 prefix:
 
 ```text
 [relay] House keys
@@ -70,8 +74,9 @@ Deploy Worker with `X-HC-Scan-UI: pass-v8` for this layout.
 
 | Step | Pass? |
 |------|-------|
-| Stranger creates lost item relay unassisted (current flat-card bridge) | ☐ |
-| Existing card owner adds lost-item child object (target flow) | ☐ manual · **create + update + scan link + disable** on `/created/` Live |
+| Stranger creates lost item relay unassisted via **deploy wizard** (`?intent=deploy` or launch door 1) | ☐ |
+| Returning steward adds lost-item relay on Live without new account | ☐ manual · **create + update + scan link + disable** on `/created/` Live |
+| Legacy flat template (`?template=lost_item`) still scans and updates after create | ☐ regression · field-kit Path B only |
 | Finder understands return path in &lt;30s | ☐ |
 | Owner revokes after “found” and re-scan shows revoked | ☐ |
 | Stranger answers “does scan prove holder?” correctly | ☐ |
@@ -119,7 +124,7 @@ Owner can change line 2 (return message) without reprinting  -  `docs/MANIFESTO_
 
 | Path | Role |
 |------|------|
-| `site/create/` | Lost item template |
+| `site/create/?intent=deploy` | Deploy wizard (current); legacy `?template=lost_item` for field-kit regression |
 | `site/js/create-card.mjs` | `[relay] ` prefix + `pilot_template` |
 | `site/created/` | Lost item pilot tip |
 | `site/js/created-child-object-lost-item.mjs` | Lost-item relay child UI on `/created/` Live |
