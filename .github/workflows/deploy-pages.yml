@@ -30,6 +30,7 @@ jobs:
         run: npm run pages:deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: 6ad770a7c6336c0c13cfb2c88c2bf8da
       - name: Post-deploy landing copy verify
         run: npm run verify:landing:production
         env:
