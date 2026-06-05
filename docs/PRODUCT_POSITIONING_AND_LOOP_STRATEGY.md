@@ -32,7 +32,7 @@
 | Job | User question | Primary door | Protocol (unchanged) |
 |-----|---------------|--------------|----------------------|
 | **Wear live state** | “What I wear should mean something *today*.” | Door 2 → `/shop/customize/` | `scope: print_artifact` on garment; steward updates from `/created/` |
-| **Deploy on something** | “Something in the world should stay *true*.” | Door 1 → create (BYOP) | Root + child object or flat pilot bridge; per [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) |
+| **Deploy on something** | “Something in the world should stay *true*.” | Door 1 → create (BYOP) | Account → endpoint → scan link via deploy wizard; legacy flat scan compat per [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) |
 | **Activate a place** | “Many scan points should share one world.” | Door 3 → play; organizers → season setup | `game_node` children + Layer 5 season overlay · [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) |
 
 Lost-item relay, status plate, menus, crisis cards, etc. are **catalog instances** of job #2 — field pilots and portfolio depth, **not** homepage nouns.
@@ -41,7 +41,7 @@ Lost-item relay, status plate, menus, crisis cards, etc. are **catalog instances
 
 | Door | Title (user-facing) | Route | Role |
 |------|---------------------|-------|------|
-| 1 | Live status on something | `/create/?intent=deploy` (target) · today `/create/?template=status_plate` | Free deploy tool (BYOP) |
+| 1 | Live status on something | `/create/?intent=deploy` (shipped) · legacy `?template=status_plate` field-kit regression only | Free deploy tool (BYOP) |
 | 2 | Live status on you | `/shop/customize/?product=glitch_hoodie_v1` | Commerce + distribution |
 | 3 | Play the city game | `/play/cedar-rapids/` | Player entry; network proof |
 
@@ -83,11 +83,11 @@ Bare `/create/` is a **two-row steward chooser**: deploy on something + wear car
 | Object graph (L1) | My objects (nested management view) |
 | Network graph (L5) | Live game · season · place |
 
-Flat-card pilots (plate/relay **is** the root) remain valid for strangers and legacy; new surfaces prefer root + child without exposing topology ([`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) § Bridge vs target).
+Legacy flat accounts (plate/relay **is** the root) remain valid for **read/scan/update**; new creates use deploy wizard (account + endpoint + scan link) without exposing topology ([`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) § Current vs legacy).
 
 **Architecture alignment:** No rename of `profile_id`, `object_type`, or document types. UI copy migration only. `isGeneralRootWalletEntry` and child-object endpoints unchanged.
 
-### Abstract create (door 1 target — planned)
+### Abstract create (door 1 — shipped step 12)
 
 Lead with **deployment + what scanners read**, not taxonomy tabs:
 
@@ -95,7 +95,7 @@ Lead with **deployment + what scanners read**, not taxonomy tabs:
 2. System maps to `status_plate`, `lost_item_relay`, or future types behind the scenes.
 3. Pilot presets (hours, return message, campaign line) live in collapsed **Examples** — not top-level create types.
 
-**Architecture alignment:** Reuses `registerChildObjectAndIssueScanLink` ([`child-object-register-issue.mjs`](../site/js/child-object-register-issue.mjs)) and flat pilot POST for strangers. Optional bundled root+child wizard is sequential client calls — **no resolver fork required for v1 doc target**.
+**Architecture alignment:** Deploy wizard (`?intent=deploy`) runs `registerChildObjectAndIssueScanLink` ([`child-object-register-issue.mjs`](../site/js/child-object-register-issue.mjs)) after general-root create when no saved account exists — Account → endpoint → scan link in one submit ([`create-deploy-submit.mjs`](../site/js/create-deploy-submit.mjs)). Legacy flat POST remains for field-kit regression only when standalone disclosure is open — **no resolver fork**.
 
 ### Catalog role (portfolio + way-finder)
 
@@ -282,7 +282,7 @@ Calm footer on lost-item relay scan template only — link to `/create/?template
 
 **Exit (target):** WS-QUALITY Q3 comprehension — 5 steward sessions without room / keys confusion · room switcher + policy in UI tests · [`CORE_PRODUCT_LOOP.md`](CORE_PRODUCT_LOOP.md).
 
-**Architecture guardrails:** No resolver fork; flat pilots and `?template=` remain for field kits; delegation (step 17) stays deferred with honest copy.
+**Architecture guardrails:** No resolver fork; `?template=` remains for LO-1/LO-2 **legacy regression** and pre-convergence QRs; delegation (step 17) stays deferred with honest copy.
 
 ---
 

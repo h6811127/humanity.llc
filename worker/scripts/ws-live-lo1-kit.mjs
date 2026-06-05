@@ -37,7 +37,7 @@ function main() {
   const urls = resolveWsLiveLo1KitUrls({ production: productionMode, host });
   const html = buildWsLiveLo1KitHtml({
     origin: urls.origin,
-    createGeneralUrl: urls.createGeneralUrl,
+    createDeployUrl: urls.createDeployUrl,
     createStatusPlateUrl: urls.createStatusPlateUrl,
     createLostItemUrl: urls.createLostItemUrl,
     showcaseStatusPlateUrl: urls.showcaseStatusPlateUrl,

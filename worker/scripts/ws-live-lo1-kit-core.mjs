@@ -19,7 +19,7 @@ function escapeHtml(value) {
 /**
  * @param {{
  *   origin: string;
- *   createGeneralUrl: string;
+ *   createDeployUrl: string;
  *   createStatusPlateUrl: string;
  *   createLostItemUrl: string;
  *   showcaseStatusPlateUrl?: string;
@@ -71,22 +71,22 @@ export function buildWsLiveLo1KitHtml(opts) {
   </p>
   <p class="lead">Origin: ${escapeHtml(origin)} · Use a second phone for stranger scans.</p>
 
-  <h2>Path A — child object under general root (target)</h2>
-  <a class="cta" href="${escapeHtml(opts.createGeneralUrl)}">1. Create general root card</a>
-  <p class="lead">Save keys on device → open <strong>/created/</strong> → expand
-    <strong>Live objects under this root</strong>.</p>
+  <h2>Path A — deploy wizard (current create)</h2>
+  <p class="lead">Account → Endpoint → Scan link in one submit when no saved account exists.</p>
+  <a class="cta" href="${escapeHtml(opts.createDeployUrl)}">1. Open deploy wizard</a>
   <ol>
-    <li>Register a <strong>status plate</strong> (object name + status line) → download QR → print</li>
+    <li>Create a <strong>status plate</strong> (object name + status line) → save keys → download QR → print</li>
     <li>Second device scan — answer in &lt;30s: open or not? Does scan prove who owns the door?</li>
     <li>Update status line on Live — re-scan without reprinting</li>
     <li>Disable this plate — re-scan shows object unavailable</li>
-    <li>Repeat for <strong>lost-item relay</strong> (item name + return message)</li>
-    <li>On /created/ use <strong>Copy pilot summary</strong> for founder roll-up</li>
+    <li>On the same account: <strong>Add lost-item relay</strong> on <code>/created/</code> Live (or run deploy wizard again for lost-item fields)</li>
+    <li>Repeat scan / update / disable for the relay; use <strong>Copy pilot summary</strong> for founder roll-up</li>
   </ol>
 
-  <h2>Path B — flat-card bridge (stranger create)</h2>
-  <a class="cta cta-secondary" href="${escapeHtml(opts.createStatusPlateUrl)}">Create status plate template</a>
-  <a class="cta cta-secondary" href="${escapeHtml(opts.createLostItemUrl)}">Create lost-item template</a>
+  <h2>Path B — legacy flat (regression only)</h2>
+  <p class="lead">Pre-convergence QRs and field-kit regression — plate/relay <strong>is</strong> the account root. Scans and updates still work; not the front-door create path.</p>
+  <a class="cta cta-secondary" href="${escapeHtml(opts.createStatusPlateUrl)}">Legacy status plate template</a>
+  <a class="cta cta-secondary" href="${escapeHtml(opts.createLostItemUrl)}">Legacy lost-item template</a>
 
   ${
     opts.showcaseStatusPlateUrl
@@ -101,12 +101,14 @@ export function buildWsLiveLo1KitHtml(opts) {
     <table>
       <thead><tr><th>Check</th><th>Pass?</th></tr></thead>
       <tbody>
-        <tr><td>Stranger creates or owner adds child object unassisted</td><td>☐</td></tr>
+        <tr><td>Stranger completes deploy wizard unassisted (Path A)</td><td>☐</td></tr>
+        <tr><td>Returning steward adds endpoint on Live without new account</td><td>☐</td></tr>
+        <tr><td>Legacy flat template still scans and updates after create (Path B)</td><td>☐</td></tr>
         <tr><td>Scan answers status / return path in &lt;30s</td><td>☐</td></tr>
         <tr><td>Stranger: scan does <strong>not</strong> prove holder owns object</td><td>☐</td></tr>
-        <tr><td>Print + second-device scan + revoke without founder</td><td>☐</td></tr>
+        <tr><td>Print + second-device scan + disable without founder</td><td>☐</td></tr>
         <tr><td>Status plate: ≥2 live updates on one plate</td><td>☐</td></tr>
-        <tr><td>Lost item: revoke after &quot;found&quot; shows revoked state</td><td>☐</td></tr>
+        <tr><td>Lost item: disable after &quot;found&quot; shows unavailable state</td><td>☐</td></tr>
       </tbody>
     </table>
   </div>
@@ -114,7 +116,7 @@ export function buildWsLiveLo1KitHtml(opts) {
   <h2>Five-layer reminder</h2>
   <div class="scorecard">
     <ol>
-      <li><strong>L1</strong> — root → child → QR (this walk)</li>
+      <li><strong>L1</strong> — account → endpoint → scan link (this walk)</li>
       <li><strong>L2</strong> — read + request (live proof) + offer (lost-item finder message)</li>
       <li><strong>L3–L4</strong> — streams + time policy on /created/ editors</li>
       <li><strong>L5</strong> — Cedar Rapids game nodes (LO-2) — same resolver</li>
@@ -139,7 +141,7 @@ export function resolveWsLiveLo1KitUrls(opts = {}) {
   return {
     origin: pagesOrigin,
     apiOrigin,
-    createGeneralUrl: `${pagesOrigin}/create/?template=general`,
+    createDeployUrl: `${pagesOrigin}/create/?intent=deploy`,
     createStatusPlateUrl: `${pagesOrigin}/create/?template=status_plate`,
     createLostItemUrl: `${pagesOrigin}/create/?template=lost_item_relay`,
     kitPageUrl: `${pagesOrigin}/dev/ws-live-lo1-comprehension.html`,

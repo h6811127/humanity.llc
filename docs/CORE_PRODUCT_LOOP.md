@@ -128,7 +128,7 @@ Prefer **surgical** changes aligned with existing patterns:
 | **Step 20 — entry states** | No “field looks broken” reports from disabled/hidden inputs on mobile PWA |
 | **Step 20 — wear tracks** | Stewards understand fulfilled garment (no expiry) vs BYOP QR (may expire) before filling forms |
 
-**Architecture guardrails during Q3:** `verify:desk:fast` green; child objects stay out of `hc_wallet`; flat pilots remain for LO-1/LO-2 field kits; no landing hero revert; presentation policy is UI-only; add UI filtered by room, lists show all children ([`STEWARD_UX_PRESENTATION_TARGET.md`](STEWARD_UX_PRESENTATION_TARGET.md) § Presentation policy table).
+**Architecture guardrails during Q3:** `verify:desk:fast` green; child objects stay out of `hc_wallet`; LO-1/LO-2 field kits exercise **deploy wizard (Path A)** plus **legacy flat regression (Path B)** — existing flat QRs keep scanning; no landing hero revert; presentation policy is UI-only; add UI filtered by room, lists show all children ([`STEWARD_UX_PRESENTATION_TARGET.md`](STEWARD_UX_PRESENTATION_TARGET.md) § Presentation policy table).
 
 ---
 

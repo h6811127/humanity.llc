@@ -157,9 +157,9 @@ Focus params may deep-link into a step; they must not be the only progress signa
 
 ### Field kit exception (fourth narrow path)
 
-**Not a main door.** Flat-card create (`?template=status_plate|lost_item`) for strangers and LO-1/LO-2 field kits ([`STATUS_PLATE_PILOT.md`](STATUS_PLATE_PILOT.md), [`LOST_ITEM_RELAY_PILOT.md`](LOST_ITEM_RELAY_PILOT.md)).
+**Not a main door.** Strangers create via **deploy wizard** (`?intent=deploy`) — Account → endpoint → scan link. Legacy flat create (`?template=status_plate|lost_item`) is **regression only** for LO-1/LO-2 Path B and pre-convergence QRs ([`STATUS_PLATE_PILOT.md`](STATUS_PLATE_PILOT.md), [`LOST_ITEM_RELAY_PILOT.md`](LOST_ITEM_RELAY_PILOT.md)).
 
-- Plate/relay **is** the root (bridge path).  
+- On legacy path only: plate/relay **is** the account root; scans and updates still work.  
 - Comprehension scorecard + pilot summary export.  
 - Must not look like a broken deploy room or pollute main create chooser.
 
@@ -194,7 +194,7 @@ Actions map to verbs/lifecycle; **Details** holds `profile_id`, scope, streams, 
 | 2 | Returning, keys in session | Room home or “add scan point” |
 | 3 | Returning, keys in wallet only | “Unlock on this device” then room home |
 | 4 | Wrong device / context (PWA ≠ Safari on iPhone) | Honest two-wallet copy — no fake create form |
-| 5 | Stranger / pilot | Field kit path only |
+| 5 | Stranger / pilot | Deploy wizard (`?intent=deploy`); legacy `?template=` for field-kit regression only |
 
 Multi-root wallets remain valid ([`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md)); entry shows **which identity** (@handle), not `profile_id`.
 
@@ -333,7 +333,7 @@ Slice 1 shipped add-hub filter only; **list policy** is slice 2+.
 | Object-first scan | **Strong** | + capability + trust ordering |
 | Season vs deploy split | **Strong** | Presentation policy required |
 | Wear carrier split | **Good** | Must keep two-track lifecycle copy |
-| Flat-card / pilot bridge | **Required exception** | Field kit path |
+| Legacy flat scan compat | **Required exception** | Field-kit Path B regression only; deploy wizard is current create |
 | Verbs on scan | **Must design** | Per room verb catalog |
 | Streams + precedence | **Must design** | Optional deploy streams; care on game nodes |
 | Time policy / season phases | **Must design** | “When” panel in season cockpit |
