@@ -172,5 +172,6 @@ export function syncCreatedRoomSwitcher(profileId, session) {
     });
   bindStewardActiveRoomRuntime(profileId, room);
   syncRoomSwitcherButtons(wrap, room);
+  syncWearRoomPanels(room);
   syncRoomCrosshint(profileId, session, room);
 }

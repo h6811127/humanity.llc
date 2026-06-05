@@ -6,6 +6,8 @@ import {
   redirectOpenStatusForDeploy,
 } from "../../site/js/create-handoff-core.mjs";
 import {
+  CONTROL_ACCOUNT_HERO_LEAD,
+  controlHeroCopy,
   controlHeroTitle,
   freshSetupHeroCopy,
   resolveControlOutcomeKind,
@@ -45,12 +47,14 @@ describe("resolveFreshOutcomeKind", () => {
 });
 
 describe("controlHeroTitle", () => {
-  it("uses contextual live titles", () => {
+  it("uses contextual live titles and account lead", () => {
     expect(controlHeroTitle("sign")).toBe("Your sign is live");
     expect(controlHeroTitle("tag")).toBe("Your tag is live");
     expect(controlHeroTitle("wear")).toBe("Your wearable QR is live");
     expect(controlHeroTitle("season")).toBe("Your season is live");
     expect(controlHeroTitle("account")).toBe("Your account is live");
+    expect(controlHeroCopy("account").lead).toBe(CONTROL_ACCOUNT_HERO_LEAD);
+    expect(controlHeroCopy("sign").lead).toBeNull();
   });
 
   it("maps lost-item pilot sessions to tag hero", () => {
@@ -87,6 +91,17 @@ describe("resolveCreatedFreshPresentation", () => {
       session: { pilot_template: "status_plate" },
     });
     expect(presentation.hero?.title).toBe("Your sign is live");
+  });
+
+  it("includes account hero lead for general control", () => {
+    const presentation = resolveCreatedFreshPresentation({
+      freshParam: false,
+      mode: "control",
+      searchParams: new URLSearchParams(""),
+      session: { pilot_template: "general" },
+    });
+    expect(presentation.hero?.title).toBe("Your account is live");
+    expect(presentation.hero?.lead).toBe(CONTROL_ACCOUNT_HERO_LEAD);
   });
 
   it("returns handoff banner for redirect paths", () => {

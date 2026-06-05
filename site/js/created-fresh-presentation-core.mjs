@@ -84,12 +84,21 @@ export function controlHeroTitle(kind) {
   return "Your account is live";
 }
 
+/** Hero lead on first control visit for general accounts (P0.2). */
+export const CONTROL_ACCOUNT_HERO_LEAD = "Add your first sign or tag.";
+
+/** Primary CTA label — scrolls to sign add section (P0.2). */
+export const CREATED_ACCOUNT_FIRST_SIGN_CTA_LABEL = "Add your first sign";
+
 /**
  * @param {ControlOutcomeKind} kind
  * @returns {{ title: string; lead: string | null }}
  */
 export function controlHeroCopy(kind) {
-  return { title: controlHeroTitle(kind), lead: null };
+  return {
+    title: controlHeroTitle(kind),
+    lead: kind === "account" ? CONTROL_ACCOUNT_HERO_LEAD : null,
+  };
 }
 
 /**

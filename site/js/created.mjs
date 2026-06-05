@@ -105,7 +105,16 @@ import {
   isFirstControlSessionActive,
 } from "./created-first-session-containment-core.mjs";
 import { applyFirstSessionContainment } from "./created-first-session-containment.mjs";
+import {
+  focusSignAddSection,
+  wireCreatedAccountFirstSignCtaClick,
+} from "./created-account-first-sign-cta.mjs";
 import { syncCreatedPageDisplayLabels } from "./created-display-labels.mjs";
+import {
+  initCreatedRoomSwitcher,
+  syncCreatedRoomSwitcher,
+} from "./created-room-switcher.mjs";
+import { STEWARD_ROOM_DOORS } from "./steward-active-room-core.mjs";
 import { applyGameSeasonSetupFocus } from "./created-game-season-setup-focus.mjs";
 import { syncGameSeasonSetupPanel } from "./created-game-season-setup-panel.mjs";
 import { isGameSeasonSetupFlowActive, isGameSeasonSetupFocus, markGameSeasonSetupFlow } from "./create-organizer-season-core.mjs";
@@ -441,6 +450,8 @@ let gameNodeCtl = null;
 let createdTabs;
 let workspaceMode = "view";
 let dashboardWired = false;
+/** @type {ReturnType<typeof initCreatedRoomSwitcher> | null} */
+let createdRoomSwitcher = null;
 let ownerToolsBootstrapped = false;
 let downloadQrClick = null;
 /** @type {ReturnType<typeof initCreatedLiveObjectCard> | null} */
@@ -471,31 +482,40 @@ function refreshGameSeasonSetupPresentation() {
   if (anchor) anchor.hidden = false;
 }
 
+function onStewardRoomApplied(room) {
+  syncChildObjectAddHub(loadSession(), { profileId, activeRoom: room });
+  childObjectCtl?.refresh?.();
+  lostItemRelayCtl?.refresh?.();
+  gameNodeCtl?.refresh?.();
+  refreshGameSeasonSetupPresentation();
+}
+
+function wireCreatedRoomSwitcher() {
+  if (!profileId || createdRoomSwitcher) return;
+  createdRoomSwitcher = initCreatedRoomSwitcher({
+    profileId,
+    getSession: loadSession,
+    getHandle: () => {
+      const session = loadSession();
+      return typeof session?.handle === "string" ? session.handle : data?.handle ?? null;
+    },
+    onRoomApplied: onStewardRoomApplied,
+  });
+}
+
 function applyStewardLandingFocus() {
   if (!createdTabs) {
     createdTabs = initCreatedTabs();
   }
   applyGameSeasonSetupFocus((id) => createdTabs.select(id), params, {
     applyRoom: (room) => {
-      if (profileId) {
-        try {
-          sessionStorage.setItem(`hc_steward_active_room:${profileId}`, room);
-        } catch {
-          /* ignore */
-        }
-      }
-      const wrap = document.getElementById("created-room-switcher-wrap");
-      if (!wrap) return;
       if (profileId && isFirstControlSessionActive(profileId, sessionStorage)) {
-        wrap.hidden = true;
+        const wrap = document.getElementById("created-room-switcher-wrap");
+        if (wrap) wrap.hidden = true;
         return;
       }
-      wrap.hidden = false;
-      for (const btn of wrap.querySelectorAll("[data-steward-room]")) {
-        if (!(btn instanceof HTMLButtonElement)) continue;
-        const selected = btn.dataset.stewardRoom === room;
-        btn.classList.toggle("is-active", selected);
-        btn.setAttribute("aria-pressed", selected ? "true" : "false");
+      if (createdRoomSwitcher) {
+        createdRoomSwitcher.applyRoom(room, { persist: true, announce: false });
       }
     },
     refreshPresentation: () => refreshGameSeasonSetupPresentation(),
@@ -515,13 +535,19 @@ function finalizeControlWorkspacePresentation() {
     freshParam,
     mode: "control",
     session: loadSession(),
+    profileId,
   });
   applyStewardLandingFocus();
   if (profileId) {
     applyFirstSessionContainment(profileId);
+    syncCreatedRoomSwitcher(profileId, loadSession());
     syncChildObjectAddHub(loadSession(), { profileId });
     window.dispatchEvent(new Event("hc-created-live-setup-memory-sync"));
   }
+  wireCreatedAccountFirstSignCtaClick(() => {
+    focusSignAddSection(profileId);
+    onStewardRoomApplied(STEWARD_ROOM_DOORS);
+  });
 }
 
 function enterControlWorkspace() {
@@ -1698,6 +1724,9 @@ async function bootstrapOwnerTools() {
     gameNodeCtl?.refresh?.();
   });
   void manifestoUpdate;
+
+  wireCreatedRoomSwitcher();
+  syncCreatedRoomSwitcher(profileId, loadSession());
 
   const session = loadSession();
   applyPilotTemplateUi(session);

@@ -5,8 +5,9 @@ import {
 } from "./merch-funnel-core.mjs";
 
 /**
- * Phase A: tuck generic manifesto update until owner has revoked once in-session.
- * Pilots and Tier 1 merch owners need live line edits before revoke field tests.
+ * Live publish visibility on /created/ (What scanners see).
+ * General roots publish without a revoke-first detour; revoke stays on Manage.
+ * Pilots and Tier 1 merch owners were always unlocked before revoke.
  * @see docs/PHASE_A_STRANGER_PATH_PRIORITIES.md
  * @see docs/EPHEMERAL_STATE_AND_MERCH.md
  */
@@ -70,11 +71,32 @@ export function isEphemeralStateUpdateUnlocked(profileId, session = null) {
 }
 
 /**
+ * General account roots may publish public scanner copy without revoke-first.
+ * @param {Record<string, unknown> | null | undefined} session
+ */
+export function isGeneralPublishUnlocked(session) {
+  const explicit =
+    typeof session?.pilot_template === "string"
+      ? session.pilot_template.trim().toLowerCase()
+      : "";
+  if (explicit === "status_plate" || explicit === "lost_item_relay") return false;
+  if (explicit === "general" || !explicit) return true;
+  if (typeof session?.manifesto_line !== "string" || !session.manifesto_line.trim()) {
+    return true;
+  }
+  return inferPilotTemplate(session.manifesto_line) === "general";
+}
+
+/**
  * @param {string | null | undefined} profileId
  * @param {Record<string, unknown> | null | undefined} session
  */
 export function isScannersSeeUnlocked(profileId, session = null) {
-  return hasFirstRevokeDone(profileId) || isEphemeralStateUpdateUnlocked(profileId, session);
+  return (
+    hasFirstRevokeDone(profileId) ||
+    isEphemeralStateUpdateUnlocked(profileId, session) ||
+    isGeneralPublishUnlocked(session)
+  );
 }
 
 /**

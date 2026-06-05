@@ -150,8 +150,8 @@ test.describe("/created/ control mode (Live · Manage)", () => {
     await expect(page.getByRole("tab", { name: "Manage" })).toBeVisible();
     await expect(page.locator("#created-live-setup-memory-wrap")).toBeVisible();
     await expect(page.locator("#created-live-primary-btn")).toBeVisible();
-    await expect(page.locator("#created-live-scanners-see")).toBeHidden();
-    await expect(page.locator("#created-scanners-see-gate-hint")).toBeVisible();
+    await expect(page.locator("#created-live-scanners-see")).toBeVisible();
+    await expect(page.locator("#created-scanners-see-gate-hint")).toBeHidden();
     await expect(page.locator("#created-deploy-print")).toBeVisible();
     await expect(page.locator("#manifesto-update-panel")).toHaveCount(0);
   });

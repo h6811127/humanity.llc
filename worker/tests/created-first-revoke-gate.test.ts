@@ -3,7 +3,9 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   hasFirstRevokeDone,
   isEphemeralStateUpdateUnlocked,
+  isGeneralPublishUnlocked,
   isPilotUpdateUnlocked,
+  isScannersSeeUnlocked,
   markFirstRevokeDone,
   syncUpdateStatusTaskGate,
 } from "../../site/js/created-first-revoke-gate.mjs";
@@ -62,10 +64,19 @@ describe("created-first-revoke-gate", () => {
     expect(isPilotUpdateUnlocked({ pilot_template: "general", manifesto_line: "Public line" })).toBe(false);
   });
 
-  it("keeps generic update copy gated until first revoke", () => {
+  it("unlocks general account publish without revoke-first", () => {
+    expect(isGeneralPublishUnlocked({ pilot_template: "general" })).toBe(true);
+    expect(isGeneralPublishUnlocked({})).toBe(true);
+    expect(isGeneralPublishUnlocked({ pilot_template: "status_plate" })).toBe(false);
+    expect(
+      isScannersSeeUnlocked("profile_a", { pilot_template: "general" })
+    ).toBe(true);
+  });
+
+  it("shows scanners-see for general accounts without revoke", () => {
     const elements: Record<string, { hidden: boolean }> = {
-      "created-live-scanners-see": { hidden: false },
-      "created-scanners-see-gate-hint": { hidden: true },
+      "created-live-scanners-see": { hidden: true },
+      "created-scanners-see-gate-hint": { hidden: false },
     };
     Object.defineProperty(globalThis, "document", {
       configurable: true,
@@ -74,11 +85,6 @@ describe("created-first-revoke-gate", () => {
       },
     });
 
-    syncUpdateStatusTaskGate("profile_a", { pilot_template: "general" });
-    expect(elements["created-live-scanners-see"].hidden).toBe(true);
-    expect(elements["created-scanners-see-gate-hint"].hidden).toBe(false);
-
-    markFirstRevokeDone("profile_a");
     syncUpdateStatusTaskGate("profile_a", { pilot_template: "general" });
     expect(elements["created-live-scanners-see"].hidden).toBe(false);
     expect(elements["created-scanners-see-gate-hint"].hidden).toBe(true);
