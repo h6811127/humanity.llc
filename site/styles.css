@@ -10164,133 +10164,43 @@ body[data-created-mode="setup"] #created-setup-keys-mount .flow-keys-panel {
   color: var(--grey);
 }
 
-.created-manage-menu {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.created-manage-section {
-  margin-bottom: 14px;
-}
-
-.created-manage-section:last-child {
-  margin-bottom: 0;
-}
-
-.created-manage-stack {
-  display: flex;
-  flex-direction: column;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
-  overflow: hidden;
-  background: var(--white);
-}
-
-.created-manage-stack .settings-disclosure-menu {
-  border: none;
-  border-radius: 0;
-  background: transparent;
-}
-
-.created-manage-stack .settings-disclosure-menu + .settings-disclosure-menu {
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
-}
-
-.created-manage-stack--primary .settings-summary {
-  padding: 11px 14px;
-}
-
-.created-manage-stack--primary .settings-summary-title {
-  font-weight: 500;
-}
-
-.created-manage-stack .settings-summary {
-  padding: 10px 14px;
-}
-
-.created-manage-stack .settings-summary-title {
-  font-size: 15px;
-  font-weight: 500;
-}
-
-.created-manage-stack .settings-summary-sub:not(.created-manage-sub--risk):not(.created-manage-sub--status) {
-  display: none;
-}
-
-.created-manage-sub--status {
-  font-size: 12px;
-  color: var(--grey);
-}
-
-.created-manage-sub--risk {
-  font-size: 12px;
-  color: rgba(219, 27, 67, 0.78);
-}
-
-.created-manage-row--destructive .settings-summary-title {
-  color: rgba(219, 27, 67, 0.92);
-}
-
-.created-manage-row--destructive .settings-summary {
-  background: rgba(219, 27, 67, 0.03);
-}
-
-.created-manage-hub,
 .created-manage-more {
-  margin-top: 2px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  margin-top: 4px;
+  border: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.08));
   border-radius: 12px;
-  background: rgba(0, 0, 0, 0.015);
+  background: var(--surface-inset, rgba(0, 0, 0, 0.02));
 }
 
-.created-manage-hub-summary,
 .created-manage-more-summary {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 11px 14px;
+  padding: 12px 14px;
   cursor: pointer;
   list-style: none;
 }
 
-.created-manage-hub-summary::-webkit-details-marker,
 .created-manage-more-summary::-webkit-details-marker {
   display: none;
 }
 
-.created-manage-hub-title,
 .created-manage-more-title {
-  flex: 1;
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--black);
-}
-
-.created-manage-hub-body,
-.created-manage-more-body {
-  padding: 0 10px 10px;
-}
-
-.created-manage-hub-body .created-manage-stack,
-.created-manage-more-body .created-manage-stack {
-  border-color: rgba(0, 0, 0, 0.08);
-}
-
-.created-manage-stack--nested .settings-disclosure-info {
-  background: transparent;
-  border: none;
-}
-
-.created-manage-hub[open] .created-manage-hub-summary .list-chevron,
-.created-manage-more[open] .created-manage-more-summary .list-chevron {
-  transform: rotate(90deg);
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .created-manage-more-sub {
   margin-left: auto;
   margin-right: 4px;
   font-size: 12px;
+}
+
+.created-manage-more-body {
+  padding: 0 10px 12px;
+}
+
+.created-manage-more-body .created-manage-group:first-child {
+  margin-top: 4px;
 }
 
 .created-vouch-return-banner {
