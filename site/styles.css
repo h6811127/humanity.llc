@@ -6680,6 +6680,91 @@ body.page-wallet .device-hub-status-key {
   font-weight: 600;
 }
 
+.created-room-switcher-wrap {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(118, 118, 128, 0.08);
+  border: 0.5px solid var(--shell-separator, rgba(60, 60, 67, 0.2));
+}
+
+.created-room-switcher-wrap[hidden] {
+  display: none !important;
+}
+
+.created-room-switcher-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 8px;
+  margin: 0 0 10px;
+}
+
+.created-room-switcher-kicker {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--grey);
+}
+
+.created-room-switcher-handle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.created-room-switcher.flow-segmented {
+  display: flex;
+  gap: 0;
+  padding: 3px;
+  border-radius: 10px;
+  background: rgba(118, 118, 128, 0.12);
+  border: 0.5px solid var(--shell-separator, rgba(60, 60, 67, 0.2));
+}
+
+.created-room-switcher-btn {
+  flex: 1;
+  min-height: 36px;
+  margin: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--grey);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.35s ease,
+    color 0.25s ease,
+    box-shadow 0.35s ease;
+}
+
+.created-room-switcher-btn.is-active,
+.created-room-switcher-btn[aria-pressed="true"] {
+  color: var(--text);
+  background: var(--white, #fff);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.created-room-crosshint {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin: 10px 0 0;
+}
+
+.created-room-crosshint[hidden] {
+  display: none !important;
+}
+
+.created-room-crosshint-switch {
+  padding: 0;
+  font-size: inherit;
+  font-weight: 600;
+}
+
 .created-live-cockpit {
   margin: 0 0 20px;
 }
