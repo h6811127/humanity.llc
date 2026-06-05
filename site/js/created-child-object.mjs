@@ -34,7 +34,7 @@ import {
   childObjectRegisterProgressLabel,
   childObjectRegisterSuccessMessage,
 } from "./child-object-register-issue-core.mjs";
-import { preserveChildDocumentFields } from "./child-object-time-policy-core.mjs";
+import { syncChildObjectAddSectionLabels } from "./created-display-labels.mjs";
 import { renderChildObjectTimePolicySection } from "./created-child-object-time-policy.mjs";
 import { renderChildObjectCustodySection } from "./created-child-object-custody.mjs";
 import { runChildObjectCustodyFormSubmit } from "./child-object-custody-publish.mjs";
@@ -197,6 +197,7 @@ export function initCreatedChildObject(ctx) {
         submitId: "child-object-status-plate-submit",
       });
     }
+    syncChildObjectAddSectionLabels(ctx.profileId, localStorage);
   }
 
   refreshVisibility();

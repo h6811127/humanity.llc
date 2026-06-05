@@ -46,6 +46,17 @@ describe("resolveFreshOutcomeKind", () => {
     expect(
       resolveFreshOutcomeKind({
         searchParams: new URLSearchParams(""),
+        hash: "#add-lost-item",
+      })
+    ).toBe("tag");
+    expect(
+      resolveFreshOutcomeKind({
+        searchParams: new URLSearchParams("deploy_success=1&endpoint=lost_item_relay"),
+      })
+    ).toBe("tag");
+    expect(
+      resolveFreshOutcomeKind({
+        searchParams: new URLSearchParams(""),
       })
     ).toBe("account");
   });
@@ -84,6 +95,7 @@ describe("controlHeroTitle", () => {
 describe("freshSetupHeroCopy", () => {
   it("uses path-aware titles and leads", () => {
     expect(freshSetupHeroCopy("sign", "setup").title).toBe("Your sign is ready.");
+    expect(freshSetupHeroCopy("tag", "setup").title).toBe("Your tag is ready.");
     expect(freshSetupHeroCopy("wear", "setup").title).toBe("Your wearable QR is ready.");
     expect(freshSetupHeroCopy("season", "setup").title).toBe("Set up your season");
     expect(freshSetupHeroCopy("account", "setup").title).toBe("Your account is ready.");

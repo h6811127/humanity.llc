@@ -703,7 +703,9 @@ async function submitCreate(e, opts = {}) {
     }
 
     if (strategy === "root_and_child") {
-      setStatus("Creating your sign…");
+      setStatus(
+        activeTemplate === "lost_item_relay" ? "Creating your tag…" : "Creating your sign…"
+      );
       const fields = readCreateFormFields();
       await runDeployRootAndChildCreate(activeTemplate, fields, {
         handle: input.handle,

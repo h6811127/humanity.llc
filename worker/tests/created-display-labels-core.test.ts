@@ -3,6 +3,8 @@ import { describe, expect, it } from "vitest";
 import {
   CHILD_OBJECT_REGISTER_SUBMIT_LABEL,
   CREATED_ADD_CHECKPOINT_TITLE,
+  CREATED_ADD_FIRST_LOST_ITEM_TAG_TITLE,
+  CREATED_ADD_FIRST_SIGN_TITLE,
   CREATED_ADD_HUB_SUMMARY,
   CREATED_ADD_LOST_ITEM_TAG_TITLE,
   CREATED_ADD_SIGN_TITLE,
@@ -19,5 +21,10 @@ describe("created-display-labels-core", () => {
     expect(CREATED_ADD_SIGN_TITLE).toBe("Add another sign");
     expect(CREATED_ADD_LOST_ITEM_TAG_TITLE).toBe("Add another lost-item tag");
     expect(CREATED_ADD_CHECKPOINT_TITLE).toBe("Add another checkpoint");
+  });
+
+  it("ships distinct first-time and repeat sign/tag titles", () => {
+    expect(CREATED_ADD_FIRST_SIGN_TITLE).toBe("Add your first sign");
+    expect(CREATED_ADD_FIRST_LOST_ITEM_TAG_TITLE).toBe("Add your first lost-item tag");
   });
 });

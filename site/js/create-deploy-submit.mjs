@@ -5,9 +5,11 @@
 import { appendChildObjectRow } from "./child-object-store-core.mjs";
 import { registerChildObjectAndIssueScanLink } from "./child-object-register-issue.mjs";
 import {
+  buildDeploySuccessCreatedUrl,
+} from "./created-deploy-success-focus-core.mjs";
+import {
   childObjectTypeForDeployTemplate,
   createdLiveAddObjectHref,
-  deployCreatedFocusHash,
   generalRootManifestoForDeploy,
   parseDeployChildFields,
 } from "./create-deploy-wizard-core.mjs";
@@ -73,20 +75,17 @@ export async function runDeployRootAndChildCreate(template, fields, ctx) {
       : {}),
   });
 
-  const created = new URL("/created/", location.origin);
-  created.searchParams.set("profile_id", profileId);
-  if (childResult.qrId) {
-    created.searchParams.set("qr_id", childResult.qrId);
-  } else if (createResult.qrId) {
-    created.searchParams.set("qr_id", createResult.qrId);
-  }
-  created.searchParams.set("fresh", "1");
-  const focus = deployCreatedFocusHash(template);
-  if (focus) {
-    created.searchParams.set("focus", focus);
-    created.hash = focus;
-  }
-  location.replace(created.href);
+  const qrId =
+    childResult.qrId || createResult.qrId;
+  location.replace(
+    buildDeploySuccessCreatedUrl({
+      origin: location.origin,
+      profileId,
+      qrId,
+      objectId: childResult.objectId,
+      objectType,
+    })
+  );
 }
 
 /**

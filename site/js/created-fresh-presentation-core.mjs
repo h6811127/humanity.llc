@@ -3,6 +3,7 @@
  */
 
 import { ADD_LOST_ITEM_FOCUS, ADD_STATUS_PLATE_FOCUS } from "./create-flow-convergence-core.mjs";
+import { deployEndpointOutcomeFromParams } from "./created-deploy-success-focus-core.mjs";
 import {
   CREATE_HANDOFF_BANNER_TITLE,
   createHandoffDetailLine,
@@ -15,8 +16,8 @@ import {
 import { WEAR_PRINT_FOCUS } from "./create-wear-wizard-core.mjs";
 import { STEWARD_ROOM_SEASON } from "./steward-active-room-core.mjs";
 
-/** @typedef {"account" | "sign" | "wear" | "season"} FreshOutcomeKind */
-/** @typedef {FreshOutcomeKind | "tag"} ControlOutcomeKind */
+/** @typedef {"account" | "sign" | "tag" | "wear" | "season"} FreshOutcomeKind */
+/** @typedef {FreshOutcomeKind} ControlOutcomeKind */
 /** @typedef {"setup" | "control" | "view"} CreatedMode */
 
 /**
@@ -32,6 +33,9 @@ export function resolveFreshOutcomeKind(ctx) {
   const focus = ctx.searchParams.get("focus");
   const room = ctx.searchParams.get("room");
 
+  const deployOutcome = deployEndpointOutcomeFromParams(ctx.searchParams);
+  if (deployOutcome) return deployOutcome;
+
   if (focus === WEAR_PRINT_FOCUS || hashKey === WEAR_PRINT_FOCUS) return "wear";
   if (
     room === STEWARD_ROOM_SEASON ||
@@ -44,10 +48,14 @@ export function resolveFreshOutcomeKind(ctx) {
     return "season";
   }
   if (
-    hashKey === ADD_STATUS_PLATE_FOCUS ||
     hashKey === ADD_LOST_ITEM_FOCUS ||
-    focus === ADD_STATUS_PLATE_FOCUS ||
     focus === ADD_LOST_ITEM_FOCUS
+  ) {
+    return "tag";
+  }
+  if (
+    hashKey === ADD_STATUS_PLATE_FOCUS ||
+    focus === ADD_STATUS_PLATE_FOCUS
   ) {
     return "sign";
   }
@@ -69,6 +77,8 @@ export function resolveControlOutcomeKind(ctx) {
       : "";
   if (pilot === "lost_item_relay") return "tag";
   if (pilot === "status_plate") return "sign";
+  const deployOutcome = deployEndpointOutcomeFromParams(ctx.searchParams);
+  if (deployOutcome) return deployOutcome;
   return resolveFreshOutcomeKind(ctx);
 }
 
@@ -133,6 +143,12 @@ export function freshSetupHeroCopy(kind, mode) {
   if (kind === "sign") {
     return {
       title: "Your sign is ready.",
+      lead: "Save control on this device, print the QR, and test a scan.",
+    };
+  }
+  if (kind === "tag") {
+    return {
+      title: "Your tag is ready.",
       lead: "Save control on this device, print the QR, and test a scan.",
     };
   }

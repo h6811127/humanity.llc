@@ -2385,6 +2385,12 @@ a.hub-card-menu-item {
   border: none !important;
 }
 
+.child-object-endpoint-row--deploy-focus {
+  outline: 2px solid var(--red, #db1b43);
+  outline-offset: 4px;
+  border-radius: 12px;
+}
+
 .hc-notice[hidden] {
   display: none !important;
   margin: 0 !important;

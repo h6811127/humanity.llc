@@ -113,13 +113,15 @@ import {
   focusSeasonSetupChecklist,
   wireCreatedSeasonSetupCtaClick,
 } from "./created-season-setup-cta.mjs";
-import { syncCreatedPageDisplayLabels } from "./created-display-labels.mjs";
+import { syncCreatedPageDisplayLabels, syncChildObjectAddSectionLabels } from "./created-display-labels.mjs";
 import {
   initCreatedRoomSwitcher,
   syncCreatedRoomSwitcher,
 } from "./created-room-switcher.mjs";
 import { STEWARD_ROOM_DOORS, STEWARD_ROOM_SEASON } from "./steward-active-room-core.mjs";
 import { applyGameSeasonSetupFocus } from "./created-game-season-setup-focus.mjs";
+import { applyDeploySuccessFocus } from "./created-deploy-success-focus.mjs";
+import { isDeploySuccessLanding } from "./created-deploy-success-focus-core.mjs";
 import { syncGameSeasonSetupPanel } from "./created-game-season-setup-panel.mjs";
 import { isGameSeasonSetupFlowActive, isGameSeasonSetupFocus, markGameSeasonSetupFlow } from "./create-organizer-season-core.mjs";
 import { isWalletSaved, loadWallet, getWalletSigningKeyCount } from "./device-wallet.mjs";
@@ -511,6 +513,16 @@ function applyStewardLandingFocus() {
   if (!createdTabs) {
     createdTabs = initCreatedTabs();
   }
+  if (
+    applyDeploySuccessFocus((id) => createdTabs.select(id), params, {
+      refreshEndpoints: async () => {
+        await childObjectCtl?.refresh?.();
+        await lostItemRelayCtl?.refresh?.();
+      },
+    })
+  ) {
+    return;
+  }
   applyGameSeasonSetupFocus((id) => createdTabs.select(id), params, {
     applyRoom: (room) => {
       if (profileId && isFirstControlSessionActive(profileId, sessionStorage)) {
@@ -541,11 +553,18 @@ function finalizeControlWorkspacePresentation() {
     session: loadSession(),
     profileId,
   });
+  const deploySuccessLanding = isDeploySuccessLanding(params);
+  if (profileId) {
+    applyFirstSessionContainment(profileId, {
+      outcomeKind: presentation.outcomeKind,
+      deploySuccessLanding,
+    });
+  }
   applyStewardLandingFocus();
   if (profileId) {
-    applyFirstSessionContainment(profileId, { outcomeKind: presentation.outcomeKind });
     syncCreatedRoomSwitcher(profileId, loadSession());
     syncChildObjectAddHub(loadSession(), { profileId });
+    syncChildObjectAddSectionLabels(profileId, localStorage);
     window.dispatchEvent(new Event("hc-created-live-setup-memory-sync"));
   }
   wireCreatedAccountFirstSignCtaClick(() => {

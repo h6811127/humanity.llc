@@ -12,7 +12,7 @@ import { hideSeasonSetupAdvancedSections } from "./created-season-setup-cta.mjs"
 
 /**
  * @param {string | null | undefined} profileId
- * @param {{ outcomeKind?: string } | undefined} opts
+ * @param {{ outcomeKind?: string; deploySuccessLanding?: boolean } | undefined} opts
  */
 export function applyFirstSessionContainment(profileId, opts = {}) {
   if (!profileId || !isFirstControlSessionActive(profileId, sessionStorage)) {
@@ -22,6 +22,7 @@ export function applyFirstSessionContainment(profileId, opts = {}) {
 
   document.body.dataset.createdFirstSession = "1";
   const seasonFirstSession = opts.outcomeKind === "season";
+  const deploySuccessLanding = opts.deploySuccessLanding === true;
 
   if (shouldHideRoomSwitcherForFirstSession(profileId, sessionStorage)) {
     const roomWrap = document.getElementById("created-room-switcher-wrap");
@@ -29,7 +30,7 @@ export function applyFirstSessionContainment(profileId, opts = {}) {
   }
 
   const addHub = document.getElementById("child-object-add-hub");
-  if (addHub instanceof HTMLDetailsElement) {
+  if (addHub instanceof HTMLDetailsElement && !deploySuccessLanding) {
     addHub.removeAttribute("open");
   }
   const addHubSummary = addHub?.querySelector(".created-child-object-add-hub-summary");

@@ -38,7 +38,7 @@ import { preserveChildDocumentFields } from "./child-object-time-policy-core.mjs
 import { renderChildObjectCustodySection } from "./created-child-object-custody.mjs";
 import { renderChildObjectTimePolicySection } from "./created-child-object-time-policy.mjs";
 import { runChildObjectCustodyFormSubmit } from "./child-object-custody-publish.mjs";
-import { runChildObjectTimePolicyFormSubmit } from "./child-object-time-policy-publish.mjs";
+import { syncChildObjectAddSectionLabels } from "./created-display-labels.mjs";
 import {
   dismissRelayOfferFromSection,
   refreshRelayOffersSection,
@@ -202,6 +202,7 @@ export function initCreatedLostItemRelay(ctx) {
         submitId: "child-object-lost-item-submit",
       });
     }
+    syncChildObjectAddSectionLabels(ctx.profileId, localStorage);
   }
 
   refreshVisibility();
