@@ -12,6 +12,13 @@ describe("create flow object_streams", () => {
   it("create page includes optional detail rows for status plate and general", () => {
     const html = fs.readFileSync(createHtmlPath, "utf8");
     expect(html).toContain('id="create-fields-object-streams"');
+    expect(html).toContain("Add extra details (optional)");
+    expect(html).toMatch(
+      /<details[^>]*id="create-fields-object-streams"[^>]*>[\s\S]*id="create-stream-1-label"/
+    );
+    expect(html).not.toMatch(
+      /<fieldset[^>]*id="create-fields-object-streams"/
+    );
     expect(html).toContain('id="create-stream-1-label"');
     expect(html).toContain('id="create-stream-2-value"');
     expect(html).toContain('id="create-entry-chooser"');
