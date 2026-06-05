@@ -48,12 +48,14 @@ export function browserNotifTogglePressed(on, permission) {
 /**
  * @param {boolean} on
  * @param {NotificationPermissionState} permission
+ * @param {{ standalone?: boolean }} [opts]
  */
-export function browserNotifToggleSub(on, permission) {
+export function browserNotifToggleSub(on, permission, opts = {}) {
   if (permission === "unsupported") return "Not supported in this browser";
   if (on && permission === "granted") return "On · live proof in background";
   if (permission === "denied") return "Blocked · enable in system settings";
-  return "Off · tap to allow";
+  if (opts.standalone) return "Off · tap to allow";
+  return "Off · works best when installed";
 }
 
 /**

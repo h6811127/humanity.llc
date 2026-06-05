@@ -70,15 +70,15 @@ On `/`, **Design choices**, **Clear limits**, and **Documentation** are collapse
 
 **Removed (intentionally):** homepage pass-card demo; doc row “Create → scan → revoke.”
 
-### Focus mode (`hc_landing_focus`)
+### Simple mode (`hc_landing_focus`)
 
-Hides `[data-landing-tutorial]` (hero, **How it works**, One use, design choices, dock, help pill).
+User-facing label **Simple mode** (internal key unchanged). Hides `[data-landing-tutorial]` (hero, **How it works**, One use, design choices, dock, help pill).
 
 **Stays visible:**
 
 - Status line (shield + chevron; search on the right), system banner (if any), hub, hub glance, contact  
-- **Help & protocol**  -  compact list group (`#landing-docs-footer`); full Documentation hidden  
-- Hub **Auto-save** toggle and **Show intro again**  
+- **Learn**  -  compact list group (`#landing-docs-footer`); full Documentation hidden  
+- Landing **App settings** (Appearance, Alerts, Auto-save, Simple mode toggle)  
 
 **Default:** on when wallet or pins exist (`landing-focus.mjs`). Strangers without saved data stay in intro mode until first save.
 
@@ -300,5 +300,6 @@ Merch and stranger tests do **not** block on further M5.5 work unless QA finds a
 | `site/css/device-shell.css` | Shell materials, motion, system status chrome |
 | `docs/VISUAL_DEVICE_SHELL.md` | Visual / interaction philosophy + OSification roadmap |
 | `site/js/device-hub-ui.mjs` | Shared hub |
-| `site/js/landing-focus.mjs` | Focus mode toggle |
+| `site/js/landing-focus.mjs` | Simple mode toggle |
+| `site/js/landing-focus-settings.mjs` | Landing settings actions (manage QRs, restore) |
 | `site/index.html` | Glance + banner + docs split |

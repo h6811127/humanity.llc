@@ -355,8 +355,8 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
                   </span>
                   <span class="list-content">
-                    <span class="list-title">Settings &amp; shortcuts</span>
-                    <span class="list-sub">Theme, auto-save, notifications</span>
+                  <span class="list-title">App settings</span>
+                  <span class="list-sub">Theme, alerts, auto-save</span>
                   </span>
                   <span class="list-chevron" aria-hidden="true">›</span>
                 </a>
@@ -1000,137 +1000,154 @@
         <section
           class="landing-device-settings device-prefs-boot-gated"
           id="landing-device-settings"
-          aria-labelledby="landing-device-settings-title"
+          aria-label="Device settings"
         >
-          <h2 class="landing-device-settings-title" id="landing-device-settings-title">
-            Shortcuts &amp; settings
-          </h2>
-          <ul class="landing-device-settings-list">
-            <li class="list-row list-action" data-hub-searchable="dark mode appearance theme">
-              <button
-                type="button"
-                class="device-theme-toggle"
-                data-device-theme-toggle
-                id="device-theme-toggle"
-                aria-pressed="false"
+          <div class="landing-device-settings-group">
+            <h2 class="landing-device-settings-group-label">Saved on this device</h2>
+            <ul class="landing-device-settings-list">
+              <li class="list-row list-action" data-hub-searchable="saved controls cards keys store vouch wallet">
+                <a href="/wallet/">
+                  <span class="list-icon list-icon-tone-trust" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  </span>
+                  <span class="list-content">
+                    <span class="list-title">Saved controls</span>
+                    <span class="list-sub">QRs saved on this device</span>
+                  </span>
+                  <span class="list-chevron" aria-hidden="true">›</span>
+                </a>
+              </li>
+              <li class="list-row list-action" data-hub-searchable="manage saved qrs created update revoke backup">
+                <button type="button" id="landing-manage-saved-qrs">
+                  <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
+                  </span>
+                  <span class="list-content">
+                    <span class="list-title">Manage saved QRs</span>
+                    <span class="list-sub">Update, revoke, or back up</span>
+                  </span>
+                  <span class="list-chevron" aria-hidden="true">›</span>
+                </button>
+              </li>
+              <li class="list-row list-action" data-hub-searchable="restore access backup recovery import">
+                <button type="button" id="landing-restore-access">
+                  <span class="list-icon list-icon-tone-trust" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  </span>
+                  <span class="list-content">
+                    <span class="list-title">Restore access</span>
+                    <span class="list-sub">Import backup or recovery code</span>
+                  </span>
+                  <span class="list-chevron" aria-hidden="true">›</span>
+                </button>
+              </li>
+            </ul>
+          </div>
+          <div class="landing-device-settings-group">
+            <h2 class="landing-device-settings-group-label">App settings</h2>
+            <ul class="landing-device-settings-list">
+              <li class="list-row list-action" data-hub-searchable="dark mode appearance theme">
+                <button
+                  type="button"
+                  class="device-theme-toggle"
+                  data-device-theme-toggle
+                  id="device-theme-toggle"
+                  aria-pressed="false"
+                >
+                  <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                  </span>
+                  <span class="list-content">
+                    <span class="list-title">Appearance</span>
+                    <span class="list-sub">…</span>
+                  </span>
+                  <span class="list-chevron list-chevron--spacer" aria-hidden="true">›</span>
+                </button>
+              </li>
+              <li class="list-row list-action" data-hub-searchable="browser notifications alerts">
+                <button
+                  type="button"
+                  data-device-browser-notif-toggle
+                  aria-pressed="false"
+                >
+                  <span class="list-icon list-icon-tone-gold" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                  </span>
+                  <span class="list-content">
+                    <span class="list-title">Alerts</span>
+                    <span class="list-sub">…</span>
+                  </span>
+                  <span class="list-chevron list-chevron--spacer" aria-hidden="true">›</span>
+                </button>
+              </li>
+              <li class="list-row list-action" data-hub-searchable="auto save device keys">
+                <button type="button" id="device-auto-save-toggle">
+                  <span class="list-icon list-icon-tone-trust" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
+                  </span>
+                  <span class="list-content">
+                    <span class="list-title">Auto-save</span>
+                    <span class="list-sub">…</span>
+                  </span>
+                  <span class="list-chevron list-chevron--spacer" aria-hidden="true">›</span>
+                </button>
+              </li>
+              <li class="list-row list-action" data-hub-searchable="simple mode focus intro tutorial">
+                <button type="button" id="landing-focus-toggle">
+                  <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </span>
+                  <span class="list-content">
+                    <span class="list-title">Simple mode</span>
+                    <span class="list-sub">Hide extra help</span>
+                  </span>
+                  <span class="list-chevron list-chevron--spacer" aria-hidden="true">›</span>
+                </button>
+              </li>
+              <li
+                class="list-row list-action"
+                data-hub-searchable="share network checks tabs resolver sync"
               >
-                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">Appearance</span>
-                  <span class="list-sub">…</span>
-                </span>
-                <span class="list-chevron list-chevron--spacer" aria-hidden="true">›</span>
-              </button>
-            </li>
-            <li class="list-row list-action" data-hub-searchable="browser notifications alerts">
-              <button
-                type="button"
-                data-device-browser-notif-toggle
-                aria-pressed="false"
+                <button type="button" id="device-resolver-sync-toggle" aria-pressed="true">
+                  <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                  </span>
+                  <span class="list-content">
+                    <span class="list-title">Share network checks</span>
+                    <span class="list-sub">…</span>
+                  </span>
+                  <span class="list-chevron list-chevron--spacer" aria-hidden="true">›</span>
+                </button>
+              </li>
+              <li
+                class="list-row list-action"
+                data-hub-searchable="refresh all tabs network live proof check"
               >
-                <span class="list-icon list-icon-tone-gold" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">Browser alerts</span>
-                  <span class="list-sub">…</span>
-                </span>
-                <span class="list-chevron list-chevron--spacer" aria-hidden="true">›</span>
-              </button>
-            </li>
-            <li
-              class="list-row list-action"
-              data-hub-searchable="share network checks tabs resolver sync"
-            >
-              <button type="button" id="device-resolver-sync-toggle" aria-pressed="true">
-                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">Share network checks</span>
-                  <span class="list-sub">…</span>
-                </span>
-                <span class="list-chevron list-chevron--spacer" aria-hidden="true">›</span>
-              </button>
-            </li>
-            <li
-              class="list-row list-action"
-              data-hub-searchable="refresh all tabs network live proof check"
-            >
-              <button type="button" id="device-resolver-refresh-all-tabs">
-                <span class="list-icon list-icon-tone-green" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">Refresh all tabs</span>
-                  <span class="list-sub">One check, then share with open tabs</span>
-                </span>
-                <span class="list-chevron list-chevron--spacer" aria-hidden="true">›</span>
-              </button>
-            </li>
-            <li class="list-row list-action" data-hub-searchable="saved cards keys store vouch">
-              <a href="/wallet/">
-                <span class="list-icon list-icon-tone-trust" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">My objects</span>
-                  <span class="list-sub">Saved on this device</span>
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </a>
-            </li>
-            <li class="list-row list-action" data-hub-searchable="revoke manage created update backup">
-              <a href="/created/">
-                <span class="list-icon list-icon-tone-red" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">Revoke &amp; manage</span>
-                  <span class="list-sub">Update, revoke, backup</span>
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </a>
-            </li>
-            <li class="list-row list-action" data-hub-searchable="auto save device keys">
-              <button type="button" id="device-auto-save-toggle">
-                <span class="list-icon list-icon-tone-trust" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">Auto-save</span>
-                  <span class="list-sub">…</span>
-                </span>
-                <span class="list-chevron list-chevron--spacer" aria-hidden="true">›</span>
-              </button>
-            </li>
-            <li class="list-row list-action" data-hub-searchable="open last object new tabs rehydrate">
-              <button type="button" id="device-quiet-tab-rehydrate-toggle">
-                <span class="list-icon list-icon-tone-trust" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12h16"/><path d="M12 4v16"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">Open last object in new tabs</span>
-                  <span class="list-sub">…</span>
-                </span>
-                <span class="list-chevron list-chevron--spacer" aria-hidden="true">›</span>
-              </button>
-            </li>
-            <li class="list-row list-action" data-hub-searchable="focus intro tutorial">
-              <button type="button" id="landing-focus-toggle">
-                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">Focus mode</span>
-                  <span class="list-sub">Hide intro · hub-first</span>
-                </span>
-                <span class="list-chevron list-chevron--spacer" aria-hidden="true">›</span>
-              </button>
-            </li>
-          </ul>
+                <button type="button" id="device-resolver-refresh-all-tabs">
+                  <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                  </span>
+                  <span class="list-content">
+                    <span class="list-title">Refresh all tabs</span>
+                    <span class="list-sub">One check, then share with open tabs</span>
+                  </span>
+                  <span class="list-chevron list-chevron--spacer" aria-hidden="true">›</span>
+                </button>
+              </li>
+              <li class="list-row list-action" data-hub-searchable="open last object new tabs rehydrate">
+                <button type="button" id="device-quiet-tab-rehydrate-toggle">
+                  <span class="list-icon list-icon-tone-trust" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12h16"/><path d="M12 4v16"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+                  </span>
+                  <span class="list-content">
+                    <span class="list-title">Open last object in new tabs</span>
+                    <span class="list-sub">…</span>
+                  </span>
+                  <span class="list-chevron list-chevron--spacer" aria-hidden="true">›</span>
+                </button>
+              </li>
+            </ul>
+          </div>
         </section>
 
         <details
@@ -1406,7 +1423,7 @@
         </details>
 
         <section class="group landing-essentials landing-docs-footer" id="landing-docs-footer">
-          <h2 class="group-label">Help &amp; protocol</h2>
+          <h2 class="group-label">Learn</h2>
           <ul class="list list-compact">
             <li class="list-row list-action">
               <a href="/help/">
@@ -1415,43 +1432,19 @@
                 </span>
                 <span class="list-content">
                   <span class="list-title">Help guide</span>
-                  <span class="list-sub">Ownership, hub, wallet, and create — one place</span>
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </a>
-            </li>
-            <li class="list-row list-action">
-              <a href="/features-available-now.html">
-                <span class="list-icon list-icon-tone-green" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">All features available now</span>
-                  <span class="list-sub">Protocol map, limits, security</span>
+                  <span class="list-sub">How saved QRs work</span>
                 </span>
                 <span class="list-chevron" aria-hidden="true">›</span>
               </a>
             </li>
             <li class="list-row list-action">
               <a href="/help/#ownership">
-                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                <span class="list-icon list-icon-tone-trust" aria-hidden="true">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 </span>
                 <span class="list-content">
-                  <span class="list-title">How ownership works</span>
+                  <span class="list-title">How saved controls work</span>
                   <span class="list-sub">Save, recover, and manage on this device</span>
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </a>
-            </li>
-            <li class="list-row list-action">
-              <a href="/case-study/">
-                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">Case study</span>
-                  <span class="list-sub">Create → scan → revoke loop</span>
                 </span>
                 <span class="list-chevron" aria-hidden="true">›</span>
               </a>
@@ -1464,18 +1457,6 @@
                 <span class="list-content">
                   <span class="list-title">Architecture &amp; security</span>
                   <span class="list-sub">Threat models, failure modes, tests, and tradeoffs</span>
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </a>
-            </li>
-            <li class="list-row list-action">
-              <a href="/data-policy.html">
-                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">Data policy</span>
-                  <span class="list-sub">What the network stores</span>
                 </span>
                 <span class="list-chevron" aria-hidden="true">›</span>
               </a>
@@ -1533,7 +1514,7 @@
         <p class="form-status" id="device-hub-qr-scanner-status" role="status" hidden></p>
       </div>
     </dialog>
-    <script src="/js/landing-focus.mjs?v=4" type="module"></script>
+    <script src="/js/landing-focus.mjs?v=5" type="module"></script>
     <script src="/js/device-status-bootstrap.mjs?v=94" type="module"></script>
     <script src="/js/landing-device-hub.mjs?v=14" type="module"></script>
     <script src="/js/landing-showcase.mjs?v=2" type="module"></script>

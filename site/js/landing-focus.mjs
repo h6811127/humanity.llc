@@ -8,6 +8,10 @@ import {
   landingFocusDatasetValue,
   LANDING_FOCUS_KEY,
 } from "./landing-focus-boot-core.mjs";
+import {
+  LANDING_ROW_SIMPLE_MODE_TITLE,
+  simpleModeToggleSub,
+} from "./landing-focus-settings-copy-core.mjs";
 
 const toggle = document.getElementById("landing-focus-toggle");
 const docsFull = document.getElementById("landing-docs-full");
@@ -35,10 +39,10 @@ function applyFocus() {
     const title = toggle.querySelector(".list-title");
     const sub = toggle.querySelector(".list-sub");
     if (title && sub) {
-      title.textContent = "Focus mode";
-      sub.textContent = on ? "On · show intro again" : "Off · hide intro, hub-first";
+      title.textContent = LANDING_ROW_SIMPLE_MODE_TITLE;
+      sub.textContent = simpleModeToggleSub(on);
     } else {
-      toggle.textContent = on ? "Show intro again" : "Hide intro · focus on this device";
+      toggle.textContent = on ? "Show intro again" : "Hide extra help";
     }
     toggle.setAttribute("aria-pressed", on ? "true" : "false");
   }

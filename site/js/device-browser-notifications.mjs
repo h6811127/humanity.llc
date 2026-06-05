@@ -7,6 +7,7 @@ import {
   browserAlertWhileOpenCopy,
   readShellCopyContext,
 } from "./device-shell-copy-core.mjs";
+import { LANDING_ROW_ALERTS_TITLE } from "./landing-focus-settings-copy-core.mjs";
 import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
 import {
   browserNotifTogglePressed,
@@ -237,23 +238,24 @@ function syncBrowserNotifToggleButtons() {
   const perm = notificationPermission();
   const permState =
     perm === "granted" || perm === "denied" ? perm : perm === "unsupported" ? "unsupported" : "default";
+  const standalone = readStandaloneModeFromWindow(window);
   document.querySelectorAll("[data-device-browser-notif-toggle]").forEach((btn) => {
     if (!(btn instanceof HTMLButtonElement)) return;
     btn.setAttribute("aria-pressed", browserNotifTogglePressed(on, permState) ? "true" : "false");
     const title = btn.querySelector(".list-title");
     const sub = btn.querySelector(".list-sub");
     if (title && sub) {
-      title.textContent = "Browser alerts";
-      sub.textContent = browserNotifToggleSub(on, permState);
+      title.textContent = LANDING_ROW_ALERTS_TITLE;
+      sub.textContent = browserNotifToggleSub(on, permState, { standalone });
     } else {
       btn.textContent =
         !on
-          ? "Browser alerts · off"
+          ? `${LANDING_ROW_ALERTS_TITLE} · off`
           : perm === "granted"
-            ? "Browser alerts · on"
+            ? `${LANDING_ROW_ALERTS_TITLE} · on`
             : perm === "denied"
-              ? "Browser alerts · blocked in settings"
-              : "Browser alerts · tap to allow";
+              ? `${LANDING_ROW_ALERTS_TITLE} · blocked in settings`
+              : `${LANDING_ROW_ALERTS_TITLE} · tap to allow`;
     }
     btn.disabled = perm === "unsupported";
   });

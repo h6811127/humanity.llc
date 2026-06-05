@@ -14,6 +14,7 @@ import {
   themeTogglePressed,
   themeToggleSub,
 } from "./device-prefs-boot-core.mjs";
+import { LANDING_ROW_ALERTS_TITLE } from "./landing-focus-settings-copy-core.mjs";
 import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
 import { syncBrowserTabOnlyShortcutRows } from "./pwa-browser-tab-shortcuts.mjs";
 
@@ -80,12 +81,13 @@ export function applyDevicePrefsBootToDocument(doc = document, opts = {}) {
 
   const prefs = readPrefsStorage(opts.storage);
   const permission = opts.permission ?? readNotificationPermission();
+  const standalone = readStandaloneModeFromWindow(win ?? undefined);
 
   doc.querySelectorAll("[data-device-browser-notif-toggle]").forEach((el) => {
     if (!(el instanceof HTMLButtonElement)) return;
     applyListToggleCopy(el, {
-      title: "Browser alerts",
-      sub: browserNotifToggleSub(prefs.browserNotifOn, permission),
+      title: LANDING_ROW_ALERTS_TITLE,
+      sub: browserNotifToggleSub(prefs.browserNotifOn, permission, { standalone }),
       pressed: browserNotifTogglePressed(prefs.browserNotifOn, permission),
       disabled: permission === "unsupported",
     });

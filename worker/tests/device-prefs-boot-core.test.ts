@@ -48,7 +48,8 @@ describe("toggle copy helpers", () => {
   });
 
   it("browser notif sub reflects permission", () => {
-    expect(browserNotifToggleSub(false, "default")).toContain("Off");
+    expect(browserNotifToggleSub(false, "default")).toContain("works best when installed");
+    expect(browserNotifToggleSub(false, "default", { standalone: true })).toContain("tap to allow");
     expect(browserNotifToggleSub(true, "granted")).toContain("On");
     expect(browserNotifToggleSub(true, "denied")).toContain("Blocked");
     expect(browserNotifToggleSub(false, "unsupported")).toContain("Not supported");

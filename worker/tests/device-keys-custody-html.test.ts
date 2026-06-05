@@ -75,7 +75,9 @@ describe("device-keys-custody-html", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
     expect(html).toContain("Control on your device");
     expect(html).not.toContain("Keys in your browser");
-    expect(html).toContain("How ownership works");
+    expect(html).toContain("How saved controls work");
+    expect(html).toContain("Saved controls");
+    expect(html).not.toContain("Revoke &amp; manage");
   });
 
   it("card creation demotes keys-custody disclosure for developers", () => {

@@ -68,7 +68,7 @@ The collapsed hub does not consume layout on `/` (hero stays above the fold). Op
 |---------|--------|
 | `#device-hub-network-tools` | Monitoring eyebrow, check buttons, watch toggle |
 | `#device-hub-keys-custody` | Education + proactive rows (empty hint carries custody for strangers) |
-| `[data-hub-group="shortcuts"]` | Landing hub only — settings remain on page **Shortcuts & settings** section |
+| `[data-hub-group="shortcuts"]` | Landing hub only — settings remain on page **App settings** (`#landing-device-settings`) |
 | `#device-hub-actions-section` | Recent device actions |
 | `#device-hub-status-key` | Status dot color legend |
 
@@ -108,7 +108,7 @@ Manual: **P1-HE** in [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) — stranger hub on `/
 ### Contract
 
 - Hub sheet **stays collapsed** on first visit; coachmark is the only onboarding overlay (no auto-expand). Enforced in `device-status.mjs` init (`setHubExpanded(false)` + `sessionStorage.hc_hub_open = "0"`).
-- **Focus mode** enables only when `hc_wallet` or pins exist (`landing-focus.mjs`); strangers always see hero + **How it works** until first save.
+- **Simple mode** enables only when `hc_wallet` or pins exist (`landing-focus.mjs`); strangers always see hero + **How it works** until first save.
 - On **`/`** with stranger-empty counts, `#shell-status-line` stays hidden; the neutral empty-wallet dot is the only top-chrome network cue.
 - Hub intro coachmark uses **stranger copy** when wallet, pins, and inbox actions are all zero.
 

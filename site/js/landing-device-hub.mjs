@@ -16,6 +16,7 @@ import { initDeviceHub } from "./device-hub-ui.mjs";
 import { initBrowserTabOnlyShortcutsVisibility } from "./pwa-browser-tab-shortcuts.mjs";
 import { mountThemeToggles } from "./device-theme.mjs";
 import "./device-help-fab.mjs";
+import "./landing-focus-settings.mjs";
 
 markDevicePrefsBootReady();
 applyDevicePrefsBootToDocument();

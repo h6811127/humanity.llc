@@ -4,11 +4,11 @@
   "phase": "smooth_mode_phase_0",
   "asset_version": 94,
   "module_count": 86,
-  "js_bytes_total": 561130,
+  "js_bytes_total": 561348,
   "shell_css_bytes_total": 78709,
   "landing_css_bytes_total": 331105,
-  "transfer_bytes_shell_graph": 639839,
-  "transfer_bytes_landing_first_paint": 892235,
+  "transfer_bytes_shell_graph": 640057,
+  "transfer_bytes_landing_first_paint": 892453,
   "js_modules": [
     {
       "file": "js/device-status-bootstrap.mjs",
@@ -348,7 +348,7 @@
     },
     {
       "file": "js/device-browser-notifications.mjs",
-      "bytes": 14574
+      "bytes": 14792
     },
     {
       "file": "js/device-browser-notifications-core.mjs",

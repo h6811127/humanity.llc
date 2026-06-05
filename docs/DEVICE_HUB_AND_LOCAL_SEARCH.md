@@ -65,11 +65,11 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 **Hub rows (shipped):** Saved cards show **Open controls** and **Open scan** on the row; **Prove live** inline when a challenge is waiting. Steward actions (**Update status**, **Revoke QR**, **New QR**, **Revoke options**) live under ⋯ → **QR & lifecycle** and call `openCardControlPage()` → `/created/#…` with keys loaded. **⋯** also has Open card, Relabel, vouch default, sign lock, Remove. **Open card** and **Open controls** both call `openCardNowPage()` when you need the full Tasks tab. See [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md). **Import backup file** decrypts `.hcbackup.json` into `hc_wallet`.
 
-**Landing focus mode:** `localStorage.hc_landing_focus` hides intro (`[data-landing-tutorial]`). Keeps **hub**, **hub glance**, **system banner** (if unhealthy), **Help & protocol** list (not the full **Documentation** disclosure card), and **contact**. Trust sections (**Design choices**, **Clear limits**) are intro-only and hidden in focus mode. No bottom Create dock or “New here?” float. **Auto-save** on by default via `hc_auto_save_device` (opt out in hub shortcuts).
+**Landing focus mode (Simple mode):** `localStorage.hc_landing_focus` hides intro (`[data-landing-tutorial]`). Keeps **hub**, **hub glance**, **system banner** (if unhealthy), **Learn** list (`#landing-docs-footer` — Help guide, How saved controls work, Architecture & security; not the full **Documentation** disclosure card), and **contact**. Trust sections (**Design choices**, **Clear limits**) are intro-only and hidden in focus mode. No bottom Create dock or “New here?” float. **Auto-save** on by default via `hc_auto_save_device` (opt out in App settings).
 
 **Landing trust UI:** Intro mode shows **Design choices**, **Clear limits**, and **Documentation** as stacked `.landing-disclosure-card` rows (icon + title + subtitle + chevron). The status-plate **flow strip** (plate → scan → live state) uses `.flow-strip--model` and picks up dark surfaces from `site/css/theme-dark.css` when `hc_theme` is dark.
 
-**Shortcuts & settings (shipped):** On the **homepage** (`/`) only - section after the studio example (unified list rows: Appearance, **Browser alerts** (background OS notifications for live proof), **Share network checks**, **Refresh all tabs**, **Open last object in new tabs** (browser context only — hidden in standalone PWA per [`PWA_INSTALL.md`](PWA_INSTALL.md)), saved cards, manage, auto-save, focus). Hub sheet on all routes has **home icon** (left) and status line (center); Create lives beside the saved-items heading; no shortcuts block in the hub.
+**Landing device settings (shipped):** On the **homepage** (`/`) only — `#landing-device-settings` after the studio example, grouped as **Saved on this device** (Saved controls → `/wallet/`; Manage saved QRs — smart handoff to last saved object or `/wallet/`; Restore access — opens hub restore section), **App settings** (Appearance, **Alerts**, Auto-save, Simple mode, plus **Share network checks** / **Refresh all tabs** / **Open last object in new tabs** — browser context only, hidden in standalone PWA per [`PWA_INSTALL.md`](PWA_INSTALL.md)). Landing row **Saved controls** is naming-only; `/wallet/` page title stays **My objects**. Hub sheet shortcut: **App settings** → `#landing-device-settings`. Hub sheet on all routes has **home icon** (left) and status line (center); Create lives beside the saved-items heading.
 
 **Hub header simplification (Steps 1-2):** Create moves out of the sheet's top status rail and into the saved-items section header as compact **+ New**. The top rail shows Home plus a single-line resolver/device status where zero saved or pinned counts stay subordinate, while Close remains the sheet escape. See [`HUB_HEADER_SIMPLIFICATION.md`](HUB_HEADER_SIMPLIFICATION.md).
 
@@ -227,7 +227,9 @@ No backend required:
 | `docs/DEVICE_HUB_INTRO_COACHMARK.md` | Coachmark show/dismiss/seen contract |
 | `site/js/landing-device-hub.mjs` | Landing init wrapper |
 | `site/js/created-hub.mjs` | Created init wrapper |
-| `site/js/landing-focus.mjs` | Focus mode + intro toggle |
+| `site/js/landing-focus.mjs` | Simple mode + intro toggle |
+| `site/js/landing-focus-settings.mjs` | Manage QRs handoff, Restore access hub scroll |
+| `site/js/landing-focus-settings-copy-core.mjs` | Landing settings copy constants (Vitest) |
 | `site/js/device-status.mjs` | Status line, dot sheet, hub expand |
 | `site/js/device-theme.mjs` | Appearance toggle (`hc_theme`) |
 | `site/css/theme-dark.css` | Pure-black dark palette |

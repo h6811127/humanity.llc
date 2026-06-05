@@ -141,11 +141,11 @@ Canonical `kind` values (target: one module `device-inbox-core.mjs`, Vitest-cove
 
 **Shipped (phase 10):** `buildGlanceRowPlan()` in `device-inbox-core.mjs` orders inbox actionable rows, saved-card peek (max 3), and “N more”. Glance renders from that plan; since-visit suffix on saved rows uses `revokedHintProfileIds` and is suppressed when the profile is already on the `card_disabled_since_visit` inbox item.
 
-### Landing settings - Browser alerts
+### Landing settings - Alerts
 
 **Shipped:**
 
-- Toggle on homepage **Shortcuts & settings** (`data-device-browser-notif-toggle` in `site/index.html`).
+- Toggle on homepage **App settings** (`data-device-browser-notif-toggle` in `site/index.html`; row title **Alerts**).
 - Module: `site/js/device-browser-notifications.mjs`.
 - Storage: `localStorage.hc_browser_notif` (`on` / off).
 - Behavior: when enabled + `Notification.permission === 'granted'` + tab **hidden**, fire OS notification for new live-proof signature; **no** notification while tab visible.
@@ -174,7 +174,7 @@ See [Background alerts roadmap](#background-alerts-roadmap) (v2 phases A–B shi
 - Copy: *“Someone is waiting for live proof. Get an alert when this tab is in the background?”* · `[Turn on background alerts]` · `[Not now]`
 - **Not now** sets `localStorage.hc_browser_notif_prompt_dismissed`.
 - If permission denied: blocked copy; inbox badge remains fallback.
-- Landing **Browser alerts** toggle unchanged (`data-device-browser-notif-toggle`).
+- Landing **Alerts** toggle unchanged (`data-device-browser-notif-toggle`).
 
 ### v2 Phase B - Smarter payload (shipped)
 
