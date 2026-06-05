@@ -10,8 +10,8 @@ export const LANDING_SETTINGS_GROUP_LEARN = "Learn";
 export const LANDING_ROW_SAVED_CONTROLS_TITLE = "Saved controls";
 export const LANDING_ROW_SAVED_CONTROLS_SUB = "QRs saved on this device";
 
-export const LANDING_ROW_MANAGE_SAVED_QRS_TITLE = "Manage saved QRs";
-export const LANDING_ROW_MANAGE_SAVED_QRS_SUB = "Update, revoke, or back up";
+export const LANDING_ROW_MANAGE_SAVED_QRS_TITLE = "Open current item";
+export const LANDING_ROW_MANAGE_SAVED_QRS_SUB = "Update, revoke, or backup";
 
 export const LANDING_ROW_RESTORE_ACCESS_TITLE = "Restore access";
 export const LANDING_ROW_RESTORE_ACCESS_SUB = "Import backup or recovery code";

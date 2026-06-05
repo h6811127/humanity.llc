@@ -24,7 +24,7 @@ describe("landing focus settings copy", () => {
 
   it("exports landing-only row titles", () => {
     expect(LANDING_ROW_SAVED_CONTROLS_TITLE).toBe("Saved controls");
-    expect(LANDING_ROW_MANAGE_SAVED_QRS_TITLE).toBe("Manage saved QRs");
+    expect(LANDING_ROW_MANAGE_SAVED_QRS_TITLE).toBe("Open current item");
     expect(LANDING_ROW_ALERTS_TITLE).toBe("Alerts");
     expect(LANDING_ROW_SIMPLE_MODE_TITLE).toBe("Simple mode");
     expect(LANDING_LEARN_HELP_GUIDE_SUB).toBe("How saved QRs work");
