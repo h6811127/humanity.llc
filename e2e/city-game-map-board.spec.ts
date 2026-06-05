@@ -88,6 +88,57 @@ test.describe("city game map board", () => {
     await expect(board).toHaveAttribute("data-snapshot-loaded", "1");
   });
 
+  test("Explore By filters places and schematic pins with district AND logic", async ({
+    page,
+  }) => {
+    await mockSeasonSnapshot(page, mockSnapshotBody());
+
+    await page.goto("/play/cedar-rapids/map/");
+
+    const board = page.locator(".city-game-map-board");
+    await expect(board).toBeVisible({ timeout: 15_000 });
+    await expect(board).toHaveAttribute("data-snapshot-loaded", "1");
+
+    const explore = board.locator(".city-game-map-explore-filter");
+    await expect(explore.getByRole("button", { name: /Relay 17/ })).toBeVisible();
+
+    await explore.getByRole("button", { name: /Relay 17/ }).click();
+    await expect(board).toHaveAttribute("data-active-explore", "relay_gate");
+    await expect(board.locator('.city-game-map-node-row[data-role="relay_gate"]')).toHaveCount(17);
+    await expect(board.locator('.city-game-map-node-row[data-role="relay_gate"]:visible')).toHaveCount(
+      17
+    );
+    await expect(board.locator('.city-game-map-node-row[data-role="lore_archive"]:visible')).toHaveCount(
+      0
+    );
+
+    await board.getByRole("button", { name: "River spine" }).click();
+    await expect(board).toHaveAttribute("data-active-district", "river_spine");
+    const visibleRelayRiver = board.locator(
+      '.city-game-map-node-row[data-district="river_spine"][data-role="relay_gate"]:visible'
+    );
+    await expect(visibleRelayRiver).not.toHaveCount(0);
+    await expect(
+      board.locator(
+        '.city-game-map-node-row[data-district="river_spine"][data-role="lore_archive"]:visible'
+      )
+    ).toHaveCount(0);
+
+    await openDistrictSketch(board);
+    await expect(
+      board.locator('.city-game-map-pin[data-role="relay_gate"][data-district="river_spine"]:visible')
+    ).not.toHaveCount(0);
+    await expect(
+      board.locator('.city-game-map-pin[data-role="lore_archive"]:visible')
+    ).toHaveCount(0);
+
+    await explore.getByRole("button", { name: "All kinds" }).click();
+    await board.getByRole("button", { name: "All districts" }).click();
+    await expect(board).toHaveAttribute("data-active-explore", "all");
+    await expect(board).toHaveAttribute("data-active-district", "all");
+    await expect(board.locator(".city-game-map-node-row:visible")).toHaveCount(40);
+  });
+
   test("schematic pin click highlights matching place row", async ({ page }) => {
     await mockSeasonSnapshot(page, mockSnapshotBody());
 

@@ -110,8 +110,12 @@ describe("city-game map board render", () => {
     expect(html).toContain("Map &amp; mechanics");
     expect(html).toContain("Hidden on the sketch");
     expect(html).toContain("Wake the city: 0 /");
-    expect(html).toContain("Place types");
-    expect(html).toContain("city-game-map-roles-details");
+    expect(html).toContain("city-game-map-explore-filter");
+    expect(html).toContain('data-explore-filter="relay_gate"');
+    expect(html).toContain("Relay 17");
+    expect(html).toContain('data-role="relay_gate"');
+    expect(html).not.toContain("city-game-map-roles-details");
+    expect(html).not.toContain("Place types");
     expect(html).not.toContain("Signal War · fog");
     expect(html).not.toContain("public lattice");
     expect(html).not.toContain("quorum and witness");
