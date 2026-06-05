@@ -39,18 +39,18 @@
     "hook_stirring": "Something is stirring.",
     "hook_awake": "The city woke.",
     "progress_suffix": "fragments recovered",
-    "code_hint": "For this weekend: the code is on the back of the sticker.",
-    "row_scan_hint": "Scan sticker there.",
-    "spotlight_scan_hint": "Scan sticker · enter code",
-    "count_placeholder": "Scan for live count",
+    "code_hint": "Each place can reveal a different live state or action.",
+    "row_scan_hint": "Scan sticker there",
+    "spotlight_scan_hint": "Scan River Lantern",
+    "count_placeholder": "Live count loading…",
     "browse_summary": "Browse all places",
     "live_hint": "Find stickers. Scan them. Help unlock city goals.",
     "start_here": {
       "title": "Start here",
       "steps": [
-        "Find a sticker",
+        "Find a live sticker",
         "Scan it",
-        "Add to the city"
+        "See what changed"
       ]
     },
     "wayfinding_intro": "Start anywhere — scan any game sticker you find. Planning from home? Search place names in your maps app; the sketch below is districts only, not streets.",
@@ -69,15 +69,16 @@
     "roles_summary": "Place types",
     "launch": {
       "hero_steps": [
-        "Find a sticker",
+        "Find a live sticker",
         "Scan it",
-        "Add to the city"
+        "See what changed"
       ],
       "hero_aria_label": "How to play",
-      "code_hint": "For this weekend: the code is on the back of the sticker.",
-      "count_placeholder": "Scan for live count",
-      "spotlight_scan_hint": "Scan sticker · enter code",
-      "row_scan_hint": "Scan sticker there.",
+      "code_hint": "Each place can reveal a different live state or action.",
+      "lantern_line": "River Lantern tracks one shared city count.",
+      "count_placeholder": "Live count loading…",
+      "spotlight_scan_hint": "Scan River Lantern",
+      "row_scan_hint": "Scan sticker there",
       "browse_summary": "Browse all places",
       "what_changed_summary": "What changed"
     }

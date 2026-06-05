@@ -77,7 +77,7 @@ describe("city-game map snapshot core", () => {
     expect(html).toContain('data-node-id="node_04"');
     expect(html).toContain("city-game-map-node-live");
     expect(html).toContain("Open in Maps");
-    expect(html).toContain("Scan for live count");
+    expect(html).toContain("Live count loading…");
   });
 
   it("formats launch collective line from chip value", () => {
@@ -101,13 +101,13 @@ describe("city-game map snapshot core", () => {
   });
 
   it("applySpotlightFromSnapshot updates spotlight count element", () => {
-    const countEl = { textContent: "Scan for live count" };
+    const countEl = { textContent: "Live count loading…" };
     const liveEl = { innerHTML: "" };
     const spotlight = {
       dataset: {
         nodeId: "node_04",
-        countPlaceholder: "Scan for live count",
-        scanHint: "Scan sticker · enter code",
+        countPlaceholder: "Live count loading…",
+        scanHint: "Scan River Lantern",
       },
       classList: { toggle: () => {} },
     };

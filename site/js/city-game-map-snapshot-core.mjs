@@ -170,8 +170,8 @@ export function applySpotlightFromSnapshot(boardRoot, snapshot) {
   const spotlightDataset = /** @type {{ nodeId?: string; countPlaceholder?: string; scanHint?: string; scanLinkLabel?: string }} */ (
     spotlight.dataset
   );
-  const placeholder = spotlightDataset.countPlaceholder?.trim() || "Scan for live count";
-  const scanHint = spotlightDataset.scanHint?.trim() || "Scan sticker · enter code";
+  const placeholder = spotlightDataset.countPlaceholder?.trim() || "Live count loading…";
+  const scanHint = spotlightDataset.scanHint?.trim() || "Scan River Lantern";
   const nodeId = spotlightDataset.nodeId?.trim();
   if (!nodeId) return;
 
