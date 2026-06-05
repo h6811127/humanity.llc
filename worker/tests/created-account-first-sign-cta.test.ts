@@ -4,7 +4,10 @@ import {
   shouldShowAccountFirstSignCta,
   syncCreatedAccountFirstSignCta,
 } from "../../site/js/created-account-first-sign-cta.mjs";
-import { CREATED_ACCOUNT_FIRST_SIGN_CTA_LABEL } from "../../site/js/created-fresh-presentation-core.mjs";
+import {
+  CONTROL_ACCOUNT_HERO_LEAD,
+  CREATED_ACCOUNT_FIRST_SIGN_CTA_LABEL,
+} from "../../site/js/created-fresh-presentation-core.mjs";
 
 function makeStorage() {
   const storage = new Map<string, string>();
@@ -67,7 +70,7 @@ describe("created-account-first-sign-cta", () => {
     ).toBe(false);
   });
 
-  it("syncs button visibility and label", () => {
+  it("syncs button visibility and label alongside account hero lead", () => {
     const session = makeStorage();
     session.setItem("hc_created_first_control_active:prof1", "1");
     const btn = Object.assign(new HTMLButtonElement(), {
@@ -91,5 +94,6 @@ describe("created-account-first-sign-cta", () => {
     });
     expect(btn.hidden).toBe(false);
     expect(btn.textContent).toBe(CREATED_ACCOUNT_FIRST_SIGN_CTA_LABEL);
+    expect(CONTROL_ACCOUNT_HERO_LEAD).toContain("sign");
   });
 });

@@ -87,6 +87,24 @@ export function controlHeroTitle(kind) {
 /** Hero lead on first control visit for general accounts (P0.2). */
 export const CONTROL_ACCOUNT_HERO_LEAD = "Add your first sign or tag.";
 
+/** Contextual next-step leads on control hero (P1.1). */
+export const CONTROL_SIGN_HERO_LEAD =
+  "Update what scanners see, then print or test your QR.";
+export const CONTROL_TAG_HERO_LEAD =
+  "Add a return message, then print or test your QR.";
+export const CONTROL_WEAR_HERO_LEAD = "Print or customize your wearable QR.";
+export const CONTROL_SEASON_HERO_LEAD =
+  "Continue season setup and add your first checkpoint.";
+
+/** @type {Record<ControlOutcomeKind, string>} */
+const CONTROL_HERO_LEADS = {
+  account: CONTROL_ACCOUNT_HERO_LEAD,
+  sign: CONTROL_SIGN_HERO_LEAD,
+  tag: CONTROL_TAG_HERO_LEAD,
+  wear: CONTROL_WEAR_HERO_LEAD,
+  season: CONTROL_SEASON_HERO_LEAD,
+};
+
 /** Primary CTA label — scrolls to sign add section (P0.2). */
 export const CREATED_ACCOUNT_FIRST_SIGN_CTA_LABEL = "Add your first sign";
 
@@ -97,7 +115,7 @@ export const CREATED_ACCOUNT_FIRST_SIGN_CTA_LABEL = "Add your first sign";
 export function controlHeroCopy(kind) {
   return {
     title: controlHeroTitle(kind),
-    lead: kind === "account" ? CONTROL_ACCOUNT_HERO_LEAD : null,
+    lead: CONTROL_HERO_LEADS[kind] ?? null,
   };
 }
 
@@ -143,7 +161,7 @@ export function seasonContinuationHeroCopy(kind) {
   if (kind !== "season") return null;
   return {
     title: "Continue season setup",
-    lead: "Add checkpoints and publish rules from this account.",
+    lead: CONTROL_SEASON_HERO_LEAD,
   };
 }
 

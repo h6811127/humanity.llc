@@ -146,6 +146,7 @@ test.describe("/created/ control mode (Live · Manage)", () => {
     await expect(page.locator("#created-setup-root")).toBeHidden();
     await expect(page.locator("#created-control-root")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Your account is live" })).toBeVisible();
+    await expect(page.locator("#created-hero-meta")).toHaveText("Add your first sign or tag.");
     await expect(page.getByRole("tab", { name: "Live", selected: true })).toBeVisible();
     await expect(page.getByRole("tab", { name: "Manage" })).toBeVisible();
     await expect(page.locator("#created-live-setup-memory-wrap")).toBeVisible();

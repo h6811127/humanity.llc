@@ -7,12 +7,17 @@ import {
 } from "../../site/js/create-handoff-core.mjs";
 import {
   CONTROL_ACCOUNT_HERO_LEAD,
+  CONTROL_SEASON_HERO_LEAD,
+  CONTROL_SIGN_HERO_LEAD,
+  CONTROL_TAG_HERO_LEAD,
+  CONTROL_WEAR_HERO_LEAD,
   controlHeroCopy,
   controlHeroTitle,
   freshSetupHeroCopy,
   resolveControlOutcomeKind,
   resolveCreatedFreshPresentation,
   resolveFreshOutcomeKind,
+  seasonContinuationHeroCopy,
 } from "../../site/js/created-fresh-presentation-core.mjs";
 import { WEAR_PRINT_FOCUS } from "../../site/js/create-wear-wizard-core.mjs";
 import { GAME_SEASON_SETUP_FOCUS } from "../../site/js/create-organizer-season-core.mjs";
@@ -47,14 +52,17 @@ describe("resolveFreshOutcomeKind", () => {
 });
 
 describe("controlHeroTitle", () => {
-  it("uses contextual live titles and account lead", () => {
+  it("uses contextual live titles and next-step leads (P1.1)", () => {
     expect(controlHeroTitle("sign")).toBe("Your sign is live");
     expect(controlHeroTitle("tag")).toBe("Your tag is live");
     expect(controlHeroTitle("wear")).toBe("Your wearable QR is live");
     expect(controlHeroTitle("season")).toBe("Your season is live");
     expect(controlHeroTitle("account")).toBe("Your account is live");
     expect(controlHeroCopy("account").lead).toBe(CONTROL_ACCOUNT_HERO_LEAD);
-    expect(controlHeroCopy("sign").lead).toBeNull();
+    expect(controlHeroCopy("sign").lead).toBe(CONTROL_SIGN_HERO_LEAD);
+    expect(controlHeroCopy("tag").lead).toBe(CONTROL_TAG_HERO_LEAD);
+    expect(controlHeroCopy("wear").lead).toBe(CONTROL_WEAR_HERO_LEAD);
+    expect(controlHeroCopy("season").lead).toBe(CONTROL_SEASON_HERO_LEAD);
   });
 
   it("maps lost-item pilot sessions to tag hero", () => {
@@ -91,6 +99,7 @@ describe("resolveCreatedFreshPresentation", () => {
       session: { pilot_template: "status_plate" },
     });
     expect(presentation.hero?.title).toBe("Your sign is live");
+    expect(presentation.hero?.lead).toBe(CONTROL_SIGN_HERO_LEAD);
   });
 
   it("includes account hero lead for general control", () => {
@@ -104,13 +113,49 @@ describe("resolveCreatedFreshPresentation", () => {
     expect(presentation.hero?.lead).toBe(CONTROL_ACCOUNT_HERO_LEAD);
   });
 
-  it("returns handoff banner for redirect paths", () => {
+  it("includes tag hero lead for lost-item relay control", () => {
+    const presentation = resolveCreatedFreshPresentation({
+      freshParam: false,
+      mode: "control",
+      searchParams: new URLSearchParams(""),
+      session: { pilot_template: "lost_item_relay" },
+    });
+    expect(presentation.hero?.title).toBe("Your tag is live");
+    expect(presentation.hero?.lead).toBe(CONTROL_TAG_HERO_LEAD);
+  });
+
+  it("includes wear hero lead when focus is wear print", () => {
+    const presentation = resolveCreatedFreshPresentation({
+      freshParam: false,
+      mode: "control",
+      searchParams: new URLSearchParams(`focus=${WEAR_PRINT_FOCUS}`),
+      session: { pilot_template: "general" },
+    });
+    expect(presentation.hero?.title).toBe("Your wearable QR is live");
+    expect(presentation.hero?.lead).toBe(CONTROL_WEAR_HERO_LEAD);
+  });
+
+  it("includes season hero lead on season control path", () => {
+    const presentation = resolveCreatedFreshPresentation({
+      freshParam: false,
+      mode: "control",
+      searchParams: new URLSearchParams(`room=season&focus=${GAME_SEASON_SETUP_FOCUS}`),
+      session: { pilot_template: "general" },
+    });
+    expect(presentation.hero?.title).toBe("Your season is live");
+    expect(presentation.hero?.lead).toBe(CONTROL_SEASON_HERO_LEAD);
+  });
+
+  it("uses season continuation lead with handoff banner", () => {
     const presentation = resolveCreatedFreshPresentation({
       freshParam: false,
       mode: "control",
       searchParams: new URLSearchParams("focus=game-season-setup&room=season"),
       handoff: { kind: "season", handle: "@river_studio", at: 1 },
     });
+    expect(presentation.hero?.title).toBe("Continue season setup");
+    expect(presentation.hero?.lead).toBe(CONTROL_SEASON_HERO_LEAD);
+    expect(seasonContinuationHeroCopy("season")?.lead).toBe(CONTROL_SEASON_HERO_LEAD);
     expect(presentation.handoffBanner?.title).toBe(CREATE_HANDOFF_BANNER_TITLE);
     expect(presentation.handoffBanner?.detail).toContain("@river_studio");
   });
