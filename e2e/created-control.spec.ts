@@ -104,6 +104,10 @@ test.describe("/created/ control mode (Live · Manage)", () => {
         JSON.stringify({ [sample.profile_id]: true })
       );
       localStorage.setItem(
+        `hc_created_control_visited:${sample.profile_id}`,
+        "1"
+      );
+      localStorage.setItem(
         "hc_wallet",
         JSON.stringify([
           {
@@ -141,7 +145,7 @@ test.describe("/created/ control mode (Live · Manage)", () => {
 
     await expect(page.locator("#created-setup-root")).toBeHidden();
     await expect(page.locator("#created-control-root")).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Your object is live" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Your account is live" })).toBeVisible();
     await expect(page.getByRole("tab", { name: "Live", selected: true })).toBeVisible();
     await expect(page.getByRole("tab", { name: "Manage" })).toBeVisible();
     await expect(page.locator("#created-live-setup-memory-wrap")).toBeVisible();
@@ -238,6 +242,10 @@ test.describe("/created/ live proof panel", () => {
       localStorage.setItem(
         "hc_setup_done",
         JSON.stringify({ [sample.profile_id]: true })
+      );
+      localStorage.setItem(
+        `hc_created_control_visited:${sample.profile_id}`,
+        "1"
       );
       localStorage.setItem(
         "hc_wallet",

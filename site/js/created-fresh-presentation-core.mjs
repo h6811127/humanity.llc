@@ -81,7 +81,7 @@ export function controlHeroTitle(kind) {
   if (kind === "tag") return "Your tag is live";
   if (kind === "wear") return "Your wearable QR is live";
   if (kind === "season") return "Your season is live";
-  return "Your QR is live";
+  return "Your account is live";
 }
 
 /**

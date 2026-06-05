@@ -39,12 +39,12 @@ export function qrScopeRelationshipCopy({ scope, handle } = {}) {
  */
 export function qrTrustGroupScopeSubtitle(scope) {
   if (normalizeQrScope(scope) === QR_SCOPE_CHILD_OBJECT) {
-    return "Child object — revoke this scan link without disabling the root card";
+    return "Child object. Revoke this scan link without disabling the account";
   }
   if (isChildObjectScope(scope)) {
-    return "Printed item — revoke one artifact without killing the card";
+    return "Printed item. Revoke one artifact without disabling the account";
   }
-  return "Root card-scoped credential";
+  return "Account-scoped credential";
 }
 
 /**
@@ -62,12 +62,13 @@ export function qrNoCalendarExpirySubtitle(scope) {
  */
 export function objectTypeLabelFromContext({ pilotTemplate, qrScope } = {}) {
   const pilot = typeof pilotTemplate === "string" ? pilotTemplate.trim().toLowerCase() : "";
-  if (pilot === "status_plate") return { label: "Status plate", tone: "status-plate" };
-  if (pilot === "lost_item_relay") return { label: "Lost item", tone: "lost-item" };
+  if (pilot === "status_plate") return { label: "Sign", tone: "status-plate" };
+  if (pilot === "lost_item_relay") return { label: "Lost-item tag", tone: "lost-item" };
+  if (pilot === "game_node") return { label: "Checkpoint", tone: "game-node" };
   if (normalizeQrScope(qrScope) === QR_SCOPE_CHILD_OBJECT) {
-    return { label: "Status plate", tone: "status-plate" };
+    return { label: "Sign", tone: "status-plate" };
   }
   if (isChildObjectScope(qrScope)) return { label: "Printed item", tone: "wearable" };
-  return { label: "Root card", tone: "general" };
+  return { label: "Account", tone: "general" };
 }
 

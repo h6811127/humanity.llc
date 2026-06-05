@@ -43,7 +43,7 @@ function showImportOpenControlsCta(statusEl, entry) {
   cta.type = "button";
   cta.id = "hub-recovery-import-open-controls";
   cta.className = "btn-secondary hub-import-open-controls";
-  cta.textContent = "Open card controls";
+  cta.textContent = "Continue";
   cta.addEventListener("click", () => {
     window.dispatchEvent(new CustomEvent("hc-hub-sheet-close"));
     openCardNowPage(entry);

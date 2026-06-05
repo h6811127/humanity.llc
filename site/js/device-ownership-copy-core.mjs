@@ -489,11 +489,11 @@ export const SETUP_WALLET_SAVE_REQUIRED =
 export const SETUP_WALLET_SAVED_CONFIRMATION = "Saved on this device.";
 
 export const SETUP_WALLET_SAVED_DONE_DETAIL =
-  "Your control key is saved on this device. Open card controls when you are ready.";
+  "Your control key is saved on this device. Continue when you are ready.";
 
 /** Setup wizard — Manage tab unlocks after setup (RC-13). */
 export const SETUP_MANAGE_TAB_HINT =
-  "Revoke, recovery, and steward tools unlock under the Manage tab after you tap Open card controls.";
+  "Revoke, recovery, and steward tools unlock under the Manage tab after you tap Continue.";
 
 /** Setup done panel — Live vs Manage split (RC-13). */
 export const SETUP_DONE_PANEL_LEAD =

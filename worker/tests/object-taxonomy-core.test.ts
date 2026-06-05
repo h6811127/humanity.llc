@@ -20,7 +20,7 @@ describe("object taxonomy core", () => {
 
   it("describes child-object QR scope without assigning human trust to it", () => {
     expect(qrTrustGroupScopeSubtitle("print_artifact")).toBe(
-      "Printed item — revoke one artifact without killing the card"
+      "Printed item. Revoke one artifact without disabling the account"
     );
     expect(qrNoCalendarExpirySubtitle("print_artifact")).toBe(
       "This object QR stays valid until the owner revokes or replaces it"
@@ -30,15 +30,15 @@ describe("object taxonomy core", () => {
     );
   });
 
-  it("keeps root-card scope distinct from printed objects", () => {
-    expect(qrTrustGroupScopeSubtitle("card")).toBe("Root card-scoped credential");
+  it("keeps account scope distinct from printed objects", () => {
+    expect(qrTrustGroupScopeSubtitle("card")).toBe("Account-scoped credential");
     expect(qrNoCalendarExpirySubtitle("card")).toBeNull();
     expect(objectTypeLabelFromContext({ qrScope: "print_artifact" })).toEqual({
       label: "Printed item",
       tone: "wearable",
     });
     expect(objectTypeLabelFromContext({ qrScope: "card" })).toEqual({
-      label: "Root card",
+      label: "Account",
       tone: "general",
     });
   });
@@ -49,7 +49,18 @@ describe("object taxonomy core", () => {
         pilotTemplate: "status_plate",
         qrScope: "print_artifact",
       })
-    ).toEqual({ label: "Status plate", tone: "status-plate" });
+    ).toEqual({ label: "Sign", tone: "status-plate" });
+    expect(
+      objectTypeLabelFromContext({
+        pilotTemplate: "lost_item_relay",
+        qrScope: "child_object",
+      })
+    ).toEqual({ label: "Lost-item tag", tone: "lost-item" });
+    expect(
+      objectTypeLabelFromContext({
+        pilotTemplate: "game_node",
+        qrScope: "child_object",
+      })
+    ).toEqual({ label: "Checkpoint", tone: "game-node" });
   });
 });
-

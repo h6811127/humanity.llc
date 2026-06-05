@@ -45,12 +45,12 @@ describe("resolveFreshOutcomeKind", () => {
 });
 
 describe("controlHeroTitle", () => {
-  it("uses contextual live titles and QR fallback", () => {
+  it("uses contextual live titles", () => {
     expect(controlHeroTitle("sign")).toBe("Your sign is live");
     expect(controlHeroTitle("tag")).toBe("Your tag is live");
     expect(controlHeroTitle("wear")).toBe("Your wearable QR is live");
     expect(controlHeroTitle("season")).toBe("Your season is live");
-    expect(controlHeroTitle("account")).toBe("Your QR is live");
+    expect(controlHeroTitle("account")).toBe("Your account is live");
   });
 
   it("maps lost-item pilot sessions to tag hero", () => {

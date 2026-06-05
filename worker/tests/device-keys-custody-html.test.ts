@@ -90,7 +90,7 @@ describe("device-keys-custody-html", () => {
     expect(html).toContain('id="device-keys-custody-created-setup"');
     expect(html).toContain('id="created-setup-keys-mount"');
     expect(html).toContain("Save ownership on this device");
-    expect(html).toContain("control of this root card plus its object QRs");
+    expect(html).toContain("control of this account plus its object QRs");
     expect(html).toContain("restores root and object QR control");
     expect(html).toContain("Restore ownership");
   });

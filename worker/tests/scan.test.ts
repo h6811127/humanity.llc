@@ -958,7 +958,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
       "https://humanity.llc"
     );
     const html = await renderScanPage(vm, "https://humanity.llc");
-    expect(html).toContain("Printed item — revoke one artifact without killing the card");
+    expect(html).toContain("Printed item. Revoke one artifact without disabling the account");
     expect(html).toContain('data-merch-funnel="1"');
     expect(html).toContain(MERCH_SCAN_CUSTOMIZE_PATH);
     expect(html).toContain('id="scan-owner-restore-cta"');
