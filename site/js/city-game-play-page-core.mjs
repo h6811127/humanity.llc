@@ -2,11 +2,10 @@
  * Single boot path for city game play pages — season fetch, board, guide, banners.
  * @see docs/CITY_GAME_MAP_DASHBOARD.md
  */
-import { renderMapBoard, showMapBoardError } from "./city-game-map-board-core.mjs";
-import { bootCityGameMapSnapshot } from "./city-game-map-snapshot.mjs";
 import { buildPlayerGuideListHtml, resolvePlayerGuide } from "./city-game-player-guide-core.mjs";
 import { resolvePlayPageSeason } from "./city-game-season-resolve.mjs";
 import { bootCityGameSeasonBanners } from "./city-game-season-banner-core.mjs";
+import { seasonBoardPath } from "./city-game-season-path-shared.mjs";
 
 /**
  * @param {HTMLElement} list
@@ -14,23 +13,26 @@ import { bootCityGameSeasonBanners } from "./city-game-season-banner-core.mjs";
 function showPlayerGuideFallback(list) {
   if (list.children.length) return;
   list.innerHTML =
-    '<li class="list-row"><span class="list-content"><span class="list-sub">Could not load start guide — open the place list below or scan any sticker you find.</span></span></li>';
+    '<li class="list-row"><span class="list-content"><span class="list-sub">Could not load start guide. Open the place list below or scan any sticker you find.</span></span></li>';
 }
 
-function scrollToCityStateAnchor() {
-  if (location.hash !== "#city-state") return;
-  const section = document.getElementById("city-state");
-  if (!(section instanceof HTMLElement)) return;
-  requestAnimationFrame(() => {
-    section.scrollIntoView({ block: "start", behavior: "auto" });
-  });
+/**
+ * Legacy #city-state links open the dedicated board page.
+ * @param {Record<string, unknown>} season
+ * @returns {boolean} true when navigation was triggered
+ */
+function redirectCityStateHashToBoardPage(season) {
+  if (location.hash !== "#city-state") return false;
+  const boardPath = seasonBoardPath(String(season.rules_path ?? ""));
+  if (!boardPath) return false;
+  location.replace(boardPath);
+  return true;
 }
 
 /**
  * @param {Document | HTMLElement} [root]
  */
 export async function bootCityGamePlayPage(root = document) {
-  const mount = root.getElementById("city-game-map-root");
   const guideList = root.getElementById("city-game-player-guide-list");
   const heroSubline = root.getElementById("city-game-hero-subline");
 
@@ -40,13 +42,12 @@ export async function bootCityGamePlayPage(root = document) {
   let resolved = null;
 
   try {
-    resolved = await resolvePlayPageSeason(mount ?? undefined);
+    resolved = await resolvePlayPageSeason(guideList ?? undefined);
     const res = await fetch(resolved.jsonUrl, { cache: "no-store" });
     if (!res.ok) throw new Error(`season fetch ${res.status}`);
     season = await res.json();
   } catch (err) {
     console.warn("[city-game-play-page]", err);
-    if (mount) showMapBoardError(mount, "City board could not load.");
     if (guideList instanceof HTMLElement) showPlayerGuideFallback(guideList);
     await bootCityGameSeasonBanners(root);
     return { ok: false, season: null };
@@ -59,22 +60,8 @@ export async function bootCityGamePlayPage(root = document) {
     heroSubline.innerHTML = resolvePlayerGuide(season).heroSubline;
   }
 
-  if (mount instanceof HTMLElement) {
-    const result = renderMapBoard(mount, season);
-    if (!result.ok) {
-      console.warn("[city-game-play-page] map layout", result.issues);
-      await bootCityGameSeasonBanners(root);
-      return { ok: false, season };
-    }
-
-    scrollToCityStateAnchor();
-    const boardRoot = mount.querySelector(".city-game-map-board");
-    if (boardRoot instanceof HTMLElement) {
-      bootCityGameMapSnapshot(
-        boardRoot,
-        String(season.season_id ?? resolved?.seasonId ?? "")
-      );
-    }
+  if (redirectCityStateHashToBoardPage(season)) {
+    return { ok: true, season };
   }
 
   await bootCityGameSeasonBanners(root);

@@ -5,12 +5,10 @@ import {
   createdGameSeasonSetupHref,
   gameSeasonBlocksDeviceUnlock,
   gameSeasonRootManifesto,
-  gameSeasonSubmitButtonLabel,
   isGameSeasonCreateIntent,
   isGameSeasonCustodySession,
   isGameSeasonSetupFocus,
   parseGameSeasonIdField,
-  resolveGameSeasonSubmitStrategy,
   walletEntryHasOrganizerIssuerKey,
 } from "../../site/js/create-organizer-season-core.mjs";
 
@@ -26,48 +24,6 @@ describe("isGameSeasonSetupFocus", () => {
     expect(isGameSeasonSetupFocus("focus=game-season-setup")).toBe(true);
     expect(isGameSeasonSetupFocus("", "#game-season-setup")).toBe(true);
     expect(isGameSeasonSetupFocus("focus=deploy")).toBe(false);
-  });
-});
-
-describe("resolveGameSeasonSubmitStrategy", () => {
-  it("redirects when a season root with organizer key exists", () => {
-    expect(
-      resolveGameSeasonSubmitStrategy({
-        searchParams: new URLSearchParams("intent=game"),
-        walletEntries: [
-          {
-            pilot_template: "general",
-            profile_id: "p1",
-            owner_private_key_b58: "priv",
-            issuer_public_key: "org_pub",
-          },
-        ],
-      })
-    ).toBe("redirect_live");
-  });
-
-  it("creates season root when only a deploy general root exists", () => {
-    expect(
-      resolveGameSeasonSubmitStrategy({
-        searchParams: new URLSearchParams("intent=game"),
-        walletEntries: [
-          {
-            pilot_template: "general",
-            profile_id: "p1",
-            owner_private_key_b58: "priv",
-          },
-        ],
-      })
-    ).toBe("create_season_root");
-  });
-
-  it("creates season root when no saved general root", () => {
-    expect(
-      resolveGameSeasonSubmitStrategy({
-        searchParams: new URLSearchParams("intent=game"),
-        walletEntries: [],
-      })
-    ).toBe("create_season_root");
   });
 });
 
@@ -97,13 +53,6 @@ describe("parseGameSeasonIdField", () => {
   it("validates slug", () => {
     expect(parseGameSeasonIdField("my_city_01")).toBe("my_city_01");
     expect(() => parseGameSeasonIdField("Bad Season")).toThrow();
-  });
-});
-
-describe("gameSeasonSubmitButtonLabel", () => {
-  it("labels redirect and create paths", () => {
-    expect(gameSeasonSubmitButtonLabel("redirect_live")).toContain("Continue");
-    expect(gameSeasonSubmitButtonLabel("create_season_root")).toContain("Create season root");
   });
 });
 

@@ -93,7 +93,7 @@ function main() {
     const kitNodes = resolveProductionKitScanUrls(resolved.scanUrlByNode, season);
     const productionOutPath = seasonComprehensionOutputPath(season);
     const productionKitUrl = seasonComprehensionProductionUrl(season);
-    const boardUrl = `${rulesUrl}#city-state`;
+    const boardUrl = `${rulesUrl.replace(/\/?$/, "/")}map/`;
     const html = buildComprehensionKitHtml({
       host: "humanity.llc",
       rulesUrl,

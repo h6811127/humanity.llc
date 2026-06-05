@@ -11,11 +11,13 @@ import { readFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { seasonBoardPath } from "../../site/js/city-game-season-path-shared.mjs";
 import { cityGameSeasonReadiness } from "./city-game-season-readiness.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const seasonPath = join(root, "site/data/city-game-cr-season-01.json");
 const rulesPath = join(root, "site/play/cedar-rapids/index.html");
+const mapPath = join(root, "site/play/cedar-rapids/map/index.html");
 const wranglerPath = join(root, "worker/wrangler.toml");
 
 const requireLaunch = process.argv.includes("--require-launch");
@@ -44,7 +46,14 @@ if (existsSync(rulesPath)) {
     issues.push("Rules page missing 'What a scan proves' section.");
   }
   if (!rules.includes('id="city-state"')) {
-    issues.push('Rules page missing city state board section (#city-state).');
+    issues.push('Rules page missing city board CTA section (#city-state).');
+  }
+  const boardPath = seasonBoardPath(season.rules_path);
+  if (boardPath && !rules.includes(boardPath)) {
+    issues.push(`Rules page missing link to board page ${boardPath}.`);
+  }
+  if (rules.includes('id="city-game-map-root"')) {
+    issues.push("Rules page must not embed city-game-map-root — board lives on /map/ page.");
   }
   if (!rules.includes("city-game-play-page.mjs")) {
     issues.push("Rules page missing city-game-play-page.mjs module (single play-page boot).");
@@ -54,6 +63,22 @@ if (existsSync(rulesPath)) {
   }
 } else {
   issues.push(`Missing rules page: ${rulesPath}`);
+}
+
+if (existsSync(mapPath)) {
+  const mapPage = readFileSync(mapPath, "utf8");
+  if (!mapPage.includes('id="city-game-map-root"')) {
+    issues.push("Map page missing city-game-map-root mount.");
+  }
+  if (!mapPage.includes("city-game-map-page.mjs")) {
+    issues.push("Map page missing city-game-map-page.mjs boot script.");
+  }
+  const mapBoardPath = seasonBoardPath(season.rules_path);
+  if (mapBoardPath && !mapPage.includes(mapBoardPath)) {
+    issues.push(`Map page missing canonical board path ${mapBoardPath}.`);
+  }
+} else {
+  issues.push(`Missing map page: ${mapPath}`);
 }
 
 try {

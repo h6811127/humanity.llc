@@ -36,15 +36,15 @@ const DEFAULT_MAP_COPY = {
   title: "City state",
   subtitle: "Weekend board · read-only",
   live_hint:
-    "Use the place list for names and directions. Scan the sticker when you arrive for live signed state — faction holds, quorum, fragments, and care pauses.",
+    "Use the place list for names and directions. Scan the sticker when you arrive for live signed state. Faction holds, quorum, fragments, and care pauses.",
   wayfinding_intro:
-    "Start anywhere — scan any game sticker you find. Planning from home? Search place names in your maps app; the sketch below is districts only, not streets.",
+    "Start anywhere. Scan any game sticker you find. Planning from home? Search place names in your maps app; the sketch below is districts only, not streets.",
   diagram_note:
-    "District sketch only — not a street map. Names and Open in Maps links are how you find places.",
+    "District sketch only. Not a street map. Names and Open in Maps links are how you find places.",
   privacy_note:
     "Same city truth for everyone. No account. No visit log. No GPS tracking.",
   unlock_intro:
-    "Paths below wake when the city unlocks them together — not when you personally check boxes.",
+    "Paths below wake when the city unlocks them together. Not when you personally check boxes.",
 };
 
 /**
@@ -130,7 +130,7 @@ export function resolveMapCopy(season) {
 }
 
 /**
- * Short label for schematic pins — drop redundant district prefixes when space is tight.
+ * Short label for schematic pins. Drop redundant district prefixes when space is tight.
  * @param {string} label
  */
 export function abbreviatePinLabel(label) {
@@ -143,7 +143,7 @@ export function abbreviatePinLabel(label) {
 }
 
 /**
- * External maps search URL — optional per-node `maps_query` overrides label + city.
+ * External maps search URL. Optional per-node `maps_query` overrides label + city.
  * @param {Record<string, unknown>} season
  * @param {{ label?: string; maps_query?: string }} row
  */
@@ -440,7 +440,7 @@ export function buildMapBoardInnerHtml(season) {
  * @param {string} message
  */
 export function showMapBoardError(mount, message) {
-  mount.innerHTML = `<p class="city-game-map-error" role="alert">${message} Try refreshing — or scan any season sticker for live state.</p>`;
+  mount.innerHTML = `<p class="city-game-map-error" role="alert">${message} Try refreshing. Or scan any season sticker for live state.</p>`;
 }
 
 /**

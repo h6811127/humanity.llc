@@ -55,9 +55,10 @@ describe("city game season registry", () => {
 });
 
 describe("play rules page draft", () => {
-  it("includes city state board boot with season id", () => {
-    expect(rulesHtml).toContain('id="city-game-map-root"');
-    expect(rulesHtml).toContain('data-season-id="cr_season_01_wake"');
+  it("links to dedicated board page instead of embedding the map", () => {
+    expect(rulesHtml).toContain("/play/cedar-rapids/map/");
+    expect(rulesHtml).toContain('id="city-state"');
+    expect(rulesHtml).not.toContain('id="city-game-map-root"');
     expect(rulesHtml).toContain("city-game-play-page.mjs");
     expect(rulesHtml).not.toMatch(/city-game-map-board\.mjs[^"]*"\s*>\s*<script[^>]*city-game-play-page/);
   });

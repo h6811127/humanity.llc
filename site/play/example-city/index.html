@@ -9,7 +9,7 @@
     <title>Wake the grid · Example City (template) · humanity.llc</title>
     <meta
       name="description"
-      content="Template city game season — cooperation-first public object state without tracking players."
+      content="Template city game season. Cooperation-first public object state without tracking players."
     />
     <meta name="robots" content="noindex, nofollow" />
     <meta name="theme-color" content="#ffffff" />
@@ -31,10 +31,10 @@
           <p class="hero-eyebrow">Example City · Template season</p>
           <h1>Wake the grid</h1>
           <p class="hero-line">
-            Template season for a second city — same protocol as Cedar Rapids, different places and unlock graph. <strong>Not live</strong> until an operator mints nodes and sets dates.
+            Template season for a second city. Same protocol as Cedar Rapids, different places and unlock graph. <strong>Not live</strong> until an operator mints nodes and sets dates.
           </p>
           <p class="hero-line hero-line-sub" id="city-game-hero-subline">
-            <a href="#city-state">Jump to the place list</a> — districts, Open in Maps links (scan stickers for live chips).
+            <a href="/play/example-city/map/">Open the weekend city board</a>. Every game spot, districts, and Open in Maps links (scan stickers for live chips).
           </p>
         </section>
 
@@ -51,9 +51,9 @@
 
         <div class="research-dev-hint" role="note">
           <p>
-            <strong>Template only.</strong> Mint nodes, set <code>season_root_profile_id</code>, window dates, and
-            <code>status</code> before launch. Regenerate:
-            <code>npm run city-game:scaffold-play -- --season example_city_season_01 --apply</code>
+            <strong>Template only.</strong> Register nodes on your card&apos;s Live panel, set window dates and
+            <code>status</code>, then use <strong>Rules page &amp; launch</strong> on
+            <a href="/created/">/created/</a> to prepare the public rules page.
           </p>
         </div>
 
@@ -63,7 +63,7 @@
             <li class="list-row">
               <span class="list-content">
                 <span class="list-title">Public object truth</span>
-                <span class="list-sub">Live signed state on relays, drops, sanctuaries, and finale nodes — not who scanned.</span>
+                <span class="list-sub">Live signed state on relays, drops, sanctuaries, and finale nodes. Not who scanned.</span>
               </span>
             </li>
             <li class="list-row">
@@ -88,26 +88,23 @@
         </section>
 
         <section
-          class="idea-section city-game-map-section"
+          class="idea-section city-game-map-cta"
           id="city-state"
-          aria-labelledby="city-state-title"
+          aria-labelledby="city-board-cta-title"
         >
-          <div id="city-game-map-root" class="city-game-map-root" data-season-id="example_city_season_01">
-            <noscript>
-              <p class="city-game-map-error">
-                City board needs JavaScript. Open
-                <a href="/data/city-game-example-season-01.json">season data</a>
-                or scan any game sticker for live state.
-              </p>
-            </noscript>
-            <p class="city-game-map-loading" aria-live="polite">Loading city state board…</p>
-          </div>
+          <h2 class="group-label" id="city-board-cta-title">Weekend city board</h2>
+          <p class="group-intro short">
+            Every game spot, live progress, and Open in Maps links live on their own page. Easier on your phone and simple to share.
+          </p>
+          <p class="group-intro short">
+            <a href="/play/example-city/map/"><strong>Open weekend city board</strong></a>
+          </p>
         </section>
 
         <section class="qr-compare idea-compare" aria-labelledby="rules-privacy-title">
           <h2 class="group-label" id="rules-privacy-title">Privacy</h2>
           <p class="group-intro short">
-            Read the <a href="/data-policy.html">operator data policy</a>. Same city truth for everyone — no account, no visit log.
+            Read the <a href="/data-policy.html">operator data policy</a>. Same city truth for everyone. No account, no visit log.
           </p>
         </section>
 
@@ -118,6 +115,6 @@
         </p>
       </main>
     </div>
-    <script type="module" src="/js/city-game-play-page.mjs?v=2"></script>
+    <script type="module" src="/js/city-game-play-page.mjs?v=3"></script>
   </body>
 </html>

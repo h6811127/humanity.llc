@@ -156,7 +156,7 @@ export function terminalMintDeprecationUiCopy() {
     body:
       "Register nodes, issue scan QRs, bulk-import the starter registry, and prepare rules from this card. Do not run city-game:mint-node or city-game:seed-local for new self-serve seasons.",
     pilot:
-      "Cedar Rapids pilot ops and engineering CI may still use terminal scripts — see CITY_GAME_LOCAL_DEV.md.",
+      "Cedar Rapids pilot ops and engineering CI may still use terminal scripts. See CITY_GAME_LOCAL_DEV.md.",
   };
 }
 
@@ -168,9 +168,9 @@ export function formatSeasonSetupNextSteps(opts = {}) {
   if (opts.selfServe !== false) {
     lines.push(
       "Self-serve organizers:",
-      "  1. /create/ — season root card + game-operator public key (Organizer / issuer)",
-      "  2. /created/ Live · Manage — Add game node · bulk import · rules publish",
-      "  3. /game-operator/ — weekend world-state console (session-only private key)"
+      "  1. /create/. Season root card + game-operator public key (Organizer / issuer)",
+      "  2. /created/ Live · Manage · Add game node · bulk import · rules publish",
+      "  3. /game-operator/. Weekend world-state console (session-only private key)"
     );
   }
   if (opts.pilot !== false) {

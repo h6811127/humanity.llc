@@ -21,12 +21,12 @@ export const GAME_OPERATOR_CUSTODY_STORAGE_KEY = "hc_city_game_operator_custody_
 /** Plain-language GT scorecard (organizer-facing). */
 export const GT_COMPREHENSION_SCORECARD = [
   { id: "GT-1", prompt: 'Players say "we unlocked it together," not "I won"' },
-  { id: "GT-2", prompt: "Sharing a clue helps the group — hiding it does not" },
+  { id: "GT-2", prompt: "Sharing a clue helps the group. Hiding it does not" },
   { id: "GT-3", prompt: "Sanctuary spots feel like regroup with no capture" },
   { id: "GT-4", prompt: "Trust paths work without creating an account" },
   { id: "GT-5", prompt: "When care says maintenance pause, game bulletins stay muted" },
   { id: "GT-6", prompt: "No rank, streak, or scan count anywhere" },
-  { id: "GT-7", prompt: "City board shows shared world state — not personal GPS or visit history" },
+  { id: "GT-7", prompt: "City board shows shared world state. Not personal GPS or visit history" },
 ];
 
 /** Custody checklist shown at create + Live setup. */
@@ -37,7 +37,7 @@ export const GAME_OPERATOR_CUSTODY_ITEMS = [
   },
   {
     id: "session_paste",
-    label: "Paste the private key only at /game-operator/ — never upload it anywhere else",
+    label: "Paste the private key only at /game-operator/. Never upload it anywhere else",
   },
   {
     id: "owner_recovery",
@@ -54,7 +54,7 @@ export const WEEKEND_RUNBOOK_PLAIN = [
   {
     id: "world_state",
     title: "Flips describe world state, not player rewards",
-    body: "Bulletins and route windows change what everyone sees on scan — no leaderboard, XP, or scan counts.",
+    body: "Bulletins and route windows change what everyone sees on scan. No leaderboard, XP, or scan counts.",
   },
   {
     id: "care_pause",
@@ -64,17 +64,17 @@ export const WEEKEND_RUNBOOK_PLAIN = [
   {
     id: "compromise",
     title: "Compromise + rekey is public truth only",
-    body: "Mark a node compromised, warn on scan, rekey after stewards verify — never publish who scanned.",
+    body: "Mark a node compromised, warn on scan, rekey after stewards verify. Never publish who scanned.",
   },
   {
     id: "revoke",
     title: "Emergency revoke stays on owner tools",
-    body: "Disable one sticker or the whole season from /created/ Manage or /organizer-revoke/ — scans must show paused truth.",
+    body: "Disable one sticker or the whole season from /created/ Manage or /organizer-revoke/. Scans must show paused truth.",
   },
   {
     id: "weekend_console",
     title: "Weekend console",
-    body: "Use /game-operator/ for bulletin rotation. Most unlock paths are player-driven via site codes at scan — operators monitor copy, not flip every beat.",
+    body: "Use /game-operator/ for bulletin rotation. Most unlock paths are player-driven via site codes at scan. Operators monitor copy, not flip every beat.",
   },
 ];
 
@@ -184,7 +184,7 @@ export function buildSelfServeSetupChecklist(input) {
     },
     {
       id: "comprehension",
-      label: "≥5 un coached comprehension passes (GT-1–GT-7) before marketing",
+      label: "≥5 un coached comprehension passes (GT-1 to GT-7) before marketing",
       done: false,
       required: false,
       humanGate: true,
@@ -221,7 +221,7 @@ export function buildOrganizerComprehensionBrief(season, rulesUrl) {
   const wayfinding = buildJamieWayfindingChecks(season);
 
   const lines = [
-    "City game comprehension brief (give testers the rules page first — no coaching)",
+    "City game comprehension brief (give testers the rules page first. No coaching)",
     "",
     `Rules: ${rules}`,
     `Comprehension kit path (when deployed): ${comprehensionUrl}`,
@@ -232,7 +232,7 @@ export function buildOrganizerComprehensionBrief(season, rulesUrl) {
     "Wayfinding (Jamie checks):",
     ...wayfinding.map((row) => `  ${row.id}: ${row.prompt}`),
     "",
-    "Scorecard (per tester — need ≥5 passes before launch marketing):",
+    "Scorecard (per tester. Need ≥5 passes before launch marketing):",
     ...GT_COMPREHENSION_SCORECARD.map((row) => `  ${row.id}: ${row.prompt}`),
     "",
     "Probe nodes for optional spot checks:",
@@ -252,7 +252,7 @@ export function gameSeasonSetupWizardCustodyCopy() {
     eyebrow: "City game season root",
     title: "Two keys, two jobs",
     detail:
-      "Owner + recovery keys control this card and every game node under it. The game-operator private key flips weekend world state at /game-operator/ only — save it offline and never upload it. Register nodes and publish rules from Live after setup.",
+      "Owner + recovery keys control this card and every game node under it. The game-operator private key flips weekend world state at /game-operator/ only. Save it offline and never upload it. Register nodes and publish rules from Live after setup.",
     links: [
       { href: "/game-operator/", label: "Weekend console" },
       { href: "/created/#advanced", label: "Manage · recovery" },

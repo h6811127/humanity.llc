@@ -39,7 +39,7 @@ describe("city-game-season-banner-core", () => {
     expect(seasonListSubtitle("before", season)).toContain("Season opens soon");
     expect(seasonListSubtitle("before", season)).toContain("Cedar Rapids");
     expect(seasonBannerBodyHtml("before", "rules", season)).toContain("plan your weekend");
-    expect(seasonBannerBodyHtml("open", "rules", season)).toContain("#city-state");
+    expect(seasonBannerBodyHtml("open", "rules", season)).toContain("/play/cedar-rapids/map/");
     expect(seasonBannerBodyHtml("open", "rules", season)).toContain("Cedar Rapids");
     expect(seasonBannerBodyHtml("open", "research", season)).toContain("/play/cedar-rapids/");
     expect(seasonBannerNoticeClass("after")).toBe("hc-notice--warning");

@@ -86,17 +86,16 @@ export function applyGameSeasonSetupFocus(select, searchParams, opts = {}) {
     history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
   }
 
-  if (typeof opts.refreshPresentation === "function") {
-    window.setTimeout(() => {
-      opts.refreshPresentation();
-      const setupDetails = document.getElementById(GAME_SEASON_SETUP_SCROLL_TARGET_ID);
-      if (setupDetails instanceof HTMLDetailsElement) {
-        setupDetails.hidden = false;
-        setupDetails.open = true;
-        setupDetails.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    }, 800);
-  }
+  window.setTimeout(() => {
+    const gameSection = document.getElementById("child-object-add-game-node");
+    if (gameSection) gameSection.hidden = false;
+    const setupDetails = document.getElementById(GAME_SEASON_SETUP_SCROLL_TARGET_ID);
+    if (setupDetails instanceof HTMLDetailsElement) {
+      setupDetails.hidden = false;
+      setupDetails.open = true;
+      setupDetails.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, 1200);
 
   return true;
 }

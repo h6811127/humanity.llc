@@ -23,7 +23,8 @@ export const B13_GT7_REQUIRED_TESTERS = 5;
  */
 export function htmlMarketsLiveCityBoard(html) {
   if (!html || typeof html !== "string") return false;
-  const hasBoardSurface = /#city-state|city-game-map-board|city-game-map-snapshot/i.test(html);
+  const hasBoardSurface =
+    /#city-state|\/play\/[^/]+\/map\/|city-game-map-board|city-game-map-snapshot/i.test(html);
   const hasLiveBoardCopy =
     /live chips/i.test(html) ||
     /city state board/i.test(html) ||
@@ -38,7 +39,10 @@ export function surfacesMarketLiveCityBoard(surfaces) {
   if (htmlMarketsLiveCityBoard(surfaces.rulesHtml ?? "")) return true;
   for (const html of Object.values(surfaces.researchHtmlByRel ?? {})) {
     if (!html) continue;
-    if (/city state board/i.test(html) && /#city-state|\/play\/cedar-rapids\//i.test(html)) {
+    if (
+      /city state board|weekend city board/i.test(html) &&
+      /#city-state|\/play\/[^/]+\/map\/|\/play\/cedar-rapids\//i.test(html)
+    ) {
       return true;
     }
   }

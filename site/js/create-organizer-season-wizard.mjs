@@ -11,6 +11,11 @@ import {
 } from "./create-season-fork-ui-core.mjs";
 import { isGameSeasonCreateIntent } from "./create-organizer-season-core.mjs";
 import { loadWallet } from "./device-wallet.mjs";
+import {
+  listGeneralRootsWithKeys,
+  pickPreferredGeneralRoot,
+} from "./create-flow-convergence-core.mjs";
+import { pickPreferredGameSeasonRoot } from "./create-organizer-season-core.mjs";
 
 const GAME_SEASON_HERO = {
   title: "Organize a live season",
@@ -83,7 +88,13 @@ export function syncCreateOrganizerSeasonWizardUi(searchParams) {
   }
 
   syncGameSeasonIdFieldUi(strategy);
-  const label = gameSeasonSubmitButtonLabel(strategy);
+  let preferredRoot = null;
+  if (strategy === "redirect_live") {
+    preferredRoot = pickPreferredGameSeasonRoot(walletEntries);
+  } else if (strategy === "use_existing_account") {
+    preferredRoot = pickPreferredGeneralRoot(listGeneralRootsWithKeys(walletEntries));
+  }
+  const label = gameSeasonSubmitButtonLabel(strategy, preferredRoot);
   if (label) submitBtn.textContent = label;
 }
 

@@ -93,7 +93,7 @@ describe("fork ui helpers", () => {
   });
 
   it("labels submit paths", () => {
-    expect(gameSeasonSubmitButtonLabel("use_existing_account")).toContain("Continue");
+    expect(gameSeasonSubmitButtonLabel("use_existing_account")).toContain("set up season");
     expect(gameSeasonSubmitButtonLabel("create_dual_skin_root")).toContain("Create account");
     expect(gameSeasonSubmitButtonLabel("create_season_only_root")).toContain("season-only");
   });

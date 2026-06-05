@@ -28,7 +28,7 @@ describe("city-game-player-guide-core", () => {
     expect(guide.steps[2]?.title).toMatch(/Signal War/i);
     expect(guide.steps[4]?.title).toMatch(/Fog/i);
     expect(guide.quorumSpot?.title).toBe("Riverwalk River Lantern");
-    expect(guide.heroSubline).toContain("#city-state");
+    expect(guide.heroSubline).toContain("/play/cedar-rapids/map/");
   });
 
   it("builds HTML list with quorum spot", () => {

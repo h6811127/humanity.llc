@@ -2,13 +2,16 @@
  * Jamie-friendly player onboarding from season JSON (multi-city).
  */
 
-import { seasonSlugFromRulesPath } from "./city-game-season-path-shared.mjs";
+import {
+  seasonBoardPath,
+  seasonSlugFromRulesPath,
+} from "./city-game-season-path-shared.mjs";
 import { resolveSignalWarGuideSteps } from "./city-game-signal-war-core.mjs";
 
 const DEFAULT_STEPS = [
   {
     title: "No required first stop",
-    body: "Walk until you spot a game sticker, or pick a place from the list below and head there — any sticker works.",
+    body: "Walk until you spot a game sticker, or pick a place from the list below and head there. Any sticker works.",
   },
   {
     title: "Planning from home",
@@ -17,7 +20,16 @@ const DEFAULT_STEPS = [
 ];
 
 const DEFAULT_HERO_SUBLINE =
-  'Jump to the <a href="#city-state">place list</a> — all spots by district, with Open in Maps links (scan each sticker for live chips).';
+  'Open the <a href="/play/cedar-rapids/map/">weekend city board</a>. Every game spot, with Open in Maps links (scan each sticker for live chips).';
+
+/**
+ * @param {Record<string, unknown>} season
+ */
+function defaultHeroSubline(season) {
+  const board =
+    seasonBoardPath(String(season.rules_path ?? "")) ?? "/play/cedar-rapids/map/";
+  return `Open the <a href="${board}">weekend city board</a>. Every game spot, with Open in Maps links (scan each sticker for live chips).`;
+}
 
 /**
  * @param {Record<string, unknown>} season
@@ -68,7 +80,7 @@ export function resolvePlayerGuide(season) {
     if (row?.label) {
       quorumSpot = {
         title: String(row.label),
-        body: "The shared quorum spot — scan there to see collective progress and add your visit with the site code on the sticker.",
+        body: "The shared quorum spot. Scan there to see collective progress and add your visit with the site code on the sticker.",
       };
     }
   }
@@ -76,7 +88,7 @@ export function resolvePlayerGuide(season) {
   const heroSubline =
     typeof guide.hero_subline === "string" && guide.hero_subline.trim()
       ? guide.hero_subline.trim()
-      : DEFAULT_HERO_SUBLINE;
+      : defaultHeroSubline(season);
 
   return { steps, quorumSpot, heroSubline };
 }
@@ -132,10 +144,10 @@ export function resolveComprehensionProbeNodes(season) {
   const byRole = (role) => rows.find((row) => row.role === role);
   const quorumId = primaryQuorumNodeId(season);
   const picks = [
-    { node_id: quorumId, blurb: "GT-1 / GT-2 — collective unlock + seed clue" },
-    { node_id: byRole("lore_archive")?.node_id, blurb: "GT-4 — trust path (no account)" },
-    { node_id: byRole("sanctuary")?.node_id, blurb: "GT-3 — sanctuary / regroup" },
-    { node_id: byRole("care_loop")?.node_id, blurb: "GT-5 — care stream vs game bulletins" },
+    { node_id: quorumId, blurb: "GT-1 / GT-2. Collective unlock + seed clue" },
+    { node_id: byRole("lore_archive")?.node_id, blurb: "GT-4. Trust path (no account)" },
+    { node_id: byRole("sanctuary")?.node_id, blurb: "GT-3. Sanctuary / regroup" },
+    { node_id: byRole("care_loop")?.node_id, blurb: "GT-5. Care stream vs game bulletins" },
   ].filter((row) => row.node_id);
 
   return picks.map((row) => ({
@@ -170,15 +182,15 @@ export function buildJamieWayfindingChecks(season) {
   return [
     {
       id: "GT-W1",
-      prompt: "How would you start? (any sticker / place list — no required first stop)",
+      prompt: "How would you start? (any sticker / place list. No required first stop)",
     },
     {
       id: "GT-W2",
-      prompt: "Planning from home: maps app + place names — not numbered dots on the sketch",
+      prompt: "Planning from home: maps app + place names. Not numbered dots on the sketch",
     },
     {
       id: "GT-W3",
-      prompt: `${quorumName}: find it via place list or Open in Maps — scan there for quorum mechanics`,
+      prompt: `${quorumName}: find it via place list or Open in Maps. Scan there for quorum mechanics`,
     },
   ];
 }

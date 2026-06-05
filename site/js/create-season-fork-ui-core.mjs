@@ -2,14 +2,22 @@
  * Season create fork — submit labels and season-id field visibility.
  */
 
+import { generalRootDisplayLabel } from "./create-flow-convergence-core.mjs";
+
 /** @typedef {import("./create-season-fork-core.mjs").GameSeasonSubmitStrategy} GameSeasonSubmitStrategy */
 
 /**
  * @param {GameSeasonSubmitStrategy} strategy
+ * @param {Record<string, unknown> | null | undefined} [preferredRoot]
  */
-export function gameSeasonSubmitButtonLabel(strategy) {
-  if (strategy === "redirect_live") return "Continue season setup on Live";
-  if (strategy === "use_existing_account") return "Continue season setup on Live";
+export function gameSeasonSubmitButtonLabel(strategy, preferredRoot) {
+  const handle =
+    preferredRoot && typeof preferredRoot === "object"
+      ? generalRootDisplayLabel(preferredRoot)
+      : "";
+  if (strategy === "redirect_live" || strategy === "use_existing_account") {
+    return handle ? `Open ${handle} to set up season` : "Open your account to set up season";
+  }
   if (strategy === "create_dual_skin_root") return "Create account and continue season setup";
   if (strategy === "create_season_only_root") return "Create season-only account and continue";
   return null;
@@ -24,7 +32,7 @@ export function gameSeasonIdFieldUiState(strategy) {
     return {
       showSeasonIdField: false,
       redirectHint:
-        "You already have a season root saved in this browser. Tap below to continue on Live. Enter the season id when you register game nodes.",
+        "You already have a season account saved on this device. Tap below to continue season setup.",
       inputRequired: false,
     };
   }
@@ -32,7 +40,7 @@ export function gameSeasonIdFieldUiState(strategy) {
     return {
       showSeasonIdField: false,
       redirectHint:
-        "Continue on your saved account. Register the game-operator key from Live setup if you have not yet. Enter the season id on your first game node.",
+        "Continue on your saved account. Name the season when you add your first checkpoint.",
       inputRequired: false,
     };
   }
@@ -40,7 +48,7 @@ export function gameSeasonIdFieldUiState(strategy) {
     return {
       showSeasonIdField: false,
       redirectHint:
-        "One @handle for door plates and season scan points. Enter the season id when you register your first game node on Live.",
+        "One @name for signs and season scan points. Name the season when you add your first checkpoint.",
       inputRequired: false,
     };
   }

@@ -108,23 +108,33 @@ function seasonCityLabel(season) {
 
 /**
  * @param {"unset" | "before" | "open" | "after"} phase
- * @param {"rules" | "research" | "hub"} variant
+ * @param {"rules" | "research" | "hub" | "map"} variant
  * @param {Record<string, unknown>} [season]
  */
 export function seasonBannerBodyHtml(phase, variant, season = {}) {
   const city = seasonCityLabel(season);
   const rulesHref = seasonRulesHref(season);
-  const boardHref = seasonRulesHref(season, "#city-state");
+  const boardHref = seasonBoardHref(season);
   const seasonTitle = String(season.title ?? "Season 1").trim() || "Season 1";
+
+  if (variant === "map") {
+    if (phase === "before") {
+      return `${seasonTitle} opens on the date above. You can browse spots below now; game progression starts when the window opens.`;
+    }
+    if (phase === "after") {
+      return `${seasonTitle} has ended. Spots and public state below are for reference; scans still show readable object state.`;
+    }
+    return `Live updates appear on stickers around ${city} and on this board. No account required.`;
+  }
 
   if (variant === "rules") {
     if (phase === "before") {
-      return `${seasonTitle} opens on the date above. Scans work now, but game progression and contributions start when the window opens. Use the <a href="#city-state">place list below</a> to plan your weekend.`;
+      return `${seasonTitle} opens on the date above. Scans work now, but game progression and contributions start when the window opens. Open the <a href="${boardHref}">city board</a> to plan your weekend.`;
     }
     if (phase === "after") {
-      return `${seasonTitle} has ended. Public object state remains readable on scans; game progression is paused. The <a href="#city-state">place list</a> and rules below stay available for reference.`;
+      return `${seasonTitle} has ended. Public object state remains readable on scans; game progression is paused. The <a href="${boardHref}">city board</a> and rules stay available for reference.`;
     }
-    return `Scan game stickers around ${city} to read public object state. No account required. Open the <a href="#city-state">weekend city state board</a> for districts, live chips, and unlock paths.`;
+    return `Scan game stickers around ${city} to read public object state. No account required. Open the <a href="${boardHref}">weekend city board</a> for every spot, live progress, and directions.`;
   }
 
   if (variant === "hub") {
@@ -132,24 +142,24 @@ export function seasonBannerBodyHtml(phase, variant, season = {}) {
       return "Plan ahead with the rules and city board before the window opens.";
     }
     if (phase === "after") {
-      return "Season ended — rules and city board remain for reference.";
+      return "Season ended. Rules and city board remain for reference.";
     }
     return "Read the rules and city board before scanning game nodes.";
   }
 
   if (phase === "before") {
-    return `<a href="${rulesHref}">Read the rules</a> and <a href="${boardHref}">open the place list</a> to plan ahead — scans work now, but play progression starts when the window opens.`;
+    return `<a href="${rulesHref}">Read the rules</a> and <a href="${boardHref}">open the place list</a> to plan ahead. Scans work now, but play progression starts when the window opens.`;
   }
   if (phase === "after") {
     return `<a href="${rulesHref}">Rules</a> and the <a href="${boardHref}">city board</a> remain available. Resolver-backed play progression is paused.`;
   }
-  return `<a href="${rulesHref}">Read the rules</a> and <a href="${boardHref}">open the city state board</a> before scanning game nodes. Resolver-backed play runs on live <code>/c/…</code> scan URLs — demo layouts on this page remain design reference.`;
+  return `<a href="${rulesHref}">Read the rules</a> and <a href="${boardHref}">open the city state board</a> before scanning game nodes. Resolver-backed play runs on live <code>/c/…</code> scan URLs. Demo layouts on this page remain design reference.`;
 }
 
 /**
  * @param {Record<string, unknown>} season
  * @param {"unset" | "before" | "open" | "after"} phase
- * @param {"rules" | "research" | "hub"} variant
+ * @param {"rules" | "research" | "hub" | "map"} variant
  */
 export function applySeasonBannerMount(mount, season, phase, variant) {
   const windowLabel = formatSeasonWindowLabel(season);
@@ -176,7 +186,7 @@ export function applySeasonBannerMount(mount, season, phase, variant) {
 /**
  * @param {Record<string, unknown>} season
  * @param {string} jsonUrl
- * @param {"rules" | "research" | "hub"} variant
+ * @param {"rules" | "research" | "hub" | "map"} variant
  */
 export function buildSeasonBannerBlock(season, jsonUrl, variant = "research") {
   const windowLabel = formatSeasonWindowLabel(season);
@@ -185,7 +195,7 @@ export function buildSeasonBannerBlock(season, jsonUrl, variant = "research") {
   }
 
   const rulesHref = seasonRulesHref(season);
-  const boardHref = seasonRulesHref(season, "#city-state");
+  const boardHref = seasonBoardHref(season);
   const body = seasonBannerBodyHtml("open", variant, season);
 
   if (variant === "hub") {

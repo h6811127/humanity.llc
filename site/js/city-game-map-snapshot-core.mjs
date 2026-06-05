@@ -153,10 +153,10 @@ export function applySnapshotToMapBoard(boardRoot, snapshot) {
   if (figcaption instanceof HTMLElement) {
     if (nodes.length) {
       figcaption.textContent =
-        "Schematic layout only — not GPS. Pins and chips show the same public object state as scan.";
+        "Schematic layout only. Not GPS. Pins and chips show the same public object state as scan.";
     } else if (Array.isArray(snapshot.headlines) && snapshot.headlines.length) {
       figcaption.textContent =
-        "Schematic layout only — not GPS. Headlines refresh from season schedule; scan stickers for node chips until mint.";
+        "Schematic layout only. Not GPS. Headlines refresh from season schedule; scan stickers for node chips until mint.";
     }
   }
 
@@ -209,7 +209,7 @@ export function applySignalWarFromSnapshot(boardRoot, snapshot) {
 export function markSnapshotStale(syncEl) {
   if (!(syncEl instanceof HTMLElement)) return;
   syncEl.classList.add("city-game-map-sync--stale");
-  syncEl.textContent = "Board may be stale — last refresh failed. Scan nodes for live state.";
+  syncEl.textContent = "Board may be stale. Last refresh failed. Scan nodes for live state.";
 }
 
 /**
@@ -236,7 +236,7 @@ export function renderTickerHeadlines(list, headlines) {
   const lines = Array.isArray(headlines) ? headlines.filter(Boolean) : [];
   if (!lines.length) {
     const li = document.createElement("li");
-    li.textContent = "Weekend board quiet — scan nodes as the city wakes.";
+    li.textContent = "Weekend board quiet. Scan nodes as the city wakes.";
     list.appendChild(li);
     return;
   }

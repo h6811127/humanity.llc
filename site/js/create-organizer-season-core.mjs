@@ -14,9 +14,7 @@ export const GAME_SEASON_SETUP_FOCUS = "game-season-setup";
 export const GAME_SEASON_ID_SESSION_PREFIX = "hc_game_season_id:";
 export const GAME_SEASON_SETUP_FLOW_KEY = "hc_game_season_setup_flow";
 
-const GAME_SEASON_MANIFESTO_PREFIX = "City game season";
-
-/** @typedef {"standard" | "redirect_live" | "create_season_root"} GameSeasonSubmitStrategy */
+export const GAME_SEASON_MANIFESTO_PREFIX = "City game season";
 
 /**
  * @param {URLSearchParams} searchParams
@@ -188,25 +186,3 @@ export function createdGameSeasonSetupHref(entry, origin = "https://humanity.llc
   return `${url.pathname}${url.search}`;
 }
 
-/**
- * @param {{
- *   searchParams: URLSearchParams;
- *   walletEntries: unknown[];
- * }} ctx
- * @returns {GameSeasonSubmitStrategy}
- */
-export function resolveGameSeasonSubmitStrategy(ctx) {
-  if (!isGameSeasonCreateIntent(ctx.searchParams)) return "standard";
-  const seasonRoot = pickPreferredGameSeasonRoot(ctx.walletEntries);
-  if (seasonRoot) return "redirect_live";
-  return "create_season_root";
-}
-
-/**
- * @param {GameSeasonSubmitStrategy} strategy
- */
-export function gameSeasonSubmitButtonLabel(strategy) {
-  if (strategy === "redirect_live") return "Continue season setup on Live";
-  if (strategy === "create_season_root") return "Create season root & continue";
-  return null;
-}

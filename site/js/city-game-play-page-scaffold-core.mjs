@@ -5,11 +5,12 @@
 
 import { buildSeasonBannerBlock, formatSeasonWindowLabel } from "./city-game-season-banner-core.mjs";
 import {
+  seasonBoardPath,
   seasonJsonPublicUrl,
   seasonLaunchContext,
 } from "./city-game-season-path-shared.mjs";
 
-export const PLAY_PAGE_SCRIPT = "/js/city-game-play-page.mjs?v=2";
+export const PLAY_PAGE_SCRIPT = "/js/city-game-play-page.mjs?v=3";
 export const STYLES_HREF = "/styles.css?v=144";
 export const PILOT_PLAY_SLUG = "cedar-rapids";
 
@@ -94,7 +95,7 @@ ${robotsMeta}    <meta name="theme-color" content="#ffffff" />
             ${heroLine}
           </p>
           <p class="hero-line hero-line-sub" id="city-game-hero-subline">
-            <a href="#city-state">Jump to the place list</a> — districts, Open in Maps links (scan stickers for live chips).
+            <a href="${escapeHtml(ctx.boardPath)}">Open the weekend city board</a> — every game spot, districts, and Open in Maps links (scan stickers for live chips).
           </p>
         </section>
 
@@ -142,20 +143,17 @@ ${robotsMeta}    <meta name="theme-color" content="#ffffff" />
         </section>
 
         <section
-          class="idea-section city-game-map-section"
+          class="idea-section city-game-map-cta"
           id="city-state"
-          aria-labelledby="city-state-title"
+          aria-labelledby="city-board-cta-title"
         >
-          <div id="city-game-map-root" class="city-game-map-root" data-season-id="${escapeHtml(seasonId)}">
-            <noscript>
-              <p class="city-game-map-error">
-                City board needs JavaScript. Open
-                <a href="${escapeHtml(jsonUrl)}">season data</a>
-                or scan any game sticker for live state.
-              </p>
-            </noscript>
-            <p class="city-game-map-loading" aria-live="polite">Loading city state board…</p>
-          </div>
+          <h2 class="group-label" id="city-board-cta-title">Weekend city board</h2>
+          <p class="group-intro short">
+            Every game spot, live progress, and Open in Maps links live on their own page — easier on your phone and simple to share.
+          </p>
+          <p class="group-intro short">
+            <a href="${escapeHtml(ctx.boardPath)}"><strong>Open weekend city board</strong></a>
+          </p>
         </section>
 
         <section class="qr-compare idea-compare" aria-labelledby="rules-privacy-title">
@@ -186,20 +184,21 @@ export function verifyPlayPageHtml(html, season) {
   const issues = [];
   const seasonId = String(season.season_id ?? "").trim();
   if (!seasonId) issues.push("season_id required");
-  if (!html.includes(`data-season-id="${seasonId}"`)) {
-    issues.push(`missing data-season-id="${seasonId}"`);
-  }
   if (!html.includes("city-game-play-page.mjs")) {
     issues.push("missing city-game-play-page.mjs boot script");
-  }
-  if (!html.includes('id="city-game-map-root"')) {
-    issues.push("missing city-game-map-root mount");
   }
   if (!html.includes('id="city-game-player-guide-list"')) {
     issues.push("missing city-game-player-guide-list mount");
   }
   if (!html.includes('id="city-state"')) {
     issues.push("missing #city-state section");
+  }
+  const boardPath = seasonBoardPath(String(season.rules_path ?? ""));
+  if (boardPath && !html.includes(boardPath)) {
+    issues.push(`missing board page link ${boardPath}`);
+  }
+  if (html.includes('id="city-game-map-root"')) {
+    issues.push("rules page must not embed city-game-map-root — use /map/ page");
   }
   return { ok: issues.length === 0, issues };
 }

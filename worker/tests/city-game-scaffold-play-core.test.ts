@@ -41,13 +41,13 @@ describe("city-game-scaffold-play-core", () => {
     const verify = verifyPlayPageHtml(html, config);
 
     expect(verify.ok).toBe(true);
-    expect(html).toContain('data-season-id="example_city_season_01"');
+    expect(html).toContain("/play/example-city/map/");
+    expect(html).not.toContain('id="city-game-map-root"');
     expect(html).toContain("city-game-play-page.mjs");
     expect(html).toContain('id="city-game-player-guide-list"');
     expect(html).toContain('id="city-state"');
     expect(html).toContain("Template only.");
     expect(html).toMatch(/noindex/i);
-    expect(html).toContain("/data/city-game-example-season-01.json");
   });
 
   it("example-city on-disk page matches contract when present", () => {

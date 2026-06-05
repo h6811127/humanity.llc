@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Weekend city board · Cedar Rapids, Iowa · humanity.llc</title>
+    <meta
+      name="description"
+      content="Weekend city board for Cedar Rapids, Iowa. Every game spot, live public progress, and Open in Maps links. No app. No account."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=146" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+
+      <main class="screen screen-landing">
+        <section class="hero hero-compact">
+          <p class="hero-eyebrow">Cedar Rapids, Iowa</p>
+          <h1>Weekend city board</h1>
+          <p class="hero-line">
+            See every game spot around town. <strong>live progress</strong>, districts, and
+            directions. The same view for everyone. No app. No account.
+          </p>
+          <p class="hero-line hero-line-sub">
+            <a href="/play/cedar-rapids/">How to play (rules)</a>
+            · scan any sticker when you arrive for the latest state
+          </p>
+        </section>
+
+        <div class="research-live-banner hc-notice hc-notice--info" role="note" data-city-game-season-banner data-season-json="/data/city-game-cr-season-01.json" data-banner-variant="map">
+  <p>
+    <strong data-city-game-season-banner-label>Season window</strong><span data-city-game-season-banner-dates> Wake the city · Signal War · 2026-06-06T18:00:00-05:00 → 2026-09-01T22:00:00-05:00</span>
+  </p>
+  <p data-city-game-season-banner-body>Live updates appear on stickers around Cedar Rapids, Iowa and on this board. No account required.</p>
+</div>
+
+        <section
+          class="idea-section city-game-map-section"
+          id="city-state"
+          aria-labelledby="city-state-title"
+        >
+          <div id="city-game-map-root" class="city-game-map-root" data-season-id="cr_season_01_wake">
+            <noscript>
+              <p class="city-game-map-error">
+                City board needs JavaScript. Open
+                <a href="/data/city-game-cr-season-01.json">season data</a>
+                or scan any game sticker for live state.
+              </p>
+            </noscript>
+            <p class="city-game-map-loading" aria-live="polite">Loading city board…</p>
+          </div>
+        </section>
+
+        <p class="idea-footnote">
+          <a href="/play/cedar-rapids/">Full rules</a>
+          ·
+          <a href="/play/cedar-rapids/map/">Share this board</a>
+          ·
+          <a href="/play/season/">All city games</a>
+          ·
+          <a href="/data-policy.html">Data policy</a>
+        </p>
+      </main>
+    </div>
+    <script type="module" src="/js/city-game-map-page.mjs?v=1"></script>
+  </body>
+</html>

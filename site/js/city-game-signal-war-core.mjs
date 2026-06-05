@@ -74,12 +74,12 @@ export function resolveSignalWarGuideSteps(season) {
   }
   return [
     {
-      title: "Signal War — faction contest",
-      body: "Four teams fight for relay holds on the public board. Sanctuaries are treaty zones — pledge a faction there, no capture grinding.",
+      title: "Signal War. Faction contest",
+      body: "Four teams fight for relay holds on the public board. Sanctuaries are treaty zones. Pledge a faction there, no capture grinding.",
     },
     {
       title: "Operator-paced relays at open",
-      body: "At season open, relay holds flip from operator bulletins — not your personal scan count. Player capture opens mid-season when the season config enables it.",
+      body: "At season open, relay holds flip from operator bulletins. Not your personal scan count. Player capture opens mid-season when the season config enables it.",
     },
   ];
 }

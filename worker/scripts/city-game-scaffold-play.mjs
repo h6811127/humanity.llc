@@ -20,6 +20,10 @@ import {
   seasonLaunchContext,
 } from "../../site/js/city-game-season-path-core.mjs";
 import {
+  buildMapPageHtml,
+  verifyMapPageHtml,
+} from "../../site/js/city-game-map-page-scaffold-core.mjs";
+import {
   PILOT_PLAY_SLUG,
   buildPlayPageHtml,
   seasonWantsAutoRulesPage,
@@ -79,21 +83,30 @@ function main() {
   for (const { basename, config } of targets) {
     const ctx = seasonLaunchContext(config, basename);
     const outPath = join(root, ctx.rulesPageRel);
+    const mapOutPath = join(root, ctx.boardPageRel);
     const html = buildPlayPageHtml(config, basename);
     const verify = verifyPlayPageHtml(html, config);
+    const mapHtml = buildMapPageHtml(config, basename);
+    const mapVerify = verifyMapPageHtml(mapHtml, config);
 
     console.log(`\n${config.season_id} → ${ctx.rulesPageRel}`);
+    console.log(`  board → ${ctx.boardPageRel}`);
 
-    if (ctx.slug === PILOT_PLAY_SLUG && apply && !force) {
-      console.error(`  ✗ Refusing to overwrite pilot page without --force`);
+    const pilotGuard = ctx.slug === PILOT_PLAY_SLUG && apply && !force;
+
+    if (pilotGuard) {
+      console.error(`  ✗ Refusing to overwrite pilot rules page without --force`);
       failed = true;
-      continue;
-    }
-
-    if (apply) {
+    } else if (apply) {
       mkdirSync(dirname(outPath), { recursive: true });
       writeFileSync(outPath, html, "utf8");
       console.log(`  ✓ Wrote ${ctx.rulesPageRel}`);
+    }
+
+    if (apply) {
+      mkdirSync(dirname(mapOutPath), { recursive: true });
+      writeFileSync(mapOutPath, mapHtml, "utf8");
+      console.log(`  ✓ Wrote ${ctx.boardPageRel}`);
     }
 
     if (check) {
@@ -113,11 +126,34 @@ function main() {
       }
 
       if (!verify.ok) {
-        console.log("  ✗ Generated HTML issues:");
+        console.log("  ✗ Generated rules HTML issues:");
         for (const issue of verify.issues) console.log(`    · ${issue}`);
         failed = true;
+      } else if (apply && !pilotGuard) {
+        console.log("  ✓ Generated rules HTML passes contract");
+      }
+
+      if (existsSync(mapOutPath)) {
+        const mapOnDisk = readFileSync(mapOutPath, "utf8");
+        const mapDiskVerify = verifyMapPageHtml(mapOnDisk, config);
+        if (mapDiskVerify.ok) {
+          console.log("  ✓ On-disk map page matches season contract");
+        } else {
+          console.log("  ✗ On-disk map page issues:");
+          for (const issue of mapDiskVerify.issues) console.log(`    · ${issue}`);
+          if (!apply) failed = true;
+        }
+      } else if (!apply) {
+        console.log("  ✗ Missing on-disk map page (run with --apply)");
+        failed = true;
+      }
+
+      if (!mapVerify.ok) {
+        console.log("  ✗ Generated map HTML issues:");
+        for (const issue of mapVerify.issues) console.log(`    · ${issue}`);
+        failed = true;
       } else if (apply) {
-        console.log("  ✓ Generated HTML passes contract");
+        console.log("  ✓ Generated map HTML passes contract");
       }
     }
   }

@@ -38,7 +38,7 @@ export function buildMapPageHtml(season, jsonBasename) {
   const mapCopy = season.map_copy && typeof season.map_copy === "object"
     ? /** @type {Record<string, string>} */ (season.map_copy)
     : {};
-  const boardTitle = mapCopy.title?.trim() || "City board";
+  const boardTitle = mapCopy.title?.trim() || "Weekend city board";
   const isPlanned = season.status === "planned" || !formatSeasonWindowLabel(season);
   const robotsMeta = isPlanned
     ? '    <meta name="robots" content="noindex, nofollow" />\n'
@@ -53,7 +53,7 @@ export function buildMapPageHtml(season, jsonBasename) {
             <a href="/created/">/created/</a> to open the live board.
           </p>
         </div>`
-    : `${buildSeasonBannerBlock(season, jsonUrl, "rules")}`;
+    : `${buildSeasonBannerBlock(season, jsonUrl, "map")}`;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -117,6 +117,8 @@ ${robotsMeta}    <meta name="theme-color" content="#ffffff" />
 
         <p class="idea-footnote">
           <a href="${escapeHtml(ctx.rulesPath)}">Full rules</a>
+          ·
+          <a href="${escapeHtml(boardPath)}">Share this board</a>
           ·
           <a href="/play/season/">All city games</a>
           ·

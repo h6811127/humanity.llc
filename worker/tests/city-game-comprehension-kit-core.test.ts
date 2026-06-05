@@ -74,7 +74,7 @@ describe("city-game-comprehension-kit-core", () => {
     expect(html).toContain("place list");
     expect(html).toContain("https://humanity.llc/c/p?q=qr_04");
     expect(html).toContain("GT-7");
-    expect(html).toContain("#city-state");
+    expect(html).toContain("/play/cedar-rapids/map/");
     expect(html).toContain("noindex,nofollow");
   });
 
@@ -130,7 +130,7 @@ describe("city-game-comprehension-kit-core", () => {
       rulesUrl: "https://humanity.llc/play/cedar-rapids/",
       kitUrl: "https://humanity.llc/play/cedar-rapids/comprehension/",
       primaryScanUrl: "https://humanity.llc/c/CEen?q=qr_04",
-      boardUrl: "https://humanity.llc/play/cedar-rapids/#city-state",
+      boardUrl: "https://humanity.llc/play/cedar-rapids/map/",
     });
     const out = applyComprehensionRunbookProductionUrls(content, block);
     expect(out).toContain("2026-06-04");

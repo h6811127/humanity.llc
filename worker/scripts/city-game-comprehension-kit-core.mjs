@@ -134,7 +134,7 @@ export function buildComprehensionKitHtml(opts) {
       : `http://${host.includes(":") ? host.split(":")[0] : host}:8788/play/cedar-rapids/`);
   const boardUrl =
     opts.boardUrl?.trim() ||
-    `${rulesUrl.replace(/\/?$/, "/")}#city-state`;
+    `${rulesUrl.replace(/\/?$/, "/")}map/`;
   const primaryNodeId = comprehensionPrimaryNodeId(season);
   const primaryNode =
     opts.kitNodes.find((n) => n.node_id === primaryNodeId) ??

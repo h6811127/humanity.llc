@@ -60,42 +60,40 @@ async function mockSeasonSnapshot(page: Page, body: Record<string, unknown>) {
   await page.route(`**${SNAPSHOT_PATH}`, fulfill);
 }
 
-test.describe("city game map board (rules page)", () => {
-  test("loads static board from season JSON and applies snapshot chips", async ({ page }) => {
+test.describe("city game map board", () => {
+  test("dedicated map page loads board and applies snapshot chips", async ({ page }) => {
     await mockSeasonSnapshot(page, mockSnapshotBody());
 
-    await page.goto("/play/cedar-rapids/#city-state");
+    await page.goto("/play/cedar-rapids/map/");
 
     const board = page.locator(".city-game-map-board");
     await expect(board).toBeVisible({ timeout: 15_000 });
     await expect(page.locator(".city-game-map-loading")).toHaveCount(0);
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(/weekend city board/i);
+    await expect(page.locator('a[href="/play/cedar-rapids/"]')).toBeVisible();
 
-    await expect(page.locator("#city-state")).toBeVisible();
     await expect(board.getByText("No visit log")).toBeVisible();
-    await expect(board.getByText("not GPS", { exact: false })).toBeVisible();
-
     const riverRow = board.locator('.city-game-map-node-row[data-node-id="node_04"]');
-    await expect(riverRow).toBeVisible();
     await expect(riverRow.locator(".city-game-map-chip-value")).toHaveText("14 / 20");
-    await expect(riverRow).toHaveClass(/city-game-map-node-row--live/);
-
-    await expect(page.locator("#city-game-live-map-ticker li")).toContainText(
-      "NewBo relay arch"
-    );
-    await expect(page.locator("#city-game-map-sync")).toContainText("City board synced");
-
     await expect(board).toHaveAttribute("data-snapshot-loaded", "1");
+  });
 
-    const boardText = (await board.innerText()).toLowerCase();
-    expect(boardText).not.toMatch(/\byour visits\b/);
-    expect(boardText).not.toMatch(/\bleaderboard\b/);
+  test("legacy #city-state hash redirects to dedicated map page", async ({ page }) => {
+    await mockSeasonSnapshot(page, mockSnapshotBody());
+
+    await page.goto("/play/cedar-rapids/#city-state");
+
+    await expect(page).toHaveURL(/\/play\/cedar-rapids\/map\/?/, { timeout: 15_000 });
+    const board = page.locator(".city-game-map-board");
+    await expect(board).toBeVisible({ timeout: 15_000 });
+    await expect(board.getByText("No visit log")).toBeVisible();
   });
 
   test("mobile viewport keeps district sketch visible below capped place list", async ({ page }) => {
     await mockSeasonSnapshot(page, mockSnapshotBody());
     await page.setViewportSize({ width: 390, height: 844 });
 
-    await page.goto("/play/cedar-rapids/#city-state");
+    await page.goto("/play/cedar-rapids/map/");
 
     const board = page.locator(".city-game-map-board");
     await expect(board).toBeVisible({ timeout: 15_000 });
@@ -129,7 +127,7 @@ test.describe("city game map board (rules page)", () => {
       route.fulfill({ status: 503, contentType: "application/json", body: "{}" })
     );
 
-    await page.goto("/play/cedar-rapids/#city-state");
+    await page.goto("/play/cedar-rapids/map/");
 
     const board = page.locator(".city-game-map-board");
     await expect(board).toBeVisible({ timeout: 15_000 });

@@ -18,12 +18,12 @@ export const SELF_SERVE_STAGING_EXAMPLE_SEASON_ID = "example_city_season_01";
  */
 export function selfServeStagingWalkthroughSteps() {
   return [
-    "/create/ — season root card + game-operator public key (Organizer / issuer) · owner + recovery keys saved",
-    "/created/ Live · Manage — choose example (or your) season · confirm terminal mint notice",
-    "Bulk import starter registry — register all 15 nodes (no city-game:mint-node)",
-    "Issue scan QRs from hub rows or register form — download PNGs for install QA",
-    "Rules page & launch panel — set window + status · preview draft · download launch HTML · npm run build",
-    "Deploy Pages preview/staging — spot-scan node_01, node_04, node_07 on staging WebKit",
+    "/create/. Season root card + game-operator public key (Organizer / issuer) · owner + recovery keys saved",
+    "/created/ Live · Manage. Choose example (or your) season · confirm terminal mint notice",
+    "Bulk import starter registry. Register all 15 nodes (no city-game:mint-node)",
+    "Issue scan QRs from hub rows or register form. Download PNGs for install QA",
+    "Rules page & launch panel. Set window + status · preview draft · download launch HTML · npm run build",
+    "Deploy Pages preview/staging. Spot-scan node_01, node_04, node_07 on staging WebKit",
     "Sign E3 when complete: npm run city-game:self-serve-staging-preflight -- --expect-complete",
   ];
 }
@@ -59,10 +59,10 @@ export function assessSelfServeStagingReady(input) {
   if (!seasonUsesSelfServeSetup(season)) {
     if (isPilotTerminalMintSeason(season)) {
       blockers.push(
-        "Season is Cedar Rapids pilot — E3 targets self-serve seasons (example_city_season_01 or auto_rules_page)."
+        "Season is Cedar Rapids pilot · E3 targets self-serve seasons (example_city_season_01 or auto_rules_page)."
       );
     } else {
-      blockers.push("Season missing auto_rules_page — browser self-serve setup not enabled.");
+      blockers.push("Season missing auto_rules_page. Browser self-serve setup not enabled.");
     }
   }
 
@@ -74,7 +74,7 @@ export function assessSelfServeStagingReady(input) {
 
   if (expectedNodes < SELF_SERVE_STAGING_REQUIRED_NODE_COUNT) {
     warnings.push(
-      `Template has ${expectedNodes} nodes — E3 walkthrough expects ${SELF_SERVE_STAGING_REQUIRED_NODE_COUNT}.`
+      `Template has ${expectedNodes} nodes · E3 walkthrough expects ${SELF_SERVE_STAGING_REQUIRED_NODE_COUNT}.`
     );
   }
 
@@ -91,7 +91,7 @@ export function assessSelfServeStagingReady(input) {
   }
 
   if (input.rulesPublishReady === false) {
-    warnings.push("Rules publish panel not launch-ready — finish window/status/districts draft on /created/.");
+    warnings.push("Rules publish panel not launch-ready. Finish window/status/districts draft on /created/.");
   }
 
   if (!season.season_root_profile_id && input.profileId) {

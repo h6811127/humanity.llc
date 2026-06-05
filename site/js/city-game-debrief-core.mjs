@@ -164,8 +164,8 @@ export function renderDebriefPanel(root, input) {
 
   const phaseNote =
     phase === "after" || input.season.status === "ended"
-      ? `<p class="idea-footnote">Season window ended. This page names what the public objects showed — not who scanned what.</p>`
-      : `<p class="idea-footnote">Season still open — outcomes below reflect live snapshot truth and may change before close.</p>`;
+      ? `<p class="idea-footnote">Season window ended. This page names what the public objects showed. Not who scanned what.</p>`
+      : `<p class="idea-footnote">Season still open. Outcomes below reflect live snapshot truth and may change before close.</p>`;
 
   root.innerHTML = `<section class="idea-section" aria-labelledby="debrief-outcomes-title">
   <h2 class="group-label" id="debrief-outcomes-title">Public outcomes</h2>

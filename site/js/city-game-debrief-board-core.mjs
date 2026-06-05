@@ -42,7 +42,7 @@ export function buildDebriefBoardCtaHtml(season, now = new Date()) {
   >
   <h3 class="group-label" id="city-game-map-debrief-title">Season debrief</h3>
   <p class="group-intro short city-game-map-debrief-intro">
-    The window has closed. Read public outcomes and named coordination patterns from the same snapshot the board used — not a personal scoreboard.
+    The window has closed. Read public outcomes and named coordination patterns from the same snapshot the board used. Not a personal scoreboard.
   </p>
   <p><a class="btn btn-secondary" href="${escapeHtml(href)}">Open season debrief</a></p>
 </section>`;

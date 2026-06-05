@@ -17,7 +17,7 @@
     "downtown"
   ],
   "map_copy": {
-    "title": "City state",
+    "title": "Weekend city board",
     "subtitle": "Summer board · read-only",
     "live_hint": "Use the place list for names and directions. Scan the sticker when you arrive for live signed state — faction holds, quorum, fragments, and care pauses.",
     "wayfinding_intro": "Start anywhere — scan any game sticker you find. Planning from home? Search place names in your maps app; the sketch below is districts only, not streets.",
@@ -26,7 +26,7 @@
     "unlock_intro": "Paths below wake when the city unlocks them together — not when you personally check boxes."
   },
   "player_guide": {
-    "hero_subline": "Jump to the <a href=\"#city-state\">place list</a> — all spots by district, with Open in Maps links (scan each sticker for live chips).",
+    "hero_subline": "Open the <a href=\"/play/cedar-rapids/map/\">weekend city board</a> — every game spot, with Open in Maps links (scan each sticker for live chips).",
     "steps": [
       {
         "title": "No required first stop",
