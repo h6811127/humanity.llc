@@ -41,12 +41,12 @@ export function buildMapPageHtml(season, jsonBasename) {
   const boardTitle = mapCopy.title?.trim() || "Weekend city board";
   const heroObjective =
     mapCopy.hero_objective?.trim() ||
-    `Find stickers around ${city}. Scan them to move the city board.`;
+    `The city is asleep. Find fragments around ${city}.`;
   const isPlanned = season.status === "planned" || !formatSeasonWindowLabel(season);
   const robotsMeta = isPlanned
     ? '    <meta name="robots" content="noindex, nofollow" />\n'
     : "";
-  const metaDescription = `${heroObjective} Open places, live board state, and maps links. No app. No account.`;
+  const metaDescription = `${heroObjective} Weekend city board for ${city}. No app. No account.`;
 
   const bannerOrHint = isPlanned
     ? `<div class="research-dev-hint" role="note">
@@ -87,11 +87,9 @@ ${robotsMeta}    <meta name="theme-color" content="#ffffff" />
       <main class="screen screen-landing">
         <section class="hero hero-compact">
           <p class="hero-eyebrow">${escapeHtml(city)}</p>
-          <h1>${escapeHtml(boardTitle)}</h1>
-          <p class="hero-line">${escapeHtml(heroObjective)}</p>
+          <h1 id="city-state-title">${escapeHtml(boardTitle)}</h1>
           <p class="hero-line hero-line-sub">
-            <a href="${escapeHtml(ctx.rulesPath)}">How to play (rules)</a>
-            · scan any sticker when you arrive for the latest state
+            <a href="${escapeHtml(ctx.rulesPath)}">Rules</a>
           </p>
         </section>
 

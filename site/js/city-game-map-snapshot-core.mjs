@@ -2,7 +2,11 @@
  * Apply season snapshot JSON to the city board DOM (M2 live chips).
  * @see docs/CITY_GAME_MAP_DASHBOARD.md
  */
-import { escapeMapHtml } from "./city-game-map-board-core.mjs";
+import {
+  escapeMapHtml,
+  formatHookLine,
+  formatProgressLine,
+} from "./city-game-map-board-core.mjs";
 
 export const CITY_GAME_SNAPSHOT_POLL_MS = 90_000;
 export const CITY_GAME_SNAPSHOT_STALE_MS = CITY_GAME_SNAPSHOT_POLL_MS * 2;
@@ -23,7 +27,7 @@ export function seasonSnapshotUrl(seasonId, origin) {
  */
 export function buildNodeChipsHtml(chips) {
   if (!Array.isArray(chips) || !chips.length) {
-    return `<span class="city-game-map-live-hint">Scan for live state</span>`;
+    return `<span class="city-game-map-live-hint">Scan on arrival</span>`;
   }
   const items = chips
     .map((chip) => {
@@ -67,6 +71,35 @@ export function formatFinaleFootnote(finale, wakeTitle = "Wake the city") {
  * @param {HTMLElement} boardRoot
  * @param {Record<string, unknown>} snapshot
  */
+export function applyLobbyProgressFromSnapshot(boardRoot, snapshot) {
+  const lobby = boardRoot.querySelector(".city-game-map-lobby");
+  const progressEl = boardRoot.querySelector("#city-game-map-progress");
+  const hookEl = boardRoot.querySelector("#city-game-map-hook");
+  if (!lobby || typeof lobby !== "object" || !("dataset" in lobby)) return;
+
+  const dataset = /** @type {{ hook?: string; hookStirring?: string; hookAwake?: string; progressSuffix?: string }} */ (
+    lobby.dataset
+  );
+  const copy = {
+    hook: dataset.hook,
+    hook_stirring: dataset.hookStirring,
+    hook_awake: dataset.hookAwake,
+    progress_suffix: dataset.progressSuffix,
+  };
+  const finale = /** @type {Record<string, unknown>} */ (snapshot.finale);
+
+  if (progressEl && typeof progressEl === "object" && "textContent" in progressEl) {
+    progressEl.textContent = formatProgressLine(finale, copy);
+  }
+  if (hookEl && typeof hookEl === "object" && "textContent" in hookEl) {
+    hookEl.textContent = formatHookLine(finale, copy);
+  }
+}
+
+/**
+ * @param {HTMLElement} boardRoot
+ * @param {Record<string, unknown>} snapshot
+ */
 export function applyFinaleFromSnapshot(boardRoot, snapshot) {
   const footnote = boardRoot.querySelector("#city-game-map-finale-footnote");
   if (!(footnote instanceof HTMLElement)) return;
@@ -99,7 +132,7 @@ export function applySnapshotToMapBoard(boardRoot, snapshot) {
     if (!(live instanceof HTMLElement)) continue;
     const snap = nodeSnapshot(nodeById, nodeId);
     if (!snap) {
-      live.innerHTML = `<span class="city-game-map-live-hint">Scan for live state</span>`;
+      live.innerHTML = `<span class="city-game-map-live-hint">Scan on arrival</span>`;
       row.classList.remove("city-game-map-node-row--live");
       continue;
     }
@@ -151,16 +184,11 @@ export function applySnapshotToMapBoard(boardRoot, snapshot) {
   }
 
   const figcaption = boardRoot.querySelector(".city-game-map-figcaption");
-  if (figcaption instanceof HTMLElement) {
-    if (nodes.length) {
-      figcaption.textContent =
-        "Schematic layout only. Not GPS. Pins and chips show the same public object state as scan.";
-    } else if (Array.isArray(snapshot.headlines) && snapshot.headlines.length) {
-      figcaption.textContent =
-        "Schematic layout only. Not GPS. Headlines refresh from season schedule; scan stickers for node chips until mint.";
-    }
+  if (figcaption instanceof HTMLElement && nodes.length) {
+    figcaption.textContent = "District sketch — not a street map.";
   }
 
+  applyLobbyProgressFromSnapshot(boardRoot, snapshot);
   applyFinaleFromSnapshot(boardRoot, snapshot);
   applySignalWarFromSnapshot(boardRoot, snapshot);
 
@@ -219,7 +247,7 @@ export function applySignalWarFromSnapshot(boardRoot, snapshot) {
 export function markSnapshotStale(syncEl) {
   if (!(syncEl instanceof HTMLElement)) return;
   syncEl.classList.add("city-game-map-sync--stale");
-  syncEl.textContent = "Board may be stale. Last refresh failed. Scan nodes for live state.";
+  syncEl.textContent = "Couldn’t refresh. Scan a sticker for live state.";
 }
 
 /**
@@ -227,13 +255,13 @@ export function markSnapshotStale(syncEl) {
  */
 export function formatSyncLabel(iso) {
   const ms = Date.parse(iso);
-  if (!Number.isFinite(ms)) return "City board synced";
+  if (!Number.isFinite(ms)) return "Live board";
   const when = new Date(ms);
   const time = when.toLocaleTimeString(undefined, {
     hour: "numeric",
     minute: "2-digit",
   });
-  return `City board synced · ${time} local`;
+  return `Updated · ${time}`;
 }
 
 /**
@@ -246,7 +274,7 @@ export function renderTickerHeadlines(list, headlines) {
   const lines = Array.isArray(headlines) ? headlines.filter(Boolean) : [];
   if (!lines.length) {
     const li = document.createElement("li");
-    li.textContent = "Weekend board quiet. Scan nodes as the city wakes.";
+    li.textContent = "Quiet so far.";
     list.appendChild(li);
     return;
   }

@@ -10843,6 +10843,81 @@ body.device-shell-created .flow-keys-group .list-row {
   overflow-x: clip;
 }
 
+.city-game-map-lobby {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 4px 0 8px;
+}
+
+.city-game-map-hook {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--black);
+}
+
+.city-game-map-progress {
+  margin: 0;
+  font-size: clamp(28px, 7vw, 40px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--red);
+}
+
+.city-game-map-actions {
+  margin: 0 0 10px;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--grey);
+}
+
+.city-game-map-action-sep {
+  opacity: 0.55;
+}
+
+.city-game-map-places--primary {
+  padding: 14px 14px 12px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.city-game-map-places--primary .city-game-map-list-title {
+  margin: 0 0 6px;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.city-game-map-advanced {
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  padding-top: 8px;
+}
+
+.city-game-map-advanced-summary {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--grey);
+}
+
+.city-game-map-advanced-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: 12px;
+}
+
+.city-game-map-advanced .city-game-map-privacy {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--grey);
+}
+
 .city-game-map-header {
   display: flex;
   flex-direction: column;
@@ -10923,6 +10998,7 @@ body.device-shell-created .flow-keys-group .list-row {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  padding-top: 4px;
 }
 
 .city-game-map-places {

@@ -217,12 +217,12 @@ export function seasonBannerBodyHtml(phase, variant, season = {}) {
 
   if (variant === "map") {
     if (phase === "before") {
-      return `${seasonTitle} opens on the date above. You can browse spots below now; game progression starts when the window opens.`;
+      return "Browse places below. Play opens on the date above.";
     }
     if (phase === "after") {
-      return `${seasonTitle} has ended. Spots and public state below are for reference; scans still show readable object state.`;
+      return "Season ended. Board is reference only.";
     }
-    return `Live updates appear on stickers around ${city} and on this board. No account required.`;
+    return "Season live.";
   }
 
   if (variant === "rules") {

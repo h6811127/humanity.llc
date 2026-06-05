@@ -10,8 +10,13 @@ import {
   formatSyncLabel,
   isSchematicPinFogged,
   signalWarSummaryLines,
+  applyLobbyProgressFromSnapshot,
 } from "../../site/js/city-game-map-snapshot-core.mjs";
-import { buildMapBoardInnerHtml } from "../../site/js/city-game-map-board-core.mjs";
+import {
+  buildMapBoardInnerHtml,
+  formatHookLine,
+  formatProgressLine,
+} from "../../site/js/city-game-map-board-core.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 
@@ -49,6 +54,7 @@ describe("city-game map snapshot core", () => {
     });
     expect(html).toContain('id="city-game-map-sync"');
     expect(html).toContain('id="city-game-map-signal-war"');
+    expect(html).toContain('id="city-game-map-progress"');
     expect(html).toContain('data-edge-from="node_04"');
     expect(html).toContain('data-node-id="node_04"');
     expect(html).toContain("city-game-map-node-live");
@@ -56,7 +62,42 @@ describe("city-game map snapshot core", () => {
   });
 
   it("formats sync label from snapshot timestamp", () => {
-    expect(formatSyncLabel("2026-06-07T18:00:00.000Z")).toContain("City board synced");
+    expect(formatSyncLabel("2026-06-07T18:00:00.000Z")).toContain("Updated ·");
+  });
+
+  it("formats lobby hook and progress from snapshot finale", () => {
+    expect(formatProgressLine({ fragments: { claimed: 1, required: 3 } })).toBe(
+      "1 / 3 fragments recovered"
+    );
+    expect(formatHookLine({ fragments: { claimed: 1 } })).toBe("Something is stirring.");
+    expect(formatHookLine({ fragments: { claimed: 3, complete: true } })).toBe("The city woke.");
+
+    /** @type {Record<string, HTMLElement>} */
+    const nodes = {};
+    const lobby = {
+      dataset: {
+        hook: "The city is asleep.",
+        hookStirring: "Something is stirring.",
+        hookAwake: "The city woke.",
+        progressSuffix: "fragments recovered",
+      },
+    };
+    const progressEl = { textContent: "" };
+    const hookEl = { textContent: "" };
+    const boardRoot = {
+      querySelector: (sel) => {
+        if (sel === ".city-game-map-lobby") return lobby;
+        if (sel === "#city-game-map-progress") return progressEl;
+        if (sel === "#city-game-map-hook") return hookEl;
+        return nodes[sel] ?? null;
+      },
+    };
+
+    applyLobbyProgressFromSnapshot(/** @type {HTMLElement} */ (boardRoot), {
+      finale: { fragments: { claimed: 2, required: 3, complete: false } },
+    });
+    expect(progressEl.textContent).toBe("2 / 3 fragments recovered");
+    expect(hookEl.textContent).toBe("Something is stirring.");
   });
 
   it("extracts signal war summary lines from snapshot (SW-07)", () => {
