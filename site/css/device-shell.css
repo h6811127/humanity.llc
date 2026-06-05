@@ -852,24 +852,26 @@ body.device-glance-popover-open .device-hub-glance-popover:not([hidden]) {
 }
 
 .landing-device-settings {
-  margin: 20px 0 8px;
+  margin: 16px 0 6px;
 }
 
 .landing-device-settings-group {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .landing-device-settings-group:last-child {
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
-.landing-device-settings-group-label {
-  margin: 0 0 8px;
-  font-size: 12px;
+.landing-device-settings-group-label,
+.landing-docs-footer .group-label {
+  margin: 0 0 6px 4px;
+  font-size: 24px;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--grey);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  text-transform: none;
+  color: var(--shell-label);
 }
 
 .landing-device-settings-title {
