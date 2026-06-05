@@ -92,6 +92,7 @@ if (!skipTests) {
     "worker/tests/city-game-route-window-schedule.test.ts",
     "worker/tests/city-game-player-guide-core.test.ts",
     "worker/tests/city-game-play-page-core.test.ts",
+    "worker/tests/city-game-map-page-core.test.ts",
     "worker/tests/city-game-map-board-core.test.ts",
     "worker/tests/city-game-map-interaction-core.test.ts",
     "worker/tests/live-map-ticker.test.ts",

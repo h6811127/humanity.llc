@@ -1,8 +1,9 @@
 /**
- * Boot city board pages — snapshot board + season banner only.
+ * Boot city board pages — snapshot board, M4 list↔pin interaction, season banner.
  * @see docs/CITY_GAME_MAP_DASHBOARD.md
  */
 import { renderMapBoard, showMapBoardError } from "./city-game-map-board-core.mjs";
+import { bootCityGameMapInteraction } from "./city-game-map-interaction.mjs";
 import { bootCityGameMapSnapshot } from "./city-game-map-snapshot.mjs";
 import { resolvePlayPageSeason } from "./city-game-season-resolve.mjs";
 import { bootCityGameSeasonBanners } from "./city-game-season-banner-core.mjs";
@@ -40,6 +41,7 @@ export async function bootCityGameMapPage(root = document) {
 
     const boardRoot = mount.querySelector(".city-game-map-board");
     if (boardRoot instanceof HTMLElement) {
+      bootCityGameMapInteraction(boardRoot, season);
       bootCityGameMapSnapshot(
         boardRoot,
         String(season.season_id ?? resolved?.seasonId ?? "")
