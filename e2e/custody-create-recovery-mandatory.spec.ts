@@ -48,7 +48,7 @@ test.describe("create recovery mandatory for device_unlock (G-C2 · K13)", () =>
 
     const fullRadio = page.locator('input[name="custody_mode"][value="full_keys"]');
     await expect(fullRadio).toBeChecked({ timeout: 15_000 });
-    await expect(page.locator("#create-recovery-hint")).toContainText(/Recommended for full control/i);
+    await expect(page.locator("#create-recovery-hint")).toContainText(/Recommended for show-keys/i);
 
     const recoveryCb = page.locator("#generate-recovery");
     await expect(recoveryCb).toBeEnabled();

@@ -45,7 +45,7 @@ export function validateCreateRecoveryForCustody(input) {
   return {
     ok: false,
     error:
-      "This device (Face ID / Touch ID) requires a recovery method. Turn on recovery or choose full control keys.",
+      "This device requires a backup. Turn on backup or choose show keys (advanced).",
   };
 }
 

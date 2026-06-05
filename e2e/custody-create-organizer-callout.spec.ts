@@ -28,7 +28,7 @@ test.describe("create custody organizer Face ID callout", () => {
 
     await expect(callout).toBeVisible();
     await expect(page.locator("#create-custody-organizer-callout-title")).toContainText(
-      /Organizer revoke uses full control keys/i
+      /Organizer turn-off uses show-keys mode/i
     );
     await expect(page.locator('input[name="custody_mode"][value="device_unlock"]')).toBeDisabled();
 

@@ -52,7 +52,7 @@ export const UNLOCK_TO_MANAGE_IN_THIS_TAB = "Unlock to manage in this tab";
 export const UNLOCK_TO_MANAGE_IN_THIS_APP = "Unlock to manage in this app";
 
 export const UNLOCK_TO_MANAGE_PROMPT =
-  "Unlock to manage — tap to use Face ID / Touch ID";
+  "Unlock to manage. Tap to use Face ID / Touch ID";
 
 export const UNLOCK_NOT_IN_TAB_SUBTITLE =
   "Your object is saved on this device. Unlock here to manage or attest.";
@@ -64,7 +64,7 @@ export const CUSTODY_MIGRATE_MODE_DEVICE_UNLOCK =
 export const CUSTODY_MIGRATE_MODE_FULL_KEYS = "Full control keys";
 
 export const CUSTODY_MIGRATE_SUMMARY_DEVICE_UNLOCK =
-  "Passkey-wrapped — unlock to manage";
+  "Passkey-wrapped. Unlock to manage";
 
 export const CUSTODY_MIGRATE_SUMMARY_FULL_KEYS =
   "Raw signing key saved in this browser";
@@ -88,33 +88,49 @@ export const CUSTODY_REENROLL_DEVICE_UNLOCK_LEAD =
 export const CUSTODY_REENROLL_DEVICE_UNLOCK_BTN = "Set up Face ID on this device";
 
 export const CUSTODY_REENROLL_NEED_BACKUP_HINT =
-  "Import your encrypted backup on Manage first — recovery code alone cannot enroll a new passkey.";
+  "Import your encrypted backup on Manage first. Recovery code alone cannot enroll a new passkey.";
 
-/** /create/ Device control hints (G-C3 · K12). */
+/** /create/ pre-submit trust stack (P0). */
+export const CREATE_PUBLIC_CARD_NOTICE =
+  "Your @name and message will be public. Save on this device after create. We can't restore access if you lose this tab.";
+
+export const CREATE_RECOVERY_HINT_DEVICE_UNLOCK =
+  "You'll save a backup on the next screen. Backups are not stored by humanity.llc.";
+
+export const CREATE_RECOVERY_LABEL_DEVICE_UNLOCK = "Include backup (required for this device)";
+
+export const CREATE_RECOVERY_HINT_FULL_KEYS =
+  "Recommended for show-keys mode. Save on the next screen.";
+
+export const CREATE_RECOVERY_LABEL_FULL_KEYS = "Include backup (optional)";
+
+export const CREATE_CUSTODY_SUMMARY = "Use this device to manage updates.";
+
+/** /create/ Device control hints — Advanced disclosure (G-C3 · K12). */
 export const CREATE_CUSTODY_DEVICE_UNLOCK_DEFAULT_HINT =
-  "This device locks your signing key behind your passkey. You won't manage raw keys in normal use.";
+  "Face ID or Touch ID on this phone unlocks updates. You won't see raw keys in normal use.";
 
 export const CREATE_CUSTODY_ORGANIZER_FULL_KEYS_HINT =
-  "Organizer revoke requires full control keys on this device.";
+  "Organizer turn-off permission requires show-keys mode on this device.";
 
 export const CREATE_CUSTODY_GAME_SEASON_FULL_KEYS_HINT =
-  "City game seasons need full control keys so your game-operator key stays available for node registration.";
+  "City game seasons require show-keys mode so season operator access stays available on Live.";
 
 export const CREATE_CUSTODY_WEBAUTHN_UNAVAILABLE_HINT =
-  "This browser cannot use Face ID / Touch ID device unlock. Full control keys will be used.";
+  "This browser cannot use Face ID / Touch ID. Show keys (advanced) will be used.";
 
 /** Alert when /created/ setup save would enroll Face ID during game season flow. */
 export const GAME_SEASON_FACE_ID_SAVE_BLOCKED_MESSAGE =
-  "City game seasons can't use Face ID only. Choose full control keys when you save — you need the game-operator key for registering nodes on Live.";
+  "City game seasons can't use Face ID only. Choose full control keys when you save. You need the game-operator key for registering nodes on Live.";
 
 /** /create/ — when organizer revoke blocks Face ID (organizer + WebAuthn available). */
 export const CREATE_CUSTODY_ORGANIZER_FACE_ID_CALLOUT_EYEBROW = "Face ID unavailable";
 
 export const CREATE_CUSTODY_ORGANIZER_FACE_ID_CALLOUT_TITLE =
-  "Organizer revoke uses full control keys";
+  "Organizer turn-off uses show-keys mode";
 
 export const CREATE_CUSTODY_ORGANIZER_FACE_ID_CALLOUT_DETAIL =
-  "Turn off Register an organizer revoke key above to choose This device (Face ID / Touch ID).";
+  "Turn off organizer turn-off permission above to choose This device (recommended).";
 
 export const CREATE_CUSTODY_ORGANIZER_FACE_ID_CALLOUT_ACTION =
   "Go to organizer revoke setting";
@@ -123,13 +139,13 @@ export const CREATE_CUSTODY_ORGANIZER_FACE_ID_CALLOUT_ACTION =
 export const CREATE_CUSTODY_GAME_SEASON_FACE_ID_CALLOUT_EYEBROW = "Face ID unavailable";
 
 export const CREATE_CUSTODY_GAME_SEASON_FACE_ID_CALLOUT_TITLE =
-  "City game seasons use full control keys";
+  "City game seasons use show-keys mode";
 
 export const CREATE_CUSTODY_GAME_SEASON_FACE_ID_CALLOUT_DETAIL =
-  "Organizing a live season registers a game-operator key with your owner keys. Face ID only wraps the owner key and hides the operator key you need on Live.";
+  "Season setup needs operator access on this device. This device (recommended) is not available for city game seasons.";
 
 export const CREATE_CUSTODY_GAME_SEASON_FACE_ID_CALLOUT_ACTION =
-  "Use full control keys";
+  "Use show keys (advanced)";
 
 export const HUB_RECOVERY_DEVICE_UNLOCK_REENROLL_HINT =
   "Recovery saved. Import your encrypted backup, then set up Face ID on this device in Manage.";
@@ -227,11 +243,11 @@ export const VIEW_ONLY_LIVE_TAB_LEAD =
 
 /** Setup wizard protect step (Phase 2 · K7 · WS-CUSTODY C0). */
 export const SETUP_SEATBELT_PANEL_LEAD =
-  "Before your object goes live, save a recovery method. Your phone holds control — humanity.llc cannot restore it if this device is lost.";
+  "Before your object goes live, save a recovery method. Your phone holds control. Humanity.llc cannot restore it if this device is lost.";
 
 /** Protect step — device_unlock (WS-CUSTODY G-C1). */
 export const SETUP_SEATBELT_DEVICE_UNLOCK_LEAD =
-  "Before your object goes live, confirm your recovery method. Face ID locks signing on this device — humanity.llc cannot restore it if you lose the phone and skip backup.";
+  "Before your object goes live, confirm your recovery method. Face ID locks signing on this device. Humanity.llc cannot restore it if you lose the phone and skip backup.";
 
 export const CUSTODY_RECOVERY_DEVICE_UNLOCK_PLATFORM_SYNC =
   "Face ID on this device is not a Humanity recovery path. Save the recovery code below or download an encrypted backup before going live.";
@@ -254,7 +270,7 @@ export const SETUP_SEATBELT_RECOVERY_SAVED_STATUS =
 
 /** Setup protect step — iOS Safari storage eviction (RC-3). */
 export const SETUP_SEATBELT_IOS_SAFARI_HINT =
-  "On iPhone Safari, saved cards can be deleted after about seven days without a visit, or when storage is low. If you add humanity.llc to your Home Screen, use only that icon — Safari tabs are a separate copy. Keep your recovery code or encrypted backup.";
+  "On iPhone Safari, saved cards can be deleted after about seven days without a visit, or when storage is low. If you add humanity.llc to your Home Screen, use only that icon · Safari tabs are a separate copy. Keep your recovery code or encrypted backup.";
 
 /** Setup done step — Home Screen guidance after first live (RC-3). */
 export const SETUP_DONE_IOS_HOME_SCREEN_EYEBROW = "iPhone tip";
@@ -263,7 +279,7 @@ export const SETUP_DONE_IOS_HOME_SCREEN_TITLE =
   "Add to Home Screen after you finish here";
 
 export const SETUP_DONE_IOS_HOME_SCREEN_DETAIL =
-  "Tap Share → Add to Home Screen, then manage your cards only from that icon. Never remove it to refresh — pull down in the app instead. Keep your recovery backup. For printed QRs, tap the scan icon in the app — not your camera alone.";
+  "Tap Share → Add to Home Screen, then manage your cards only from that icon. Never remove it to refresh. Pull down in the app instead. Keep your recovery backup. For printed QRs, tap the scan icon in the app. Not your camera alone.";
 
 /** Setup QR step — prefer in-app scan after print (WS-CUSTODY C0). */
 export const SETUP_PRINT_IN_APP_HINT =
@@ -280,10 +296,10 @@ export const SETUP_TEST_SCAN_IN_APP_LABEL = "Scan with this app";
 export const SETUP_TEST_SCAN_EXTERNAL_LABEL = "Preview in browser tab";
 
 export const SETUP_TEST_SCAN_HINT =
-  "Optional preview. Tap Continue when you are ready to save recovery — you do not need to scan first.";
+  "Optional preview. Tap Continue when you are ready to save recovery. You do not need to scan first.";
 
 export const SETUP_PRINT_DEVICE_UNLOCK_HINT =
-  "After you print: unlock with Face ID on this device when you update status — strangers only see the scan page.";
+  "After you print: unlock with Face ID on this device when you update status. Strangers only see the scan page.";
 
 export const SETUP_TEST_SCAN_DEVICE_UNLOCK_LEAD =
   "Preview what scanners see. Face ID unlock is separate from the public scan page.";
@@ -292,10 +308,10 @@ export const SETUP_TEST_SCAN_DEVICE_UNLOCK_HINT =
   "Use in-app scan to stay in humanity.llc, or open the scan page in a browser tab.";
 
 export const SETUP_DONE_DEVICE_UNLOCK_IOS_DETAIL =
-  "Add to Home Screen and open cards only from that icon. Face ID unlock applies in this app — keep your recovery backup.";
+  "Add to Home Screen and open cards only from that icon. Face ID unlock applies in this app. Keep your recovery backup.";
 
 export const DEVICE_UNLOCK_WEBAUTHN_CANCELED_HINT =
-  "Face ID was canceled — your card is still here. Try again when you are ready to unlock.";
+  "Face ID was canceled. Your card is still here. Try again when you are ready to unlock.";
 
 export const DEFAULT_FOR_ATTESTATION = "Default for attestation";
 
@@ -317,13 +333,13 @@ export const VOUCH_EXPLAINER_EYEBROW = "Your control";
 export const VOUCH_EXPLAINER_TITLE = "Checking this tab";
 
 export const VOUCH_EXPLAINER_INITIAL_COPY =
-  "Checking whether you have control of your identity in this tab. Steward and Vouched Human are network checks—separate from attestation. " +
+  "Checking whether you have control of your identity in this tab. Steward and Vouched Human are network checks, separate from attestation. " +
   "Use <strong>Attest as…</strong> or <a href=\"WALLET_HREF\">My objects</a>. " +
   "Only the signed attestation is sent; your control stays on this device.";
 
 /** Live control scanner lead (M7 comprehension). */
 export const LIVE_CONTROL_SCANNER_LEAD =
-  "Ask the owner to prove they can respond with control of this object—right now, on the spot.";
+  "Ask the owner to prove they can respond with control of this object, right now, on the spot.";
 
 /** Live control success panel (M7 L1–L2 · H-002). */
 export const LIVE_CONTROL_SUCCESS_TITLE = "Control proven";
@@ -402,7 +418,7 @@ export const WALLET_CORRUPT_HUB_TITLE =
   "Ownership data on this device could not be read";
 
 export const WALLET_CORRUPT_HUB_DETAIL =
-  "Local storage for saved cards is damaged. Import an encrypted backup or recovery code below — humanity.llc cannot repair this browser file.";
+  "Local storage for saved cards is damaged. Import an encrypted backup or recovery code below. Humanity.llc cannot repair this browser file.";
 
 /** /wallet/ tab hint when `hc_wallet` is corrupt (P1-4 step 2). */
 export const WALLET_CORRUPT_PAGE_DETAIL =
@@ -423,7 +439,7 @@ export const RESTORE_CONTROL_IN_THIS_APP = OPEN_CONTROLS_ACTION;
  * @see docs/PWA_INSTALL.md § iPhone home screen custody
  */
 export const IOS_PWA_NEVER_REMOVE_ICON_WITHOUT_BACKUP =
-  "Never remove the Home Screen icon to refresh or clear cache — iOS deletes saved cards when you remove it. Pull down to refresh instead. Keep an encrypted backup or recovery code before removing the icon.";
+  "Never remove the Home Screen icon to refresh or clear cache. IOS deletes saved cards when you remove it. Pull down to refresh instead. Keep an encrypted backup or recovery code before removing the icon.";
 
 export const PWA_MISMATCH_TITLE_STANDALONE =
   "Use only this app on iPhone";
@@ -435,14 +451,14 @@ export const PWA_MISMATCH_TITLE_BROWSER =
   "Use your Home Screen app on iPhone";
 
 export const PWA_MISMATCH_DETAIL_BROWSER =
-  "On iPhone, Safari and the installed app do not share saved cards. After Add to Home Screen, open humanity.llc only from that icon — not Safari. To use Safari again, export a backup from the home screen app and import it here.";
+  "On iPhone, Safari and the installed app do not share saved cards. After Add to Home Screen, open humanity.llc only from that icon. Not Safari. To use Safari again, export a backup from the home screen app and import it here.";
 
 /** Safari tab with no wallet rows after the user last signed in the home screen app (iOS storage split). */
 export const PWA_MISMATCH_TITLE_BROWSER_EMPTY =
   "Your cards are in the Home Screen app";
 
 export const PWA_MISMATCH_DETAIL_BROWSER_EMPTY =
-  "On iPhone, Safari and the installed app keep separate saved cards. Open humanity.llc from your home screen icon — not this Safari tab. To manage cards here instead, export a backup from the app and import it below.";
+  "On iPhone, Safari and the installed app keep separate saved cards. Open humanity.llc from your home screen icon. Not this Safari tab. To manage cards here instead, export a backup from the app and import it below.";
 
 /** iOS Safari ITP storage eviction notice (P2-1 · R4). */
 export const SAFARI_ITP_NOTICE_EYEBROW = "iPhone storage";
@@ -450,10 +466,10 @@ export const SAFARI_ITP_NOTICE_EYEBROW = "iPhone storage";
 export const SAFARI_ITP_NOTICE_TITLE = "On iPhone, pick one app";
 
 export const SAFARI_ITP_NOTICE_DETAIL_BROWSER =
-  "Safari and your Home Screen app store cards separately. If you added humanity.llc to your Home Screen, use only that icon — not Safari tabs. Safari may also delete saved cards after about seven days without a visit. Never remove the Home Screen icon to refresh — pull down in the app instead. Keep an encrypted backup.";
+  "Safari and your Home Screen app store cards separately. If you added humanity.llc to your Home Screen, use only that icon. Not Safari tabs. Safari may also delete saved cards after about seven days without a visit. Never remove the Home Screen icon to refresh. Pull down in the app instead. Keep an encrypted backup.";
 
 export const SAFARI_ITP_NOTICE_DETAIL_STANDALONE =
-  "Use only this home screen icon on iPhone — not Safari tabs. iOS keeps them as separate saved wallets. Open this app regularly so iOS does not clear storage. Never remove this icon to refresh — pull down instead; iOS deletes saved cards when you remove it. Keep an encrypted backup.";
+  "Use only this home screen icon on iPhone. Not Safari tabs. IOS keeps them as separate saved wallets. Open this app regularly so iOS does not clear storage. Never remove this icon to refresh. Pull down instead; iOS deletes saved cards when you remove it. Keep an encrypted backup.";
 
 /** iOS Safari persist() denied — saved ownership may be evicted (RC-2). */
 export const STORAGE_PERSIST_DENIED_EYEBROW = "iPhone storage";
@@ -501,13 +517,13 @@ export const EPHEMERAL_BROWSING_DETAIL =
   "Private or temporary browsing modes delete site storage when you close the tab. Open humanity.llc in a normal browser window to create cards and save control on this device.";
 
 export const EPHEMERAL_BROWSING_CREATE_BLOCKED =
-  "Cannot create in private browsing — ownership cannot be saved on this device. Open humanity.llc in a normal browser window and try again.";
+  "Cannot create in private browsing. Ownership cannot be saved on this device. Open humanity.llc in a normal browser window and try again.";
 
 export const EPHEMERAL_BROWSING_SAVE_BLOCKED =
-  "Cannot save ownership in private browsing — it will not stay on this device. Open humanity.llc in a normal browser window and save again.";
+  "Cannot save ownership in private browsing. It will not stay on this device. Open humanity.llc in a normal browser window and save again.";
 
 /** Hub / wallet empty state — Layer 2 (D9). @see docs/HUB_STRANGER_ONBOARDING.md */
-export const HUB_PINS_BOOKMARKS_ONLY = "Bookmarks only — cannot manage objects";
+export const HUB_PINS_BOOKMARKS_ONLY = "Bookmarks only. Cannot manage objects";
 
 /** Hub restore group label (backup + steward scan handoff · S4). */
 export const HUB_RESTORE_GROUP_LABEL = "Restore & scan";
@@ -518,17 +534,17 @@ export const HUB_STEWARD_VOUCH_GUIDANCE_EYEBROW = "Printed QR on iPhone";
 export const HUB_STEWARD_VOUCH_GUIDANCE_TITLE = "Vouch from this app";
 
 export const HUB_STEWARD_VOUCH_GUIDANCE_DETAIL =
-  "Your camera opens Safari, which does not share cards with this Home Screen app. Tap the scan icon in the top bar — or use Open scan link after copying the URL in Safari. Never remove this Home Screen icon to refresh — pull down instead.";
+  "Your camera opens Safari, which does not share cards with this Home Screen app. Tap the scan icon in the top bar. Or use Open scan link after copying the URL in Safari. Never remove this Home Screen icon to refresh. Pull down instead.";
 
 /** Hub steward vouch guidance — Safari browser on iPhone (S4). */
-export const HUB_STEWARD_SAFARI_VOUCH_GUIDANCE_TITLE = "Your card is here — use this browser";
+export const HUB_STEWARD_SAFARI_VOUCH_GUIDANCE_TITLE = "Your card is here. Use this browser";
 
 export const HUB_STEWARD_SAFARI_VOUCH_GUIDANCE_DETAIL =
-  "Your camera opens this Safari tab. Keep your steward card saved here before you vouch. If you use the Home Screen app instead, use the scan icon in the app — not the Camera app alone.";
+  "Your camera opens this Safari tab. Keep your steward card saved here before you vouch. If you use the Home Screen app instead, use the scan icon in the app. Not the Camera app alone.";
 
 /** PWA install card — iOS manual Add to Home Screen detail (S4). */
 export const PWA_INSTALL_IOS_DETAIL =
-  "Same keys and inbox — no account. Tap Share → Add to Home Screen, then use only that icon on iPhone. Never remove it to refresh — pull down instead. Keep a backup. For prints, tap the scan icon in the app — not your camera alone.";
+  "Same keys and inbox. No account. Tap Share → Add to Home Screen, then use only that icon on iPhone. Never remove it to refresh. Pull down instead. Keep a backup. For prints, tap the scan icon in the app. Not your camera alone.";
 
 /** Hub backup import summary line (Phase 4). */
 export const HUB_RESTORE_IMPORT_SUMMARY = "Encrypted backup file";
@@ -542,30 +558,30 @@ export const HUB_RESTORE_RECOVERY_SUMMARY = "Recovery code (no file)";
 
 /** Hub recovery import hint — primary cross-device path without file transfer. */
 export const HUB_RESTORE_RECOVERY_HINT =
-  "Paste your scan link (or profile ID) and the recovery code you saved at create. Works across Safari and your Home Screen app — no file transfer.";
+  "Paste your scan link (or profile ID) and the recovery code you saved at create. Works across Safari and your Home Screen app. No file transfer.";
 
 /** Scan page — print_artifact owner path to /created/#restore. */
 export const SCAN_OWNER_RESTORE_CTA_LABEL = OPEN_CONTROLS_ACTION;
 
 export const SCAN_OWNER_RESTORE_CTA_HINT =
-  "Is this your printed object? Open your card page to import a recovery code or encrypted backup. Control stays on this device — humanity.llc cannot restore keys for you.";
+  "Is this your printed object? Open your card page to import a recovery code or encrypted backup. Control stays on this device. Humanity.llc cannot restore keys for you.";
 
 /** Hub open scan link — after iPhone camera opens Safari (PWA handoff). */
 export const HUB_OPEN_SCAN_SUMMARY = "Open a scan in this app";
 
 export const HUB_OPEN_SCAN_HINT =
-  "After your camera opens Safari, copy the scan link there, then paste it here to open the same scan in your Home Screen app — where your steward card lives.";
+  "After your camera opens Safari, copy the scan link there, then paste it here to open the same scan in your Home Screen app. Where your steward card lives.";
 
 /** Vouch / attest when iPhone camera landed in Safari with empty wallet. */
 export const VOUCH_PWA_CAMERA_HANDOFF_LEAD =
-  "Your camera opened Safari, but your steward card is in your Home Screen app. iPhone keeps them separate — you cannot attest from Safari alone.";
+  "Your camera opened Safari, but your steward card is in your Home Screen app. IPhone keeps them separate. You cannot attest from Safari alone.";
 
 export const VOUCH_PWA_CAMERA_HANDOFF_STEPS =
   "Copy this scan link → open humanity.llc from your Home Screen → tap the status dot → Open scan link → paste → attest.";
 
 /** Safari steward landing with `?hc_steward=1` (S5). */
 export const VOUCH_PWA_STEWARD_PARAM_HANDOFF_LEAD =
-  "This scan is for stewards who vouch from a Home Screen app. Your camera opened Safari — your steward card is not in this tab.";
+  "This scan is for stewards who vouch from a Home Screen app. Your camera opened Safari. Your steward card is not in this tab.";
 
 export const VOUCH_PWA_STEWARD_PARAM_HANDOFF_STEPS =
   "Copy this scan link → open humanity.llc from your Home Screen icon → status dot → Open scan link → paste → attest.";
@@ -577,7 +593,7 @@ export const STEWARD_HANDOFF_INTERSTITIAL_TITLE =
   "Open this scan in your Home Screen app";
 
 export const STEWARD_HANDOFF_INTERSTITIAL_DETAIL =
-  "Your camera opened Safari. On iPhone, your steward card lives in the Home Screen app — not this tab. Copy the scan link below, switch apps, then paste under Open scan link.";
+  "Your camera opened Safari. On iPhone, your steward card lives in the Home Screen app. Not this tab. Copy the scan link below, switch apps, then paste under Open scan link.";
 
 export const STEWARD_HANDOFF_INTERSTITIAL_CONTINUE = "Continue to scan page";
 
@@ -585,17 +601,17 @@ export const STEWARD_HANDOFF_INTERSTITIAL_COPY = "Copy scan link";
 
 /** Dual-QR print materials on /created/ (S7). */
 export const DUAL_QR_SECTION_LEAD =
-  "Print the public QR for strangers. Optionally add a steward handoff QR on internal collateral only — never replace the public code.";
+  "Print the public QR for strangers. Optionally add a steward handoff QR on internal collateral only. Never replace the public code.";
 
 export const DUAL_QR_PUBLIC_LABEL = "Public scan";
 
 export const DUAL_QR_PUBLIC_HINT =
-  "For strangers — outward-facing print. Encodes the standard https scan link.";
+  "For strangers. Outward-facing print. Encodes the standard https scan link.";
 
 export const DUAL_QR_STEWARD_LABEL = "Steward handoff";
 
 export const DUAL_QR_STEWARD_HINT =
-  "Internal only — shorter link for stewards who vouch from a Home Screen app. Opens a Safari handoff page.";
+  "Internal only. Shorter link for stewards who vouch from a Home Screen app. Opens a Safari handoff page.";
 
 export const COPY_STEWARD_HANDOFF_LINK = "Copy steward handoff link";
 
@@ -605,7 +621,7 @@ export const DOWNLOAD_PUBLIC_QR = "Download public QR";
 
 /** Print & share disclosure → Full-size QR steward discovery (RC-2 / S7). */
 export const PRINT_SHARE_STEWARD_DISCOVERY =
-  "This downloads the public QR for strangers. For an optional steward handoff QR on internal collateral, open Full-size QR below — never replace the public code on outward-facing print.";
+  "This downloads the public QR for strangers. For an optional steward handoff QR on internal collateral, open Full-size QR below. Never replace the public code on outward-facing print.";
 
 export const PRINT_SHARE_STEWARD_FULL_SIZE_CTA = "View steward handoff QR";
 

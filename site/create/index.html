@@ -33,7 +33,7 @@
       })();
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=5" />
-    <link rel="stylesheet" href="/styles.css?v=147" />
+    <link rel="stylesheet" href="/styles.css?v=150" />
     <link rel="stylesheet" href="/css/device-shell.css?v=94" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=30" />
   </head>
@@ -248,7 +248,7 @@
             data-hub-group="pins"
           >
             <p class="device-hub-subgroup-label">Pinned scans</p>
-            <p class="wallet-section-hint">Bookmarks only — cannot manage objects</p>
+            <p class="wallet-section-hint">Bookmarks only. Cannot manage objects</p>
             <ul class="list list-compact" id="device-hub-pins-list" hidden></ul>
             <p class="device-hub-section-empty" id="device-hub-pins-empty">
               Your pinned scans will show here.
@@ -380,7 +380,7 @@
           >
             <h3 class="device-hub-section-title" id="device-hub-actions-title">Recent device actions</h3>
             <p class="device-hub-section-lead">
-              Things this browser did — saved keys, signed live proof, loaded keys.
+              Things this browser did. Saved keys, signed live proof, loaded keys.
             </p>
             <div
               class="device-hub-group device-hub-group--empty device-hub-activity-group"
@@ -408,11 +408,11 @@
             <p class="hero-eyebrow">Create</p>
             <h1 id="create-chooser-hero-title">Pick how you want to start</h1>
             <p class="hero-line" id="create-chooser-hero-lead">
-              Same primitive — live state on a physical thing.
+              Same primitive. Live state on a physical thing.
             </p>
           </section>
           <h2 class="landing-launch-doors-title group-label" id="create-entry-chooser-title">
-            Two ways to make live status
+            Ways to make live status
           </h2>
           <ul
             class="list list-compact landing-launch-doors-list"
@@ -420,7 +420,8 @@
             aria-labelledby="create-entry-chooser-title"
           ></ul>
           <p class="landing-launch-doors-note">
-            <a href="/play/cedar-rapids/">Play Cedar Rapids</a> ·
+            <a href="/play/cedar-rapids/map/">Cedar Rapids city board</a> ·
+            <a href="/play/cedar-rapids/">Rules</a> ·
             <a href="/create/?intent=game">Organize a live season</a> ·
             <a href="/case-study/">See the full loop</a>
           </p>
@@ -436,12 +437,8 @@
           <p class="hero-eyebrow">Create</p>
           <h1 id="create-hero-title">Create a live card</h1>
           <p class="hero-line" id="create-hero-lead">
-            One general live card on the network — add status plates, lost-item relays, and more from
-            Live after create. Signed QR, live status — not a frozen link.
-          </p>
-          <p class="hero-line hero-line-sub">
-            Control stays in this tab until you save ownership on this device, add a recovery
-            method, or export an encrypted backup if you want to revoke later.
+            One general live card on the network. Add status plates, lost-item relays, and more from
+            Live after create. Signed QR, live status. Not a frozen link.
           </p>
         </section>
 
@@ -536,28 +533,87 @@
           </details>
 
           <section
+            class="flow-form-section flow-inset-fields create-game-season-fork"
+            id="create-game-season-fork"
+            hidden
+            aria-labelledby="create-game-season-fork-title"
+          >
+            <h2 class="group-label" id="create-game-season-fork-title">
+              How should this season live on the network?
+            </h2>
+            <p class="form-hint">
+              Same primitive either way. Pick the identity story that matches your season.
+            </p>
+            <div class="create-season-fork-list" role="group" aria-label="Season account choice">
+              <button
+                type="button"
+                class="create-season-fork-card"
+                id="create-game-season-fork-existing"
+                data-season-fork="existing"
+              >
+                <span class="create-season-fork-rec"></span>
+                <span class="create-season-fork-title"></span>
+                <span class="create-season-fork-sub"></span>
+              </button>
+              <button
+                type="button"
+                class="create-season-fork-card"
+                id="create-game-season-fork-dedicated"
+                data-season-fork="dedicated"
+              >
+                <span class="create-season-fork-rec"></span>
+                <span class="create-season-fork-title"></span>
+                <span class="create-season-fork-sub"></span>
+              </button>
+            </div>
+          </section>
+
+          <section
             class="flow-form-section flow-inset-fields create-game-season-wizard"
             id="create-game-season-wizard"
             hidden
             aria-labelledby="create-game-season-wizard-title"
           >
-            <h2 class="group-label" id="create-game-season-wizard-title">Season root card</h2>
+            <h2 class="group-label" id="create-game-season-wizard-title">Season setup</h2>
             <p class="form-hint">
-              Creates a general root with an organizer key. After create you will register game nodes,
-              publish rules, and export print packs from Live.
+              Register the game-operator key, then add game nodes, publish rules, and export print
+              packs from Live.
             </p>
-            <label class="form-label" for="game-season-id">Season id</label>
-            <input
-              class="form-input"
-              id="game-season-id"
-              name="game_season_id"
-              maxlength="48"
-              placeholder="my_city_season_01"
-              autocomplete="off"
-              required
-            />
+            <p class="form-hint" id="game-season-redirect-hint" hidden></p>
+            <div id="game-season-id-block">
+              <label class="form-label" for="game-season-id">Season id</label>
+              <input
+                class="form-input"
+                id="game-season-id"
+                name="game_season_id"
+                maxlength="48"
+                placeholder="my_city_season_01"
+                autocomplete="off"
+                autocapitalize="off"
+                autocorrect="off"
+                spellcheck="false"
+                inputmode="text"
+                enterkeyhint="next"
+                required
+              />
+              <p class="form-hint">
+                Lowercase slug (letters, numbers, underscores). Used when registering game nodes.
+              </p>
+            </div>
+          </section>
+
+          <section
+            class="flow-form-section flow-inset-fields create-wear-wizard"
+            id="create-wear-wizard"
+            hidden
+            aria-labelledby="create-wear-wizard-title"
+          >
+            <h2 class="group-label" id="create-wear-wizard-title">Your QR on what you wear</h2>
             <p class="form-hint">
-              Lowercase slug (letters, numbers, underscores). Used when registering game nodes.
+              Free BYOP path. Sign a live card, download the QR, and print on your own hoodie,
+              jacket, or sticker. Buying the
+              <a href="/shop/customize/?product=glitch_hoodie_v1">Glitch hoodie</a> is optional
+              print quality and fulfillment; the live primitive is the same.
             </p>
           </section>
 
@@ -590,13 +646,14 @@
               name="deploy_scanner_line"
               maxlength="199"
               rows="2"
-              placeholder="Open · Thu–Sun until 9 PM"
+              placeholder="Open · Thu to Sun until 9 PM"
             ></textarea>
             <p class="form-hint" id="deploy-scanner-line-hint">
-              Live status line — change it later on Live without reprinting the QR.
+              Live status line. Change it later on Live without reprinting the QR.
             </p>
           </section>
 
+          <div class="create-form-main-fields" id="create-form-main-fields">
           <section class="flow-form-section flow-inset-fields">
           <label class="form-label" for="handle">Handle</label>
           <input
@@ -632,7 +689,7 @@
               Or create a standalone card (legacy)
             </summary>
             <p class="form-hint">
-              Mints a new root card and keypair — use only when you need a separate pilot card without a
+              Mints a new root card and keypair. Use only when you need a separate pilot card without a
               general root.
             </p>
 
@@ -653,9 +710,9 @@
               name="status_line"
               maxlength="199"
               rows="2"
-              placeholder="Open · Thu–Sun until 9 PM"
+              placeholder="Open · Thu to Sun until 9 PM"
             ></textarea>
-            <p class="form-hint">Live status line — change it later on Live without reprinting the QR.</p>
+            <p class="form-hint">Live status line. Change it later on Live without reprinting the QR.</p>
           </div>
 
           <div id="create-fields-lost-item" hidden>
@@ -667,7 +724,7 @@
               maxlength="72"
               placeholder="House keys"
             />
-            <p class="form-hint">Shown as the headline when someone scans  -  not your phone number.</p>
+            <p class="form-hint">Shown as the headline when someone scans: not your phone number.</p>
             <label class="form-label" for="relay-message">What should finders see?</label>
             <textarea
               class="form-input form-textarea"
@@ -675,7 +732,7 @@
               name="relay_message"
               maxlength="199"
               rows="2"
-              placeholder="Lost  -  contact owner through relay (see scan page)"
+              placeholder="Lost: contact owner through relay (see scan page)"
             ></textarea>
             <p class="form-hint">
               Return instructions only. Revoke when recovered or if the relay is abused.
@@ -689,7 +746,7 @@
             hidden
           >
             <legend class="form-label">Optional details (shown on scan)</legend>
-            <p class="form-hint">Same QR — add short place facts like tasks or tool status.</p>
+            <p class="form-hint">Same QR. Add short place facts like tasks or tool status.</p>
             <label class="form-label" for="create-stream-1-label">Detail 1 label</label>
             <input
               class="form-input"
@@ -730,7 +787,7 @@
           <details class="create-organizer-opt flow-disclosure" id="create-organizer-details">
             <summary class="form-label create-organizer-summary">Organizer can revoke (optional)</summary>
             <p class="form-hint">
-              Register a coalition or event key that may revoke this card&rsquo;s QR  -  without
+              Register a coalition or event key that may revoke this card&rsquo;s QR: without
               owning the card. You keep the owner key; the organizer gets their own.
             </p>
             <label class="revoke-confirm">
@@ -761,22 +818,18 @@
             </fieldset>
           </details>
 
-          <label class="form-label" for="qr-validity-days">This QR stays valid for</label>
+          <label class="form-label" for="qr-validity-days">How long this code works</label>
           <select class="form-input" id="qr-validity-days" name="qr_validity_days">
             <option value="7">7 days (event, wristband)</option>
             <option value="30">30 days</option>
             <option value="90">90 days</option>
             <option value="365" selected>1 year (default)</option>
           </select>
-          <p class="form-hint">
-            After this date the scan shows <strong>expired</strong>  -  different from
-            <strong>revoke</strong>, which you control anytime. See
-            <a href="/created/#revoke-rules">revoke rules</a> after create.
-          </p>
 
+          <p class="form-hint" id="create-recovery-hint"></p>
           <label class="revoke-confirm create-recovery-opt flow-inset-check">
             <input type="checkbox" id="generate-recovery" name="generate_recovery" checked />
-            <span>Generate recovery method (recommended; save once on the next screen)</span>
+            <span id="create-recovery-label">Include backup (optional)</span>
           </label>
           </section>
 
@@ -784,7 +837,8 @@
             class="create-custody-mode flow-form-section flow-inset-fields"
             id="create-custody-mode"
           >
-            <legend class="form-label">Device control</legend>
+            <legend class="form-label">How you'll manage updates</legend>
+            <p class="form-hint" id="create-custody-mode-summary">Use this device to manage updates.</p>
             <div
               id="create-custody-organizer-callout"
               class="hc-emphasis-card hc-emphasis-card--info create-custody-organizer-callout"
@@ -815,16 +869,18 @@
                 value="device_unlock"
                 checked
               />
-              <span>This device (Face ID / Touch ID) — recommended</span>
+              <span>This device (recommended)</span>
             </label>
             <label class="revoke-confirm create-custody-opt flow-inset-check">
               <input type="radio" name="custody_mode" value="full_keys" />
-              <span>Full control keys (advanced)</span>
+              <span>Show keys (advanced)</span>
             </label>
-            <p class="form-hint" id="create-custody-mode-hint">
-              This device locks your signing key behind your passkey. You won't manage raw keys in
-              normal use.
-            </p>
+            <details class="flow-disclosure create-custody-advanced" id="create-custody-advanced">
+              <summary class="form-label">Advanced</summary>
+              <p class="form-hint" id="create-custody-mode-hint">
+                Face ID or Touch ID on this phone unlocks updates. You won't see raw keys in normal use.
+              </p>
+            </details>
           </fieldset>
 
           <div
@@ -835,14 +891,9 @@
             <div class="hc-emphasis-card__main">
               <span class="hc-emphasis-card__dot hc-emphasis-card__dot--warn" aria-hidden="true"></span>
               <div class="hc-emphasis-card__copy">
-                <p class="hc-emphasis-card__eyebrow">Before you create</p>
-                <p class="hc-emphasis-card__title">Create registers a public card on the network</p>
-                <p class="hc-emphasis-card__detail">
-                  Handle, QR, and status are stored on the network. Control stays in this tab until
-                  you save ownership on this device, export a backup, or keep a recovery method. Without save or
-                  backup, closing this tab means you cannot revoke or update from the web UI.
-                  humanity.llc cannot restore lost ownership or revoke on your behalf. Card creation does
-                  not verify legal identity.
+                <p class="hc-emphasis-card__detail" id="create-public-card-notice-copy">
+                  Your @name and message will be public. Save on this device after create. We can't
+                  restore access if you lose this tab.
                 </p>
               </div>
             </div>
@@ -853,6 +904,8 @@
             id="create-ephemeral-browsing-notice"
             hidden
           ></div>
+
+          </div>
 
           <button type="submit" class="btn-primary flow-submit" id="submit">Create card &amp; QR</button>
           <p id="status" class="form-status" role="status"></p>
@@ -893,8 +946,28 @@
         <p class="form-status" id="device-hub-qr-scanner-status" role="status" hidden></p>
       </div>
     </dialog>
+    <script>
+      (function () {
+        var params = new URLSearchParams(location.search);
+        if (!params.get("template") && !params.get("intent") && !params.get("hc_ref")) return;
+        var chooser = document.getElementById("create-entry-chooser");
+        var panel = document.getElementById("create-form-panel");
+        if (chooser) chooser.hidden = true;
+        if (panel) panel.hidden = false;
+        if (params.get("intent") === "deploy") {
+          var deployWizard = document.getElementById("create-deploy-wizard");
+          var generalFields = document.getElementById("create-fields-general");
+          if (deployWizard) deployWizard.hidden = false;
+          if (generalFields) generalFields.hidden = true;
+        }
+        if (params.get("intent") === "general") {
+          var generalFields = document.getElementById("create-fields-general");
+          if (generalFields) generalFields.hidden = false;
+        }
+      })();
+    </script>
     <script src="/js/device-status-bootstrap.mjs?v=94" type="module"></script>
     <script src="/js/create-hub.mjs?v=1" type="module"></script>
-    <script type="module" src="/js/create-card.mjs?v=22"></script>
+    <script type="module" src="/js/create-card.mjs?v=24"></script>
   </body>
 </html>

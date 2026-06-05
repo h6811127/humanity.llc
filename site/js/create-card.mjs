@@ -16,16 +16,28 @@ import {
   redirectDeployToLiveAddObject,
   runDeployRootAndChildCreate,
 } from "./create-deploy-submit.mjs";
-import { resolveGameSeasonSubmitStrategy } from "./create-organizer-season-core.mjs";
+import { resolveGameSeasonSubmitStrategy } from "./create-season-fork-core.mjs";
 import { syncCreateOrganizerSeasonWizardUi } from "./create-organizer-season-wizard.mjs";
 import {
   isGameSeasonCreateIntent,
   gameSeasonBlocksDeviceUnlock,
 } from "./create-organizer-season-core.mjs";
 import {
+  redirectToDeployRootSeasonSetup,
   redirectToGameSeasonSetup,
+  runGameSeasonDualSkinCreate,
   runGameSeasonRootCreate,
 } from "./create-organizer-season-submit.mjs";
+import {
+  isWearCreateIntent,
+  resolveWearSubmitStrategy,
+} from "./create-wear-wizard-core.mjs";
+import { syncCreateWearWizardUi } from "./create-wear-wizard.mjs";
+import { syncCreateGeneralRoomUi } from "./create-general-room-wizard.mjs";
+import {
+  redirectToWearPrintOnLive,
+  runWearCardCreate,
+} from "./create-wear-submit.mjs";
 import { formatCreateResolverError } from "./create-resolver-error-core.mjs";
 import {
   handoffMerchRefAfterCreate,
@@ -57,6 +69,11 @@ import {
   createCustodyModeHintForKey,
   createCustodyModePanelState,
 } from "./device-custody-create-core.mjs";
+import { validateCreateRecoveryForCustody } from "./device-custody-recovery-gate-core.mjs";
+import {
+  syncCreateCustodySummary,
+  syncCreateRecoveryUi,
+} from "./create-trust-stack-ui.mjs";
 import {
   CREATE_CUSTODY_GAME_SEASON_FACE_ID_CALLOUT_ACTION,
   CREATE_CUSTODY_GAME_SEASON_FACE_ID_CALLOUT_DETAIL,
@@ -154,11 +171,13 @@ function setTemplate(template) {
   if (statusLine) statusLine.required = isPlate && !deployActive;
   if (relayItem) relayItem.required = isRelay && !deployActive;
   if (relayMessage) relayMessage.required = isRelay && !deployActive;
-  syncCreateHeroCopy(template);
-  syncCreateFlowConvergence(template);
   const searchParams = new URLSearchParams(location.search);
+  syncCreateHeroCopy(template, searchParams);
+  syncCreateFlowConvergence(template);
   syncCreateDeployWizardUi(searchParams, template);
   syncCreateOrganizerSeasonWizardUi(searchParams);
+  syncCreateWearWizardUi(searchParams);
+  syncCreateGeneralRoomUi(searchParams);
   syncCreateCustodyModeUi({ scrollOrganizerCallout: isGameSeasonCreateIntent(searchParams) });
 }
 
@@ -335,6 +354,8 @@ function syncCreateCustodyModeUi(opts = {}) {
   if (hint) {
     hint.textContent = createCustodyModeHintForKey(panel.hintKey);
   }
+  syncCreateCustodySummary();
+  syncCreateRecoveryUi(panel);
   syncCreateCustodyOrganizerCallout(panel.faceIdBlockedReason);
 
   if (opts.scrollOrganizerCallout && panel.showOrganizerBlocksFaceIdCallout) {
@@ -440,7 +461,7 @@ export async function runCreateCard(input) {
   const card = await signDocument(cardUnsigned, privateKey, publicKeyBase58);
   const qr_credential = await signDocument(qrUnsigned, privateKey, publicKeyBase58);
 
-  setStatus("Submitting to resolver…");
+  setStatus("Finishing up…");
   const attributionRef = sampleCard ? null : peekMerchCreateRef();
   /** @type {{ card: typeof card, qr_credential: typeof qr_credential, attribution_ref?: string }} */
   const payload = { card, qr_credential };
@@ -628,12 +649,18 @@ function readValidatedCreateInput() {
   }
   const { manifesto, pilotTemplate } = buildManifestoLine();
   const objectStreams = buildObjectStreamsForCreate();
+  const custodyMode = readCreateCustodyMode();
+  const wantRecovery = document.getElementById("generate-recovery")?.checked ?? true;
+  const recoveryCheck = validateCreateRecoveryForCustody({ custodyMode, wantRecovery });
+  if (!recoveryCheck.ok) {
+    throw new Error(recoveryCheck.error ?? "Backup is required for this device.");
+  }
   return {
     handle: validation.handle,
     manifesto,
     pilotTemplate,
     objectStreams,
-    wantRecovery: document.getElementById("generate-recovery")?.checked ?? true,
+    wantRecovery,
     qrValidityDays: readQrValidityDays(),
     organizer: readOrganizerKeyConfig(),
   };
@@ -651,20 +678,38 @@ async function submitCreate(e, opts = {}) {
   try {
     const input = readValidatedCreateInput();
     const searchParams = new URLSearchParams(location.search);
-    const legacyEl = document.getElementById("create-flat-pilot-compat");
     const gameStrategy = resolveGameSeasonSubmitStrategy({
       searchParams,
       walletEntries: loadWallet(),
     });
 
-    if (gameStrategy === "redirect_live") {
+    if (gameStrategy === "fork_choose") {
+      throw new Error("Choose how this season should live on the network first.");
+    }
+
+    if (gameStrategy === "redirect_live" || gameStrategy === "use_existing_account") {
       setStatus("Opening season setup on Live…");
-      await redirectToGameSeasonSetup();
+      if (gameStrategy === "use_existing_account") {
+        await redirectToDeployRootSeasonSetup();
+      } else {
+        await redirectToGameSeasonSetup();
+      }
       return;
     }
 
-    if (gameStrategy === "create_season_root") {
-      setStatus("Creating season root…");
+    if (gameStrategy === "create_dual_skin_root") {
+      setStatus("Setting up your account…");
+      await runGameSeasonDualSkinCreate({
+        handle: input.handle,
+        wantRecovery: input.wantRecovery,
+        qrValidityDays: input.qrValidityDays,
+        runCreateCard,
+      });
+      return;
+    }
+
+    if (gameStrategy === "create_season_only_root") {
+      setStatus("Setting up season account…");
       const seasonId = document.getElementById("game-season-id")?.value ?? "";
       await runGameSeasonRootCreate({
         handle: input.handle,
@@ -676,10 +721,32 @@ async function submitCreate(e, opts = {}) {
       return;
     }
 
+    const wearStrategy = resolveWearSubmitStrategy({
+      searchParams,
+      walletEntries: loadWallet(),
+    });
+
+    if (wearStrategy === "redirect_live") {
+      setStatus("Opening Live…");
+      await redirectToWearPrintOnLive();
+      return;
+    }
+
+    if (wearStrategy === "create_wear_card") {
+      setStatus("Creating…");
+      await runWearCardCreate({
+        handle: input.handle,
+        manifesto: input.manifesto,
+        wantRecovery: input.wantRecovery,
+        qrValidityDays: input.qrValidityDays,
+        runCreateCard,
+      });
+      return;
+    }
+
     const strategy = resolveDeploySubmitStrategy({
       searchParams,
       template: activeTemplate,
-      legacyFlatDetailsOpen: legacyEl instanceof HTMLDetailsElement && legacyEl.open,
       walletEntries: loadWallet(),
     });
 
@@ -690,7 +757,7 @@ async function submitCreate(e, opts = {}) {
     }
 
     if (strategy === "root_and_child") {
-      setStatus("Creating account and deploying object…");
+      setStatus("Creating your sign…");
       const fields = readCreateFormFields();
       await runDeployRootAndChildCreate(activeTemplate, fields, {
         handle: input.handle,
@@ -702,7 +769,7 @@ async function submitCreate(e, opts = {}) {
       return;
     }
 
-    setStatus("Generating keys and signing…");
+    setStatus("Creating…");
     await runCreateCard({
       handle: input.handle,
       manifesto: input.manifesto,
@@ -764,6 +831,9 @@ document
 document.querySelectorAll('input[name="organizer_key_mode"]').forEach((el) => {
   el.addEventListener("change", syncOrganizerFieldsUi);
 });
+document.querySelectorAll('input[name="custody_mode"]').forEach((el) => {
+  el.addEventListener("change", () => syncCreateCustodyModeUi());
+});
 syncOrganizerFieldsUi();
 syncCreateCustodyModeUi();
 
@@ -783,7 +853,15 @@ function openDeploySomethingForm() {
   url.searchParams.set("intent", "deploy");
   history.replaceState(null, "", `${url.pathname}${url.search}`);
   setTemplate("status_plate");
-  syncCreateDeployWizardUi(new URLSearchParams(location.search), "status_plate");
+}
+
+function openGeneralAccountForm() {
+  showCreateFormPanel();
+  const url = new URL(location.href);
+  url.searchParams.delete("template");
+  url.searchParams.set("intent", "general");
+  history.replaceState(null, "", `${url.pathname}${url.search}`);
+  setTemplate("general");
 }
 
 document.getElementById("create-flat-pilot-compat")?.addEventListener("toggle", () => {
@@ -794,17 +872,31 @@ function bootstrapCreateEntry() {
   if (shouldSkipCreateEntryChooser(createSearchParams)) {
     showCreateFormPanel();
     setTemplate(defaultTemplateForCreateEntry(createSearchParams));
-    syncCreateOrganizerSeasonWizardUi(createSearchParams);
     return;
   }
 
   showCreateEntryChooserPanel();
   initCreateEntryChooser({
     onDeploySomething: openDeploySomethingForm,
+    onOpenGeneralAccount: openGeneralAccountForm,
   });
 }
 
 bootstrapCreateEntry();
+
+window.addEventListener("hc-device-hub-changed", () => {
+  const searchParams = new URLSearchParams(location.search);
+  if (isGameSeasonCreateIntent(searchParams)) {
+    syncCreateOrganizerSeasonWizardUi(searchParams);
+  }
+  if (isWearCreateIntent(searchParams)) {
+    syncCreateWearWizardUi(searchParams);
+  }
+});
+
+window.addEventListener("hc-create-season-fork-changed", () => {
+  syncCreateOrganizerSeasonWizardUi(new URLSearchParams(location.search));
+});
 
 function initEphemeralBrowsingGate() {
   if (!ephemeralBrowsing) return;

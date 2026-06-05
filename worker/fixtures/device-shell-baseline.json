@@ -4,11 +4,11 @@
   "phase": "smooth_mode_phase_0",
   "asset_version": 94,
   "module_count": 86,
-  "js_bytes_total": 559342,
+  "js_bytes_total": 561061,
   "shell_css_bytes_total": 77438,
-  "landing_css_bytes_total": 327981,
-  "transfer_bytes_shell_graph": 636780,
-  "transfer_bytes_landing_first_paint": 887323,
+  "landing_css_bytes_total": 336742,
+  "transfer_bytes_shell_graph": 638499,
+  "transfer_bytes_landing_first_paint": 897803,
   "js_modules": [
     {
       "file": "js/device-status-bootstrap.mjs",
@@ -48,7 +48,7 @@
     },
     {
       "file": "js/device-status.mjs",
-      "bytes": 23675
+      "bytes": 23679
     },
     {
       "file": "js/device-hub-intro-coachmark.mjs",
@@ -60,15 +60,15 @@
     },
     {
       "file": "js/device-custody-mode-core.mjs",
-      "bytes": 5899
+      "bytes": 6027
     },
     {
       "file": "js/device-ownership-copy-core.mjs",
-      "bytes": 30300
+      "bytes": 31894
     },
     {
       "file": "js/device-shell-copy-core.mjs",
-      "bytes": 6555
+      "bytes": 6557
     },
     {
       "file": "js/device-emphasis-card-html.mjs",
@@ -96,7 +96,7 @@
     },
     {
       "file": "js/device-live-proof-banner.mjs",
-      "bytes": 2595
+      "bytes": 2592
     },
     {
       "file": "js/device-shell-boot-core.mjs",
@@ -320,11 +320,11 @@
     },
     {
       "file": "js/device-steward-session-core.mjs",
-      "bytes": 7017
+      "bytes": 7014
     },
     {
       "file": "js/device-steward-quota-core.mjs",
-      "bytes": 1578
+      "bytes": 1575
     },
     {
       "file": "js/device-steward-push.mjs",
