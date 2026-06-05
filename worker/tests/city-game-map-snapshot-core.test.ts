@@ -7,10 +7,13 @@ import { describe, expect, it } from "vitest";
 import {
   buildNodeChipsHtml,
   formatFinaleFootnote,
+  formatSpotlightCountFromSnap,
+  formatSpotlightCountLine,
   formatSyncLabel,
   isSchematicPinFogged,
   signalWarSummaryLines,
   applyLobbyProgressFromSnapshot,
+  applySpotlightFromSnapshot,
 } from "../../site/js/city-game-map-snapshot-core.mjs";
 import {
   buildMapBoardInnerHtml,
@@ -33,7 +36,7 @@ describe("city-game map snapshot core", () => {
     const html = buildMapBoardInnerHtml({
       season_id: "cr_season_01_wake",
       city: "Cedar Rapids, Iowa",
-      districts: ["river_spine"],
+      districts: ["river_spine", "czech_village"],
       nodes: [
         {
           node_id: "node_04",
@@ -42,7 +45,19 @@ describe("city-game map snapshot core", () => {
           district: "river_spine",
           label: "Riverwalk River Lantern",
         },
+        {
+          node_id: "node_07",
+          object_id: "obj_cr_node_07_cabinet",
+          role: "lore_archive",
+          district: "czech_village",
+          label: "Czech Village cabinet",
+        },
       ],
+      map_copy: {
+        launch: {
+          count_label: "River Lantern",
+        },
+      },
       unlock_edges: [
         { from: "node_04", to: "node_07", label: "River Lantern unlocks Czech Village cabinet" },
       ],
@@ -55,10 +70,56 @@ describe("city-game map snapshot core", () => {
     expect(html).toContain('id="city-game-map-sync"');
     expect(html).toContain('id="city-game-map-signal-war"');
     expect(html).toContain('id="city-game-map-progress"');
+    expect(html).toContain('id="city-game-map-spotlight"');
     expect(html).toContain('data-edge-from="node_04"');
     expect(html).toContain('data-node-id="node_04"');
     expect(html).toContain("city-game-map-node-live");
     expect(html).toContain("Open in Maps");
+    expect(html).toContain("Scan for live count");
+  });
+
+  it("formats spotlight count from collective chip", () => {
+    expect(
+      formatSpotlightCountFromSnap({
+        chips: [{ kind: "collective", label: "City progress", value: "14 / 20" }],
+      })
+    ).toBe("14 / 20");
+    expect(formatSpotlightCountFromSnap({ chips: [] })).toBeNull();
+  });
+
+  it("formats spotlight count line with optional label prefix", () => {
+    expect(formatSpotlightCountLine("14 / 20", "River Lantern")).toBe("River Lantern · 14 / 20");
+    expect(formatSpotlightCountLine("14 / 20", "")).toBe("14 / 20");
+    expect(formatSpotlightCountLine(null, "River Lantern")).toBeNull();
+  });
+
+  it("applySpotlightFromSnapshot updates spotlight count element", () => {
+    const countEl = { textContent: "Scan for live count" };
+    const spotlight = {
+      dataset: {
+        nodeId: "node_04",
+        countLabel: "River Lantern",
+        countPlaceholder: "Scan for live count",
+      },
+      classList: { toggle: () => {} },
+    };
+    const boardRoot = {
+      querySelector: (sel) => {
+        if (sel === "#city-game-map-spotlight") return spotlight;
+        if (sel === "#city-game-map-spotlight-count") return countEl;
+        return null;
+      },
+    };
+
+    applySpotlightFromSnapshot(/** @type {HTMLElement} */ (boardRoot), {
+      nodes: [
+        {
+          node_id: "node_04",
+          chips: [{ kind: "collective", label: "City progress", value: "14 / 20" }],
+        },
+      ],
+    });
+    expect(countEl.textContent).toBe("River Lantern · 14 / 20");
   });
 
   it("formats sync label from snapshot timestamp", () => {

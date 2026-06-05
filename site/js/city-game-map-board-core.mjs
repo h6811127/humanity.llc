@@ -3,11 +3,16 @@
  * @see docs/CITY_GAME_MAP_DASHBOARD.md · M4 interaction in city-game-map-interaction.mjs
  */
 
+import { buildBoardFilterSummaryHtml } from "./city-game-map-filter-summary-core.mjs";
 import {
   buildDistrictFilterHtml,
   isDenseMapBoard,
 } from "./city-game-map-interaction-core.mjs";
 import { buildExploreFilterHtml } from "./city-game-map-explore-core.mjs";
+import { comprehensionPrimaryNodeId } from "./city-game-player-guide-core.mjs";
+
+/** Default row hint before snapshot chips replace the live cell. */
+export const MAP_ROW_SCAN_HINT = "Scan sticker there.";
 
 export const CITY_GAME_SEASON_JSON_URL = "/data/city-game-cr-season-01.json";
 /** Multi-city index — prefer resolvePlayPageSeason() on play pages. */
@@ -35,7 +40,7 @@ export const CITY_GAME_ROLE_LABELS = {
 
 const DEFAULT_START_HERE = {
   title: "Start here",
-  steps: ["Pick a district", "Open a place", "Scan when you arrive"],
+  steps: ["Find a sticker", "Scan it", "Add your charge"],
 };
 
 const DEFAULT_MAP_COPY = {
@@ -46,6 +51,11 @@ const DEFAULT_MAP_COPY = {
   hook_stirring: "Something is stirring.",
   hook_awake: "The city woke.",
   progress_suffix: "fragments recovered",
+  code_hint: "Code is on the back of the sticker.",
+  row_scan_hint: MAP_ROW_SCAN_HINT,
+  spotlight_scan_hint: "Scan sticker · enter code",
+  count_placeholder: "Scan for live count",
+  browse_summary: "Browse all places",
   live_hint: "Find stickers. Scan them. Help unlock city goals.",
   wayfinding_intro:
     "Start anywhere. Scan any game sticker you find. Planning from home? Search place names in your maps app; the sketch below is districts only, not streets.",
@@ -130,6 +140,59 @@ export function escapeMapHtml(value) {
 /**
  * @param {Record<string, unknown>} season
  */
+export function resolveLaunchCopy(season) {
+  const mapCopy =
+    season.map_copy && typeof season.map_copy === "object"
+      ? /** @type {Record<string, unknown>} */ (season.map_copy)
+      : {};
+  const launch =
+    mapCopy.launch && typeof mapCopy.launch === "object"
+      ? /** @type {Record<string, unknown>} */ (mapCopy.launch)
+      : {};
+  const startHere =
+    mapCopy.start_here && typeof mapCopy.start_here === "object"
+      ? /** @type {Record<string, unknown>} */ (mapCopy.start_here)
+      : {};
+  const mapResolved = resolveMapCopy(season);
+
+  const rawSteps = Array.isArray(launch.hero_steps)
+    ? launch.hero_steps
+    : Array.isArray(startHere.steps)
+      ? startHere.steps
+      : DEFAULT_START_HERE.steps;
+  const heroSteps = rawSteps.map((step) => String(step ?? "").trim()).filter(Boolean);
+  const steps = heroSteps.length ? heroSteps : [...DEFAULT_START_HERE.steps];
+
+  return {
+    hero_steps: steps,
+    hero_aria_label:
+      (typeof launch.hero_aria_label === "string" && launch.hero_aria_label.trim()) ||
+      DEFAULT_START_HERE.title,
+    code_hint: (typeof launch.code_hint === "string" && launch.code_hint.trim()) || mapResolved.code_hint,
+    privacy_note:
+      (typeof launch.privacy_note === "string" && launch.privacy_note.trim()) || mapResolved.privacy_note,
+    count_placeholder:
+      (typeof launch.count_placeholder === "string" && launch.count_placeholder.trim()) ||
+      mapResolved.count_placeholder,
+    count_label:
+      (typeof launch.count_label === "string" && launch.count_label.trim()) || "",
+    spotlight_scan_hint:
+      (typeof launch.spotlight_scan_hint === "string" && launch.spotlight_scan_hint.trim()) ||
+      mapResolved.spotlight_scan_hint,
+    row_scan_hint:
+      (typeof launch.row_scan_hint === "string" && launch.row_scan_hint.trim()) || mapResolved.row_scan_hint,
+    browse_summary:
+      (typeof launch.browse_summary === "string" && launch.browse_summary.trim()) ||
+      mapResolved.browse_summary,
+    what_changed_summary:
+      (typeof launch.what_changed_summary === "string" && launch.what_changed_summary.trim()) ||
+      "What changed",
+  };
+}
+
+/**
+ * @param {Record<string, unknown>} season
+ */
 export function resolveMapCopy(season) {
   const copy = season.map_copy;
   if (!copy || typeof copy !== "object") {
@@ -144,6 +207,11 @@ export function resolveMapCopy(season) {
     hook_stirring: c.hook_stirring?.trim() || DEFAULT_MAP_COPY.hook_stirring,
     hook_awake: c.hook_awake?.trim() || DEFAULT_MAP_COPY.hook_awake,
     progress_suffix: c.progress_suffix?.trim() || DEFAULT_MAP_COPY.progress_suffix,
+    code_hint: c.code_hint?.trim() || DEFAULT_MAP_COPY.code_hint,
+    row_scan_hint: c.row_scan_hint?.trim() || DEFAULT_MAP_COPY.row_scan_hint,
+    spotlight_scan_hint: c.spotlight_scan_hint?.trim() || DEFAULT_MAP_COPY.spotlight_scan_hint,
+    count_placeholder: c.count_placeholder?.trim() || DEFAULT_MAP_COPY.count_placeholder,
+    browse_summary: c.browse_summary?.trim() || DEFAULT_MAP_COPY.browse_summary,
     live_hint: c.live_hint?.trim() || DEFAULT_MAP_COPY.live_hint,
     wayfinding_intro: c.wayfinding_intro?.trim() || DEFAULT_MAP_COPY.wayfinding_intro,
     diagram_note: c.diagram_note?.trim() || DEFAULT_MAP_COPY.diagram_note,
@@ -245,17 +313,102 @@ export function buildMapStartHereHtml(season) {
 }
 
 /**
+ * @param {ReturnType<typeof resolveLaunchCopy>} launchCopy
+ */
+export function buildMapActionsStripHtml(launchCopy) {
+  const items = launchCopy.hero_steps
+    .map((step) => `<span class="city-game-map-action">${escapeMapHtml(step)}</span>`)
+    .join('<span class="city-game-map-action-sep" aria-hidden="true"> · </span>');
+  return `<p class="city-game-map-actions" aria-label="${escapeMapHtml(launchCopy.hero_aria_label)}">${items}</p>`;
+}
+
+/**
+ * @param {ReturnType<typeof resolveLaunchCopy>} launchCopy
+ */
+export function buildMapCodeHintHtml(launchCopy) {
+  return `<p class="city-game-map-code-hint">${escapeMapHtml(launchCopy.code_hint)}</p>`;
+}
+
+/**
+ * @param {ReturnType<typeof resolveLaunchCopy>} launchCopy
+ */
+export function buildMapPrivacyInlineHtml(launchCopy) {
+  return `<p class="city-game-map-privacy-inline idea-footnote">${escapeMapHtml(launchCopy.privacy_note)}</p>`;
+}
+
+/**
  * @param {Record<string, unknown>} season
  */
-export function buildMapActionsStripHtml(season) {
-  const { steps } = resolveMapStartHere(season);
-  const items = steps
-    .map(
-      (step) =>
-        `<span class="city-game-map-action">${escapeMapHtml(step)}</span>`
-    )
-    .join('<span class="city-game-map-action-sep" aria-hidden="true"> · </span>');
-  return `<p class="city-game-map-actions" aria-label="Quick start">${items}</p>`;
+export function resolveSpotlightNode(season) {
+  const nodeId = comprehensionPrimaryNodeId(season);
+  return nodeRows(season).find((row) => row?.node_id === nodeId) ?? null;
+}
+
+/**
+ * @param {Record<string, unknown>} season
+ * @param {ReturnType<typeof resolveLaunchCopy>} launchCopy
+ */
+export function buildMapSpotlightHtml(season, launchCopy) {
+  const row = resolveSpotlightNode(season);
+  if (!row) return "";
+
+  const nodeId = escapeMapHtml(String(row.node_id ?? ""));
+  const label = escapeMapHtml(String(row.label ?? row.node_id ?? "Spotlight"));
+  const mapsUrl = escapeMapHtml(buildMapsSearchUrl(season, row));
+  const scanHint = escapeMapHtml(launchCopy.spotlight_scan_hint);
+  const countPlaceholder = escapeMapHtml(launchCopy.count_placeholder);
+  const countLabel = escapeMapHtml(launchCopy.count_label);
+
+  return `<article
+    class="city-game-map-spotlight"
+    id="city-game-map-spotlight"
+    data-node-id="${nodeId}"
+    data-count-placeholder="${countPlaceholder}"
+    data-count-label="${countLabel}"
+    aria-labelledby="city-game-map-spotlight-title"
+  >
+    <h2 class="city-game-map-spotlight-title" id="city-game-map-spotlight-title">${label}</h2>
+    <p class="city-game-map-spotlight-count" id="city-game-map-spotlight-count" aria-live="polite">${countPlaceholder}</p>
+    <div class="city-game-map-spotlight-actions">
+      <a class="city-game-map-maps-link" href="${mapsUrl}" target="_blank" rel="noopener noreferrer">Open in Maps</a>
+      <span class="city-game-map-spotlight-hint">${scanHint}</span>
+    </div>
+  </article>`;
+}
+
+/**
+ * @param {Record<string, unknown>} season
+ * @param {ReturnType<typeof resolveLaunchCopy>} launchCopy
+ */
+export function buildMapFirstPaintHtml(season, launchCopy) {
+  return `<div class="city-game-map-first-paint">
+    ${buildMapActionsStripHtml(launchCopy)}
+    ${buildMapCodeHintHtml(launchCopy)}
+    ${buildMapPrivacyInlineHtml(launchCopy)}
+    ${buildMapSpotlightHtml(season, launchCopy)}
+  </div>`;
+}
+
+/**
+ * @param {Record<string, unknown>} season
+ * @param {ReturnType<typeof resolveMapCopy>} copy
+ * @param {ReturnType<typeof resolveLaunchCopy>} launchCopy
+ */
+export function buildMapBrowseHtml(season, copy, launchCopy) {
+  return `<details class="city-game-map-browse" id="city-game-map-browse">
+  <summary class="city-game-map-browse-summary">${escapeMapHtml(launchCopy.browse_summary)}</summary>
+  <div class="city-game-map-browse-body">
+    <div class="city-game-map-list-panel">
+      <h2 class="city-game-map-list-title" id="city-game-map-list-title">${escapeMapHtml(copy.section_places_title)}</h2>
+      <div class="city-game-map-browse-filters">
+        ${buildDistrictFilterHtml(season)}
+        ${buildExploreFilterHtml(season)}
+      </div>
+      ${buildBoardFilterSummaryHtml()}
+      ${buildMapNodeListHtml(season, launchCopy)}
+    </div>
+  </div>
+</details>`;
 }
 
 /**
@@ -383,8 +536,10 @@ ${pins}
 /**
  * @param {Record<string, unknown>} season
  */
-export function buildMapNodeListHtml(season) {
-  const rows = nodeRows(season);
+export function buildMapNodeListHtml(season, launchCopy = resolveLaunchCopy(season)) {
+  const rowHint = launchCopy.row_scan_hint?.trim() || MAP_ROW_SCAN_HINT;
+  const spotlightId = comprehensionPrimaryNodeId(season);
+  const rows = nodeRows(season).filter((row) => row?.node_id !== spotlightId);
   const byDistrict = new Map();
   for (const row of rows) {
     const district = row.district ?? "other";
@@ -406,7 +561,7 @@ export function buildMapNodeListHtml(season) {
           const mapsUrl = buildMapsSearchUrl(season, row);
           const liveLine = scanUrl
             ? `<a class="city-game-map-scan-link" href="${escapeMapHtml(scanUrl)}">Open live scan</a>`
-            : `<span class="city-game-map-live-hint">Scan on arrival</span>`;
+            : `<span class="city-game-map-live-hint">${escapeMapHtml(rowHint)}</span>`;
           const role = escapeMapHtml(row.role ?? "");
           return `<li class="city-game-map-node-row" data-node-id="${escapeMapHtml(row.node_id)}" data-district="${escapeMapHtml(row.district ?? "")}" data-role="${role}" tabindex="0">
   <span class="city-game-map-node-title">${escapeMapHtml(row.label)}</span>
@@ -498,27 +653,11 @@ export function buildMapAdvancedHtml(season, copy) {
 
 /**
  * @param {Record<string, unknown>} season
- * @returns {string}
+ * @param {ReturnType<typeof resolveMapCopy>} copy
  */
-export function buildMapBoardInnerHtml(season) {
-  const copy = resolveMapCopy(season);
-  const dense = isDenseMapBoard(season);
-  const denseClass = dense ? " city-game-map-board--dense" : "";
-
-  return `<div class="city-game-map-board${denseClass}" data-active-district="all" data-active-explore="all">
-  ${buildMapLobbyHeaderHtml(season, copy)}
-  <section class="city-game-map-places city-game-map-places--primary" aria-labelledby="city-game-map-list-title">
-    <div class="city-game-map-list-panel">
-      <h2 class="city-game-map-list-title" id="city-game-map-list-title">${escapeMapHtml(copy.section_places_title)}</h2>
-      ${buildMapActionsStripHtml(season)}
-      <div class="city-game-map-browse-filters">
-        ${buildDistrictFilterHtml(season)}
-        ${buildExploreFilterHtml(season)}
-      </div>
-      ${buildMapNodeListHtml(season)}
-    </div>
-  </section>
-  <section class="city-game-map-state" aria-labelledby="city-game-map-state-title">
+export function buildMapStateSectionHtml(season, copy) {
+  return `<section class="city-game-map-state" aria-labelledby="city-game-map-state-title">
+    ${buildMapLobbyHeaderHtml(season, copy)}
     <h3 class="group-label" id="city-game-map-state-title">${escapeMapHtml(copy.section_state_title)}</h3>
     <p class="city-game-map-sync" id="city-game-map-sync" aria-live="polite">Syncing…</p>
     <div
@@ -546,7 +685,39 @@ export function buildMapBoardInnerHtml(season) {
         class="guestbook-lines guestbook-lines-update"
       ></ul>
     </div>
+  </section>`;
+}
+
+/**
+ * @param {Record<string, unknown>} season
+ * @param {ReturnType<typeof resolveMapCopy>} copy
+ * @param {ReturnType<typeof resolveLaunchCopy>} launchCopy
+ */
+export function buildMapWhatChangedHtml(season, copy, launchCopy) {
+  return `<details class="city-game-map-changed" id="city-game-map-changed">
+  <summary class="city-game-map-changed-summary">${escapeMapHtml(launchCopy.what_changed_summary)}</summary>
+  <div class="city-game-map-changed-body">
+    ${buildMapStateSectionHtml(season, copy)}
+  </div>
+</details>`;
+}
+
+/**
+ * @param {Record<string, unknown>} season
+ * @returns {string}
+ */
+export function buildMapBoardInnerHtml(season) {
+  const copy = resolveMapCopy(season);
+  const launchCopy = resolveLaunchCopy(season);
+  const dense = isDenseMapBoard(season);
+  const denseClass = dense ? " city-game-map-board--dense" : "";
+
+  return `<div class="city-game-map-board${denseClass}" data-active-district="all" data-active-explore="all">
+  <section class="city-game-map-places city-game-map-places--primary" aria-labelledby="city-game-map-spotlight-title">
+    ${buildMapFirstPaintHtml(season, launchCopy)}
+    ${buildMapBrowseHtml(season, copy, launchCopy)}
   </section>
+  ${buildMapWhatChangedHtml(season, copy, launchCopy)}
   ${buildMapAdvancedHtml(season, copy)}
 </div>`;
 }

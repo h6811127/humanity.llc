@@ -69,6 +69,24 @@ async function openDistrictSketch(board: ReturnType<Page["locator"]>) {
   });
 }
 
+async function openBrowsePlaces(board: ReturnType<Page["locator"]>) {
+  await board.locator("#city-game-map-browse").evaluate((el) => {
+    if (el instanceof HTMLDetailsElement) el.open = true;
+  });
+}
+
+async function openWhatChanged(board: ReturnType<Page["locator"]>) {
+  await board.locator("#city-game-map-changed").evaluate((el) => {
+    if (el instanceof HTMLDetailsElement) el.open = true;
+  });
+}
+
+async function clickMapPin(pin: ReturnType<ReturnType<Page["locator"]>["locator"]>) {
+  await pin.evaluate((el) => {
+    el.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+  });
+}
+
 test.describe("city game map board", () => {
   test("dedicated map page loads board and applies snapshot chips", async ({ page }) => {
     await mockSeasonSnapshot(page, mockSnapshotBody());
@@ -79,13 +97,25 @@ test.describe("city game map board", () => {
     await expect(board).toBeVisible({ timeout: 15_000 });
     await expect(page.locator(".city-game-map-loading")).toHaveCount(0);
     await expect(page.getByRole("heading", { level: 1 })).toContainText(/weekend city board/i);
-    await expect(page.locator('a[href="/play/cedar-rapids/"]')).toBeVisible();
+    await expect(page.getByRole("link", { name: "Rules", exact: true })).toBeVisible();
 
+    await expect(board.getByText("Find a sticker")).toBeVisible();
+    await expect(board.getByText("Code is on the back of the sticker.")).toBeVisible();
+    await expect(board.getByRole("heading", { name: "Riverwalk River Lantern" })).toBeVisible();
+    await expect(board.getByText("Scan sticker · enter code")).toBeVisible();
+    await expect(board.locator("#city-game-map-browse")).toHaveJSProperty("open", false);
+    await expect(board.locator(".city-game-map-browse-filters")).toBeHidden();
+
+    await expect(board).toHaveAttribute("data-snapshot-loaded", "1");
+    await expect(board.locator("#city-game-map-spotlight-count")).toHaveText("River Lantern · 14 / 20");
+    await expect(board.locator("#city-game-map-changed")).toHaveJSProperty("open", false);
+    await expect(board.getByText("1 / 3 fragments recovered")).toBeHidden();
+    await expect(board.getByText("Something is stirring.")).toBeHidden();
+    await openWhatChanged(board);
     await expect(board.getByText("1 / 3 fragments recovered")).toBeVisible();
     await expect(board.getByText("Something is stirring.")).toBeVisible();
-    const riverRow = board.locator('.city-game-map-node-row[data-node-id="node_04"]');
-    await expect(riverRow.locator(".city-game-map-chip-value")).toHaveText("14 / 20");
-    await expect(board).toHaveAttribute("data-snapshot-loaded", "1");
+    await openBrowsePlaces(board);
+    await expect(board.locator('.city-game-map-node-row[data-node-id="node_04"]')).toHaveCount(0);
   });
 
   test("Explore By filters places and schematic pins with district AND logic", async ({
@@ -99,6 +129,7 @@ test.describe("city game map board", () => {
     await expect(board).toBeVisible({ timeout: 15_000 });
     await expect(board).toHaveAttribute("data-snapshot-loaded", "1");
 
+    await openBrowsePlaces(board);
     const explore = board.locator(".city-game-map-explore-filter");
     await expect(explore.getByRole("button", { name: /Relay 17/ })).toBeVisible();
 
@@ -136,7 +167,52 @@ test.describe("city game map board", () => {
     await board.getByRole("button", { name: "All districts" }).click();
     await expect(board).toHaveAttribute("data-active-explore", "all");
     await expect(board).toHaveAttribute("data-active-district", "all");
-    await expect(board.locator(".city-game-map-node-row:visible")).toHaveCount(40);
+    await expect(board.locator(".city-game-map-node-row:visible")).toHaveCount(39);
+  });
+
+  test("mobile filter chips show active styling and viewing summary", async ({ page }) => {
+    await mockSeasonSnapshot(page, mockSnapshotBody());
+    await page.setViewportSize({ width: 390, height: 844 });
+
+    await page.goto("/play/cedar-rapids/map/");
+
+    const board = page.locator(".city-game-map-board");
+    await expect(board).toBeVisible({ timeout: 15_000 });
+    await expect(board).toHaveAttribute("data-snapshot-loaded", "1");
+
+    await openBrowsePlaces(board);
+    const explore = board.locator(".city-game-map-explore-filter");
+    const relayBtn = explore.getByRole("button", { name: /Relay 17/ });
+    await relayBtn.click();
+
+    await expect(relayBtn).toHaveAttribute("aria-pressed", "true");
+    await expect(relayBtn).toHaveClass(/city-game-map-filter-btn--active/);
+    await expect(relayBtn).toHaveCSS("background-color", "rgb(219, 27, 67)");
+    await expect(explore.getByRole("button", { name: "All kinds" })).toHaveAttribute(
+      "aria-pressed",
+      "false"
+    );
+
+    const summary = board.locator("#city-game-map-filter-summary");
+    await expect(summary).toBeVisible();
+    await expect(summary).toContainText("Viewing:");
+    await expect(summary.locator("[data-filter-summary-scope]")).toContainText(
+      "All districts · Relay"
+    );
+    await expect(summary.locator("[data-filter-summary-count]")).toHaveText("17 places");
+
+    const newBoBtn = board.getByRole("button", { name: "NewBo", exact: true });
+    await newBoBtn.click();
+    await expect(newBoBtn).toHaveAttribute("aria-pressed", "true");
+    await expect(newBoBtn).toHaveClass(/city-game-map-filter-btn--active/);
+    await expect(summary.locator("[data-filter-summary-scope]")).toContainText("NewBo · Relay");
+
+    await summary.getByRole("button", { name: "Clear filters" }).click();
+    await expect(board).toHaveAttribute("data-active-district", "all");
+    await expect(board).toHaveAttribute("data-active-explore", "all");
+    await expect(summary).toBeHidden();
+    await expect(relayBtn).toHaveAttribute("aria-pressed", "false");
+    await expect(newBoBtn).toHaveAttribute("aria-pressed", "false");
   });
 
   test("schematic pin click highlights matching place row", async ({ page }) => {
@@ -148,13 +224,14 @@ test.describe("city game map board", () => {
     await expect(board).toBeVisible({ timeout: 15_000 });
     await expect(board).toHaveAttribute("data-snapshot-loaded", "1");
 
-    const pin = board.locator('.city-game-map-pin[data-node-id="node_04"]');
-    const row = board.locator('.city-game-map-node-row[data-node-id="node_04"]');
+    const pin = board.locator('.city-game-map-pin[data-node-id="node_07"]');
+    const row = board.locator('.city-game-map-node-row[data-node-id="node_07"]');
+    await openBrowsePlaces(board);
     await openDistrictSketch(board);
     await expect(pin).toBeVisible();
-    await pin.click();
+    await clickMapPin(pin);
 
-    await expect(board).toHaveAttribute("data-highlight-node-id", "node_04");
+    await expect(board).toHaveAttribute("data-highlight-node-id", "node_07");
     await expect(pin).toHaveClass(/city-game-map-pin--highlight/);
     await expect(row).toHaveClass(/city-game-map-node-row--highlight/);
     await expect(row).toHaveAttribute("aria-current", "true");
@@ -182,10 +259,11 @@ test.describe("city game map board", () => {
     await expect(board).toBeVisible({ timeout: 15_000 });
     await expect(board).toHaveAttribute("data-snapshot-loaded", "1");
 
-    const pin = board.locator('.city-game-map-pin[data-node-id="node_04"]');
-    const row = board.locator('.city-game-map-node-row[data-node-id="node_04"]');
+    const pin = board.locator('.city-game-map-pin[data-node-id="node_07"]');
+    const row = board.locator('.city-game-map-node-row[data-node-id="node_07"]');
     const list = board.locator(".city-game-map-list-panel");
 
+    await openBrowsePlaces(board);
     await openDistrictSketch(board);
 
     await expect(pin).toHaveClass(/city-game-map-pin--fog-hidden/);
@@ -199,7 +277,7 @@ test.describe("city game map board", () => {
       el.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
     });
 
-    await expect(board).toHaveAttribute("data-highlight-node-id", "node_04");
+    await expect(board).toHaveAttribute("data-highlight-node-id", "node_07");
     await expect(pin).toHaveClass(/city-game-map-pin--highlight/);
     await expect(row).toHaveClass(/city-game-map-node-row--highlight/);
     await expect(row).toHaveAttribute("aria-current", "true");
@@ -228,9 +306,9 @@ test.describe("city game map board", () => {
 
     const pin = board.locator('.city-game-map-pin[data-node-id="node_04"]');
     await openDistrictSketch(board);
-    await pin.click();
+    await clickMapPin(pin);
     await expect(board).toHaveAttribute("data-highlight-node-id", "node_04");
-    await pin.click();
+    await clickMapPin(pin);
     await expect(board).not.toHaveAttribute("data-highlight-node-id", "node_04");
     await expect(pin).not.toHaveClass(/city-game-map-pin--highlight/);
   });
@@ -243,15 +321,16 @@ test.describe("city game map board", () => {
     const board = page.locator(".city-game-map-board");
     await expect(board).toBeVisible({ timeout: 15_000 });
 
-    const pin = board.locator('.city-game-map-pin[data-node-id="node_04"]');
-    const row = board.locator('.city-game-map-node-row[data-node-id="node_04"]');
+    const pin = board.locator('.city-game-map-pin[data-node-id="node_07"]');
+    const row = board.locator('.city-game-map-node-row[data-node-id="node_07"]');
+    await openBrowsePlaces(board);
     await openDistrictSketch(board);
 
     await row.focus();
     await expect(row).toBeFocused();
-    await pin.click();
+    await clickMapPin(pin);
 
-    await expect(board).toHaveAttribute("data-highlight-node-id", "node_04");
+    await expect(board).toHaveAttribute("data-highlight-node-id", "node_07");
     await expect(pin).toHaveClass(/city-game-map-pin--highlight/);
   });
 
@@ -263,11 +342,12 @@ test.describe("city game map board", () => {
     const board = page.locator(".city-game-map-board");
     await expect(board).toBeVisible({ timeout: 15_000 });
 
-    const pin = board.locator('.city-game-map-pin[data-node-id="node_04"]');
-    const row = board.locator('.city-game-map-node-row[data-node-id="node_04"]');
+    const pin = board.locator('.city-game-map-pin[data-node-id="node_07"]');
+    const row = board.locator('.city-game-map-node-row[data-node-id="node_07"]');
+    await openBrowsePlaces(board);
     await openDistrictSketch(board);
     await row.locator(".city-game-map-node-title").click();
-    await expect(board).toHaveAttribute("data-highlight-node-id", "node_04");
+    await expect(board).toHaveAttribute("data-highlight-node-id", "node_07");
     await expect(pin).toHaveClass(/city-game-map-pin--highlight/);
     await expect(row).toHaveAttribute("aria-current", "true");
   });
@@ -280,10 +360,12 @@ test.describe("city game map board", () => {
     await expect(page).toHaveURL(/\/play\/cedar-rapids\/map\/?/, { timeout: 15_000 });
     const board = page.locator(".city-game-map-board");
     await expect(board).toBeVisible({ timeout: 15_000 });
-    await expect(page.locator('a[href="/data-policy.html"]')).toBeVisible();
+    await expect(page.locator(".idea-footnote").getByRole("link", { name: "Data policy" })).toBeVisible();
   });
 
-  test("mobile viewport keeps collapsed sketch summary below capped place list", async ({ page }) => {
+  test("mobile viewport keeps launch spotlight above collapsed browse and mechanics", async ({
+    page,
+  }) => {
     await mockSeasonSnapshot(page, mockSnapshotBody());
     await page.setViewportSize({ width: 390, height: 844 });
 
@@ -291,8 +373,9 @@ test.describe("city game map board", () => {
 
     const board = page.locator(".city-game-map-board");
     await expect(board).toBeVisible({ timeout: 15_000 });
-    await expect(board.getByRole("heading", { name: "Quest log" })).toBeVisible();
-    await expect(board.getByRole("heading", { name: "Places" })).toBeVisible();
+    await expect(board.getByRole("heading", { name: "Riverwalk River Lantern" })).toBeVisible();
+    await expect(board.locator("#city-game-map-browse")).toHaveJSProperty("open", false);
+    await expect(board.getByRole("heading", { name: "Places" })).toBeHidden();
 
     const advanced = board.locator("#city-game-map-advanced");
     const sketch = board.locator("#district-sketch");
@@ -300,33 +383,36 @@ test.describe("city game map board", () => {
     await expect(advanced).toHaveJSProperty("open", false);
     await expect(sketch).toHaveJSProperty("open", false);
 
-    const lobby = board.locator(".city-game-map-lobby");
-    const stateSection = board.locator(".city-game-map-state");
+    const spotlight = board.locator("#city-game-map-spotlight");
     const placesSection = board.locator(".city-game-map-places");
-    const list = board.locator(".city-game-map-list-panel");
+    const changedSection = board.locator("#city-game-map-changed");
 
-    const lobbyBox = await lobby.boundingBox();
-    const stateBox = await stateSection.boundingBox();
+    await expect(board.getByRole("heading", { name: "Quest log" })).toBeHidden();
+    await expect(changedSection.getByText(/what changed/i)).toBeVisible();
+
+    const spotlightBox = await spotlight.boundingBox();
     const placesBox = await placesSection.boundingBox();
+    const changedBox = await changedSection.boundingBox();
     const advancedBox = await advanced.boundingBox();
-    const listBox = await list.boundingBox();
 
-    expect(lobbyBox?.width ?? 0).toBeGreaterThan(280);
-    expect(stateBox?.width ?? 0).toBeGreaterThan(280);
+    expect(spotlightBox?.width ?? 0).toBeGreaterThan(280);
     expect(placesBox?.width ?? 0).toBeGreaterThan(280);
+    expect(changedBox?.width ?? 0).toBeGreaterThan(280);
     expect(advancedBox?.width ?? 0).toBeGreaterThan(280);
-    expect(listBox?.width ?? 0).toBeGreaterThan(280);
 
-    // Progress hook, then places, then quest log; mechanics tucked below the capped list.
-    expect((lobbyBox?.y ?? 0) + (lobbyBox?.height ?? 0)).toBeLessThanOrEqual(
-      (placesBox?.y ?? 0) + 24
+    expect((spotlightBox?.y ?? 0) + (spotlightBox?.height ?? 0)).toBeLessThanOrEqual(
+      (changedBox?.y ?? 0) + 24
     );
     expect((placesBox?.y ?? 0) + (placesBox?.height ?? 0)).toBeLessThanOrEqual(
-      (stateBox?.y ?? 0) + 24
+      (changedBox?.y ?? 0) + 24
     );
-    expect((listBox?.y ?? 0) + (listBox?.height ?? 0)).toBeLessThanOrEqual(
+    expect((changedBox?.y ?? 0) + (changedBox?.height ?? 0)).toBeLessThanOrEqual(
       (advancedBox?.y ?? 0) + 24
     );
+
+    await openBrowsePlaces(board);
+    const list = board.locator(".city-game-map-list-panel");
+    const listBox = await list.boundingBox();
     expect(listBox?.height ?? 0).toBeLessThanOrEqual(360);
     await advanced.scrollIntoViewIfNeeded();
     await expect(advanced).toBeInViewport({ ratio: 0.2 });

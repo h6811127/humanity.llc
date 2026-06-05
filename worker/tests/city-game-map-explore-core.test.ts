@@ -42,8 +42,10 @@ describe("city-game-map-explore-core", () => {
     const html = buildExploreFilterHtml(season);
     expect(html).toContain('data-explore-filter="all"');
     expect(html).toContain('data-explore-filter="relay_gate"');
-    expect(html).toContain("Relay 17");
-    expect(html).toContain("Story 7");
+    expect(html).toContain('data-filter-label="Relay"');
+    expect(html).toContain("city-game-map-filter-btn-count");
+    expect(html).toContain("Relay");
+    expect(html).toContain("Story");
     expect(html).not.toContain("Moving story");
     expect(html).toContain("Explore by");
   });

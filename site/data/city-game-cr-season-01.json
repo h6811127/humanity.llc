@@ -39,13 +39,18 @@
     "hook_stirring": "Something is stirring.",
     "hook_awake": "The city woke.",
     "progress_suffix": "fragments recovered",
+    "code_hint": "Code is on the back of the sticker.",
+    "row_scan_hint": "Scan sticker there.",
+    "spotlight_scan_hint": "Scan sticker · enter code",
+    "count_placeholder": "Scan for live count",
+    "browse_summary": "Browse all places",
     "live_hint": "Find stickers. Scan them. Help unlock city goals.",
     "start_here": {
       "title": "Start here",
       "steps": [
-        "Pick a district",
-        "Open a place",
-        "Scan when you arrive"
+        "Find a sticker",
+        "Scan it",
+        "Add your charge"
       ]
     },
     "wayfinding_intro": "Start anywhere — scan any game sticker you find. Planning from home? Search place names in your maps app; the sketch below is districts only, not streets.",
@@ -61,7 +66,23 @@
     "fog_title": "Hidden on the sketch",
     "fog_lead_signal_war": "Some pins stay hidden until the city claims them.",
     "fog_lead_rumor_only": "The sketch shows rumored spots only — scan to find the rest.",
-    "roles_summary": "Place types"
+    "roles_summary": "Place types",
+    "launch": {
+      "hero_steps": [
+        "Find a sticker",
+        "Scan it",
+        "Add your charge"
+      ],
+      "hero_aria_label": "How to play",
+      "code_hint": "Code is on the back of the sticker.",
+      "privacy_note": "No account. No visit log. No GPS tracking.",
+      "count_placeholder": "Scan for live count",
+      "count_label": "River Lantern",
+      "spotlight_scan_hint": "Scan sticker · enter code",
+      "row_scan_hint": "Scan sticker there.",
+      "browse_summary": "Browse places",
+      "what_changed_summary": "What changed"
+    }
   },
   "player_guide": {
     "hero_subline": "Open the <a href=\"/play/cedar-rapids/map/\">weekend city board</a> — every game spot, with Open in Maps links (scan each sticker for live chips).",

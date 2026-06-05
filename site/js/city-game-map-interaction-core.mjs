@@ -73,13 +73,16 @@ function escapeAttr(value) {
 export function buildDistrictFilterHtml(season) {
   const options = buildDistrictFilterOptions(season);
   const chips = [
-    `<button type="button" class="city-game-map-filter-btn city-game-map-filter-btn--active" data-district-filter="all" aria-pressed="true">All districts</button>`,
+    `<button type="button" class="city-game-map-filter-btn city-game-map-filter-btn--active" data-district-filter="all" data-filter-label="All districts" aria-pressed="true">All districts</button>`,
     ...options.map(
       (o) =>
-        `<button type="button" class="city-game-map-filter-btn" data-district-filter="${escapeAttr(o.id)}" aria-pressed="false">${escapeAttr(o.label)}</button>`
+        `<button type="button" class="city-game-map-filter-btn" data-district-filter="${escapeAttr(o.id)}" data-filter-label="${escapeAttr(o.label)}" aria-pressed="false">${escapeAttr(o.label)}</button>`
     ),
   ].join("");
-  return `<div class="city-game-map-filter" role="toolbar" aria-label="Filter places by district">${chips}</div>`;
+  return `<div class="city-game-map-district-filter city-game-map-filter" role="toolbar" aria-label="Filter places by district">
+  <span class="city-game-map-filter-label">District</span>
+  <div class="city-game-map-filter-chips">${chips}</div>
+</div>`;
 }
 
 /**
@@ -96,12 +99,13 @@ export function resolveMapNodeHighlight(currentNodeId, clickedNodeId) {
 }
 
 /**
- * District-filtered pins use [hidden]; snapshot fog stays visual-only and hittable.
- * @param {{ hidden?: boolean } | null | undefined} pin
+ * Filter-hidden and [hidden] pins are not interactive; snapshot fog stays hittable.
+ * @param {{ hidden?: boolean; hasAttribute?: (name: string) => boolean } | null | undefined} pin
  */
 export function isMapPinInteractive(pin) {
   if (!pin) return false;
   if (pin.hidden) return false;
+  if (typeof pin.hasAttribute === "function" && pin.hasAttribute("hidden")) return false;
   return true;
 }
 

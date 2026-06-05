@@ -37,6 +37,8 @@ describe("city-game-map-interaction-core", () => {
     const html = buildDistrictFilterHtml(season);
     expect(html).toContain('data-district-filter="all"');
     expect(html).toContain('data-district-filter="river_spine"');
+    expect(html).toContain("city-game-map-filter-label");
+    expect(html).toContain("District");
   });
 
   it("styles include M4 highlight and filter chrome", () => {
@@ -44,6 +46,10 @@ describe("city-game-map-interaction-core", () => {
     expect(styles).toContain(".city-game-map-pin--highlight");
     expect(styles).toContain(".city-game-map-node-row--highlight");
     expect(styles).toContain(".city-game-map-filter-btn");
+    expect(styles).toContain(".city-game-map-filter-btn--active");
+    expect(styles).toContain(".city-game-map-filter-summary");
+    expect(styles).toContain(".city-game-map-filter-clear");
+    expect(styles).toContain(".city-game-map-node-row[hidden]");
   });
 
   it("accepts SVG pin targets on board click", () => {
@@ -54,6 +60,7 @@ describe("city-game-map-interaction-core", () => {
     expect(src).toContain("function selectMapPin(");
     expect(src).toContain("isMapPinInteractive");
     expect(src).toContain("setExploreFilter");
+    expect(src).toContain("clearBoardFilters");
     expect(src).toContain("applyBoardFilterVisibility");
   });
 
@@ -65,13 +72,15 @@ describe("city-game-map-interaction-core", () => {
 
   it("isMapPinInteractive rejects filter-hidden pins only", () => {
     expect(isMapPinInteractive({ hidden: true })).toBe(false);
+    expect(isMapPinInteractive({ hasAttribute: (name) => name === "hidden" })).toBe(false);
     expect(
       isMapPinInteractive({
         hidden: false,
+        hasAttribute: () => false,
         classList: { contains: (name) => name === "city-game-map-pin--fog-hidden" },
       })
     ).toBe(true);
-    expect(isMapPinInteractive({ hidden: false })).toBe(true);
+    expect(isMapPinInteractive({ hidden: false, hasAttribute: () => false })).toBe(true);
   });
 
   it("fog styling does not disable schematic pin hit targets", () => {

@@ -3,6 +3,103 @@
  */
 
 import { matchesBoardNodeFilters, normalizeBoardFilterState } from "./city-game-map-explore-core.mjs";
+import {
+  formatBoardFilterCountLabel,
+  formatBoardFilterSummaryScope,
+  isBoardFilterActive,
+} from "./city-game-map-filter-summary-core.mjs";
+
+/**
+ * @param {HTMLElement} boardRoot
+ */
+export function countVisibleBoardNodes(boardRoot) {
+  let count = 0;
+  for (const row of boardRoot.querySelectorAll(".city-game-map-node-row[data-node-id]")) {
+    if (!row || typeof row !== "object" || !("hidden" in row)) continue;
+    if (!row.hidden) count += 1;
+  }
+  return count;
+}
+
+/**
+ * @param {string} value
+ */
+function escapeSelectorValue(value) {
+  if (typeof CSS !== "undefined" && typeof CSS.escape === "function") {
+    return CSS.escape(value);
+  }
+  return String(value).replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+}
+
+/**
+ * @param {HTMLElement} boardRoot
+ * @param {string} filterAttr
+ * @param {string} filterId
+ * @param {string} fallbackLabel
+ */
+function readFilterButtonLabel(boardRoot, filterAttr, filterId, fallbackLabel) {
+  const selector = `[${filterAttr}="${escapeSelectorValue(filterId)}"]`;
+  const btn = boardRoot.querySelector(selector);
+  if (!btn || typeof btn.getAttribute !== "function") return fallbackLabel;
+  const dataLabel = btn.getAttribute("data-filter-label");
+  if (dataLabel && dataLabel.trim()) return dataLabel.trim();
+  const text = typeof btn.textContent === "string" ? btn.textContent.trim() : "";
+  return text || fallbackLabel;
+}
+
+/**
+ * @param {HTMLElement} boardRoot
+ */
+export function syncBoardFilterSummary(boardRoot) {
+  const summary = boardRoot.querySelector("#city-game-map-filter-summary");
+  if (!summary || typeof summary !== "object" || !("hidden" in summary)) return;
+
+  const districtId = boardRoot.dataset.activeDistrict ?? "all";
+  const exploreId = boardRoot.dataset.activeExplore ?? "all";
+
+  if (!isBoardFilterActive(districtId, exploreId)) {
+    summary.hidden = true;
+    return;
+  }
+
+  const districtLabel = readFilterButtonLabel(
+    boardRoot,
+    "data-district-filter",
+    districtId,
+    districtId === "all" ? "All districts" : districtId
+  );
+  const exploreLabel = readFilterButtonLabel(
+    boardRoot,
+    "data-explore-filter",
+    exploreId,
+    exploreId === "all" ? "All kinds" : exploreId
+  );
+
+  const scopeEl = summary.querySelector("[data-filter-summary-scope]");
+  if (scopeEl) {
+    scopeEl.textContent = formatBoardFilterSummaryScope(districtLabel, exploreLabel);
+  }
+
+  const countEl = summary.querySelector("[data-filter-summary-count]");
+  if (countEl) {
+    countEl.textContent = formatBoardFilterCountLabel(countVisibleBoardNodes(boardRoot));
+  }
+
+  summary.hidden = false;
+}
+
+/**
+ * @param {{ hidden?: boolean; hasAttribute?: (name: string) => boolean } | null | undefined} el
+ * @param {boolean} hidden
+ */
+export function setBoardFilterHidden(el, hidden) {
+  if (!el || typeof el !== "object") return;
+  if (typeof el.setAttribute === "function" && typeof el.removeAttribute === "function") {
+    if (hidden) el.setAttribute("hidden", "");
+    else el.removeAttribute("hidden");
+  }
+  if ("hidden" in el) el.hidden = hidden;
+}
 
 /**
  * @param {HTMLElement} boardRoot
@@ -23,6 +120,7 @@ export function applyBoardFilterVisibility(boardRoot) {
       { activeDistrict, activeExplore }
     );
     if ("hidden" in row) row.hidden = !match;
+    else setBoardFilterHidden(row, !match);
   }
 
   for (const pin of boardRoot.querySelectorAll(".city-game-map-pin[data-district]")) {
@@ -34,25 +132,29 @@ export function applyBoardFilterVisibility(boardRoot) {
       },
       { activeDistrict, activeExplore }
     );
-    if ("hidden" in pin) pin.hidden = !match;
+    setBoardFilterHidden(pin, !match);
   }
 
   for (const block of boardRoot.querySelectorAll(".city-game-map-district[data-district]")) {
     if (!block || typeof block !== "object" || typeof block.getAttribute !== "function") continue;
     const districtId = block.getAttribute("data-district");
     if (activeDistrict && districtId !== activeDistrict) {
-      if ("hidden" in block) block.hidden = true;
+      setBoardFilterHidden(block, true);
       continue;
     }
     const rowNodes =
       typeof block.querySelectorAll === "function"
         ? block.querySelectorAll(".city-game-map-node-row")
         : [];
-    const anyVisible = [...rowNodes].some(
-      (row) => row && typeof row === "object" && "hidden" in row && !row.hidden
-    );
-    if ("hidden" in block) block.hidden = !anyVisible;
+    const anyVisible = [...rowNodes].some((row) => {
+      if (!row || typeof row !== "object") return false;
+      if ("hidden" in row) return !row.hidden;
+      return !row.hasAttribute?.("hidden");
+    });
+    setBoardFilterHidden(block, !anyVisible);
   }
+
+  syncBoardFilterSummary(boardRoot);
 }
 
 /**
@@ -111,4 +213,15 @@ export function setExploreFilter(boardRoot, exploreId) {
   boardRoot.dataset.activeExplore = exploreId;
   applyBoardFilterVisibility(boardRoot);
   syncExploreFilterUi(boardRoot, exploreId);
+}
+
+/**
+ * @param {HTMLElement} boardRoot
+ */
+export function clearBoardFilters(boardRoot) {
+  boardRoot.dataset.activeDistrict = "all";
+  boardRoot.dataset.activeExplore = "all";
+  applyBoardFilterVisibility(boardRoot);
+  syncDistrictFilterUi(boardRoot, "all");
+  syncExploreFilterUi(boardRoot, "all");
 }

@@ -41,6 +41,59 @@ function mockBoardRoot(nodes) {
     rowRefs: rows.filter((row) => row.district === district),
   }));
 
+  /** @type {{ hidden: boolean; scopeText: string; countText: string }} */
+  const summary = {
+    hidden: true,
+    scopeText: "",
+    countText: "",
+  };
+
+  /** @type {Record<string, { label: string }>} */
+  const districtButtons = {
+    all: { label: "All districts" },
+    newbo: { label: "NewBo" },
+    river_spine: { label: "River spine" },
+  };
+
+  /** @type {Record<string, { label: string }>} */
+  const exploreButtons = {
+    all: { label: "All kinds" },
+    relay_gate: { label: "Relay" },
+  };
+
+  /**
+   * @param {string} selector
+   */
+  function queryFilterButton(selector) {
+    const districtMatch = selector.match(/^\[data-district-filter="([^"]+)"\]$/);
+    if (districtMatch) {
+      const id = districtMatch[1];
+      const meta = districtButtons[id];
+      if (!meta) return null;
+      return {
+        getAttribute(name) {
+          if (name === "data-filter-label") return meta.label;
+          return null;
+        },
+        textContent: meta.label,
+      };
+    }
+    const exploreMatch = selector.match(/^\[data-explore-filter="([^"]+)"\]$/);
+    if (exploreMatch) {
+      const id = exploreMatch[1];
+      const meta = exploreButtons[id];
+      if (!meta) return null;
+      return {
+        getAttribute(name) {
+          if (name === "data-filter-label") return meta.label;
+          return null;
+        },
+        textContent: meta.label,
+      };
+    }
+    return null;
+  }
+
   const boardRoot = {
     dataset: {
       activeDistrict: "all",
@@ -101,12 +154,45 @@ function mockBoardRoot(nodes) {
       }
       return [];
     },
-    querySelector() {
-      return null;
+    querySelector(selector) {
+      if (selector === "#city-game-map-filter-summary") {
+        return {
+          get hidden() {
+            return summary.hidden;
+          },
+          set hidden(value) {
+            summary.hidden = Boolean(value);
+          },
+          querySelector(sel) {
+            if (sel === "[data-filter-summary-scope]") {
+              return {
+                get textContent() {
+                  return summary.scopeText;
+                },
+                set textContent(value) {
+                  summary.scopeText = String(value ?? "");
+                },
+              };
+            }
+            if (sel === "[data-filter-summary-count]") {
+              return {
+                get textContent() {
+                  return summary.countText;
+                },
+                set textContent(value) {
+                  summary.countText = String(value ?? "");
+                },
+              };
+            }
+            return null;
+          },
+        };
+      }
+      return queryFilterButton(selector);
     },
   };
 
-  return { boardRoot, rows, pins, blocks };
+  return { boardRoot, rows, pins, blocks, summary };
 }
 
 describe("city-game-map-filter-core", () => {
@@ -184,8 +270,30 @@ describe("city-game-map-filter-core", () => {
     const html = buildMapBoardInnerHtml(season);
     expect(html).toContain("city-game-map-explore-filter");
     expect(html).toContain('data-explore-filter="relay_gate"');
-    expect(html).toContain("Relay 17");
+    expect(html).toContain("Relay");
     expect(html).toContain('data-role="relay_gate"');
+    expect(html).toContain("city-game-map-filter-summary");
+    expect(html).toContain("Clear filters");
     expect(html).not.toContain("city-game-map-roles-details");
+  });
+
+  it("syncBoardFilterSummary shows combined district and explore labels", () => {
+    const nodes = season.nodes.map(
+      (row: { node_id: string; district: string; role: string }) => ({
+        node_id: row.node_id,
+        district: row.district,
+        role: row.role,
+      })
+    );
+    const { boardRoot, rows, summary } = mockBoardRoot(nodes);
+
+    boardRoot.dataset.activeDistrict = "newbo";
+    boardRoot.dataset.activeExplore = "relay_gate";
+    applyBoardFilterVisibility(/** @type {HTMLElement} */ (boardRoot));
+
+    expect(summary.hidden).toBe(false);
+    expect(summary.scopeText).toBe("NewBo · Relay");
+    const visible = rows.filter((row) => !row.hidden).length;
+    expect(summary.countText).toBe(visible === 1 ? "1 place" : `${visible} places`);
   });
 });

@@ -6,6 +6,7 @@ import {
   escapeMapHtml,
   formatHookLine,
   formatProgressLine,
+  MAP_ROW_SCAN_HINT,
 } from "./city-game-map-board-core.mjs";
 
 export const CITY_GAME_SNAPSHOT_POLL_MS = 90_000;
@@ -27,7 +28,7 @@ export function seasonSnapshotUrl(seasonId, origin) {
  */
 export function buildNodeChipsHtml(chips) {
   if (!Array.isArray(chips) || !chips.length) {
-    return `<span class="city-game-map-live-hint">Scan on arrival</span>`;
+    return `<span class="city-game-map-live-hint">${escapeMapHtml(MAP_ROW_SCAN_HINT)}</span>`;
   }
   const items = chips
     .map((chip) => {
@@ -112,6 +113,73 @@ export function applyFinaleFromSnapshot(boardRoot, snapshot) {
 }
 
 /**
+ * @param {{ chips?: Array<{ kind?: string; value?: string }> } | null | undefined} snap
+ */
+export function formatSpotlightCountFromSnap(snap) {
+  if (!snap || !Array.isArray(snap.chips) || !snap.chips.length) return null;
+  const collective = snap.chips.find((chip) => chip?.kind === "collective");
+  const chip = collective ?? snap.chips[0];
+  const value = typeof chip?.value === "string" ? chip.value.trim() : "";
+  return value || null;
+}
+
+/**
+ * @param {string | null | undefined} value
+ * @param {string} [countLabel]
+ */
+export function formatSpotlightCountLine(value, countLabel = "") {
+  const trimmed = typeof value === "string" ? value.trim() : "";
+  if (!trimmed) return null;
+  const label = countLabel?.trim();
+  return label ? `${label} · ${trimmed}` : trimmed;
+}
+
+/**
+ * @param {HTMLElement} boardRoot
+ * @param {Record<string, unknown>} snapshot
+ */
+export function applySpotlightFromSnapshot(boardRoot, snapshot) {
+  const spotlight = boardRoot.querySelector("#city-game-map-spotlight");
+  const countEl = boardRoot.querySelector("#city-game-map-spotlight-count");
+  if (
+    !spotlight ||
+    typeof spotlight !== "object" ||
+    !("dataset" in spotlight) ||
+    !countEl ||
+    typeof countEl !== "object" ||
+    !("textContent" in countEl)
+  ) {
+    return;
+  }
+
+  const spotlightDataset = /** @type {{ nodeId?: string; countPlaceholder?: string; countLabel?: string }} */ (
+    spotlight.dataset
+  );
+  const placeholder = spotlightDataset.countPlaceholder?.trim() || "Scan for live count";
+  const countLabel = spotlightDataset.countLabel?.trim() || "";
+  const nodeId = spotlightDataset.nodeId?.trim();
+  if (!nodeId) return;
+
+  const nodes = Array.isArray(snapshot.nodes) ? snapshot.nodes : [];
+  const nodeById = Object.fromEntries(
+    nodes.filter((row) => row?.node_id).map((row) => [row.node_id, row])
+  );
+  const snap = nodeById[nodeId] ?? null;
+  const count = formatSpotlightCountFromSnap(snap);
+  const line = formatSpotlightCountLine(count, countLabel);
+
+  countEl.textContent = line ?? placeholder;
+  if (typeof spotlight.classList?.toggle === "function") {
+    spotlight.classList.toggle("city-game-map-spotlight--live", Boolean(line));
+    spotlight.classList.toggle(
+      "city-game-map-spotlight--maintenance",
+      snap?.map_mode === "care_pause" || snap?.lifecycle === "paused"
+    );
+    spotlight.classList.toggle("city-game-map-spotlight--revoked", snap?.lifecycle === "revoked");
+  }
+}
+
+/**
  * @param {HTMLElement} boardRoot
  * @param {Record<string, unknown>} snapshot
  */
@@ -132,7 +200,7 @@ export function applySnapshotToMapBoard(boardRoot, snapshot) {
     if (!(live instanceof HTMLElement)) continue;
     const snap = nodeSnapshot(nodeById, nodeId);
     if (!snap) {
-      live.innerHTML = `<span class="city-game-map-live-hint">Scan on arrival</span>`;
+      live.innerHTML = `<span class="city-game-map-live-hint">${escapeMapHtml(MAP_ROW_SCAN_HINT)}</span>`;
       row.classList.remove("city-game-map-node-row--live");
       continue;
     }
@@ -191,6 +259,7 @@ export function applySnapshotToMapBoard(boardRoot, snapshot) {
   applyLobbyProgressFromSnapshot(boardRoot, snapshot);
   applyFinaleFromSnapshot(boardRoot, snapshot);
   applySignalWarFromSnapshot(boardRoot, snapshot);
+  applySpotlightFromSnapshot(boardRoot, snapshot);
 
   return { ok: true, nodeCount: nodes.length };
 }

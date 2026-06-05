@@ -3,6 +3,7 @@
  */
 import {
   applyBoardFilterVisibility,
+  clearBoardFilters,
   setDistrictFilter,
   setExploreFilter,
 } from "./city-game-map-filter-core.mjs";
@@ -207,6 +208,11 @@ export function bootCityGameMapInteraction(boardRoot, season) {
     const target = event.target;
     if (!(target instanceof Element)) return;
 
+    if (target.closest("[data-filter-clear]")) {
+      clearBoardFilters(boardRoot);
+      return;
+    }
+
     const pin = target.closest(".city-game-map-pin");
     if (pin instanceof SVGGElement) {
       const nodeId = pin.getAttribute("data-node-id");
@@ -215,7 +221,7 @@ export function bootCityGameMapInteraction(boardRoot, season) {
     }
 
     if (target.closest("a[href]")) return;
-    if (target.closest("[data-district-filter], [data-explore-filter]")) return;
+    if (target.closest("[data-district-filter], [data-explore-filter], [data-filter-clear]")) return;
 
     const row = target.closest(".city-game-map-node-row");
     if (row instanceof HTMLElement && row.dataset.nodeId) {
