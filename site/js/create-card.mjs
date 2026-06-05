@@ -100,13 +100,6 @@ import {
 } from "./device-ownership-copy-core.mjs";
 import { isEphemeralBrowsingStorage } from "./private-browsing-detect-core.mjs";
 import { buildObjectStreamsFromFormRows } from "./object-streams-core.mjs";
-
-/** @param {string} phase @param {Record<string, unknown>} [detail] */
-function logCreateSubmit(phase, detail = {}) {
-  if (typeof console !== "undefined" && typeof console.debug === "function") {
-    console.debug("[hc-create-submit]", phase, detail);
-  }
-}
 import {
   qrExpiryFromIssued,
   encodePrivateKeyBase58,
@@ -119,6 +112,13 @@ import {
   signDocument,
   withProtocolFields,
 } from "./hc-sign.mjs";
+
+/** @param {string} phase @param {Record<string, unknown>} [detail] */
+function logCreateSubmit(phase, detail = {}) {
+  if (typeof console !== "undefined" && typeof console.debug === "function") {
+    console.debug("[hc-create-submit]", phase, detail);
+  }
+}
 
 const form = document.getElementById("create-form");
 const statusEl = document.getElementById("status");

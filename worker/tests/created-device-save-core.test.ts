@@ -97,15 +97,19 @@ describe("create-card P0-2 wiring", () => {
     expect(src).not.toContain("queueMicrotask");
   });
 
-  it("pre-navigate autosave uses full_keys so WebAuthn does not block redirect", () => {
+  it("pre-navigate autosave uses full_keys even when session custody is device_unlock", () => {
     const src = readFileSync(join(root, "site/js/create-card.mjs"), "utf8");
+    expect(src).toContain("[hc-create-submit]");
     expect(src).toContain("autosave:before-navigate:start");
+    expect(src).toContain("sessionCustody: session.custody_mode");
+    expect(src).toContain("saveCustody: CUSTODY_MODE_FULL_KEYS");
     expect(src).toMatch(
       /shouldSyncAutoSaveBeforeCreateNavigate[\s\S]*saveSessionToWalletWithCustody\([\s\S]*custodyMode:\s*CUSTODY_MODE_FULL_KEYS/
     );
     expect(src).not.toMatch(
       /shouldSyncAutoSaveBeforeCreateNavigate[\s\S]*custodyMode:\s*session\.custody_mode/
     );
+    expect(src).not.toMatch(/navigator\.credentials\.create/);
   });
 
   it("created-device-save does not defer auto-save to microtask", () => {
