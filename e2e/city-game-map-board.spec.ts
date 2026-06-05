@@ -69,38 +69,14 @@ async function openDistrictSketch(board: ReturnType<Page["locator"]>) {
   });
 }
 
-async function openBrowsePlaces(board: ReturnType<Page["locator"]>) {
-  await board.locator("#city-game-map-browse").evaluate((el) => {
-    if (el instanceof HTMLDetailsElement) el.open = true;
-  });
-}
-
-/** Viewing bar fully inside the scrollport of `.city-game-map-list-panel`. */
-async function expectFilterSummaryPinnedInListPanel(board: ReturnType<Page["locator"]>) {
-  const pinned = await board.locator(".city-game-map-list-panel").evaluate((panel) => {
-    if (!(panel instanceof HTMLElement)) return false;
-    const summary = panel.querySelector("#city-game-map-filter-summary");
-    if (!(summary instanceof HTMLElement) || summary.hidden) return false;
-    const panelRect = panel.getBoundingClientRect();
-    const summaryRect = summary.getBoundingClientRect();
-    return (
-      summaryRect.top >= panelRect.top - 1 &&
-      summaryRect.bottom <= panelRect.bottom + 1
-    );
-  });
-  expect(pinned).toBe(true);
-}
-
-async function openWhatChanged(board: ReturnType<Page["locator"]>) {
-  await board.locator("#city-game-map-changed").evaluate((el) => {
-    if (el instanceof HTMLDetailsElement) el.open = true;
-  });
-}
-
 async function clickMapPin(pin: ReturnType<ReturnType<Page["locator"]>["locator"]>) {
   await pin.evaluate((el) => {
     el.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
   });
+}
+
+function districtSketchPin(board: ReturnType<Page["locator"]>, nodeId: string) {
+  return board.locator(`#district-sketch .city-game-map-pin[data-node-id="${nodeId}"]`);
 }
 
 test.describe("city game map board", () => {
@@ -118,7 +94,9 @@ test.describe("city game map board", () => {
     await expect(board.getByText("Help wake the city.")).toBeVisible();
     await expect(board.locator("#city-game-map-mission-progress")).toBeVisible();
     await expect(board.getByText("Relays unclaimed · Finale dormant")).toBeVisible();
-    await expect(board.getByText("No account. No GPS. No visit log.")).toBeVisible();
+    await expect(board.locator("#city-game-map-mission .city-game-map-mission-privacy")).toContainText(
+      "No account. No GPS. No visit log."
+    );
     await expect(board.getByText("Find a live sticker")).toBeVisible();
     await expect(board.getByText("See what changed")).toBeVisible();
     await expect(
@@ -126,28 +104,30 @@ test.describe("city game map board", () => {
     ).toBeVisible();
     await expect(board.getByRole("heading", { name: "Riverwalk River Lantern" })).toBeVisible();
     await expect(board.getByText("Find the River Lantern and add one signal.")).toBeVisible();
-    await expect(board.getByText("Unlocks Czech Village cabinet")).toBeVisible();
-    await expect(board.getByText("Find the River Lantern")).toBeVisible();
+    await expect(board.locator("#city-game-map-spotlight .city-game-map-spotlight-effect")).toContainText(
+      "Unlocks Czech Village cabinet"
+    );
+    await expect(board.locator("#city-game-map-spotlight .city-game-map-spotlight-hint")).toContainText(
+      "Find the River Lantern"
+    );
     await expect(board.getByText(/back of the sticker|enter code|Add to the city/i)).toHaveCount(0);
-    await expect(board.locator("#city-game-map-browse")).toHaveJSProperty("open", false);
-    await expect(board.locator(".city-game-map-browse-filters")).toBeHidden();
+    await expect(board.locator("#city-game-map-places")).toBeVisible();
+    await expect(board.locator(".city-game-map-browse-filters")).toBeVisible();
+    await expect(board.getByText("Start at Riverwalk River Lantern.")).toBeVisible();
 
     await expect(board).toHaveAttribute("data-snapshot-loaded", "1");
     await expect(board.locator("#city-game-map-mission-progress")).toHaveText("1 / 3 fragments recovered");
     await expect(board.locator("#city-game-map-spotlight-count")).toHaveText("14 / 20");
     await expect(board.locator("#city-game-map-changed")).toHaveJSProperty("open", true);
-    await expect(board.getByText("1 / 3 fragments recovered")).toBeVisible();
-    await expect(board.getByText("Something is stirring.")).toBeVisible();
-    await openBrowsePlaces(board);
+    await expect(board.locator("#city-game-map-progress")).toHaveText("1 / 3 fragments recovered");
+    await expect(board.locator("#city-game-map-changed")).toContainText("Something is stirring.");
     const riverRow = board.locator('.city-game-map-node-row[data-node-id="node_04"]');
     await expect(riverRow).toHaveCount(1);
     await expect(riverRow).toHaveClass(/city-game-map-node-row--spotlight/);
     await expect(riverRow.locator("[data-node-effect]")).toContainText("14 / 20");
   });
 
-  test("Explore By filters places and schematic pins with district AND logic", async ({
-    page,
-  }) => {
+  test("type and state filters narrow places and schematic pins", async ({ page }) => {
     await mockSeasonSnapshot(page, mockSnapshotBody());
 
     await page.goto("/play/cedar-rapids/map/");
@@ -156,12 +136,11 @@ test.describe("city game map board", () => {
     await expect(board).toBeVisible({ timeout: 15_000 });
     await expect(board).toHaveAttribute("data-snapshot-loaded", "1");
 
-    await openBrowsePlaces(board);
-    const explore = board.locator(".city-game-map-explore-filter");
-    await expect(explore.getByRole("button", { name: /Relay 17/ })).toBeVisible();
+    const typeFilter = board.locator(".city-game-map-type-filter");
+    await expect(typeFilter.getByRole("button", { name: /Relays 17/ })).toBeVisible();
 
-    await explore.getByRole("button", { name: /Relay 17/ }).click();
-    await expect(board).toHaveAttribute("data-active-explore", "relay_gate");
+    await typeFilter.getByRole("button", { name: /Relays 17/ }).click();
+    await expect(board).toHaveAttribute("data-active-type", "relay_gate");
     await expect(board.locator('.city-game-map-node-row[data-role="relay_gate"]')).toHaveCount(17);
     await expect(board.locator('.city-game-map-node-row[data-role="relay_gate"]:visible')).toHaveCount(
       17
@@ -170,30 +149,25 @@ test.describe("city game map board", () => {
       0
     );
 
-    await board.getByRole("button", { name: "River spine" }).click();
-    await expect(board).toHaveAttribute("data-active-district", "river_spine");
-    const visibleRelayRiver = board.locator(
-      '.city-game-map-node-row[data-district="river_spine"][data-role="relay_gate"]:visible'
-    );
-    await expect(visibleRelayRiver).not.toHaveCount(0);
-    await expect(
-      board.locator(
-        '.city-game-map-node-row[data-district="river_spine"][data-role="lore_archive"]:visible'
-      )
-    ).toHaveCount(0);
-
     await openDistrictSketch(board);
     await expect(
-      board.locator('.city-game-map-pin[data-role="relay_gate"][data-district="river_spine"]:visible')
+      board.locator('#district-sketch .city-game-map-pin[data-role="relay_gate"]:not([hidden])')
     ).not.toHaveCount(0);
     await expect(
-      board.locator('.city-game-map-pin[data-role="lore_archive"]:visible')
+      board.locator('#district-sketch .city-game-map-pin[data-role="lore_archive"]:not([hidden])')
     ).toHaveCount(0);
 
-    await explore.getByRole("button", { name: "All kinds" }).click();
-    await board.getByRole("button", { name: "All districts" }).click();
-    await expect(board).toHaveAttribute("data-active-explore", "all");
-    await expect(board).toHaveAttribute("data-active-district", "all");
+    const stateFilter = board.locator(".city-game-map-state-filter");
+    await stateFilter.getByRole("button", { name: "Needs action" }).click();
+    await expect(board).toHaveAttribute("data-active-state", "needs_action");
+    await expect(
+      board.locator('.city-game-map-node-row[data-role="relay_gate"]:visible')
+    ).not.toHaveCount(0);
+
+    await typeFilter.getByRole("button", { name: "All", exact: true }).click();
+    await stateFilter.getByRole("button", { name: "All states" }).click();
+    await expect(board).toHaveAttribute("data-active-type", "all");
+    await expect(board).toHaveAttribute("data-active-state", "all");
     await expect(board.locator(".city-game-map-node-row:visible")).toHaveCount(40);
   });
 
@@ -207,53 +181,54 @@ test.describe("city game map board", () => {
     await expect(board).toBeVisible({ timeout: 15_000 });
     await expect(board).toHaveAttribute("data-snapshot-loaded", "1");
 
-    await openBrowsePlaces(board);
-    const explore = board.locator(".city-game-map-explore-filter");
-    const allDistricts = board.getByRole("button", { name: "All districts" });
-    const allKinds = explore.getByRole("button", { name: "All kinds" });
-    await expect(allDistricts).toHaveAttribute("aria-pressed", "true");
-    await expect(allKinds).toHaveAttribute("aria-pressed", "true");
-    await expect(allDistricts).not.toHaveClass(/city-game-map-filter-btn--active/);
-    await expect(allKinds).not.toHaveClass(/city-game-map-filter-btn--active/);
+    const typeFilter = board.locator(".city-game-map-type-filter");
+    const stateFilter = board.locator(".city-game-map-state-filter");
+    const allTypes = typeFilter.getByRole("button", { name: "All", exact: true });
+    const allStates = stateFilter.getByRole("button", { name: "All states" });
+    await expect(allTypes).toHaveAttribute("aria-pressed", "true");
+    await expect(allStates).toHaveAttribute("aria-pressed", "true");
+    await expect(allTypes).not.toHaveClass(/city-game-map-filter-btn--active/);
+    await expect(allStates).not.toHaveClass(/city-game-map-filter-btn--active/);
 
-    const relayBtn = explore.getByRole("button", { name: /Relay 17/ });
+    const relayBtn = typeFilter.getByRole("button", { name: /Relays 17/ });
     await relayBtn.click();
 
     await expect(relayBtn).toHaveAttribute("aria-pressed", "true");
     await expect(relayBtn).toHaveClass(/city-game-map-filter-btn--active/);
     await expect(relayBtn).toHaveCSS("background-color", "rgb(219, 27, 67)");
-    await expect(allKinds).toHaveAttribute("aria-pressed", "false");
-    await expect(allKinds).not.toHaveClass(/city-game-map-filter-btn--active/);
+    await expect(allTypes).toHaveAttribute("aria-pressed", "false");
+    await expect(allTypes).not.toHaveClass(/city-game-map-filter-btn--active/);
 
     const summary = board.locator("#city-game-map-filter-summary");
     await expect(summary).toBeVisible();
     await expect(summary).toContainText("Viewing:");
     await expect(summary.locator("[data-filter-summary-scope]")).toContainText(
-      "All districts · Relay"
+      "Relays · 17 places"
     );
-    await expect(summary.locator("[data-filter-summary-count]")).toHaveText("17 places");
 
-    const newBoBtn = board.getByRole("button", { name: "NewBo", exact: true });
-    await newBoBtn.click();
-    await expect(newBoBtn).toHaveAttribute("aria-pressed", "true");
-    await expect(newBoBtn).toHaveClass(/city-game-map-filter-btn--active/);
-    await expect(summary.locator("[data-filter-summary-scope]")).toContainText("NewBo · Relay");
+    const needsBtn = stateFilter.getByRole("button", { name: "Needs action" });
+    await needsBtn.click();
+    await expect(needsBtn).toHaveAttribute("aria-pressed", "true");
+    await expect(needsBtn).toHaveClass(/city-game-map-filter-btn--active/);
+    await expect(summary.locator("[data-filter-summary-scope]")).toContainText(
+      /Relays · Needs action · \d+ places/
+    );
 
     await summary.getByRole("button", { name: "Clear filters" }).click();
-    await expect(board).toHaveAttribute("data-active-district", "all");
-    await expect(board).toHaveAttribute("data-active-explore", "all");
+    await expect(board).toHaveAttribute("data-active-type", "all");
+    await expect(board).toHaveAttribute("data-active-state", "all");
     await expect(summary).toBeHidden();
     await expect(relayBtn).toHaveAttribute("aria-pressed", "false");
     await expect(relayBtn).not.toHaveClass(/city-game-map-filter-btn--active/);
-    await expect(newBoBtn).toHaveAttribute("aria-pressed", "false");
-    await expect(newBoBtn).not.toHaveClass(/city-game-map-filter-btn--active/);
-    await expect(allDistricts).toHaveAttribute("aria-pressed", "true");
-    await expect(allKinds).toHaveAttribute("aria-pressed", "true");
-    await expect(allDistricts).not.toHaveClass(/city-game-map-filter-btn--active/);
-    await expect(allKinds).not.toHaveClass(/city-game-map-filter-btn--active/);
+    await expect(needsBtn).toHaveAttribute("aria-pressed", "false");
+    await expect(needsBtn).not.toHaveClass(/city-game-map-filter-btn--active/);
+    await expect(allTypes).toHaveAttribute("aria-pressed", "true");
+    await expect(allStates).toHaveAttribute("aria-pressed", "true");
+    await expect(allTypes).not.toHaveClass(/city-game-map-filter-btn--active/);
+    await expect(allStates).not.toHaveClass(/city-game-map-filter-btn--active/);
   });
 
-  test("mobile filter summary stays pinned when scrolling place list", async ({ page }) => {
+  test("mobile place list uses page scroll not nested panel scroll", async ({ page }) => {
     await mockSeasonSnapshot(page, mockSnapshotBody());
     await page.setViewportSize({ width: 390, height: 844 });
 
@@ -263,22 +238,29 @@ test.describe("city game map board", () => {
     await expect(board).toBeVisible({ timeout: 15_000 });
     await expect(board).toHaveAttribute("data-snapshot-loaded", "1");
 
-    await openBrowsePlaces(board);
-    const explore = board.locator(".city-game-map-explore-filter");
-    await explore.getByRole("button", { name: /Relay/ }).click();
-    await board.getByRole("button", { name: "NewBo", exact: true }).click();
+    const listScroll = board.locator(".city-game-map-list-scroll");
+    const overflow = await listScroll.evaluate((el) => {
+      if (!(el instanceof HTMLElement)) return "";
+      return getComputedStyle(el).overflowY;
+    });
+    expect(overflow).not.toBe("auto");
+    expect(overflow).not.toBe("scroll");
 
+    const maxHeight = await listScroll.evaluate((el) => {
+      if (!(el instanceof HTMLElement)) return 0;
+      const value = getComputedStyle(el).maxHeight;
+      if (value === "none") return 0;
+      return parseFloat(value);
+    });
+    expect(maxHeight).toBe(0);
+
+    await board.locator(".city-game-map-type-filter").getByRole("button", { name: /Relays/ }).click();
     const summary = board.locator("#city-game-map-filter-summary");
     await expect(summary).toBeVisible();
-    await expectFilterSummaryPinnedInListPanel(board);
 
-    const listScroll = board.locator(".city-game-map-list-scroll");
-    await listScroll.evaluate((el) => {
-      el.scrollTop = el.scrollHeight;
-    });
-
-    await expectFilterSummaryPinnedInListPanel(board);
-    await expect(summary.locator("[data-filter-summary-scope]")).toContainText("NewBo · Relay");
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await expect(summary).toBeVisible();
+    await expect(summary.locator("[data-filter-summary-scope]")).toContainText(/Relays · \d+ places/);
   });
 
   test("schematic pin click highlights matching place row", async ({ page }) => {
@@ -290,11 +272,10 @@ test.describe("city game map board", () => {
     await expect(board).toBeVisible({ timeout: 15_000 });
     await expect(board).toHaveAttribute("data-snapshot-loaded", "1");
 
-    const pin = board.locator('.city-game-map-pin[data-node-id="node_07"]');
+    const pin = districtSketchPin(board, "node_07");
     const row = board.locator('.city-game-map-node-row[data-node-id="node_07"]');
-    await openBrowsePlaces(board);
     await openDistrictSketch(board);
-    await expect(pin).toBeVisible();
+    await expect(pin).toBeAttached();
     await clickMapPin(pin);
 
     await expect(board).toHaveAttribute("data-highlight-node-id", "node_07");
@@ -303,7 +284,7 @@ test.describe("city game map board", () => {
     await expect(row).toHaveAttribute("aria-current", "true");
   });
 
-  test("production-like empty snapshot still allows fogged pin click and list scroll", async ({
+  test("production-like empty snapshot still allows fogged pin click and page scroll", async ({
     page,
   }) => {
     await mockSeasonSnapshot(
@@ -325,19 +306,15 @@ test.describe("city game map board", () => {
     await expect(board).toBeVisible({ timeout: 15_000 });
     await expect(board).toHaveAttribute("data-snapshot-loaded", "1");
 
-    const pin = board.locator('.city-game-map-pin[data-node-id="node_07"]');
+    const pin = districtSketchPin(board, "node_07");
     const row = board.locator('.city-game-map-node-row[data-node-id="node_07"]');
-    const list = board.locator(".city-game-map-list-scroll");
 
-    await openBrowsePlaces(board);
     await openDistrictSketch(board);
 
     await expect(pin).toHaveClass(/city-game-map-pin--fog-hidden/);
     await expect(pin).not.toHaveAttribute("hidden", "");
 
-    await list.evaluate((el) => {
-      if (el instanceof HTMLElement) el.scrollTop = el.scrollHeight;
-    });
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
 
     await pin.evaluate((el) => {
       el.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
@@ -348,20 +325,8 @@ test.describe("city game map board", () => {
     await expect(row).toHaveClass(/city-game-map-node-row--highlight/);
     await expect(row).toHaveAttribute("aria-current", "true");
 
-    await expect
-      .poll(async () =>
-        list.evaluate((el, rowEl) => {
-          if (!(el instanceof HTMLElement) || !(rowEl instanceof HTMLElement)) return false;
-          const rowRect = rowEl.getBoundingClientRect();
-          const panelRect = el.getBoundingClientRect();
-          const rowOffset = el.scrollTop + (rowRect.top - panelRect.top);
-          const rowEnd = rowOffset + rowEl.offsetHeight;
-          const viewTop = el.scrollTop;
-          const viewBottom = viewTop + el.clientHeight;
-          return rowOffset >= viewTop && rowEnd <= viewBottom;
-        }, await row.elementHandle())
-      )
-      .toBe(true);
+    await row.scrollIntoViewIfNeeded();
+    await expect(row).toBeInViewport({ ratio: 0.2 });
   });
 
   test("repeat pin click clears highlight", async ({ page }) => {
@@ -372,7 +337,7 @@ test.describe("city game map board", () => {
     const board = page.locator(".city-game-map-board");
     await expect(board).toBeVisible({ timeout: 15_000 });
 
-    const pin = board.locator('.city-game-map-pin[data-node-id="node_04"]');
+    const pin = districtSketchPin(board, "node_04");
     await openDistrictSketch(board);
     await clickMapPin(pin);
     await expect(board).toHaveAttribute("data-highlight-node-id", "node_04");
@@ -389,9 +354,8 @@ test.describe("city game map board", () => {
     const board = page.locator(".city-game-map-board");
     await expect(board).toBeVisible({ timeout: 15_000 });
 
-    const pin = board.locator('.city-game-map-pin[data-node-id="node_07"]');
+    const pin = districtSketchPin(board, "node_07");
     const row = board.locator('.city-game-map-node-row[data-node-id="node_07"]');
-    await openBrowsePlaces(board);
     await openDistrictSketch(board);
 
     await row.focus();
@@ -410,9 +374,8 @@ test.describe("city game map board", () => {
     const board = page.locator(".city-game-map-board");
     await expect(board).toBeVisible({ timeout: 15_000 });
 
-    const pin = board.locator('.city-game-map-pin[data-node-id="node_07"]');
+    const pin = districtSketchPin(board, "node_07");
     const row = board.locator('.city-game-map-node-row[data-node-id="node_07"]');
-    await openBrowsePlaces(board);
     await openDistrictSketch(board);
     await row.locator(".city-game-map-node-title").click();
     await expect(board).toHaveAttribute("data-highlight-node-id", "node_07");
@@ -431,7 +394,7 @@ test.describe("city game map board", () => {
     await expect(page.locator(".idea-footnote").getByRole("link", { name: "Data policy" })).toBeVisible();
   });
 
-  test("mobile viewport keeps launch spotlight above collapsed browse and mechanics", async ({
+  test("mobile viewport keeps launch spotlight above places list and mechanics", async ({
     page,
   }) => {
     await mockSeasonSnapshot(page, mockSnapshotBody());
@@ -442,8 +405,8 @@ test.describe("city game map board", () => {
     const board = page.locator(".city-game-map-board");
     await expect(board).toBeVisible({ timeout: 15_000 });
     await expect(board.getByRole("heading", { name: "Riverwalk River Lantern" })).toBeVisible();
-    await expect(board.locator("#city-game-map-browse")).toHaveJSProperty("open", false);
-    await expect(board.getByRole("heading", { name: "Places" })).toBeHidden();
+    await expect(board.getByRole("heading", { name: "Places" })).toBeVisible();
+    await expect(board.locator(".city-game-map-mobile-sketch")).toBeVisible();
 
     const advanced = board.locator("#city-game-map-advanced");
     const sketch = board.locator("#district-sketch");
@@ -452,14 +415,14 @@ test.describe("city game map board", () => {
     await expect(sketch).toHaveJSProperty("open", false);
 
     const spotlight = board.locator("#city-game-map-spotlight");
-    const placesSection = board.locator(".city-game-map-places");
+    const placesList = board.locator("#city-game-map-places");
     const changedSummary = board.locator("#city-game-map-changed .city-game-map-changed-summary");
 
     await expect(board.getByRole("heading", { name: "Quest log" })).toBeVisible();
     await expect(changedSummary).toBeVisible();
 
     const spotlightBox = await spotlight.boundingBox();
-    const placesBox = await placesSection.boundingBox();
+    const placesBox = await placesList.boundingBox();
     const changedBox = await changedSummary.boundingBox();
     const advancedBox = await advanced.boundingBox();
 
@@ -471,17 +434,14 @@ test.describe("city game map board", () => {
     expect((spotlightBox?.y ?? 0) + (spotlightBox?.height ?? 0)).toBeLessThanOrEqual(
       (changedBox?.y ?? 0) + 24
     );
-    expect((placesBox?.y ?? 0) + (placesBox?.height ?? 0)).toBeLessThanOrEqual(
-      (changedBox?.y ?? 0) + 24
-    );
+    expect((placesBox?.y ?? 0)).toBeGreaterThan((changedBox?.y ?? 0) - 24);
     expect((changedBox?.y ?? 0) + (changedBox?.height ?? 0)).toBeLessThanOrEqual(
       (advancedBox?.y ?? 0) + 24
     );
 
-    await openBrowsePlaces(board);
     const list = board.locator(".city-game-map-list-scroll");
     const listBox = await list.boundingBox();
-    expect(listBox?.height ?? 0).toBeLessThanOrEqual(360);
+    expect(listBox?.height ?? 0).toBeGreaterThan(360);
     await advanced.scrollIntoViewIfNeeded();
     await expect(advanced).toBeInViewport({ ratio: 0.2 });
   });
@@ -499,7 +459,7 @@ test.describe("city game map board", () => {
 
     await openDistrictSketch(page.locator(".city-game-map-board"));
     await expect(sketch).toHaveJSProperty("open", true);
-    await expect(sketch.locator('.city-game-map-pin[data-node-id="node_04"]')).toBeVisible();
+    await expect(districtSketchPin(page.locator(".city-game-map-board"), "node_04")).toBeAttached();
   });
 
   test("shows stale sync banner when snapshot fetch fails", async ({ page }) => {

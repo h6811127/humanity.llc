@@ -1,8 +1,9 @@
 /**
- * City board filter visibility — district + Explore By (AND).
+ * City board filter visibility — type + world-state (AND).
  */
 
-import { matchesBoardNodeFilters, normalizeBoardFilterState } from "./city-game-map-explore-core.mjs";
+import { matchesBoardStateFilters } from "./city-game-map-state-filter-core.mjs";
+import { matchesBoardTypeFilters } from "./city-game-map-type-filter-core.mjs";
 import {
   formatBoardFilterCountLabel,
   formatBoardFilterSummaryScope,
@@ -54,35 +55,40 @@ export function syncBoardFilterSummary(boardRoot) {
   const summary = boardRoot.querySelector("#city-game-map-filter-summary");
   if (!summary || typeof summary !== "object" || !("hidden" in summary)) return;
 
-  const districtId = boardRoot.dataset.activeDistrict ?? "all";
-  const exploreId = boardRoot.dataset.activeExplore ?? "all";
+  const typeId = boardRoot.dataset.activeType ?? boardRoot.dataset.activeExplore ?? "all";
+  const stateId = boardRoot.dataset.activeState ?? "all";
 
-  if (!isBoardFilterActive(districtId, exploreId)) {
+  if (!isBoardFilterActive(typeId, stateId)) {
     summary.hidden = true;
     return;
   }
 
-  const districtLabel = readFilterButtonLabel(
+  const typeLabel = readFilterButtonLabel(
     boardRoot,
-    "data-district-filter",
-    districtId,
-    districtId === "all" ? "All districts" : districtId
+    "data-type-filter",
+    typeId,
+    typeId === "all" ? "All" : typeId
   );
-  const exploreLabel = readFilterButtonLabel(
-    boardRoot,
-    "data-explore-filter",
-    exploreId,
-    exploreId === "all" ? "All kinds" : exploreId
-  );
+  const stateLabel =
+    stateId === "all"
+      ? null
+      : readFilterButtonLabel(boardRoot, "data-state-filter", stateId, stateId);
 
   const scopeEl = summary.querySelector("[data-filter-summary-scope]");
-  if (scopeEl) {
-    scopeEl.textContent = formatBoardFilterSummaryScope(districtLabel, exploreLabel);
-  }
-
   const countEl = summary.querySelector("[data-filter-summary-count]");
+  const count = countVisibleBoardNodes(boardRoot);
+  const countLabel = formatBoardFilterCountLabel(count);
+  const scopeParts = [];
+  if (typeId !== "all") scopeParts.push(typeLabel);
+  if (stateId !== "all" && stateLabel) scopeParts.push(stateLabel);
+  scopeParts.push(countLabel);
+
+  if (scopeEl) {
+    scopeEl.textContent = scopeParts.join(" · ");
+  }
   if (countEl) {
-    countEl.textContent = formatBoardFilterCountLabel(countVisibleBoardNodes(boardRoot));
+    countEl.textContent = "";
+    countEl.hidden = true;
   }
 
   summary.hidden = false;
@@ -105,43 +111,57 @@ export function setBoardFilterHidden(el, hidden) {
  * @param {HTMLElement} boardRoot
  */
 export function applyBoardFilterVisibility(boardRoot) {
-  const { activeDistrict, activeExplore } = normalizeBoardFilterState(
-    boardRoot.dataset.activeDistrict,
-    boardRoot.dataset.activeExplore
-  );
+  const activeType =
+    boardRoot.dataset.activeType && boardRoot.dataset.activeType !== "all"
+      ? boardRoot.dataset.activeType
+      : boardRoot.dataset.activeExplore && boardRoot.dataset.activeExplore !== "all"
+        ? boardRoot.dataset.activeExplore
+        : null;
+  const activeState =
+    boardRoot.dataset.activeState && boardRoot.dataset.activeState !== "all"
+      ? boardRoot.dataset.activeState
+      : null;
 
   for (const row of boardRoot.querySelectorAll(".city-game-map-node-row[data-node-id]")) {
     if (!row || typeof row !== "object" || typeof row.getAttribute !== "function") continue;
-    const match = matchesBoardNodeFilters(
+    const typeMatch = matchesBoardTypeFilters(
       {
-        district: row.getAttribute("data-district"),
         role: row.getAttribute("data-role"),
+        boardVisibility: row.getAttribute("data-board-visibility"),
       },
-      { activeDistrict, activeExplore }
+      { activeType }
     );
+    const stateMatch = matchesBoardStateFilters(
+      {
+        boardStates: row.getAttribute("data-board-states"),
+      },
+      { activeState }
+    );
+    const match = typeMatch && stateMatch;
     if ("hidden" in row) row.hidden = !match;
     else setBoardFilterHidden(row, !match);
   }
 
-  for (const pin of boardRoot.querySelectorAll(".city-game-map-pin[data-district]")) {
+  for (const pin of boardRoot.querySelectorAll(".city-game-map-pin[data-node-id]")) {
     if (!pin || typeof pin !== "object" || typeof pin.getAttribute !== "function") continue;
-    const match = matchesBoardNodeFilters(
+    const typeMatch = matchesBoardTypeFilters(
       {
-        district: pin.getAttribute("data-district"),
         role: pin.getAttribute("data-role"),
+        boardVisibility: pin.getAttribute("data-board-visibility"),
       },
-      { activeDistrict, activeExplore }
+      { activeType }
     );
-    setBoardFilterHidden(pin, !match);
+    const stateMatch = matchesBoardStateFilters(
+      {
+        boardStates: pin.getAttribute("data-board-states"),
+      },
+      { activeState }
+    );
+    setBoardFilterHidden(pin, !(typeMatch && stateMatch));
   }
 
   for (const block of boardRoot.querySelectorAll(".city-game-map-district[data-district]")) {
     if (!block || typeof block !== "object" || typeof block.getAttribute !== "function") continue;
-    const districtId = block.getAttribute("data-district");
-    if (activeDistrict && districtId !== activeDistrict) {
-      setBoardFilterHidden(block, true);
-      continue;
-    }
     const rowNodes =
       typeof block.querySelectorAll === "function"
         ? block.querySelectorAll(".city-game-map-node-row")
@@ -158,8 +178,6 @@ export function applyBoardFilterVisibility(boardRoot) {
 }
 
 /**
- * Only narrowed (non-all) chips get filled active styling — "All" stays neutral
- * so selecting Relay/NewBo reads as a new highlight, not a same-weight swap.
  * @param {string} filterId
  */
 export function isBoardFilterChipEmphasized(filterId) {
@@ -168,17 +186,15 @@ export function isBoardFilterChipEmphasized(filterId) {
 
 /**
  * @param {HTMLElement} boardRoot
- * @param {string} districtId
+ * @param {string} typeId
  */
-export function syncDistrictFilterUi(boardRoot, districtId) {
-  const toolbar =
-    boardRoot.querySelector(".city-game-map-district-filter") ??
-    boardRoot.querySelector(".city-game-map-filter");
+export function syncTypeFilterUi(boardRoot, typeId) {
+  const toolbar = boardRoot.querySelector(".city-game-map-type-filter");
   if (!toolbar) return;
-  const emphasize = isBoardFilterChipEmphasized(districtId);
-  for (const btn of toolbar.querySelectorAll("[data-district-filter]")) {
-    if (!btn || typeof btn !== "object" || !("dataset" in btn)) continue;
-    const selected = btn.dataset.districtFilter === districtId;
+  const emphasize = isBoardFilterChipEmphasized(typeId);
+  for (const btn of toolbar.querySelectorAll("[data-type-filter]")) {
+    if (!btn || typeof btn !== "object") continue;
+    const selected = btn.getAttribute("data-type-filter") === typeId;
     if (typeof btn.setAttribute === "function") {
       btn.setAttribute("aria-pressed", selected ? "true" : "false");
     }
@@ -188,17 +204,22 @@ export function syncDistrictFilterUi(boardRoot, districtId) {
   }
 }
 
-/**
- * @param {HTMLElement} boardRoot
- * @param {string} exploreId
- */
+/** @deprecated Use syncTypeFilterUi */
 export function syncExploreFilterUi(boardRoot, exploreId) {
-  const toolbar = boardRoot.querySelector(".city-game-map-explore-filter");
+  syncTypeFilterUi(boardRoot, exploreId);
+}
+
+/**
+ * @param {HTMLElement} boardRoot
+ * @param {string} stateId
+ */
+export function syncStateFilterUi(boardRoot, stateId) {
+  const toolbar = boardRoot.querySelector(".city-game-map-state-filter");
   if (!toolbar) return;
-  const emphasize = isBoardFilterChipEmphasized(exploreId);
-  for (const btn of toolbar.querySelectorAll("[data-explore-filter]")) {
-    if (!btn || typeof btn !== "object" || !("dataset" in btn)) continue;
-    const selected = btn.dataset.exploreFilter === exploreId;
+  const emphasize = isBoardFilterChipEmphasized(stateId);
+  for (const btn of toolbar.querySelectorAll("[data-state-filter]")) {
+    if (!btn || typeof btn !== "object") continue;
+    const selected = btn.getAttribute("data-state-filter") === stateId;
     if (typeof btn.setAttribute === "function") {
       btn.setAttribute("aria-pressed", selected ? "true" : "false");
     }
@@ -208,33 +229,50 @@ export function syncExploreFilterUi(boardRoot, exploreId) {
   }
 }
 
-/**
- * @param {HTMLElement} boardRoot
- * @param {string} districtId
- */
+/** @deprecated District filter removed from primary board UI. */
+export function syncDistrictFilterUi(_boardRoot, _districtId) {}
+
+/** @deprecated District filter removed from primary board UI. */
 export function setDistrictFilter(boardRoot, districtId) {
   boardRoot.dataset.activeDistrict = districtId;
   applyBoardFilterVisibility(boardRoot);
-  syncDistrictFilterUi(boardRoot, districtId);
 }
 
 /**
  * @param {HTMLElement} boardRoot
- * @param {string} exploreId
+ * @param {string} typeId
  */
-export function setExploreFilter(boardRoot, exploreId) {
-  boardRoot.dataset.activeExplore = exploreId;
+export function setTypeFilter(boardRoot, typeId) {
+  boardRoot.dataset.activeType = typeId;
+  boardRoot.dataset.activeExplore = typeId;
   applyBoardFilterVisibility(boardRoot);
-  syncExploreFilterUi(boardRoot, exploreId);
+  syncTypeFilterUi(boardRoot, typeId);
+}
+
+/** @deprecated Use setTypeFilter */
+export function setExploreFilter(boardRoot, exploreId) {
+  setTypeFilter(boardRoot, exploreId);
+}
+
+/**
+ * @param {HTMLElement} boardRoot
+ * @param {string} stateId
+ */
+export function setStateFilter(boardRoot, stateId) {
+  boardRoot.dataset.activeState = stateId;
+  applyBoardFilterVisibility(boardRoot);
+  syncStateFilterUi(boardRoot, stateId);
 }
 
 /**
  * @param {HTMLElement} boardRoot
  */
 export function clearBoardFilters(boardRoot) {
-  boardRoot.dataset.activeDistrict = "all";
+  boardRoot.dataset.activeType = "all";
   boardRoot.dataset.activeExplore = "all";
+  boardRoot.dataset.activeState = "all";
+  boardRoot.dataset.activeDistrict = "all";
   applyBoardFilterVisibility(boardRoot);
-  syncDistrictFilterUi(boardRoot, "all");
-  syncExploreFilterUi(boardRoot, "all");
+  syncTypeFilterUi(boardRoot, "all");
+  syncStateFilterUi(boardRoot, "all");
 }

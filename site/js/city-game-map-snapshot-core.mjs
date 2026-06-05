@@ -2,15 +2,18 @@
  * Apply season snapshot JSON to the city board DOM (M2 live chips).
  * @see docs/CITY_GAME_MAP_DASHBOARD.md
  */
+import { applyBoardFilterVisibility } from "./city-game-map-filter-core.mjs";
 import {
   escapeMapHtml,
   formatHookLine,
-  formatNodeEffectLine,
+  formatMysteryNodeCopy,
+  formatNodeConsequenceLine,
   formatProgressLine,
   formatStaticWorldStatusLine,
   MAP_ROW_SCAN_HINT,
   resolveRowScanCta,
 } from "./city-game-map-board-core.mjs";
+import { deriveNodeBoardStates } from "./city-game-map-state-filter-core.mjs";
 
 export const CITY_GAME_SNAPSHOT_POLL_MS = 90_000;
 export const CITY_GAME_SNAPSHOT_STALE_MS = CITY_GAME_SNAPSHOT_POLL_MS * 2;
@@ -112,16 +115,36 @@ export function formatWorldStatusLineFromSnapshot(snapshot, worldDefault = "Rela
  * @param {Record<string, unknown>} season
  */
 export function formatNodeEffectFromSnapshot(nodeId, role, snap, season) {
-  const base = formatNodeEffectLine(nodeId, role, season);
-  if (!snap || !Array.isArray(snap.chips) || !snap.chips.length) return base;
+  if (!snap || !Array.isArray(snap.chips) || !snap.chips.length) {
+    return formatNodeConsequenceLine(nodeId, role, season);
+  }
   const primary =
     snap.chips.find((chip) => chip?.kind === "state") ??
     snap.chips.find((chip) => chip?.kind === "collective") ??
     snap.chips[0];
   const value = typeof primary?.value === "string" ? primary.value.trim() : "";
+  const base = formatNodeConsequenceLine(nodeId, role, season);
   if (!value) return base;
-  const unlockTail = base.includes(" · helps ") ? base.slice(base.indexOf(" · helps ")) : "";
-  return unlockTail ? `${value}${unlockTail}` : value;
+  const unlockTail = base.includes(" · ") ? base.slice(base.indexOf(" · ") + 3) : "";
+  if (unlockTail && !value.toLowerCase().includes(unlockTail.slice(0, 8).toLowerCase())) {
+    return `${value} · ${unlockTail}`;
+  }
+  return value;
+}
+
+/**
+ * @param {HTMLElement} row
+ * @param {string} role
+ * @param {Record<string, unknown>} season
+ */
+export function applyMysteryRowPresentation(row, role, season) {
+  if (!(row instanceof HTMLElement)) return;
+  const mystery = formatMysteryNodeCopy(role, season);
+  const titleEl = row.querySelector(".city-game-map-node-title");
+  const effectEl = row.querySelector("[data-node-effect]");
+  if (titleEl) titleEl.textContent = mystery.title;
+  if (effectEl) effectEl.textContent = mystery.consequence;
+  row.classList.add("city-game-map-node-row--hidden");
 }
 
 /**
@@ -306,6 +329,8 @@ export function applySnapshotToMapBoard(boardRoot, snapshot) {
     unlock_edges: Array.isArray(snapshot.unlock_edges) ? snapshot.unlock_edges : [],
     nodes,
   };
+  const mapVisibility =
+    typeof snapshot.map_visibility === "string" ? snapshot.map_visibility.trim() : "public";
 
   for (const row of boardRoot.querySelectorAll(".city-game-map-node-row[data-node-id]")) {
     const nodeId = row.getAttribute("data-node-id");
@@ -317,29 +342,38 @@ export function applySnapshotToMapBoard(boardRoot, snapshot) {
     const ctaLabel = resolveRowScanCta(role);
     const effectEl = row.querySelector("[data-node-effect]");
 
-    if (!snap) {
+    if (!snap && mapVisibility !== "public") {
+      row.setAttribute("data-board-visibility", "hidden");
+      row.setAttribute("data-board-states", "locked");
+      applyMysteryRowPresentation(row, role, seasonCtx);
+      live.innerHTML = `<span class="city-game-map-live-hint city-game-map-row-cta">${escapeMapHtml(ctaLabel)}</span>`;
       row.classList.remove("city-game-map-node-row--live");
       row.classList.remove("city-game-map-node-row--maintenance");
       row.classList.remove("city-game-map-node-row--revoked");
       continue;
     }
 
+    row.classList.remove("city-game-map-node-row--hidden");
+    row.setAttribute("data-board-visibility", "public");
+    const boardStates = deriveNodeBoardStates(snap, role);
+    row.setAttribute("data-board-states", boardStates.join(" "));
+
     if (effectEl instanceof HTMLElement) {
       effectEl.textContent = formatNodeEffectFromSnapshot(nodeId, role, snap, seasonCtx);
     }
 
-    if (snap.scan_url) {
+    if (snap?.scan_url) {
       live.innerHTML = `<a class="city-game-map-scan-link city-game-map-row-cta" href="${escapeMapHtml(String(snap.scan_url))}">${escapeMapHtml(ctaLabel)}</a>`;
     } else {
       live.innerHTML = `<span class="city-game-map-live-hint city-game-map-row-cta">${escapeMapHtml(ctaLabel)}</span>`;
     }
     row.classList.add("city-game-map-node-row--live");
-    if (snap.map_mode === "care_pause" || snap.lifecycle === "paused") {
+    if (snap?.map_mode === "care_pause" || snap?.lifecycle === "paused") {
       row.classList.add("city-game-map-node-row--maintenance");
     } else {
       row.classList.remove("city-game-map-node-row--maintenance");
     }
-    if (snap.lifecycle === "revoked") {
+    if (snap?.lifecycle === "revoked") {
       row.classList.add("city-game-map-node-row--revoked");
     } else {
       row.classList.remove("city-game-map-node-row--revoked");
@@ -359,11 +393,25 @@ export function applySnapshotToMapBoard(boardRoot, snapshot) {
     const nodeId = pin.getAttribute("data-node-id");
     const snap = nodeId ? nodeSnapshot(nodeById, nodeId) : null;
     const fogHidden = isSchematicPinFogged(nodeId, snap);
+    const role = pin.getAttribute("data-role");
     // Fog is visual-only — schematic pins stay hittable for M4 list↔map navigation.
     pin.classList.toggle("city-game-map-pin--fog-hidden", fogHidden);
     pin.classList.toggle("city-game-map-pin--live", Boolean(snap?.chips?.length));
     pin.classList.toggle("city-game-map-pin--maintenance", snap?.map_mode === "care_pause");
+    if (fogHidden || (!snap && mapVisibility !== "public")) {
+      pin.setAttribute("data-board-visibility", "hidden");
+      pin.setAttribute("data-board-states", "locked");
+    } else {
+      pin.setAttribute("data-board-visibility", "public");
+      pin.setAttribute("data-board-states", deriveNodeBoardStates(snap, role).join(" "));
+    }
+    const labelEl = pin.querySelector(".city-game-map-pin-label");
+    if (labelEl instanceof SVGTextElement) {
+      labelEl.setAttribute("visibility", "hidden");
+    }
   }
+
+  applyBoardFilterVisibility(boardRoot);
 
   const sync = boardRoot.querySelector("#city-game-map-sync");
   if (sync instanceof HTMLElement && typeof snapshot.generated_at === "string") {

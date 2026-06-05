@@ -63,7 +63,7 @@ describe("city-game-map-interaction-core", () => {
     expect(src).toContain('row.setAttribute("aria-current", "true")');
     expect(src).toContain("function selectMapPin(");
     expect(src).toContain("isMapPinInteractive");
-    expect(src).toContain("setExploreFilter");
+    expect(src).toContain("setTypeFilter");
     expect(src).toContain("clearBoardFilters");
     expect(src).toContain("applyBoardFilterVisibility");
   });

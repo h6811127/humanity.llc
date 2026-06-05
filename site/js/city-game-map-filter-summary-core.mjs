@@ -3,21 +3,22 @@
  */
 
 /**
- * @param {string | null | undefined} activeDistrict
- * @param {string | null | undefined} activeExplore
+ * @param {string | null | undefined} activeType
+ * @param {string | null | undefined} activeState
  */
-export function isBoardFilterActive(activeDistrict, activeExplore) {
-  const district = String(activeDistrict ?? "all");
-  const explore = String(activeExplore ?? "all");
-  return district !== "all" || explore !== "all";
+export function isBoardFilterActive(activeType, activeState) {
+  const type = String(activeType ?? "all");
+  const state = String(activeState ?? "all");
+  return type !== "all" || state !== "all";
 }
 
 /**
- * @param {string} districtLabel
- * @param {string} exploreLabel
+ * @param {string} typeLabel
+ * @param {string | null | undefined} stateLabel
  */
-export function formatBoardFilterSummaryScope(districtLabel, exploreLabel) {
-  return `${districtLabel} · ${exploreLabel}`;
+export function formatBoardFilterSummaryScope(typeLabel, stateLabel) {
+  const state = stateLabel?.trim();
+  return state ? `${typeLabel} · ${state}` : typeLabel;
 }
 
 /**

@@ -4,11 +4,9 @@
  */
 
 import { buildBoardFilterSummaryHtml } from "./city-game-map-filter-summary-core.mjs";
-import {
-  buildDistrictFilterHtml,
-  isDenseMapBoard,
-} from "./city-game-map-interaction-core.mjs";
-import { buildExploreFilterHtml } from "./city-game-map-explore-core.mjs";
+import { buildStateFilterHtml, deriveNodeBoardStates } from "./city-game-map-state-filter-core.mjs";
+import { isDenseMapBoard } from "./city-game-map-interaction-core.mjs";
+import { buildTypeFilterHtml } from "./city-game-map-type-filter-core.mjs";
 import { comprehensionPrimaryNodeId } from "./city-game-player-guide-core.mjs";
 
 /** Default row hint before snapshot chips replace the live cell. */
@@ -30,13 +28,13 @@ export const ROW_ROLE_CTA = {
 /** Short role labels for place rows (district · role line). */
 export const ROW_ROLE_SHORT = {
   relay_gate: "Relay",
-  lore_archive: "Story",
-  sanctuary: "Regroup",
-  temp_drop: "Clue",
+  lore_archive: "Lore",
+  sanctuary: "Sanctuary",
+  temp_drop: "Temp drop",
   witness: "Witness",
   route_splitter: "Route",
   finale: "Finale",
-  care_loop: "Care",
+  care_loop: "Care loop",
   mobile_lore: "Story",
 };
 
@@ -97,6 +95,8 @@ const DEFAULT_MAP_COPY = {
   spotlight_lead: "Find the River Lantern and add one signal.",
   count_placeholder: "Live count opens when play starts.",
   browse_summary: "All places",
+  start_here_title: "Start here",
+  start_here_why: "Adds one signal toward waking the city.",
   live_hint: "Find stickers. Scan them. Help unlock city goals.",
   wayfinding_intro:
     "Start anywhere. Scan any game sticker you find. Planning from home? Search place names in your maps app; the sketch below is districts only, not streets.",
@@ -231,6 +231,12 @@ export function resolveLaunchCopy(season) {
     browse_summary:
       (typeof launch.browse_summary === "string" && launch.browse_summary.trim()) ||
       mapResolved.browse_summary,
+    start_here_title:
+      (typeof launch.start_here_title === "string" && launch.start_here_title.trim()) ||
+      mapResolved.start_here_title,
+    start_here_why:
+      (typeof launch.start_here_why === "string" && launch.start_here_why.trim()) ||
+      mapResolved.start_here_why,
     what_changed_summary:
       (typeof launch.what_changed_summary === "string" && launch.what_changed_summary.trim()) ||
       "What changed",
@@ -262,6 +268,8 @@ export function resolveMapCopy(season) {
     count_placeholder: c.count_placeholder?.trim() || DEFAULT_MAP_COPY.count_placeholder,
     world_status_default: c.world_status_default?.trim() || DEFAULT_MAP_COPY.world_status_default,
     browse_summary: c.browse_summary?.trim() || DEFAULT_MAP_COPY.browse_summary,
+    start_here_title: c.start_here_title?.trim() || DEFAULT_MAP_COPY.start_here_title,
+    start_here_why: c.start_here_why?.trim() || DEFAULT_MAP_COPY.start_here_why,
     live_hint: c.live_hint?.trim() || DEFAULT_MAP_COPY.live_hint,
     wayfinding_intro: c.wayfinding_intro?.trim() || DEFAULT_MAP_COPY.wayfinding_intro,
     diagram_note: c.diagram_note?.trim() || DEFAULT_MAP_COPY.diagram_note,
@@ -363,21 +371,93 @@ export function resolvePrimaryUnlockEdge(nodeId, season) {
  * @param {Record<string, unknown>} season
  */
 export function formatNodeEffectLine(nodeId, role, season) {
-  const status = defaultNodeStatusHint(role);
-  const edge = resolvePrimaryUnlockEdge(nodeId, season);
-  if (!edge) return status;
-  const toRow = nodeRows(season).find((row) => row.node_id === edge.to);
-  const toLabel = toRow?.label ?? edge.to;
-  const shortTo = abbreviatePinLabel(String(toLabel ?? "")) || String(toLabel ?? "");
-  if (typeof edge.label === "string" && edge.label.trim()) {
-    const normalized = edge.label.trim();
-    if (/^unlocks /i.test(normalized)) return `${status} · helps ${normalized}`;
-    if (/ unlocks /i.test(normalized)) {
-      const tail = normalized.replace(/^.* unlocks /i, "unlock ");
-      return `${status} · helps ${tail}`;
-    }
+  return formatNodeConsequenceLine(nodeId, role, season);
+}
+
+/**
+ * @param {string} nodeId
+ * @param {string | null | undefined} role
+ * @param {Record<string, unknown>} season
+ */
+export function formatNodeConsequenceLine(nodeId, role, season) {
+  const roleId = String(role ?? "").trim();
+  const unlockEffect = formatSpotlightUnlockEffect(nodeId, season);
+  const unlockTail = unlockEffect
+    ? unlockEffect.replace(/^Unlocks /i, "unlocks ")
+    : "";
+
+  if (roleId === "temp_drop") {
+    return unlockTail
+      ? `Adds to shared city count · ${unlockTail}`
+      : "Adds to shared city count";
   }
-  return `${status} · helps unlock ${shortTo}`;
+  if (roleId === "relay_gate") {
+    return unlockTail
+      ? `Unclaimed · helps ${unlockTail.replace(/^unlocks /i, "unlock ")}`
+      : "Unclaimed · helps hold the network";
+  }
+  if (roleId === "witness") {
+    return unlockTail ? `Sunset window · ${unlockTail}` : "Sunset window · shared witness count";
+  }
+  if (roleId === "sanctuary") {
+    return "Regroup spot · shared sanctuary state";
+  }
+  if (roleId === "care_loop") {
+    return "Care state · maintenance can pause game copy";
+  }
+  if (roleId === "finale") {
+    const required = season.automation?.fragment_nodes?.length ?? 3;
+    return `Dormant · wakes after ${required} fragments`;
+  }
+  if (roleId === "lore_archive") {
+    return unlockTail ? `Sealed · ${unlockTail}` : "Sealed · lore unlocks with the city";
+  }
+
+  const status = defaultNodeStatusHint(role);
+  if (unlockTail) return `${status} · helps ${unlockTail.replace(/^unlocks /i, "unlock ")}`;
+  return status;
+}
+
+/**
+ * @param {string | null | undefined} role
+ * @param {Record<string, unknown>} [season]
+ */
+export function formatMysteryNodeCopy(role, season = {}) {
+  const roleId = String(role ?? "").trim();
+  const required = season.automation?.fragment_nodes?.length ?? 3;
+  if (roleId === "relay_gate") {
+    return {
+      title: "Hidden relay",
+      consequence: "Reveals when the city claims a network hold",
+    };
+  }
+  if (roleId === "finale") {
+    return {
+      title: "Locked finale",
+      consequence: `Wakes after ${required} fragments`,
+    };
+  }
+  return {
+    title: "Locked clue",
+    consequence: `Wakes after ${required} fragments`,
+  };
+}
+
+/**
+ * @param {Record<string, unknown>} season
+ * @param {ReturnType<typeof resolveLaunchCopy>} launchCopy
+ */
+export function buildMapStartHereCalloutHtml(season, launchCopy) {
+  const row = resolveSpotlightNode(season);
+  if (!row) return "";
+  const title = launchCopy.start_here_title?.trim() || DEFAULT_MAP_COPY.start_here_title;
+  const why = launchCopy.start_here_why?.trim() || DEFAULT_MAP_COPY.start_here_why;
+  const label = String(row.label ?? row.node_id ?? "Riverwalk River Lantern");
+  return `<div class="city-game-map-start-callout" id="city-game-map-start-callout">
+  <p class="city-game-map-start-callout-kicker">${escapeMapHtml(title)}</p>
+  <p class="city-game-map-start-callout-title">Start at ${escapeMapHtml(label)}.</p>
+  <p class="city-game-map-start-callout-why">${escapeMapHtml(why)}</p>
+</div>`;
 }
 
 /**
@@ -554,8 +634,8 @@ export function buildMapSpotlightHtml(season, launchCopy) {
     ${effectHtml}
     <p class="city-game-map-spotlight-count" id="city-game-map-spotlight-count" aria-live="polite">${countPlaceholder}</p>
     <div class="city-game-map-spotlight-actions">
-      <a class="city-game-map-maps-link" href="${mapsUrl}" target="_blank" rel="noopener noreferrer">Open in Maps</a>
       <span class="city-game-map-spotlight-live" id="city-game-map-spotlight-live"><span class="city-game-map-spotlight-hint">${scanHint}</span></span>
+      <a class="city-game-map-maps-link city-game-map-maps-link--secondary" href="${mapsUrl}" target="_blank" rel="noopener noreferrer">Open in Maps</a>
     </div>
   </article>`;
 }
@@ -577,25 +657,32 @@ export function buildMapFirstPaintHtml(season, launchCopy) {
  * @param {ReturnType<typeof resolveMapCopy>} copy
  * @param {ReturnType<typeof resolveLaunchCopy>} launchCopy
  */
-export function buildMapBrowseHtml(season, copy, launchCopy) {
-  return `<details class="city-game-map-browse" id="city-game-map-browse">
-  <summary class="city-game-map-browse-summary">${escapeMapHtml(launchCopy.browse_summary)}</summary>
-  <div class="city-game-map-browse-body">
-    <div class="city-game-map-list-panel">
-      <div class="city-game-map-list-head">
-        <h2 class="city-game-map-list-title" id="city-game-map-list-title">${escapeMapHtml(copy.section_places_title)}</h2>
-        <div class="city-game-map-browse-filters">
-          ${buildDistrictFilterHtml(season)}
-          ${buildExploreFilterHtml(season)}
-        </div>
-      </div>
-      ${buildBoardFilterSummaryHtml()}
-      <div class="city-game-map-list-scroll">
-        ${buildMapNodeListHtml(season, launchCopy)}
-      </div>
+export function buildMapPlacesSectionHtml(season, copy, launchCopy) {
+  return `<section class="city-game-map-places-list" id="city-game-map-places" aria-labelledby="city-game-map-list-title">
+  ${buildMapStartHereCalloutHtml(season, launchCopy)}
+  <div class="city-game-map-list-panel">
+    <h2 class="city-game-map-list-title" id="city-game-map-list-title">${escapeMapHtml(copy.section_places_title)}</h2>
+    <div class="city-game-map-browse-filters">
+      ${buildTypeFilterHtml(season)}
+      ${buildStateFilterHtml()}
+    </div>
+    ${buildBoardFilterSummaryHtml()}
+    <figure class="city-game-map-mobile-sketch" aria-label="District sketch">
+      ${buildMapSchematicSvg(season, { hidePinLabels: true, hideZoneLabels: true, mobileSketch: true })}
+      <figcaption class="city-game-map-figcaption">${escapeMapHtml(copy.diagram_note)} Tap a dot after selecting a place.</figcaption>
+    </figure>
+    <div class="city-game-map-list-scroll">
+      ${buildMapNodeListHtml(season, launchCopy)}
     </div>
   </div>
-</details>`;
+</section>`;
+}
+
+/**
+ * @deprecated Use buildMapPlacesSectionHtml — kept for tests referencing browse id.
+ */
+export function buildMapBrowseHtml(season, copy, launchCopy) {
+  return buildMapPlacesSectionHtml(season, copy, launchCopy);
 }
 
 /**
@@ -663,6 +750,8 @@ export function buildMapRolesLegendHtml(copy) {
  */
 export function buildMapSchematicSvg(season, options = {}) {
   const hidePinLabels = Boolean(options.hidePinLabels);
+  const hideZoneLabels = Boolean(options.hideZoneLabels);
+  const mobileSketch = Boolean(options.mobileSketch);
   const positions = nodePositionMap(season);
   const rows = nodeRows(season);
   const edges = Array.isArray(season.unlock_edges) ? season.unlock_edges : [];
@@ -676,7 +765,8 @@ export function buildMapSchematicSvg(season, options = {}) {
       const y1 = from.y * 100;
       const x2 = to.x * 100;
       const y2 = to.y * 100;
-      return `<line class="city-game-map-edge" data-edge-from="${escapeMapHtml(edge.from)}" data-edge-to="${escapeMapHtml(edge.to)}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" />`;
+      const edgeClass = mobileSketch ? "city-game-map-edge city-game-map-edge--soft" : "city-game-map-edge";
+      return `<line class="${edgeClass}" data-edge-from="${escapeMapHtml(edge.from)}" data-edge-to="${escapeMapHtml(edge.to)}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" />`;
     })
     .join("");
 
@@ -691,11 +781,11 @@ export function buildMapSchematicSvg(season, options = {}) {
       const role = escapeMapHtml(row.role ?? "");
       const district = escapeMapHtml(row.district ?? "");
       const labelMarkup = hidePinLabels
-        ? ""
+        ? `<text class="city-game-map-pin-label" y="6.8" text-anchor="middle" visibility="hidden">${pinLabel}</text>`
         : `<text class="city-game-map-pin-label" y="6.8" text-anchor="middle">${pinLabel}</text>`;
-      return `<g class="city-game-map-pin" data-node-id="${escapeMapHtml(row.node_id)}" data-district="${district}" data-role="${role}" transform="translate(${cx} ${cy})" aria-label="${fullLabel}" tabindex="-1" role="img">
+      return `<g class="city-game-map-pin" data-node-id="${escapeMapHtml(row.node_id)}" data-district="${district}" data-role="${role}" data-board-visibility="public" transform="translate(${cx} ${cy})" aria-label="${fullLabel}" tabindex="-1" role="img">
   <title>${fullLabel}</title>
-  <circle class="city-game-map-pin-dot" r="3.2" />
+  <circle class="city-game-map-pin-dot" r="${mobileSketch ? "2.8" : "3.2"}" />
   ${labelMarkup}
 </g>`;
     })
@@ -704,11 +794,13 @@ export function buildMapSchematicSvg(season, options = {}) {
   const layout = season.map_layout && typeof season.map_layout === "object" ? season.map_layout : {};
   const zoneRows = Array.isArray(layout.district_zones) ? layout.district_zones : [];
   const districtZones = zoneRows
-    .map(
-      (z) =>
-        `<rect class="city-game-map-zone" x="${z.x}" y="${z.y}" width="${z.w}" height="${z.h}" rx="2" />
-<text class="city-game-map-zone-label" x="${z.x + 4}" y="${z.y + 8}">${escapeMapHtml(z.label ?? z.id ?? "")}</text>`
-    )
+    .map((z) => {
+      const zoneLabel = hideZoneLabels
+        ? ""
+        : `<text class="city-game-map-zone-label" x="${z.x + 4}" y="${z.y + 8}">${escapeMapHtml(z.label ?? z.id ?? "")}</text>`;
+      return `<rect class="city-game-map-zone" x="${z.x}" y="${z.y}" width="${z.w}" height="${z.h}" rx="2" />
+${zoneLabel}`;
+    })
     .join("");
   const cityLabel = String(season.city ?? "city").trim() || "city";
   const svgTitle =
@@ -755,23 +847,22 @@ export function buildMapNodeListHtml(season, launchCopy = resolveLaunchCopy(seas
           const scanUrl = row.scan_url && typeof row.scan_url === "string" ? row.scan_url.trim() : "";
           const mapsUrl = buildMapsSearchUrl(season, row);
           const rowCta = resolveRowScanCta(row.role, launchCopy);
-          const liveLine = scanUrl
+          const primaryCta = scanUrl
             ? `<a class="city-game-map-scan-link city-game-map-row-cta" href="${escapeMapHtml(scanUrl)}">${escapeMapHtml(rowCta)}</a>`
             : `<span class="city-game-map-live-hint city-game-map-row-cta">${escapeMapHtml(rowCta)}</span>`;
           const role = escapeMapHtml(row.role ?? "");
           const nodeId = String(row.node_id ?? "");
-          const effectLine = formatNodeEffectLine(nodeId, row.role, season);
-          const statusHint = defaultNodeStatusHint(row.role);
+          const consequenceLine = formatNodeConsequenceLine(nodeId, row.role, season);
+          const boardStates = deriveNodeBoardStates(null, row.role).join(" ");
           const spotlightClass =
             row.node_id === spotlightId ? " city-game-map-node-row--spotlight" : "";
-          return `<li class="city-game-map-node-row${spotlightClass}" data-node-id="${escapeMapHtml(nodeId)}" data-district="${escapeMapHtml(row.district ?? "")}" data-role="${role}" tabindex="0">
+          return `<li class="city-game-map-node-row${spotlightClass}" data-node-id="${escapeMapHtml(nodeId)}" data-district="${escapeMapHtml(row.district ?? "")}" data-role="${role}" data-board-visibility="public" data-board-states="${escapeMapHtml(boardStates)}" tabindex="0">
   <span class="city-game-map-node-title">${escapeMapHtml(row.label)}</span>
   <span class="city-game-map-node-meta">${escapeMapHtml(districtLabel)} · ${escapeMapHtml(roleLabel)}</span>
-  <span class="city-game-map-node-effect" data-node-effect>${escapeMapHtml(effectLine)}</span>
-  <span class="city-game-map-node-status" data-node-status hidden>${escapeMapHtml(statusHint)}</span>
+  <span class="city-game-map-node-effect" data-node-effect>${escapeMapHtml(consequenceLine)}</span>
   <span class="city-game-map-node-actions">
-    <a class="city-game-map-maps-link" href="${escapeMapHtml(mapsUrl)}" target="_blank" rel="noopener noreferrer">Open in Maps</a>
-    <span class="city-game-map-node-live">${liveLine}</span>
+    <span class="city-game-map-node-live">${primaryCta}</span>
+    <a class="city-game-map-maps-link city-game-map-maps-link--secondary" href="${escapeMapHtml(mapsUrl)}" target="_blank" rel="noopener noreferrer">Open in Maps</a>
   </span>
 </li>`;
         })
@@ -932,13 +1023,13 @@ export function buildMapBoardInnerHtml(season) {
     : "";
   const changedOpen = isLaunchMapBoard(season) ? " open" : "";
 
-  return `<div class="city-game-map-board${launchClass}${denseClass}" data-active-district="all" data-active-explore="all"${primaryAttr}>
+  return `<div class="city-game-map-board${launchClass}${denseClass}" data-active-type="all" data-active-state="all" data-active-district="all" data-active-explore="all"${primaryAttr}>
   ${buildMapMissionSummaryHtml(season, copy, launchCopy)}
   <section class="city-game-map-places city-game-map-places--primary" aria-labelledby="city-game-map-spotlight-title">
     ${buildMapFirstPaintHtml(season, launchCopy)}
   </section>
   ${buildMapWhatChangedHtml(season, copy, launchCopy, changedOpen)}
-  ${buildMapBrowseHtml(season, copy, launchCopy)}
+  ${buildMapPlacesSectionHtml(season, copy, launchCopy)}
   ${buildMapAdvancedHtml(season, copy)}
 </div>`;
 }

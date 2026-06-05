@@ -46,6 +46,8 @@
     "spotlight_lead": "Find the River Lantern and add one signal.",
     "count_placeholder": "Live count opens when play starts.",
     "browse_summary": "All places",
+    "start_here_title": "Start here",
+    "start_here_why": "Adds one signal toward waking the city.",
     "live_hint": "Find stickers. Scan them. Help unlock city goals.",
     "start_here": {
       "title": "Start here",
@@ -84,6 +86,8 @@
       "spotlight_scan_hint": "Find the River Lantern",
       "row_scan_hint": "Scan sticker there",
       "browse_summary": "All places",
+      "start_here_title": "Start here",
+      "start_here_why": "Adds one signal toward waking the city.",
       "what_changed_summary": "What changed"
     }
   },

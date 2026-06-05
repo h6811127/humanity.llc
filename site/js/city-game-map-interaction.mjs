@@ -1,11 +1,11 @@
 /**
- * M4 — district filter + Explore By + list↔pin highlight on city state board.
+ * M4 — type/state filters + list↔pin highlight on city state board.
  */
 import {
   applyBoardFilterVisibility,
   clearBoardFilters,
-  setDistrictFilter,
-  setExploreFilter,
+  setStateFilter,
+  setTypeFilter,
 } from "./city-game-map-filter-core.mjs";
 import {
   isMapPinInteractive,
@@ -35,12 +35,24 @@ function setHighlightNode(boardRoot, nodeId) {
     if (row instanceof HTMLElement) row.removeAttribute("aria-current");
   }
 
+  for (const pin of boardRoot.querySelectorAll(".city-game-map-pin[data-node-id]")) {
+    const labelEl = pin.querySelector(".city-game-map-pin-label");
+    if (labelEl instanceof SVGTextElement) {
+      labelEl.setAttribute("visibility", "hidden");
+    }
+  }
+
   if (!nodeId) return;
 
-  const pin = boardRoot.querySelector(
+  for (const pin of boardRoot.querySelectorAll(
     `.city-game-map-pin[data-node-id="${CSS.escape(nodeId)}"]`
-  );
-  if (pin) pin.classList.add("city-game-map-pin--highlight");
+  )) {
+    pin.classList.add("city-game-map-pin--highlight");
+    const labelEl = pin.querySelector(".city-game-map-pin-label");
+    if (labelEl instanceof SVGTextElement) {
+      labelEl.setAttribute("visibility", "visible");
+    }
+  }
 
   const row = boardRoot.querySelector(
     `.city-game-map-node-row[data-node-id="${CSS.escape(nodeId)}"]`
@@ -60,26 +72,6 @@ function scrollListRowIntoView(boardRoot, nodeId) {
     `.city-game-map-node-row[data-node-id="${CSS.escape(nodeId)}"]`
   );
   if (!(row instanceof HTMLElement)) return;
-
-  const panel =
-    boardRoot.querySelector(".city-game-map-list-scroll") ??
-    boardRoot.querySelector(".city-game-map-list-panel");
-  if (panel instanceof HTMLElement && panel.scrollHeight > panel.clientHeight + 1) {
-    const rowRect = row.getBoundingClientRect();
-    const panelRect = panel.getBoundingClientRect();
-    const rowOffset = panel.scrollTop + (rowRect.top - panelRect.top);
-    const rowEnd = rowOffset + row.offsetHeight;
-    const viewTop = panel.scrollTop;
-    const viewBottom = viewTop + panel.clientHeight;
-    if (rowOffset < viewTop || rowEnd > viewBottom) {
-      panel.scrollTo({
-        top: Math.max(0, rowOffset - 12),
-        behavior: "smooth",
-      });
-      return;
-    }
-  }
-
   row.scrollIntoView({ block: "nearest", behavior: "smooth" });
 }
 
@@ -88,21 +80,16 @@ function scrollListRowIntoView(boardRoot, nodeId) {
  * @param {string} nodeId
  */
 function scrollSketchToPin(boardRoot, nodeId) {
-  const advanced = boardRoot.querySelector("#city-game-map-advanced");
-  if (advanced instanceof HTMLDetailsElement) advanced.open = true;
-
-  const sketch = boardRoot.querySelector("#district-sketch");
-  if (sketch instanceof HTMLDetailsElement) sketch.open = true;
+  const sketch = boardRoot.querySelector(".city-game-map-mobile-sketch");
+  if (sketch instanceof HTMLElement) {
+    sketch.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }
 
   const pin = boardRoot.querySelector(
     `.city-game-map-pin[data-node-id="${CSS.escape(nodeId)}"]`
   );
   if (pin instanceof SVGGElement && isMapPinInteractive(pin)) {
-    pin.scrollIntoView({ block: "nearest", behavior: "smooth" });
-    return;
-  }
-  if (sketch instanceof HTMLElement) {
-    sketch.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    pin.scrollIntoView({ block: "nearest", behavior: "smooth", inline: "nearest" });
   }
 }
 
@@ -174,27 +161,27 @@ export function bootCityGameMapInteraction(boardRoot, season) {
     typeof window !== "undefined" &&
     shouldScrollSketchForRowFocus((query) => window.matchMedia(query).matches);
 
-  const districtToolbar = boardRoot.querySelector(".city-game-map-filter");
-  if (districtToolbar instanceof HTMLElement) {
-    districtToolbar.addEventListener("click", (event) => {
+  const typeToolbar = boardRoot.querySelector(".city-game-map-type-filter");
+  if (typeToolbar instanceof HTMLElement) {
+    typeToolbar.addEventListener("click", (event) => {
       const target = event.target;
       if (!(target instanceof HTMLElement)) return;
-      const btn = target.closest("[data-district-filter]");
+      const btn = target.closest("[data-type-filter]");
       if (!(btn instanceof HTMLButtonElement)) return;
-      const district = btn.dataset.districtFilter ?? "all";
-      setDistrictFilter(boardRoot, district);
+      const typeId = btn.dataset.typeFilter ?? "all";
+      setTypeFilter(boardRoot, typeId);
     });
   }
 
-  const exploreToolbar = boardRoot.querySelector(".city-game-map-explore-filter");
-  if (exploreToolbar instanceof HTMLElement) {
-    exploreToolbar.addEventListener("click", (event) => {
+  const stateToolbar = boardRoot.querySelector(".city-game-map-state-filter");
+  if (stateToolbar instanceof HTMLElement) {
+    stateToolbar.addEventListener("click", (event) => {
       const target = event.target;
       if (!(target instanceof HTMLElement)) return;
-      const btn = target.closest("[data-explore-filter]");
+      const btn = target.closest("[data-state-filter]");
       if (!(btn instanceof HTMLButtonElement)) return;
-      const explore = btn.dataset.exploreFilter ?? "all";
-      setExploreFilter(boardRoot, explore);
+      const stateId = btn.dataset.stateFilter ?? "all";
+      setStateFilter(boardRoot, stateId);
     });
   }
 
@@ -225,7 +212,7 @@ export function bootCityGameMapInteraction(boardRoot, season) {
     }
 
     if (target.closest("a[href]")) return;
-    if (target.closest("[data-district-filter], [data-explore-filter], [data-filter-clear]")) return;
+    if (target.closest("[data-type-filter], [data-state-filter], [data-filter-clear]")) return;
 
     const row = target.closest(".city-game-map-node-row");
     if (row instanceof HTMLElement && row.dataset.nodeId) {

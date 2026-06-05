@@ -62,7 +62,8 @@ describe("city-game map board render", () => {
 
   it("hides dense-board pin labels when requested", () => {
     const svg = buildMapSchematicSvg(season, { hidePinLabels: true });
-    expect(svg).not.toContain("city-game-map-pin-label");
+    expect(svg).toContain('class="city-game-map-pin-label"');
+    expect(svg).toContain('visibility="hidden"');
   });
 
   it("builds external maps search urls from label and city", () => {
@@ -79,8 +80,8 @@ describe("city-game map board render", () => {
 
   it("formats place-row effect lines from unlock edges", () => {
     const line = formatNodeEffectLine("node_04", "temp_drop", season);
-    expect(line).toContain("helps unlock");
-    expect(line).toContain("Czech Village");
+    expect(line).toContain("Adds to shared city count");
+    expect(line).toContain("unlocks Czech Village");
   });
 
   it("uses role-specific row CTAs", () => {
@@ -111,12 +112,13 @@ describe("city-game map board render", () => {
     expect(html).toContain("city-game-map-board--launch");
     expect(html).toContain('data-primary-node="node_04"');
     expect(html).toContain("city-game-map-node-row--spotlight");
-    expect(html).toContain('id="city-game-map-browse"');
-    expect(html).not.toContain('id="city-game-map-browse" open');
-    expect(html).toContain("All places");
+    expect(html).toContain('id="city-game-map-places"');
+    expect(html).not.toContain('id="city-game-map-browse"');
+    expect(html).toContain("city-game-map-browse-filters");
     expect(html).toContain("city-game-map-actions");
     expect(html).not.toContain("city-game-map-privacy-inline");
-    expect(html).not.toContain("city-game-map-start-here");
+    expect(html).toContain("city-game-map-start-callout");
+    expect(html).toContain("Start at Riverwalk River Lantern.");
     expect(html).not.toContain("city-game-map-wayfinding");
     expect(html).not.toContain("Pick a district");
     expect(html).not.toContain("Scan when you arrive");
@@ -126,8 +128,8 @@ describe("city-game map board render", () => {
     expect(html).toContain("Quest log");
     expect(html).toContain("city-game-map-state");
     expect(html).toContain("Places");
-    expect(html).toContain("city-game-map-list-head");
     expect(html).toContain("city-game-map-list-scroll");
+    expect(html).toContain("city-game-map-mobile-sketch");
     expect(html).toContain("city-game-map-places--primary");
     expect(html).toContain('id="city-game-map-progress"');
     expect(html).toContain("0 / 3 fragments recovered");
@@ -156,9 +158,11 @@ describe("city-game map board render", () => {
     expect(html).not.toContain("Map &amp; mechanics");
     expect(html).toContain("Hidden on the sketch");
     expect(html).toContain("Wake the city: 0 /");
-    expect(html).toContain("city-game-map-explore-filter");
-    expect(html).toContain('data-explore-filter="relay_gate"');
-    expect(html).toContain("Relay");
+    expect(html).toContain("city-game-map-type-filter");
+    expect(html).toContain('data-type-filter="relay_gate"');
+    expect(html).toContain("Relays");
+    expect(html).toContain("city-game-map-state-filter");
+    expect(html).toContain('data-state-filter="needs_action"');
     expect(html).toContain("city-game-map-filter-btn-count");
     expect(html).toContain('data-role="relay_gate"');
     expect(html).not.toContain("city-game-map-roles-details");

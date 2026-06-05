@@ -8,10 +8,10 @@ import { buildMapBoardInnerHtml } from "../../site/js/city-game-map-board-core.m
 import {
   applyBoardFilterVisibility,
   isBoardFilterChipEmphasized,
-  setDistrictFilter,
-  setExploreFilter,
-  syncDistrictFilterUi,
-  syncExploreFilterUi,
+  setStateFilter,
+  setTypeFilter,
+  syncStateFilterUi,
+  syncTypeFilterUi,
 } from "../../site/js/city-game-map-filter-core.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
@@ -20,19 +20,22 @@ const season = JSON.parse(
 );
 
 /**
- * @param {Array<{ node_id: string; district: string; role: string }>} nodes
+ * @param {Array<{ node_id: string; district: string; role: string; boardStates?: string; boardVisibility?: string }>} nodes
  */
 function mockBoardRoot(nodes) {
-  /** @type {Array<{ district: string; role: string; hidden: boolean }>} */
+  /** @type {Array<{ district: string; role: string; boardStates: string; boardVisibility: string; hidden: boolean }>} */
   const rows = nodes.map((node) => ({
     district: node.district,
     role: node.role,
+    boardStates: node.boardStates ?? "needs_action",
+    boardVisibility: node.boardVisibility ?? "public",
     hidden: false,
   }));
-  /** @type {Array<{ district: string; role: string; hidden: boolean }>} */
+  /** @type {Array<{ role: string; boardStates: string; boardVisibility: string; hidden: boolean }>} */
   const pins = nodes.map((node) => ({
-    district: node.district,
     role: node.role,
+    boardStates: node.boardStates ?? "needs_action",
+    boardVisibility: node.boardVisibility ?? "public",
     hidden: false,
   }));
 
@@ -52,26 +55,25 @@ function mockBoardRoot(nodes) {
   };
 
   /** @type {Record<string, { label: string }>} */
-  const districtButtons = {
-    all: { label: "All districts" },
-    newbo: { label: "NewBo" },
-    river_spine: { label: "River spine" },
+  const typeButtons = {
+    all: { label: "All" },
+    relay_gate: { label: "Relays" },
   };
 
   /** @type {Record<string, { label: string }>} */
-  const exploreButtons = {
-    all: { label: "All kinds" },
-    relay_gate: { label: "Relay" },
+  const stateButtons = {
+    all: { label: "All states" },
+    needs_action: { label: "Needs action" },
   };
 
   /**
    * @param {string} selector
    */
   function queryFilterButton(selector) {
-    const districtMatch = selector.match(/^\[data-district-filter="([^"]+)"\]$/);
-    if (districtMatch) {
-      const id = districtMatch[1];
-      const meta = districtButtons[id];
+    const typeMatch = selector.match(/^\[data-type-filter="([^"]+)"\]$/);
+    if (typeMatch) {
+      const id = typeMatch[1];
+      const meta = typeButtons[id];
       if (!meta) return null;
       return {
         getAttribute(name) {
@@ -81,10 +83,10 @@ function mockBoardRoot(nodes) {
         textContent: meta.label,
       };
     }
-    const exploreMatch = selector.match(/^\[data-explore-filter="([^"]+)"\]$/);
-    if (exploreMatch) {
-      const id = exploreMatch[1];
-      const meta = exploreButtons[id];
+    const stateMatch = selector.match(/^\[data-state-filter="([^"]+)"\]$/);
+    if (stateMatch) {
+      const id = stateMatch[1];
+      const meta = stateButtons[id];
       if (!meta) return null;
       return {
         getAttribute(name) {
@@ -99,8 +101,10 @@ function mockBoardRoot(nodes) {
 
   const boardRoot = {
     dataset: {
-      activeDistrict: "all",
+      activeType: "all",
+      activeState: "all",
       activeExplore: "all",
+      activeDistrict: "all",
     },
     querySelectorAll(selector) {
       if (selector === ".city-game-map-node-row[data-node-id]") {
@@ -108,6 +112,8 @@ function mockBoardRoot(nodes) {
           getAttribute(name) {
             if (name === "data-district") return row.district;
             if (name === "data-role") return row.role;
+            if (name === "data-board-states") return row.boardStates;
+            if (name === "data-board-visibility") return row.boardVisibility;
             return null;
           },
           get hidden() {
@@ -118,11 +124,12 @@ function mockBoardRoot(nodes) {
           },
         }));
       }
-      if (selector === ".city-game-map-pin[data-district]") {
+      if (selector === ".city-game-map-pin[data-node-id]") {
         return pins.map((pin) => ({
           getAttribute(name) {
-            if (name === "data-district") return pin.district;
             if (name === "data-role") return pin.role;
+            if (name === "data-board-states") return pin.boardStates;
+            if (name === "data-board-visibility") return pin.boardVisibility;
             return null;
           },
           get hidden() {
@@ -185,6 +192,7 @@ function mockBoardRoot(nodes) {
                 set textContent(value) {
                   summary.countText = String(value ?? "");
                 },
+                hidden: true,
               };
             }
             return null;
@@ -202,7 +210,11 @@ function mockFilterButton(filterKey, filterValue) {
   let active = false;
   const calls = [];
   return {
-    dataset: { [filterKey]: filterValue },
+    getAttribute(name) {
+      if (name === `data-${filterKey}`) return filterValue;
+      const hit = calls.filter(([n]) => n === name).at(-1);
+      return hit ? hit[1] : null;
+    },
     classList: {
       toggle(_className, on) {
         active = Boolean(on);
@@ -214,60 +226,56 @@ function mockFilterButton(filterKey, filterValue) {
     setAttribute(name, value) {
       calls.push([name, value]);
     },
-    getAttribute(name) {
-      const hit = calls.filter(([n]) => n === name).at(-1);
-      return hit ? hit[1] : null;
-    },
   };
 }
 
 describe("city-game-map-filter-core", () => {
   it("only emphasizes narrowed chips, not All reset chips", () => {
     expect(isBoardFilterChipEmphasized("relay_gate")).toBe(true);
-    expect(isBoardFilterChipEmphasized("newbo")).toBe(true);
+    expect(isBoardFilterChipEmphasized("needs_action")).toBe(true);
     expect(isBoardFilterChipEmphasized("all")).toBe(false);
   });
 
-  it("syncDistrictFilterUi highlights narrowed district only", () => {
-    const allBtn = mockFilterButton("districtFilter", "all");
-    const newBoBtn = mockFilterButton("districtFilter", "newbo");
-    const boardRoot = {
-      querySelector: () => ({
-        querySelectorAll: () => [allBtn, newBoBtn],
-      }),
-    };
-
-    syncDistrictFilterUi(/** @type {HTMLElement} */ (boardRoot), "newbo");
-    expect(allBtn.classList.active).toBe(false);
-    expect(newBoBtn.classList.active).toBe(true);
-    expect(newBoBtn.getAttribute("aria-pressed")).toBe("true");
-    expect(allBtn.getAttribute("aria-pressed")).toBe("false");
-
-    syncDistrictFilterUi(/** @type {HTMLElement} */ (boardRoot), "all");
-    expect(allBtn.classList.active).toBe(false);
-    expect(newBoBtn.classList.active).toBe(false);
-    expect(allBtn.getAttribute("aria-pressed")).toBe("true");
-  });
-
-  it("syncExploreFilterUi highlights narrowed role only", () => {
-    const allBtn = mockFilterButton("exploreFilter", "all");
-    const relayBtn = mockFilterButton("exploreFilter", "relay_gate");
+  it("syncTypeFilterUi highlights narrowed type only", () => {
+    const allBtn = mockFilterButton("type-filter", "all");
+    const relayBtn = mockFilterButton("type-filter", "relay_gate");
     const boardRoot = {
       querySelector: () => ({
         querySelectorAll: () => [allBtn, relayBtn],
       }),
     };
 
-    syncExploreFilterUi(/** @type {HTMLElement} */ (boardRoot), "relay_gate");
+    syncTypeFilterUi(/** @type {HTMLElement} */ (boardRoot), "relay_gate");
     expect(allBtn.classList.active).toBe(false);
     expect(relayBtn.classList.active).toBe(true);
+    expect(relayBtn.getAttribute("aria-pressed")).toBe("true");
+    expect(allBtn.getAttribute("aria-pressed")).toBe("false");
 
-    syncExploreFilterUi(/** @type {HTMLElement} */ (boardRoot), "all");
+    syncTypeFilterUi(/** @type {HTMLElement} */ (boardRoot), "all");
     expect(allBtn.classList.active).toBe(false);
     expect(relayBtn.classList.active).toBe(false);
+    expect(allBtn.getAttribute("aria-pressed")).toBe("true");
   });
 
-  it("filters rows and pins by explore role", () => {
+  it("syncStateFilterUi highlights narrowed state only", () => {
+    const allBtn = mockFilterButton("state-filter", "all");
+    const needsBtn = mockFilterButton("state-filter", "needs_action");
+    const boardRoot = {
+      querySelector: () => ({
+        querySelectorAll: () => [allBtn, needsBtn],
+      }),
+    };
+
+    syncStateFilterUi(/** @type {HTMLElement} */ (boardRoot), "needs_action");
+    expect(allBtn.classList.active).toBe(false);
+    expect(needsBtn.classList.active).toBe(true);
+
+    syncStateFilterUi(/** @type {HTMLElement} */ (boardRoot), "all");
+    expect(allBtn.classList.active).toBe(false);
+    expect(needsBtn.classList.active).toBe(false);
+  });
+
+  it("filters rows and pins by type role group", () => {
     const nodes = season.nodes.map(
       (row: { node_id: string; district: string; role: string }) => ({
         node_id: row.node_id,
@@ -277,7 +285,7 @@ describe("city-game-map-filter-core", () => {
     );
     const { boardRoot, rows, pins } = mockBoardRoot(nodes);
 
-    setExploreFilter(/** @type {HTMLElement} */ (boardRoot), "relay_gate");
+    setTypeFilter(/** @type {HTMLElement} */ (boardRoot), "relay_gate");
 
     const visibleRows = rows.filter((row) => !row.hidden);
     expect(visibleRows.length).toBe(17);
@@ -285,24 +293,30 @@ describe("city-game-map-filter-core", () => {
     expect(pins.filter((pin) => !pin.hidden).length).toBe(17);
   });
 
-  it("combines river spine district with relay explore using AND logic", () => {
-    const nodes = season.nodes.map(
-      (row: { node_id: string; district: string; role: string }) => ({
-        node_id: row.node_id,
-        district: row.district,
-        role: row.role,
-      })
-    );
+  it("combines type and state filters with AND logic", () => {
+    const nodes = [
+      {
+        node_id: "node_a",
+        district: "river_spine",
+        role: "relay_gate",
+        boardStates: "needs_action",
+      },
+      {
+        node_id: "node_b",
+        district: "newbo",
+        role: "relay_gate",
+        boardStates: "locked",
+      },
+    ];
     const { boardRoot, rows } = mockBoardRoot(nodes);
 
-    setDistrictFilter(/** @type {HTMLElement} */ (boardRoot), "river_spine");
-    setExploreFilter(/** @type {HTMLElement} */ (boardRoot), "relay_gate");
+    setTypeFilter(/** @type {HTMLElement} */ (boardRoot), "relay_gate");
+    setStateFilter(/** @type {HTMLElement} */ (boardRoot), "needs_action");
 
     const visible = rows.filter((row) => !row.hidden);
-    expect(visible.length).toBeGreaterThan(0);
-    expect(
-      visible.every((row) => row.district === "river_spine" && row.role === "relay_gate")
-    ).toBe(true);
+    expect(visible.length).toBe(1);
+    expect(visible[0]?.role).toBe("relay_gate");
+    expect(visible[0]?.boardStates).toBe("needs_action");
   });
 
   it("clears to all places when filters reset to all", () => {
@@ -315,40 +329,43 @@ describe("city-game-map-filter-core", () => {
     );
     const { boardRoot, rows } = mockBoardRoot(nodes);
 
-    setExploreFilter(/** @type {HTMLElement} */ (boardRoot), "finale");
+    setTypeFilter(/** @type {HTMLElement} */ (boardRoot), "finale");
     expect(rows.filter((row) => !row.hidden).length).toBe(2);
 
-    setExploreFilter(/** @type {HTMLElement} */ (boardRoot), "all");
-    setDistrictFilter(/** @type {HTMLElement} */ (boardRoot), "all");
+    setTypeFilter(/** @type {HTMLElement} */ (boardRoot), "all");
+    setStateFilter(/** @type {HTMLElement} */ (boardRoot), "all");
     expect(rows.filter((row) => !row.hidden).length).toBe(season.nodes.length);
   });
 
-  it("applyBoardFilterVisibility hides empty district blocks under role filter", () => {
+  it("applyBoardFilterVisibility hides empty district blocks under type filter", () => {
     const nodes = [
       { node_id: "node_a", district: "downtown", role: "care_loop" },
       { node_id: "node_b", district: "newbo", role: "relay_gate" },
     ];
     const { boardRoot, blocks } = mockBoardRoot(nodes);
 
-    boardRoot.dataset.activeExplore = "care_loop";
+    boardRoot.dataset.activeType = "care_loop";
     applyBoardFilterVisibility(/** @type {HTMLElement} */ (boardRoot));
 
     expect(blocks.find((b) => b.district === "downtown")?.hidden).toBe(false);
     expect(blocks.find((b) => b.district === "newbo")?.hidden).toBe(true);
   });
 
-  it("board html includes explore toolbar and data-role on rows", () => {
+  it("board html includes type and state toolbars with data-role on rows", () => {
     const html = buildMapBoardInnerHtml(season);
-    expect(html).toContain("city-game-map-explore-filter");
-    expect(html).toContain('data-explore-filter="relay_gate"');
-    expect(html).toContain("Relay");
+    expect(html).toContain("city-game-map-type-filter");
+    expect(html).toContain('data-type-filter="relay_gate"');
+    expect(html).toContain("Relays");
+    expect(html).toContain("city-game-map-state-filter");
+    expect(html).toContain('data-state-filter="needs_action"');
     expect(html).toContain('data-role="relay_gate"');
     expect(html).toContain("city-game-map-filter-summary");
     expect(html).toContain("Clear filters");
     expect(html).not.toContain("city-game-map-roles-details");
+    expect(html).toContain("city-game-map-start-callout");
   });
 
-  it("syncBoardFilterSummary shows combined district and explore labels", () => {
+  it("syncBoardFilterSummary merges type, state, and count into scope line", () => {
     const nodes = season.nodes.map(
       (row: { node_id: string; district: string; role: string }) => ({
         node_id: row.node_id,
@@ -358,13 +375,16 @@ describe("city-game-map-filter-core", () => {
     );
     const { boardRoot, rows, summary } = mockBoardRoot(nodes);
 
-    boardRoot.dataset.activeDistrict = "newbo";
-    boardRoot.dataset.activeExplore = "relay_gate";
+    boardRoot.dataset.activeType = "relay_gate";
+    boardRoot.dataset.activeState = "needs_action";
     applyBoardFilterVisibility(/** @type {HTMLElement} */ (boardRoot));
 
     expect(summary.hidden).toBe(false);
-    expect(summary.scopeText).toBe("NewBo · Relay");
     const visible = rows.filter((row) => !row.hidden).length;
-    expect(summary.countText).toBe(visible === 1 ? "1 place" : `${visible} places`);
+    expect(summary.scopeText).toContain("Relays");
+    expect(summary.scopeText).toContain("Needs action");
+    expect(summary.scopeText).toContain(
+      visible === 1 ? "1 place" : `${visible} places`
+    );
   });
 });
