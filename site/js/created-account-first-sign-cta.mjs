@@ -3,6 +3,7 @@
  */
 
 import { mountChildObjectAddHubSections } from "./created-child-object-add-hub.mjs";
+import { deploySuccessSuppressesAddForm } from "./created-deploy-success-focus-core.mjs";
 import {
   CREATED_ACCOUNT_FIRST_SIGN_CTA_LABEL,
   CONTROL_ACCOUNT_HERO_LEAD,
@@ -33,7 +34,7 @@ export function shouldShowAccountFirstSignCta(ctx) {
 export const SIGN_ADD_SECTION_IDS = ["child-object-add-hub", "child-object-add-status-plate"];
 
 /**
- * Reveal sign add section inside the hub (hub stays collapsed).
+ * Open add hub and reveal sign add form for first-session CTA.
  * @param {string | null | undefined} profileId
  * @returns {HTMLElement | null} Sign add section when focused
  */
@@ -47,11 +48,16 @@ export function focusSignAddSection(profileId) {
   if (hub instanceof HTMLElement) {
     hub.hidden = false;
     if (hub instanceof HTMLDetailsElement) {
-      hub.removeAttribute("open");
+      hub.open = true;
     }
   }
   if (section instanceof HTMLElement) {
     section.hidden = false;
+    if (!deploySuccessSuppressesAddForm("status_plate")) {
+      for (const el of section.querySelectorAll("[data-child-object-add-chrome]")) {
+        if (el instanceof HTMLElement) el.hidden = false;
+      }
+    }
     section.scrollIntoView({ behavior: "smooth", block: "start" });
   }
   return section instanceof HTMLElement ? section : null;

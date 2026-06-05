@@ -579,8 +579,8 @@ function finalizeControlWorkspacePresentation() {
     window.dispatchEvent(new Event("hc-created-live-setup-memory-sync"));
   }
   wireCreatedAccountFirstSignCtaClick(() => {
-    focusSignAddSection(profileId);
     onStewardRoomApplied(STEWARD_ROOM_DOORS);
+    focusSignAddSection(profileId);
   });
   wireCreatedSeasonSetupCtaClick(() => {
     focusSeasonSetupChecklist(profileId);
