@@ -90,6 +90,13 @@ describe("created-first-revoke-gate", () => {
     expect(elements["created-scanners-see-gate-hint"].hidden).toBe(true);
   });
 
+  it("still unlocks publish after first revoke in session (existing account)", () => {
+    markFirstRevokeDone("profile_a");
+    expect(
+      isScannersSeeUnlocked("profile_a", { pilot_template: "general" })
+    ).toBe(true);
+  });
+
   it("shows pilot update copy before first revoke", () => {
     const elements: Record<string, { hidden: boolean }> = {
       "created-live-scanners-see": { hidden: true },

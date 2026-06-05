@@ -152,8 +152,63 @@ test.describe("/created/ control mode (Live · Manage)", () => {
     await expect(page.locator("#created-live-primary-btn")).toBeVisible();
     await expect(page.locator("#created-live-scanners-see")).toBeVisible();
     await expect(page.locator("#created-scanners-see-gate-hint")).toBeHidden();
-    await expect(page.locator("#created-deploy-print")).toBeVisible();
+    await expect(page.locator("#created-tab-now #created-deploy-print")).toBeVisible();
     await expect(page.locator("#manifesto-update-panel")).toHaveCount(0);
+  });
+
+  test("new general account publishes without revoke-first detour", async ({ page }) => {
+    await page.addInitScript((sample) => {
+      sessionStorage.removeItem("hc_created_first_qr_revoke");
+      sessionStorage.setItem(
+        "hc_created",
+        JSON.stringify({
+          profile_id: sample.profile_id,
+          qr_id: sample.qr_id,
+          handle: sample.handle,
+          manifesto_line: sample.manifesto_line,
+          pilot_template: "general",
+          scan_url: sample.scan_url,
+          owner_public_key_b58: sample.owner_public_key_b58,
+          owner_private_key_b58: sample.owner_private_key_b58,
+        })
+      );
+    }, SAMPLE);
+
+    await page.goto(`/created/?profile_id=${SAMPLE.profile_id}&qr_id=${SAMPLE.qr_id}`);
+
+    await expect(page.locator("#created-live-scanners-see")).toBeVisible();
+    await expect(page.locator("#created-scanners-see-gate-hint")).toBeHidden();
+    await expect(page.locator("#manifesto-update-form")).toBeVisible();
+    await expect(page.locator("#update-manifesto-general")).toBeVisible();
+    await expect(page.locator("#manifesto-update-submit")).toBeEnabled();
+  });
+
+  test("existing account still publishes after revoke session flag", async ({ page }) => {
+    await page.addInitScript((sample) => {
+      sessionStorage.setItem(
+        "hc_created_first_qr_revoke",
+        JSON.stringify({ [sample.profile_id]: true })
+      );
+      sessionStorage.setItem(
+        "hc_created",
+        JSON.stringify({
+          profile_id: sample.profile_id,
+          qr_id: sample.qr_id,
+          handle: sample.handle,
+          manifesto_line: sample.manifesto_line,
+          pilot_template: "general",
+          scan_url: sample.scan_url,
+          owner_public_key_b58: sample.owner_public_key_b58,
+          owner_private_key_b58: sample.owner_private_key_b58,
+        })
+      );
+    }, SAMPLE);
+
+    await page.goto(`/created/?profile_id=${SAMPLE.profile_id}&qr_id=${SAMPLE.qr_id}`);
+
+    await expect(page.locator("#created-live-scanners-see")).toBeVisible();
+    await expect(page.locator("#update-manifesto-general")).toHaveValue(SAMPLE.manifesto_line);
+    await expect(page.locator("#manifesto-update-submit")).toBeEnabled();
   });
 
   test("status plate exposes scanner copy update before revoke", async ({ page }) => {
