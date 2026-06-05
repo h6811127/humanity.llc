@@ -30,7 +30,8 @@ import { isLocalStorageEphemeral } from "./private-browsing-detect-core.mjs";
 export async function saveSessionToWalletWithCustody(session, label = "", opts = {}) {
   const profileId = typeof session?.profile_id === "string" ? session.profile_id : "";
   const existing = profileId ? loadWallet().find((entry) => entry.profile_id === profileId) : null;
-  const mode = session.custody_mode ?? opts.custodyMode ?? resolveEntryCustodyMode(existing);
+  const mode =
+    opts.custodyMode ?? session.custody_mode ?? resolveEntryCustodyMode(existing);
 
   if (existing && resolveEntryCustodyMode(existing) === CUSTODY_MODE_DEVICE_UNLOCK) {
     if (!profileId || !session?.owner_public_key_b58) {

@@ -112,6 +112,16 @@ describe("create-card P0-2 wiring", () => {
     expect(src).not.toMatch(/navigator\.credentials\.create/);
   });
 
+  it("saveSessionToWalletWithCustody prefers explicit opts.custodyMode over session", () => {
+    const src = readFileSync(join(root, "site/js/device-custody-save.mjs"), "utf8");
+    expect(src).toMatch(
+      /opts\.custodyMode\s*\?\?\s*session\.custody_mode/
+    );
+    expect(src).not.toMatch(
+      /session\.custody_mode\s*\?\?\s*opts\.custodyMode/
+    );
+  });
+
   it("created-device-save does not defer auto-save to microtask", () => {
     const src = readFileSync(join(root, "site/js/created-device-save.mjs"), "utf8");
     expect(src).toContain("shouldSyncAutoSaveOnCreatedLoad");
