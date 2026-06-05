@@ -56,7 +56,7 @@ export function renderLiveProofBanner() {
   const title = "Prove live control";
   const detail =
     n === 1
-      ? `Someone nearby scanned ${escapeEmphasisHtml(label)} and asked for live proof. Sign once from this key-holding device.`
+      ? `Someone nearby scanned ${escapeEmphasisHtml(label)} and asked you to prove you can update it right now. Tap below on this device.`
       : `${n} cards need your signature — starting with ${escapeEmphasisHtml(label)}.`;
 
   banner.hidden = false;

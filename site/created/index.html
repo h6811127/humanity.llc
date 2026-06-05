@@ -257,8 +257,9 @@
               <p class="hc-emphasis-card__eyebrow">Live proof</p>
               <p class="hc-emphasis-card__title">Prove live control</p>
               <p class="hc-emphasis-card__detail" id="live-control-proof-lead">
-                Someone nearby scanned your QR and asked for live proof. Sign once from this
-                key-holding device: it does not reveal legal identity or create a badge.
+                Someone nearby scanned your QR and asked you to prove you can update it right now.
+                Tap below on this device. This does not prove legal identity or who holds the
+                physical item.
               </p>
               <p class="form-status live-control-notification-status" id="live-control-proof-status" role="status"></p>
             </div>
@@ -390,10 +391,10 @@
           </div>
 
           <div class="created-setup-panel" data-setup-panel="test" id="created-setup-panel-test" hidden>
-            <h2 class="created-setup-panel-title">Test from another device</h2>
-            <p class="created-setup-panel-lead">
-              Preview what anyone scanning this QR will see. Use a friend’s camera or a second
-              phone. No app required.
+            <h2 class="created-setup-panel-title" id="created-setup-test-title">Test your QR</h2>
+            <p class="created-setup-panel-lead" id="created-setup-test-lead">
+              Preview what scanners see. On this phone, scan with the app first so you stay in one
+              place with your saved control.
             </p>
             <button type="button" class="btn-secondary created-setup-inline-action" data-setup-action="test-scan">
               Open scan page
@@ -475,8 +476,8 @@
           <div class="created-setup-panel" data-setup-panel="done" id="created-setup-panel-done" hidden>
             <h2 class="created-setup-panel-title">You’re live</h2>
             <p class="created-setup-panel-lead">
-              Object now resolves live on the network. The same QR stays valid as status changes.
-              Update copy on <strong>Live</strong>; revoke, recovery, and steward tools are under
+              Your QR is live. The same code stays valid when you change status. Update what
+              scanners read on <strong>Live</strong>; turn off, backup, and advanced tools are under
               <strong>Manage</strong>.
             </p>
             <div id="created-setup-game-season-done" hidden role="note"></div>
@@ -883,8 +884,8 @@
               hidden
               data-created-signing-only
             >
-              Revoke this QR once under <strong>Manage</strong> to unlock publishing scanner copy on
-              Live.
+              For signs and return tags: open <strong>Manage</strong> and try turning off this QR
+              once so you know how revoke works. Then edit what scanners see on <strong>Live</strong>.
             </p>
 
             <div class="created-live-deploy" role="group" aria-label="Deploy and verify">
@@ -940,14 +941,15 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
                   </span>
                   <span class="settings-summary-text">
-                    <span class="settings-summary-title">Test from another device</span>
-                    <span class="settings-summary-sub">Preview what anyone scanning this QR will see</span>
+                    <span class="settings-summary-title">Test your QR</span>
+                    <span class="settings-summary-sub">Preview what scanners see when they scan</span>
                   </span>
                   <span class="list-chevron" aria-hidden="true">›</span>
                 </summary>
                 <div class="settings-panel settings-panel-action">
                   <p class="form-hint">
-                    Use a friend’s camera or a second phone. No app required.
+                    On this phone, use the scan icon in the top bar to preview without leaving the
+                    app. Or open the scan page in a new tab from another camera.
                   </p>
                   <button type="button" class="btn-primary" data-created-action="test-scan">
                     Open scan page
@@ -1011,7 +1013,7 @@
                 novalidate
               >
                 <label class="flow-field" for="created-device-save-label">
-                  <span class="flow-field-label">Label in wallet</span>
+                  <span class="flow-field-label">Name in My objects</span>
                   <input
                     class="flow-field-input"
                     id="created-device-save-label"
@@ -1621,9 +1623,9 @@
         <!--  -  -  -  Advanced: update, revoke, keys  -  -  -  -->
         <div class="created-tab-panel" data-created-panel="advanced" id="created-tab-advanced" role="tabpanel" aria-labelledby="created-tab-btn-advanced" hidden>
           <p class="created-tab-lead" id="created-control-manage-lead" data-created-signing-only>
-            Rotate, revoke, recovery, and backup. This root ownership controls the card and its
-            object QRs; you change resolver state, not the sticker. Public copy publishes on
-            <strong>Live</strong>. Activate control on Live (or
+            Turn off QRs, rotate links, recovery, and backup. This @name controls every QR on it.
+            The sticker stays; you change live status on the network. Public copy publishes on
+            <strong>Live</strong>. Open controls on <strong>Live</strong> (or
             <a href="/wallet/">My objects</a>) before switching tabs.
           </p>
           <p class="created-tab-lead" id="created-view-manage-lead" hidden></p>
@@ -1636,7 +1638,7 @@
             <h3 class="form-label" id="created-view-restore-import-title">Recovery import</h3>
             <p class="form-hint">Paste the recovery code you saved at create.</p>
             <form id="import-recovery-form" class="compact-form" novalidate>
-              <label class="form-label" for="import-recovery-key">Recovery private key (Base58)</label>
+              <label class="form-label" for="import-recovery-key">Recovery code</label>
               <textarea
                 class="form-input form-textarea"
                 id="import-recovery-key"
@@ -1777,15 +1779,16 @@
               </span>
               <span class="settings-summary-text">
                 <span class="settings-summary-title" id="revoke-summary-title">Revoke this QR</span>
-                <span class="settings-summary-sub" id="revoke-summary-sub">Turn off this scan pointer</span>
+                <span class="settings-summary-sub" id="revoke-summary-sub">Stop this QR from working</span>
               </span>
               <span class="list-chevron" aria-hidden="true">›</span>
             </summary>
             <div class="settings-panel settings-panel-action">
               <div class="owner-network-status" id="owner-network-status" aria-live="polite">
-                <p class="owner-network-status-kicker">Resolver check</p>
+                <p class="owner-network-status-kicker">Live status check</p>
                 <p class="owner-network-status-lead">
-                  What scanners see <strong>right now</strong>: fetched live, not guessed from this tab.
+                  What scanners see <strong>right now</strong>, fetched from the network, not guessed
+                  from this tab.
                 </p>
                 <ul class="list list-compact owner-network-status-rows">
                   <li class="list-row">
@@ -1857,7 +1860,7 @@
                   </div>
                   <label class="revoke-confirm">
                     <input type="checkbox" id="confirm-revoke-qr" />
-                    <span>I understand: revoke this scan QR only</span>
+                    <span>I understand this turns off this QR only</span>
                   </label>
                   <button type="button" class="btn-danger" id="revoke-qr-btn" disabled>
                     Revoke this QR
@@ -2130,14 +2133,15 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
                   </span>
                   <span class="settings-summary-text">
-                    <span class="settings-summary-title">Test from another device</span>
-                    <span class="settings-summary-sub">Preview what anyone scanning this QR will see</span>
+                    <span class="settings-summary-title">Test your QR</span>
+                    <span class="settings-summary-sub">Preview what scanners see when they scan</span>
                   </span>
                   <span class="list-chevron" aria-hidden="true">›</span>
                 </summary>
                 <div class="settings-panel settings-panel-action">
                   <p class="form-hint">
-                    Use a friend’s camera or a second phone. No app required.
+                    On this phone, use the scan icon in the top bar to preview without leaving the
+                    app. Or open the scan page in a new tab from another camera.
                   </p>
                   <button type="button" class="btn-primary" data-created-action="test-scan">
                     Open scan page
@@ -2247,7 +2251,7 @@
                       <a href="/architecture.html">
                         <span class="list-content">
                           <span class="list-title">Architecture</span>
-                          <span class="list-sub">How revoke, keys, and resolver state work</span>
+                          <span class="list-sub">How turn-off, keys, and scan pages work</span>
                         </span>
                         <span class="list-chevron" aria-hidden="true">›</span>
                       </a>

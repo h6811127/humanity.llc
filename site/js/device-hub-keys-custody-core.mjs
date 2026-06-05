@@ -133,7 +133,7 @@ export function buildHubKeysCustodyPanel(input) {
   } else if (hasActiveKeys) {
     rows.push({
       kind: "this_tab_active",
-      title: "You can manage objects here",
+      title: "You can update these QRs from this browser",
       subtitle: tabSessionLabel,
     });
   }

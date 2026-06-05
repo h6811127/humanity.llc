@@ -46,7 +46,7 @@ export function buildForegroundAttentionStripModel(items, ctx = {}) {
       title: "Prove live control",
       detail:
         n === 1
-          ? `Someone nearby scanned ${label} and asked for live proof. Sign once from this key-holding device.`
+          ? `Someone nearby scanned ${label} and asked you to prove you can update it right now. Tap below on this device.`
           : `${n} cards need your signature — starting with ${label}.`,
       ctaLabel: "Prove control now",
       proofItem: first,

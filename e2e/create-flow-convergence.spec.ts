@@ -37,6 +37,73 @@ async function seedGeneralRootWallet(page: Page) {
   }, GENERAL_ROOT);
 }
 
+const EXISTING_SIGN_CHILD = {
+  object_id: "obj_e2e_existing_sign",
+  object_type: "status_plate",
+  public_label: "Front door",
+  public_state: "Open",
+  qr_id: "qr_existing_sign",
+  status: "active",
+  created_at: "2026-06-05T12:00:00.000Z",
+};
+
+const EXISTING_TAG_CHILD = {
+  object_id: "obj_e2e_existing_tag",
+  object_type: "lost_item_relay",
+  public_label: "House keys",
+  public_state: "Lost",
+  qr_id: "qr_existing_tag",
+  status: "active",
+  created_at: "2026-06-05T12:00:00.000Z",
+};
+
+async function seedGeneralRootControlReady(
+  page: Page,
+  childRows: Record<string, unknown>[] = []
+) {
+  await page.addInitScript(
+    ({ entry, children }) => {
+      localStorage.setItem("hc_wallet", JSON.stringify([entry]));
+      localStorage.setItem("hc_keys_custody_notice_dismissed", "1");
+      localStorage.setItem("hc_setup_done", JSON.stringify({ [entry.profile_id]: true }));
+      if (children.length) {
+        localStorage.setItem(`hc_child_objects_v1:${entry.profile_id}`, JSON.stringify(children));
+      }
+      sessionStorage.setItem(
+        "hc_created",
+        JSON.stringify({
+          profile_id: entry.profile_id,
+          qr_id: entry.qr_id,
+          handle: entry.handle,
+          owner_public_key_b58: entry.owner_public_key_b58,
+          owner_private_key_b58: entry.owner_private_key_b58,
+          pilot_template: "general",
+        })
+      );
+    },
+    { entry: GENERAL_ROOT, children: childRows }
+  );
+}
+
+async function stubCreatedCardFetch(page: Page) {
+  await page.route("**/.well-known/hc/v1/cards/**", (route) => {
+    if (route.request().method() !== "GET") {
+      return route.fallback();
+    }
+    return route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        profile_id: GENERAL_ROOT.profile_id,
+        handle: GENERAL_ROOT.handle,
+        status: "active",
+        qr: { active_qr_id: GENERAL_ROOT.qr_id },
+        objects: [],
+      }),
+    });
+  });
+}
+
 test.describe("create entry chooser (step 11)", () => {
   test.beforeEach(async ({ page }) => {
     await stubCreateShellHealth(page);
@@ -157,5 +224,44 @@ test.describe("topology convergence — field-kit deep links", () => {
 
     await expect(page.locator("#create-deploy-wizard")).toBeVisible();
     await expect(page.locator("#submit")).toHaveText("Open @river_studio to add sign");
+  });
+});
+
+test.describe("redirect_live add-object hash focus", () => {
+  test.beforeEach(async ({ page }) => {
+    await stubCreateShellHealth(page);
+    await stubCreatedCardFetch(page);
+  });
+
+  test("#add-status-plate opens add hub with sign form", async ({ page }) => {
+    await seedGeneralRootControlReady(page, [EXISTING_SIGN_CHILD]);
+    await page.goto(
+      `/created/?profile_id=${GENERAL_ROOT.profile_id}&qr_id=${GENERAL_ROOT.qr_id}#add-status-plate`
+    );
+
+    await expect(page.locator("#created-control-root")).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator("#child-object-add-hub")).toBeVisible();
+    await expect(page.locator("#child-object-add-hub")).toHaveAttribute("open", "");
+    await expect(page.locator("#child-object-add-status-plate")).toBeVisible();
+    await expect(page.locator("#child-object-status-plate-form")).toBeVisible();
+    await expect(page.locator("#child-object-add-status-plate-title")).toHaveText(
+      "Add another sign"
+    );
+  });
+
+  test("#add-lost-item opens add hub with tag form", async ({ page }) => {
+    await seedGeneralRootControlReady(page, [EXISTING_TAG_CHILD]);
+    await page.goto(
+      `/created/?profile_id=${GENERAL_ROOT.profile_id}&qr_id=${GENERAL_ROOT.qr_id}#add-lost-item`
+    );
+
+    await expect(page.locator("#created-control-root")).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator("#child-object-add-hub")).toBeVisible();
+    await expect(page.locator("#child-object-add-hub")).toHaveAttribute("open", "");
+    await expect(page.locator("#child-object-add-lost-item")).toBeVisible();
+    await expect(page.locator("#child-object-lost-item-form")).toBeVisible();
+    await expect(page.locator("#child-object-add-lost-item-title")).toHaveText(
+      "Add another lost-item tag"
+    );
   });
 });

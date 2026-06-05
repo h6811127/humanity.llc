@@ -138,8 +138,8 @@ export function createConvergenceNudgeCopy(template, ctx) {
   }
 
   return {
-    title: "Create your account first",
-    body: `Then ${addVerb.toLowerCase()} from your card page. Use the field-kit option below only if you need a separate account.`,
+    title: "Pick your @name first",
+    body: `Then ${addVerb.toLowerCase()} from your card page. Use the field-kit option below only if you need a separate @name.`,
     primaryLabel: "Switch to general account",
     primaryHref: null,
     showGeneralSwitch: true,

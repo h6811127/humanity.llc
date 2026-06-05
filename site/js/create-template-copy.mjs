@@ -8,9 +8,9 @@
 /** @type {Record<CreatePilotTemplate, { title: string; lead: string }>} */
 export const CREATE_TEMPLATE_HERO = {
   general: {
-    title: "Create your account",
+    title: "Pick your @name",
     lead:
-      "Pick an @name and one public sentence. Add signs and tags from your card page after.",
+      "Choose a public @name and one sentence scanners will read. Add signs and tags from your card page after.",
   },
   status_plate: {
     title: "Make a QR sign",

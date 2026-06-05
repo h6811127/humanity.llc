@@ -121,9 +121,9 @@ describe("create-template-copy", () => {
     expect(CREATE_TEMPLATE_HERO.status_plate.title).toBe("Make a QR sign");
   });
 
-  it("general template emphasizes account-first create", () => {
-    expect(createHeroCopyForTemplate("general").title).toBe("Create your account");
-    expect(createHeroCopyForTemplate(undefined).title).toBe("Create your account");
+  it("general template emphasizes @name-first create", () => {
+    expect(createHeroCopyForTemplate("general").title).toBe("Pick your @name");
+    expect(createHeroCopyForTemplate(undefined).title).toBe("Pick your @name");
     expect(createHeroCopyForTemplate("general").lead).not.toMatch(/\bnetwork\b/i);
     expect(createHeroCopyForTemplate("general").lead).not.toMatch(/signed qr/i);
   });

@@ -1,4 +1,8 @@
 import {
+  ADD_LOST_ITEM_FOCUS,
+  ADD_STATUS_PLATE_FOCUS,
+} from "./create-flow-convergence-core.mjs";
+import {
   CHILD_OBJECT_ADD_COUNT_ELEMENT_IDS,
   childObjectAddCountLabel,
   childObjectAddHubSubcopy,
@@ -19,11 +23,41 @@ const ADD_HUB_SECTION_IDS = [
   "child-object-add-game-node",
 ];
 
-let addHubSectionsMounted = false;
+/** @type {Record<string, string>} */
+const ADD_OBJECT_HASH_FOCUS_SECTION_IDS = {
+  [ADD_STATUS_PLATE_FOCUS]: "child-object-add-status-plate",
+  [ADD_LOST_ITEM_FOCUS]: "child-object-add-lost-item",
+};
 
-/** Move legacy add sections under the grouped hub (once). */
+/**
+ * Mount add hub and open it before redirect_live hash focus (#add-status-plate / #add-lost-item).
+ * @param {string} focusKey
+ */
+export function prepareAddObjectHashFocus(focusKey) {
+  const sectionId = ADD_OBJECT_HASH_FOCUS_SECTION_IDS[focusKey];
+  if (!sectionId) return false;
+
+  mountChildObjectAddHubSections();
+
+  const hub = document.getElementById("child-object-add-hub");
+  if (hub instanceof HTMLDetailsElement) {
+    hub.hidden = false;
+    hub.open = true;
+  } else if (hub instanceof HTMLElement) {
+    hub.hidden = false;
+  }
+
+  const section = document.getElementById(sectionId);
+  if (!(section instanceof HTMLElement)) return false;
+  section.hidden = false;
+  for (const el of section.querySelectorAll("[data-child-object-add-chrome]")) {
+    if (el instanceof HTMLElement) el.hidden = false;
+  }
+  return true;
+}
+
+/** Move legacy add sections under the grouped hub (idempotent). */
 export function mountChildObjectAddHubSections() {
-  if (addHubSectionsMounted) return;
   const hub = document.getElementById("child-object-add-hub");
   const body = hub?.querySelector(".created-child-add-hub-body");
   if (!body) return;
@@ -33,7 +67,6 @@ export function mountChildObjectAddHubSections() {
       body.appendChild(section);
     }
   }
-  addHubSectionsMounted = true;
 }
 
 /**

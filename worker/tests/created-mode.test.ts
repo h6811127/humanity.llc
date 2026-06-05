@@ -68,6 +68,8 @@ describe("resolveCreatedMode", () => {
 
   it("stewardFocusKeyFromHash recognizes hub deep-link hashes", () => {
     expect(stewardFocusKeyFromHash("#revoke")).toBe("revoke");
+    expect(stewardFocusKeyFromHash("#add-status-plate")).toBe("add-status-plate");
+    expect(stewardFocusKeyFromHash("#add-lost-item")).toBe("add-lost-item");
     expect(stewardFocusKeyFromHash("#setup-qr")).toBe(null);
   });
 

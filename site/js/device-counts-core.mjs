@@ -45,7 +45,9 @@ export function buildStatusSegmentsFromCounts(input) {
         : "Resolver Offline";
   const networkChip =
     network === "ok"
-      ? "Network reachable"
+      ? saved > 0
+        ? "Ready to update QRs"
+        : "Online"
       : network === "degraded"
         ? "Sync limited"
         : "Offline";
@@ -74,9 +76,13 @@ export function buildStatusSegmentsFromCounts(input) {
     },
     {
       id: "pinned",
-      label: pins === 0 ? "No Pinned Scans" : `${pins} Pinned`,
-      chipLabel: pins === 0 ? "0 pinned" : `${pins} pinned`,
-      detail: `${pins} pinned scan${pins === 1 ? "" : "s"} on this device`,
+      label:
+        pins === 0
+          ? "No saved scans"
+          : `${pins} saved scan${pins === 1 ? "" : "s"}`,
+      chipLabel:
+        pins === 0 ? "0 saved scans" : `${pins} saved scan${pins === 1 ? "" : "s"}`,
+      detail: `${pins} saved scan${pins === 1 ? "" : "s"} on this device`,
       zero: pins === 0,
       highlight: false,
     },
@@ -136,7 +142,7 @@ export function buildStatusSegmentsFromCounts(input) {
 export function buildDeviceCountsLabel(saved, pins) {
   const parts = [];
   if (saved > 0) parts.push(`${saved} on Device`);
-  if (pins > 0) parts.push(`${pins} Pinned`);
+  if (pins > 0) parts.push(`${pins} saved scan${pins === 1 ? "" : "s"}`);
   return {
     saved,
     pins,

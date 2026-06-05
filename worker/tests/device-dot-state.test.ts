@@ -429,7 +429,7 @@ describe("shell S4 neutral dot and chrome status line", () => {
     const items = hubStatusLineItemsFromSegments([
       {
         id: "network",
-        chipLabel: "Network reachable",
+        chipLabel: "Online",
         label: "Resolver Online",
         detail: "Resolver Online",
         zero: false,
@@ -446,8 +446,8 @@ describe("shell S4 neutral dot and chrome status line", () => {
       },
       {
         id: "pinned",
-        chipLabel: "0 pinned",
-        label: "No Pinned Scans",
+        chipLabel: "0 saved scans",
+        label: "No saved scans",
         detail: "",
         zero: true,
         highlight: false,
@@ -464,9 +464,9 @@ describe("shell S4 neutral dot and chrome status line", () => {
     ]);
 
     expect(items.map((item) => item.label)).toEqual([
-      "Network reachable",
+      "Online",
       "0 cards",
-      "0 pinned",
+      "0 saved scans",
       "Not saved",
     ]);
     expect(items.find((item) => item.id === "network")?.emphasis).toBe("primary");

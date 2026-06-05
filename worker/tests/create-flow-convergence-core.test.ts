@@ -71,7 +71,7 @@ describe("createConvergenceNudgeCopy", () => {
       preferredRoot: null,
       rootCount: 0,
     });
-    expect(copy.title).toContain("account first");
+    expect(copy.title).toContain("@name first");
     expect(copy.collapseLegacyForm).toBe(false);
   });
 });

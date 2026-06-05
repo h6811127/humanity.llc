@@ -44,7 +44,7 @@ describe("buildHubKeysCustodyPanel", () => {
     expect(state.rows).toEqual([
       {
         kind: "this_tab_active",
-        title: "You can manage objects here",
+        title: "You can update these QRs from this browser",
         subtitle: "@steward",
       },
     ]);

@@ -146,7 +146,7 @@ describe("pipeline: status counts label", () => {
       saved: 2,
       pins: 1,
       total: 3,
-      label: "2 on Device · 1 Pinned",
+      label: "2 on Device · 1 saved scan",
     });
   });
 

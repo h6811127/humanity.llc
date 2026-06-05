@@ -503,8 +503,19 @@ describe("buildStatusSegmentsFromCounts", () => {
     });
     expect(segments.find((s) => s.id === "notices")).toBeUndefined();
     expect(segments.find((s) => s.id === "network")?.chipLabel).toBe(
-      "Network reachable"
+      "Ready to update QRs"
     );
+  });
+
+  it("shows Online when resolver is ok and no saved cards", () => {
+    const segments = buildStatusSegmentsFromCounts({
+      network: "ok",
+      saved: 0,
+      pins: 0,
+      notices: 0,
+      liveProof: 0,
+    });
+    expect(segments.find((s) => s.id === "network")?.chipLabel).toBe("Online");
   });
 
   it("shows proof check limited when poll health is degraded", () => {
@@ -547,7 +558,7 @@ describe("buildDeviceCountsLabel", () => {
       saved: 2,
       pins: 3,
       total: 5,
-      label: "2 on Device · 3 Pinned",
+      label: "2 on Device · 3 saved scans",
     });
     expect(buildDeviceCountsLabel(0, 0).label).toBe("");
   });

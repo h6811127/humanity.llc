@@ -570,6 +570,10 @@ function finalizeControlWorkspacePresentation() {
       deploySuccessLanding,
     });
   }
+  if (profileId) {
+    mountChildObjectAddHubSections();
+    syncChildObjectAddHub(loadSession(), { profileId });
+  }
   applyStewardLandingFocus();
   if (profileId) {
     syncCreatedRoomSwitcher(profileId, loadSession());

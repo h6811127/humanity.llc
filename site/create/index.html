@@ -247,11 +247,11 @@
             id="device-hub-pins-group"
             data-hub-group="pins"
           >
-            <p class="device-hub-subgroup-label">Pinned scans</p>
+            <p class="device-hub-subgroup-label">Scans you saved</p>
             <p class="wallet-section-hint">Bookmarks only — cannot manage objects</p>
             <ul class="list list-compact" id="device-hub-pins-list" hidden></ul>
             <p class="device-hub-section-empty" id="device-hub-pins-empty">
-              Your pinned scans will show here.
+              Scans you save will show here.
             </p>
           </div>
 
@@ -428,9 +428,9 @@
         </p>
         <section class="hero hero-compact">
           <p class="hero-eyebrow">Create</p>
-          <h1 id="create-hero-title">Create your account</h1>
+          <h1 id="create-hero-title">Pick your @name</h1>
           <p class="hero-line" id="create-hero-lead">
-            Pick an @name and one public sentence. Add signs and tags from your card page after.
+            Choose a public @name and one sentence scanners will read. Add signs and tags from your card page after.
           </p>
         </section>
 
@@ -561,7 +561,7 @@
 
           <div class="create-form-main-fields" id="create-form-main-fields">
           <section class="flow-form-section flow-inset-fields">
-          <label class="form-label" for="handle">Handle</label>
+          <label class="form-label" for="handle">Your @name</label>
           <input
             class="form-input flow-field-input"
             id="handle"
@@ -637,8 +637,8 @@
           <details class="create-organizer-opt flow-disclosure" id="create-organizer-details">
             <summary class="form-label create-organizer-summary">Organizer can revoke (optional)</summary>
             <p class="form-hint">
-              Register a coalition or event key that may revoke this card&rsquo;s QR: without
-              owning the card. You keep the owner key; the organizer gets their own.
+              Register a coalition or event key that can turn off this QR without owning the card.
+              You keep owner control; the organizer gets a separate key.
             </p>
             <label class="revoke-confirm">
               <input type="checkbox" id="enable-organizer-revoke" />
@@ -668,7 +668,7 @@
             </fieldset>
           </details>
 
-          <label class="form-label" for="qr-validity-days">How long this code works</label>
+          <label class="form-label" for="qr-validity-days">How long the QR stays valid</label>
           <select class="form-input" id="qr-validity-days" name="qr_validity_days">
             <option value="7">7 days (event, wristband)</option>
             <option value="30">30 days</option>
@@ -723,7 +723,7 @@
             </label>
             <label class="revoke-confirm create-custody-opt flow-inset-check">
               <input type="radio" name="custody_mode" value="full_keys" />
-              <span>Show keys (advanced)</span>
+              <span>Signing keys (advanced)</span>
             </label>
             <details class="flow-disclosure create-custody-advanced" id="create-custody-advanced">
               <summary class="form-label">Advanced</summary>

@@ -608,7 +608,7 @@ function hubEl(id) {
 }
 
 const HUB_SECTION_EMPTY = {
-  pins: "Your pinned scans will show here.",
+  pins: "Scans you save will show here.",
   saved: "Cards you save on this device will show here.",
   activity: "Nothing logged yet on this browser.",
 };

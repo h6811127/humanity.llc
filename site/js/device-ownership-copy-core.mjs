@@ -497,7 +497,7 @@ export const SETUP_MANAGE_TAB_HINT =
 
 /** Setup done panel — Live vs Manage split (RC-13). */
 export const SETUP_DONE_PANEL_LEAD =
-  "Object now resolves live on the network. The same QR stays valid as status changes. Update copy on Live; revoke, recovery, and steward tools are under Manage.";
+  "Your QR is live. The same code stays valid when you change status. Update what scanners read on Live; turn off, backup, and advanced tools are under Manage.";
 
 /** Live control proof — keys missing in this tab (RC-13 copy alignment). */
 export const LIVE_CONTROL_SIGNING_KEYS_MISSING =

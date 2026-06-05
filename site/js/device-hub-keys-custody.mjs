@@ -244,7 +244,7 @@ function renderPanelHtml(state) {
     : "";
 
   return `
-    <p class="device-hub-group-label" id="device-hub-keys-custody-title">Ownership on this device</p>
+    <p class="device-hub-group-label" id="device-hub-keys-custody-title">Saved controls on this phone</p>
     ${rowItems ? `<ul class="list list-compact device-hub-keys-custody-list">${rowItems}</ul>` : ""}
     ${education}`;
 }

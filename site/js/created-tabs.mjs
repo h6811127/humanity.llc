@@ -2,6 +2,7 @@
  * Segmented tabs for /created/ (Live · Manage; ids remain now/advanced).
  */
 
+import { prepareAddObjectHashFocus } from "./created-child-object-add-hub.mjs";
 import {
   childObjectHubFocusHash,
   childObjectIdFromHubFocusHash,
@@ -59,6 +60,9 @@ function focusCreatedPanel(select, focusKey) {
     select("advanced");
   } else {
     return;
+  }
+  if (focusKey === "add-status-plate" || focusKey === "add-lost-item") {
+    prepareAddObjectHashFocus(focusKey);
   }
   requestAnimationFrame(() => {
     const el = document.getElementById(panelId);
