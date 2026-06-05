@@ -78,7 +78,7 @@ describe("city-game map board render", () => {
     expect(html).toContain("city-game-map-node-live");
     expect(html).toContain("Scan sticker there.");
     expect(html).toContain("Find a sticker");
-    expect(html).toContain("Add to the city.");
+    expect(html).toContain("Add to the city");
     expect(html).toContain("For this weekend: the code is on the back of the sticker.");
     expect(html).toContain('id="city-game-map-spotlight"');
     expect(html).toContain("Riverwalk River Lantern");

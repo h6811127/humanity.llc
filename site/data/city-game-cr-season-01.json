@@ -39,7 +39,7 @@
     "hook_stirring": "Something is stirring.",
     "hook_awake": "The city woke.",
     "progress_suffix": "fragments recovered",
-    "code_hint": "Code is on the back of the sticker.",
+    "code_hint": "For this weekend: the code is on the back of the sticker.",
     "row_scan_hint": "Scan sticker there.",
     "spotlight_scan_hint": "Scan sticker · enter code",
     "count_placeholder": "Scan for live count",
@@ -50,7 +50,7 @@
       "steps": [
         "Find a sticker",
         "Scan it",
-        "Add to the city."
+        "Add to the city"
       ]
     },
     "wayfinding_intro": "Start anywhere — scan any game sticker you find. Planning from home? Search place names in your maps app; the sketch below is districts only, not streets.",
@@ -71,7 +71,7 @@
       "hero_steps": [
         "Find a sticker",
         "Scan it",
-        "Add to the city."
+        "Add to the city"
       ],
       "hero_aria_label": "How to play",
       "code_hint": "For this weekend: the code is on the back of the sticker.",

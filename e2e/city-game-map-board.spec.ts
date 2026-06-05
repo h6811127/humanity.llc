@@ -100,7 +100,7 @@ test.describe("city game map board", () => {
     await expect(page.getByRole("link", { name: "Rules", exact: true })).toBeVisible();
 
     await expect(board.getByText("Find a sticker")).toBeVisible();
-    await expect(board.getByText("Add to the city.")).toBeVisible();
+    await expect(board.getByText("Add to the city")).toBeVisible();
     await expect(
       board.getByText("For this weekend: the code is on the back of the sticker.")
     ).toBeVisible();
