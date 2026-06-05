@@ -10,7 +10,7 @@ export const CREATE_TEMPLATE_HERO = {
   general: {
     title: "Pick your @handle",
     lead:
-      "Your @handle is how you control updates. Write one sentence for your first QR; add signs and tags from Live after.",
+      "Your @handle is your control line. Signs, tags, wearables, and other live objects can be added from Live later.",
   },
   status_plate: {
     title: "Make a QR sign",

@@ -20,7 +20,7 @@ export const CREATE_ENTRY_DOORS = [
   {
     id: "account",
     title: "Your @handle",
-    sub: "How you control updates. Add scan points from Live after create",
+    sub: "Your @handle is your control line. Add signs, tags, wearables, and other live objects from Live later.",
     href: null,
     intent: "general",
   },
