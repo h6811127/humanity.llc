@@ -11,7 +11,7 @@ import {
 } from "./city-game-season-path-shared.mjs";
 
 export const MAP_PAGE_SCRIPT = "/js/city-game-map-page.mjs?v=1";
-export const STYLES_HREF = "/styles.css?v=147";
+export const STYLES_HREF = "/styles.css?v=148";
 
 /**
  * @param {string} value
