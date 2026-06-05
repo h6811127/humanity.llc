@@ -18,6 +18,8 @@ describe("shouldSkipCreateEntryChooser", () => {
     );
     expect(shouldSkipCreateEntryChooser(new URLSearchParams("intent=deploy"))).toBe(true);
     expect(shouldSkipCreateEntryChooser(new URLSearchParams("intent=game"))).toBe(true);
+    expect(shouldSkipCreateEntryChooser(new URLSearchParams("intent=wear"))).toBe(true);
+    expect(shouldSkipCreateEntryChooser(new URLSearchParams("intent=general"))).toBe(true);
     expect(shouldSkipCreateEntryChooser(new URLSearchParams("hc_ref=scan_customize"))).toBe(
       true
     );
@@ -31,6 +33,14 @@ describe("defaultTemplateForCreateEntry", () => {
     ).toBe("status_plate");
   });
 
+  it("maps wear intent to general", () => {
+    expect(defaultTemplateForCreateEntry(new URLSearchParams("intent=wear"))).toBe("general");
+  });
+
+  it("maps general intent to general template", () => {
+    expect(defaultTemplateForCreateEntry(new URLSearchParams("intent=general"))).toBe("general");
+  });
+
   it("maps legacy template params", () => {
     expect(
       defaultTemplateForCreateEntry(new URLSearchParams("template=lost_item"))
@@ -41,9 +51,11 @@ describe("defaultTemplateForCreateEntry", () => {
 describe("CREATE_ENTRY_DOORS", () => {
   it("lists steward paths only (no player play door)", () => {
     expect(CREATE_ENTRY_DOORS.map((d) => d.title)).toEqual([
+      "Your @handle",
       "Live status on something",
       "Live status on you",
     ]);
+    expect(createEntryDoorById("account")?.intent).toBe("general");
     expect(createEntryDoorById("wear")?.href).toContain("glitch_hoodie_v1");
     expect(createEntryDoorById("play")).toBeNull();
   });

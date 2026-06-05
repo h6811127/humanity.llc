@@ -2,17 +2,27 @@
  * Organizer season create wizard UI (step 14).
  */
 
-import { loadWallet } from "./device-wallet.mjs";
+import { isCreateRoomIsolatedIntent } from "./create-deploy-wizard-core.mjs";
+import { syncCreateSeasonForkUi } from "./create-season-fork.mjs";
+import { resolveGameSeasonSubmitStrategy } from "./create-season-fork-core.mjs";
 import {
+  gameSeasonIdFieldUiState,
   gameSeasonSubmitButtonLabel,
-  isGameSeasonCreateIntent,
-  resolveGameSeasonSubmitStrategy,
-} from "./create-organizer-season-core.mjs";
+} from "./create-season-fork-ui-core.mjs";
+import { isGameSeasonCreateIntent } from "./create-organizer-season-core.mjs";
+import { loadWallet } from "./device-wallet.mjs";
 
 const GAME_SEASON_HERO = {
   title: "Organize a live season",
-  lead:
-    "Create a season root card with an organizer key, then register game nodes and publish rules from Live — no terminal scripts.",
+  lead: "Set up checkpoints and rules from your card page after you create.",
+};
+
+/** @type {Record<string, { title: string; lead: string }>} */
+const GAME_SEASON_FORK_HERO = {
+  existing:
+    "One @handle for door plates and season scan points. Add the season operator key on Live.",
+  dedicated:
+    "New season-only @handle from day one. Best when door plates stay on another account.",
 };
 
 /**
@@ -20,8 +30,14 @@ const GAME_SEASON_HERO = {
  */
 export function syncCreateOrganizerSeasonWizardUi(searchParams) {
   const active = isGameSeasonCreateIntent(searchParams);
+  const walletEntries = loadWallet();
+  const strategy = active
+    ? resolveGameSeasonSubmitStrategy({ searchParams, walletEntries })
+    : "standard";
+  const showFork = active && strategy === "fork_choose";
+
+  syncCreateSeasonForkUi(searchParams);
   const wizard = document.getElementById("create-game-season-wizard");
-  const glossary = document.getElementById("create-glossary-section");
   const demoStrip = document.querySelector(".create-demo-strip");
   const deployWizard = document.getElementById("create-deploy-wizard");
   const templateAdvanced = document.getElementById("create-template-advanced");
@@ -32,17 +48,22 @@ export function syncCreateOrganizerSeasonWizardUi(searchParams) {
     'input[name="organizer_key_mode"][value="generate"]'
   );
 
-  if (wizard) wizard.hidden = !active;
-  if (glossary) glossary.hidden = active;
+  if (wizard) wizard.hidden = !active || showFork;
   if (demoStrip) demoStrip.hidden = active;
-  if (deployWizard) deployWizard.hidden = active;
-  if (templateAdvanced) templateAdvanced.hidden = active;
+  if (active && deployWizard) deployWizard.hidden = true;
+  if (templateAdvanced) templateAdvanced.hidden = isCreateRoomIsolatedIntent(searchParams);
 
   if (active) {
     const titleEl = document.getElementById("create-hero-title");
     const leadEl = document.getElementById("create-hero-lead");
     if (titleEl) titleEl.textContent = GAME_SEASON_HERO.title;
-    if (leadEl) leadEl.textContent = GAME_SEASON_HERO.lead;
+    const forkLead =
+      strategy === "create_season_only_root"
+        ? GAME_SEASON_FORK_HERO.dedicated
+        : strategy === "create_dual_skin_root" || strategy === "use_existing_account"
+          ? GAME_SEASON_FORK_HERO.existing
+          : GAME_SEASON_HERO.lead;
+    if (leadEl) leadEl.textContent = forkLead;
     if (organizerDetails instanceof HTMLDetailsElement) organizerDetails.open = true;
     if (enableOrganizer instanceof HTMLInputElement) {
       enableOrganizer.checked = true;
@@ -61,16 +82,31 @@ export function syncCreateOrganizerSeasonWizardUi(searchParams) {
     return;
   }
 
-  const strategy = resolveGameSeasonSubmitStrategy({
-    searchParams,
-    walletEntries: loadWallet(),
-  });
+  syncGameSeasonIdFieldUi(strategy);
   const label = gameSeasonSubmitButtonLabel(strategy);
   if (label) submitBtn.textContent = label;
+}
 
+/**
+ * @param {import("./create-season-fork-core.mjs").GameSeasonSubmitStrategy} strategy
+ */
+export function syncGameSeasonIdFieldUi(strategy) {
+  const { showSeasonIdField, redirectHint, inputRequired } = gameSeasonIdFieldUiState(strategy);
+  const seasonBlock = document.getElementById("game-season-id-block");
+  const redirectHintEl = document.getElementById("game-season-redirect-hint");
   const seasonInput = document.getElementById("game-season-id");
+
+  if (seasonBlock instanceof HTMLElement) {
+    seasonBlock.hidden = !showSeasonIdField;
+  }
+  if (redirectHintEl instanceof HTMLElement) {
+    redirectHintEl.hidden = !redirectHint;
+    if (redirectHint) redirectHintEl.textContent = redirectHint;
+  }
   if (seasonInput instanceof HTMLInputElement) {
-    seasonInput.required = strategy === "create_season_root";
-    seasonInput.disabled = strategy === "redirect_live";
+    seasonInput.required = inputRequired;
+    seasonInput.disabled = false;
+    seasonInput.removeAttribute("readonly");
+    seasonInput.setAttribute("aria-disabled", "false");
   }
 }

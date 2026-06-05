@@ -1,10 +1,10 @@
 /**
- * Create page entry chooser — steward paths only (deploy + wear carrier).
+ * Create page entry chooser — steward paths (account + deploy + wear carrier).
  * Landing door 3 (Play) is player entry; organizers use ?intent=game or /created/.
  * @see docs/PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md § Front door strategy · Step 11
  */
 
-/** @typedef {"something" | "wear"} CreateEntryDoorId */
+/** @typedef {"account" | "something" | "wear"} CreateEntryDoorId */
 
 /**
  * Steward create doors — not a mirror of landing #launch-doors (no player play path).
@@ -18,16 +18,23 @@
  */
 export const CREATE_ENTRY_DOORS = [
   {
+    id: "account",
+    title: "Your @handle",
+    sub: "One public line. Add door plates and tags from Live after create",
+    href: null,
+    intent: "general",
+  },
+  {
     id: "something",
     title: "Live status on something",
-    sub: "Door plate, desk tag, sign — deploy live state you can update without reprinting",
+    sub: "Door plate, desk tag, sign. Deploy live state you can update without reprinting",
     href: null,
     intent: "deploy",
   },
   {
     id: "wear",
     title: "Live status on you",
-    sub: "Glitch hoodie — your QR, your line, change it from Live without reprinting",
+    sub: "Glitch hoodie. Your QR, your line, change it from Live without reprinting",
     href: "/shop/customize/?product=glitch_hoodie_v1",
     intent: null,
   },
@@ -41,7 +48,9 @@ export function shouldSkipCreateEntryChooser(searchParams) {
   if (searchParams.get("template")) return true;
   if (searchParams.get("hc_ref")) return true;
   const intent = searchParams.get("intent");
-  if (intent === "deploy" || intent === "game" || intent === "general") return true;
+  if (intent === "deploy" || intent === "game" || intent === "wear" || intent === "general") {
+    return true;
+  }
   return false;
 }
 
@@ -55,6 +64,8 @@ export function defaultTemplateForCreateEntry(searchParams) {
   if (template === "lost_item") return "lost_item_relay";
   if (template === "status_plate") return "status_plate";
   if (searchParams.get("intent") === "deploy") return "status_plate";
+  if (searchParams.get("intent") === "wear") return "general";
+  if (searchParams.get("intent") === "general") return "general";
   return "general";
 }
 

@@ -8,19 +8,33 @@
 /** @type {Record<CreatePilotTemplate, { title: string; lead: string }>} */
 export const CREATE_TEMPLATE_HERO = {
   general: {
-    title: "Create a live card",
+    title: "Create your account",
     lead:
-      "One general live card on the network — add status plates, lost-item relays, and more from Live after create. Signed QR, live status — not a frozen link.",
+      "Pick an @name and one public sentence. Add signs and tags from your card page after.",
   },
   status_plate: {
-    title: "Deploy on something",
+    title: "Make a QR sign",
     lead:
-      "What should scanners see right now? Recommended: add under an existing account on Live — one key, nested in My objects. Examples below for legacy pilots.",
+      "Say what it's on and what scanners should read. Add more signs from your card page after.",
   },
   lost_item_relay: {
-    title: "Add a lost-item relay",
+    title: "Make a return tag",
     lead:
-      "Recommended: add under an existing live card on Live — one root key, no phone number on the tag. Standalone relay paths below stay available for legacy pilots.",
+      "Say what's lost and what finders should read. Add more tags from your card page after.",
+  },
+};
+
+/** Hero copy when `?intent=deploy` (deploy room — no taxonomy tabs). */
+export const CREATE_DEPLOY_ROOM_HERO = {
+  status_plate: {
+    title: "Make a QR sign",
+    lead:
+      "Say what it's on and what scanners should read. Pick an @name if you don't have one yet.",
+  },
+  lost_item_relay: {
+    title: "Make a return tag",
+    lead:
+      "Say what's lost and what finders should read. Pick an @name if you don't have one yet.",
   },
 };
 
@@ -35,16 +49,22 @@ export function normalizeCreateTemplate(template) {
 
 /**
  * @param {string | null | undefined} template
+ * @param {URLSearchParams} [searchParams]
  */
-export function createHeroCopyForTemplate(template) {
-  return CREATE_TEMPLATE_HERO[normalizeCreateTemplate(template)];
+export function createHeroCopyForTemplate(template, searchParams) {
+  const normalized = normalizeCreateTemplate(template);
+  if (searchParams?.get("intent") === "deploy") {
+    return CREATE_DEPLOY_ROOM_HERO[normalized] ?? CREATE_DEPLOY_ROOM_HERO.status_plate;
+  }
+  return CREATE_TEMPLATE_HERO[normalized];
 }
 
 /**
  * @param {string | null | undefined} template
+ * @param {URLSearchParams} [searchParams]
  */
-export function syncCreateHeroCopy(template) {
-  const copy = createHeroCopyForTemplate(template);
+export function syncCreateHeroCopy(template, searchParams = new URLSearchParams(location.search)) {
+  const copy = createHeroCopyForTemplate(template, searchParams);
   const titleEl = document.getElementById("create-hero-title");
   const leadEl = document.getElementById("create-hero-lead");
   if (titleEl) titleEl.textContent = copy.title;

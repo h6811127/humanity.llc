@@ -48,21 +48,64 @@ test.describe("create entry chooser (step 11)", () => {
 
     await expect(page.locator("#create-entry-chooser")).toBeVisible();
     await expect(page.locator("#create-form-panel")).toBeHidden();
+    await expect(page.getByText("Your @handle")).toBeVisible();
     await expect(page.getByText("Live status on something")).toBeVisible();
     await expect(page.getByText("Live status on you")).toBeVisible();
     await expect(page.getByText("Play the city game")).toHaveCount(0);
-    await expect(page.getByRole("link", { name: /Play Cedar Rapids/i })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Cedar Rapids city board/i })).toBeVisible();
   });
 
-  test("organize a live season link opens game intent wizard", async ({ page }) => {
+  test("organize a live season link opens season account fork", async ({ page }) => {
     await page.goto("/create/");
 
     await page.getByRole("link", { name: /Organize a live season/i }).click();
 
     await expect(page).toHaveURL(/intent=game/);
-    await expect(page.locator("#create-game-season-wizard")).toBeVisible();
+    await expect(page.locator("#create-game-season-fork")).toBeVisible();
+    await expect(page.locator("#create-game-season-wizard")).toBeHidden();
     await expect(page.locator("#create-hero-title")).toHaveText("Organize a live season");
+  });
+
+  test("season fork dedicated path shows season id field", async ({ page }) => {
+    await page.goto("/create/?intent=game&season_account=dedicated");
+
+    await expect(page.locator("#create-game-season-fork")).toBeHidden();
+    await expect(page.locator("#create-game-season-wizard")).toBeVisible();
+    await expect(page.locator("#game-season-id-block")).toBeVisible();
     await expect(page.locator("#enable-organizer-revoke")).toBeChecked();
+    await expect(page.locator("#submit")).toHaveText(/season-only account/i);
+  });
+
+  test("season fork existing path continues on saved deploy root", async ({ page }) => {
+    await seedGeneralRootWallet(page);
+    await page.goto("/create/?intent=game&season_account=existing");
+
+    await expect(page.locator("#game-season-id-block")).toBeHidden();
+    await expect(page.locator("#submit")).toHaveText(/Continue season setup on Live/i);
+  });
+
+  test("wear BYOP link opens form with intent=wear", async ({ page }) => {
+    await page.goto("/create/?intent=wear");
+
+    await expect(page.locator("#create-form-panel")).toBeVisible();
+    await expect(page).toHaveURL(/intent=wear/);
+    await expect(page.locator("#create-wear-wizard")).toBeVisible();
+    await expect(page.locator("#create-hero-title")).toHaveText("Print your own QR wear");
+    await expect(page.locator("#create-template-advanced")).toBeHidden();
+  });
+
+  test("general account door opens form with intent=general", async ({ page }) => {
+    await page.goto("/create/");
+
+    await page.locator('[data-create-door="account"]').click();
+
+    await expect(page.locator("#create-form-panel")).toBeVisible();
+    await expect(page.locator("#create-entry-chooser")).toBeHidden();
+    await expect(page).toHaveURL(/intent=general/);
+    await expect(page.locator("#create-hero-title")).toHaveText("Create your account");
+    await expect(page.locator("#manifesto")).toBeVisible();
+    await expect(page.locator("#create-template-advanced")).toBeHidden();
+    await expect(page.locator("#submit")).toHaveText("Create and get QR");
   });
 
   test("deploy door opens form with intent=deploy", async ({ page }) => {
@@ -73,9 +116,24 @@ test.describe("create entry chooser (step 11)", () => {
     await expect(page.locator("#create-form-panel")).toBeVisible();
     await expect(page.locator("#create-entry-chooser")).toBeHidden();
     await expect(page).toHaveURL(/intent=deploy/);
-    await expect(page.locator("#create-hero-title")).toHaveText("Deploy on something");
+    await expect(page.locator("#create-hero-title")).toHaveText("Make a QR sign");
+    await expect(page.locator("#create-hero-lead")).not.toContainText("legacy pilots");
     await expect(page.locator("#create-deploy-wizard")).toBeVisible();
-    await expect(page.locator("#create-glossary-section")).toBeHidden();
+    await expect(page.locator("#create-template-advanced")).toBeHidden();
+    await expect(page.locator("#create-game-season-wizard")).toBeHidden();
+    await expect(page.locator("#create-add-object-nudge")).toBeHidden();
+  });
+
+  test("deploy room hides taxonomy when general root exists (redirect on Live)", async ({
+    page,
+  }) => {
+    await seedGeneralRootWallet(page);
+    await page.goto("/create/?intent=deploy");
+
+    await expect(page.locator("#create-deploy-wizard")).toBeVisible();
+    await expect(page.locator("#create-template-advanced")).toBeHidden();
+    await expect(page.locator("#create-add-object-nudge")).toBeHidden();
+    await expect(page.locator("#submit")).toHaveText("Continue on Live");
   });
 });
 

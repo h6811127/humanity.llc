@@ -16,7 +16,7 @@ import {
   parseStatusPlateChildFields,
 } from "./created-child-object-core.mjs";
 
-/** @typedef {"standard" | "flat_legacy" | "redirect_live" | "root_and_child"} DeploySubmitStrategy */
+/** @typedef {"standard" | "redirect_live" | "root_and_child"} DeploySubmitStrategy */
 
 /**
  * @param {URLSearchParams} searchParams
@@ -25,6 +25,24 @@ export function isDeployWizardIntent(searchParams) {
   if (searchParams.get("intent") === "deploy") return true;
   const template = searchParams.get("template");
   return template === "status_plate" || template === "lost_item";
+}
+
+/**
+ * Launch door 1 deploy room (`?intent=deploy`) — hide cross-room create UI.
+ * Field-kit deep links (`?template=`) stay on the legacy convergence path.
+ * @param {URLSearchParams} searchParams
+ */
+export function isDeployRoomCreateIntent(searchParams) {
+  return searchParams.get("intent") === "deploy";
+}
+
+/**
+ * Room entry (`?intent=deploy|wear|game`) — hide shared taxonomy / cross-room blocks.
+ * @param {URLSearchParams} searchParams
+ */
+export function isCreateRoomIsolatedIntent(searchParams) {
+  const intent = searchParams.get("intent");
+  return intent === "deploy" || intent === "wear" || intent === "game" || intent === "general";
 }
 
 /**
@@ -59,19 +77,15 @@ export function parseDeployChildFields(template, fields) {
  * @param {{
  *   searchParams: URLSearchParams;
  *   template: string;
- *   legacyFlatDetailsOpen: boolean;
  *   walletEntries: unknown[];
  * }} ctx
  * @returns {DeploySubmitStrategy}
  */
 export function resolveDeploySubmitStrategy(ctx) {
-  const { searchParams, template, legacyFlatDetailsOpen, walletEntries } = ctx;
+  const { searchParams, template, walletEntries } = ctx;
   const isPilot = template === "status_plate" || template === "lost_item_relay";
   if (!isDeployWizardIntent(searchParams) || !isPilot) {
     return "standard";
-  }
-  if (legacyFlatDetailsOpen) {
-    return "flat_legacy";
   }
   const preferredRoot = pickPreferredGeneralRoot(listGeneralRootsWithKeys(walletEntries));
   if (preferredRoot) {

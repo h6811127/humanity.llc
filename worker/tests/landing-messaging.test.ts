@@ -88,7 +88,7 @@ describe("landing messaging (Step 3)", () => {
     const html = readFileSync(join(root, "site/create/index.html"), "utf8");
     expect(html).toContain('id="create-hero-title"');
     expect(html).toContain('id="create-hero-lead"');
-    expect(html).toContain("change it later on Live without reprinting");
+    expect(html).toContain("Change it later on Live without reprinting the QR");
   });
 });
 
@@ -115,14 +115,16 @@ describe("public marketing clarity (AI step 5)", () => {
 });
 
 describe("create-template-copy", () => {
-  it("status plate lead recommends Live add under root", () => {
+  it("status plate lead recommends card page add under root", () => {
     const copy = createHeroCopyForTemplate("status_plate");
-    expect(copy.lead).toMatch(/Live/);
-    expect(CREATE_TEMPLATE_HERO.status_plate.title).toBe("Deploy on something");
+    expect(copy.lead).toMatch(/card page/i);
+    expect(CREATE_TEMPLATE_HERO.status_plate.title).toBe("Make a QR sign");
   });
 
-  it("general template emphasizes live card first", () => {
-    expect(createHeroCopyForTemplate("general").title).toBe("Create a live card");
-    expect(createHeroCopyForTemplate(undefined).title).toBe("Create a live card");
+  it("general template emphasizes account-first create", () => {
+    expect(createHeroCopyForTemplate("general").title).toBe("Create your account");
+    expect(createHeroCopyForTemplate(undefined).title).toBe("Create your account");
+    expect(createHeroCopyForTemplate("general").lead).not.toMatch(/\bnetwork\b/i);
+    expect(createHeroCopyForTemplate("general").lead).not.toMatch(/signed qr/i);
   });
 });

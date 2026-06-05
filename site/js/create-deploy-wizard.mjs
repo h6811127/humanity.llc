@@ -5,6 +5,8 @@
 import { loadWallet } from "./device-wallet.mjs";
 import {
   deploySubmitButtonLabel,
+  isCreateRoomIsolatedIntent,
+  isDeployRoomCreateIntent,
   isDeployWizardIntent,
   resolveDeploySubmitStrategy,
 } from "./create-deploy-wizard-core.mjs";
@@ -15,7 +17,6 @@ import {
  */
 export function syncCreateDeployWizardUi(searchParams, template) {
   const deployWizard = document.getElementById("create-deploy-wizard");
-  const glossary = document.getElementById("create-glossary-section");
   const demoStrip = document.querySelector(".create-demo-strip");
   const submitBtn = document.getElementById("submit");
   const objectLabel = document.getElementById("deploy-object-label");
@@ -26,10 +27,21 @@ export function syncCreateDeployWizardUi(searchParams, template) {
 
   const isPilot = template === "status_plate" || template === "lost_item_relay";
   const active = isDeployWizardIntent(searchParams) && isPilot;
+  const deployRoom = isDeployRoomCreateIntent(searchParams) && active;
+
+  const templateAdvanced = document.getElementById("create-template-advanced");
+  const gameWizard = document.getElementById("create-game-season-wizard");
+  const wearWizard = document.getElementById("create-wear-wizard");
+  const flatCompat = document.getElementById("create-flat-pilot-compat");
+  const convergenceNudge = document.getElementById("create-add-object-nudge");
 
   if (deployWizard) deployWizard.hidden = !active;
-  if (glossary) glossary.hidden = active;
   if (demoStrip) demoStrip.hidden = active;
+  if (templateAdvanced) templateAdvanced.hidden = isCreateRoomIsolatedIntent(searchParams);
+  if (gameWizard && deployRoom) gameWizard.hidden = true;
+  if (wearWizard && deployRoom) wearWizard.hidden = true;
+  if (flatCompat && deployRoom) flatCompat.hidden = true;
+  if (convergenceNudge && deployRoom) convergenceNudge.hidden = true;
 
   if (active && template === "lost_item_relay") {
     if (objectLabel) objectLabel.placeholder = "House keys";
@@ -60,16 +72,13 @@ export function syncCreateDeployWizardUi(searchParams, template) {
   }
 
   if (!submitBtn || !active) {
-    if (submitBtn && !active) submitBtn.textContent = "Create card & QR";
+    if (submitBtn && !active) submitBtn.textContent = "Create and get QR";
     return;
   }
 
-  const legacyEl = document.getElementById("create-flat-pilot-compat");
-  const legacyOpen = legacyEl instanceof HTMLDetailsElement && legacyEl.open;
   const strategy = resolveDeploySubmitStrategy({
     searchParams,
     template,
-    legacyFlatDetailsOpen: legacyOpen,
     walletEntries: loadWallet(),
   });
   const label = deploySubmitButtonLabel(template, strategy);

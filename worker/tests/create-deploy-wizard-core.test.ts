@@ -2,10 +2,13 @@ import { describe, expect, it } from "vitest";
 
 import {
   generalRootManifestoForDeploy,
+  isCreateRoomIsolatedIntent,
+  isDeployRoomCreateIntent,
   isDeployWizardIntent,
   parseDeployChildFields,
   resolveDeploySubmitStrategy,
 } from "../../site/js/create-deploy-wizard-core.mjs";
+import { createHeroCopyForTemplate } from "../../site/js/create-template-copy.mjs";
 
 describe("isDeployWizardIntent", () => {
   it("is true for deploy intent and pilot templates", () => {
@@ -15,11 +18,51 @@ describe("isDeployWizardIntent", () => {
   });
 });
 
+describe("isDeployRoomCreateIntent", () => {
+  it("is true only for intent=deploy (not field-kit template deep links)", () => {
+    expect(isDeployRoomCreateIntent(new URLSearchParams("intent=deploy"))).toBe(true);
+    expect(isDeployRoomCreateIntent(new URLSearchParams("template=status_plate"))).toBe(false);
+    expect(isDeployRoomCreateIntent(new URLSearchParams("intent=wear"))).toBe(false);
+    expect(isDeployRoomCreateIntent(new URLSearchParams("intent=game"))).toBe(false);
+  });
+});
+
+describe("isCreateRoomIsolatedIntent", () => {
+  it("is true for deploy, wear, and game room entry only", () => {
+    expect(isCreateRoomIsolatedIntent(new URLSearchParams("intent=deploy"))).toBe(true);
+    expect(isCreateRoomIsolatedIntent(new URLSearchParams("intent=wear"))).toBe(true);
+    expect(isCreateRoomIsolatedIntent(new URLSearchParams("intent=game"))).toBe(true);
+    expect(isCreateRoomIsolatedIntent(new URLSearchParams("intent=general"))).toBe(true);
+    expect(isCreateRoomIsolatedIntent(new URLSearchParams("template=status_plate"))).toBe(false);
+    expect(isCreateRoomIsolatedIntent(new URLSearchParams(""))).toBe(false);
+  });
+});
+
+describe("createHeroCopyForTemplate — deploy room", () => {
+  it("uses deploy-room hero without legacy pilot copy", () => {
+    const copy = createHeroCopyForTemplate(
+      "status_plate",
+      new URLSearchParams("intent=deploy")
+    );
+    expect(copy.title).toBe("Make a QR sign");
+    expect(copy.lead).not.toMatch(/legacy/i);
+    expect(copy.lead).toMatch(/scanners should read/i);
+  });
+
+  it("keeps field-kit hero on template deep link without legacy pilot jargon", () => {
+    const copy = createHeroCopyForTemplate(
+      "status_plate",
+      new URLSearchParams("template=status_plate")
+    );
+    expect(copy.lead).not.toMatch(/legacy/i);
+    expect(copy.lead).toMatch(/card page/i);
+  });
+});
+
 describe("resolveDeploySubmitStrategy", () => {
   const base = {
     searchParams: new URLSearchParams("intent=deploy"),
     template: "status_plate",
-    legacyFlatDetailsOpen: false,
     walletEntries: [],
   };
 
@@ -42,13 +85,8 @@ describe("resolveDeploySubmitStrategy", () => {
     ).toBe("redirect_live");
   });
 
-  it("uses flat legacy when standalone disclosure is open", () => {
-    expect(
-      resolveDeploySubmitStrategy({
-        ...base,
-        legacyFlatDetailsOpen: true,
-      })
-    ).toBe("flat_legacy");
+  it("uses root_and_child even when legacy compat disclosure is open (flat_legacy retired)", () => {
+    expect(resolveDeploySubmitStrategy(base)).toBe("root_and_child");
   });
 
   it("returns standard for non-deploy flows", () => {

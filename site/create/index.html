@@ -182,7 +182,7 @@
             hidden
           ></section>
           <p class="form-hint device-hub-lead-sub device-boot-gated" id="device-hub-empty-hint" hidden>
-            Finish the form below, then save your control key on the <a href="/created/">card page</a>.
+            Finish the form below, then save your control key on the <a href="/created/">Manage page</a>.
           </p>
 
           <div class="device-hub-search-block" id="device-hub-search-block" role="search">
@@ -404,13 +404,6 @@
           id="create-entry-chooser"
           aria-labelledby="create-entry-chooser-title"
         >
-          <section class="hero hero-compact">
-            <p class="hero-eyebrow">Create</p>
-            <h1 id="create-chooser-hero-title">Pick how you want to start</h1>
-            <p class="hero-line" id="create-chooser-hero-lead">
-              Same primitive. Live state on a physical thing.
-            </p>
-          </section>
           <h2 class="landing-launch-doors-title group-label" id="create-entry-chooser-title">
             Ways to make live status
           </h2>
@@ -435,44 +428,10 @@
         </p>
         <section class="hero hero-compact">
           <p class="hero-eyebrow">Create</p>
-          <h1 id="create-hero-title">Create a live card</h1>
+          <h1 id="create-hero-title">Create your account</h1>
           <p class="hero-line" id="create-hero-lead">
-            One general live card on the network. Add status plates, lost-item relays, and more from
-            Live after create. Signed QR, live status. Not a frozen link.
+            Pick an @name and one public sentence. Add signs and tags from your card page after.
           </p>
-        </section>
-
-        <section class="flow-section" id="create-glossary-section" aria-labelledby="create-glossary-label">
-          <h2 class="group-label" id="create-glossary-label">Card vs QR</h2>
-          <ul class="list list-compact flow-glossary">
-            <li class="list-row">
-              <span class="list-content">
-                <span class="list-title">Card</span>
-                <span class="list-sub"
-                  >Your live profile: handle, public line, status on the network. Not the same as
-                  profile ID alone.</span
-                >
-              </span>
-            </li>
-            <li class="list-row">
-              <span class="list-content">
-                <span class="list-title">QR</span>
-                <span class="list-sub"
-                  >Signed credential encoded in the code. It points at your card and can expire or
-                  be revoked separately from reprinting.</span
-                >
-              </span>
-            </li>
-            <li class="list-row">
-              <span class="list-content">
-                <span class="list-title">Profile ID</span>
-                <span class="list-sub"
-                  >Opaque network ID for your card (assigned at create). Printers and scanners use
-                  it; you rarely need to memorize it.</span
-                >
-              </span>
-            </li>
-          </ul>
         </section>
 
         <section class="create-demo-strip flow-demo-strip" aria-label="Demo">
@@ -539,11 +498,8 @@
             aria-labelledby="create-game-season-fork-title"
           >
             <h2 class="group-label" id="create-game-season-fork-title">
-              How should this season live on the network?
+              How should this season run?
             </h2>
-            <p class="form-hint">
-              Same primitive either way. Pick the identity story that matches your season.
-            </p>
             <div class="create-season-fork-list" role="group" aria-label="Season account choice">
               <button
                 type="button"
@@ -576,8 +532,7 @@
           >
             <h2 class="group-label" id="create-game-season-wizard-title">Season setup</h2>
             <p class="form-hint">
-              Register the game-operator key, then add game nodes, publish rules, and export print
-              packs from Live.
+              Continue on your card page to add checkpoints and publish rules.
             </p>
             <p class="form-hint" id="game-season-redirect-hint" hidden></p>
             <div id="game-season-id-block">
@@ -610,10 +565,10 @@
           >
             <h2 class="group-label" id="create-wear-wizard-title">Your QR on what you wear</h2>
             <p class="form-hint">
-              Free BYOP path. Sign a live card, download the QR, and print on your own hoodie,
-              jacket, or sticker. Buying the
+              Free print-your-own path. Get a @handle, download the QR, and print on your own
+              hoodie, jacket, or sticker. The
               <a href="/shop/customize/?product=glitch_hoodie_v1">Glitch hoodie</a> is optional
-              print quality and fulfillment; the live primitive is the same.
+              print quality and fulfillment.
             </p>
           </section>
 
@@ -672,7 +627,7 @@
           <p class="form-hint">Lowercase letters, digits, underscores. 3 to 32 characters.</p>
 
           <div id="create-fields-general">
-            <label class="form-label" for="manifesto">What should this card say?</label>
+            <label class="form-label" for="manifesto">What should people read?</label>
             <textarea
               class="form-input form-textarea"
               id="manifesto"
@@ -907,7 +862,7 @@
 
           </div>
 
-          <button type="submit" class="btn-primary flow-submit" id="submit">Create card &amp; QR</button>
+          <button type="submit" class="btn-primary flow-submit" id="submit">Create and get QR</button>
           <p id="status" class="form-status" role="status"></p>
         </form>
         </div>
@@ -968,6 +923,6 @@
     </script>
     <script src="/js/device-status-bootstrap.mjs?v=94" type="module"></script>
     <script src="/js/create-hub.mjs?v=1" type="module"></script>
-    <script type="module" src="/js/create-card.mjs?v=24"></script>
+    <script type="module" src="/js/create-card.mjs?v=25"></script>
   </body>
 </html>
