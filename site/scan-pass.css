@@ -1450,6 +1450,22 @@ a {
   display: none;
 }
 
+.scan-truth-unverified-banner {
+  margin: 0 var(--pad) 12px;
+  padding: 12px 14px;
+  font-size: 14px;
+  line-height: 1.45;
+  font-weight: 600;
+  color: var(--black);
+  background: rgba(255, 59, 48, 0.1);
+  border: 1px solid rgba(255, 59, 48, 0.35);
+  border-radius: 14px;
+}
+
+.scan-truth-unverified-banner[hidden] {
+  display: none;
+}
+
 .scan-steward-preview-return {
   margin: 0 var(--pad) 12px;
   padding: 10px 14px;

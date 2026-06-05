@@ -10,7 +10,7 @@ import { CACHE_ACTIVE, CACHE_INACTIVE } from "../src/resolver/scan-state";
 
 describe("staleness contract (Order 6)", () => {
   it("parses max-age from cache-control", () => {
-    expect(maxAgeSecondsFromCacheControl(CACHE_ACTIVE)).toBe(300);
+    expect(maxAgeSecondsFromCacheControl(CACHE_ACTIVE)).toBe(30);
     expect(maxAgeSecondsFromCacheControl(CACHE_INACTIVE)).toBe(60);
   });
 
@@ -22,7 +22,7 @@ describe("staleness contract (Order 6)", () => {
       kind: "active",
     });
     expect(payload.fetched_at).toBe("2026-06-07T18:00:00.000Z");
-    expect(payload.max_age_seconds).toBe(300);
+    expect(payload.max_age_seconds).toBe(30);
     expect(payload.source).toBe("resolver");
     expect(payload.stale_disclosure).toBe(STALE_DISCLOSURE_RESOLVER);
   });

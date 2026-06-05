@@ -155,7 +155,7 @@ function gameNodeMutedCopy(
 }
 
 /** Response header  -  confirms pass-card scan UI (not legacy .block layout). */
-export const SCAN_UI_VERSION = "pass-v39";
+export const SCAN_UI_VERSION = "pass-v40";
 
 /**
  * Public scan UI  -  flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
@@ -200,6 +200,7 @@ export async function renderScanPage(
       <a id="scan-steward-preview-return-link" class="scan-steward-preview-return-link" href="#">Back</a>
     </div>
     <p class="scan-offline-banner" id="scan-offline-banner" role="status" hidden>${escapeHtml(SCAN_OFFLINE_BANNER_TEXT)}</p>
+    <p class="scan-truth-unverified-banner" id="scan-truth-unverified-banner" role="alert" hidden></p>
     ${renderScanFreshnessBannerMarkup(freshness)}
     <main class="screen scan-screen">
       ${renderScanHeroSection(vm, safety, pageOrigin, qrMarkup)}
@@ -331,6 +332,7 @@ function renderScanHeroSection(
     : "";
   const qrAttr = vm.qrId ? ` data-qr-id="${escapeHtml(vm.qrId)}"` : "";
   const scanActiveAttr = vm.kind === "active" ? ` data-scan-active="1"` : "";
+  const ssrKindAttr = ` data-ssr-scan-kind="${escapeHtml(vm.kind)}"`;
   const merchFunnelAttr = isMerchFunnelScan(vm) ? ` data-merch-funnel="1"` : "";
   const objectAttr = vm.childObjectId
     ? ` data-object-id="${escapeHtml(vm.childObjectId)}"`
@@ -371,7 +373,7 @@ function renderScanHeroSection(
     : "";
 
   return `<div class="scan-pass-layer">
-<article class="scan-hero scan-status-panel scan-safety-header scan-live-check--pending" id="scan-safety-header" aria-label="Live check"${profileAttr}${qrAttr}${objectAttr}${scanActiveAttr}${merchFunnelAttr}${gameContributeAttr}${gamePledgeAttr}${lostItemOfferAttr}>
+<article class="scan-hero scan-status-panel scan-safety-header scan-live-check--pending" id="scan-safety-header" aria-label="Live check"${profileAttr}${qrAttr}${ssrKindAttr}${objectAttr}${scanActiveAttr}${merchFunnelAttr}${gameContributeAttr}${gamePledgeAttr}${lostItemOfferAttr}>
   <header class="scan-hero-head">
     ${renderScanHeroHost()}
     ${renderHeroStatusStrip(vm)}
@@ -1555,7 +1557,7 @@ function renderScanLiveCheckArriveScript(
   originEnv?: ScanPageOriginEnv
 ): string {
   const assetOrigin = pagesJsOrigin(origin, request, originEnv);
-  const mod = JSON.stringify(`${assetOrigin}/js/scan-live-check-arrive.mjs?v=2`);
+  const mod = JSON.stringify(`${assetOrigin}/js/scan-live-check-arrive.mjs?v=3`);
   return `<script type="module" src=${mod}></script>`;
 }
 
@@ -1633,7 +1635,7 @@ function renderScanActorBand(vm: ScanViewModel, origin: string): string {
   if (vm.kind !== "active" || !vm.profileId || !vm.qrId) return "";
   const walletUrl = `${escapeHtml(origin)}/wallet/`;
   return `<section id="scan-actor-band" class="scan-actor-band scan-actor-band--hidden" hidden aria-label="Your device on this scan">
-  <h2 class="scan-actor-band-title">Ownership on this device</h2>
+  <h2 class="scan-actor-band-title">Saved control</h2>
   <p class="scan-actor-band-lead">You can vouch or open your cards from here.</p>
   <div class="scan-actor-band-actions">
     <button type="button" class="scan-actor-band-primary" id="scan-actor-band-restore" hidden>Restore control here</button>

@@ -22,14 +22,26 @@ describe("scanArriveLabelsAgree", () => {
 });
 
 describe("shouldSkipScanArriveCheckingPhase", () => {
-  it("skips when online and labels agree", () => {
+  it("skips when online, truth verified, and labels agree", () => {
     expect(
       shouldSkipScanArriveCheckingPhase({
         arriveLabel: "Active",
         statusText: "Active",
         online: true,
+        truthVerified: true,
       })
     ).toBe(true);
+  });
+
+  it("does not skip when labels agree but truth is not verified", () => {
+    expect(
+      shouldSkipScanArriveCheckingPhase({
+        arriveLabel: "Active",
+        statusText: "Active",
+        online: true,
+        truthVerified: false,
+      })
+    ).toBe(false);
   });
 
   it("does not skip when offline (stale SSR may disagree)", () => {
@@ -54,7 +66,7 @@ describe("shouldSkipScanArriveCheckingPhase", () => {
 });
 
 describe("shouldUseScanArriveSsrFastPath", () => {
-  it("is true when SSR strip label matches data-arrive-label", () => {
+  it("is true when truth is verified and SSR strip labels match", () => {
     const hero = {
       querySelector: (sel) => {
         if (sel === ".scan-arrive-strip") {
@@ -66,7 +78,8 @@ describe("shouldUseScanArriveSsrFastPath", () => {
         return null;
       },
     };
-    expect(shouldUseScanArriveSsrFastPath(hero)).toBe(true);
+    expect(shouldUseScanArriveSsrFastPath(hero, { truthVerified: true })).toBe(true);
+    expect(shouldUseScanArriveSsrFastPath(hero)).toBe(false);
   });
 
   it("is false when arrive label is missing", () => {

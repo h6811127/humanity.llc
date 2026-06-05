@@ -17,6 +17,7 @@ import { errorResponse, jsonResponse, requestOrigin } from "../http/resolver";
 import { validateManifestoLine } from "../validation/manifesto";
 import { validateObjectStreamsField } from "../validation/object-streams";
 import { resolveStoredQrExpiresAt } from "./merch-qr-policy";
+import { purgeScanCacheAfterMutation } from "./scan-cache-purge";
 
 function parseRotateBody(body: unknown): {
   card: Record<string, unknown>;
@@ -327,6 +328,13 @@ export async function handlePostRotateQr(
     }
     return errorResponse("RESOLVER_ERROR", msg, 500);
   }
+
+  await purgeScanCacheAfterMutation({
+    request,
+    db,
+    profileId,
+    extraQrIds: [newQrId, activeRow?.qr_id ?? ""].filter(Boolean),
+  });
 
   return jsonResponse(
     {

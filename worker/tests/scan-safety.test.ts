@@ -126,8 +126,10 @@ describe("scan-safety", () => {
     expect(html).toContain("scan-safety-first-seen");
     expect(html).toContain("scan-hero-limit");
     expect(html).toContain("scan-live-check--pending");
-    expect(html).toContain("scan-live-check-arrive.mjs");
+    expect(html).toContain("scan-live-check-arrive.mjs?v=3");
     expect(html).toContain("data-arrive-label");
+    expect(html).toContain('data-ssr-scan-kind="active"');
+    expect(html).toContain("scan-truth-unverified-banner");
     expect(html).toContain("Active");
     expect(html).not.toContain("Checking live status…");
     expect(html).toContain('id="scan-actor-band"');

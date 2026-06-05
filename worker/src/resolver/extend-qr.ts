@@ -11,6 +11,7 @@ import { getActiveCardScopeQr } from "../db/qr-rotation";
 import { getCardOwner } from "../db/revoke";
 import { errorResponse, jsonResponse, requestOrigin } from "../http/resolver";
 import { QR_ID_REGEX } from "./scan-state";
+import { purgeScanCacheAfterMutation } from "./scan-cache-purge";
 
 function parseExtendBody(body: unknown): Record<string, unknown> | null {
   if (!body || typeof body !== "object") return null;
@@ -221,6 +222,13 @@ export async function handlePostExtendQr(
     const msg = e instanceof Error ? e.message : "Database error.";
     return errorResponse("RESOLVER_ERROR", msg, 500);
   }
+
+  await purgeScanCacheAfterMutation({
+    request,
+    db,
+    profileId,
+    targetQrId: qrId,
+  });
 
   return jsonResponse(
     {

@@ -66,11 +66,28 @@ function qr(): QrCredentialRow {
 }
 
 describe("M3.6 cache + HTTP status", () => {
-  it("active scan uses standards Cache-Control", () => {
+  it("active scan uses short must-revalidate Cache-Control", () => {
     const vm = buildScanViewModel(PROFILE, QR, { card: card(), qr: qr(), verification: null, revocationDisplay: null }, "https://humanity.llc");
     expect(vm.cacheControl).toBe(CACHE_ACTIVE);
+    expect(CACHE_ACTIVE).not.toContain("stale-while-revalidate");
     expect(httpStatusForScanKind("card_revoked")).toBe(410);
     expect(httpStatusForScanKind("malformed")).toBe(400);
+  });
+
+  it("revoked scan responses use no-store", () => {
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: card(),
+        qr: { ...qr(), status: "revoked" },
+        verification: null,
+        revocationDisplay: null,
+      },
+      "https://humanity.llc"
+    );
+    expect(vm.kind).toBe("qr_revoked");
+    expect(vm.cacheControl).toBe("no-store");
   });
 });
 

@@ -126,7 +126,7 @@ describe("scan freshness banner (Order 6)", () => {
     expect(html).toContain('id="scan-freshness-banner"');
     expect(html).toContain(STALE_DISCLOSURE_RESOLVER);
     expect(html).toMatch(/data-fetched-at="\d{4}-\d{2}-\d{2}T/);
-    expect(html).toContain('data-max-age-seconds="300"');
+    expect(html).toContain('data-max-age-seconds="30"');
     expect(html).toContain('data-source="resolver"');
     expect(renderScanFreshnessBannerMarkup(freshness)).toContain(" hidden");
     expect(renderScanFreshnessBannerScript()).toContain("pageshow");

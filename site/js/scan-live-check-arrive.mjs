@@ -1,5 +1,6 @@
 /**
  * Path 2 live check data-arriving on scan pages (L2 Settle + L1 dot sync).
+ * Phase 1: network status JSON gate before trusting SSR (scan-live-truth).
  * @see docs/SCAN_PAGE_TRUST_UI.md
  */
 import {
@@ -9,6 +10,13 @@ import {
   SCAN_ARRIVE_SETTLE_MS,
   shouldSkipScanArriveCheckingPhase,
 } from "./scan-live-check-arrive-core.mjs";
+import { shouldBypassSsrFastPath } from "./scan-live-truth-core.mjs";
+import {
+  applyConfirmedScanTruth,
+  fetchScanLiveTruth,
+  handleScanTruthMismatch,
+  showScanTruthUnverified,
+} from "./scan-live-truth.mjs";
 
 const PENDING_CLASS = "scan-live-check--pending";
 const SETTLED_CLASS = "scan-live-check--settled";
@@ -28,6 +36,11 @@ function resolvedLabel(hero) {
 
 function statusLabelEl(hero) {
   return hero?.querySelector(".scan-arrive-status-label");
+}
+
+function navigationType() {
+  const entry = performance.getEntriesByType("navigation")[0];
+  return entry && "type" in entry ? String(entry.type) : null;
 }
 
 function revealItem(el, reduced) {
@@ -83,7 +96,14 @@ function settleInstant(hero) {
   window.dispatchEvent(new CustomEvent("hc-scan-live-check-settled", { detail: { instant: true } }));
 }
 
-async function runArriveSequence(hero) {
+/**
+ * @param {HTMLElement} hero
+ * @param {{
+ *   truthVerified?: boolean,
+ *   forceRevalidate?: boolean,
+ * }} opts
+ */
+async function runArriveSequence(hero, opts = {}) {
   const reduced = prefersReducedMotion();
   const label = resolvedLabel(hero);
   const statusEl = statusLabelEl(hero);
@@ -92,6 +112,8 @@ async function runArriveSequence(hero) {
     arriveLabel: label,
     statusText: statusEl?.textContent,
     online: navigator.onLine !== false,
+    truthVerified: opts.truthVerified === true,
+    forceRevalidate: opts.forceRevalidate === true,
   });
 
   if (reduced) {
@@ -124,10 +146,70 @@ async function runArriveSequence(hero) {
   }, staggerEnd + 40);
 }
 
-export function initScanLiveCheckArrive() {
-  const hero = heroEl();
-  if (!hero || !hero.classList.contains(PENDING_CLASS)) return;
-  void runArriveSequence(hero);
+/**
+ * @param {HTMLElement} hero
+ * @param {{ persisted?: boolean }} [opts]
+ */
+async function gateScanLiveTruth(hero, opts = {}) {
+  if (!hero.dataset.profileId || !hero.dataset.qrId) {
+    return { truthVerified: false, forceRevalidate: false };
+  }
+
+  const truth = await fetchScanLiveTruth(hero);
+  const forceRevalidate = shouldBypassSsrFastPath({
+    persisted: opts.persisted === true,
+    navigationType: navigationType(),
+  });
+
+  if (!truth.ok) {
+    showScanTruthUnverified();
+    return { truthVerified: false, forceRevalidate: true };
+  }
+
+  if (!truth.match) {
+    const action = handleScanTruthMismatch(hero, truth);
+    if (action === "reload") {
+      return { truthVerified: false, forceRevalidate: true, reloading: true };
+    }
+    return {
+      truthVerified: false,
+      forceRevalidate: true,
+      arriveLabel: truth.arriveLabel,
+    };
+  }
+
+  applyConfirmedScanTruth(hero, truth);
+  return {
+    truthVerified: true,
+    forceRevalidate,
+    arriveLabel: truth.arriveLabel,
+  };
 }
 
-initScanLiveCheckArrive();
+export async function initScanLiveCheckArrive(opts = {}) {
+  const hero = heroEl();
+  if (!hero || !hero.classList.contains(PENDING_CLASS)) return;
+
+  const gate = await gateScanLiveTruth(hero, opts);
+  if (gate.reloading) return;
+
+  await runArriveSequence(hero, {
+    truthVerified: gate.truthVerified,
+    forceRevalidate: gate.forceRevalidate,
+  });
+}
+
+void initScanLiveCheckArrive();
+
+window.addEventListener("pageshow", (event) => {
+  if (!event.persisted) return;
+  const hero = heroEl();
+  if (!hero) return;
+  void (async () => {
+    const gate = await gateScanLiveTruth(hero, { persisted: true });
+    if (gate.reloading) return;
+    const statusEl = statusLabelEl(hero);
+    const label = gate.arriveLabel || resolvedLabel(hero);
+    if (statusEl && label) statusEl.textContent = label;
+  })();
+});

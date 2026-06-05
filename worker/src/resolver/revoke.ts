@@ -16,6 +16,7 @@ import type { RevocationTargetKind } from "../db/types";
 import { REVOCATION_TARGET_KINDS } from "../db/types";
 import { parseRevocationDisplayFields } from "./revocation-display";
 import { authorizeDelegatedChildRoute } from "./delegated-child-signer";
+import { purgeScanCacheAfterMutation } from "./scan-cache-purge";
 
 const OWNER_REASONS = new Set(["owner_revoked"]);
 const ORGANIZER_REASONS = new Set(["organizer_revoked"]);
@@ -248,6 +249,14 @@ export async function handlePostRevoke(
     }
     return errorResponse("RESOLVER_ERROR", msg, 500);
   }
+
+  await purgeScanCacheAfterMutation({
+    request,
+    db,
+    profileId,
+    targetKind,
+    targetQrId,
+  });
 
   return jsonResponse(
     {

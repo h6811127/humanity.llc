@@ -26,6 +26,7 @@ import { defaultSeason } from "../city-game/season-loader";
 import type { CrSeasonConfig } from "../city-game/season-config";
 import { resolveFactionBadgeScanForPrintArtifact } from "../city-game/faction-badge";
 import { resolveMobileLoreScanForPrintArtifact } from "../city-game/mobile-lore";
+import { cacheControlForScanKind } from "./scan-cache-purge";
 
 export const QR_ID_REGEX =
   /^qr_[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{8,40}$/;
@@ -64,9 +65,12 @@ export function httpStatusForScanKind(kind: ScanPageKind): number {
   }
 }
 
-export const CACHE_ACTIVE =
-  "public, max-age=300, stale-while-revalidate=3600";
-export const CACHE_INACTIVE = "public, max-age=60";
+export {
+  CACHE_ACTIVE,
+  CACHE_INACTIVE,
+  CACHE_NO_STORE,
+  cacheControlForScanKind,
+} from "./scan-cache-purge";
 
 export interface ScanViewModel {
   kind: ScanPageKind;
@@ -673,7 +677,7 @@ function baseView(input: BaseViewInput, origin: string, now: Date = new Date()):
       input.profileId && input.qrId
         ? deriveCredentialCodeSync(input.profileId, input.qrId)
         : null,
-    cacheControl: isHealthy ? CACHE_ACTIVE : CACHE_INACTIVE,
+    cacheControl: cacheControlForScanKind(input.kind),
     malformedReason: null,
     childObjectType: input.childObjectType ?? null,
     childObjectId: input.childObjectId ?? null,

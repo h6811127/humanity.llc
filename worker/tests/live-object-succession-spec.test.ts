@@ -92,7 +92,7 @@ describe("succession spec (Order 6)", () => {
       new Date("2026-06-07T18:00:00.000Z")
     );
     expect(body.scan.freshness.fetched_at).toBe("2026-06-07T18:00:00.000Z");
-    expect(body.scan.freshness.max_age_seconds).toBe(300);
+    expect(body.scan.freshness.max_age_seconds).toBe(30);
     expect(body.scan.succession.phase).toBe("live");
     expect(buildScanCapabilities(vm).length).toBeGreaterThan(0);
   });

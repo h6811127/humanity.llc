@@ -27,17 +27,26 @@ export function scanArriveLabelsAgree(arriveLabel, statusText) {
 }
 
 /**
- * Skip the artificial checking phase when SSR and the live strip already agree.
- * Offline loads may show stale cached HTML — keep checking motion in that case.
+ * Skip the artificial checking phase only after live-truth JSON confirmed SSR kind.
+ * Cached HTML may self-agree while stale — never skip without `truthVerified`.
  *
  * @param {{
  *   arriveLabel?: string | null,
  *   statusText?: string | null,
  *   online?: boolean,
+ *   truthVerified?: boolean,
+ *   forceRevalidate?: boolean,
  * }} input
  */
 export function shouldSkipScanArriveCheckingPhase(input = {}) {
-  const { arriveLabel, statusText, online = true } = input;
+  const {
+    arriveLabel,
+    statusText,
+    online = true,
+    truthVerified = false,
+    forceRevalidate = false,
+  } = input;
+  if (!truthVerified || forceRevalidate) return false;
   if (!online) return false;
   return scanArriveLabelsAgree(arriveLabel, statusText);
 }
@@ -46,8 +55,10 @@ export function shouldSkipScanArriveCheckingPhase(input = {}) {
  * RC-8: Worker SSR embeds the settled strip label on `data-arrive-label` and in
  * `.scan-arrive-status-label`. When both match, skip the artificial checking hold.
  * @param {{ querySelector?: (sel: string) => Element | null } | null | undefined} hero
- * @param {{ online?: boolean }} [opts]
+ * @param {{ online?: boolean, truthVerified?: boolean }} [opts]
  */
+export { shouldBypassSsrFastPath } from "./scan-live-truth-core.mjs";
+
 export function shouldUseScanArriveSsrFastPath(hero, opts = {}) {
   if (!hero?.querySelector) return false;
   const strip = hero.querySelector(".scan-arrive-strip");
@@ -62,6 +73,7 @@ export function shouldUseScanArriveSsrFastPath(hero, opts = {}) {
     arriveLabel,
     statusText,
     online: opts.online ?? true,
+    truthVerified: opts.truthVerified === true,
   });
 }
 

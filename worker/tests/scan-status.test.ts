@@ -88,7 +88,7 @@ describe("scan status JSON (M3.4)", () => {
     expect(body.scan.limits.scan_analytics).toBe(false);
     expect(body.scan.verification.vouch_count).toBe(0);
     expect(httpStatusForScanKind(vm.kind)).toBe(200);
-    expect(body.scan.freshness.max_age_seconds).toBe(300);
+    expect(body.scan.freshness.max_age_seconds).toBe(30);
     expect(body.scan.succession.phase).toBe("live");
   });
 
@@ -356,7 +356,7 @@ describe("scan status JSON (M3.4)", () => {
       PROFILE
     );
     expect(second.status).toBe(304);
-    expect(second.headers.get("Cache-Control")).toContain("max-age=300");
+    expect(second.headers.get("Cache-Control")).toContain("max-age=30");
   });
 
   it("GET status through worker.fetch includes CORS for Pages dev origin", async () => {

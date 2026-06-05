@@ -8,6 +8,7 @@ import { applyCardUpdate, getCardForUpdate } from "../db/card-update";
 import { errorResponse, jsonResponse } from "../http/resolver";
 import { validateManifestoLine } from "../validation/manifesto";
 import { validateObjectStreamsField } from "../validation/object-streams";
+import { purgeScanCacheAfterMutation } from "./scan-cache-purge";
 
 function parseUpdateBody(body: unknown): Record<string, unknown> | null {
   if (!body || typeof body !== "object") return null;
@@ -164,6 +165,8 @@ export async function handlePostCardUpdate(
     const msg = e instanceof Error ? e.message : "Database error.";
     return errorResponse("RESOLVER_ERROR", msg, 500);
   }
+
+  await purgeScanCacheAfterMutation({ request, db, profileId });
 
   return jsonResponse(
     {
