@@ -863,7 +863,15 @@ body.device-glance-popover-open .device-hub-glance-popover:not([hidden]) {
   margin-bottom: 8px;
 }
 
-.landing-device-settings-group-label,
+.landing-device-settings-group-label {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--grey);
+}
+
 .landing-device-settings-title {
   margin: 0 0 10px;
   font-size: 13px;
