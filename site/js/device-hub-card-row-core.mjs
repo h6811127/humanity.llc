@@ -5,6 +5,25 @@
 
 import { verificationTrustChip } from "./human-trust-ui.mjs";
 
+/** Hub object-type labels that add no steward value without a specific subtype or trust chip. */
+export const GENERIC_HUB_OBJECT_TYPE_LABELS = new Set(["Object", "Account"]);
+
+/** @param {string | null | undefined} label */
+export function isGenericHubVerificationLabel(label) {
+  const normalized = String(label ?? "").trim();
+  return !normalized || normalized === "Registered" || normalized === "Unknown";
+}
+
+/** @param {{ label?: string, tone?: string } | null | undefined} chip */
+export function isMeaningfulHubVerificationChip(chip) {
+  return Boolean(chip?.label) && !isGenericHubVerificationLabel(chip.label);
+}
+
+/** @param {string | null | undefined} objectTypeLabel */
+export function isGenericHubObjectTypeLabel(objectTypeLabel) {
+  return GENERIC_HUB_OBJECT_TYPE_LABELS.has(String(objectTypeLabel ?? "").trim());
+}
+
 /**
  * @param {number | null | undefined} at
  * @param {number} [now]
@@ -48,19 +67,34 @@ export function hubCardTitle(entry) {
  * }} ctx
  */
 export function hubCardIdentityLine(ctx) {
-  const parts = [ctx.objectTypeLabel];
+  const objectTypeLabel = String(ctx.objectTypeLabel ?? "").trim();
+  const genericType = isGenericHubObjectTypeLabel(objectTypeLabel);
+
   let verifyTone = "muted";
+  /** @type {{ label: string, tone: string } | null} */
+  let verifyChip = null;
   if (ctx.includeVerification !== false) {
-    const chip = verificationTrustChip({
+    verifyChip = verificationTrustChip({
       label: ctx.verificationLabel,
       state: ctx.verificationState,
     });
-    if (chip.label) {
-      parts.push(chip.label);
-      verifyTone = chip.tone;
-    }
   }
-  return { text: parts.join(" · "), verifyTone };
+
+  const meaningfulVerify =
+    verifyChip != null && isMeaningfulHubVerificationChip(verifyChip);
+
+  /** @type {string[]} */
+  const parts = [];
+  if (!genericType && objectTypeLabel) {
+    parts.push(objectTypeLabel);
+  }
+  if (meaningfulVerify && verifyChip) {
+    parts.push(verifyChip.label);
+    verifyTone = verifyChip.tone;
+  }
+
+  const text = parts.join(" · ");
+  return { text, verifyTone, visible: text.length > 0 };
 }
 
 /**

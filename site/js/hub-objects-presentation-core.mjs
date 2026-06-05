@@ -6,7 +6,10 @@
  */
 
 import { verificationTrustChip } from "./human-trust-ui.mjs";
-import { hubCardTitle } from "./device-hub-card-row-core.mjs";
+import {
+  hubCardTitle,
+  isMeaningfulHubVerificationChip,
+} from "./device-hub-card-row-core.mjs";
 import {
   hubChildObjectRootHandle,
   isGeneralRootWalletEntry,
@@ -68,19 +71,22 @@ export function hubAccountLineTitle(entry) {
  */
 export function hubAccountLineIdentity(ctx) {
   const handle = hubChildObjectRootHandle(ctx.entry);
-  const parts = ["Account", handle];
+  /** @type {string[]} */
+  const parts = ["Account"];
+  if (handle) parts.push(handle);
   let verifyTone = "muted";
   if (ctx.includeVerification !== false) {
     const chip = verificationTrustChip({
       label: ctx.verificationLabel,
       state: ctx.verificationState,
     });
-    if (chip.label) {
+    if (isMeaningfulHubVerificationChip(chip)) {
       parts.push(chip.label);
       verifyTone = chip.tone;
     }
   }
-  return { text: parts.join(" · "), verifyTone };
+  const text = parts.join(" · ");
+  return { text, verifyTone, visible: text.length > 0 };
 }
 
 /**

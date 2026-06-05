@@ -683,6 +683,12 @@ function hubCardStatusHtml(profileId, statusOverride, scanKindOverride) {
   return `<span class="hub-card-status hub-card-status--${status.tone}" role="status"><span class="hub-card-status-dot" aria-hidden="true"></span><span class="hub-card-status-label">${escapeHtml(status.label)}</span></span>`;
 }
 
+/** @param {{ text: string, verifyTone: string, visible?: boolean }} identity */
+function hubCardIdentityHtml(identity) {
+  const hidden = identity.visible === false || !identity.text;
+  return `<span class="hub-card-identity hub-card-identity--${identity.verifyTone}"${hidden ? " hidden" : ""}>${escapeHtml(identity.text)}</span>`;
+}
+
 function scanUrlForEntry(entry) {
   return resolveWalletEntryScanUrl(entry, location.origin, walletEntryQrId(entry));
 }
@@ -990,6 +996,7 @@ function applyNetworkChipsToDom(
       });
       identityEl.className = `hub-card-identity hub-card-identity--${identity.verifyTone}`;
       identityEl.textContent = identity.text;
+      identityEl.hidden = !identity.visible;
     }
     const iconEl = li.querySelector(".hub-card-head .list-icon");
     if (iconEl) {
@@ -1972,7 +1979,7 @@ function renderSavedRows(opts = {}) {
         ${cardIcon}
         <span class="list-content">
           <span class="list-title">${escapeHtml(hubRootRowTitle(entry, hubChildRows.length))}</span>
-          <span class="hub-card-identity hub-card-identity--${identity.verifyTone}">${escapeHtml(identity.text)}</span>
+          ${hubCardIdentityHtml(identity)}
           ${statusHtml}
           ${fullRows && presentationMode !== "account_line" ? hubCardSubHtml(entry, lastUsed) : ""}
         </span>

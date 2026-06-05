@@ -281,14 +281,54 @@ describe("hubCardStatusLine", () => {
 });
 
 describe("hubCardIdentityLine", () => {
-  it("joins object type and verification", () => {
+  it("suppresses generic Object · Registered", () => {
+    expect(
+      hubCardIdentityLine({
+        objectTypeLabel: "Object",
+        verificationLabel: "Registered",
+        verificationState: "registered",
+      })
+    ).toEqual({ text: "", verifyTone: "muted", visible: false });
+  });
+
+  it("suppresses generic Account · Registered", () => {
+    expect(
+      hubCardIdentityLine({
+        objectTypeLabel: "Account",
+        verificationLabel: "Registered",
+        verificationState: "registered",
+      })
+    ).toEqual({ text: "", verifyTone: "muted", visible: false });
+  });
+
+  it("shows specific object type without Registered", () => {
     expect(
       hubCardIdentityLine({
         objectTypeLabel: "Live demo",
         verificationLabel: "Registered",
         verificationState: "registered",
       })
-    ).toEqual({ text: "Live demo · Registered", verifyTone: "muted" });
+    ).toEqual({ text: "Live demo", verifyTone: "muted", visible: true });
+  });
+
+  it("shows meaningful trust without generic object type", () => {
+    expect(
+      hubCardIdentityLine({
+        objectTypeLabel: "Object",
+        verificationLabel: "Steward",
+        verificationState: "steward",
+      })
+    ).toEqual({ text: "Steward", verifyTone: "steward", visible: true });
+  });
+
+  it("joins specific object type and meaningful trust", () => {
+    expect(
+      hubCardIdentityLine({
+        objectTypeLabel: "Sign",
+        verificationLabel: "Steward",
+        verificationState: "steward",
+      })
+    ).toEqual({ text: "Sign · Steward", verifyTone: "steward", visible: true });
   });
 });
 

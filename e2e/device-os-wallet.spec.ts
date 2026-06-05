@@ -203,7 +203,7 @@ test.describe("device OS wallet flow", () => {
     await expect(page).toHaveURL(/\/created\/\?.*profile_id=7Xk9mP2nQ4rT6vW8yZ1aB3cD5/);
     await expect(page.locator("#created-setup-root")).toBeHidden();
 
-    await expect(page.getByRole("tab", { name: "Manage", selected: true })).toBeVisible();
+    await expect(page.getByRole("tab", { name: "Settings", selected: true })).toBeVisible();
     await expect(page.locator("#revoke-details")).toBeVisible();
     await expect(page.locator("#revoke-details")).toHaveAttribute("open");
   });
@@ -226,7 +226,7 @@ test.describe("device OS wallet flow", () => {
     });
     await expect(page.locator("#created-setup-root")).toBeHidden();
     await expect(page.locator("#created-control-root")).toBeVisible();
-    await expect(page.getByRole("tab", { name: "Live", selected: true })).toBeVisible();
+    await expect(page.getByRole("tab", { name: "What opens", selected: true })).toBeVisible();
   });
 
   test("Open workspace banner opens card controls when hc_setup_done unset", async ({
@@ -247,7 +247,7 @@ test.describe("device OS wallet flow", () => {
       timeout: 15_000,
     });
     await expect(page.locator("#created-setup-root")).toBeHidden();
-    await expect(page.getByRole("tab", { name: "Live", selected: true })).toBeVisible();
+    await expect(page.getByRole("tab", { name: "What opens", selected: true })).toBeVisible();
   });
 
   test("control mode shows Live tab, setup memory chips, and primary CTA", async ({
@@ -271,8 +271,8 @@ test.describe("device OS wallet flow", () => {
       timeout: 15_000,
     });
     await expect(page.locator("#created-control-root")).toBeVisible();
-    await expect(page.getByRole("tab", { name: "Live", selected: true })).toBeVisible();
-    await expect(page.getByRole("tab", { name: "Manage" })).toBeVisible();
+    await expect(page.getByRole("tab", { name: "What opens", selected: true })).toBeVisible();
+    await expect(page.getByRole("tab", { name: "Settings" })).toBeVisible();
   });
 
   test("fresh=1 shows post-create setup wizard (not control tabs)", async ({ page }) => {
@@ -361,7 +361,7 @@ test.describe("device OS wallet flow", () => {
     await expect(page).toHaveURL(/#update-status/);
     const sessionRaw = await page.evaluate(() => sessionStorage.getItem("hc_created"));
     expect(sessionRaw).toContain("privkeyfortestonlyxxxxxxxxx");
-    await expect(page.getByRole("tab", { name: "Live", selected: true })).toBeVisible();
+    await expect(page.getByRole("tab", { name: "What opens", selected: true })).toBeVisible();
     await expect(page.locator("#created-live-scanners-see")).toBeVisible();
   });
 
@@ -397,7 +397,7 @@ test.describe("device OS wallet flow", () => {
 
     await page.goto("/wallet/");
     await expect(page.getByText("Reachable")).toBeVisible();
-    await expect(page.getByText("Registered")).toBeVisible();
+    await expect(page.locator(".hub-card-item .hub-card-identity").first()).toBeHidden();
     await expect(
       page.getByText("Card disabled on the network since your last visit.")
     ).toBeHidden();
@@ -596,7 +596,7 @@ test.describe("device OS wallet flow", () => {
 
     await page.goto("/wallet/");
     await expect(page.getByText("Reachable")).toBeVisible();
-    await expect(page.getByText("Registered")).toBeVisible();
+    await expect(page.locator(".hub-card-item .hub-card-identity").first()).toBeHidden();
     await expect(
       page.getByText("Card disabled on the network since your last visit.")
     ).toBeHidden();

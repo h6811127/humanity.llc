@@ -68,6 +68,16 @@ describe("hubAccountLineIdentity", () => {
     expect(line.text).toContain("@river_studio");
     expect(line.text).toContain("Steward");
   });
+
+  it("omits Registered from account line identity", () => {
+    const line = hubAccountLineIdentity({
+      entry: { handle: "river_studio" },
+      verificationLabel: "Registered",
+      verificationState: "registered",
+    });
+    expect(line.text).toBe("Account · @river_studio");
+    expect(line.visible).toBe(true);
+  });
 });
 
 describe("shouldExpandHostedGameSeasonPanel", () => {
