@@ -2,7 +2,6 @@
  * Wear BYOP create wizard UI (step 15).
  */
 
-import { isCreateRoomIsolatedIntent } from "./create-deploy-wizard-core.mjs";
 import { loadWallet } from "./device-wallet.mjs";
 import {
   listGeneralRootsWithKeys,
@@ -29,7 +28,6 @@ export function syncCreateWearWizardUi(searchParams) {
   const demoStrip = document.querySelector(".create-demo-strip");
   const deployWizard = document.getElementById("create-deploy-wizard");
   const gameWizard = document.getElementById("create-game-season-wizard");
-  const templateAdvanced = document.getElementById("create-template-advanced");
   const submitBtn = document.getElementById("submit");
   const manifestoLabel = document.querySelector('label[for="manifesto"]');
   const manifestoHint = document.querySelector("#create-fields-general .form-hint");
@@ -40,7 +38,6 @@ export function syncCreateWearWizardUi(searchParams) {
     if (deployWizard) deployWizard.hidden = true;
     if (gameWizard) gameWizard.hidden = true;
   }
-  if (templateAdvanced) templateAdvanced.hidden = isCreateRoomIsolatedIntent(searchParams);
 
   if (active) {
     const titleEl = document.getElementById("create-hero-title");

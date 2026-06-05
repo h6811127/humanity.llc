@@ -186,26 +186,11 @@ describe("device-emphasis-card-html", () => {
     expect(css).toMatch(/\.hc-emphasis-card\[hidden\][\s\S]*display:\s*none\s*!important/);
   });
 
-  it("create convergence nudge uses labeled info emphasis card with paired CTAs", () => {
+  it("create page no longer ships flat pilot convergence nudge", () => {
     const html = readFileSync(join(root, "site/create/index.html"), "utf8");
-    expect(html).toContain('id="create-add-object-nudge"');
-    expect(html).toContain("hc-emphasis-card--info create-add-object-nudge");
-    expect(html).toContain('id="create-add-object-nudge-eyebrow"');
-    expect(html).toContain("Recommended path");
-    expect(html).toContain('class="hc-emphasis-card__cta" id="create-add-object-nudge-primary"');
-    expect(html).toContain(
-      'class="hc-emphasis-card__cta hc-emphasis-card__cta--secondary"'
-    );
-    expect(html).not.toContain("hc-notice--info create-add-object-nudge");
-    expect(html).not.toMatch(/create-add-object-nudge-general[\s\S]*hc-notice-ack/);
-
-    const styles = readFileSync(join(root, "site/styles.css"), "utf8");
-    expect(styles).toMatch(
-      /#create-add-object-nudge\.hc-emphasis-card[\s\S]*flex-direction:\s*column/
-    );
-    expect(styles).toMatch(
-      /#create-add-object-nudge\.hc-emphasis-card \.hc-emphasis-card__main[\s\S]*flex:\s*none/
-    );
+    expect(html).not.toContain('id="create-add-object-nudge"');
+    expect(html).not.toContain('id="create-flat-pilot-compat"');
+    expect(html).not.toContain('id="create-template-advanced"');
   });
 
   it("scan bundle propagates compact emphasis spacing tokens", () => {
@@ -231,8 +216,8 @@ describe("device-emphasis-card-html", () => {
   it("shell pages bust styles and theme-dark for emphasis alignment", () => {
     const stylesBust = {
       "site/wallet/index.html": "147",
-      "site/create/index.html": "147",
-      "site/created/index.html": "147",
+      "site/create/index.html": "150",
+      "site/created/index.html": "150",
     };
     for (const [page, v] of Object.entries(stylesBust)) {
       const html = readFileSync(join(root, page), "utf8");

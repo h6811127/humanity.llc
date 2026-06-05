@@ -2,7 +2,6 @@
  * General-account create room UI sync.
  */
 
-import { isCreateRoomIsolatedIntent } from "./create-deploy-wizard-core.mjs";
 import { isGeneralCreateIntent } from "./create-general-room-wizard-core.mjs";
 
 /**
@@ -13,9 +12,6 @@ export function syncCreateGeneralRoomUi(searchParams) {
   const deployWizard = document.getElementById("create-deploy-wizard");
   const wearWizard = document.getElementById("create-wear-wizard");
   const gameWizard = document.getElementById("create-game-season-wizard");
-  const templateAdvanced = document.getElementById("create-template-advanced");
-  const convergenceNudge = document.getElementById("create-add-object-nudge");
-  const flatCompat = document.getElementById("create-flat-pilot-compat");
   const demoStrip = document.querySelector(".create-demo-strip");
   const manifestoLabel = document.querySelector('label[for="manifesto"]');
   const manifestoHint = document.querySelector("#create-fields-general .form-hint");
@@ -26,9 +22,6 @@ export function syncCreateGeneralRoomUi(searchParams) {
     if (gameWizard) gameWizard.hidden = true;
     if (demoStrip) demoStrip.hidden = true;
   }
-  if (templateAdvanced) templateAdvanced.hidden = isCreateRoomIsolatedIntent(searchParams);
-  if (convergenceNudge && active) convergenceNudge.hidden = true;
-  if (flatCompat && active) flatCompat.hidden = true;
 
   if (active) {
     if (manifestoLabel) manifestoLabel.textContent = "What should people read?";

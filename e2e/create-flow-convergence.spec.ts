@@ -1,9 +1,8 @@
 import { test, expect, type Page } from "@playwright/test";
 
 /**
- * Create flow convergence nudge (ROOT_CARD step 14).
+ * Create flow convergence (ROOT_CARD step 14) + Phase 1 topology convergence.
  * @see docs/ROOT_CARD_AND_CHILD_OBJECTS.md § Implementation sequence step 14
- * @see docs/HC_EMPHASIS_CARD_ROLLOUT.md
  */
 
 const GENERAL_ROOT = {
@@ -91,7 +90,6 @@ test.describe("create entry chooser (step 11)", () => {
     await expect(page).toHaveURL(/intent=wear/);
     await expect(page.locator("#create-wear-wizard")).toBeVisible();
     await expect(page.locator("#create-hero-title")).toHaveText("Print your own QR wear");
-    await expect(page.locator("#create-template-advanced")).toBeHidden();
   });
 
   test("general account door opens form with intent=general", async ({ page }) => {
@@ -104,7 +102,6 @@ test.describe("create entry chooser (step 11)", () => {
     await expect(page).toHaveURL(/intent=general/);
     await expect(page.locator("#create-hero-title")).toHaveText("Create your account");
     await expect(page.locator("#manifesto")).toBeVisible();
-    await expect(page.locator("#create-template-advanced")).toBeHidden();
     await expect(page.locator("#submit")).toHaveText("Create and get QR");
   });
 
@@ -119,86 +116,46 @@ test.describe("create entry chooser (step 11)", () => {
     await expect(page.locator("#create-hero-title")).toHaveText("Make a QR sign");
     await expect(page.locator("#create-hero-lead")).not.toContainText("legacy pilots");
     await expect(page.locator("#create-deploy-wizard")).toBeVisible();
-    await expect(page.locator("#create-template-advanced")).toBeHidden();
     await expect(page.locator("#create-game-season-wizard")).toBeHidden();
-    await expect(page.locator("#create-add-object-nudge")).toBeHidden();
   });
 
-  test("deploy room hides taxonomy when general root exists (redirect on Live)", async ({
-    page,
-  }) => {
+  test("deploy room redirects to Live when general root exists", async ({ page }) => {
     await seedGeneralRootWallet(page);
     await page.goto("/create/?intent=deploy");
 
     await expect(page.locator("#create-deploy-wizard")).toBeVisible();
-    await expect(page.locator("#create-template-advanced")).toBeHidden();
-    await expect(page.locator("#create-add-object-nudge")).toBeHidden();
     await expect(page.locator("#submit")).toHaveText("Open @river_studio to add sign");
   });
 });
 
-test.describe("create flow convergence nudge", () => {
+test.describe("topology convergence — field-kit deep links", () => {
   test.beforeEach(async ({ page }) => {
     await stubCreateShellHealth(page);
   });
 
-  test("status plate shows labeled emphasis nudge with matching CTAs when general root exists", async ({
+  test("template=status_plate opens deploy wizard (tree path), not flat pilot UI", async ({
     page,
   }) => {
-    await seedGeneralRootWallet(page);
     await page.goto("/create/?template=status_plate");
 
-    const nudge = page.locator("#create-add-object-nudge");
-    await expect(nudge).toBeVisible();
-    await expect(page.locator("#create-add-object-nudge-eyebrow")).toHaveText("Recommended path");
-    await expect(page.locator("#create-add-object-nudge-title")).toContainText("existing account");
-
-    const primary = page.locator("#create-add-object-nudge-primary");
-    await expect(primary).toHaveText("Open @river_studio to add sign");
-    await expect(primary).toHaveClass(/hc-emphasis-card__cta/);
-    await expect(primary).not.toHaveClass(/hc-emphasis-card__cta--secondary/);
-    await expect(primary).toHaveAttribute(
-      "href",
-      /\/created\/\?profile_id=profE2eConvRoot01.*#add-status-plate/
-    );
-
-    const secondary = page.locator("#create-add-object-nudge-general");
-    await expect(secondary).toHaveText("Create general card instead");
-    await expect(secondary).toHaveClass(/hc-emphasis-card__cta--secondary/);
+    await expect(page.locator("#create-deploy-wizard")).toBeVisible();
+    await expect(page.locator("#create-flat-pilot-compat")).toHaveCount(0);
+    await expect(page.locator("#create-add-object-nudge")).toHaveCount(0);
+    await expect(page.locator("#create-template-advanced")).toHaveCount(0);
   });
 
-  test("Use general card switches back to general template", async ({ page }) => {
-    await seedGeneralRootWallet(page);
+  test("template=lost_item opens deploy wizard for return tag", async ({ page }) => {
     await page.goto("/create/?template=lost_item");
 
-    await expect(page.locator("#create-add-object-nudge")).toBeVisible();
-
-    await page.locator("#create-add-object-nudge-general").click();
-
-    await expect(page.locator("#create-add-object-nudge")).toBeHidden();
-    await expect(page.locator('.create-template-btn[data-template="general"]')).toHaveClass(
-      /is-active/
-    );
-    await expect(page.locator("#create-template-hint")).toBeVisible();
+    await expect(page.locator("#create-deploy-wizard")).toBeVisible();
+    await expect(page.locator("#deploy-object-label-title")).toHaveText("What is this tag on?");
   });
 
-  test("no general root: Switch to general card primary uses role=button", async ({ page }) => {
+  test("template deep link with saved root offers Live redirect", async ({ page }) => {
+    await seedGeneralRootWallet(page);
     await page.goto("/create/?template=status_plate");
 
-    const nudge = page.locator("#create-add-object-nudge");
-    await expect(nudge).toBeVisible();
-    await expect(page.locator("#create-add-object-nudge-title")).toContainText(
-      "account first"
-    );
-
-    const primary = page.locator("#create-add-object-nudge-primary");
-    await expect(primary).toHaveText("Switch to general account");
-    await expect(primary).toHaveAttribute("role", "button");
-
-    await primary.click();
-    await expect(nudge).toBeHidden();
-    await expect(page.locator('.create-template-btn[data-template="general"]')).toHaveClass(
-      /is-active/
-    );
+    await expect(page.locator("#create-deploy-wizard")).toBeVisible();
+    await expect(page.locator("#submit")).toHaveText("Open @river_studio to add sign");
   });
 });

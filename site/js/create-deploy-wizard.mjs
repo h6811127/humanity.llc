@@ -9,7 +9,6 @@ import {
 } from "./create-flow-convergence-core.mjs";
 import {
   deploySubmitButtonLabel,
-  isCreateRoomIsolatedIntent,
   isDeployRoomCreateIntent,
   isDeployWizardIntent,
   resolveDeploySubmitStrategy,
@@ -33,19 +32,13 @@ export function syncCreateDeployWizardUi(searchParams, template) {
   const active = isDeployWizardIntent(searchParams) && isPilot;
   const deployRoom = isDeployRoomCreateIntent(searchParams) && active;
 
-  const templateAdvanced = document.getElementById("create-template-advanced");
   const gameWizard = document.getElementById("create-game-season-wizard");
   const wearWizard = document.getElementById("create-wear-wizard");
-  const flatCompat = document.getElementById("create-flat-pilot-compat");
-  const convergenceNudge = document.getElementById("create-add-object-nudge");
 
   if (deployWizard) deployWizard.hidden = !active;
   if (demoStrip) demoStrip.hidden = active;
-  if (templateAdvanced) templateAdvanced.hidden = isCreateRoomIsolatedIntent(searchParams);
   if (gameWizard && deployRoom) gameWizard.hidden = true;
   if (wearWizard && deployRoom) wearWizard.hidden = true;
-  if (flatCompat && deployRoom) flatCompat.hidden = true;
-  if (convergenceNudge && deployRoom) convergenceNudge.hidden = true;
 
   if (active && template === "lost_item_relay") {
     if (objectLabel) objectLabel.placeholder = "House keys";

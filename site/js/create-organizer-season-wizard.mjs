@@ -2,7 +2,6 @@
  * Organizer season create wizard UI (step 14).
  */
 
-import { isCreateRoomIsolatedIntent } from "./create-deploy-wizard-core.mjs";
 import { syncCreateSeasonForkUi } from "./create-season-fork.mjs";
 import { resolveGameSeasonSubmitStrategy } from "./create-season-fork-core.mjs";
 import {
@@ -45,7 +44,6 @@ export function syncCreateOrganizerSeasonWizardUi(searchParams) {
   const wizard = document.getElementById("create-game-season-wizard");
   const demoStrip = document.querySelector(".create-demo-strip");
   const deployWizard = document.getElementById("create-deploy-wizard");
-  const templateAdvanced = document.getElementById("create-template-advanced");
   const submitBtn = document.getElementById("submit");
   const organizerDetails = document.getElementById("create-organizer-details");
   const enableOrganizer = document.getElementById("enable-organizer-revoke");
@@ -56,7 +54,6 @@ export function syncCreateOrganizerSeasonWizardUi(searchParams) {
   if (wizard) wizard.hidden = !active || showFork;
   if (demoStrip) demoStrip.hidden = active;
   if (active && deployWizard) deployWizard.hidden = true;
-  if (templateAdvanced) templateAdvanced.hidden = isCreateRoomIsolatedIntent(searchParams);
 
   if (active) {
     const titleEl = document.getElementById("create-hero-title");

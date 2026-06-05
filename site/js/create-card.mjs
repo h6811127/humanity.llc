@@ -129,11 +129,8 @@ try {
   ephemeralBrowsing = true;
 }
 const fieldsGeneral = document.getElementById("create-fields-general");
-const fieldsStatusPlate = document.getElementById("create-fields-status-plate");
-const fieldsLostItem = document.getElementById("create-fields-lost-item");
 const fieldsObjectStreams = document.getElementById("create-fields-object-streams");
 const manifestoEl = document.getElementById("manifesto");
-const templateBtns = document.querySelectorAll(".create-template-btn");
 
 let activeTemplate = "general";
 
@@ -155,33 +152,20 @@ function randomDemoSuffix() {
 
 function setTemplate(template) {
   activeTemplate = template;
-  templateBtns.forEach((btn) => {
-    btn.classList.toggle("is-active", btn.dataset.template === template);
-  });
   const isPlate = template === "status_plate";
   const isRelay = template === "lost_item_relay";
   const isPilot = isPlate || isRelay;
   if (fieldsGeneral) fieldsGeneral.hidden = isPilot;
-  if (fieldsStatusPlate) fieldsStatusPlate.hidden = !isPlate;
-  if (fieldsLostItem) fieldsLostItem.hidden = !isRelay;
   if (fieldsObjectStreams) {
     fieldsObjectStreams.hidden = !isPlate && template !== "general";
   }
   if (manifestoEl) manifestoEl.required = !isPilot;
-  const deployActive = isDeployWizardIntent(new URLSearchParams(location.search)) && isPilot;
+  const searchParams = new URLSearchParams(location.search);
+  const deployActive = isDeployWizardIntent(searchParams) && isPilot;
   const deployObjectLabel = document.getElementById("deploy-object-label");
   const deployScannerLine = document.getElementById("deploy-scanner-line");
-  const objectLabel = document.getElementById("object-label");
-  const statusLine = document.getElementById("status-line");
-  const relayItem = document.getElementById("relay-item");
-  const relayMessage = document.getElementById("relay-message");
   if (deployObjectLabel) deployObjectLabel.required = deployActive;
   if (deployScannerLine) deployScannerLine.required = deployActive;
-  if (objectLabel) objectLabel.required = isPlate && !deployActive;
-  if (statusLine) statusLine.required = isPlate && !deployActive;
-  if (relayItem) relayItem.required = isRelay && !deployActive;
-  if (relayMessage) relayMessage.required = isRelay && !deployActive;
-  const searchParams = new URLSearchParams(location.search);
   syncCreateHeroCopy(template, searchParams);
   syncCreateFlowConvergence(template);
   syncCreateDeployWizardUi(searchParams, template);
@@ -190,23 +174,6 @@ function setTemplate(template) {
   syncCreateGeneralRoomUi(searchParams);
   syncCreateCustodyModeUi({ scrollOrganizerCallout: isGameSeasonCreateIntent(searchParams) });
 }
-
-templateBtns.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    if (btn.dataset.template) setTemplate(btn.dataset.template);
-  });
-});
-
-document.getElementById("create-add-object-nudge-general")?.addEventListener("click", () => {
-  setTemplate("general");
-});
-
-document.getElementById("create-add-object-nudge-primary")?.addEventListener("click", (ev) => {
-  const el = ev.currentTarget;
-  if (!(el instanceof HTMLAnchorElement) || el.getAttribute("role") !== "button") return;
-  ev.preventDefault();
-  setTemplate("general");
-});
 
 function buildManifestoLine() {
   return buildPilotManifestoLine(activeTemplate, readCreateFormFields());
@@ -562,18 +529,6 @@ function deployWizardFieldsActive() {
 }
 
 function readCreateFormFields() {
-  const legacyEl = document.getElementById("create-flat-pilot-compat");
-  const legacyOpen = legacyEl instanceof HTMLDetailsElement && legacyEl.open;
-  if (legacyOpen) {
-    return {
-      objectLabel: document.getElementById("object-label")?.value ?? "",
-      statusLine: document.getElementById("status-line")?.value ?? "",
-      relayItem: document.getElementById("relay-item")?.value ?? "",
-      relayMessage: document.getElementById("relay-message")?.value ?? "",
-      manifesto: manifestoEl?.value ?? "",
-      useDeployFieldIds: false,
-    };
-  }
   if (deployWizardFieldsActive()) {
     const objectName = document.getElementById("deploy-object-label")?.value ?? "";
     const scannerLine = document.getElementById("deploy-scanner-line")?.value ?? "";
@@ -587,10 +542,10 @@ function readCreateFormFields() {
     };
   }
   return {
-    objectLabel: document.getElementById("object-label")?.value ?? "",
-    statusLine: document.getElementById("status-line")?.value ?? "",
-    relayItem: document.getElementById("relay-item")?.value ?? "",
-    relayMessage: document.getElementById("relay-message")?.value ?? "",
+    objectLabel: "",
+    statusLine: "",
+    relayItem: "",
+    relayMessage: "",
     manifesto: manifestoEl?.value ?? "",
     useDeployFieldIds: false,
   };
@@ -602,10 +557,6 @@ function applyCreateFieldValidity(missingFieldIds, message) {
     "handle",
     "deploy-object-label",
     "deploy-scanner-line",
-    "object-label",
-    "status-line",
-    "relay-item",
-    "relay-message",
     "manifesto",
   ]) {
     const el = document.getElementById(id);
@@ -764,6 +715,15 @@ async function submitCreate(e, opts = {}) {
       return;
     }
 
+    if (
+      input.pilotTemplate === "status_plate" ||
+      input.pilotTemplate === "lost_item_relay"
+    ) {
+      throw new Error(
+        "Sign and tag create use the deploy path. Open Live status on something from Create."
+      );
+    }
+
     setStatus("Creating…");
     await runCreateCard({
       handle: input.handle,
@@ -858,10 +818,6 @@ function openGeneralAccountForm() {
   history.replaceState(null, "", `${url.pathname}${url.search}`);
   setTemplate("general");
 }
-
-document.getElementById("create-flat-pilot-compat")?.addEventListener("toggle", () => {
-  syncCreateDeployWizardUi(new URLSearchParams(location.search), activeTemplate);
-});
 
 function bootstrapCreateEntry() {
   if (shouldSkipCreateEntryChooser(createSearchParams)) {

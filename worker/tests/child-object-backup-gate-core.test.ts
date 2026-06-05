@@ -98,7 +98,7 @@ describe("child-object backup gate UI", () => {
     expect(html).toContain('id="child-object-lost-item-backup-gate"');
     expect(html).toContain('id="child-object-game-node-backup-gate"');
     expect(html).toContain('id="child-object-game-node-bulk-backup-gate"');
-    expect(html).toContain('href="/styles.css?v=147"');
+    expect(html).toContain('href="/styles.css?v=150"');
     expect(html).toMatch(
       /id="child-object-status-plate-backup-gate"[\s\S]*class="hc-notice child-object-backup-gate"[\s\S]*hidden/
     );

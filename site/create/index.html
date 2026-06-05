@@ -248,7 +248,7 @@
             data-hub-group="pins"
           >
             <p class="device-hub-subgroup-label">Pinned scans</p>
-            <p class="wallet-section-hint">Bookmarks only. Cannot manage objects</p>
+            <p class="wallet-section-hint">Bookmarks only — cannot manage objects</p>
             <ul class="list list-compact" id="device-hub-pins-list" hidden></ul>
             <p class="device-hub-section-empty" id="device-hub-pins-empty">
               Your pinned scans will show here.
@@ -442,55 +442,6 @@
         </section>
 
         <form id="create-form" class="form-card flow-form-card" method="dialog" action="#" autocomplete="off" novalidate>
-          <details class="flow-disclosure create-template-advanced" id="create-template-advanced">
-            <summary class="form-label">Examples and object types</summary>
-            <p class="form-hint" id="create-template-hint">
-              Start with a general live card. Add status plates and lost-item relays from Live after
-              create.
-            </p>
-            <div class="create-template-row flow-segmented" role="group" aria-label="Template">
-              <button type="button" class="create-template-btn is-active" data-template="general">
-                General
-              </button>
-              <button type="button" class="create-template-btn" data-template="status_plate">
-                Status plate
-              </button>
-              <button type="button" class="create-template-btn" data-template="lost_item_relay">
-                Lost item
-              </button>
-            </div>
-            <div
-              id="create-add-object-nudge"
-              class="hc-emphasis-card hc-emphasis-card--info create-add-object-nudge"
-              hidden
-              role="note"
-              aria-labelledby="create-add-object-nudge-eyebrow create-add-object-nudge-title"
-            >
-              <div class="hc-emphasis-card__main">
-                <span class="hc-emphasis-card__dot hc-emphasis-card__dot--info" aria-hidden="true"></span>
-                <div class="hc-emphasis-card__copy">
-                  <p class="hc-emphasis-card__eyebrow" id="create-add-object-nudge-eyebrow">
-                    Recommended path
-                  </p>
-                  <p class="hc-emphasis-card__title" id="create-add-object-nudge-title"></p>
-                  <p class="hc-emphasis-card__detail" id="create-add-object-nudge-body"></p>
-                </div>
-              </div>
-              <div class="hc-emphasis-card__actions">
-                <a class="hc-emphasis-card__cta" id="create-add-object-nudge-primary" href="#"
-                  >Add on Live</a
-                >
-                <button
-                  type="button"
-                  class="hc-emphasis-card__cta hc-emphasis-card__cta--secondary"
-                  id="create-add-object-nudge-general"
-                >
-                  Use general card
-                </button>
-              </div>
-            </div>
-          </details>
-
           <section
             class="flow-form-section flow-inset-fields create-game-season-fork"
             id="create-game-season-fork"
@@ -638,62 +589,6 @@
             ></textarea>
             <p class="form-hint">Plain text only, 280 characters max.</p>
           </div>
-
-          <details class="create-flat-pilot-compat flow-disclosure" id="create-flat-pilot-compat" hidden>
-            <summary class="form-label create-flat-pilot-compat-summary">
-              Advanced: separate account (field kit)
-            </summary>
-            <p class="form-hint">
-              Creates a second account with its own backup. Use only when you need a separate
-              account without using your card page.
-            </p>
-
-          <div id="create-fields-status-plate" hidden>
-            <label class="form-label" for="object-label">What is this plate on?</label>
-            <input
-              class="form-input"
-              id="object-label"
-              name="object_label"
-              maxlength="80"
-              placeholder="Studio door"
-            />
-            <p class="form-hint">Shown as the headline when someone scans.</p>
-            <label class="form-label" for="status-line">What should scanners see?</label>
-            <textarea
-              class="form-input form-textarea"
-              id="status-line"
-              name="status_line"
-              maxlength="199"
-              rows="2"
-              placeholder="Open · Thu to Sun until 9 PM"
-            ></textarea>
-            <p class="form-hint">Live status line. Change it later on Live without reprinting the QR.</p>
-          </div>
-
-          <div id="create-fields-lost-item" hidden>
-            <label class="form-label" for="relay-item">What is lost?</label>
-            <input
-              class="form-input"
-              id="relay-item"
-              name="relay_item"
-              maxlength="72"
-              placeholder="House keys"
-            />
-            <p class="form-hint">Shown as the headline when someone scans: not your phone number.</p>
-            <label class="form-label" for="relay-message">What should finders see?</label>
-            <textarea
-              class="form-input form-textarea"
-              id="relay-message"
-              name="relay_message"
-              maxlength="199"
-              rows="2"
-              placeholder="Lost: contact owner through relay (see scan page)"
-            ></textarea>
-            <p class="form-hint">
-              Return instructions only. Revoke when recovered or if the relay is abused.
-            </p>
-          </div>
-          </details>
 
           <details
             id="create-fields-object-streams"
