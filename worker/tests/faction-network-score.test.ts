@@ -63,7 +63,7 @@ describe("faction-network-score", () => {
       now,
     });
     expect(summary.dominant_faction).toBe("red");
-    expect(summary.summary_lines[0]).toMatch(/Red · 10 network pts/);
+    expect(summary.summary_lines[0]).toMatch(/Signal War: Red · 10 pts/);
     expect(summary.relay_holds).toHaveLength(1);
     expect(summary.relay_holds[0]?.node_id).toBe("node_05");
   });

@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 import {
+  formatSeasonWindowInstant,
   formatSeasonWindowLabel,
   resolveSeasonWindowPhase,
   seasonBannerBodyHtml,
@@ -20,8 +21,14 @@ const season = JSON.parse(
 
 describe("city-game-season-banner-core", () => {
   it("formats season window label", () => {
-    expect(formatSeasonWindowLabel(season)).toContain("Wake the city");
-    expect(formatSeasonWindowLabel(season)).toContain("2026-06-06");
+    expect(formatSeasonWindowLabel(season)).toBe(
+      "Opens June 6 at 6 PM · Ends Sept 1 at 10 PM"
+    );
+  });
+
+  it("formats single instants for banner lines", () => {
+    expect(formatSeasonWindowInstant("2026-06-06T18:00:00-05:00")).toBe("June 6 at 6 PM");
+    expect(formatSeasonWindowInstant("2026-09-01T22:00:00-05:00")).toBe("Sept 1 at 10 PM");
   });
 
   it("resolves before, open, and after phases", () => {

@@ -2,7 +2,6 @@
  * M4 — district filter + list↔pin highlight on city state board.
  */
 import {
-  isDenseMapBoard,
   isMapPinInteractive,
   resolveMapNodeHighlight,
   shouldScrollSketchForRowFocus,
@@ -255,16 +254,6 @@ export function bootCityGameMapInteraction(boardRoot, season) {
     },
     true
   );
-
-  if (isDenseMapBoard(season)) {
-    const sketch = boardRoot.querySelector(".city-game-map-sketch-details");
-    if (
-      sketch instanceof HTMLDetailsElement &&
-      window.matchMedia("(min-width: 720px)").matches
-    ) {
-      sketch.open = true;
-    }
-  }
 
   applyDistrictFilterVisibility(boardRoot, boardRoot.dataset.activeDistrict ?? "all");
 }

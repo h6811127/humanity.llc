@@ -59,7 +59,7 @@ describe("dual-victory (SW-13)", () => {
     });
     expect(summary.network_leader).toBe("red");
     expect(summary.network_majority_met).toBe(true);
-    expect(summary.summary_lines.some((line) => line.includes("relay network"))).toBe(
+    expect(summary.summary_lines.some((line) => line.includes("Signal War:"))).toBe(
       true
     );
   });
@@ -86,8 +86,8 @@ describe("dual-victory (SW-13)", () => {
     });
     expect(summary.awakening_fragments_complete).toBe(true);
     expect(summary.finale_open).toBe(true);
-    expect(
-      summary.summary_lines.some((line) => line.includes("fragment lattice complete"))
-    ).toBe(true);
+    expect(summary.summary_lines.some((line) => line.includes("all 3 fragments found"))).toBe(
+      true
+    );
   });
 });

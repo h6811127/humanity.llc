@@ -33,8 +33,9 @@ const launchSeason = {
 
 describe("city-game-launch-surfaces-core", () => {
   it("formats season window label", () => {
-    expect(formatSeasonWindowLabel(launchSeason)).toContain("Wake the city");
-    expect(formatSeasonWindowLabel(launchSeason)).toContain("2026-06-06");
+    expect(formatSeasonWindowLabel(launchSeason)).toBe(
+      "Opens June 6 at 6 PM · Ends June 8 at 10 PM"
+    );
   });
 
   it("requires season root and window before launch surfaces apply", () => {
@@ -52,7 +53,7 @@ describe("city-game-launch-surfaces-core", () => {
     expect(next).not.toMatch(/noindex/i);
     expect(next).toContain("data-city-game-season-banner");
     expect(next).toContain("city-game-play-page.mjs");
-    expect(next).toContain("2026-06-06T18:00:00-05:00");
+    expect(next).toContain("Opens June 6 at 6 PM");
     expect(next).not.toContain("Draft rules page");
     expect(next).toContain("#city-state");
     expect(rulesPageIsLaunchReady(next)).toBe(true);

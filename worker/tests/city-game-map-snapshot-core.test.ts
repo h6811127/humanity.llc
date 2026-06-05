@@ -64,13 +64,14 @@ describe("city-game map snapshot core", () => {
   });
 
   it("formats finale lattice footnote from snapshot", () => {
-    const line = formatFinaleFootnote({
-      node_id: "node_13",
-      open: true,
-      fragments: { claimed: 3, required: 3, complete: true },
-    });
-    expect(line).toContain("3 / 3");
-    expect(line).toContain("lattice complete");
-    expect(line).toContain("alley arch live");
+    const line = formatFinaleFootnote(
+      {
+        node_id: "node_13",
+        open: true,
+        fragments: { claimed: 3, required: 3, complete: true },
+      },
+      "Wake the city"
+    );
+    expect(line).toBe("Wake the city: 3 / 3 fragments — complete");
   });
 });

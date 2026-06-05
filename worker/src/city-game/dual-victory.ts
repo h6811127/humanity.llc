@@ -72,28 +72,26 @@ export function buildDualVictorySnapshot(input: {
     ? /finale switch live|alley arch is waking/i.test(finale.public_state)
     : false;
 
+  const wakeTitle = input.season.title?.split("·")[0]?.trim() || "Wake the city";
+
   const lines: string[] = [];
   if (network_majority_met && leader) {
     const label = leader.charAt(0).toUpperCase() + leader.slice(1);
-    lines.push(
-      `Signal War · ${label} leads the relay network (${leaderRelayHolds} of ${ownedRelays} held relays)`
-    );
+    lines.push(`Signal War: ${label} holds ${leaderRelayHolds} of ${ownedRelays} relays`);
   } else if (leader) {
     const label = leader.charAt(0).toUpperCase() + leader.slice(1);
-    lines.push(`Signal War · ${label} ahead on network points — relay majority not secured yet`);
+    lines.push(`Signal War: ${label} ahead — relay majority not secured yet`);
   }
   if (awakening_fragments_complete) {
-    lines.push("Wake the city · district fragment lattice complete");
+    lines.push(`${wakeTitle}: all ${lattice.required} fragments found`);
   } else if (lattice.required > 0) {
-    lines.push(
-      `Wake the city · ${lattice.claimed} / ${lattice.required} district fragments on the public lattice`
-    );
+    lines.push(`${wakeTitle}: ${lattice.claimed} / ${lattice.required} fragments`);
   }
   if (finale_open) {
-    lines.push("Finale alley arch live — cooperative path in play");
+    lines.push("Finale arch live");
   }
   if (!lines.length) {
-    lines.push("Season open — contest relays and cooperative paths both in play");
+    lines.push("Season open — scan stickers to move the board");
   }
 
   return {

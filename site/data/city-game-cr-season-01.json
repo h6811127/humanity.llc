@@ -21,10 +21,27 @@
     "subtitle": "Summer board · read-only",
     "hero_objective": "Find stickers around Cedar Rapids. Scan them to move the city board.",
     "live_hint": "Find stickers. Scan them. Help unlock city goals.",
+    "start_here": {
+      "title": "Start here",
+      "steps": [
+        "Open places",
+        "Pick a district",
+        "Scan any sticker when you arrive"
+      ]
+    },
     "wayfinding_intro": "Start anywhere — scan any game sticker you find. Planning from home? Search place names in your maps app; the sketch below is districts only, not streets.",
     "diagram_note": "District sketch only — not a street map. Names and Open in Maps links are how you find places.",
     "privacy_note": "Same city truth for everyone. No account. No visit log. No GPS tracking.",
-    "unlock_intro": "Paths below wake when the city unlocks them together — not when you personally check boxes."
+    "unlock_intro": "Goals below unlock when the city completes them together — not when you personally check boxes.",
+    "section_state_title": "Current board state",
+    "section_places_title": "Places",
+    "section_goals_title": "City goals",
+    "sketch_summary": "District sketch (optional) — tap to expand schematic pins",
+    "finale_wake_title": "Wake the city",
+    "fog_title": "Hidden on the sketch",
+    "fog_lead_signal_war": "Some spots appear on the sketch only after the city claims them. Every place name stays in Places above.",
+    "fog_lead_rumor_only": "The sketch shows rumored spots and team holds only — scan stickers to find the rest. Full names stay in Places above.",
+    "roles_summary": "What do place types mean?"
   },
   "player_guide": {
     "hero_subline": "Open the <a href=\"/play/cedar-rapids/map/\">weekend city board</a> — every game spot, with Open in Maps links (scan each sticker for live chips).",
@@ -933,7 +950,7 @@
       },
       {
         "title": "Fog on the city board",
-        "body": "The schematic board shows owned relays, rumored hints, and cooperative nodes — not every unclaimed relay. Use Places by district below for full wayfinding."
+        "body": "The schematic board shows claimed spots and rumored hints — not every unclaimed relay. Use Places above for full wayfinding."
       }
     ]
   },

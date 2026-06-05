@@ -8,6 +8,115 @@ import { seasonBoardPath } from "./city-game-season-path-shared.mjs";
 const ISO_RE =
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/;
 
+const WALL_CLOCK_RE = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/;
+
+const MONTH_SHORT = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "June",
+  "July",
+  "Aug",
+  "Sept",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+/**
+ * Wall-clock parts from an ISO season window string (local to the encoded offset).
+ * @param {string | null | undefined} raw
+ */
+function parseWallClock(raw) {
+  if (raw == null || !String(raw).trim()) return null;
+  const trimmed = String(raw).trim();
+  if (!ISO_RE.test(trimmed)) return null;
+  const match = trimmed.match(WALL_CLOCK_RE);
+  if (!match) return null;
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const hour = Number(match[4]);
+  const minute = Number(match[5]);
+  if (month < 1 || month > 12 || day < 1 || hour > 23 || minute > 59) return null;
+  return { month, day, hour, minute };
+}
+
+/**
+ * @param {string | null | undefined} raw
+ * @returns {string | null}
+ */
+export function formatSeasonWindowInstant(raw) {
+  const clock = parseWallClock(raw);
+  if (!clock) return null;
+  const monthLabel = MONTH_SHORT[clock.month - 1] ?? String(clock.month);
+  const hour12 = clock.hour % 12 || 12;
+  const ampm = clock.hour < 12 ? "AM" : "PM";
+  const time =
+    clock.minute === 0
+      ? `${hour12} ${ampm}`
+      : `${hour12}:${String(clock.minute).padStart(2, "0")} ${ampm}`;
+  return `${monthLabel} ${clock.day} at ${time}`;
+}
+
+/**
+ * @param {{ window?: { starts_at?: string | null; ends_at?: string | null } }} season
+ * @returns {string | null}
+ */
+export function formatSeasonWindowOpensLine(season) {
+  const start = season.window?.starts_at?.trim();
+  if (!start) return null;
+  const instant = formatSeasonWindowInstant(start);
+  return instant ? `Opens ${instant}` : null;
+}
+
+/**
+ * @param {{ window?: { starts_at?: string | null; ends_at?: string | null } }} season
+ * @returns {string | null}
+ */
+export function formatSeasonWindowEndsLine(season) {
+  const end = season.window?.ends_at?.trim();
+  if (!end) return null;
+  const instant = formatSeasonWindowInstant(end);
+  return instant ? `Ends ${instant}` : null;
+}
+
+/**
+ * @param {{ window?: { starts_at?: string | null; ends_at?: string | null }; title?: string; season_id?: string }} season
+ */
+export function formatSeasonWindowLabel(season) {
+  const opens = formatSeasonWindowOpensLine(season);
+  const ends = formatSeasonWindowEndsLine(season);
+  if (!opens || !ends) return null;
+  return `${opens} · ${ends}`;
+}
+
+/**
+ * @param {Record<string, unknown>} season
+ * @param {"rules" | "research" | "hub" | "map"} variant
+ */
+function formatSeasonWindowDatesMarkup(season, variant) {
+  const opens = formatSeasonWindowOpensLine(season);
+  const ends = formatSeasonWindowEndsLine(season);
+  if (!opens || !ends) return "";
+  if (variant === "map") {
+    return ` ${escapeHtml(opens)}<br />${escapeHtml(ends)}`;
+  }
+  return ` ${escapeHtml(`${opens} · ${ends}`)}`;
+}
+
+/**
+ * @param {string} value
+ */
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
 /**
  * @param {string | null | undefined} raw
  */
@@ -38,17 +147,6 @@ export function resolveSeasonWindowPhase(now = new Date(), season = {}) {
   if (startMs != null && nowMs < startMs) return "before";
   if (endMs != null && nowMs > endMs) return "after";
   return "open";
-}
-
-/**
- * @param {{ window?: { starts_at?: string | null; ends_at?: string | null }; title?: string; season_id?: string }} season
- */
-export function formatSeasonWindowLabel(season) {
-  const start = season.window?.starts_at?.trim();
-  const end = season.window?.ends_at?.trim();
-  if (!start || !end) return null;
-  const title = season.title?.trim() || season.season_id || "Season 1";
-  return `${title} · ${start} → ${end}`;
 }
 
 /**
@@ -162,7 +260,6 @@ export function seasonBannerBodyHtml(phase, variant, season = {}) {
  * @param {"rules" | "research" | "hub" | "map"} variant
  */
 export function applySeasonBannerMount(mount, season, phase, variant) {
-  const windowLabel = formatSeasonWindowLabel(season);
   const headline = seasonBannerHeadline(phase);
   const noticeClass = seasonBannerNoticeClass(phase);
 
@@ -176,7 +273,14 @@ export function applySeasonBannerMount(mount, season, phase, variant) {
   const bodyEl = mount.querySelector("[data-city-game-season-banner-body]");
 
   if (labelEl) labelEl.textContent = headline;
-  if (datesEl) datesEl.textContent = windowLabel ? ` ${windowLabel}` : "";
+  if (datesEl) {
+    const datesMarkup = formatSeasonWindowDatesMarkup(season, variant);
+    if (variant === "map" && datesMarkup.includes("<br />")) {
+      datesEl.innerHTML = datesMarkup;
+    } else {
+      datesEl.textContent = datesMarkup || "";
+    }
+  }
   if (bodyEl) {
     if (variant === "hub") bodyEl.textContent = ` ${seasonBannerBodyHtml(phase, variant, season)}`;
     else bodyEl.innerHTML = seasonBannerBodyHtml(phase, variant, season);
@@ -189,8 +293,8 @@ export function applySeasonBannerMount(mount, season, phase, variant) {
  * @param {"rules" | "research" | "hub" | "map"} variant
  */
 export function buildSeasonBannerBlock(season, jsonUrl, variant = "research") {
-  const windowLabel = formatSeasonWindowLabel(season);
-  if (!windowLabel) {
+  const datesMarkup = formatSeasonWindowDatesMarkup(season, variant);
+  if (!datesMarkup.trim()) {
     throw new Error("Season window dates required for season banner.");
   }
 
@@ -200,7 +304,7 @@ export function buildSeasonBannerBlock(season, jsonUrl, variant = "research") {
 
   if (variant === "hub") {
     return `<p class="landing-vision-lead landing-vision-lead--dev" data-city-game-season-banner data-season-json="${escapeAttr(jsonUrl)}" data-banner-variant="${variant}">
-  <strong data-city-game-season-banner-label>Season window</strong><span data-city-game-season-banner-dates> ${windowLabel}</span>
+  <strong data-city-game-season-banner-label>Season window</strong><span data-city-game-season-banner-dates>${datesMarkup}</span>
   <span data-city-game-season-banner-body> ${seasonBannerBodyHtml("open", variant, season)}</span>
   <a href="${rulesHref}">Read the rules</a>
   and the
@@ -215,7 +319,7 @@ export function buildSeasonBannerBlock(season, jsonUrl, variant = "research") {
 
   return `<div class="research-live-banner hc-notice hc-notice--info" role="note" data-city-game-season-banner data-season-json="${escapeAttr(jsonUrl)}" data-banner-variant="${variant}">
   <p>
-    <strong data-city-game-season-banner-label>Season window</strong><span data-city-game-season-banner-dates> ${windowLabel}</span>
+    <strong data-city-game-season-banner-label>Season window</strong><span data-city-game-season-banner-dates>${datesMarkup}</span>
   </p>
   <p data-city-game-season-banner-body>${body}</p>
 </div>`;
@@ -241,10 +345,11 @@ export async function bootCityGameSeasonBanners(root = document) {
   for (const mount of mounts) {
     if (!(mount instanceof HTMLElement)) continue;
     const jsonUrl = mount.dataset.seasonJson?.trim();
-    const variant = mount.dataset.bannerVariant === "rules" ||
-      mount.dataset.bannerVariant === "hub"
-      ? mount.dataset.bannerVariant
-      : "research";
+    const rawVariant = mount.dataset.bannerVariant;
+    const variant =
+      rawVariant === "rules" || rawVariant === "hub" || rawVariant === "map"
+        ? rawVariant
+        : "research";
     if (!jsonUrl) continue;
 
     try {

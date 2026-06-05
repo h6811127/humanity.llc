@@ -49,19 +49,18 @@ function nodeSnapshot(nodeById, nodeId) {
 
 /**
  * @param {{ node_id?: string; open?: boolean; fragments?: { claimed?: number; required?: number; complete?: boolean } } | null | undefined} finale
+ * @param {string} [wakeTitle]
  */
-export function formatFinaleFootnote(finale) {
+export function formatFinaleFootnote(finale, wakeTitle = "Wake the city") {
   if (!finale || typeof finale !== "object") return null;
-  const nodeId = finale.node_id ?? "node_13";
+  const title = String(wakeTitle ?? "Wake the city").trim() || "Wake the city";
   const fragments = finale.fragments ?? {};
   const claimed = fragments.claimed ?? 0;
   const required = fragments.required ?? 3;
-  const parts = [
-    `Finale ${nodeId}: ${claimed} / ${required} district fragments on the public lattice`,
-  ];
-  if (fragments.complete) parts.push("lattice complete");
-  if (finale.open) parts.push("alley arch live");
-  return `${parts.join(" · ")}. Quorum and witness paths above still apply.`;
+  let line = `${title}: ${claimed} / ${required} fragments`;
+  if (fragments.complete) line += " — complete";
+  else if (finale.open) line += " — finale live";
+  return line;
 }
 
 /**
@@ -71,8 +70,10 @@ export function formatFinaleFootnote(finale) {
 export function applyFinaleFromSnapshot(boardRoot, snapshot) {
   const footnote = boardRoot.querySelector("#city-game-map-finale-footnote");
   if (!(footnote instanceof HTMLElement)) return;
+  const wakeTitle = footnote.dataset.wakeTitle?.trim() || "Wake the city";
   const line = formatFinaleFootnote(
-    /** @type {Record<string, unknown>} */ (snapshot.finale)
+    /** @type {Record<string, unknown>} */ (snapshot.finale),
+    wakeTitle
   );
   if (line) footnote.textContent = line;
 }

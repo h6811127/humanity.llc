@@ -31,16 +31,13 @@ describe("city-game-signal-war-board-core (SW-07)", () => {
     const lines = buildSignalWarBoardLines({
       signal_war: {
         dual_victory: {
-          summary_lines: ["Wake the city · 2 / 3 district fragments on the public lattice"],
+          summary_lines: ["Wake the city: 2 / 3 fragments"],
         },
-        summary_lines: [
-          "Wake the city · 2 / 3 district fragments on the public lattice",
-          "Red · 10 network pts",
-        ],
+        summary_lines: ["Wake the city: 2 / 3 fragments", "Signal War: Red · 10 pts"],
       },
     });
     expect(lines).toHaveLength(2);
-    expect(lines[1]).toMatch(/Red · 10 network pts/);
+    expect(lines[1]).toMatch(/Signal War: Red · 10 pts/);
   });
 
   it("shows board when faction totals exist even with zero holds", () => {
@@ -48,7 +45,7 @@ describe("city-game-signal-war-board-core (SW-07)", () => {
       shouldShowSignalWarBoard({
         signal_war: {
           faction_network_points: { red: 0, blue: 0, green: 0, yellow: 0 },
-          summary_lines: ["Signal War · relays unclaimed on the public board"],
+          summary_lines: ["Signal War: relays unclaimed"],
         },
       })
     ).toBe(true);

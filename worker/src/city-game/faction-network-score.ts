@@ -81,11 +81,11 @@ export function formatFactionNetworkSummary(
     .filter((row) => row.score > 0)
     .sort((a, b) => b.score - a.score);
   if (!ranked.length) {
-    return ["Signal War · relays unclaimed on the public board"];
+    return ["Signal War: relays unclaimed"];
   }
   return ranked.map(
     (row) =>
-      `${row.faction.charAt(0).toUpperCase()}${row.faction.slice(1)} · ${row.score} network pts`
+      `Signal War: ${row.faction.charAt(0).toUpperCase()}${row.faction.slice(1)} · ${row.score} pts`
   );
 }
 

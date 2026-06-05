@@ -77,7 +77,19 @@ describe("city-game map board render", () => {
     expect(html).toContain("Open in Maps");
     expect(html).toContain("city-game-map-node-live");
     expect(html).toContain("Scan sticker for live state");
-    expect(html).toContain("Places by district");
+    expect(html).toContain("Start here");
+    expect(html).toContain("Open places");
+    expect(html).toContain("Pick a district");
+    expect(html).toContain("Scan any sticker when you arrive");
+    expect(html).toContain("city-game-map-start-here");
+    expect(html).not.toContain("city-game-map-wayfinding");
+    expect(html).toContain("Current board state");
+    expect(html).toContain("city-game-map-state");
+    expect(html).toContain("Places");
+    expect(html).not.toContain("Places by district");
+    expect(html).not.toContain("Live map flavor");
+    expect(html).not.toContain("Unlock paths");
+    expect(html).toContain("City goals");
     if (isDenseMapBoard(season)) {
       expect(html).toContain("city-game-map-board--dense");
     } else {
@@ -85,12 +97,21 @@ describe("city-game map board render", () => {
     }
     expect(html).toContain("city-game-map-filter");
     expect(html).toContain("city-game-map-sketch-details");
-    expect(html).toContain("district-sketch");
+    expect(html).toContain('id="district-sketch">');
+    expect(html).not.toContain('id="district-sketch" open');
+    expect(html).toContain("tap to expand schematic pins");
     expect(html).toContain("not a street map");
     expect(html).toContain("Data policy");
-    expect(html).toContain("Unlock paths");
-    expect(html).toContain("Signal War · fog");
-    expect(html).toContain("Live map flavor");
+    expect(html).toContain("Hidden on the sketch");
+    expect(html).toContain("Wake the city: 0 /");
+    expect(html).toContain("What do place types mean?");
+    expect(html).toContain("city-game-map-roles-details");
+    expect(html).not.toContain("Signal War · fog");
+    expect(html).not.toContain("public lattice");
+    expect(html).not.toContain("quorum and witness");
+    expect(html).not.toContain("Relay · gate");
+    expect(html).not.toContain("city-game-map-node-tags");
+    expect(html).not.toContain("city-game-map-edge-detail");
     expect(html).toContain("city-game-live-map-ticker");
     expect(html).toContain("city-game-map-sync");
     expect(html).toContain('data-edge-from="node_04"');
