@@ -5,7 +5,9 @@
 
 **Last updated:** 2026-06-04
 
-**Changelog (2026-06-04):** **Front-door strategy documented** — Option A landing doors + Option B create chooser + carrier split (shop vs BYOP) · [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) steps 10–14 · [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) step 19 · invariants in [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md). **WS-QUALITY** owns presentation implementation (Q3); protocol unchanged.
+**Changelog (2026-06-04):** **Steward UX presentation target (step 20)** — canonical spec [`STEWARD_UX_PRESENTATION_TARGET.md`](STEWARD_UX_PRESENTATION_TARGET.md): **Q1 decided** (one root + dual skins + season-only fork), room switcher, client steward state model, presentation policy (add vs list), implementation slices, risks. Slice 1 shipped (add-hub filter). Next: room switcher (slice 2). Cross-links: [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) · [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) · [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) Phase E.
+
+**Changelog (2026-06-04):** **Front-door strategy documented** — Option A landing doors + Option B create chooser + carrier split (shop vs BYOP) · [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) steps 10–15 · [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) steps 19–20 · invariants in [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md). **WS-QUALITY** owns presentation implementation (Q3); protocol unchanged.
 
 **Changelog (2026-06-04):** **WS-LIVE opened** — umbrella MVP program: physical software objects + Cedar Rapids + [**five-layer evolving objects plan**](#ws-live--physical-software-objects--evolving-five-layer-stack) ([`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md)). Sub-tracks: **WS-QUALITY** (steward belt), **WS-CR** / **WS-SCALE** / **WS-SW** (field + network). **WS-NOTIF closed** (in-app) — **P0-N2 OS deferred**. **Desk belt** — `npm run verify:desk:fast` (CI) · `npm run verify:desk` (pre-merge).
 

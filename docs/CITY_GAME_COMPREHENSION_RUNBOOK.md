@@ -31,7 +31,7 @@ After scanning **one live game node** (or hearing you read the scan copy aloud),
 > **4) On the cabinet node — do you need an account, or just trust from another place?**  
 > **5) If maintenance says paused, do game bulletins count as safety truth?**  
 > **6) Can you name your rank, streak, or scan count anywhere on the page?**  
-> **7)** Open [`/play/cedar-rapids/#city-state`](../site/play/cedar-rapids/index.html#city-state) — **does the weekend board show what the city knows, or what you personally did?**
+> **7)** Open [`/play/cedar-rapids/map/`](../site/play/cedar-rapids/map/) — **does the weekend board show what the city knows, or what you personally did?**
 
 Do not explain game theory unless they are stuck after one neutral prompt.
 
@@ -66,7 +66,7 @@ Minimum **5** testers before marking GT comprehension passed.
 | GT-4 | Understands cabinet private vs shared ending **without account signup** | ☐ |
 | GT-5 | When care stream says paused, **does not** treat game bulletins as safety truth | ☐ |
 | GT-6 | **Cannot** name a personal rank, streak, or scan count on scan | ☐ |
-| GT-7 | On city state board at `/play/cedar-rapids/#city-state`: describes **shared world** chips, not “my visits” or GPS tracking | ☐ Required when marketing live board (**B13**) |
+| GT-7 | On weekend city board at `/play/cedar-rapids/map/`: describes **shared world** chips, not “my visits” or GPS tracking | ☐ Required when marketing live board (**B13**) |
 
 **Pass bar:** GT-1, GT-2, GT-6 required for every tester; at most one miss across GT-3–GT-5 per tester. **≥5/5** testers pass. When marketing a live board (**B13**), GT-7 required for every tester too.
 
@@ -88,7 +88,7 @@ Run `npm run city-game:comprehension-kit` — the page includes this block with 
 > 4) Do you need an **account** to go deeper, or trust from another place?  
 > 5) If it says **maintenance pause**, would you trust game bulletins for safety?  
 > 6) Do you see a **rank, streak, or scan count** anywhere?  
-7) On the **city state board** (`/play/cedar-rapids/#city-state`) — does it show what the **city** knows, or what **you** did?
+7) On the **weekend city board** (`/play/cedar-rapids/map/`) — does it show what the **city** knows, or what **you** did?
 
 ---
 
@@ -102,7 +102,7 @@ Run `npm run city-game:comprehension-kit` — the page includes this block with 
 2. Ask **W1–W3** (wayfinding) before any scan.
 3. Send the **River Lantern scan link** — wait for them to read the page.
 4. Ask **GT-1–GT-6** from the scan (and rules if needed).
-5. Send **`#city-state`** — ask **GT-7**.
+5. Send **`/play/cedar-rapids/map/`** — ask **GT-7**.
 
 **Production URLs (2026-06-03):**
 
@@ -111,7 +111,7 @@ Run `npm run city-game:comprehension-kit` — the page includes this block with 
 | Rules | https://humanity.llc/play/cedar-rapids/ |
 | Operator kit (you) | https://humanity.llc/play/cedar-rapids/comprehension/ |
 | Primary scan (node_04) | https://humanity.llc/c/CEenC57QN9qqnr2x5L89cbWt?q=qr_aV3BcFtid5NBfCuM |
-| City board (GT-7) | https://humanity.llc/play/cedar-rapids/#city-state |
+| City board (GT-7) | https://humanity.llc/play/cedar-rapids/map/ |
 **Optional spot checks** (second pass or strong testers only — links on kit page):
 
 - GT-3 sanctuary: NewBo café window (`node_02`)
@@ -152,7 +152,7 @@ After their wayfinding replies, send:
 > 6) See a **rank, streak, or scan count** anywhere?
 >
 > **Step 4:** Open the city board:  
-> https://humanity.llc/play/cedar-rapids/#city-state  
+> https://humanity.llc/play/cedar-rapids/map/  
 > 7) Does it show what the **city** knows, or what **you** did?
 
 ---

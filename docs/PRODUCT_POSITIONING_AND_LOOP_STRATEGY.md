@@ -5,7 +5,7 @@
 **Parent:** `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` · `docs/STATUS_PLATE_PILOT.md`  
 **Language policy:** [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md)  
 **Object model (protocol):** [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md)  
-**Last updated:** 2026-06-04 — front-door strategy (Option A + create chooser B)
+**Last updated:** 2026-06-04 — Step 20 steward UX presentation target ([`STEWARD_UX_PRESENTATION_TARGET.md`](STEWARD_UX_PRESENTATION_TARGET.md))
 
 ---
 
@@ -25,7 +25,7 @@
 
 ## Front door strategy (June 2026)
 
-**Decision:** **Option A** — keep landing **Three ways in** as the primary public entry. **Option B** — top-nav **Create** opens the same three-door chooser (not a protocol form). Engineering targets: Steps 10–14 below.
+**Decision:** **Option A** — keep landing **Three ways in** as the primary public entry. **Option B** — top-nav **Create** opens the same three-door chooser (not a protocol form). Engineering targets: Steps 10–15 below.
 
 ### Three user jobs (not twelve catalog pages)
 
@@ -61,7 +61,7 @@ Lost-item relay, status plate, menus, crisis cards, etc. are **catalog instances
 1. **Never paywall** the core primitive — sign, one live object, publish, revoke ([`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md)).
 2. **Charge for carriers** — hoodie, sticker sheets, print packs ([`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md)).
 3. **Create is step 4 of the merch funnel** — scan → want → **create card** → customize → checkout; not a competitor to commerce.
-4. Under door 2 (planned): honest BYOP link — “Or print your own wear” → create with wear intent.
+4. Under door 2 (shipped step 15): honest BYOP link — “Or print your own wear” → `/create/?intent=wear`.
 
 **Architecture alignment:** Merch webhook mint path (`print_artifact`) and steward create path share resolver scan routes. Commerce does not grant vouch or bypass custody gates ([`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) rules). `personalize.checkout_open` gating unchanged.
 
@@ -230,11 +230,11 @@ Calm footer on lost-item relay scan template only — link to `/create/?template
 
 ### Step 10 — Front-door doc alignment ✅
 
-**Shipped (2026-06-04):** Canonical front-door strategy in this doc; cross-links in [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) step 19, [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md), [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md), [`QR_DESIGN_SPACE.md`](QR_DESIGN_SPACE.md), [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md), [`CORE_PRODUCT_LOOP.md`](CORE_PRODUCT_LOOP.md) Q3 targets.
+**Shipped (2026-06-04):** Canonical front-door strategy in this doc; cross-links in [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) steps 19–20, [`STEWARD_UX_PRESENTATION_TARGET.md`](STEWARD_UX_PRESENTATION_TARGET.md), [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md), [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md), [`QR_DESIGN_SPACE.md`](QR_DESIGN_SPACE.md), [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md), [`CORE_PRODUCT_LOOP.md`](CORE_PRODUCT_LOOP.md) Q3 targets.
 
 ### Step 11 — Create chooser (Option B) ✅
 
-**Shipped (2026-06-04):** Bare `/create/` → steward chooser — deploy + wear only (`create-entry-chooser-core.mjs`, `create-entry-chooser.mjs`). Player play and organizer season are footnote links, not create rows. Deep links (`?template=`, `?intent=`, `hc_ref`) skip chooser. Template tabs moved to collapsed **Examples and object types** on the form panel.
+**Shipped (2026-06-04):** Bare `/create/` → steward chooser — **Your line on the network** (general), deploy, wear (`create-entry-chooser-core.mjs`, `create-entry-chooser.mjs`). Player play and organizer season are footnote links, not create rows. Deep links (`?template=`, `?intent=`, `hc_ref`) skip chooser. Template tabs moved to collapsed **Examples and object types** on the form panel (hidden for room intents including `?intent=general`).
 
 **Exit:** `worker/tests/create-entry-chooser-core.test.ts` · `e2e/create-flow-convergence.spec.ts` § create entry chooser.
 
@@ -264,14 +264,35 @@ Calm footer on lost-item relay scan template only — link to `/create/?template
 
 **Architecture guardrails:** Self-serve seasons use browser mint only; terminal `city-game:mint-node` stays pilot/CI ([`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) § Cedar Rapids).
 
+### Step 15 — Wear BYOP honest link ✅
+
+**Shipped (2026-06-04):** `/shop/customize/` **Or print your own wear** → `/create/?intent=wear` (BYOP carrier split). Wear wizard emphasizes print-your-own garment; submit **Create card & print QR** or **Continue on Live** when a general root exists → `/created/?focus=wear-print` (opens **Print & share QR** on Live). Modules: `create-wear-wizard-core.mjs`, `create-wear-wizard.mjs`, `create-wear-submit.mjs`, `created-wear-print-focus.mjs`.
+
+**Exit:** `worker/tests/create-wear-wizard-core.test.ts` · `e2e/create-flow-convergence.spec.ts` § wear BYOP.
+
+**Architecture guardrails:** Same general-root create + root QR download path as merch funnel step 4; commerce `print_artifact` webhook unchanged; never paywall sign/publish/revoke.
+
+### Step 20 — Steward UX presentation target (in progress)
+
+**Status (2026-06-04):** Canonical **target spec** — [`STEWARD_UX_PRESENTATION_TARGET.md`](STEWARD_UX_PRESENTATION_TARGET.md). Steps 11–15 shipped front-door **routing**; Step 20 defines **room-native control** (deploy · wear · season + field kit), **Q1 decided** (one root default + dual skins + season-only fork), **room switcher**, **control vs device**, **five entry states**, **client steward state** model, **presentation policy** (add UI by room; lists show all children), and **capability-driven scan** templates. Protocol unchanged.
+
+**Shipped:** Slice 1 — deploy vs season add-hub filter (`steward-presentation-policy-core.mjs`).
+
+**Next slices:** Room switcher on `/created/`; add-vs-list policy; season create fork + honest beat; five entry states; season checklist + wear track chooser; season id off create.
+
+**Exit (target):** WS-QUALITY Q3 comprehension — 5 steward sessions without room / keys confusion · room switcher + policy in UI tests · [`CORE_PRODUCT_LOOP.md`](CORE_PRODUCT_LOOP.md).
+
+**Architecture guardrails:** No resolver fork; flat pilots and `?template=` remain for field kits; delegation (step 17) stays deferred with honest copy.
+
 ---
 
 ## Related
 
 | Doc | Role |
 |-----|------|
+| `docs/STEWARD_UX_PRESENTATION_TARGET.md` | **Step 20** — room-native steward UX target (canonical) |
 | `docs/PRODUCT_LANGUAGE_STRATEGY.md` | Plain vs precise policy; object model vocabulary |
-| `docs/ROOT_CARD_AND_CHILD_OBJECTS.md` | Protocol truth + step 19 presentation |
+| `docs/ROOT_CARD_AND_CHILD_OBJECTS.md` | Protocol truth + steps 19–20 presentation |
 | `docs/SYSTEM_INVARIANTS.md` | Landing + create entry invariants |
 | `docs/QR_DESIGN_SPACE.md` | Catalog roles (wedge · pilot · research) |
 | `docs/MERCH_FUNNEL_MVP.md` | Create vs buy (carrier split) |

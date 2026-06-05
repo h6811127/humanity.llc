@@ -1,6 +1,6 @@
 # Cedar Rapids city game — map dashboard (read-only)
 
-**Status:** Canonical plan · **M1–M3 shipped** on `/play/cedar-rapids/#city-state` (static board + snapshot API + live chips/ticker)  
+**Status:** Canonical plan · **M1–M3 shipped** · primary URL **`/play/cedar-rapids/map/`** (rules page keeps `#city-state` anchor for backward compatibility)  
 **Audience:** Product, frontend (Pages), resolver (Worker), operators, agents  
 **Season:** `cr_season_01_wake` · registry [`site/data/city-game-cr-season-01.json`](../site/data/city-game-cr-season-01.json)
 

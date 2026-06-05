@@ -84,9 +84,9 @@ The **terminology map** in [`OWNERSHIP_AND_CONTROL_MODEL.md`](OWNERSHIP_AND_CONT
 - Avoid leading with “OS”, wallet jargon, lost-item relay, or status-plate pilot vocabulary as **company identity**.
 - Movement energy may be louder; **scan page stays calm** ([`VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md)).
 
-### Object model vocabulary (steward UI — step 19)
+### Object model vocabulary (steward UI — steps 19–20)
 
-Protocol terms stay in APIs, storage keys, and Advanced panels. Default steward/landing copy uses the right column:
+Protocol terms stay in APIs, storage keys, and Advanced panels. Default steward/landing copy uses the right column. **Room-native target:** [`STEWARD_UX_PRESENTATION_TARGET.md`](STEWARD_UX_PRESENTATION_TARGET.md).
 
 | Internal (Layer 1 — keep in docs/API) | User-facing (Layer 2–3 — default UI) |
 |---------------------------------------|--------------------------------------|
@@ -99,10 +99,17 @@ Protocol terms stay in APIs, storage keys, and Advanced panels. Default steward/
 | `scope: print_artifact` | Live QR on your [hoodie/sticker] |
 | Object graph (L1) | My objects |
 | Network graph (L5) | Live game · season |
-| Add under this root | Add another object |
+| Add under this root | Add another object · add a scan point (room-specific) |
 | Create general Humanity Card | *(hide — use deploy chooser)* |
+| Deploy / wear / season (jobs) | **Something in the world** · **On your body** · **Run a season** (not “general card”) |
+| Game-operator key | Season operator key (setup once; Run mode separate) |
+| `scope: card` BYOP wear QR | Your printed QR (may expire — honest copy) |
+| `scope: print_artifact` | QR on this garment (no calendar expiry) |
+| Device shell (dot, inbox) | Not “Live tab” — notices · keys · open control |
 
 **Two “networks”:** Do not say “network” for L1 custody trees. Reserve **live game / season** for L5 ([`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) five layers).
+
+**Hub subcopy (step 20 target):** Room-specific — e.g. season roots: **Game season scan points**; deploy roots: **Scan points on things** — not “Status plates · lost items · game nodes” on every root.
 
 ### Steward hub and `/created/`
 

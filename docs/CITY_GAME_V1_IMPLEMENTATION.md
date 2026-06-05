@@ -658,12 +658,14 @@ Run **in parallel** with hoodie launch prep. Do not block merch on game work.
 | Step | Surface | What the organizer does | Today (pilot) |
 |------|---------|-------------------------|---------------|
 | 1 | [`/create/`](../site/create/) | Create a **season root** card; register **game-operator public key** under Organizer / issuer | ☑ Browser |
-| 2 | [`/created/`](../site/created/) **Live · Manage** | **Game season setup** — season id, dates, districts, add `game_node` children, issue scan QRs, export print pack | ☐ Terminal (`city-game:mint-node`, `city-game:seed-local`) |
+| 2 | Season **cockpit** (target; today `/created/` Live) | **When** (dates, season id) · **Where** (game nodes + print pack) · **Rules** · not plates/relays | ☑ Browser (partial — hub not room-filtered) |
 | 3 | [`/created/`](../site/created/) or linked rules URL | Publish **rules page** draft (dates, privacy, what scans prove) | ☐ Hand-edited HTML + `city-game:launch-surfaces` |
 | 4 | [`/game-operator/`](../site/game-operator/) | Flip world state during the season (session-only game-operator key) | ☑ Browser (prototype) |
 | 5 | [`/organizer-revoke/`](../site/organizer-revoke/) · [`/created/`](../site/created/) | Emergency revoke / owner lifecycle | ☑ Browser |
 
-**Runtime vs setup:** [`/game-operator/`](../site/game-operator/) is the **weekend console** for live play. Phase E adds the **setup cockpit** on `/created/` — mirroring how status plates and lost-item relays already register child objects in-browser ([`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) steps 6–16).
+**Runtime vs setup:** [`/game-operator/`](../site/game-operator/) is the **weekend console** for live play (game-operator key). Phase E adds the **setup cockpit** — parent-signed node register + QR issue in-browser ([`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) steps 6–16).
+
+**UX target (step 20):** Season is a **dedicated skin** (room switcher), not the generic deploy hub. [`STEWARD_UX_PRESENTATION_TARGET.md`](STEWARD_UX_PRESENTATION_TARGET.md) § Room 3 — **Q1:** one root default + season-only fork; **When · Where · Rules · Run**; season id in **When** or first node (not `/create/`); Season skin add UI = **game_node only**; existing plates/relays still listed under Doors. **Slice 1 shipped:** add-hub filter. **Gap:** room switcher, season fork, progressive checklist.
 
 #### Phase E surfaces (implementation targets)
 

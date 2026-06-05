@@ -143,11 +143,16 @@ Status plates and lost-item relays currently use full card templates in the crea
 4. **Shorter QR path** — register + first scan link in one Live action (shipped)
 5. **Backup seatbelt** — warn/block before more objects without backup or recovery acknowledged (shipped)
 
-### Product UX presentation (step 19 — protocol shipped, UI planned)
+### Product UX presentation (steps 19–20)
 
-Steps 1–16 fixed the **custody bridge** (one root key, many objects). Step 19 fixes **what users see first** — without changing resolver shape.
+Steps 1–16 fixed the **custody bridge** (one root key, many objects). Steps 19–20 fix **what users see** — without changing resolver shape.
 
-**Canonical front-door spec:** [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) § Front door strategy.
+| Step | Scope | Doc |
+|------|--------|-----|
+| **19** | Front door · landing · create chooser · hub “My objects” (partial shipped steps 11–15) | [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) § Front door strategy |
+| **20** | Room-native control · presentation policy · scan templates · entry states | [`STEWARD_UX_PRESENTATION_TARGET.md`](STEWARD_UX_PRESENTATION_TARGET.md) |
+
+**Canonical UX target (step 20):** Three **job rooms** (deploy · wear · season) + **field kit** exception; **Q1 decided** — **one root per human default**, **dual UI skins** (Doors · Season) + optional **season-only account** at season entry; **room switcher** on control; **presentation policy** — add UI filtered by active room (season: game nodes only; doors: plates/relays); **existing children always listed** regardless of room.
 
 | Principle | User sees | Protocol (unchanged) |
 |-----------|-----------|----------------------|
@@ -175,7 +180,10 @@ Steps 1–16 fixed the **custody bridge** (one root key, many objects). Step 19 
 - Human trust stays on root only; scan copy still object-first ([§ Public scan copy](#public-scan-copy)).
 - Backup gate thresholds (warn @ 2nd child, block @ 3rd+) unchanged.
 - Flat pilot create (`/create/?template=status_plate|lost_item`) remains for strangers and LO-1/LO-2 field kits.
-- Game self-serve (step 18) reuses steps 6–16 patterns — step 19 does not fork mint.
+- Game self-serve (step 18) reuses steps 6–16 patterns — steps 19–20 do not fork mint.
+- Season id belongs in **season cockpit** (When / first node), not generic create — step 20.
+
+**Presentation policy (step 20):** see [`STEWARD_UX_PRESENTATION_TARGET.md`](STEWARD_UX_PRESENTATION_TARGET.md) § Presentation policy table. **Slice 1 shipped:** add-hub filter (deploy vs season inference). **Gap:** room switcher; list grouping; “not in this room” copy.
 
 ---
 
@@ -336,7 +344,9 @@ Delegated capabilities must be root-signed, scoped, expiring, revocable, and cle
 
 18. **`game_node` self-serve UI (Phase E — post–Cedar Rapids pilot):** extend `/created/` Live with **Add game node** — register `object_type: game_node`, issue scan QR, season metadata editor, rules page publish. Reuses steps 6–16 signing and hub tree patterns. Terminal mint stays for CI/pilot only. Spec: [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) § Phase E.
 
-19. **Object-first front door (presentation — planned):** landing Option A + top-nav Create Option B ([`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) steps 11–14). Deploy-intent create wizard; demote General/Status/Lost tabs; hub **My objects** copy; organizer season secondary entry. **No protocol changes** — UI routing and copy only.
+19. **Object-first front door (presentation — partial shipped):** landing Option A + top-nav Create Option B ([`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) steps 11–15). Deploy-intent create wizard; demote General/Status/Lost tabs; hub **My objects** copy; organizer season + wear BYOP entry. **No protocol changes** — UI routing and copy only.
 
-**Sequence status:** Steps **1–16 shipped** (May 2026). Step **17** is the next **product-gated** slice, not the next default engineering slice. Step **18** (game self-serve UI) largely shipped per Phase E; human E3 gate remains. Step **19** is the next **WS-QUALITY** presentation slice (Q3 UX coherence).
+20. **Room-native steward control (presentation — in progress):** [`STEWARD_UX_PRESENTATION_TARGET.md`](STEWARD_UX_PRESENTATION_TARGET.md) — Q1 decided (one root + dual skins + season fork), room switcher, client state model, presentation policy (add vs list), five entry states, capability-driven scan. Slice 1 shipped (add-hub filter).
+
+**Sequence status:** Steps **1–16 shipped** (May 2026). Step **17** is the next **product-gated** slice (delegation), not the default engineering slice. Step **18** (game self-serve UI) largely shipped per Phase E; human E3 gate remains. Steps **19–20** are **WS-QUALITY** presentation (Q3 UX coherence); step 19 partial, step 20 slice 1 shipped.
 

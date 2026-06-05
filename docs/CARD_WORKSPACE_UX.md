@@ -1,8 +1,10 @@
 # Card workspace UX (`/created/`)
 
-**Status:** Phase 0–4 shipped  
+**Status:** Phase 0–4 shipped · **target evolution:** [`STEWARD_UX_PRESENTATION_TARGET.md`](STEWARD_UX_PRESENTATION_TARGET.md) (step 20)  
 **Pages:** `site/created/index.html` · `site/wallet/` (My cards)  
 **Related:** `docs/CARD_WORKSPACE_PHASE0.md`, `docs/KEYS_CARDS_AND_VERIFICATION.md`, `docs/DEVICE_OS.md`, [`LANDING_PROGRESS_STRIP.md`](LANDING_PROGRESS_STRIP.md)
+
+**Current vs target:** Today `/created/` is a **single control workspace** (setup · Live · Manage) for all root kinds. Step 20 adds a **room switcher** (Doors · Wear · Season), **one root default + dual skins** (Q1), and filters **add** UI by active room while **lists** still show all children. Slices 1–3 shipped: inference-based add filter, room switcher, add-vs-list (lists always visible with room badges). This doc describes **shipped behavior**; [`STEWARD_UX_PRESENTATION_TARGET.md`](STEWARD_UX_PRESENTATION_TARGET.md) describes **where control should go**.
 
 ---
 

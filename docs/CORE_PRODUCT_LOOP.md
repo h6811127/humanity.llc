@@ -112,17 +112,23 @@ Prefer **surgical** changes aligned with existing patterns:
 
 **Canonical UX surfaces:** [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) · [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md) · [`CREATED_TASKS_TAB_REDESIGN.md`](CREATED_TASKS_TAB_REDESIGN.md) (phone-first).
 
-**Q3 front-door targets (2026-06-04):** [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) steps 11–14 · [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) step 19.
+**Q3 front-door targets (2026-06-04):** [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) steps 11–15 (shipped routing) · **Step 20** [`STEWARD_UX_PRESENTATION_TARGET.md`](STEWARD_UX_PRESENTATION_TARGET.md) (room-native control — planned).
 
 | Target | Comprehension pass signal |
 |--------|---------------------------|
 | Three launch doors stay abstract (not lost-item-led) | Strangers pick correct door in &lt;10s without protocol vocabulary |
-| Top-nav Create = three-door chooser (Option B) | No one asks why they must pick “General” before a plate |
+| Top-nav Create = steward chooser (deploy + wear) | No one asks why they must pick “General” before a plate |
 | Deploy create = “what scanners read” | Stewards never say “root” or “child” unprompted |
 | Hoodie path vs BYOP create | Buyers understand shop vs print-your-own as **carrier**, same live primitive |
 | Game players vs organizers | Players use door 3; organizers find season setup without terminal mint |
+| **Step 20 — three rooms** | Stewards describe deploy / wear / season as separate jobs, not one card form |
+| **Step 20 — room switcher** | Stewards always know active room (Doors / Season / Wear); no “where did my plates go?” |
+| **Step 20 — one root default** | Solo stewards use one `@handle`; org seasons may choose season-only account |
+| **Step 20 — season cockpit** | Organizers do not expect lost-item or plate **add** UI in Season skin |
+| **Step 20 — entry states** | No “field looks broken” reports from disabled/hidden inputs on mobile PWA |
+| **Step 20 — wear tracks** | Stewards understand fulfilled garment (no expiry) vs BYOP QR (may expire) before filling forms |
 
-**Architecture guardrails during Q3:** `verify:desk:fast` green; child objects stay out of `hc_wallet`; flat pilots remain for LO-1/LO-2 field kits; no landing hero revert.
+**Architecture guardrails during Q3:** `verify:desk:fast` green; child objects stay out of `hc_wallet`; flat pilots remain for LO-1/LO-2 field kits; no landing hero revert; presentation policy is UI-only; add UI filtered by room, lists show all children ([`STEWARD_UX_PRESENTATION_TARGET.md`](STEWARD_UX_PRESENTATION_TARGET.md) § Presentation policy table).
 
 ---
 

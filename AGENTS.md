@@ -46,6 +46,7 @@ Card creation needs Ed25519-signed JSON (fixtures in `worker/tests/fixtures/`). 
 | **Hybrid custody (easy + keys)** | [`docs/CUSTODY_EASY_MODE.md`](docs/CUSTODY_EASY_MODE.md) · [`docs/CUSTODY_PHASE0_RUNBOOK.md`](docs/CUSTODY_PHASE0_RUNBOOK.md) · [`docs/OWNERSHIP_AND_CONTROL_MODEL.md`](docs/OWNERSHIP_AND_CONTROL_MODEL.md) |
 | **Core loop quality + UX** | [`docs/CORE_PRODUCT_LOOP.md`](docs/CORE_PRODUCT_LOOP.md) · **WS-QUALITY** · `npm run verify:desk` |
 | **Front door + positioning** | [`docs/PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](docs/PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) § Front door strategy |
+| **Steward UX target (step 20)** | [`docs/STEWARD_UX_PRESENTATION_TARGET.md`](docs/STEWARD_UX_PRESENTATION_TARGET.md) — one root + dual skins (Q1), room switcher, add-vs-list policy; read before changing `/create/` or `/created/` presentation |
 | **Notifications v2 (active)** | [`docs/NOTIFICATION_SYSTEM_V2.md`](docs/NOTIFICATION_SYSTEM_V2.md) · **WS-NOTIF** · inbox + delivery router |
 | **Active work + regression gates** | [`docs/PRODUCT_WORKSTREAM_COORDINATION.md`](docs/PRODUCT_WORKSTREAM_COORDINATION.md) · **WS-NOTIF** · **WS-QUALITY** · Phase 2 **WS-SCALE / WS-SW / WS-CUSTODY** paused until Q3 + N4 |
 | **Feature map / roadmap** | [`docs/STEWARD_DEVICE_ROADMAP.md`](docs/STEWARD_DEVICE_ROADMAP.md) |

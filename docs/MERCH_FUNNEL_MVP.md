@@ -72,7 +72,8 @@ Commerce and BYOP create are **carrier split**, not competing products ([`PRODUC
 
 - Never paywall sign · publish · revoke ([`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) § Create entry).
 - Create in the funnel is **ownership**, not a substitute for buying the hoodie.
-- Planned: under door 2, honest **“Or print your own wear”** → create with wear intent (BYOP).
+- Shipped (step 15): under door 2, **“Or print your own wear”** on `/shop/customize/` → `/create/?intent=wear` (BYOP).
+- UX target (step 20): wear **two tracks** in one room — fulfilled `print_artifact` (no calendar expiry) vs BYOP `card` QR (expiry honest) — [`STEWARD_UX_PRESENTATION_TARGET.md`](STEWARD_UX_PRESENTATION_TARGET.md) § Room 2.
 - Commerce never grants vouch; webhook mint uses existing `print_artifact` scope — no parallel scan product.
 
 **Architecture alignment:** `POST /v1/store/artifact-intents`, Shopify webhook, and steward `/created/` Live share one resolver; [`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md) lifecycle unchanged.

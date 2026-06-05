@@ -104,12 +104,17 @@ Canonical inbox taxonomy: [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
 
 | Invariant | Detail |
 |-----------|--------|
-| Shipped (step 11) | Top-nav **Create** → **three-door chooser** matching `#launch-doors` (Option B). Form panel: template tabs in collapsed **Examples and object types** — not the first screen. Modules: `create-entry-chooser-core.mjs`, `create-entry-chooser.mjs`. |
+| Shipped (step 11) | Top-nav **Create** → **steward chooser** (account / general + deploy + wear). **Your line on the network** → `?intent=general` (handle + manifesto). Form panel: template tabs in collapsed **Examples and object types** for **field-kit** deep links (`?template=`) — not the first screen for room intents. Modules: `create-entry-chooser-core.mjs`, `create-entry-chooser.mjs`, `create-general-room-wizard.mjs`. |
 | Shipped (step 12) | Door 1 → `?intent=deploy` · object-first `#create-deploy-wizard` · submit routes: `root_and_child` \| `redirect_live` \| `flat_legacy`. Modules: `create-deploy-wizard-core.mjs`, `create-deploy-submit.mjs`. |
+| Shipped (step 20 slice — deploy room) | `?intent=deploy` hides cross-room UI (`#create-template-advanced`, season/wear wizards, convergence nudge) — same isolation pattern as `?intent=wear`. Field kits keep `?template=status_plate\|lost_item`. `isDeployRoomCreateIntent` in `create-deploy-wizard-core.mjs`. |
 | Primitive free | Core sign · publish · revoke is never paywalled; revenue is **carriers** (hoodie, print packs). See [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md). |
 | Pilots | `?template=status_plate` and `?template=lost_item` remain for field kits and legacy; not front-door positioning. |
 | Protocol | Root + child object model unchanged ([`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md)); presentation-only UX may hide “general card” vocabulary. |
 | Game organizers | `/create/?intent=game` → season root + `/created/?focus=game-season-setup` (Phase E); terminal mint pilot/CI only ([`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md)). |
+| Shipped (step 15) | Wear BYOP: `/shop/customize/` → `/create/?intent=wear` → `/created/?focus=wear-print`. Modules: `create-wear-wizard-*.mjs`, `created-wear-print-focus.mjs`. |
+| Shipped (step 20 slice — created rooms) | Room switcher on `/created/` (`steward-active-room-core.mjs`, `created-room-switcher.mjs`). Add UI filters by `active_room`; **lists show all children** with room badge (`steward-child-object-list-policy-core.mjs`, `created-child-object-section-ui.mjs`). Hub stays visible when stored children exist outside active add room. |
+| Shipped (step 20 slice — season fork) | `/create/?intent=game` shows **existing account vs season-only** fork (`create-season-fork-core.mjs`). Dual-skin path keeps deploy manifesto + organizer key; dedicated path uses season manifesto. `/created/` honest beat when deploy root gains season operator key (`steward-season-key-honest-beat-core.mjs`). |
+| Target (step 20) | Room-native steward UX — [`STEWARD_UX_PRESENTATION_TARGET.md`](STEWARD_UX_PRESENTATION_TARGET.md). **Still open:** five entry states; season id only in season cockpit; wear track chooser; season progressive checklist. |
 
 ---
 
