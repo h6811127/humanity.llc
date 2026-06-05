@@ -10,8 +10,12 @@ import {
   isActiveLostItemRelayRow,
   parseLostItemRelayChildFields,
   parseLostItemRelayChildState,
-  shouldOfferAddLostItemRelay,
 } from "./created-child-object-core.mjs";
+import { stewardPresentationExtras } from "./steward-active-room-core.mjs";
+import {
+  appendChildObjectListRoomBadge,
+  syncChildObjectSectionChrome,
+} from "./created-child-object-section-ui.mjs";
 import {
   postChildObjectUpdate,
   signChildObjectRevoke,
@@ -70,6 +74,7 @@ function renderLostItemRelayList(profileId, rows) {
       sub.className = "list-sub child-object-relay-current-state";
       sub.textContent = row.public_state;
       content.append(title, sub);
+      appendChildObjectListRoomBadge(li, "lost_item_relay");
       li.append(content);
 
       const scanWrap = document.createElement("div");
@@ -177,9 +182,18 @@ export function initCreatedLostItemRelay(ctx) {
   }
 
   function refreshVisibility() {
-    const show = shouldOfferAddLostItemRelay(ctx.getSession());
-    panel.hidden = !show;
-    if (show) void refreshList();
+    const session = ctx.getSession();
+    const extras = stewardPresentationExtras(ctx.profileId);
+    const rows = readChildObjectRows(localStorage, ctx.profileId);
+    const activeCount = rows.filter(isActiveLostItemRelayRow).length;
+    const { showSection } = syncChildObjectSectionChrome(
+      panel,
+      "lost_item_relay",
+      session,
+      activeCount,
+      extras
+    );
+    if (showSection) void refreshList();
     else {
       syncChildObjectBackupGateUi({
         profileId: ctx.profileId,

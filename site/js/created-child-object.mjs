@@ -10,8 +10,12 @@ import {
   isActiveStatusPlateRow,
   parseStatusPlateChildFields,
   parseStatusPlateChildState,
-  shouldOfferAddStatusPlate,
 } from "./created-child-object-core.mjs";
+import { stewardPresentationExtras } from "./steward-active-room-core.mjs";
+import {
+  appendChildObjectListRoomBadge,
+  syncChildObjectSectionChrome,
+} from "./created-child-object-section-ui.mjs";
 import {
   postChildObjectUpdate,
   signChildObjectRevoke,
@@ -65,6 +69,7 @@ function renderStatusPlateList(profileId, rows) {
       sub.className = "list-sub child-object-plate-current-state";
       sub.textContent = row.public_state;
       content.append(title, sub);
+      appendChildObjectListRoomBadge(li, "status_plate");
       li.append(content);
 
       const scanWrap = document.createElement("div");
@@ -172,9 +177,18 @@ export function initCreatedChildObject(ctx) {
   }
 
   function refreshVisibility() {
-    const show = shouldOfferAddStatusPlate(ctx.getSession());
-    panel.hidden = !show;
-    if (show) void refreshList();
+    const session = ctx.getSession();
+    const extras = stewardPresentationExtras(ctx.profileId);
+    const rows = readChildObjectRows(localStorage, ctx.profileId);
+    const activeCount = rows.filter(isActiveStatusPlateRow).length;
+    const { showSection } = syncChildObjectSectionChrome(
+      panel,
+      "status_plate",
+      session,
+      activeCount,
+      extras
+    );
+    if (showSection) void refreshList();
     else {
       syncChildObjectBackupGateUi({
         profileId: ctx.profileId,

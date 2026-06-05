@@ -44,7 +44,7 @@ export function setupWizardStepCount(omitSaveStep) {
  */
 export function setupProgressKicker(omitSaveStep) {
   const n = setupWizardStepCount(omitSaveStep);
-  return `${n} steps · ownership stays on this device`;
+  return `${n} steps · save on this device`;
 }
 
 /**

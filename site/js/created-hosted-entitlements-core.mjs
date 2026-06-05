@@ -223,9 +223,9 @@ export function buildCreatedHostedPlanPanelModel(policy, body, ctx) {
   }
 
   const lead = policy.stewardHosted
-    ? "Hosted plan active on this device — higher automatic check budgets. Verification labels are unchanged."
+    ? "Hosted plan active on this device. Higher automatic check budgets. Verification labels are unchanged."
     : ctx.hasSession
-      ? "Reference operator limits on this device. Paid plans raise steward and/or city-game capacity — not card create or public scan."
+      ? "Reference operator limits on this device. Paid plans raise steward and/or city-game capacity. Not card create or public scan."
       : hasSigningKeys
         ? "Keys are loaded on this tab. Use Connect steward account below, then optional paid checkout."
         : "Open the Live tab and load your card keys, then return here to connect a steward account.";

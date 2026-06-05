@@ -2,8 +2,10 @@ import {
   CHILD_OBJECT_ADD_COUNT_ELEMENT_IDS,
   childObjectAddCountLabel,
   childObjectAddHubSubcopy,
+  childObjectAddHubSummaryTitle,
   shouldShowChildObjectAddHub,
 } from "./created-child-object-add-hub-core.mjs";
+import { stewardPresentationExtras } from "./steward-active-room-core.mjs";
 
 const ADD_HUB_OPENED_KEY_PREFIX = "hc_add_hub_opened:";
 
@@ -32,16 +34,30 @@ export function mountChildObjectAddHubSections() {
 
 /**
  * @param {Record<string, unknown> | null | undefined} session
+ * @param {{ profileId?: string; activeRoom?: string | null }} [opts]
  */
-export function syncChildObjectAddHub(session) {
+export function syncChildObjectAddHub(session, opts = {}) {
   mountChildObjectAddHubSections();
   const hub = document.getElementById("child-object-add-hub");
   const sub = document.getElementById("child-object-add-hub-sub");
-  const show = shouldShowChildObjectAddHub(session);
+  const summary = hub?.querySelector(".created-child-object-add-hub-summary");
+  const profileId =
+    opts.profileId ||
+    (typeof session?.profile_id === "string" ? session.profile_id.trim() : "");
+  const extras = stewardPresentationExtras(profileId, { activeRoom: opts.activeRoom });
+  const show = shouldShowChildObjectAddHub(session, {
+    ...extras,
+    profileId,
+    storage: localStorage,
+  });
   if (hub) hub.hidden = !show;
+  if (summary) {
+    summary.textContent = childObjectAddHubSummaryTitle(session, extras);
+  }
   if (sub) {
     sub.textContent =
-      childObjectAddHubSubcopy(session) || "Register stickers — one root key, no new private key";
+      childObjectAddHubSubcopy(session, extras) ||
+      "Register stickers — one root key, no new private key";
   }
   if (show && hub instanceof HTMLDetailsElement) {
     const profileId = typeof session?.profile_id === "string" ? session.profile_id.trim() : "";

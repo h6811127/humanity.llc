@@ -28,7 +28,7 @@ export function isActiveLostItemRelayRow(row) {
  * Root general cards may add status plates as child objects (not flat-card pilots).
  * @param {Record<string, unknown> | null | undefined} session
  */
-function isGeneralRootCardSession(session) {
+export function isGeneralRootCardSession(session) {
   const explicit = typeof session?.pilot_template === "string" ? session.pilot_template : "";
   const pilot =
     explicit ||

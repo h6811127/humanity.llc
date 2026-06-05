@@ -19,6 +19,8 @@ export const CREATED_PANEL_FOCUS = {
   manage: "created-live-scanners-see",
   /** Landing Continue (Phase 2) when setup is done but card not pinned. */
   "deploy-print": "created-deploy-print",
+  /** Wear BYOP create — print QR on your own garment (step 15). */
+  "wear-print": "created-deploy-print",
   /** Create flow convergence — scroll to Add object panels on Live. */
   "add-status-plate": "child-object-add-status-plate",
   "add-lost-item": "child-object-add-lost-item",
@@ -49,7 +51,8 @@ function focusCreatedPanel(select, focusKey) {
     panelId === "created-live-scanners-see" ||
     panelId === "child-object-add-status-plate" ||
     panelId === "child-object-add-lost-item" ||
-    panelId === "game-season-setup";
+    panelId === "game-season-setup" ||
+    panelId === "created-deploy-print";
   if (livePanel) {
     select("now");
   } else if (CREATED_PANEL_FOCUS[focusKey] || document.getElementById(panelId)) {

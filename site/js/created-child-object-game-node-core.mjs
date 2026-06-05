@@ -18,15 +18,15 @@ export const GAME_NODE_ROLE_OPTIONS = [
 ];
 
 const ROLE_PUBLIC_STATE = {
-  relay_gate: "Unclaimed — relay dormant until operators open the window",
-  temp_drop: "Temp object dormant — window not open",
-  sanctuary: "Treaty zone — no capture, regroup and share rumors",
-  witness: "Witness seal dormant — passes not yet issued",
-  lore_archive: "Chapter dormant — lore unlocks with the season",
-  route_splitter: "Route splitter dormant — choose a path after season open",
-  finale: "Finale switch dormant — requires district fragments",
-  care_loop: "Discovery node — notice the place state",
-  mobile_lore: "Mobile lore node — courier status",
+  relay_gate: "Unclaimed. Relay dormant until operators open the window",
+  temp_drop: "Temp object dormant. Window not open",
+  sanctuary: "Treaty zone. No capture, regroup and share rumors",
+  witness: "Witness seal dormant. Passes not yet issued",
+  lore_archive: "Chapter dormant. Lore unlocks with the season",
+  route_splitter: "Route splitter dormant. Choose a path after season open",
+  finale: "Finale switch dormant. Requires district fragments",
+  care_loop: "Discovery node. Notice the place state",
+  mobile_lore: "Mobile lore node. Courier status",
 };
 
 const BASE_STREAMS = [

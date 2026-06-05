@@ -31,7 +31,7 @@
       })();
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=5" />
-    <link rel="stylesheet" href="/styles.css?v=147" />
+    <link rel="stylesheet" href="/styles.css?v=150" />
     <link rel="stylesheet" href="/css/device-shell.css?v=94" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=30" />
   </head>
@@ -213,6 +213,22 @@
         </section>
 
         <section
+          class="hc-emphasis-card hc-emphasis-card--info created-fresh-handoff-banner"
+          id="created-fresh-handoff-banner"
+          hidden
+          role="status"
+          aria-live="polite"
+        >
+          <div class="hc-emphasis-card__main">
+            <span class="hc-emphasis-card__dot hc-emphasis-card__dot--info" aria-hidden="true"></span>
+            <div class="hc-emphasis-card__copy">
+              <p class="hc-emphasis-card__title" id="created-fresh-handoff-title"></p>
+              <p class="hc-emphasis-card__detail" id="created-fresh-handoff-detail"></p>
+            </div>
+          </div>
+        </section>
+
+        <section
           class="hc-emphasis-card hc-emphasis-card--urgent live-control-notification"
           id="live-control-proof"
           hidden
@@ -226,7 +242,7 @@
               <p class="hc-emphasis-card__title">Prove live control</p>
               <p class="hc-emphasis-card__detail" id="live-control-proof-lead">
                 Someone nearby scanned your QR and asked for live proof. Sign once from this
-                key-holding device  -  it does not reveal legal identity or create a badge.
+                key-holding device: it does not reveal legal identity or create a badge.
               </p>
               <p class="form-status live-control-notification-status" id="live-control-proof-status" role="status"></p>
             </div>
@@ -275,8 +291,7 @@
                 Customize your live object
               </p>
               <p class="hc-emphasis-card__detail">
-                Your card is ready in this tab. Preview your branded QR on a hoodie or sticker —
-                buying never grants vouch status.
+                Your card is ready in this tab. Preview your branded QR on a hoodie or sticker.                 buying never grants vouch status.
               </p>
             </div>
           </div>
@@ -296,7 +311,7 @@
           hidden
           aria-labelledby="created-setup-title"
         >
-          <p class="created-setup-kicker">Five steps · keys stay in this browser</p>
+          <p class="created-setup-kicker">Five steps · save on this device</p>
           <ol class="created-setup-progress" aria-label="Setup progress">
             <li class="created-setup-progress-item" data-setup-step="save">
               <span class="created-setup-progress-num" aria-hidden="true">1</span>
@@ -325,15 +340,14 @@
             id="created-setup-manage-hint"
             hidden
           >
-            Revoke, recovery, and steward tools unlock under the
-            <strong>Manage</strong> tab after you tap <strong>Open card controls</strong>.
+            Revoke, backup, and advanced tools are under the
+            <strong>Manage</strong> tab after you finish setup.
           </p>
 
           <div class="created-setup-panel" data-setup-panel="save" id="created-setup-panel-save">
-            <h2 class="created-setup-panel-title" id="created-setup-title">Save ownership on this device</h2>
+            <h2 class="created-setup-panel-title" id="created-setup-title">Save on this device</h2>
             <p class="created-setup-panel-lead">
-              Control stays in this browser until you save ownership here. Without save,
-              closing this tab means you cannot update, revoke, or manage object QRs later.
+              Without save, closing this tab means you cannot update or turn off your codes later.
             </p>
             <div id="device-keys-custody-created-setup"></div>
             <div id="created-setup-keys-mount"></div>
@@ -363,7 +377,7 @@
             <h2 class="created-setup-panel-title">Test from another device</h2>
             <p class="created-setup-panel-lead">
               Preview what anyone scanning this QR will see. Use a friend’s camera or a second
-              phone - no app required.
+              phone. No app required.
             </p>
             <button type="button" class="btn-secondary created-setup-inline-action" data-setup-action="test-scan">
               Open scan page
@@ -372,7 +386,7 @@
               Scan with this device
             </button>
             <p class="form-hint created-setup-test-hint">
-              Optional preview — opens what scanners see. Tap <strong>Continue</strong> below when
+              Optional preview. Opens what scanners see. Tap <strong>Continue</strong> below when
               you’re ready to protect your control (no need to open the scan page first).
             </p>
           </div>
@@ -511,6 +525,80 @@
           </button>
         </nav>
 
+        <div class="created-room-switcher-wrap" id="created-room-switcher-wrap" hidden>
+          <div class="created-room-switcher-head">
+            <span class="created-room-switcher-kicker">Managing</span>
+            <span class="created-room-switcher-handle" id="created-room-switcher-handle"></span>
+          </div>
+          <div
+            class="created-room-switcher flow-segmented"
+            role="group"
+            aria-label="Control room"
+          >
+            <button
+              type="button"
+              class="created-room-switcher-btn"
+              data-steward-room="doors"
+              aria-pressed="false"
+            >
+              Doors
+            </button>
+            <button
+              type="button"
+              class="created-room-switcher-btn"
+              data-steward-room="wear"
+              aria-pressed="false"
+            >
+              Wear
+            </button>
+            <button
+              type="button"
+              class="created-room-switcher-btn"
+              data-steward-room="season"
+              aria-pressed="false"
+            >
+              Season
+            </button>
+          </div>
+          <p class="form-hint created-room-crosshint" id="steward-room-crosshint" hidden>
+            <span id="steward-room-crosshint-body"></span>
+            <button type="button" class="btn-link created-room-crosshint-switch" id="steward-room-crosshint-switch" hidden></button>
+          </p>
+        </div>
+
+        <section
+          class="hc-emphasis-card hc-emphasis-card--info created-season-key-honest-beat"
+          id="created-season-key-honest-beat"
+          role="note"
+          hidden
+          aria-labelledby="created-season-key-honest-beat-title"
+        >
+          <div class="hc-emphasis-card__main">
+            <span class="hc-emphasis-card__dot hc-emphasis-card__dot--info" aria-hidden="true"></span>
+            <div class="hc-emphasis-card__copy">
+              <p class="hc-emphasis-card__eyebrow">Season operator key</p>
+              <p class="hc-emphasis-card__title" id="created-season-key-honest-beat-title"></p>
+              <p class="hc-emphasis-card__detail" id="created-season-key-honest-beat-body"></p>
+            </div>
+          </div>
+          <div class="hc-emphasis-card__actions">
+            <button
+              type="button"
+              class="hc-emphasis-card__cta hc-emphasis-card__cta--secondary"
+              id="created-season-key-honest-beat-doors"
+            >
+              Switch to Doors
+            </button>
+            <button
+              type="button"
+              class="btn-text"
+              id="created-season-key-honest-beat-dismiss"
+            >
+              Got it
+            </button>
+          </div>
+        </section>
+
         <div class="created-tab-panel" data-created-panel="now" id="created-tab-now" role="tabpanel" aria-labelledby="created-tab-btn-now">
           <section
             class="hc-emphasis-card hc-emphasis-card--info created-view-live-banner"
@@ -582,7 +670,7 @@
                   id="created-live-object-limit"
                   hidden
                 >
-                  Scanners see your live line — not who holds the object.
+                  Scanners see your live line. Not who holds the object.
                 </p>
               </div>
               <p
@@ -722,7 +810,7 @@
                     class="created-scan-details-panel flow-inset-fields"
                   >
                     <p class="form-hint">
-                      Short place facts (tasks, tools) — included when you publish above.
+                      Short place facts (tasks, tools). Included when you publish above.
                     </p>
                     <label class="form-label" for="update-stream-1-label">Detail 1 label</label>
                     <input
@@ -1078,10 +1166,10 @@
             hidden
           >
             <summary class="form-label created-child-object-add-hub-summary">
-              Live objects under this root
+              Your scan points
             </summary>
             <p class="form-hint" id="child-object-add-hub-sub">
-              Status plates · lost items · game nodes
+              Add or manage scan points for this account
             </p>
             <div class="created-child-add-hub-body">
               <div id="game-season-setup" class="created-game-season-setup-anchor" hidden></div>
@@ -1103,10 +1191,14 @@
             hidden
             aria-labelledby="child-object-add-status-plate-title"
           >
-            <h2 class="created-what-now-title" id="child-object-add-status-plate-title">
+            <h2
+              class="created-what-now-title"
+              id="child-object-add-status-plate-title"
+              data-child-object-add-chrome
+            >
               Add status plate under this root
             </h2>
-            <p class="created-what-now-body">
+            <p class="created-what-now-body" data-child-object-add-chrome>
               One root card controls additional public objects. Register a
               <strong>status plate</strong> and issue its first scan link in one step (no new private
               key).
@@ -1114,10 +1206,16 @@
             <div
               id="child-object-status-plate-backup-gate"
               class="hc-notice child-object-backup-gate"
+              data-child-object-add-chrome
               hidden
               role="alert"
             ></div>
-            <form id="child-object-status-plate-form" class="compact-form" novalidate>
+            <form
+              id="child-object-status-plate-form"
+              class="compact-form"
+              data-child-object-add-chrome
+              novalidate
+            >
               <label class="form-label" for="child-object-plate-label">Object name</label>
               <input
                 class="form-input"
@@ -1159,10 +1257,14 @@
             hidden
             aria-labelledby="child-object-add-lost-item-title"
           >
-            <h2 class="created-what-now-title" id="child-object-add-lost-item-title">
+            <h2
+              class="created-what-now-title"
+              id="child-object-add-lost-item-title"
+              data-child-object-add-chrome
+            >
               Add lost-item relay under this root
             </h2>
-            <p class="created-what-now-body">
+            <p class="created-what-now-body" data-child-object-add-chrome>
               One root card controls additional public objects. Register a
               <strong>lost-item relay</strong> and issue its first scan link in one step (no new
               private key).
@@ -1170,10 +1272,16 @@
             <div
               id="child-object-lost-item-backup-gate"
               class="hc-notice child-object-backup-gate"
+              data-child-object-add-chrome
               hidden
               role="alert"
             ></div>
-            <form id="child-object-lost-item-form" class="compact-form" novalidate>
+            <form
+              id="child-object-lost-item-form"
+              class="compact-form"
+              data-child-object-add-chrome
+              novalidate
+            >
               <label class="form-label" for="child-object-relay-item">Item name</label>
               <input
                 class="form-input"
@@ -1215,20 +1323,30 @@
             hidden
             aria-labelledby="child-object-add-game-node-title"
           >
-            <h2 class="created-what-now-title" id="child-object-add-game-node-title">
+            <h2
+              class="created-what-now-title"
+              id="child-object-add-game-node-title"
+              data-child-object-add-chrome
+            >
               Add game node under this root
             </h2>
-            <p class="created-what-now-body">
+            <p class="created-what-now-body" data-child-object-add-chrome>
               Register a <strong>game node</strong> sticker object and issue its first scan link in one
               step. Requires an organizer / game-operator public key on this card at create.
             </p>
             <div
               id="child-object-game-node-backup-gate"
               class="hc-notice child-object-backup-gate"
+              data-child-object-add-chrome
               hidden
               role="alert"
             ></div>
-            <form id="child-object-game-node-form" class="compact-form" novalidate>
+            <form
+              id="child-object-game-node-form"
+              class="compact-form"
+              data-child-object-add-chrome
+              novalidate
+            >
               <label class="form-label" for="child-object-game-node-season">Season</label>
               <select class="form-input" id="child-object-game-node-season" required></select>
               <label class="form-label" for="child-object-game-node-label">Place name</label>
@@ -1259,7 +1377,7 @@
               ></div>
               <p class="form-hint created-game-node-setup-lead">
                 Confirm key custody before registering many nodes. Run comprehension with ≥5 un coached
-                testers before marketing — patterns from the weekend operator runbook in plain language.
+                testers before marketing. Patterns from the weekend operator runbook in plain language.
               </p>
               <div id="child-object-game-node-setup-checklist" aria-label="Self-serve setup progress"></div>
               <div id="child-object-game-node-setup-custody"></div>
@@ -1268,7 +1386,7 @@
                 id="child-object-game-node-setup-runbook"
                 aria-label="Weekend operator patterns"
               ></div>
-              <h3 class="created-game-node-setup-subhead">Comprehension scorecard (GT-1–GT-7)</h3>
+              <h3 class="created-game-node-setup-subhead">Comprehension scorecard (GT-1 to GT-7)</h3>
               <div id="child-object-game-node-setup-scorecard"></div>
               <div class="created-game-node-setup-links" id="child-object-game-node-setup-links"></div>
               <button
@@ -1335,7 +1453,7 @@
                 class="form-input created-game-node-rules-districts"
                 id="child-object-game-node-rules-districts"
                 rows="4"
-                placeholder="One district id per line — e.g. downtown"
+                placeholder="One district id per line. E.g. Downtown"
               ></textarea>
               <ul
                 class="created-game-node-rules-readiness"
@@ -1441,7 +1559,7 @@
           <section class="created-what-now created-what-now-compact" id="created-lost-item-tip" hidden>
             <h2 class="created-what-now-title">Lost item relay</h2>
             <p class="created-what-now-body">
-              Tag the item. Finders see what is lost and your return message  -  not your phone number.
+              Tag the item. Finders see what is lost and your return message: not your phone number.
               Update copy on <strong>Live</strong>; revoke when recovered under <strong>Manage</strong>.
             </p>
           </section>
@@ -1655,7 +1773,7 @@
               <div class="owner-network-status" id="owner-network-status" aria-live="polite">
                 <p class="owner-network-status-kicker">Resolver check</p>
                 <p class="owner-network-status-lead">
-                  What scanners see <strong>right now</strong>  -  fetched live, not guessed from this tab.
+                  What scanners see <strong>right now</strong>: fetched live, not guessed from this tab.
                 </p>
                 <ul class="list list-compact owner-network-status-rows">
                   <li class="list-row">
@@ -1708,7 +1826,7 @@
               </div>
               <p class="form-hint" id="owner-no-key">
                 Restore ownership from a saved backup or recovery method below, or create again on
-                <a href="/create/">/create/</a>. humanity.llc cannot revoke or recover
+                <a href="/create/">/create/</a>. Humanity.llc cannot revoke or recover
                 root-object control for you.
               </p>
 
@@ -1727,7 +1845,7 @@
                   </div>
                   <label class="revoke-confirm">
                     <input type="checkbox" id="confirm-revoke-qr" />
-                    <span>I understand  -  revoke this scan QR only</span>
+                    <span>I understand: revoke this scan QR only</span>
                   </label>
                   <button type="button" class="btn-danger" id="revoke-qr-btn" disabled>
                     Revoke this QR
@@ -1741,7 +1859,7 @@
                       <legend class="form-label">What scanners see</legend>
                       <label class="revoke-display-opt">
                         <input type="radio" name="revoke-display-mode" value="minimal" checked />
-                        <span>Minimal  -  headline only (default)</span>
+                        <span>Minimal: headline only (default)</span>
                       </label>
                       <label class="revoke-display-opt">
                         <input type="radio" name="revoke-display-mode" value="tombstone" />
@@ -1779,7 +1897,7 @@
                           </div>
                           <label class="revoke-confirm revoke-confirm-spaced">
                             <input type="checkbox" id="confirm-revoke-card" />
-                            <span>I understand  -  disable this card</span>
+                            <span>I understand: disable this card</span>
                           </label>
                           <button type="button" class="btn-danger btn-danger-solid" id="revoke-card-btn" disabled>
                             Disable card
@@ -2110,7 +2228,7 @@
                   <h3 class="form-label">Inspect on network</h3>
                   <p class="form-hint">
                     Status at a glance is on the <strong>Live</strong> tab. Each printed QR is its own
-                    credential — revoke one sticker without killing siblings.
+                    credential. Revoke one sticker without killing siblings.
                   </p>
                   <ul class="list list-compact">
                     <li class="list-row list-action">
@@ -2170,10 +2288,10 @@
                   profile ID and QR ID while transitions change what the resolver returns.
                 </p>
                 <ul class="created-revoke-rules-list">
-                  <li><strong>Active</strong>  -  live manifesto or pilot layout.</li>
-                  <li><strong>Expiry</strong>  -  credential time runs out; scan shows expired.</li>
-                  <li><strong>Revoke this QR</strong>  -  one pointer off; siblings can stay active.</li>
-                  <li><strong>Disable card</strong>  -  whole profile offline.</li>
+                  <li><strong>Active</strong>: live manifesto or pilot layout.</li>
+                  <li><strong>Expiry</strong>: credential time runs out; scan shows expired.</li>
+                  <li><strong>Revoke this QR</strong>: one pointer off; siblings can stay active.</li>
+                  <li><strong>Disable card</strong>: whole profile offline.</li>
                 </ul>
                 <ul class="list list-compact created-help-links">
                   <li class="list-row list-action">
@@ -2275,6 +2393,6 @@
     </dialog>
     <script src="/js/device-status-bootstrap.mjs?v=94" type="module"></script>
     <script src="/js/created-hub.mjs?v=5" type="module"></script>
-    <script type="module" src="/js/created.mjs?v=87"></script>
+    <script type="module" src="/js/created.mjs?v=88"></script>
   </body>
 </html>

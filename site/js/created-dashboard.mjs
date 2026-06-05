@@ -185,7 +185,7 @@ export function initCreatedDashboard({
         showFeedback("Saved on this device. You can update and revoke from this browser.");
       } else {
         showFeedback(
-          "Could not save yet. Keys must be in this tab - finish create here or import a backup in Manage.",
+          "Could not save yet. Keys must be in this tab. Finish create here or import a backup in Manage.",
           true
         );
       }

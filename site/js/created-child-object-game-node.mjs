@@ -11,8 +11,16 @@ import {
   fetchSeasonConfigHints,
   isActiveGameNodeRow,
   parseGameNodeChildFields,
-  shouldOfferAddGameNode,
 } from "./created-child-object-game-node-core.mjs";
+import { stewardPresentationExtras } from "./steward-active-room-core.mjs";
+import {
+  appendChildObjectListRoomBadge,
+  syncChildObjectSectionChrome,
+} from "./created-child-object-section-ui.mjs";
+import {
+  shouldShowChildObjectGameNodePanel,
+} from "./steward-child-object-list-policy-core.mjs";
+import { shouldShowGameNodeSetupRowInDefaultUi } from "./steward-presentation-policy-core.mjs";
 import {
   postChildObjectRevoke,
   signChildObjectRevoke,
@@ -73,6 +81,7 @@ function renderGameNodeList(profileId, rows) {
       sub.className = "list-sub";
       sub.textContent = row.public_state;
       content.append(title, sub);
+      appendChildObjectListRoomBadge(li, "game_node");
       li.append(content);
 
       const scanWrap = document.createElement("div");
@@ -289,7 +298,7 @@ export function initCreatedGameNode(ctx) {
       roleCell.textContent = row.role;
 
       const districtCell = document.createElement("td");
-      districtCell.textContent = row.district ?? "—";
+      districtCell.textContent = row.district ?? "None";
 
       const labelCell = document.createElement("td");
       const labelInput = document.createElement("input");
@@ -366,9 +375,23 @@ export function initCreatedGameNode(ctx) {
   }
 
   function refreshVisibility() {
-    const show = shouldOfferAddGameNode(ctx.getSession());
-    panel.hidden = !show;
-    if (show) {
+    const session = ctx.getSession();
+    const extras = stewardPresentationExtras(ctx.profileId);
+    const rows = readChildObjectRows(localStorage, ctx.profileId);
+    const activeCount = rows.filter(isActiveGameNodeRow).length;
+    const showSetup = shouldShowGameNodeSetupRowInDefaultUi(session, extras);
+    syncChildObjectSectionChrome(
+      panel,
+      "game_node",
+      session,
+      activeCount,
+      extras
+    );
+    const showPanel = shouldShowChildObjectGameNodePanel(session, activeCount, extras);
+    panel.hidden = !showPanel;
+    const setupEl = document.getElementById("child-object-game-node-setup");
+    if (setupEl instanceof HTMLElement) setupEl.hidden = !showSetup;
+    if (showPanel) {
       void loadSeasonIndex().then(() => refreshList());
     } else {
       syncChildObjectBackupGateUi({
@@ -446,7 +469,7 @@ export function initCreatedGameNode(ctx) {
         });
         refreshList();
         if (scanStatus instanceof HTMLElement) {
-          scanStatus.textContent = "Scan link ready — print or share on the sticker.";
+          scanStatus.textContent = "Scan link ready. Print or share on the sticker.";
         }
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
@@ -564,7 +587,7 @@ export function initCreatedGameNode(ctx) {
       if (statusEl) {
         statusEl.hidden = false;
         statusEl.textContent = result.scanUrl
-          ? "Game node registered and scan link ready — print or share on the sticker."
+          ? "Game node registered and scan link ready. Print or share on the sticker."
           : "Game node registered on the network. Issue scan link below when ready.";
       }
       if (result.issueFailed && result.issueError) {

@@ -1,6 +1,7 @@
 import { readChildObjectRows } from "./child-object-store-core.mjs";
 import { refreshChildObjectsFromNetwork } from "./child-object-reconcile.mjs";
-import { shouldOfferAddStatusPlate } from "./created-child-object-core.mjs";
+import { stewardPresentationExtras } from "./steward-active-room-core.mjs";
+import { shouldOfferAddStatusPlateInDefaultUi } from "./steward-presentation-policy-core.mjs";
 import {
   DELEGATED_CAPABILITY_OPERATION_OPTIONS,
   datetimeLocalValueToIsoUtc,
@@ -65,7 +66,7 @@ export function initCreatedDelegatedCapability(opts) {
       opts.profileId &&
         keys?.privateKeyBase58 &&
         keys?.publicKeyBase58 &&
-        shouldOfferAddStatusPlate(session)
+        shouldOfferAddStatusPlateInDefaultUi(session, stewardPresentationExtras(opts.profileId))
     );
     panel.hidden = !show;
   }

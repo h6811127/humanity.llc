@@ -5,7 +5,7 @@
 
 /** Level 0 limit teaser — mirrors scan hero, owner-facing. */
 export const CREATED_LIVE_OBJECT_LIMIT_TEASER =
-  "Scanners see your live line — not who holds the object.";
+  "Scanners see your live line. Not who holds the object.";
 
 export const CREATED_LIVE_PUBLISH_CONFIRM = "Same ink. New meaning.";
 
@@ -37,7 +37,7 @@ export function createdLiveObjectArriveSequenceMs(itemCount) {
  */
 export function createdLiveObjectStatusChipLabel(cardStatusText) {
   const t = cardStatusText?.trim().toLowerCase();
-  if (!t || t === "-" || t === "—") return null;
+  if (!t || t === "-" || t === ", ") return null;
   if (t === "active" || t === "reachable") return "Active";
   if (t === "revoked") return "Revoked";
   if (t === "expired") return "Expired";

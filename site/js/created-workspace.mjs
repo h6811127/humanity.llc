@@ -20,13 +20,15 @@ export function createdHeroTitleForMode(mode) {
 
 /**
  * @param {CreatedMode} mode
+ * @param {{ title?: string; lead?: string } | null} [heroOverride]
  */
-export function applyCreatedWorkspaceMode(mode) {
+export function applyCreatedWorkspaceMode(mode, heroOverride = null) {
   document.body.dataset.createdMode = mode;
 
   const setupRoot = document.getElementById("created-setup-root");
   const controlRoot = document.getElementById("created-control-root");
   const heroTitle = document.querySelector(".created-hero-title");
+  const heroMeta = document.getElementById("created-hero-meta");
 
   if (setupRoot) setupRoot.hidden = mode !== "setup";
   if (controlRoot) controlRoot.hidden = !createdControlRootVisibleForMode(mode);
@@ -35,7 +37,11 @@ export function applyCreatedWorkspaceMode(mode) {
   if (manageHint) manageHint.hidden = !setupManageTabHintVisible(mode);
 
   if (heroTitle) {
-    heroTitle.textContent = createdHeroTitleForMode(mode);
+    heroTitle.textContent = heroOverride?.title ?? createdHeroTitleForMode(mode);
+  }
+  if (heroMeta && heroOverride?.lead) {
+    heroMeta.textContent = heroOverride.lead;
+    heroMeta.hidden = false;
   }
 }
 
