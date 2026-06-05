@@ -99,13 +99,15 @@ test.describe("city game map board", () => {
     await expect(page.getByRole("heading", { level: 1 })).toContainText(/weekend city board/i);
     await expect(page.getByRole("link", { name: "Rules", exact: true })).toBeVisible();
 
-    await expect(board.getByText("Find a sticker")).toBeVisible();
-    await expect(board.getByText("Add to the city")).toBeVisible();
+    await expect(board.getByText("Find a live sticker")).toBeVisible();
+    await expect(board.getByText("See what changed")).toBeVisible();
     await expect(
-      board.getByText("For this weekend: the code is on the back of the sticker.")
+      board.getByText("Each place can reveal a different live state or action.")
     ).toBeVisible();
+    await expect(board.getByText("River Lantern tracks one shared city count.")).toBeVisible();
     await expect(board.getByRole("heading", { name: "Riverwalk River Lantern" })).toBeVisible();
-    await expect(board.getByText("Scan sticker · enter code")).toBeVisible();
+    await expect(board.getByText("Scan River Lantern")).toBeVisible();
+    await expect(board.getByText(/back of the sticker|enter code|Add to the city/i)).toHaveCount(0);
     await expect(board.locator("#city-game-map-browse")).toHaveJSProperty("open", false);
     await expect(board.locator(".city-game-map-browse-filters")).toBeHidden();
 

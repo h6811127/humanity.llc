@@ -10946,6 +10946,14 @@ body.device-shell-created .flow-keys-group .list-row {
   color: var(--map-ink);
 }
 
+.city-game-map-spotlight-lead {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--map-ink-soft);
+}
+
 .city-game-map-spotlight-count {
   margin: 0;
   font-size: clamp(30px, 8vw, 42px);

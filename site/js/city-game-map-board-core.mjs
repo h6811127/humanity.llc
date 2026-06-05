@@ -12,7 +12,7 @@ import { buildExploreFilterHtml } from "./city-game-map-explore-core.mjs";
 import { comprehensionPrimaryNodeId } from "./city-game-player-guide-core.mjs";
 
 /** Default row hint before snapshot chips replace the live cell. */
-export const MAP_ROW_SCAN_HINT = "Scan sticker there.";
+export const MAP_ROW_SCAN_HINT = "Scan sticker there";
 
 export const CITY_GAME_SEASON_JSON_URL = "/data/city-game-cr-season-01.json";
 /** Multi-city index — prefer resolvePlayPageSeason() on play pages. */
@@ -40,7 +40,7 @@ export const CITY_GAME_ROLE_LABELS = {
 
 const DEFAULT_START_HERE = {
   title: "Start here",
-  steps: ["Find a sticker", "Scan it", "Add to the city."],
+  steps: ["Find a live sticker", "Scan it", "See what changed"],
 };
 
 const DEFAULT_MAP_COPY = {
@@ -51,10 +51,10 @@ const DEFAULT_MAP_COPY = {
   hook_stirring: "Something is stirring.",
   hook_awake: "The city woke.",
   progress_suffix: "fragments recovered",
-  code_hint: "Code is on the back of the sticker.",
+  code_hint: "Each place can reveal a different live state or action.",
   row_scan_hint: MAP_ROW_SCAN_HINT,
-  spotlight_scan_hint: "Scan sticker · enter code",
-  count_placeholder: "Scan for live count",
+  spotlight_scan_hint: "Scan River Lantern",
+  count_placeholder: "Live count loading…",
   browse_summary: "Browse all places",
   live_hint: "Find stickers. Scan them. Help unlock city goals.",
   wayfinding_intro:
@@ -169,6 +169,9 @@ export function resolveLaunchCopy(season) {
       (typeof launch.hero_aria_label === "string" && launch.hero_aria_label.trim()) ||
       DEFAULT_START_HERE.title,
     code_hint: (typeof launch.code_hint === "string" && launch.code_hint.trim()) || mapResolved.code_hint,
+    lantern_line:
+      (typeof launch.lantern_line === "string" && launch.lantern_line.trim()) ||
+      "River Lantern tracks one shared city count.",
     privacy_note:
       (typeof launch.privacy_note === "string" && launch.privacy_note.trim()) || mapResolved.privacy_note,
     count_placeholder:
@@ -355,6 +358,7 @@ export function buildMapSpotlightHtml(season, launchCopy) {
   const mapsUrl = escapeMapHtml(buildMapsSearchUrl(season, row));
   const scanHint = escapeMapHtml(launchCopy.spotlight_scan_hint);
   const countPlaceholder = escapeMapHtml(launchCopy.count_placeholder);
+  const lanternLine = escapeMapHtml(launchCopy.lantern_line);
 
   return `<article
     class="city-game-map-spotlight"
@@ -365,6 +369,7 @@ export function buildMapSpotlightHtml(season, launchCopy) {
     aria-labelledby="city-game-map-spotlight-title"
   >
     <h2 class="city-game-map-spotlight-title" id="city-game-map-spotlight-title">${label}</h2>
+    <p class="city-game-map-spotlight-lead">${lanternLine}</p>
     <p class="city-game-map-spotlight-count" id="city-game-map-spotlight-count" aria-live="polite">${countPlaceholder}</p>
     <div class="city-game-map-spotlight-actions">
       <a class="city-game-map-maps-link" href="${mapsUrl}" target="_blank" rel="noopener noreferrer">Open in Maps</a>
