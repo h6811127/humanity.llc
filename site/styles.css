@@ -10935,6 +10935,15 @@ body.device-shell-created .flow-keys-group .list-row {
   background: rgba(180, 120, 0, 0.06);
 }
 
+.city-game-map-board--launch .city-game-map-first-paint {
+  margin-bottom: 10px;
+}
+
+.city-game-map-node-row--spotlight {
+  border-color: rgba(219, 27, 67, 0.28);
+  background: rgba(219, 27, 67, 0.03);
+}
+
 .city-game-map-browse {
   border-top: 1px solid rgba(0, 0, 0, 0.08);
   padding-top: 8px;

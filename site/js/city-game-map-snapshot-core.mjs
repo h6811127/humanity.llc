@@ -125,9 +125,23 @@ export function formatSpotlightCountFromSnap(snap) {
 
 /**
  * @param {string | null | undefined} value
+ */
+export function formatLaunchCollectiveLine(value) {
+  const trimmed = typeof value === "string" ? value.trim() : "";
+  if (!trimmed) return null;
+  const match = trimmed.match(/^(\d+)\s*\/\s*(\d+)$/);
+  if (match) return `${match[1]} of ${match[2]} together`;
+  return trimmed;
+}
+
+/**
+ * @param {string | null | undefined} value
  * @param {string} [countLabel]
+ * @deprecated Prefer formatLaunchCollectiveLine for launch spotlight counts.
  */
 export function formatSpotlightCountLine(value, countLabel = "") {
+  const collective = formatLaunchCollectiveLine(value);
+  if (collective) return collective;
   const trimmed = typeof value === "string" ? value.trim() : "";
   if (!trimmed) return null;
   const label = countLabel?.trim();
@@ -141,6 +155,7 @@ export function formatSpotlightCountLine(value, countLabel = "") {
 export function applySpotlightFromSnapshot(boardRoot, snapshot) {
   const spotlight = boardRoot.querySelector("#city-game-map-spotlight");
   const countEl = boardRoot.querySelector("#city-game-map-spotlight-count");
+  const liveEl = boardRoot.querySelector("#city-game-map-spotlight-live");
   if (
     !spotlight ||
     typeof spotlight !== "object" ||
@@ -152,11 +167,11 @@ export function applySpotlightFromSnapshot(boardRoot, snapshot) {
     return;
   }
 
-  const spotlightDataset = /** @type {{ nodeId?: string; countPlaceholder?: string; countLabel?: string }} */ (
+  const spotlightDataset = /** @type {{ nodeId?: string; countPlaceholder?: string; scanHint?: string; scanLinkLabel?: string }} */ (
     spotlight.dataset
   );
   const placeholder = spotlightDataset.countPlaceholder?.trim() || "Scan for live count";
-  const countLabel = spotlightDataset.countLabel?.trim() || "";
+  const scanHint = spotlightDataset.scanHint?.trim() || "Scan sticker · enter code";
   const nodeId = spotlightDataset.nodeId?.trim();
   if (!nodeId) return;
 
@@ -166,11 +181,19 @@ export function applySpotlightFromSnapshot(boardRoot, snapshot) {
   );
   const snap = nodeById[nodeId] ?? null;
   const count = formatSpotlightCountFromSnap(snap);
-  const line = formatSpotlightCountLine(count, countLabel);
 
-  countEl.textContent = line ?? placeholder;
+  countEl.textContent = count ?? placeholder;
+
+  if (liveEl && typeof liveEl === "object" && "innerHTML" in liveEl) {
+    if (snap?.scan_url) {
+      liveEl.innerHTML = `<a class="city-game-map-scan-link" href="${escapeMapHtml(String(snap.scan_url))}">Open live scan</a>`;
+    } else {
+      liveEl.innerHTML = `<span class="city-game-map-spotlight-hint">${escapeMapHtml(scanHint)}</span>`;
+    }
+  }
+
   if (typeof spotlight.classList?.toggle === "function") {
-    spotlight.classList.toggle("city-game-map-spotlight--live", Boolean(line));
+    spotlight.classList.toggle("city-game-map-spotlight--live", Boolean(count));
     spotlight.classList.toggle(
       "city-game-map-spotlight--maintenance",
       snap?.map_mode === "care_pause" || snap?.lifecycle === "paused"

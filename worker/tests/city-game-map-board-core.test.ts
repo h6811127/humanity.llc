@@ -84,11 +84,14 @@ describe("city-game map board render", () => {
     expect(html).toContain("Riverwalk River Lantern");
     expect(html).toContain("Scan sticker · enter code");
     expect(html).toContain("Scan for live count");
+    expect(html).toContain("city-game-map-board--launch");
+    expect(html).toContain('data-primary-node="node_04"');
+    expect(html).toContain("city-game-map-node-row--spotlight");
     expect(html).toContain('id="city-game-map-browse"');
     expect(html).not.toContain('id="city-game-map-browse" open');
-    expect(html).toContain("Browse places");
+    expect(html).toContain("Browse all places");
     expect(html).toContain("city-game-map-actions");
-    expect(html).toContain("city-game-map-privacy-inline");
+    expect(html).not.toContain("city-game-map-privacy-inline");
     expect(html).not.toContain("city-game-map-start-here");
     expect(html).not.toContain("city-game-map-wayfinding");
     expect(html).not.toContain("Pick a district");
@@ -103,7 +106,6 @@ describe("city-game map board render", () => {
     expect(html).toContain('id="city-game-map-progress"');
     expect(html).toContain("The city is asleep.");
     expect(html).toContain("fragments recovered");
-    expect(html).toContain('data-count-label="River Lantern"');
     expect(html).not.toContain("Places by district");
     expect(html).not.toContain("Live map flavor");
     expect(html).not.toContain("Unlock paths");

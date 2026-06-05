@@ -75,12 +75,10 @@
       ],
       "hero_aria_label": "How to play",
       "code_hint": "Code is on the back of the sticker.",
-      "privacy_note": "No account. No visit log. No GPS tracking.",
       "count_placeholder": "Scan for live count",
-      "count_label": "River Lantern",
       "spotlight_scan_hint": "Scan sticker · enter code",
       "row_scan_hint": "Scan sticker there.",
-      "browse_summary": "Browse places",
+      "browse_summary": "Browse all places",
       "what_changed_summary": "What changed"
     }
   },
