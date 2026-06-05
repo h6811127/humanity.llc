@@ -10849,6 +10849,50 @@ body.device-shell-created .flow-keys-group .list-row {
   overflow-x: clip;
 }
 
+.city-game-map-mission {
+  padding: 14px 16px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(219, 27, 67, 0.18);
+  background: linear-gradient(
+    180deg,
+    rgba(219, 27, 67, 0.07) 0%,
+    rgba(255, 255, 255, 0.98) 100%
+  );
+}
+
+.city-game-map-mission-lines {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.city-game-map-mission-lines li {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 600;
+  color: var(--black);
+}
+
+.city-game-map-mission-progress {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.city-game-map-mission-world {
+  color: rgba(0, 0, 0, 0.78);
+}
+
+.city-game-map-mission-privacy {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--grey);
+}
+
 .city-game-map-lobby {
   display: flex;
   flex-direction: column;
@@ -10944,6 +10988,31 @@ body.device-shell-created .flow-keys-group .list-row {
   line-height: 1.2;
   letter-spacing: -0.02em;
   color: var(--map-ink);
+}
+
+.city-game-map-spotlight-kicker {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--red);
+}
+
+.city-game-map-spotlight-lead {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.45;
+  font-weight: 600;
+  color: var(--map-ink);
+}
+
+.city-game-map-spotlight-effect {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 700;
+  color: var(--map-ink-soft);
 }
 
 .city-game-map-spotlight-count {
@@ -11409,6 +11478,11 @@ body.device-shell-created .flow-keys-group .list-row {
   .city-game-map-figure {
     min-height: 10rem;
   }
+
+  .city-game-map-board--dense .city-game-map-pin-label,
+  .city-game-map-sketch-details--dense .city-game-map-zone-label {
+    display: none;
+  }
 }
 
 .city-game-map-list-title,
@@ -11702,6 +11776,13 @@ body.device-shell-created .flow-keys-group .list-row {
   font-size: 13px;
   font-weight: 500;
   color: var(--map-ink-soft, rgba(0, 0, 0, 0.68));
+}
+
+.city-game-map-node-effect {
+  font-size: 13px;
+  line-height: 1.35;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.76);
 }
 
 .city-game-map-node-tags {

@@ -112,34 +112,37 @@ test.describe("city game map board", () => {
     const board = page.locator(".city-game-map-board");
     await expect(board).toBeVisible({ timeout: 15_000 });
     await expect(page.locator(".city-game-map-loading")).toHaveCount(0);
-    await expect(page.getByRole("heading", { level: 1 })).toContainText(/weekend city board/i);
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(/wake the city/i);
     await expect(page.getByRole("link", { name: "Rules", exact: true })).toBeVisible();
 
+    await expect(board.getByText("Help wake the city.")).toBeVisible();
+    await expect(board.locator("#city-game-map-mission-progress")).toBeVisible();
+    await expect(board.getByText("Relays unclaimed · Finale dormant")).toBeVisible();
+    await expect(board.getByText("No account. No GPS. No visit log.")).toBeVisible();
     await expect(board.getByText("Find a live sticker")).toBeVisible();
     await expect(board.getByText("See what changed")).toBeVisible();
     await expect(
       board.getByText("Each place can reveal a different live state or action.")
     ).toBeVisible();
-    await expect(board.getByText("River Lantern tracks one shared city count.")).toBeVisible();
     await expect(board.getByRole("heading", { name: "Riverwalk River Lantern" })).toBeVisible();
-    await expect(board.getByText("Scan River Lantern")).toBeVisible();
+    await expect(board.getByText("Find the River Lantern and add one signal.")).toBeVisible();
+    await expect(board.getByText("Unlocks Czech Village cabinet")).toBeVisible();
+    await expect(board.getByText("Find the River Lantern")).toBeVisible();
     await expect(board.getByText(/back of the sticker|enter code|Add to the city/i)).toHaveCount(0);
     await expect(board.locator("#city-game-map-browse")).toHaveJSProperty("open", false);
     await expect(board.locator(".city-game-map-browse-filters")).toBeHidden();
 
     await expect(board).toHaveAttribute("data-snapshot-loaded", "1");
+    await expect(board.locator("#city-game-map-mission-progress")).toHaveText("1 / 3 fragments recovered");
     await expect(board.locator("#city-game-map-spotlight-count")).toHaveText("14 / 20");
-    await expect(board.locator("#city-game-map-changed")).toHaveJSProperty("open", false);
-    await expect(board.getByText("1 / 3 fragments recovered")).toBeHidden();
-    await expect(board.getByText("Something is stirring.")).toBeHidden();
-    await openWhatChanged(board);
+    await expect(board.locator("#city-game-map-changed")).toHaveJSProperty("open", true);
     await expect(board.getByText("1 / 3 fragments recovered")).toBeVisible();
     await expect(board.getByText("Something is stirring.")).toBeVisible();
     await openBrowsePlaces(board);
     const riverRow = board.locator('.city-game-map-node-row[data-node-id="node_04"]');
     await expect(riverRow).toHaveCount(1);
     await expect(riverRow).toHaveClass(/city-game-map-node-row--spotlight/);
-    await expect(riverRow.locator(".city-game-map-chip-value")).toHaveText("14 / 20");
+    await expect(riverRow.locator("[data-node-effect]")).toContainText("14 / 20");
   });
 
   test("Explore By filters places and schematic pins with district AND logic", async ({
@@ -444,7 +447,7 @@ test.describe("city game map board", () => {
 
     const advanced = board.locator("#city-game-map-advanced");
     const sketch = board.locator("#district-sketch");
-    await expect(advanced.getByText(/map & mechanics/i)).toBeVisible();
+    await expect(advanced.getByText(/routes & unlocks/i)).toBeVisible();
     await expect(advanced).toHaveJSProperty("open", false);
     await expect(sketch).toHaveJSProperty("open", false);
 
@@ -452,7 +455,7 @@ test.describe("city game map board", () => {
     const placesSection = board.locator(".city-game-map-places");
     const changedSummary = board.locator("#city-game-map-changed .city-game-map-changed-summary");
 
-    await expect(board.getByRole("heading", { name: "Quest log" })).toBeHidden();
+    await expect(board.getByRole("heading", { name: "Quest log" })).toBeVisible();
     await expect(changedSummary).toBeVisible();
 
     const spotlightBox = await spotlight.boundingBox();

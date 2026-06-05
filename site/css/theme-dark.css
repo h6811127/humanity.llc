@@ -1277,6 +1277,23 @@ html[data-theme="dark"] .city-game-map-pin--highlight .city-game-map-pin-dot {
   stroke: var(--red);
 }
 
+html[data-theme="dark"] .city-game-map-mission {
+  border-color: rgba(255, 77, 109, 0.28);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 77, 109, 0.12) 0%,
+    rgba(18, 18, 18, 0.98) 100%
+  );
+}
+
+html[data-theme="dark"] .city-game-map-mission-lines li {
+  color: var(--shell-label-strong);
+}
+
+html[data-theme="dark"] .city-game-map-mission-world {
+  color: var(--shell-label);
+}
+
 html[data-theme="dark"] .city-game-map-filter-btn {
   border-color: var(--shell-separator);
   background: var(--shell-fill);

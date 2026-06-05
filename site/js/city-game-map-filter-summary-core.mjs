@@ -25,6 +25,7 @@ export function formatBoardFilterSummaryScope(districtLabel, exploreLabel) {
  */
 export function formatBoardFilterCountLabel(count) {
   const safe = Number.isFinite(count) && count >= 0 ? Math.floor(count) : 0;
+  if (safe === 0) return "0 places — try another district or kind";
   return safe === 1 ? "1 place" : `${safe} places`;
 }
 

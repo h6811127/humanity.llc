@@ -5,8 +5,11 @@
 import {
   escapeMapHtml,
   formatHookLine,
+  formatNodeEffectLine,
   formatProgressLine,
+  formatStaticWorldStatusLine,
   MAP_ROW_SCAN_HINT,
+  resolveRowScanCta,
 } from "./city-game-map-board-core.mjs";
 
 export const CITY_GAME_SNAPSHOT_POLL_MS = 90_000;
@@ -66,6 +69,90 @@ export function formatFinaleFootnote(finale, wakeTitle = "Wake the city") {
   if (fragments.complete) line += " — complete";
   else if (finale.open) line += " — finale live";
   return line;
+}
+
+/**
+ * @param {Record<string, unknown>} snapshot
+ * @param {string} [worldDefault]
+ */
+export function formatWorldStatusLineFromSnapshot(snapshot, worldDefault = "Relays unclaimed · Finale dormant") {
+  const swLines = signalWarSummaryLines(snapshot);
+  if (swLines.length) return swLines.join(" · ");
+
+  const finale = /** @type {{ open?: boolean; fragments?: { complete?: boolean } } | null | undefined} */ (
+    snapshot?.finale
+  );
+  let finalePart = "Finale dormant";
+  if (finale?.fragments?.complete) finalePart = "Finale complete";
+  else if (finale?.open) finalePart = "Finale live";
+
+  const nodes = Array.isArray(snapshot?.nodes) ? snapshot.nodes : [];
+  const relayRows = nodes.filter((row) => row?.role === "relay_gate");
+  if (relayRows.length) {
+    const claimed = relayRows.filter((row) =>
+      Array.isArray(row?.chips)
+        ? row.chips.some((chip) => /held|claimed|network/i.test(String(chip?.value ?? "")))
+        : false
+    ).length;
+    if (claimed > 0 && claimed < relayRows.length) {
+      return `Relays contested · ${finalePart}`;
+    }
+    if (claimed >= relayRows.length && relayRows.length > 0) {
+      return `Relays claimed · ${finalePart}`;
+    }
+  }
+
+  return worldDefault.includes("Finale") ? worldDefault : `Relays unclaimed · ${finalePart}`;
+}
+
+/**
+ * @param {string} nodeId
+ * @param {string | null | undefined} role
+ * @param {{ chips?: Array<{ kind?: string; value?: string }> } | null | undefined} snap
+ * @param {Record<string, unknown>} season
+ */
+export function formatNodeEffectFromSnapshot(nodeId, role, snap, season) {
+  const base = formatNodeEffectLine(nodeId, role, season);
+  if (!snap || !Array.isArray(snap.chips) || !snap.chips.length) return base;
+  const primary =
+    snap.chips.find((chip) => chip?.kind === "state") ??
+    snap.chips.find((chip) => chip?.kind === "collective") ??
+    snap.chips[0];
+  const value = typeof primary?.value === "string" ? primary.value.trim() : "";
+  if (!value) return base;
+  const unlockTail = base.includes(" · helps ") ? base.slice(base.indexOf(" · helps ")) : "";
+  return unlockTail ? `${value}${unlockTail}` : value;
+}
+
+/**
+ * @param {HTMLElement} boardRoot
+ * @param {Record<string, unknown>} snapshot
+ */
+export function applyMissionSummaryFromSnapshot(boardRoot, snapshot) {
+  const mission = boardRoot.querySelector("#city-game-map-mission");
+  const progressEl = boardRoot.querySelector("#city-game-map-mission-progress");
+  const worldEl = boardRoot.querySelector("#city-game-map-mission-world");
+  const lobbyProgress = boardRoot.querySelector("#city-game-map-progress");
+
+  const lobby = boardRoot.querySelector(".city-game-map-lobby");
+  const dataset =
+    lobby && typeof lobby === "object" && "dataset" in lobby
+      ? /** @type {{ progressSuffix?: string }} */ (lobby.dataset)
+      : {};
+  const copy = { progress_suffix: dataset.progressSuffix };
+  const finale = /** @type {Record<string, unknown>} */ (snapshot.finale);
+  const progress = formatProgressLine(finale, copy);
+
+  if (progressEl && "textContent" in progressEl) progressEl.textContent = progress;
+  if (lobbyProgress && "textContent" in lobbyProgress) lobbyProgress.textContent = progress;
+
+  const worldDefault =
+    mission instanceof HTMLElement && mission.dataset.worldDefault?.trim()
+      ? mission.dataset.worldDefault.trim()
+      : formatStaticWorldStatusLine({}, { world_status_default: "Relays unclaimed · Finale dormant" });
+  if (worldEl && "textContent" in worldEl) {
+    worldEl.textContent = formatWorldStatusLineFromSnapshot(snapshot, worldDefault);
+  }
 }
 
 /**
@@ -170,8 +257,8 @@ export function applySpotlightFromSnapshot(boardRoot, snapshot) {
   const spotlightDataset = /** @type {{ nodeId?: string; countPlaceholder?: string; scanHint?: string; scanLinkLabel?: string }} */ (
     spotlight.dataset
   );
-  const placeholder = spotlightDataset.countPlaceholder?.trim() || "Live count loading…";
-  const scanHint = spotlightDataset.scanHint?.trim() || "Scan River Lantern";
+  const placeholder = spotlightDataset.countPlaceholder?.trim() || "Live count opens when play starts.";
+  const scanHint = spotlightDataset.scanHint?.trim() || "Find the River Lantern";
   const nodeId = spotlightDataset.nodeId?.trim();
   if (!nodeId) return;
 
@@ -215,6 +302,10 @@ export function applySnapshotToMapBoard(boardRoot, snapshot) {
   const nodeById = Object.fromEntries(
     nodes.filter((row) => row?.node_id).map((row) => [row.node_id, row])
   );
+  const seasonCtx = {
+    unlock_edges: Array.isArray(snapshot.unlock_edges) ? snapshot.unlock_edges : [],
+    nodes,
+  };
 
   for (const row of boardRoot.querySelectorAll(".city-game-map-node-row[data-node-id]")) {
     const nodeId = row.getAttribute("data-node-id");
@@ -222,20 +313,27 @@ export function applySnapshotToMapBoard(boardRoot, snapshot) {
     const live = row.querySelector(".city-game-map-node-live");
     if (!(live instanceof HTMLElement)) continue;
     const snap = nodeSnapshot(nodeById, nodeId);
+    const role = row.getAttribute("data-role");
+    const ctaLabel = resolveRowScanCta(role);
+    const effectEl = row.querySelector("[data-node-effect]");
+
     if (!snap) {
-      live.innerHTML = `<span class="city-game-map-live-hint">${escapeMapHtml(MAP_ROW_SCAN_HINT)}</span>`;
       row.classList.remove("city-game-map-node-row--live");
+      row.classList.remove("city-game-map-node-row--maintenance");
+      row.classList.remove("city-game-map-node-row--revoked");
       continue;
     }
-    live.innerHTML = buildNodeChipsHtml(snap.chips);
-    row.classList.add("city-game-map-node-row--live");
-    if (snap.scan_url) {
-      const link = document.createElement("a");
-      link.className = "city-game-map-scan-link";
-      link.href = snap.scan_url;
-      link.textContent = "Open live scan";
-      live.appendChild(link);
+
+    if (effectEl instanceof HTMLElement) {
+      effectEl.textContent = formatNodeEffectFromSnapshot(nodeId, role, snap, seasonCtx);
     }
+
+    if (snap.scan_url) {
+      live.innerHTML = `<a class="city-game-map-scan-link city-game-map-row-cta" href="${escapeMapHtml(String(snap.scan_url))}">${escapeMapHtml(ctaLabel)}</a>`;
+    } else {
+      live.innerHTML = `<span class="city-game-map-live-hint city-game-map-row-cta">${escapeMapHtml(ctaLabel)}</span>`;
+    }
+    row.classList.add("city-game-map-node-row--live");
     if (snap.map_mode === "care_pause" || snap.lifecycle === "paused") {
       row.classList.add("city-game-map-node-row--maintenance");
     } else {
@@ -279,6 +377,7 @@ export function applySnapshotToMapBoard(boardRoot, snapshot) {
     figcaption.textContent = "District sketch — not a street map.";
   }
 
+  applyMissionSummaryFromSnapshot(boardRoot, snapshot);
   applyLobbyProgressFromSnapshot(boardRoot, snapshot);
   applyFinaleFromSnapshot(boardRoot, snapshot);
   applySignalWarFromSnapshot(boardRoot, snapshot);

@@ -217,12 +217,12 @@ export function seasonBannerBodyHtml(phase, variant, season = {}) {
 
   if (variant === "map") {
     if (phase === "before") {
-      return "Browse places below. Play opens on the date above.";
+      return "Help wake the city. Find a relay or the River Lantern below — play opens on the date above.";
     }
     if (phase === "after") {
       return "Season ended. Board is reference only.";
     }
-    return "Season live.";
+    return "Season live — shared city state below.";
   }
 
   if (variant === "rules") {
