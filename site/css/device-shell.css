@@ -855,6 +855,15 @@ body.device-glance-popover-open .device-hub-glance-popover:not([hidden]) {
   margin: 20px 0 8px;
 }
 
+.landing-device-settings-group {
+  margin-bottom: 16px;
+}
+
+.landing-device-settings-group:last-child {
+  margin-bottom: 8px;
+}
+
+.landing-device-settings-group-label,
 .landing-device-settings-title {
   margin: 0 0 10px;
   font-size: 13px;
@@ -1482,6 +1491,52 @@ button.device-hub-notice-banner {
   cursor: pointer;
   text-decoration: underline;
   text-underline-offset: 2px;
+}
+
+.device-hub-advanced-block {
+  margin: 0 0 14px 4px;
+}
+
+.device-hub-advanced-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: var(--shell-radius-card);
+  background: var(--surface-popover-control-bg);
+  border: 0.5px solid var(--surface-popover-border);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--surface-popover-fg-muted);
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.device-hub-advanced-summary::-webkit-details-marker {
+  display: none;
+}
+
+.device-hub-advanced-summary::after {
+  content: "";
+  margin-left: auto;
+  width: 7px;
+  height: 7px;
+  border-right: 1.5px solid var(--surface-popover-fg-muted);
+  border-bottom: 1.5px solid var(--surface-popover-fg-muted);
+  transform: rotate(45deg);
+  transition: transform 0.2s var(--shell-ease);
+}
+
+.device-hub-advanced-block[open] > .device-hub-advanced-summary::after {
+  transform: rotate(-135deg);
+  margin-top: 4px;
+}
+
+.device-hub-advanced-block[open] > .device-hub-network-tools {
+  margin: 8px 0 0;
 }
 
 .device-hub-network-tools {

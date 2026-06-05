@@ -1,5 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 
+import { expandHubNetworkToolsAdvanced } from "./helpers/hub-network-tools";
+
 const SAMPLE_WALLET_ENTRY = {
   id: "e2e_test_1",
   label: "E2E Test Card",
@@ -516,6 +518,7 @@ test.describe("device OS wallet flow", () => {
 
     await page.goto("/wallet/");
     await page.waitForResponse(statusResponse, { timeout: 15_000 });
+    await expandHubNetworkToolsAdvanced(page);
     await page.evaluate(() => {
       sessionStorage.removeItem("hc_wallet_network_cache");
       for (const key of Object.keys(sessionStorage)) {

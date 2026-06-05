@@ -1,5 +1,7 @@
 import { test, expect, type BrowserContext, type Route } from "@playwright/test";
 
+import { expandHubNetworkToolsAdvanced } from "./helpers/hub-network-tools";
+
 const PAGES_ORIGIN = new URL(
   process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:8788"
 ).origin;
@@ -593,7 +595,7 @@ test.describe("device inbox - live proof poll scope (request budget phases 1–3
     await page.goto("/");
     await openHubViaStatusDot(page);
     await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/, { timeout: 15_000 });
-    await expect(page.locator("#device-hub-check-live-proof-btn")).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator("#device-hub-check-live-proof-btn")).toBeAttached({ timeout: 15_000 });
     await expect.poll(() => challengeFetches, { timeout: 15_000 }).toBe(1);
     await page.waitForTimeout(10_000);
     expect(challengeFetches).toBe(1);
@@ -668,8 +670,9 @@ test.describe("device inbox - live proof watch toggle (request budget phase 5)",
     await page.goto("/");
     await openHubViaStatusDot(page);
     await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/, { timeout: 15_000 });
-    await expect(page.locator("#device-hub-check-live-proof-btn")).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator("#device-hub-check-live-proof-btn")).toBeAttached({ timeout: 15_000 });
     await expect.poll(() => challengeFetches, { timeout: 15_000 }).toBe(1);
+    await expandHubNetworkToolsAdvanced(page);
     await page.locator("#device-hub-check-live-proof-btn").click();
     await expect.poll(() => challengeFetches, { timeout: 10_000 }).toBe(2);
   });

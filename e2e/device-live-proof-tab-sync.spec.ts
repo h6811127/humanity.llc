@@ -1,5 +1,7 @@
 import { test, expect, type BrowserContext, type Page, type Route } from "@playwright/test";
 
+import { expandHubNetworkToolsAdvanced } from "./helpers/hub-network-tools";
+
 /**
  * Cross-tab live proof monitoring line — follower skips duplicate challenge GETs.
  * @see docs/DEVICE_TAB_RESOLVER_SYNC.md § Live proof “checked … ago”
@@ -120,6 +122,7 @@ async function openLandingTab(context: BrowserContext, challengeCounter: ReturnT
 
 async function leaderCheckLiveProof(page: Page, challengeCounter: ReturnType<typeof createChallengeCounter>) {
   await expandHub(page);
+  await expandHubNetworkToolsAdvanced(page);
   await expect(page.locator("#device-hub-check-live-proof-btn")).toBeVisible({ timeout: 15_000 });
   await page.locator("#device-hub-check-live-proof-btn").click();
   await expect.poll(() => challengeCounter.get(), { timeout: 15_000 }).toBeGreaterThanOrEqual(1);

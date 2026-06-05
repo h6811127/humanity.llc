@@ -1,5 +1,7 @@
 import { test, expect } from "@playwright/test";
 
+import { expandHubNetworkToolsAdvanced } from "./helpers/hub-network-tools";
+
 const SAMPLE_WALLET_ENTRY = {
   id: "e2e_backdrop_1",
   label: "E2E Backdrop Card",
@@ -67,6 +69,7 @@ test.describe("Check network after stuck inbox backdrop (P5f)", () => {
 
     await page.goto("/wallet/");
     await page.waitForResponse(statusResponse, { timeout: 15_000 });
+    await expandHubNetworkToolsAdvanced(page);
     await expect(page.getByRole("button", { name: "Check network" })).toBeVisible({
       timeout: 15_000,
     });
@@ -96,6 +99,7 @@ test.describe("Check network after stuck inbox backdrop (P5f)", () => {
 
   test("visibilitychange reconcile clears stuck inbox backdrop", async ({ page }) => {
     await page.goto("/wallet/");
+    await expandHubNetworkToolsAdvanced(page);
     await expect(page.getByRole("button", { name: "Check network" })).toBeVisible({
       timeout: 15_000,
     });

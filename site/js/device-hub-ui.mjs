@@ -2389,8 +2389,8 @@ function applyHubStrangerEmptyChrome() {
   for (const root of roots) {
     root.classList.toggle(HUB_STRANGER_EMPTY_CLASS, stranger);
   }
-  const toolbar = document.getElementById("device-hub-network-tools");
-  if (toolbar) toolbar.hidden = stranger;
+  const networkToolsAdvanced = document.getElementById("device-hub-network-tools-advanced");
+  if (networkToolsAdvanced) networkToolsAdvanced.hidden = stranger;
 }
 
 function notifyHubChanged() {

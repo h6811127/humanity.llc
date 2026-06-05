@@ -8,6 +8,10 @@ import { stewardServerQuotaPausedMessage } from "./device-steward-quota-core.mjs
 
 export const STORAGE_WATCH_LIVE_PROOF = "hc_watch_live_proof";
 
+/** Collapsed disclosure wrapping manual network / live-proof controls in the hub. */
+export const HUB_NETWORK_TOOLS_ADVANCED_ID = "device-hub-network-tools-advanced";
+export const HUB_NETWORK_TOOLS_ADVANCED_SUMMARY = "Advanced / debug";
+
 /** Hub monitoring line — survives reload within tab session. @see docs/DEVICE_TAB_RESOLVER_SYNC.md */
 export const HUB_NETWORK_CHECKED_AT_SESSION_KEY = "hc_hub_network_checked_at";
 

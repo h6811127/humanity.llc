@@ -61,4 +61,15 @@ describe("hub network checking chip (RC-4)", () => {
     expect(src).toContain("walletNetworkFetchAllowedByResolverHealth");
     expect(src).toContain("listWalletEntriesNeedingNetworkFetch");
   });
+
+  it("mounts network tools inside collapsed Advanced / debug disclosure", () => {
+    const src = fs.readFileSync(
+      path.join(repoRoot, "site/js/device-hub-network-tools.mjs"),
+      "utf8"
+    );
+    expect(src).toContain('document.createElement("details")');
+    expect(src).toContain("HUB_NETWORK_TOOLS_ADVANCED_ID");
+    expect(src).toContain("HUB_NETWORK_TOOLS_ADVANCED_SUMMARY");
+    expect(src).not.toContain("Monitoring");
+  });
 });

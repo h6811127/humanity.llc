@@ -1,8 +1,11 @@
 /**
  * Hub toolbar: Check network, last-checked line, Watch for live proof (Phase 5).
+ * Default hub view hides controls behind Advanced / debug disclosure.
  */
 import {
   formatHubNetworkStatusLine,
+  HUB_NETWORK_TOOLS_ADVANCED_ID,
+  HUB_NETWORK_TOOLS_ADVANCED_SUMMARY,
   isWatchLiveProofEnabled,
   STORAGE_WATCH_LIVE_PROOF,
 } from "./device-hub-network-tools-core.mjs";
@@ -47,13 +50,22 @@ export function mountHubNetworkTools(config) {
   const section = config.hubRoot.querySelector("#device-hub-saved-items-section");
   if (!section) return;
 
+  let advancedBlock = section.querySelector(`#${HUB_NETWORK_TOOLS_ADVANCED_ID}`);
   let toolbar = section.querySelector(`#${TOOLBAR_ID}`);
-  if (!toolbar) {
+
+  if (!advancedBlock) {
+    advancedBlock = document.createElement("details");
+    advancedBlock.id = HUB_NETWORK_TOOLS_ADVANCED_ID;
+    advancedBlock.className = "device-hub-advanced-block";
+
+    const summary = document.createElement("summary");
+    summary.className = "device-hub-advanced-summary";
+    summary.textContent = HUB_NETWORK_TOOLS_ADVANCED_SUMMARY;
+
     toolbar = document.createElement("div");
     toolbar.id = TOOLBAR_ID;
     toolbar.className = "device-hub-network-tools";
     toolbar.innerHTML = `
-      <p class="device-hub-network-tools-eyebrow">Monitoring</p>
       <p class="device-hub-network-tools-status" id="${STATUS_ID}" role="status"></p>
       <p class="device-hub-steward-tier-line" id="device-hub-steward-tier-line" role="status" hidden></p>
       <p class="device-hub-steward-tier-line" id="device-hub-steward-billing-pending-line" role="status" hidden></p>
@@ -71,13 +83,20 @@ export function mountHubNetworkTools(config) {
         <input type="checkbox" class="device-hub-watch-live-proof-input" id="${WATCH_INPUT_ID}" />
       </label>
     `;
+
+    advancedBlock.append(summary, toolbar);
+
     const lead = section.querySelector(".device-hub-section-lead");
     if (lead) {
-      lead.insertAdjacentElement("afterend", toolbar);
+      lead.insertAdjacentElement("afterend", advancedBlock);
     } else {
-      section.prepend(toolbar);
+      section.prepend(advancedBlock);
     }
+  } else if (!(toolbar instanceof HTMLElement)) {
+    toolbar = advancedBlock.querySelector(`#${TOOLBAR_ID}`);
   }
+
+  if (!(toolbar instanceof HTMLElement)) return;
 
   const statusEl = toolbar.querySelector(`#${STATUS_ID}`);
   const checkNetworkBtn = toolbar.querySelector(`#${CHECK_NETWORK_ID}`);

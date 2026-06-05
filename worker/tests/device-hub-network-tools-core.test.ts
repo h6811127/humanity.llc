@@ -3,10 +3,19 @@ import { describe, expect, it } from "vitest";
 import {
   formatHubNetworkStatusLine,
   formatLastCheckedRel,
+  HUB_NETWORK_TOOLS_ADVANCED_ID,
+  HUB_NETWORK_TOOLS_ADVANCED_SUMMARY,
   isWatchLiveProofEnabled,
   shouldScheduleWalletNetworkFetchAfterHubRender,
   walletHubNetworkFetchScopeActive,
 } from "../../site/js/device-hub-network-tools-core.mjs";
+
+describe("hub network tools disclosure", () => {
+  it("exports stable advanced block ids for hub mount and e2e", () => {
+    expect(HUB_NETWORK_TOOLS_ADVANCED_ID).toBe("device-hub-network-tools-advanced");
+    expect(HUB_NETWORK_TOOLS_ADVANCED_SUMMARY).toBe("Advanced / debug");
+  });
+});
 
 describe("isWatchLiveProofEnabled", () => {
   it("defaults to off when storage unset", () => {
