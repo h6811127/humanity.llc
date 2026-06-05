@@ -27,7 +27,7 @@ describe("city-game-install-map-core", () => {
     expect(row?.node_id).toBe("node_04");
     expect(row?.installed).toBe(false);
     expect(row?.qrIssued).toBe(false);
-    expect(parseInstallMapRegistry(installMapSample)).toHaveLength(15);
+    expect(parseInstallMapRegistry(installMapSample)).toHaveLength(40);
   });
 
   it("assesses QR issued from doc with install and contacts still pending", () => {
