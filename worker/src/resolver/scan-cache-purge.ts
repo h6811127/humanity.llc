@@ -67,11 +67,18 @@ export async function listQrIdsForProfile(
   db: D1Database,
   profileId: string
 ): Promise<string[]> {
-  const result = await db
-    .prepare(`SELECT qr_id FROM qr_credentials WHERE profile_id = ?`)
-    .bind(profileId)
-    .all<{ qr_id: string }>();
-  return (result.results ?? []).map((row) => row.qr_id).filter(Boolean);
+  try {
+    const bound = db
+      .prepare(`SELECT qr_id FROM qr_credentials WHERE profile_id = ?`)
+      .bind(profileId);
+    if (typeof (bound as { all?: unknown }).all !== "function") {
+      return [];
+    }
+    const result = await (bound as D1PreparedStatement).all<{ qr_id: string }>();
+    return (result.results ?? []).map((row) => row.qr_id).filter(Boolean);
+  } catch {
+    return [];
+  }
 }
 
 /**
@@ -117,14 +124,18 @@ export async function purgeScanCacheAfterMutation(input: {
   targetQrId?: string | null;
   extraQrIds?: string[];
 }): Promise<number> {
-  const origin = requestOrigin(input.request);
-  const qrIds = await qrIdsForScanCachePurge(
-    input.db,
-    input.profileId,
-    input.targetKind,
-    input.targetQrId,
-    input.extraQrIds ?? []
-  );
-  const urls = buildScanCachePurgeUrls(origin, input.profileId, qrIds);
-  return purgeScanCacheUrls(urls);
+  try {
+    const origin = requestOrigin(input.request);
+    const qrIds = await qrIdsForScanCachePurge(
+      input.db,
+      input.profileId,
+      input.targetKind,
+      input.targetQrId,
+      input.extraQrIds ?? []
+    );
+    const urls = buildScanCachePurgeUrls(origin, input.profileId, qrIds);
+    return purgeScanCacheUrls(urls);
+  } catch {
+    return 0;
+  }
 }
