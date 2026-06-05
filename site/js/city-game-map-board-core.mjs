@@ -7,6 +7,7 @@ import {
   buildDistrictFilterHtml,
   isDenseMapBoard,
 } from "./city-game-map-interaction-core.mjs";
+import { buildExploreFilterHtml } from "./city-game-map-explore-core.mjs";
 
 export const CITY_GAME_SEASON_JSON_URL = "/data/city-game-cr-season-01.json";
 /** Multi-city index — prefer resolvePlayPageSeason() on play pages. */
@@ -311,20 +312,10 @@ export function buildFinaleFootnoteHtml(season, copy) {
 
 /**
  * @param {{ finale_wake_title?: string; roles_summary?: string }} copy
+ * @deprecated E0 — Explore By chips replace the static glossary; kept for tests importing only.
  */
 export function buildMapRolesLegendHtml(copy) {
-  const summary = copy.roles_summary?.trim() || DEFAULT_MAP_COPY.roles_summary;
-  return `<details class="city-game-map-roles-details">
-  <summary class="city-game-map-roles-summary">${escapeMapHtml(summary)}</summary>
-  <section class="city-game-map-legend" aria-labelledby="city-game-map-legend-title">
-    <h3 class="group-label" id="city-game-map-legend-title">Place types</h3>
-    <ul class="tag-chips tag-chips-neutral" aria-label="Place type glossary">
-      ${Object.entries(CITY_GAME_ROLE_LABELS)
-        .map(([key, label]) => `<li data-role="${escapeMapHtml(key)}">${escapeMapHtml(label)}</li>`)
-        .join("")}
-    </ul>
-  </section>
-</details>`;
+  return "";
 }
 
 /**
@@ -416,7 +407,8 @@ export function buildMapNodeListHtml(season) {
           const liveLine = scanUrl
             ? `<a class="city-game-map-scan-link" href="${escapeMapHtml(scanUrl)}">Open live scan</a>`
             : `<span class="city-game-map-live-hint">Scan on arrival</span>`;
-          return `<li class="city-game-map-node-row" data-node-id="${escapeMapHtml(row.node_id)}" data-district="${escapeMapHtml(row.district ?? "")}" tabindex="0">
+          const role = escapeMapHtml(row.role ?? "");
+          return `<li class="city-game-map-node-row" data-node-id="${escapeMapHtml(row.node_id)}" data-district="${escapeMapHtml(row.district ?? "")}" data-role="${role}" tabindex="0">
   <span class="city-game-map-node-title">${escapeMapHtml(row.label)}</span>
   <span class="city-game-map-node-meta">${escapeMapHtml(districtLabel)}</span>
   <span class="city-game-map-node-actions">
@@ -499,7 +491,6 @@ export function buildMapAdvancedHtml(season, copy) {
       </div>
     </details>
     ${buildFogLegendHtml(season)}
-    ${buildMapRolesLegendHtml(copy)}
     <p class="city-game-map-privacy idea-footnote">${escapeMapHtml(copy.privacy_note)} <a href="/data-policy.html">Data policy</a></p>
   </div>
 </details>`;
@@ -514,13 +505,16 @@ export function buildMapBoardInnerHtml(season) {
   const dense = isDenseMapBoard(season);
   const denseClass = dense ? " city-game-map-board--dense" : "";
 
-  return `<div class="city-game-map-board${denseClass}" data-active-district="all">
+  return `<div class="city-game-map-board${denseClass}" data-active-district="all" data-active-explore="all">
   ${buildMapLobbyHeaderHtml(season, copy)}
   <section class="city-game-map-places city-game-map-places--primary" aria-labelledby="city-game-map-list-title">
     <div class="city-game-map-list-panel">
       <h2 class="city-game-map-list-title" id="city-game-map-list-title">${escapeMapHtml(copy.section_places_title)}</h2>
       ${buildMapActionsStripHtml(season)}
-      ${buildDistrictFilterHtml(season)}
+      <div class="city-game-map-browse-filters">
+        ${buildDistrictFilterHtml(season)}
+        ${buildExploreFilterHtml(season)}
+      </div>
       ${buildMapNodeListHtml(season)}
     </div>
   </section>

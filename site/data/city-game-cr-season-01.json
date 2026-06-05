@@ -16,6 +16,21 @@
     "river_spine",
     "downtown"
   ],
+  "map_board": {
+    "explore_by": {
+      "label": "Explore by",
+      "types": {
+        "relay_gate": { "label": "Relay", "order": 1 },
+        "lore_archive": { "label": "Story", "order": 2 },
+        "sanctuary": { "label": "Regroup", "order": 3 },
+        "temp_drop": { "label": "Clue", "order": 4 },
+        "witness": { "label": "Sunset", "order": 5 },
+        "route_splitter": { "label": "Route", "order": 6 },
+        "finale": { "label": "Finale", "order": 7 },
+        "care_loop": { "label": "Care", "order": 8 }
+      }
+    }
+  },
   "map_copy": {
     "title": "Weekend city board",
     "subtitle": "Summer board · read-only",

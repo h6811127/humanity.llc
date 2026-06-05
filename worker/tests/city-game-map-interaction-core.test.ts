@@ -53,6 +53,8 @@ describe("city-game-map-interaction-core", () => {
     expect(src).toContain('row.setAttribute("aria-current", "true")');
     expect(src).toContain("function selectMapPin(");
     expect(src).toContain("isMapPinInteractive");
+    expect(src).toContain("setExploreFilter");
+    expect(src).toContain("applyBoardFilterVisibility");
   });
 
   it("resolveMapNodeHighlight toggles off repeat selection", () => {
@@ -61,7 +63,7 @@ describe("city-game-map-interaction-core", () => {
     expect(resolveMapNodeHighlight("node_04", "node_07")).toBe("node_07");
   });
 
-  it("isMapPinInteractive rejects district-filtered hidden pins only", () => {
+  it("isMapPinInteractive rejects filter-hidden pins only", () => {
     expect(isMapPinInteractive({ hidden: true })).toBe(false);
     expect(
       isMapPinInteractive({

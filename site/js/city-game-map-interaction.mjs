@@ -1,6 +1,11 @@
 /**
- * M4 — district filter + list↔pin highlight on city state board.
+ * M4 — district filter + Explore By + list↔pin highlight on city state board.
  */
+import {
+  applyBoardFilterVisibility,
+  setDistrictFilter,
+  setExploreFilter,
+} from "./city-game-map-filter-core.mjs";
 import {
   isMapPinInteractive,
   resolveMapNodeHighlight,
@@ -47,39 +52,6 @@ function setHighlightNode(boardRoot, nodeId) {
 
 /**
  * @param {HTMLElement} boardRoot
- * @param {string} districtId
- */
-function applyDistrictFilterVisibility(boardRoot, districtId) {
-  const active = districtId === "all" ? null : districtId;
-  for (const block of boardRoot.querySelectorAll(".city-game-map-district[data-district]")) {
-    const match = !active || block.getAttribute("data-district") === active;
-    if (block instanceof HTMLElement) block.hidden = !match;
-  }
-  for (const pin of boardRoot.querySelectorAll(".city-game-map-pin[data-district]")) {
-    const match = !active || pin.getAttribute("data-district") === active;
-    if (pin instanceof SVGElement) pin.hidden = !match;
-  }
-}
-
-/**
- * @param {HTMLElement} boardRoot
- * @param {string} districtId
- */
-function setDistrictFilter(boardRoot, districtId) {
-  boardRoot.dataset.activeDistrict = districtId;
-  applyDistrictFilterVisibility(boardRoot, districtId);
-  const toolbar = boardRoot.querySelector(".city-game-map-filter");
-  if (!toolbar) return;
-  for (const btn of toolbar.querySelectorAll("[data-district-filter]")) {
-    if (!(btn instanceof HTMLButtonElement)) continue;
-    const active = btn.dataset.districtFilter === districtId;
-    btn.setAttribute("aria-pressed", active ? "true" : "false");
-    btn.classList.toggle("city-game-map-filter-btn--active", active);
-  }
-}
-
-/**
- * @param {HTMLElement} boardRoot
  * @param {string} nodeId
  */
 function scrollListRowIntoView(boardRoot, nodeId) {
@@ -111,6 +83,9 @@ function scrollListRowIntoView(boardRoot, nodeId) {
  * @param {string} nodeId
  */
 function scrollSketchToPin(boardRoot, nodeId) {
+  const advanced = boardRoot.querySelector("#city-game-map-advanced");
+  if (advanced instanceof HTMLDetailsElement) advanced.open = true;
+
   const sketch = boardRoot.querySelector("#district-sketch");
   if (sketch instanceof HTMLDetailsElement) sketch.open = true;
 
@@ -194,15 +169,27 @@ export function bootCityGameMapInteraction(boardRoot, season) {
     typeof window !== "undefined" &&
     shouldScrollSketchForRowFocus((query) => window.matchMedia(query).matches);
 
-  const toolbar = boardRoot.querySelector(".city-game-map-filter");
-  if (toolbar instanceof HTMLElement) {
-    toolbar.addEventListener("click", (event) => {
+  const districtToolbar = boardRoot.querySelector(".city-game-map-filter");
+  if (districtToolbar instanceof HTMLElement) {
+    districtToolbar.addEventListener("click", (event) => {
       const target = event.target;
       if (!(target instanceof HTMLElement)) return;
       const btn = target.closest("[data-district-filter]");
       if (!(btn instanceof HTMLButtonElement)) return;
       const district = btn.dataset.districtFilter ?? "all";
       setDistrictFilter(boardRoot, district);
+    });
+  }
+
+  const exploreToolbar = boardRoot.querySelector(".city-game-map-explore-filter");
+  if (exploreToolbar instanceof HTMLElement) {
+    exploreToolbar.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      const btn = target.closest("[data-explore-filter]");
+      if (!(btn instanceof HTMLButtonElement)) return;
+      const explore = btn.dataset.exploreFilter ?? "all";
+      setExploreFilter(boardRoot, explore);
     });
   }
 
@@ -228,6 +215,7 @@ export function bootCityGameMapInteraction(boardRoot, season) {
     }
 
     if (target.closest("a[href]")) return;
+    if (target.closest("[data-district-filter], [data-explore-filter]")) return;
 
     const row = target.closest(".city-game-map-node-row");
     if (row instanceof HTMLElement && row.dataset.nodeId) {
@@ -255,5 +243,5 @@ export function bootCityGameMapInteraction(boardRoot, season) {
     true
   );
 
-  applyDistrictFilterVisibility(boardRoot, boardRoot.dataset.activeDistrict ?? "all");
+  applyBoardFilterVisibility(boardRoot);
 }

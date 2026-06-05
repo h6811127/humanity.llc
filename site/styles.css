@@ -11192,6 +11192,38 @@ body.device-shell-created .flow-keys-group .list-row {
   margin: 0 0 4px;
 }
 
+.city-game-map-browse-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0 0 10px;
+}
+
+.city-game-map-browse-filters .city-game-map-filter {
+  margin: 0;
+}
+
+.city-game-map-explore-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.city-game-map-filter-label {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--grey);
+}
+
+.city-game-map-filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .city-game-map-filter {
   display: flex;
   flex-wrap: wrap;
