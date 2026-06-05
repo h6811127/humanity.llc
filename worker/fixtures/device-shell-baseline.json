@@ -5,10 +5,10 @@
   "asset_version": 94,
   "module_count": 86,
   "js_bytes_total": 561130,
-  "shell_css_bytes_total": 78543,
-  "landing_css_bytes_total": 330877,
-  "transfer_bytes_shell_graph": 639673,
-  "transfer_bytes_landing_first_paint": 892007,
+  "shell_css_bytes_total": 78709,
+  "landing_css_bytes_total": 331105,
+  "transfer_bytes_shell_graph": 639839,
+  "transfer_bytes_landing_first_paint": 892235,
   "js_modules": [
     {
       "file": "js/device-status-bootstrap.mjs",
