@@ -48,9 +48,9 @@ describe("created-setup-core", () => {
     expect(setupMinStepIndex(false)).toBe(0);
   });
 
-  it("uses four-step kicker when save is omitted (5-step wizard with protect)", () => {
-    expect(setupProgressKicker(true)).toMatch(/4 steps/);
-    expect(setupProgressKicker(false)).toMatch(/5 steps/);
+  it("uses step-count-free kicker copy", () => {
+    expect(setupProgressKicker(true)).toBe("Save on this device");
+    expect(setupProgressKicker(false)).toBe("Save on this device");
   });
 
   it("canCompleteSetupWizard requires wallet save and seatbelt (RC-4)", () => {

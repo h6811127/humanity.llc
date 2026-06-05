@@ -118,6 +118,8 @@ describe("parseDeployChildFields", () => {
 
 describe("generalRootManifestoForDeploy", () => {
   it("uses handle in manifesto line", () => {
-    expect(generalRootManifestoForDeploy("river_studio")).toBe("Live objects · @river_studio");
+    expect(generalRootManifestoForDeploy("river_studio")).toBe(
+      "What scanners see · @river_studio"
+    );
   });
 });

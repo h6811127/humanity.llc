@@ -491,21 +491,21 @@ export const SETUP_WALLET_SAVED_CONFIRMATION = "Saved on this device.";
 export const SETUP_WALLET_SAVED_DONE_DETAIL =
   "Your control key is saved on this device. Continue when you are ready.";
 
-/** Setup wizard — Manage tab unlocks after setup (RC-13). */
+/** Setup wizard — Settings tab unlocks after setup (RC-13). */
 export const SETUP_MANAGE_TAB_HINT =
-  "Revoke, recovery, and more tools unlock under the Manage tab after you tap Continue.";
+  "Revoke, backup, and more are under the Settings tab after you finish setup.";
 
-/** Setup done panel — Live vs Manage split (RC-13). */
+/** Setup done panel — What opens vs Settings split (RC-13). */
 export const SETUP_DONE_PANEL_LEAD =
-  "This item is live. The same code stays valid when you change what opens. Update what people see on Live; turn off, backup, and more tools are under Manage.";
+  "Your QR is live. The same code stays valid when you change what scanners see. Update what opens on What opens; turn off, backup, and more are under Settings.";
 
 /** Live control proof — keys missing in this tab (RC-13 copy alignment). */
 export const LIVE_CONTROL_SIGNING_KEYS_MISSING =
-  "Open this proof link in the original created tab, or unlock a saved recovery code or encrypted backup in Manage. humanity.llc cannot prove control for you.";
+  "Open this proof link in the original created tab, or unlock a saved recovery code or encrypted backup in Settings. humanity.llc cannot prove control for you.";
 
 /** Status dot steward queue pointer (RC-13 copy alignment). */
 export const STEWARD_REVIEW_QUEUE_MANAGE_HINT =
-  "Operator review queue is under Manage on Open controls.";
+  "Operator review queue is under Settings on Open controls.";
 
 /** Private / ephemeral browsing — create and save blocked (RC-6). */
 export const EPHEMERAL_BROWSING_EYEBROW = "Private browsing";

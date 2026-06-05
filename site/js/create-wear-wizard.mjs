@@ -49,7 +49,7 @@ export function syncCreateWearWizardUi(searchParams) {
     }
     if (manifestoHint) {
       manifestoHint.textContent =
-        "Your public line on scan — change it later from Live without reprinting the QR.";
+        "Your public line on scan — change it later from What opens without reprinting the QR.";
     }
   }
 

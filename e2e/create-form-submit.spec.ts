@@ -151,7 +151,7 @@ test.describe("create form submit", () => {
 
     const session = await page.evaluate(() => sessionStorage.getItem("hc_created"));
     expect(session).toBeTruthy();
-    await expect(page.getByRole("heading", { name: "Your account is ready." })).toBeVisible({
+    await expect(page.getByRole("heading", { name: "Your QR is ready." })).toBeVisible({
       timeout: 15_000,
     });
     const parsed = JSON.parse(session!) as {

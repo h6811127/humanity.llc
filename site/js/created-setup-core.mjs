@@ -42,9 +42,8 @@ export function setupWizardStepCount(omitSaveStep) {
  * @param {boolean} omitSaveStep
  * @returns {string}
  */
-export function setupProgressKicker(omitSaveStep) {
-  const n = setupWizardStepCount(omitSaveStep);
-  return `${n} steps · save on this device`;
+export function setupProgressKicker(_omitSaveStep) {
+  return "Save on this device";
 }
 
 /**

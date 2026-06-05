@@ -162,8 +162,8 @@ export function freshSetupHeroCopy(kind, mode) {
     };
   }
   return {
-    title: "Your account is ready.",
-    lead: "Save control, then create your first object.",
+    title: "Your QR is ready.",
+    lead: "Save control, then print or test your QR.",
   };
 }
 
@@ -182,12 +182,11 @@ export function seasonContinuationHeroCopy(kind) {
  * @param {FreshOutcomeKind} kind
  * @param {boolean} omitSaveStep
  */
-export function freshSetupKickerCopy(kind, omitSaveStep) {
-  const stepCount = omitSaveStep ? 4 : 5;
+export function freshSetupKickerCopy(kind, _omitSaveStep) {
   if (kind === "season") {
-    return `Season setup · ${stepCount} steps · save on this device`;
+    return "Season setup · save on this device";
   }
-  return `${stepCount} steps · save on this device`;
+  return "Save on this device";
 }
 
 /** User-goal save step copy during fresh setup (P2.4). */

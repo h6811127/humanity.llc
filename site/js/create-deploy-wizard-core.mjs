@@ -51,8 +51,8 @@ export function isCreateRoomIsolatedIntent(searchParams) {
  */
 export function generalRootManifestoForDeploy(handle) {
   const normalized = String(handle || "").trim().replace(/^@/, "");
-  if (!normalized) return "Live objects on the network";
-  return `Live objects · @${normalized}`;
+  if (!normalized) return "What scanners see";
+  return `What scanners see · @${normalized}`;
 }
 
 /**
@@ -128,7 +128,7 @@ export function deploySubmitButtonLabel(template, strategy, preferredRoot) {
     return handle ? `Open ${handle} to add sign` : "Open your account to add sign";
   }
   if (strategy === "root_and_child") {
-    return "Deploy object & QR";
+    return "Create sign & QR";
   }
   return null;
 }

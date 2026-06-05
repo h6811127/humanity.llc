@@ -182,7 +182,8 @@
             hidden
           ></section>
           <p class="form-hint device-hub-lead-sub device-boot-gated" id="device-hub-empty-hint" hidden>
-            Finish the form below, then save your control key on the <a href="/created/">Manage page</a>.
+            Finish the form below, then save your control key on
+            <a href="/created/">Settings</a> after create.
           </p>
 
           <div class="device-hub-search-block" id="device-hub-search-block" role="search">
@@ -555,7 +556,7 @@
               placeholder="Open · Thu to Sun until 9 PM"
             ></textarea>
             <p class="form-hint" id="deploy-scanner-line-hint">
-              Live status line. Change it later on Live without reprinting the QR.
+              What scanners see. Change it later on What opens without reprinting the QR.
             </p>
           </section>
 
@@ -721,15 +722,15 @@
               />
               <span>This device (recommended)</span>
             </label>
-            <label class="revoke-confirm create-custody-opt flow-inset-check">
-              <input type="radio" name="custody_mode" value="full_keys" />
-              <span>Signing keys (advanced)</span>
-            </label>
             <details class="flow-disclosure create-custody-advanced" id="create-custody-advanced">
               <summary class="form-label">Advanced</summary>
               <p class="form-hint" id="create-custody-mode-hint">
                 Face ID or Touch ID on this phone unlocks updates. You won't see raw keys in normal use.
               </p>
+              <label class="revoke-confirm create-custody-opt flow-inset-check">
+                <input type="radio" name="custody_mode" value="full_keys" />
+                <span>Signing keys (advanced)</span>
+              </label>
             </details>
           </fieldset>
 

@@ -16,13 +16,14 @@ describe("setupManageTabHintVisible (RC-13)", () => {
   });
 });
 
-describe("RC-13 Manage tab copy", () => {
-  it("uses Manage tab naming in setup and steward pointers", () => {
-    expect(SETUP_MANAGE_TAB_HINT).toMatch(/Manage tab/i);
-    expect(SETUP_DONE_PANEL_LEAD).toMatch(/Manage/i);
-    expect(LIVE_CONTROL_SIGNING_KEYS_MISSING).toMatch(/Manage/i);
-    expect(STEWARD_REVIEW_QUEUE_MANAGE_HINT).toMatch(/Manage/i);
+describe("RC-13 Settings tab copy", () => {
+  it("uses Settings tab naming in setup and steward pointers", () => {
+    expect(SETUP_MANAGE_TAB_HINT).toMatch(/Settings tab/i);
+    expect(SETUP_DONE_PANEL_LEAD).toMatch(/Settings/i);
+    expect(LIVE_CONTROL_SIGNING_KEYS_MISSING).toMatch(/Settings/i);
+    expect(STEWARD_REVIEW_QUEUE_MANAGE_HINT).toMatch(/Settings/i);
     expect(SETUP_MANAGE_TAB_HINT).not.toMatch(/Advanced/i);
+    expect(SETUP_DONE_PANEL_LEAD).not.toMatch(/Advanced/i);
     expect(LIVE_CONTROL_SIGNING_KEYS_MISSING).not.toMatch(/Advanced/i);
   });
 });

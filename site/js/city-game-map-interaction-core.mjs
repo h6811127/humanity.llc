@@ -96,13 +96,12 @@ export function resolveMapNodeHighlight(currentNodeId, clickedNodeId) {
 }
 
 /**
- * Fog-hidden and filtered pins must not drive list↔pin linking.
- * @param {{ hidden?: boolean, classList?: { contains: (name: string) => boolean } } | null | undefined} pin
+ * District-filtered pins use [hidden]; snapshot fog stays visual-only and hittable.
+ * @param {{ hidden?: boolean } | null | undefined} pin
  */
 export function isMapPinInteractive(pin) {
   if (!pin) return false;
   if (pin.hidden) return false;
-  if (pin.classList?.contains("city-game-map-pin--fog-hidden")) return false;
   return true;
 }
 

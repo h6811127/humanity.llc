@@ -61,18 +61,22 @@ describe("city-game-map-interaction-core", () => {
     expect(resolveMapNodeHighlight("node_04", "node_07")).toBe("node_07");
   });
 
-  it("isMapPinInteractive rejects fog-hidden and hidden pins", () => {
-    expect(isMapPinInteractive({ hidden: true, classList: { contains: () => false } })).toBe(
-      false
-    );
+  it("isMapPinInteractive rejects district-filtered hidden pins only", () => {
+    expect(isMapPinInteractive({ hidden: true })).toBe(false);
     expect(
       isMapPinInteractive({
         hidden: false,
         classList: { contains: (name) => name === "city-game-map-pin--fog-hidden" },
       })
-    ).toBe(false);
-    expect(isMapPinInteractive({ hidden: false, classList: { contains: () => false } })).toBe(
-      true
+    ).toBe(true);
+    expect(isMapPinInteractive({ hidden: false })).toBe(true);
+  });
+
+  it("fog styling does not disable schematic pin hit targets", () => {
+    const styles = readFileSync(join(root, "site/styles.css"), "utf8");
+    expect(styles).toContain(".city-game-map-pin--fog-hidden .city-game-map-pin-dot");
+    expect(styles).not.toMatch(
+      /\.city-game-map-pin--fog-hidden[^}]*pointer-events:\s*none/s
     );
   });
 

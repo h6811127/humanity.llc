@@ -98,7 +98,10 @@ describe("freshSetupHeroCopy", () => {
     expect(freshSetupHeroCopy("tag", "setup").title).toBe("Your tag is ready.");
     expect(freshSetupHeroCopy("wear", "setup").title).toBe("Your wearable QR is ready.");
     expect(freshSetupHeroCopy("season", "setup").title).toBe("Set up your season");
-    expect(freshSetupHeroCopy("account", "setup").title).toBe("Your account is ready.");
+    expect(freshSetupHeroCopy("account", "setup").title).toBe("Your QR is ready.");
+    expect(freshSetupHeroCopy("account", "setup").lead).toBe(
+      "Save control, then print or test your QR."
+    );
   });
 });
 

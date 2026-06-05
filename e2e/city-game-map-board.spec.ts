@@ -101,6 +101,64 @@ test.describe("city game map board", () => {
     await expect(row).toHaveAttribute("aria-current", "true");
   });
 
+  test("production-like empty snapshot still allows fogged pin click and list scroll", async ({
+    page,
+  }) => {
+    await mockSeasonSnapshot(
+      page,
+      mockSnapshotBody({
+        window_phase: "before",
+        map_visibility: "signal_war",
+        nodes: [],
+        unlock_edges: [],
+        signal_war: {
+          summary_lines: ["Red · 0 network pts", "Blue · 0 network pts"],
+        },
+      })
+    );
+
+    await page.goto("/play/cedar-rapids/map/");
+
+    const board = page.locator(".city-game-map-board");
+    await expect(board).toBeVisible({ timeout: 15_000 });
+    await expect(board).toHaveAttribute("data-snapshot-loaded", "1");
+
+    const pin = board.locator('.city-game-map-pin[data-node-id="node_04"]');
+    const row = board.locator('.city-game-map-node-row[data-node-id="node_04"]');
+    const list = board.locator(".city-game-map-list-panel");
+
+    await board.locator("#district-sketch").evaluate((el) => {
+      if (el instanceof HTMLDetailsElement) el.open = true;
+    });
+
+    await expect(pin).toHaveClass(/city-game-map-pin--fog-hidden/);
+    await expect(pin).not.toHaveAttribute("hidden", "");
+
+    await list.evaluate((el) => {
+      if (el instanceof HTMLElement) el.scrollTop = el.scrollHeight;
+    });
+
+    await pin.click();
+
+    await expect(board).toHaveAttribute("data-highlight-node-id", "node_04");
+    await expect(pin).toHaveClass(/city-game-map-pin--highlight/);
+    await expect(row).toHaveClass(/city-game-map-node-row--highlight/);
+    await expect(row).toHaveAttribute("aria-current", "true");
+
+    await expect
+      .poll(async () =>
+        list.evaluate((el, rowEl) => {
+          if (!(el instanceof HTMLElement) || !(rowEl instanceof HTMLElement)) return false;
+          const top = el.scrollTop;
+          const bottom = top + el.clientHeight;
+          const rowTop = rowEl.offsetTop;
+          const rowBottom = rowTop + rowEl.offsetHeight;
+          return rowTop >= top && rowBottom <= bottom;
+        }, await row.elementHandle())
+      )
+      .toBe(true);
+  });
+
   test("repeat pin click clears highlight", async ({ page }) => {
     await mockSeasonSnapshot(page, mockSnapshotBody());
 

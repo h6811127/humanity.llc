@@ -136,8 +136,8 @@ export function applySnapshotToMapBoard(boardRoot, snapshot) {
   for (const pin of boardRoot.querySelectorAll(".city-game-map-pin[data-node-id]")) {
     const nodeId = pin.getAttribute("data-node-id");
     const snap = nodeId ? nodeSnapshot(nodeById, nodeId) : null;
-    const fogHidden = Boolean(nodeId && !snap);
-    pin.hidden = fogHidden;
+    const fogHidden = isSchematicPinFogged(nodeId, snap);
+    // Fog is visual-only — schematic pins stay hittable for M4 list↔map navigation.
     pin.classList.toggle("city-game-map-pin--fog-hidden", fogHidden);
     pin.classList.toggle("city-game-map-pin--live", Boolean(snap?.chips?.length));
     pin.classList.toggle("city-game-map-pin--maintenance", snap?.map_mode === "care_pause");
@@ -165,6 +165,15 @@ export function applySnapshotToMapBoard(boardRoot, snapshot) {
   applySignalWarFromSnapshot(boardRoot, snapshot);
 
   return { ok: true, nodeCount: nodes.length };
+}
+
+/**
+ * Snapshot fog is visual-only — schematic pins stay hittable for M4 navigation.
+ * @param {string | null | undefined} nodeId
+ * @param {Record<string, unknown> | null | undefined} snap
+ */
+export function isSchematicPinFogged(nodeId, snap) {
+  return Boolean(nodeId && !snap);
 }
 
 /**

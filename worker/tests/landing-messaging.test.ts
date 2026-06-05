@@ -88,7 +88,7 @@ describe("landing messaging (Step 3)", () => {
     const html = readFileSync(join(root, "site/create/index.html"), "utf8");
     expect(html).toContain('id="create-hero-title"');
     expect(html).toContain('id="create-hero-lead"');
-    expect(html).toContain("Change it later on Live without reprinting the QR");
+    expect(html).toContain("Change it later on What opens without reprinting the QR");
   });
 });
 

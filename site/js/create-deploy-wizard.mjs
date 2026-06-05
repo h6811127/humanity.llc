@@ -64,7 +64,7 @@ export function syncCreateDeployWizardUi(searchParams, template) {
     if (scannerLineLabel) scannerLineLabel.textContent = "What should scanners see?";
     if (scannerLineHint) {
       scannerLineHint.textContent =
-        "Live status line — change it later on Live without reprinting the QR.";
+        "What scanners see — change it later on What opens without reprinting the QR.";
     }
   }
 

@@ -1,12 +1,19 @@
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
 import { describe, expect, it } from "vitest";
 
 import {
   buildNodeChipsHtml,
   formatFinaleFootnote,
   formatSyncLabel,
+  isSchematicPinFogged,
   signalWarSummaryLines,
 } from "../../site/js/city-game-map-snapshot-core.mjs";
 import { buildMapBoardInnerHtml } from "../../site/js/city-game-map-board-core.mjs";
+
+const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 
 describe("city-game map snapshot core", () => {
   it("builds chip html without player-tracking vocabulary", () => {
@@ -73,5 +80,21 @@ describe("city-game map snapshot core", () => {
       "Wake the city"
     );
     expect(line).toBe("Wake the city: 3 / 3 fragments — complete");
+  });
+
+  it("empty snapshot fog keeps schematic pins visible and hittable (RC1)", () => {
+    expect(isSchematicPinFogged("node_04", null)).toBe(true);
+    expect(isSchematicPinFogged("node_04", { chips: [] })).toBe(false);
+
+    const src = readFileSync(
+      join(root, "site/js/city-game-map-snapshot-core.mjs"),
+      "utf8"
+    );
+    const pinLoop = src.slice(
+      src.indexOf('for (const pin of boardRoot.querySelectorAll(".city-game-map-pin')
+    );
+    expect(pinLoop).toContain("isSchematicPinFogged");
+    expect(pinLoop).toContain("city-game-map-pin--fog-hidden");
+    expect(pinLoop).not.toMatch(/pin\.hidden\s*=\s*fogHidden/);
   });
 });

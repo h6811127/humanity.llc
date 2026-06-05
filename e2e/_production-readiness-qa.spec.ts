@@ -427,7 +427,7 @@ test.describe("Production readiness QA", () => {
     await page.locator("#manifesto").fill("One public line");
     await page.locator("#submit").click();
     await page.waitForURL(/\/created\/.*fresh=1/, { timeout: 25_000 });
-    await expect(page.getByRole("heading", { name: "Your account is ready." })).toBeVisible({
+    await expect(page.getByRole("heading", { name: "Your QR is ready." })).toBeVisible({
       timeout: 15_000,
     });
   });

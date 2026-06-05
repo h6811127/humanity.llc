@@ -26,7 +26,7 @@ describe("setup protect step seatbelt (K7)", () => {
     expect(SETUP_SEATBELT_PANEL_LEAD).toMatch(/cannot restore/i);
     expect(SETUP_SEATBELT_BLOCK_CONTINUE).toMatch(/recovery code|encrypted backup/i);
     const html = readFileSync(join(root, "site/created/index.html"), "utf8");
-    expect(html).toMatch(/Five steps/i);
+    expect(html).toMatch(/Save on this device/i);
     expect(html).toContain('data-setup-panel="protect"');
     expect(html).toContain("created-setup-export-backup-form");
     expect(html).toContain('data-setup-action="scan-in-app"');

@@ -367,7 +367,7 @@ export function initCreatedSetup(opts) {
           donePanel.classList.remove("is-live-transition");
         }, 950);
       }
-      showFeedback("Object now resolves live on the network.");
+      showFeedback("Your QR is live.");
     }
     scrollToCurrentPanel();
     writeStepHistory(!pushHistory);

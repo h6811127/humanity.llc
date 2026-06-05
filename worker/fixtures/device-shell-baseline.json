@@ -4,11 +4,11 @@
   "phase": "smooth_mode_phase_0",
   "asset_version": 94,
   "module_count": 86,
-  "js_bytes_total": 562919,
+  "js_bytes_total": 562926,
   "shell_css_bytes_total": 78910,
-  "landing_css_bytes_total": 336467,
-  "transfer_bytes_shell_graph": 641829,
-  "transfer_bytes_landing_first_paint": 899386,
+  "landing_css_bytes_total": 336540,
+  "transfer_bytes_shell_graph": 641836,
+  "transfer_bytes_landing_first_paint": 899466,
   "js_modules": [
     {
       "file": "js/device-status-bootstrap.mjs",
@@ -64,7 +64,7 @@
     },
     {
       "file": "js/device-ownership-copy-core.mjs",
-      "bytes": 31840
+      "bytes": 31847
     },
     {
       "file": "js/device-shell-copy-core.mjs",
