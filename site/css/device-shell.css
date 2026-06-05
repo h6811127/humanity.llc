@@ -856,7 +856,7 @@ body.device-glance-popover-open .device-hub-glance-popover:not([hidden]) {
 }
 
 .landing-device-settings-group {
-  margin-bottom: 12px;
+  margin-bottom: 18px;
 }
 
 .landing-device-settings-group:last-child {
