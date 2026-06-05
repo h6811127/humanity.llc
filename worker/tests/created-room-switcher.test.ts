@@ -75,27 +75,41 @@ describe("created-room-switcher", () => {
     delete globalThis.location;
   });
 
-  it("hides switcher on first control session via sync", async () => {
+  it("hides demoted switcher on first control session via sync", async () => {
     const { syncCreatedRoomSwitcher } = await import("../../site/js/created-room-switcher.mjs");
     beginFirstControlSession("prof1", sessionStore, localStore);
-    const wrap = { hidden: false };
-    mockDocument({ "created-room-switcher-wrap": wrap });
-    syncCreatedRoomSwitcher("prof1", { pilot_template: "general" });
+    const wrap = { hidden: false, querySelectorAll: () => [] };
+    const context = { hidden: true };
+    mockDocument({
+      "created-room-switcher-wrap": wrap,
+      "created-managing-context": context,
+      "created-room-switcher-handle": { textContent: "" },
+      "steward-room-crosshint": null,
+      "created-deploy-print": null,
+    });
+    syncCreatedRoomSwitcher("prof1", { pilot_template: "general", handle: "cafe" });
     expect(wrap.hidden).toBe(true);
+    expect(context.hidden).toBe(false);
   });
 
-  it("shows switcher on returning control visit via sync", async () => {
+  it("shows managing context and demoted switcher on returning control visit via sync", async () => {
     const { syncCreatedRoomSwitcher } = await import("../../site/js/created-room-switcher.mjs");
     const wrap = {
       hidden: true,
       querySelectorAll: () => [],
     };
+    const context = { hidden: true };
+    const handleEl = { textContent: "" };
     mockDocument({
       "created-room-switcher-wrap": wrap,
+      "created-managing-context": context,
+      "created-room-switcher-handle": handleEl,
       "steward-room-crosshint": null,
       "created-deploy-print": null,
     });
-    syncCreatedRoomSwitcher("prof1", { pilot_template: "general" });
+    syncCreatedRoomSwitcher("prof1", { pilot_template: "general", handle: "cafe" });
+    expect(context.hidden).toBe(false);
+    expect(handleEl.textContent).toBe("@cafe");
     expect(wrap.hidden).toBe(false);
   });
 
@@ -130,6 +144,7 @@ describe("created-room-switcher", () => {
     const applied: string[] = [];
     mockDocument({
       "created-room-switcher-wrap": wrap,
+      "created-managing-context": { hidden: true },
       "created-room-switcher-handle": { textContent: "" },
       "steward-room-crosshint": null,
       "created-deploy-print": printPanel,
@@ -173,6 +188,7 @@ describe("created-room-switcher", () => {
     mockDocument(
       {
         "created-room-switcher-wrap": wrap,
+        "created-managing-context": { hidden: true },
         "created-room-switcher-handle": { textContent: "" },
         "steward-room-crosshint": null,
         "created-deploy-print": Object.assign(new HTMLDetailsElement(), {

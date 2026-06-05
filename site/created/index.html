@@ -511,46 +511,10 @@
           </button>
         </nav>
 
-        <div class="created-room-switcher-wrap" id="created-room-switcher-wrap" hidden>
-          <div class="created-room-switcher-head">
-            <span class="created-room-switcher-kicker">Managing</span>
-            <span class="created-room-switcher-handle" id="created-room-switcher-handle"></span>
-          </div>
-          <div
-            class="created-room-switcher flow-segmented"
-            role="group"
-            aria-label="Control room"
-          >
-            <button
-              type="button"
-              class="created-room-switcher-btn"
-              data-steward-room="doors"
-              aria-pressed="false"
-            >
-              Doors
-            </button>
-            <button
-              type="button"
-              class="created-room-switcher-btn"
-              data-steward-room="wear"
-              aria-pressed="false"
-            >
-              Wear
-            </button>
-            <button
-              type="button"
-              class="created-room-switcher-btn"
-              data-steward-room="season"
-              aria-pressed="false"
-            >
-              Season
-            </button>
-          </div>
-          <p class="form-hint created-room-crosshint" id="steward-room-crosshint" hidden>
-            <span id="steward-room-crosshint-body"></span>
-            <button type="button" class="btn-link created-room-crosshint-switch" id="steward-room-crosshint-switch" hidden></button>
-          </p>
-        </div>
+        <p class="created-managing-context device-boot-gated" id="created-managing-context" hidden>
+          <span class="created-managing-kicker">Managing</span>
+          <span class="created-managing-handle" id="created-room-switcher-handle"></span>
+        </p>
 
         <section
           class="hc-emphasis-card hc-emphasis-card--info created-season-key-honest-beat"
@@ -1024,6 +988,51 @@
               sign · lost-item tag
             </p>
             <div class="created-child-add-hub-body">
+              <div class="created-room-switcher-demoted" id="created-room-switcher-wrap" hidden>
+                <p class="form-label created-room-switcher-demoted-label">Filter add options</p>
+                <p class="form-hint created-room-switcher-demoted-lead">
+                  Door plate, wear print, or season checkpoints — does not change this QR.
+                </p>
+                <div
+                  class="created-room-switcher flow-segmented"
+                  role="group"
+                  aria-label="Add options filter"
+                >
+                  <button
+                    type="button"
+                    class="created-room-switcher-btn"
+                    data-steward-room="doors"
+                    aria-pressed="false"
+                  >
+                    Doors
+                  </button>
+                  <button
+                    type="button"
+                    class="created-room-switcher-btn"
+                    data-steward-room="wear"
+                    aria-pressed="false"
+                  >
+                    Wear
+                  </button>
+                  <button
+                    type="button"
+                    class="created-room-switcher-btn"
+                    data-steward-room="season"
+                    aria-pressed="false"
+                  >
+                    Season
+                  </button>
+                </div>
+                <p class="form-hint created-room-crosshint" id="steward-room-crosshint" hidden>
+                  <span id="steward-room-crosshint-body"></span>
+                  <button
+                    type="button"
+                    class="btn-link created-room-crosshint-switch"
+                    id="steward-room-crosshint-switch"
+                    hidden
+                  ></button>
+                </p>
+              </div>
               <div id="game-season-setup" class="created-game-season-setup-anchor" hidden></div>
             </div>
           </details>

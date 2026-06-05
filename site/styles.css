@@ -6686,27 +6686,17 @@ body.page-wallet .device-hub-status-key {
   font-weight: 600;
 }
 
-.created-room-switcher-wrap {
-  margin: 0 0 14px;
-  padding: 12px 14px;
-  border-radius: 12px;
-  background: rgba(118, 118, 128, 0.08);
-  border: 0.5px solid var(--shell-separator, rgba(60, 60, 67, 0.2));
+.created-managing-context {
+  margin: 0 0 12px 2px;
+  font-size: 14px;
 }
 
-.created-room-switcher-wrap[hidden] {
+.created-managing-context[hidden] {
   display: none !important;
 }
 
-.created-room-switcher-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 6px 8px;
-  margin: 0 0 10px;
-}
-
-.created-room-switcher-kicker {
+.created-managing-kicker {
+  margin-right: 6px;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -6714,10 +6704,30 @@ body.page-wallet .device-hub-status-key {
   color: var(--grey);
 }
 
-.created-room-switcher-handle {
+.created-managing-handle {
   font-size: 15px;
   font-weight: 700;
   color: var(--text);
+}
+
+.created-room-switcher-demoted {
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(118, 118, 128, 0.08);
+  border: 0.5px solid var(--shell-separator, rgba(60, 60, 67, 0.2));
+}
+
+.created-room-switcher-demoted[hidden] {
+  display: none !important;
+}
+
+.created-room-switcher-demoted-label {
+  margin: 0 0 4px;
+}
+
+.created-room-switcher-demoted-lead {
+  margin: 0 0 10px;
 }
 
 .created-room-switcher.flow-segmented {
@@ -10863,6 +10873,24 @@ body.device-shell-created .flow-keys-group .list-row {
   color: var(--black);
 }
 
+.city-game-map-start-here {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.city-game-map-start-steps {
+  margin: 0;
+  padding-left: 1.25rem;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--black);
+}
+
+.city-game-map-start-steps li + li {
+  margin-top: 4px;
+}
+
 .city-game-map-wayfinding {
   margin: 0;
   font-size: 14px;
@@ -10873,6 +10901,19 @@ body.device-shell-created .flow-keys-group .list-row {
 .city-game-map-privacy a {
   color: var(--red);
   font-weight: 600;
+}
+
+.city-game-map-state {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.city-game-map-places {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
 }
 
 .city-game-map-shell {
@@ -10888,27 +10929,9 @@ body.device-shell-created .flow-keys-group .list-row {
   max-width: 100%;
 }
 
-/* Stack on phones and touch devices — avoid 720px grid squeezing map beside list in landscape. */
+/* Legacy shell wrapper — board layout no longer nests list + sketch here. */
 @media (min-width: 960px) and (hover: hover) and (pointer: fine) {
-  .city-game-map-shell {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    grid-template-areas:
-      "sync sync"
-      "list map";
-    align-items: start;
-  }
-
-  .city-game-map-sync {
-    grid-area: sync;
-  }
-
-  .city-game-map-sketch-block {
-    grid-area: map;
-  }
-
   .city-game-map-list-panel {
-    grid-area: list;
     max-height: min(520px, 70vh);
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;

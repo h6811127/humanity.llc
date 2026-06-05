@@ -52,17 +52,44 @@ function syncRoomCrosshint(profileId, session, room) {
 }
 
 /**
- * @param {HTMLElement} wrap
+ * @param {HTMLElement} controlsRoot
  * @param {import("./steward-active-room-core.mjs").StewardActiveRoom} activeRoom
  */
-function syncRoomSwitcherButtons(wrap, activeRoom) {
-  for (const btn of wrap.querySelectorAll("[data-steward-room]")) {
+function syncRoomSwitcherButtons(controlsRoot, activeRoom) {
+  for (const btn of controlsRoot.querySelectorAll("[data-steward-room]")) {
     if (!(btn instanceof HTMLButtonElement)) continue;
     const room = btn.dataset.stewardRoom;
     const selected = room === activeRoom;
     btn.classList.toggle("is-active", selected);
     btn.setAttribute("aria-pressed", selected ? "true" : "false");
   }
+}
+
+/**
+ * @param {boolean} show
+ * @param {string} handle
+ */
+function syncManagingContext(show, handle) {
+  const context = document.getElementById("created-managing-context");
+  const handleEl = document.getElementById("created-room-switcher-handle");
+  if (context) context.hidden = !show;
+  if (handleEl) {
+    handleEl.textContent = handle ? `@${String(handle).replace(/^@/, "")}` : "this account";
+  }
+}
+
+/**
+ * @param {string | null | undefined} profileId
+ * @param {boolean} showDemotedControls
+ */
+function syncDemotedRoomSwitcherVisibility(profileId, showDemotedControls) {
+  const wrap = document.getElementById("created-room-switcher-wrap");
+  if (!wrap) return;
+  if (profileId && shouldHideRoomSwitcherForFirstSession(profileId, sessionStorage)) {
+    wrap.hidden = true;
+    return;
+  }
+  wrap.hidden = !showDemotedControls;
 }
 
 /**
@@ -74,10 +101,9 @@ function syncRoomSwitcherButtons(wrap, activeRoom) {
  * }} ctx
  */
 export function initCreatedRoomSwitcher(ctx) {
-  const wrap = document.getElementById("created-room-switcher-wrap");
-  const handleEl = document.getElementById("created-room-switcher-handle");
+  const controlsRoot = document.getElementById("created-room-switcher-wrap");
   const crosshintSwitch = document.getElementById("steward-room-crosshint-switch");
-  if (!wrap) return null;
+  if (!controlsRoot) return null;
 
   const walletEntry = ctx.profileId ? findWalletEntryByProfileId(ctx.profileId) : null;
   const session = ctx.getSession();
@@ -99,7 +125,7 @@ export function initCreatedRoomSwitcher(ctx) {
     if (opts.persist !== false) {
       writePersistedStewardActiveRoom(ctx.profileId, room);
     }
-    syncRoomSwitcherButtons(wrap, room);
+    syncRoomSwitcherButtons(controlsRoot, room);
     syncWearRoomPanels(room);
     syncRoomCrosshint(ctx.profileId, ctx.getSession(), room);
     if (opts.announce !== false) {
@@ -113,19 +139,17 @@ export function initCreatedRoomSwitcher(ctx) {
   }
 
   const show = shouldShowStewardRoomSwitcher(session);
-  wrap.hidden = !show;
-
   const handle =
     typeof ctx.getHandle === "function"
       ? ctx.getHandle()
       : typeof session?.handle === "string"
         ? session.handle
         : "";
-  if (handleEl) {
-    handleEl.textContent = handle ? `@${String(handle).replace(/^@/, "")}` : "this account";
-  }
 
-  for (const btn of wrap.querySelectorAll("[data-steward-room]")) {
+  syncManagingContext(show, handle);
+  syncDemotedRoomSwitcherVisibility(ctx.profileId, show);
+
+  for (const btn of controlsRoot.querySelectorAll("[data-steward-room]")) {
     if (!(btn instanceof HTMLButtonElement)) continue;
     const room = btn.dataset.stewardRoom;
     if (!isValidStewardActiveRoom(room)) continue;
@@ -154,15 +178,19 @@ export function initCreatedRoomSwitcher(ctx) {
  * @param {Record<string, unknown> | null | undefined} session
  */
 export function syncCreatedRoomSwitcher(profileId, session) {
-  const wrap = document.getElementById("created-room-switcher-wrap");
-  if (!wrap) return;
-  if (shouldHideRoomSwitcherForFirstSession(profileId, sessionStorage)) {
-    wrap.hidden = true;
-    return;
-  }
+  const controlsRoot = document.getElementById("created-room-switcher-wrap");
+  if (!controlsRoot) return;
+
   const show = shouldShowStewardRoomSwitcher(session);
-  wrap.hidden = !show;
+  const handle =
+    typeof session?.handle === "string" && session.handle.trim()
+      ? session.handle
+      : "";
+
+  syncManagingContext(show, handle);
+  syncDemotedRoomSwitcherVisibility(profileId, show);
   if (!show) return;
+
   const room =
     getBoundStewardActiveRoom(profileId) ??
     resolveInitialStewardActiveRoom({
@@ -171,7 +199,7 @@ export function syncCreatedRoomSwitcher(profileId, session) {
       walletEntry: findWalletEntryByProfileId(profileId),
     });
   bindStewardActiveRoomRuntime(profileId, room);
-  syncRoomSwitcherButtons(wrap, room);
+  syncRoomSwitcherButtons(controlsRoot, room);
   syncWearRoomPanels(room);
   syncRoomCrosshint(profileId, session, room);
 }

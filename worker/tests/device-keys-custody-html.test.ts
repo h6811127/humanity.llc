@@ -134,6 +134,15 @@ describe("device-keys-custody-html", () => {
     expect(html).not.toContain("Issue new QR");
     expect(html).toContain('id="created-manage-more"');
     expect(html).toContain("More settings");
+    expect(html).toContain('id="created-managing-context"');
+    expect(html).toContain('id="child-object-add-hub"');
+    const tabsIdx = html.indexOf('role="tablist"');
+    const addHubIdx = html.indexOf('id="child-object-add-hub"');
+    const primarySegmentIdx = html.indexOf('aria-label="Control room"');
+    expect(tabsIdx).toBeGreaterThan(-1);
+    expect(addHubIdx).toBeGreaterThan(tabsIdx);
+    expect(primarySegmentIdx).toBe(-1);
+    expect(html).toContain('aria-label="Add options filter"');
   });
 
   it("created Manage tab collapses developer export under Export for developers (D8)", () => {
