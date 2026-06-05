@@ -7,7 +7,7 @@
 
 **Primary GTM after M5:** **Merch funnel Tier 1** (scan wear → create → `/shop/customize/` → unique QR on Printify product) — [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) · [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md). Status plate / lost-item / organizer pilots below are **optional vertical hardening**, not the main launch wedge.
 
-**Canonical loop (unchanged):** Create card → print QR → scan live status → revoke → re-scan revoked state. See `docs/M3_M4_EXECUTION_PLAN.md`.
+**Canonical loop (unchanged):** Create account + scan point → print scan link → scan live status → revoke/disable → re-scan revoked state. Strangers enter via **deploy wizard** (`?intent=deploy`). See `docs/M3_M4_EXECUTION_PLAN.md`.
 
 ---
 
@@ -52,7 +52,7 @@ These tighten Phase A for the chosen vertical without a new “product tab”:
 
 | Area | Direction |
 |------|-----------|
-| **Create / scan copy** | Name the **object** (“Studio door”, “Keys tag”) on scan UI where helpful; keep “what this does not prove” visible. **Shipped:** scanner safety chips (`Object · …` / `Item · …`) on `/c/…` per `docs/SCANNER_EXPERIENCE.md` Phase B. |
+| **Create / scan copy** | Name the **object** (“Studio door”, “Keys tag”) on scan UI where helpful; keep “what this does not prove” visible. Strangers create via **deploy wizard** (`?intent=deploy`) for plate/relay pilots. **Shipped:** scanner safety chips (`Object · …` / `Item · …`) on `/c/…` per `docs/SCANNER_EXPERIENCE.md` Phase B. |
 | **Scan page** | Active vs revoked in &lt;30s; **Live check** hero (manifesto/plate as H1, one status, one limit) per [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) and [`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) UI refresh phases. |
 | **`/created/`** | Recovery gate stays; **Update status** unlocks after first in-session revoke (`created-first-revoke-gate.mjs`). |
 | **Print path** | Download QR PNG + phone print steps on `/created/` (shipped); validate strangers actually print before testing revoke in the wild. |

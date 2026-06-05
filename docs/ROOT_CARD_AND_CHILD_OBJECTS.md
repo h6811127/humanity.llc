@@ -106,7 +106,7 @@ The shipped v1 bridge is `scope: "print_artifact"`:
 - It renders object-forward scan UI.
 - It does not require a separate private key.
 
-Status plates and lost-item relays currently use full card templates in the create flow. The target model is to make them child objects under a root card, while preserving legacy flat cards as valid.
+Status plates and lost-item relays **create** via the deploy wizard or `/created/` add-object: **Account** (general root) → **Endpoint** (child object) → **Scan link**. **Legacy flat accounts** (`?template=status_plate|lost_item`) mint a root whose `manifesto_line` encodes the plate or relay — retained for **read/scan/update compatibility** and field-kit regression, not front-door create.
 
 ---
 
@@ -114,31 +114,31 @@ Status plates and lost-item relays currently use full card templates in the crea
 
 **Protocol and resolver:** Shipped and aligned with this doc — parent-signed `child_objects` rows, `scope: child_object` QRs, object-first scan HTML, per-object disable/revoke, no operator key custody, no scan analytics.
 
-**Steward shell:** **Bridge complete for v1 child-object tree** (steps 13–16). Hub and **My cards** show nested children; `/create/` converges on general root; register + first scan link is one action; backup seatbelt gates growth. Legacy flat-card create remains for strangers and pilots. Remaining gap: **delegated child keys** (step 17, deferred until team/event pilots demand them).
+**Steward shell:** **Bridge complete for v1 child-object tree** (steps 13–16). Hub and **My cards** show nested children; `/create/?intent=deploy` deploy wizard mints Account + endpoint + scan link; register + first scan link is one action on Live; backup seatbelt gates growth. Legacy flat-card create (`?template=…`) remains for **field-kit regression and pre-convergence QRs**. Remaining gap: **delegated child keys** (step 17, deferred until team/event pilots demand them).
 
 | Layer | Maturity | Notes |
 |-------|----------|--------|
 | Trust / anti-surveillance | **Strong** | Same data-minimization posture; children inherit root control, not human verification |
 | Protocol simplicity | **Strong** | One root key; no child private keys by default |
-| Steward UX simplicity | **Strong (v1 tree shipped)** | General root + Add object on Live; nested hub rows; combined register+QR; legacy flat `/create/` templates remain |
+| Steward UX simplicity | **Strong (v1 tree shipped)** | Deploy wizard + Add object on Live; nested hub rows; combined register+QR; legacy flat `/create/?template=` for field-kit regression only |
 | Cross-context robustness | **Strong** | Resolver child list + reconcile on `/created/` and hub; same-origin storage rules documented |
 
-### Bridge vs target (steward-facing)
+### Current vs legacy (steward-facing)
 
-| Question | Flat pilot (`/create/?template=…`) | Child object (`/created/` → Add … under root) |
-|----------|--------------------------------------|--------------------------------------------------|
-| What gets a `profile_id`? | The plate/relay **is** the root card | Only the **general root**; children get `object_id` |
-| Private keys | New owner + recovery keypair | Reuses root keys |
-| First QR | Immediate at create | Register object + first scan link in one Live action (step 15) |
-| Where it appears on device | **My cards** (`hc_wallet` row) | **Nested under root** in hub / **My cards** + `hc_child_objects_v1:{profile_id}` index |
-| Human trust on scan | Root card’s verification | Root relationship (“Controlled by @handle”); trust stays on root |
+| Question | Legacy flat pilot (`/create/?template=…`) | Current (deploy wizard or `/created/` Add …) |
+|----------|-------------------------------------------|-----------------------------------------------|
+| What gets a `profile_id`? | The plate/relay **is** the root card | Only the **account** (general root); endpoints get `object_id` |
+| Private keys | New owner + recovery keypair | Reuses account keys |
+| First QR | Immediate at flat create | Deploy wizard or register + first scan link in one Live action (step 15) |
+| Where it appears on device | **My cards** (`hc_wallet` row) | **Nested under account** in hub / **My cards** + `hc_child_objects_v1:{profile_id}` index |
+| Human trust on scan | Root card’s verification | Account relationship (“Controlled by @handle”); trust stays on account |
 
-**Product direction:** Converge new stewards on **general root first → add objects**. Keep flat pilots valid for strangers and legacy plates; do not mint a new keyed root for every door or tag when a general root already exists.
+**Product direction:** New stewards use **deploy wizard** (`?intent=deploy`) or **account first → add endpoints** on Live. Legacy flat QRs keep scanning and updating; do not mint a new keyed root for every door or tag when an account already exists.
 
 ### What “feels simple” when done (steps 13–16 shipped)
 
 1. **One visible tree** — root row in **My cards**, children nested underneath (shipped)
-2. **One create story** — `/create/` emphasizes general Humanity Card; status plate / lost item are **Add object** actions (shipped)
+2. **One create story** — deploy wizard (`?intent=deploy`) for strangers; status plate / lost item are **Add endpoint** actions on Live (shipped)
 3. **Network-backed list** — `/created/` and hub reconcile child rows from resolver truth (shipped)
 4. **Shorter QR path** — register + first scan link in one Live action (shipped)
 5. **Backup seatbelt** — warn/block before more objects without backup or recovery acknowledged (shipped)
@@ -159,7 +159,7 @@ Steps 1–16 fixed the **custody bridge** (one root key, many objects). Steps 19
 | Nouns, not topology | Lost item · door plate · hoodie QR · game node | `object_type` on `child_objects` row |
 | Account is invisible at first | @handle · My objects | `profile_id` root + `hc_wallet` |
 | General card is internal | Never “Create general card” on landing | `template=general` create POST |
-| Pilots are not the company | Status plate / lost item in catalog + field kits only | Flat-card bridge + child path both valid |
+| Pilots are not the company | Status plate / lost item in catalog + field kits only | Deploy wizard + child endpoint; legacy flat scan compat |
 | Games = place, not folder | Organize a live season | `game_node` + season config (L5) |
 
 **User-facing vocabulary** (full table: [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) § Object model vocabulary):
@@ -179,7 +179,7 @@ Steps 1–16 fixed the **custody bridge** (one root key, many objects). Steps 19
 - One root key still controls children; children still must not become separate `hc_wallet` entries.
 - Human trust stays on root only; scan copy still object-first ([§ Public scan copy](#public-scan-copy)).
 - Backup gate thresholds (warn @ 2nd child, block @ 3rd+) unchanged.
-- Flat pilot create (`/create/?template=status_plate|lost_item`) remains for strangers and LO-1/LO-2 field kits.
+- Flat pilot create (`/create/?template=status_plate|lost_item`) remains for LO-1/LO-2 **legacy regression** and existing flat QRs in the field.
 - Game self-serve (step 18) reuses steps 6–16 patterns — steps 19–20 do not fork mint.
 - Season id belongs in **season cockpit** (When / first node), not generic create — step 20.
 

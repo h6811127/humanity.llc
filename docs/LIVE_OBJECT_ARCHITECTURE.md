@@ -113,12 +113,12 @@ From [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md):
 
 ### Bridge today
 
-| Pilot | Current storage | Target | Status |
-|-------|-----------------|--------|--------|
-| Status plate | Two-line `manifesto_line` on root card **or** child object | Child object `status_plate` | **Partial** — child path shipped; flat-card bridge retained for stranger create |
-| Lost-item relay | `[relay]` prefix in `manifesto_line` **or** child object | Child object `lost_item_relay` | **Partial** — child path shipped; flat-card bridge retained |
-| Game node | `game_node` child + `game_meta` JSON | **Shipped** — reference type | **Shipped** |
-| Merch / print | `scope: print_artifact` | **Shipped** | **Shipped** |
+| Pilot | Current create | Legacy storage (scan/update compat) | Status |
+|-------|----------------|-------------------------------------|--------|
+| Status plate | Deploy wizard + `/created/` add → child `status_plate` | Two-line `manifesto_line` on root card | **Shipped (create)** · legacy read/update retained |
+| Lost-item relay | Deploy wizard + `/created/` add → child `lost_item_relay` | `[relay]` prefix in root `manifesto_line` | **Shipped (create)** · legacy read/update retained |
+| Game node | `game_node` child + `game_meta` JSON | — | **Shipped** |
+| Merch / print | `scope: print_artifact` | — | **Shipped** |
 
 Scan composition reads **`childPublicLabel` / `childPublicState`** on the view model when `scope: child_object` (see `resolveScanHeroDisplay` in `manifesto-display.ts`) — not manifesto parsing alone.
 
@@ -276,7 +276,7 @@ Card-scope scans (`qr.scope: card`) use `composeCardScanState` (`live-object/com
 7. Capabilities + HTML
 ```
 
-**Status plate today:** owner updates via child object `POST …/objects/{id}/update` or flat-card manifesto bridge ([`MANIFESTO_STATUS_UPDATE.md`](MANIFESTO_STATUS_UPDATE.md)).
+**Status plate today:** new creates use child endpoint `POST …/objects/{id}/update`. Legacy flat accounts still update via root manifesto bridge ([`MANIFESTO_STATUS_UPDATE.md`](MANIFESTO_STATUS_UPDATE.md)).
 
 **Time policy:** `worker/src/live-object/time-policy.ts` — shared with Phase A child types; game season dormancy remains in `season-window.ts`.
 
@@ -414,7 +414,8 @@ Engineering (**done** unless noted):
 | Scan reads `public_label` / `public_state` first-class | `ScanViewModel.childPublicLabel`, `childPublicState`, `resolveScanHeroDisplay` | Shipped |
 | Child `object_streams` on scan | `objectStreamsFromChildDocumentJson` | Shipped |
 | Owner UX: add + update under `/created/` | `created-child-object*.mjs` | Shipped |
-| Flat-card bridge for stranger create | `/create/?template=status_plate\|lost_item_relay` | Shipped (bridge) |
+| Deploy wizard create (Account → Endpoint → Scan link) | `?intent=deploy`, `create-deploy-submit.mjs` | Shipped |
+| Legacy flat-card create (field-kit regression) | `/create/?template=status_plate\|lost_item_relay` | Shipped (compatibility) |
 
 Still open before **Partial → Shipped** promotion on traceability rows:
 

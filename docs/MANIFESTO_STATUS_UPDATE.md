@@ -10,7 +10,7 @@
 
 Create locks the first public line at issuance. **Status plates** and **lost-item relays** need the printed QR to stay the same while **network copy changes** (open/closed, return message, corrections).
 
-Today those pilots are implemented as flat card templates. Target model: they become child objects under a root Humanity Card, so the root key edits the object without giving the status plate or lost-item tag its own private key.
+**New creates** use child-object endpoints under a general account (deploy wizard or `/created/` add). The account key edits the endpoint without giving the plate or tag its own private key. **Legacy flat accounts** still update via root `manifesto_line` POST — same QR, same scan layout; no reprint required.
 
 That is the gap between **revocable** (pull trust back) and **live** (current truth at scan time).
 
@@ -21,8 +21,8 @@ That is the gap between **revocable** (pull trust back) and **live** (current tr
 > Same physical QR · root-signed public object update on the resolver.
 
 - **Immutable root fields:** `profile_id`, owner `public_key`, `handle`, `created_at`
-- **Mutable today:** `manifesto_line`, `updated_at`, full signed `humanity_card` document stored in D1
-- **Target child mutable fields:** object label, object public state, object streams, child QR lifecycle state
+- **Mutable today (legacy flat):** `manifesto_line`, `updated_at`, full signed `humanity_card` document stored in D1
+- **Mutable today (child endpoint):** object label, object public state, object streams, child QR lifecycle state
 - **Not mutable via this API:** QR credentials, verification, badges, organizer key
 
 ---
@@ -59,13 +59,15 @@ Scans and `GET …/cards/{id}` read the updated document on next fetch (active c
 
 ## Storage formats (pilots)
 
-Current bridge is same as create  -  one `manifesto_line` field, layout parsed at scan time (`worker/src/resolver/manifesto-display.ts`):
+**Legacy flat storage** — one root `manifesto_line` field, layout parsed at scan time (`worker/src/resolver/manifesto-display.ts`):
 
 | Pilot | Format | Example line 1 · line 2 |
 |-------|--------|-------------------------|
 | **Status plate** | Two lines | `Studio door` · `Closed until Monday` |
 | **Lost item relay** | `[relay]` prefix | `[relay] Keys` · `Found  -  thank you` |
 | **General card** | One line (or two treated as plate if newline) | Single public statement |
+
+**Current child endpoint storage** — `public_label` + `public_state` on the `child_objects` row; scan composes from these first-class fields when `scope: child_object`.
 
 ### Optional object streams (status plate / live object)
 
