@@ -115,7 +115,7 @@ export function createConvergenceNudgeCopy(template, ctx) {
   const objectLabel = template === "status_plate" ? "sign" : "return tag";
   const addVerb = template === "status_plate" ? "Add sign" : "Add return tag";
   const focusLabel =
-    template === "status_plate" ? "Add sign on your card page" : "Add return tag on your card page";
+    template === "status_plate" ? "Add sign on Live" : "Add return tag on Live";
 
   if (ctx.preferredRoot) {
     const rootLabel = generalRootDisplayLabel(ctx.preferredRoot);
@@ -124,11 +124,11 @@ export function createConvergenceNudgeCopy(template, ctx) {
         ? `Open ${rootLabel} to add sign`
         : `Open ${rootLabel} to add return tag`;
     return {
-      title: `${addVerb} under your existing account`,
+      title: `${addVerb} under your saved @handle`,
       body:
         ctx.rootCount > 1
-          ? `Recommended: use ${rootLabel}. Add this ${objectLabel} on your card page instead of creating a second account.`
-          : `Recommended: use ${rootLabel}. Add this ${objectLabel} on your card page instead of creating again.`,
+          ? `Recommended: use ${rootLabel}. Add this ${objectLabel} on Live instead of creating a second @handle.`
+          : `Recommended: use ${rootLabel}. Add this ${objectLabel} on Live instead of creating again.`,
       primaryLabel: openLabel,
       primaryHref: null,
       showGeneralSwitch: true,
@@ -138,9 +138,9 @@ export function createConvergenceNudgeCopy(template, ctx) {
   }
 
   return {
-    title: "Pick your @name first",
-    body: `Then ${addVerb.toLowerCase()} from your card page. Use the field-kit option below only if you need a separate @name.`,
-    primaryLabel: "Switch to general account",
+    title: "Pick your @handle first",
+    body: `Then ${addVerb.toLowerCase()} from Live. Use the field-kit option below only if you need a separate @handle.`,
+    primaryLabel: "Start with your @handle",
     primaryHref: null,
     showGeneralSwitch: true,
     collapseLegacyForm: false,

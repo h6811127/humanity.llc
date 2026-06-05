@@ -90,6 +90,15 @@ describe("landing messaging (Step 3)", () => {
     expect(html).toContain('id="create-hero-lead"');
     expect(html).toContain("Change it later on What opens without reprinting the QR");
   });
+
+  it("create meta describes steward paths only (no player play door)", () => {
+    const html = readFileSync(join(root, "site/create/index.html"), "utf8");
+    expect(html).toContain("Create your @handle");
+    expect(html).toContain("deploy live status on something");
+    expect(html).toContain("customize live wear");
+    expect(html).not.toMatch(/play the city game/i);
+    expect(html).toContain("/create/?intent=game\">Organize a live season</a>");
+  });
 });
 
 describe("public marketing clarity (AI step 5)", () => {
@@ -115,15 +124,16 @@ describe("public marketing clarity (AI step 5)", () => {
 });
 
 describe("create-template-copy", () => {
-  it("status plate lead recommends card page add under root", () => {
+  it("status plate lead recommends Live add under root", () => {
     const copy = createHeroCopyForTemplate("status_plate");
-    expect(copy.lead).toMatch(/card page/i);
+    expect(copy.lead).toMatch(/Live/i);
     expect(CREATE_TEMPLATE_HERO.status_plate.title).toBe("Make a QR sign");
   });
 
-  it("general template emphasizes @name-first create", () => {
-    expect(createHeroCopyForTemplate("general").title).toBe("Pick your @name");
-    expect(createHeroCopyForTemplate(undefined).title).toBe("Pick your @name");
+  it("general template emphasizes @handle control line", () => {
+    expect(createHeroCopyForTemplate("general").title).toBe("Pick your @handle");
+    expect(createHeroCopyForTemplate(undefined).title).toBe("Pick your @handle");
+    expect(createHeroCopyForTemplate("general").lead).toMatch(/control updates/i);
     expect(createHeroCopyForTemplate("general").lead).not.toMatch(/\bnetwork\b/i);
     expect(createHeroCopyForTemplate("general").lead).not.toMatch(/signed qr/i);
   });

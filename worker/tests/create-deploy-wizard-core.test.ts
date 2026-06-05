@@ -55,7 +55,7 @@ describe("createHeroCopyForTemplate — deploy room", () => {
       new URLSearchParams("template=status_plate")
     );
     expect(copy.lead).not.toMatch(/legacy/i);
-    expect(copy.lead).toMatch(/card page/i);
+    expect(copy.lead).toMatch(/Live/i);
   });
 });
 

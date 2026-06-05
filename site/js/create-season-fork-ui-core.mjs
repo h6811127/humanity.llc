@@ -16,7 +16,7 @@ export function gameSeasonSubmitButtonLabel(strategy, preferredRoot) {
       ? generalRootDisplayLabel(preferredRoot)
       : "";
   if (strategy === "redirect_live" || strategy === "use_existing_account") {
-    return handle ? `Open ${handle} to set up season` : "Open your saved card to set up season";
+    return handle ? `Open ${handle} to set up season` : "Open Live to set up season";
   }
   if (strategy === "create_dual_skin_root") return "Create @handle and continue season setup";
   if (strategy === "create_season_only_root") return "Create season @handle and continue";
@@ -32,7 +32,7 @@ export function gameSeasonIdFieldUiState(strategy) {
     return {
       showSeasonIdField: false,
       redirectHint:
-        "You already have a season card saved on this device. Tap below to continue season setup.",
+        "You already have a season saved on this device. Tap below to continue season setup.",
       inputRequired: false,
     };
   }
@@ -48,7 +48,7 @@ export function gameSeasonIdFieldUiState(strategy) {
     return {
       showSeasonIdField: false,
       redirectHint:
-        "One @name for signs and season scan points. Name the season when you add your first checkpoint.",
+        "One @handle for signs and season scan points. Name the season when you add your first checkpoint.",
       inputRequired: false,
     };
   }

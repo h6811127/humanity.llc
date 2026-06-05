@@ -667,7 +667,7 @@ async function submitCreate(e, opts = {}) {
     }
 
     if (gameStrategy === "create_dual_skin_root") {
-      setStatus("Setting up your account…");
+      setStatus("Setting up your @handle…");
       await runGameSeasonDualSkinCreate({
         handle: input.handle,
         wantRecovery: input.wantRecovery,
@@ -678,7 +678,7 @@ async function submitCreate(e, opts = {}) {
     }
 
     if (gameStrategy === "create_season_only_root") {
-      setStatus("Setting up season account…");
+      setStatus("Setting up season @handle…");
       const seasonId = document.getElementById("game-season-id")?.value ?? "";
       await runGameSeasonRootCreate({
         handle: input.handle,

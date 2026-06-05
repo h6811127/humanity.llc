@@ -18,7 +18,7 @@ import { pickPreferredGameSeasonRoot } from "./create-organizer-season-core.mjs"
 
 const GAME_SEASON_HERO = {
   title: "Organize a live season",
-  lead: "Set up checkpoints and rules from your card page after you create.",
+  lead: "Set up checkpoints and rules from Live after you create.",
 };
 
 /** @type {Record<string, { title: string; lead: string }>} */
@@ -26,7 +26,7 @@ const GAME_SEASON_FORK_HERO = {
   existing:
     "One @handle for door plates and season scan points. Add the season operator key on Live.",
   dedicated:
-    "New season @handle from day one. Best when signs use a different @name.",
+    "New season @handle from day one. Best when signs use a different @handle.",
 };
 
 /**

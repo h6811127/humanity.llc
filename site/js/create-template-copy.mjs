@@ -8,19 +8,19 @@
 /** @type {Record<CreatePilotTemplate, { title: string; lead: string }>} */
 export const CREATE_TEMPLATE_HERO = {
   general: {
-    title: "Pick your @name",
+    title: "Pick your @handle",
     lead:
-      "Choose a public @name and one sentence scanners will read. Add signs and tags from your card page after.",
+      "Your @handle is how you control updates. Write one sentence for your first QR; add signs and tags from Live after.",
   },
   status_plate: {
     title: "Make a QR sign",
     lead:
-      "Say what it's on and what scanners should read. Add more signs from your card page after.",
+      "Say what it's on and what scanners should read. Add more signs from Live after.",
   },
   lost_item_relay: {
     title: "Make a return tag",
     lead:
-      "Say what's lost and what finders should read. Add more tags from your card page after.",
+      "Say what's lost and what finders should read. Add more tags from Live after.",
   },
 };
 
@@ -29,12 +29,12 @@ export const CREATE_DEPLOY_ROOM_HERO = {
   status_plate: {
     title: "Make a QR sign",
     lead:
-      "Say what it's on and what scanners should read. Pick an @name if you don't have one yet.",
+      "Say what it's on and what scanners should read. Pick a @handle if you don't have one yet.",
   },
   lost_item_relay: {
     title: "Make a return tag",
     lead:
-      "Say what's lost and what finders should read. Pick an @name if you don't have one yet.",
+      "Say what's lost and what finders should read. Pick a @handle if you don't have one yet.",
   },
 };
 

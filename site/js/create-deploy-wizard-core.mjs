@@ -123,9 +123,9 @@ export function deploySubmitButtonLabel(template, strategy, preferredRoot) {
       : "";
   if (strategy === "redirect_live") {
     if (template === "lost_item_relay") {
-      return handle ? `Open ${handle} to add return tag` : "Open your account to add return tag";
+      return handle ? `Open ${handle} to add return tag` : "Open Live to add return tag";
     }
-    return handle ? `Open ${handle} to add sign` : "Open your account to add sign";
+    return handle ? `Open ${handle} to add sign` : "Open Live to add sign";
   }
   if (strategy === "root_and_child") {
     return "Create sign & QR";

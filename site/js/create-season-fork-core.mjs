@@ -70,13 +70,13 @@ export function gameSeasonForkCardCopy(fork) {
   if (fork === GAME_SEASON_FORK_DEDICATED) {
     return {
       title: "Separate season @handle",
-      sub: "New @name for the season from day one. Best for city seasons, operator handoff, or when signs stay on a different @name.",
+      sub: "New @handle for the season from day one. Best for city seasons, operator handoff, or when signs stay on a different @handle.",
       recommended: "Org / city / operator crew",
     };
   }
   return {
     title: "One @handle for signs and season",
-    sub: "Door plates and season scan points share one @name. Add the season operator key on Live.",
+    sub: "Door plates and season scan points share one @handle. Add the season operator key on Live.",
     recommended: "Most people",
   };
 }
