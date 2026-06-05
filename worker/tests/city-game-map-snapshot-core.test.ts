@@ -7,6 +7,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildNodeChipsHtml,
   formatFinaleFootnote,
+  formatLaunchCollectiveLine,
   formatSpotlightCountFromSnap,
   formatSpotlightCountLine,
   formatSyncLabel,
@@ -66,6 +67,7 @@ describe("city-game map snapshot core", () => {
         nodes: { node_04: { x: 0.5, y: 0.6 } },
       },
       automation: { quorum_nodes: ["node_04"], finale_node: "node_13", fragment_nodes: [] },
+      comprehension_kit: { primary_scan_node: "node_04" },
     });
     expect(html).toContain('id="city-game-map-sync"');
     expect(html).toContain('id="city-game-map-signal-war"');
@@ -78,6 +80,11 @@ describe("city-game map snapshot core", () => {
     expect(html).toContain("Scan for live count");
   });
 
+  it("formats launch collective line from chip value", () => {
+    expect(formatLaunchCollectiveLine("14 / 20")).toBe("14 of 20 together");
+    expect(formatSpotlightCountLine("14 / 20")).toBe("14 of 20 together");
+  });
+
   it("formats spotlight count from collective chip", () => {
     expect(
       formatSpotlightCountFromSnap({
@@ -87,19 +94,20 @@ describe("city-game map snapshot core", () => {
     expect(formatSpotlightCountFromSnap({ chips: [] })).toBeNull();
   });
 
-  it("formats spotlight count line with optional label prefix", () => {
-    expect(formatSpotlightCountLine("14 / 20", "River Lantern")).toBe("River Lantern · 14 / 20");
-    expect(formatSpotlightCountLine("14 / 20", "")).toBe("14 / 20");
+  it("formats spotlight count line for launch collective display", () => {
+    expect(formatSpotlightCountLine("14 / 20", "River Lantern")).toBe("14 of 20 together");
+    expect(formatSpotlightCountLine("14 / 20", "")).toBe("14 of 20 together");
     expect(formatSpotlightCountLine(null, "River Lantern")).toBeNull();
   });
 
   it("applySpotlightFromSnapshot updates spotlight count element", () => {
     const countEl = { textContent: "Scan for live count" };
+    const liveEl = { innerHTML: "" };
     const spotlight = {
       dataset: {
         nodeId: "node_04",
-        countLabel: "River Lantern",
         countPlaceholder: "Scan for live count",
+        scanHint: "Scan sticker · enter code",
       },
       classList: { toggle: () => {} },
     };
@@ -107,6 +115,7 @@ describe("city-game map snapshot core", () => {
       querySelector: (sel) => {
         if (sel === "#city-game-map-spotlight") return spotlight;
         if (sel === "#city-game-map-spotlight-count") return countEl;
+        if (sel === "#city-game-map-spotlight-live") return liveEl;
         return null;
       },
     };
@@ -119,7 +128,7 @@ describe("city-game map snapshot core", () => {
         },
       ],
     });
-    expect(countEl.textContent).toBe("River Lantern · 14 / 20");
+    expect(countEl.textContent).toBe("14 / 20");
   });
 
   it("formats sync label from snapshot timestamp", () => {

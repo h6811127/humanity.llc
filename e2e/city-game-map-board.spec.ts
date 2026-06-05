@@ -100,14 +100,17 @@ test.describe("city game map board", () => {
     await expect(page.getByRole("link", { name: "Rules", exact: true })).toBeVisible();
 
     await expect(board.getByText("Find a sticker")).toBeVisible();
-    await expect(board.getByText("Code is on the back of the sticker.")).toBeVisible();
+    await expect(board.getByText("Add to the city")).toBeVisible();
+    await expect(
+      board.getByText("For this weekend: the code is on the back of the sticker.")
+    ).toBeVisible();
     await expect(board.getByRole("heading", { name: "Riverwalk River Lantern" })).toBeVisible();
     await expect(board.getByText("Scan sticker · enter code")).toBeVisible();
     await expect(board.locator("#city-game-map-browse")).toHaveJSProperty("open", false);
     await expect(board.locator(".city-game-map-browse-filters")).toBeHidden();
 
     await expect(board).toHaveAttribute("data-snapshot-loaded", "1");
-    await expect(board.locator("#city-game-map-spotlight-count")).toHaveText("River Lantern · 14 / 20");
+    await expect(board.locator("#city-game-map-spotlight-count")).toHaveText("14 / 20");
     await expect(board.locator("#city-game-map-changed")).toHaveJSProperty("open", false);
     await expect(board.getByText("1 / 3 fragments recovered")).toBeHidden();
     await expect(board.getByText("Something is stirring.")).toBeHidden();
@@ -115,7 +118,10 @@ test.describe("city game map board", () => {
     await expect(board.getByText("1 / 3 fragments recovered")).toBeVisible();
     await expect(board.getByText("Something is stirring.")).toBeVisible();
     await openBrowsePlaces(board);
-    await expect(board.locator('.city-game-map-node-row[data-node-id="node_04"]')).toHaveCount(0);
+    const riverRow = board.locator('.city-game-map-node-row[data-node-id="node_04"]');
+    await expect(riverRow).toHaveCount(1);
+    await expect(riverRow).toHaveClass(/city-game-map-node-row--spotlight/);
+    await expect(riverRow.locator(".city-game-map-chip-value")).toHaveText("14 / 20");
   });
 
   test("Explore By filters places and schematic pins with district AND logic", async ({
@@ -167,7 +173,7 @@ test.describe("city game map board", () => {
     await board.getByRole("button", { name: "All districts" }).click();
     await expect(board).toHaveAttribute("data-active-explore", "all");
     await expect(board).toHaveAttribute("data-active-district", "all");
-    await expect(board.locator(".city-game-map-node-row:visible")).toHaveCount(39);
+    await expect(board.locator(".city-game-map-node-row:visible")).toHaveCount(40);
   });
 
   test("mobile filter chips show active styling and viewing summary", async ({ page }) => {
@@ -385,14 +391,14 @@ test.describe("city game map board", () => {
 
     const spotlight = board.locator("#city-game-map-spotlight");
     const placesSection = board.locator(".city-game-map-places");
-    const changedSection = board.locator("#city-game-map-changed");
+    const changedSummary = board.locator("#city-game-map-changed .city-game-map-changed-summary");
 
     await expect(board.getByRole("heading", { name: "Quest log" })).toBeHidden();
-    await expect(changedSection.getByText(/what changed/i)).toBeVisible();
+    await expect(changedSummary).toBeVisible();
 
     const spotlightBox = await spotlight.boundingBox();
     const placesBox = await placesSection.boundingBox();
-    const changedBox = await changedSection.boundingBox();
+    const changedBox = await changedSummary.boundingBox();
     const advancedBox = await advanced.boundingBox();
 
     expect(spotlightBox?.width ?? 0).toBeGreaterThan(280);

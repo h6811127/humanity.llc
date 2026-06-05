@@ -40,7 +40,7 @@ export const CITY_GAME_ROLE_LABELS = {
 
 const DEFAULT_START_HERE = {
   title: "Start here",
-  steps: ["Find a sticker", "Scan it", "Add your charge"],
+  steps: ["Find a sticker", "Scan it", "Add to the city."],
 };
 
 const DEFAULT_MAP_COPY = {
@@ -174,8 +174,6 @@ export function resolveLaunchCopy(season) {
     count_placeholder:
       (typeof launch.count_placeholder === "string" && launch.count_placeholder.trim()) ||
       mapResolved.count_placeholder,
-    count_label:
-      (typeof launch.count_label === "string" && launch.count_label.trim()) || "",
     spotlight_scan_hint:
       (typeof launch.spotlight_scan_hint === "string" && launch.spotlight_scan_hint.trim()) ||
       mapResolved.spotlight_scan_hint,
@@ -357,21 +355,20 @@ export function buildMapSpotlightHtml(season, launchCopy) {
   const mapsUrl = escapeMapHtml(buildMapsSearchUrl(season, row));
   const scanHint = escapeMapHtml(launchCopy.spotlight_scan_hint);
   const countPlaceholder = escapeMapHtml(launchCopy.count_placeholder);
-  const countLabel = escapeMapHtml(launchCopy.count_label);
 
   return `<article
     class="city-game-map-spotlight"
     id="city-game-map-spotlight"
     data-node-id="${nodeId}"
     data-count-placeholder="${countPlaceholder}"
-    data-count-label="${countLabel}"
+    data-scan-hint="${scanHint}"
     aria-labelledby="city-game-map-spotlight-title"
   >
     <h2 class="city-game-map-spotlight-title" id="city-game-map-spotlight-title">${label}</h2>
     <p class="city-game-map-spotlight-count" id="city-game-map-spotlight-count" aria-live="polite">${countPlaceholder}</p>
     <div class="city-game-map-spotlight-actions">
       <a class="city-game-map-maps-link" href="${mapsUrl}" target="_blank" rel="noopener noreferrer">Open in Maps</a>
-      <span class="city-game-map-spotlight-hint">${scanHint}</span>
+      <span class="city-game-map-spotlight-live" id="city-game-map-spotlight-live"><span class="city-game-map-spotlight-hint">${scanHint}</span></span>
     </div>
   </article>`;
 }
@@ -384,7 +381,6 @@ export function buildMapFirstPaintHtml(season, launchCopy) {
   return `<div class="city-game-map-first-paint">
     ${buildMapActionsStripHtml(launchCopy)}
     ${buildMapCodeHintHtml(launchCopy)}
-    ${buildMapPrivacyInlineHtml(launchCopy)}
     ${buildMapSpotlightHtml(season, launchCopy)}
   </div>`;
 }
@@ -539,7 +535,7 @@ ${pins}
 export function buildMapNodeListHtml(season, launchCopy = resolveLaunchCopy(season)) {
   const rowHint = launchCopy.row_scan_hint?.trim() || MAP_ROW_SCAN_HINT;
   const spotlightId = comprehensionPrimaryNodeId(season);
-  const rows = nodeRows(season).filter((row) => row?.node_id !== spotlightId);
+  const rows = nodeRows(season);
   const byDistrict = new Map();
   for (const row of rows) {
     const district = row.district ?? "other";
@@ -553,8 +549,12 @@ export function buildMapNodeListHtml(season, launchCopy = resolveLaunchCopy(seas
     .filter((d) => byDistrict.has(d))
     .map((district) => {
       const label = CITY_GAME_DISTRICT_LABELS[district] ?? district;
-      const items = byDistrict
-        .get(district)
+      const districtRows = [...byDistrict.get(district)].sort((a, b) => {
+        if (a?.node_id === spotlightId) return -1;
+        if (b?.node_id === spotlightId) return 1;
+        return 0;
+      });
+      const items = districtRows
         .map((row) => {
           const districtLabel = CITY_GAME_DISTRICT_LABELS[row.district] ?? row.district;
           const scanUrl = row.scan_url && typeof row.scan_url === "string" ? row.scan_url.trim() : "";
@@ -563,7 +563,9 @@ export function buildMapNodeListHtml(season, launchCopy = resolveLaunchCopy(seas
             ? `<a class="city-game-map-scan-link" href="${escapeMapHtml(scanUrl)}">Open live scan</a>`
             : `<span class="city-game-map-live-hint">${escapeMapHtml(rowHint)}</span>`;
           const role = escapeMapHtml(row.role ?? "");
-          return `<li class="city-game-map-node-row" data-node-id="${escapeMapHtml(row.node_id)}" data-district="${escapeMapHtml(row.district ?? "")}" data-role="${role}" tabindex="0">
+          const spotlightClass =
+            row.node_id === spotlightId ? " city-game-map-node-row--spotlight" : "";
+          return `<li class="city-game-map-node-row${spotlightClass}" data-node-id="${escapeMapHtml(row.node_id)}" data-district="${escapeMapHtml(row.district ?? "")}" data-role="${role}" tabindex="0">
   <span class="city-game-map-node-title">${escapeMapHtml(row.label)}</span>
   <span class="city-game-map-node-meta">${escapeMapHtml(districtLabel)}</span>
   <span class="city-game-map-node-actions">
@@ -704,15 +706,30 @@ export function buildMapWhatChangedHtml(season, copy, launchCopy) {
 
 /**
  * @param {Record<string, unknown>} season
+ */
+export function isLaunchMapBoard(season) {
+  const kit = season.comprehension_kit;
+  return Boolean(
+    kit && typeof kit === "object" && typeof kit.primary_scan_node === "string" && kit.primary_scan_node.trim()
+  );
+}
+
+/**
+ * @param {Record<string, unknown>} season
  * @returns {string}
  */
 export function buildMapBoardInnerHtml(season) {
   const copy = resolveMapCopy(season);
   const launchCopy = resolveLaunchCopy(season);
   const dense = isDenseMapBoard(season);
+  const launchClass = isLaunchMapBoard(season) ? " city-game-map-board--launch" : "";
   const denseClass = dense ? " city-game-map-board--dense" : "";
+  const primaryNode = isLaunchMapBoard(season) ? comprehensionPrimaryNodeId(season) : "";
+  const primaryAttr = primaryNode
+    ? ` data-primary-node="${escapeMapHtml(primaryNode)}"`
+    : "";
 
-  return `<div class="city-game-map-board${denseClass}" data-active-district="all" data-active-explore="all">
+  return `<div class="city-game-map-board${launchClass}${denseClass}" data-active-district="all" data-active-explore="all"${primaryAttr}>
   <section class="city-game-map-places city-game-map-places--primary" aria-labelledby="city-game-map-spotlight-title">
     ${buildMapFirstPaintHtml(season, launchCopy)}
     ${buildMapBrowseHtml(season, copy, launchCopy)}
