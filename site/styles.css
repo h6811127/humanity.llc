@@ -10900,6 +10900,11 @@ body.device-shell-created .flow-keys-group .list-row {
   outline: none;
 }
 
+.city-game-map-pin--fog-hidden,
+.city-game-map-pin[hidden] {
+  pointer-events: none;
+}
+
 .city-game-map-pin-dot {
   fill: #ffffff;
   stroke: rgba(219, 27, 67, 0.85);

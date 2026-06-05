@@ -35,6 +35,19 @@ describe("city-game-map-interaction-core", () => {
     expect(html).toContain('data-district-filter="all"');
     expect(html).toContain('data-district-filter="river_spine"');
   });
+
+  it("styles include M4 highlight and filter chrome", () => {
+    const styles = readFileSync(join(root, "site/styles.css"), "utf8");
+    expect(styles).toContain(".city-game-map-pin--highlight");
+    expect(styles).toContain(".city-game-map-node-row--highlight");
+    expect(styles).toContain(".city-game-map-filter-btn");
+  });
+
+  it("accepts SVG pin targets on board click", () => {
+    const src = readFileSync(join(root, "site/js/city-game-map-interaction.mjs"), "utf8");
+    const boardClick = src.slice(src.indexOf('boardRoot.addEventListener("click"'));
+    expect(boardClick).toContain("if (!(target instanceof Element)) return;");
+  });
 });
 
 describe("spread-city-game-map-layout", () => {

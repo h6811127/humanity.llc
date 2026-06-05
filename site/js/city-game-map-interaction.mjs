@@ -37,8 +37,25 @@ function setHighlightNode(boardRoot, nodeId) {
  * @param {HTMLElement} boardRoot
  * @param {string} districtId
  */
+function applyDistrictFilterVisibility(boardRoot, districtId) {
+  const active = districtId === "all" ? null : districtId;
+  for (const block of boardRoot.querySelectorAll(".city-game-map-district[data-district]")) {
+    const match = !active || block.getAttribute("data-district") === active;
+    if (block instanceof HTMLElement) block.hidden = !match;
+  }
+  for (const pin of boardRoot.querySelectorAll(".city-game-map-pin[data-district]")) {
+    const match = !active || pin.getAttribute("data-district") === active;
+    if (pin instanceof SVGElement) pin.hidden = !match;
+  }
+}
+
+/**
+ * @param {HTMLElement} boardRoot
+ * @param {string} districtId
+ */
 function setDistrictFilter(boardRoot, districtId) {
   boardRoot.dataset.activeDistrict = districtId;
+  applyDistrictFilterVisibility(boardRoot, districtId);
   const toolbar = boardRoot.querySelector(".city-game-map-filter");
   if (!toolbar) return;
   for (const btn of toolbar.querySelectorAll("[data-district-filter]")) {
@@ -83,7 +100,7 @@ export function bootCityGameMapInteraction(boardRoot, season) {
 
   boardRoot.addEventListener("click", (event) => {
     const target = event.target;
-    if (!(target instanceof HTMLElement)) return;
+    if (!(target instanceof Element)) return;
 
     const pin = target.closest(".city-game-map-pin");
     if (pin instanceof SVGGElement) {
@@ -124,4 +141,6 @@ export function bootCityGameMapInteraction(boardRoot, season) {
       sketch.open = true;
     }
   }
+
+  applyDistrictFilterVisibility(boardRoot, boardRoot.dataset.activeDistrict ?? "all");
 }

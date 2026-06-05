@@ -78,6 +78,28 @@ test.describe("city game map board", () => {
     await expect(board).toHaveAttribute("data-snapshot-loaded", "1");
   });
 
+  test("schematic pin click highlights matching place row", async ({ page }) => {
+    await mockSeasonSnapshot(page, mockSnapshotBody());
+
+    await page.goto("/play/cedar-rapids/map/");
+
+    const board = page.locator(".city-game-map-board");
+    await expect(board).toBeVisible({ timeout: 15_000 });
+    await expect(board).toHaveAttribute("data-snapshot-loaded", "1");
+
+    const pin = board.locator('.city-game-map-pin[data-node-id="node_04"]');
+    const row = board.locator('.city-game-map-node-row[data-node-id="node_04"]');
+    await board.locator("#district-sketch").evaluate((el) => {
+      if (el instanceof HTMLDetailsElement) el.open = true;
+    });
+    await expect(pin).toBeVisible();
+    await pin.click();
+
+    await expect(board).toHaveAttribute("data-highlight-node-id", "node_04");
+    await expect(pin).toHaveClass(/city-game-map-pin--highlight/);
+    await expect(row).toHaveClass(/city-game-map-node-row--highlight/);
+  });
+
   test("legacy #city-state hash redirects to dedicated map page", async ({ page }) => {
     await mockSeasonSnapshot(page, mockSnapshotBody());
 
