@@ -84,6 +84,21 @@ describe("created-room-switcher", () => {
     expect(wrap.hidden).toBe(true);
   });
 
+  it("shows switcher on returning control visit via sync", async () => {
+    const { syncCreatedRoomSwitcher } = await import("../../site/js/created-room-switcher.mjs");
+    const wrap = {
+      hidden: true,
+      querySelectorAll: () => [],
+    };
+    mockDocument({
+      "created-room-switcher-wrap": wrap,
+      "steward-room-crosshint": null,
+      "created-deploy-print": null,
+    });
+    syncCreatedRoomSwitcher("prof1", { pilot_template: "general" });
+    expect(wrap.hidden).toBe(false);
+  });
+
   it("calls onRoomApplied when a room button is clicked", () => {
     function roomBtn(room: string) {
       const btn = Object.assign(new HTMLButtonElement(), {

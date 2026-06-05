@@ -29,9 +29,13 @@ export function shouldShowAccountFirstSignCta(ctx) {
   return isFirstControlSessionActive(ctx.profileId, ctx.sessionStorage ?? null);
 }
 
+/** @type {readonly string[]} */
+export const SIGN_ADD_SECTION_IDS = ["child-object-add-hub", "child-object-add-status-plate"];
+
 /**
  * Reveal sign add section inside the hub (hub stays collapsed).
  * @param {string | null | undefined} profileId
+ * @returns {HTMLElement | null} Sign add section when focused
  */
 export function focusSignAddSection(profileId) {
   mountChildObjectAddHubSections();
@@ -40,11 +44,17 @@ export function focusSignAddSection(profileId) {
   if (profileId) {
     writePersistedStewardActiveRoom(profileId, STEWARD_ROOM_DOORS);
   }
-  if (hub) hub.hidden = false;
+  if (hub instanceof HTMLElement) {
+    hub.hidden = false;
+    if (hub instanceof HTMLDetailsElement) {
+      hub.removeAttribute("open");
+    }
+  }
   if (section instanceof HTMLElement) {
     section.hidden = false;
     section.scrollIntoView({ behavior: "smooth", block: "start" });
   }
+  return section instanceof HTMLElement ? section : null;
 }
 
 /**
