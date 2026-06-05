@@ -190,16 +190,21 @@ test.describe("city game map board", () => {
 
     await openBrowsePlaces(board);
     const explore = board.locator(".city-game-map-explore-filter");
+    const allDistricts = board.getByRole("button", { name: "All districts" });
+    const allKinds = explore.getByRole("button", { name: "All kinds" });
+    await expect(allDistricts).toHaveAttribute("aria-pressed", "true");
+    await expect(allKinds).toHaveAttribute("aria-pressed", "true");
+    await expect(allDistricts).not.toHaveClass(/city-game-map-filter-btn--active/);
+    await expect(allKinds).not.toHaveClass(/city-game-map-filter-btn--active/);
+
     const relayBtn = explore.getByRole("button", { name: /Relay 17/ });
     await relayBtn.click();
 
     await expect(relayBtn).toHaveAttribute("aria-pressed", "true");
     await expect(relayBtn).toHaveClass(/city-game-map-filter-btn--active/);
     await expect(relayBtn).toHaveCSS("background-color", "rgb(219, 27, 67)");
-    await expect(explore.getByRole("button", { name: "All kinds" })).toHaveAttribute(
-      "aria-pressed",
-      "false"
-    );
+    await expect(allKinds).toHaveAttribute("aria-pressed", "false");
+    await expect(allKinds).not.toHaveClass(/city-game-map-filter-btn--active/);
 
     const summary = board.locator("#city-game-map-filter-summary");
     await expect(summary).toBeVisible();
@@ -220,7 +225,13 @@ test.describe("city game map board", () => {
     await expect(board).toHaveAttribute("data-active-explore", "all");
     await expect(summary).toBeHidden();
     await expect(relayBtn).toHaveAttribute("aria-pressed", "false");
+    await expect(relayBtn).not.toHaveClass(/city-game-map-filter-btn--active/);
     await expect(newBoBtn).toHaveAttribute("aria-pressed", "false");
+    await expect(newBoBtn).not.toHaveClass(/city-game-map-filter-btn--active/);
+    await expect(allDistricts).toHaveAttribute("aria-pressed", "true");
+    await expect(allKinds).toHaveAttribute("aria-pressed", "true");
+    await expect(allDistricts).not.toHaveClass(/city-game-map-filter-btn--active/);
+    await expect(allKinds).not.toHaveClass(/city-game-map-filter-btn--active/);
   });
 
   test("schematic pin click highlights matching place row", async ({ page }) => {

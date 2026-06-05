@@ -11504,8 +11504,9 @@ body.device-shell-created .flow-keys-group .list-row {
   margin: 0 0 12px;
   padding: 10px 12px;
   border-radius: var(--radius-md, 12px);
-  border: 1px solid rgba(219, 27, 67, 0.18);
-  background: rgba(219, 27, 67, 0.05);
+  border: 1px solid rgba(219, 27, 67, 0.28);
+  background: rgba(219, 27, 67, 0.08);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.65) inset;
 }
 
 .city-game-map-filter-summary[hidden] {
@@ -11529,7 +11530,8 @@ body.device-shell-created .flow-keys-group .list-row {
 }
 
 .city-game-map-filter-summary-scope {
-  font-weight: 600;
+  font-weight: 700;
+  color: var(--red);
 }
 
 .city-game-map-filter-summary-count {

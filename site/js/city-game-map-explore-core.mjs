@@ -138,7 +138,7 @@ export function buildExploreFilterHtml(season) {
 
   const toolbarLabel = exploreFilterToolbarLabel(season);
   const chips = [
-    `<button type="button" class="city-game-map-filter-btn city-game-map-filter-btn--active" data-explore-filter="all" data-filter-label="All kinds" aria-pressed="true">All kinds</button>`,
+    `<button type="button" class="city-game-map-filter-btn" data-explore-filter="all" data-filter-label="All kinds" aria-pressed="true">All kinds</button>`,
     ...options.map(
       (o) =>
         `<button type="button" class="city-game-map-filter-btn" data-explore-filter="${escapeAttr(o.id)}" data-filter-label="${escapeAttr(o.label)}" aria-pressed="false">${escapeAttr(o.label)} <span class="city-game-map-filter-btn-count">${o.count}</span></button>`

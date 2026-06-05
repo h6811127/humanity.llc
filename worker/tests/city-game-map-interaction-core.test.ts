@@ -33,12 +33,15 @@ describe("city-game-map-interaction-core", () => {
     expect(options.find((o) => o.id === "newbo")?.label).toBe("NewBo");
   });
 
-  it("renders filter toolbar html", () => {
+  it("renders filter toolbar html without filled All chip", () => {
     const html = buildDistrictFilterHtml(season);
     expect(html).toContain('data-district-filter="all"');
     expect(html).toContain('data-district-filter="river_spine"');
     expect(html).toContain("city-game-map-filter-label");
     expect(html).toContain("District");
+    expect(html).not.toMatch(
+      /data-district-filter="all"[^>]*city-game-map-filter-btn--active/
+    );
   });
 
   it("styles include M4 highlight and filter chrome", () => {

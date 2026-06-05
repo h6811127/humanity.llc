@@ -73,7 +73,7 @@ function escapeAttr(value) {
 export function buildDistrictFilterHtml(season) {
   const options = buildDistrictFilterOptions(season);
   const chips = [
-    `<button type="button" class="city-game-map-filter-btn city-game-map-filter-btn--active" data-district-filter="all" data-filter-label="All districts" aria-pressed="true">All districts</button>`,
+    `<button type="button" class="city-game-map-filter-btn" data-district-filter="all" data-filter-label="All districts" aria-pressed="true">All districts</button>`,
     ...options.map(
       (o) =>
         `<button type="button" class="city-game-map-filter-btn" data-district-filter="${escapeAttr(o.id)}" data-filter-label="${escapeAttr(o.label)}" aria-pressed="false">${escapeAttr(o.label)}</button>`

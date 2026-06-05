@@ -158,20 +158,32 @@ export function applyBoardFilterVisibility(boardRoot) {
 }
 
 /**
+ * Only narrowed (non-all) chips get filled active styling — "All" stays neutral
+ * so selecting Relay/NewBo reads as a new highlight, not a same-weight swap.
+ * @param {string} filterId
+ */
+export function isBoardFilterChipEmphasized(filterId) {
+  return String(filterId ?? "all") !== "all";
+}
+
+/**
  * @param {HTMLElement} boardRoot
  * @param {string} districtId
  */
 export function syncDistrictFilterUi(boardRoot, districtId) {
-  const toolbar = boardRoot.querySelector(".city-game-map-filter");
+  const toolbar =
+    boardRoot.querySelector(".city-game-map-district-filter") ??
+    boardRoot.querySelector(".city-game-map-filter");
   if (!toolbar) return;
+  const emphasize = isBoardFilterChipEmphasized(districtId);
   for (const btn of toolbar.querySelectorAll("[data-district-filter]")) {
     if (!btn || typeof btn !== "object" || !("dataset" in btn)) continue;
-    const active = btn.dataset.districtFilter === districtId;
+    const selected = btn.dataset.districtFilter === districtId;
     if (typeof btn.setAttribute === "function") {
-      btn.setAttribute("aria-pressed", active ? "true" : "false");
+      btn.setAttribute("aria-pressed", selected ? "true" : "false");
     }
     if (btn.classList && typeof btn.classList.toggle === "function") {
-      btn.classList.toggle("city-game-map-filter-btn--active", active);
+      btn.classList.toggle("city-game-map-filter-btn--active", selected && emphasize);
     }
   }
 }
@@ -183,14 +195,15 @@ export function syncDistrictFilterUi(boardRoot, districtId) {
 export function syncExploreFilterUi(boardRoot, exploreId) {
   const toolbar = boardRoot.querySelector(".city-game-map-explore-filter");
   if (!toolbar) return;
+  const emphasize = isBoardFilterChipEmphasized(exploreId);
   for (const btn of toolbar.querySelectorAll("[data-explore-filter]")) {
     if (!btn || typeof btn !== "object" || !("dataset" in btn)) continue;
-    const active = btn.dataset.exploreFilter === exploreId;
+    const selected = btn.dataset.exploreFilter === exploreId;
     if (typeof btn.setAttribute === "function") {
-      btn.setAttribute("aria-pressed", active ? "true" : "false");
+      btn.setAttribute("aria-pressed", selected ? "true" : "false");
     }
     if (btn.classList && typeof btn.classList.toggle === "function") {
-      btn.classList.toggle("city-game-map-filter-btn--active", active);
+      btn.classList.toggle("city-game-map-filter-btn--active", selected && emphasize);
     }
   }
 }

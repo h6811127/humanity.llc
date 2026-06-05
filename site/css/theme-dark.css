@@ -1284,8 +1284,22 @@ html[data-theme="dark"] .city-game-map-filter-btn {
 }
 
 html[data-theme="dark"] .city-game-map-filter-btn--active {
-  border-color: rgba(255, 77, 109, 0.45);
-  background: rgba(255, 77, 109, 0.14);
+  border-color: var(--red);
+  background: var(--red);
+  color: var(--white);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 2px 10px rgba(255, 77, 109, 0.24);
+}
+
+html[data-theme="dark"] .city-game-map-filter-summary {
+  border-color: rgba(255, 77, 109, 0.32);
+  background: rgba(255, 77, 109, 0.12);
+  box-shadow: none;
+}
+
+html[data-theme="dark"] .city-game-map-filter-summary-scope {
+  color: rgba(255, 140, 160, 0.98);
 }
 
 html[data-theme="dark"] .city-game-map-node-row--highlight,

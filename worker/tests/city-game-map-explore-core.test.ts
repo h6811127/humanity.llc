@@ -38,7 +38,7 @@ describe("city-game-map-explore-core", () => {
     expect(options.find((o) => o.id === "lore_archive")?.label).toBe("Story");
   });
 
-  it("renders explore toolbar with counts and All kinds", () => {
+  it("renders explore toolbar with counts and neutral All kinds chip", () => {
     const html = buildExploreFilterHtml(season);
     expect(html).toContain('data-explore-filter="all"');
     expect(html).toContain('data-explore-filter="relay_gate"');
@@ -48,6 +48,9 @@ describe("city-game-map-explore-core", () => {
     expect(html).toContain("Story");
     expect(html).not.toContain("Moving story");
     expect(html).toContain("Explore by");
+    expect(html).not.toMatch(
+      /data-explore-filter="all"[^>]*city-game-map-filter-btn--active/
+    );
   });
 
   it("falls back to role labels when map_board.explore_by is absent", () => {

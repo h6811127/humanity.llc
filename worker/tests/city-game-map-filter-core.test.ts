@@ -7,8 +7,11 @@ import { describe, expect, it } from "vitest";
 import { buildMapBoardInnerHtml } from "../../site/js/city-game-map-board-core.mjs";
 import {
   applyBoardFilterVisibility,
+  isBoardFilterChipEmphasized,
   setDistrictFilter,
   setExploreFilter,
+  syncDistrictFilterUi,
+  syncExploreFilterUi,
 } from "../../site/js/city-game-map-filter-core.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
@@ -195,7 +198,75 @@ function mockBoardRoot(nodes) {
   return { boardRoot, rows, pins, blocks, summary };
 }
 
+function mockFilterButton(filterKey, filterValue) {
+  let active = false;
+  const calls = [];
+  return {
+    dataset: { [filterKey]: filterValue },
+    classList: {
+      toggle(_className, on) {
+        active = Boolean(on);
+      },
+      get active() {
+        return active;
+      },
+    },
+    setAttribute(name, value) {
+      calls.push([name, value]);
+    },
+    getAttribute(name) {
+      const hit = calls.filter(([n]) => n === name).at(-1);
+      return hit ? hit[1] : null;
+    },
+  };
+}
+
 describe("city-game-map-filter-core", () => {
+  it("only emphasizes narrowed chips, not All reset chips", () => {
+    expect(isBoardFilterChipEmphasized("relay_gate")).toBe(true);
+    expect(isBoardFilterChipEmphasized("newbo")).toBe(true);
+    expect(isBoardFilterChipEmphasized("all")).toBe(false);
+  });
+
+  it("syncDistrictFilterUi highlights narrowed district only", () => {
+    const allBtn = mockFilterButton("districtFilter", "all");
+    const newBoBtn = mockFilterButton("districtFilter", "newbo");
+    const boardRoot = {
+      querySelector: () => ({
+        querySelectorAll: () => [allBtn, newBoBtn],
+      }),
+    };
+
+    syncDistrictFilterUi(/** @type {HTMLElement} */ (boardRoot), "newbo");
+    expect(allBtn.classList.active).toBe(false);
+    expect(newBoBtn.classList.active).toBe(true);
+    expect(newBoBtn.getAttribute("aria-pressed")).toBe("true");
+    expect(allBtn.getAttribute("aria-pressed")).toBe("false");
+
+    syncDistrictFilterUi(/** @type {HTMLElement} */ (boardRoot), "all");
+    expect(allBtn.classList.active).toBe(false);
+    expect(newBoBtn.classList.active).toBe(false);
+    expect(allBtn.getAttribute("aria-pressed")).toBe("true");
+  });
+
+  it("syncExploreFilterUi highlights narrowed role only", () => {
+    const allBtn = mockFilterButton("exploreFilter", "all");
+    const relayBtn = mockFilterButton("exploreFilter", "relay_gate");
+    const boardRoot = {
+      querySelector: () => ({
+        querySelectorAll: () => [allBtn, relayBtn],
+      }),
+    };
+
+    syncExploreFilterUi(/** @type {HTMLElement} */ (boardRoot), "relay_gate");
+    expect(allBtn.classList.active).toBe(false);
+    expect(relayBtn.classList.active).toBe(true);
+
+    syncExploreFilterUi(/** @type {HTMLElement} */ (boardRoot), "all");
+    expect(allBtn.classList.active).toBe(false);
+    expect(relayBtn.classList.active).toBe(false);
+  });
+
   it("filters rows and pins by explore role", () => {
     const nodes = season.nodes.map(
       (row: { node_id: string; district: string; role: string }) => ({
