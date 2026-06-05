@@ -4,6 +4,7 @@
 
 import { GAME_SEASON_SETUP_FOCUS, markGameSeasonSetupFlow } from "./create-organizer-season-core.mjs";
 import { isFirstControlSessionActive } from "./created-first-session-containment-core.mjs";
+import { focusSeasonSetupChecklist } from "./created-season-setup-cta.mjs";
 import { CREATED_PANEL_FOCUS } from "./created-tabs.mjs";
 
 const STEWARD_ROOM_SEASON = "season";
@@ -51,10 +52,14 @@ export function applyGameSeasonSetupFocus(select, searchParams, opts = {}) {
   const profileId = new URLSearchParams(location.search).get("profile_id")?.trim() || "";
   const containFirstSession =
     profileId && isFirstControlSessionActive(profileId, sessionStorage);
-  if (containFirstSession) return true;
 
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
+      if (containFirstSession) {
+        focusSeasonSetupChecklist(profileId);
+        return;
+      }
+
       const hub = document.getElementById("child-object-add-hub");
       if (hub instanceof HTMLDetailsElement) {
         hub.hidden = false;
@@ -93,6 +98,10 @@ export function applyGameSeasonSetupFocus(select, searchParams, opts = {}) {
   }
 
   window.setTimeout(() => {
+    if (containFirstSession) {
+      focusSeasonSetupChecklist(profileId);
+      return;
+    }
     const gameSection = document.getElementById("child-object-add-game-node");
     if (gameSection) gameSection.hidden = false;
     const setupDetails = document.getElementById(GAME_SEASON_SETUP_SCROLL_TARGET_ID);

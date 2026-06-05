@@ -94,7 +94,7 @@ export const CONTROL_TAG_HERO_LEAD =
   "Add a return message, then print or test your QR.";
 export const CONTROL_WEAR_HERO_LEAD = "Print or customize your wearable QR.";
 export const CONTROL_SEASON_HERO_LEAD =
-  "Continue season setup and add your first checkpoint.";
+  "Continue setup and add your first checkpoint.";
 
 /** @type {Record<ControlOutcomeKind, string>} */
 const CONTROL_HERO_LEADS = {
