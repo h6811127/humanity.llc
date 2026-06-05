@@ -69,6 +69,29 @@ export function clearCreateHandoff() {
 }
 
 /**
+ * @param {string | null | undefined} raw
+ */
+function normalizeHandoffHandle(raw) {
+  const handle = String(raw ?? "").trim().replace(/^@/, "");
+  return handle || null;
+}
+
+/**
+ * Ignore stale create handoffs when opening a different saved account.
+ * @param {ReturnType<typeof readCreateHandoff>} handoff
+ * @param {Record<string, unknown> | null | undefined} session
+ */
+export function createHandoffAppliesToSession(handoff, session) {
+  if (!handoff) return false;
+  const sessionHandle = normalizeHandoffHandle(
+    typeof session?.handle === "string" ? session.handle : ""
+  );
+  const handoffHandle = normalizeHandoffHandle(handoff.handle);
+  if (!sessionHandle || !handoffHandle) return true;
+  return sessionHandle === handoffHandle;
+}
+
+/**
  * @param {CreateHandoffKind} kind
  * @param {string} handle
  */

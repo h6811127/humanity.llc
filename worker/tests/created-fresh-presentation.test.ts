@@ -163,6 +163,7 @@ describe("resolveCreatedFreshPresentation", () => {
       freshParam: false,
       mode: "control",
       searchParams: new URLSearchParams("focus=game-season-setup&room=season"),
+      session: { handle: "river_studio" },
       handoff: { kind: "season", handle: "@river_studio", at: 1 },
     });
     expect(presentation.hero?.title).toBe("Continue season setup");
@@ -170,6 +171,39 @@ describe("resolveCreatedFreshPresentation", () => {
     expect(seasonContinuationHeroCopy("season")?.lead).toBe(CONTROL_SEASON_HERO_LEAD);
     expect(presentation.handoffBanner?.title).toBe(CREATE_HANDOFF_BANNER_TITLE);
     expect(presentation.handoffBanner?.detail).toContain("@river_studio");
+  });
+
+  it("uses account hero for general deploy roots with coalition revoke keys", () => {
+    const presentation = resolveCreatedFreshPresentation({
+      freshParam: false,
+      mode: "control",
+      searchParams: new URLSearchParams(""),
+      session: {
+        pilot_template: "general",
+        handle: "river_studio",
+        manifesto_line: "Live objects · @river_studio",
+        issuer_public_key: "org",
+      },
+    });
+    expect(presentation.outcomeKind).toBe("account");
+    expect(presentation.hero?.title).toBe("Your account is live");
+    expect(presentation.hero?.lead).toBe(CONTROL_ACCOUNT_HERO_LEAD);
+  });
+
+  it("ignores stale season handoff when opening a different account", () => {
+    const presentation = resolveCreatedFreshPresentation({
+      freshParam: false,
+      mode: "control",
+      searchParams: new URLSearchParams(""),
+      session: {
+        pilot_template: "general",
+        handle: "other_studio",
+        manifesto_line: "Live objects · @other_studio",
+      },
+      handoff: { kind: "season", handle: "@river_studio", at: 1 },
+    });
+    expect(presentation.hero?.title).toBe("Your account is live");
+    expect(presentation.handoffBanner).toBeNull();
   });
 });
 

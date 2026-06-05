@@ -68,7 +68,7 @@ describe("gameSeasonBlocksDeviceUnlock", () => {
       gameSeasonBlocksDeviceUnlock({
         session: { pilot_template: "general", issuer_public_key: "org" },
       })
-    ).toBe(true);
+    ).toBe(false);
     expect(
       gameSeasonBlocksDeviceUnlock({
         session: { pilot_template: "general", manifesto_line: "My deploy card" },
@@ -90,5 +90,15 @@ describe("isGameSeasonCustodySession", () => {
     expect(
       isGameSeasonCustodySession({ manifesto_line: "City game season · s1 · @a" })
     ).toBe(true);
+  });
+
+  it("does not treat coalition revoke issuer key as season custody", () => {
+    expect(
+      isGameSeasonCustodySession({
+        pilot_template: "general",
+        manifesto_line: "Live objects · @river_studio",
+        issuer_public_key: "org",
+      })
+    ).toBe(false);
   });
 });

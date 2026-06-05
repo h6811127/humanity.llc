@@ -11,8 +11,8 @@ import {
 import {
   GAME_SEASON_SETUP_FOCUS,
   isGameSeasonCustodySession,
-  isGameSeasonSetupFlowActive,
 } from "./create-organizer-season-core.mjs";
+import { createHandoffAppliesToSession } from "./create-handoff-core.mjs";
 import { WEAR_PRINT_FOCUS } from "./create-wear-wizard-core.mjs";
 import { STEWARD_ROOM_SEASON } from "./steward-active-room-core.mjs";
 
@@ -42,7 +42,6 @@ export function resolveFreshOutcomeKind(ctx) {
     focus === GAME_SEASON_SETUP_FOCUS ||
     focus === "game" ||
     hashKey === GAME_SEASON_SETUP_FOCUS ||
-    isGameSeasonSetupFlowActive() ||
     isGameSeasonCustodySession(ctx.session)
   ) {
     return "season";
@@ -222,7 +221,8 @@ export function createHandoffBannerCopy(kind, handle) {
  */
 export function resolveCreatedFreshPresentation(ctx) {
   const outcomeKind = resolveFreshOutcomeKind(ctx);
-  const handoff = ctx.handoff ?? null;
+  const handoffRaw = ctx.handoff ?? null;
+  const handoff = createHandoffAppliesToSession(handoffRaw, ctx.session) ? handoffRaw : null;
 
   /** @type {{ title: string; lead: string } | null} */
   let hero = null;
@@ -235,7 +235,7 @@ export function resolveCreatedFreshPresentation(ctx) {
       title: "Continue on your account",
       lead: createHandoffDetailLine(handoff.kind, handoff.handle),
     };
-  } else if (ctx.mode === "control" && !isGameSeasonSetupFlowActive()) {
+  } else if (ctx.mode === "control") {
     hero = controlHeroCopy(resolveControlOutcomeKind(ctx));
   }
 

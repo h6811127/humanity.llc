@@ -110,9 +110,10 @@ export function pickPreferredGameSeasonRoot(walletEntries) {
  */
 export function isGameSeasonCustodySession(session) {
   if (!session || typeof session !== "object") return false;
-  if (walletEntryHasOrganizerIssuerKey(session)) return true;
   const manifesto =
     typeof session.manifesto_line === "string" ? session.manifesto_line.trim() : "";
+  // Season roots use the City game manifesto. Optional coalition revoke keys on
+  // deploy-style general accounts are not season custody.
   return manifesto.startsWith(GAME_SEASON_MANIFESTO_PREFIX);
 }
 
