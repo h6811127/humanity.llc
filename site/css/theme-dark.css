@@ -1305,17 +1305,46 @@ html[data-theme="dark"] .city-game-map-filter-btn--active {
   background: var(--red);
   color: var(--white);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    0 2px 10px rgba(255, 77, 109, 0.24);
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 0 0 2px rgba(18, 18, 18, 0.98),
+    0 0 0 4px rgba(255, 77, 109, 0.62),
+    0 0 18px rgba(255, 77, 109, 0.34);
+  transform: translateY(-1px);
+}
+
+html[data-theme="dark"] .city-game-map-board--filtered .city-game-map-type-filter .city-game-map-filter-btn:not(.city-game-map-filter-btn--active),
+html[data-theme="dark"] .city-game-map-board--filtered .city-game-map-state-filter .city-game-map-filter-btn:not(.city-game-map-filter-btn--active) {
+  opacity: 0.62;
+  border-color: var(--shell-separator);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 html[data-theme="dark"] .city-game-map-filter-summary {
-  border-color: rgba(255, 77, 109, 0.32);
-  background: rgba(255, 77, 109, 0.12);
-  box-shadow: none;
+  border-color: rgba(255, 77, 109, 0.38);
+  border-left-color: var(--red);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 77, 109, 0.18) 0%,
+    rgba(255, 77, 109, 0.08) 100%
+  );
+  box-shadow:
+    0 0 0 1px rgba(255, 77, 109, 0.08) inset,
+    0 4px 16px rgba(0, 0, 0, 0.28);
 }
 
 html[data-theme="dark"] .city-game-map-filter-summary-scope {
+  color: rgba(255, 160, 176, 0.98);
+}
+
+html[data-theme="dark"] .city-game-map-filter-summary-count {
+  color: var(--shell-label);
+}
+
+html[data-theme="dark"] .city-game-map-board--filtered .city-game-map-filters-details:not([open]) > .city-game-map-filters-summary {
+  color: rgba(255, 140, 160, 0.98);
+}
+
+html[data-theme="dark"] .city-game-map-board--filtered .city-game-map-district:not([hidden]) .city-game-map-district-label {
   color: rgba(255, 140, 160, 0.98);
 }
 

@@ -60,6 +60,12 @@ export function syncBoardFilterSummary(boardRoot) {
 
   if (!isBoardFilterActive(typeId, stateId)) {
     summary.hidden = true;
+    if (summary.classList && typeof summary.classList.remove === "function") {
+      summary.classList.remove("city-game-map-filter-summary--live");
+    }
+    if (boardRoot.classList && typeof boardRoot.classList.toggle === "function") {
+      boardRoot.classList.toggle("city-game-map-board--filtered", false);
+    }
     return;
   }
 
@@ -81,14 +87,24 @@ export function syncBoardFilterSummary(boardRoot) {
   const scopeParts = [];
   if (typeId !== "all") scopeParts.push(typeLabel);
   if (stateId !== "all" && stateLabel) scopeParts.push(stateLabel);
-  scopeParts.push(countLabel);
 
   if (scopeEl) {
-    scopeEl.textContent = scopeParts.join(" · ");
+    scopeEl.textContent =
+      scopeParts.length > 0
+        ? formatBoardFilterSummaryScope(scopeParts[0], scopeParts[1] ?? null)
+        : typeLabel;
   }
   if (countEl) {
-    countEl.textContent = "";
-    countEl.hidden = true;
+    countEl.textContent = countLabel;
+    if ("hidden" in countEl) countEl.hidden = false;
+    else if (typeof countEl.removeAttribute === "function") countEl.removeAttribute("hidden");
+  }
+
+  if (summary.classList && typeof summary.classList.add === "function") {
+    summary.classList.add("city-game-map-filter-summary--live");
+  }
+  if (boardRoot.classList && typeof boardRoot.classList.toggle === "function") {
+    boardRoot.classList.toggle("city-game-map-board--filtered", true);
   }
 
   summary.hidden = false;
