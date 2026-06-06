@@ -9180,9 +9180,28 @@ button.btn-danger {
 
 .device-hub-keys-custody-row-inner {
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
+  align-items: stretch;
   gap: 10px;
   padding: 10px 12px;
+}
+
+.device-hub-keys-custody-row-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+}
+
+.device-hub-keys-custody-row-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.device-hub-keys-custody-row-copy .list-title,
+.device-hub-keys-custody-row-copy .list-sub {
+  display: block;
+  width: 100%;
 }
 
 .device-hub-keys-custody-dot {
@@ -9209,9 +9228,9 @@ button.btn-danger {
 .device-hub-keys-custody-actions {
   display: flex;
   flex-direction: column;
+  align-items: stretch;
   gap: 6px;
-  margin-left: auto;
-  flex-shrink: 0;
+  width: 100%;
 }
 
 .device-hub-keys-custody-action {
@@ -9225,6 +9244,40 @@ button.btn-danger {
   cursor: pointer;
   color: var(--hc-emphasis-card-info-fg, #007aff);
   background: var(--surface-popover-crosstab-bg, rgba(0, 122, 255, 0.12));
+  width: 100%;
+  max-width: 100%;
+  text-align: center;
+  white-space: normal;
+}
+
+@media (max-width: 767px) {
+  .device-hub-keys-custody-row-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (min-width: 768px) {
+  .device-hub-keys-custody-row-inner {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .device-hub-keys-custody-row-head {
+    flex: 1;
+  }
+
+  .device-hub-keys-custody-actions {
+    width: auto;
+    max-width: min(16rem, 42%);
+    flex-shrink: 0;
+    align-self: flex-start;
+  }
+
+  .device-hub-keys-custody-action {
+    width: auto;
+    white-space: nowrap;
+  }
 }
 
 .device-hub-keys-custody-action--secondary {

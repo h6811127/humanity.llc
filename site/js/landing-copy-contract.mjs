@@ -9,7 +9,7 @@
 /** Bump when hero / launch doors copy or structure changes intentionally. */
 export const LANDING_COPY_CONTRACT_VERSION = 1;
 
-export const LANDING_STYLES_CACHE_BUST = "151";
+export const LANDING_STYLES_CACHE_BUST = "152";
 
 export const LANDING_REQUIRED_SNIPPETS = [
   "Public programmable objects",
