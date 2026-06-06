@@ -138,8 +138,14 @@ export function applyBoardFilterVisibility(boardRoot) {
       { activeState }
     );
     const match = typeMatch && stateMatch;
-    if ("hidden" in row) row.hidden = !match;
-    else setBoardFilterHidden(row, !match);
+    const fogOmitted =
+      row &&
+      typeof row === "object" &&
+      row.classList &&
+      typeof row.classList.contains === "function" &&
+      row.classList.contains("city-game-map-node-row--fog-omitted");
+    if ("hidden" in row) row.hidden = fogOmitted || !match;
+    else setBoardFilterHidden(row, fogOmitted || !match);
   }
 
   for (const pin of boardRoot.querySelectorAll(".city-game-map-pin[data-node-id]")) {
