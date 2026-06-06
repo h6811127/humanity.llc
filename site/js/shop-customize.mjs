@@ -99,6 +99,11 @@ import {
   persistGlitchPrintFrameBackground,
   readStoredGlitchPrintFrameBackground,
 } from "./shop-customize-printify-qr-core.mjs?v=5";
+import {
+  fetchPrintArtifactSvg,
+  printArtifactDownloadFilename,
+  triggerSvgDownload,
+} from "./shop-customize-print-download-core.mjs";
 
 const PERSONALIZE_PROOF_CONSENT_IDS = proofConsentRequiredIds("personalized");
 
@@ -119,6 +124,8 @@ const mockGarmentEl = document.getElementById("shop-customize-mock-garment");
 const mockPhotoEl = document.getElementById("shop-customize-mock-photo");
 const plannedQrSectionEl = document.getElementById("shop-customize-planned-qr");
 const plannedQrImgEl = document.getElementById("shop-customize-planned-qr-img");
+const plannedQrDownloadBtn = document.getElementById("shop-customize-planned-qr-download");
+const plannedQrDownloadHintEl = document.getElementById("shop-customize-planned-qr-download-hint");
 const plannedQrLabelEl = document.querySelector(".shop-customize-planned-qr__label");
 const plannedQrHintEl = document.querySelector(".shop-customize-planned-qr__hint");
 const mockPhotoWrapEl = document.getElementById("shop-customize-mock-photo-wrap");
@@ -166,7 +173,7 @@ let selectedSize = "";
 let signingSession = null;
 /** @type {string | null} */
 let selectedProductId = null;
-/** @type {{ artifact_intent_id: string, planned_item_qr_ids: string[], shopify?: { cart_line_attributes: { key: string, value: string }[] } } | null} */
+/** @type {{ artifact_intent_id: string, planned_item_qr_ids: string[], planned_print_artifact_ids?: string[], shopify?: { cart_line_attributes: { key: string, value: string }[] } } | null} */
 let activeIntent = null;
 /** @type {"planned" | "card_fallback" | null} */
 let previewMode = null;
@@ -851,6 +858,56 @@ function hidePlannedQrPreview() {
     plannedQrImgEl.removeAttribute("src");
     plannedQrImgEl.classList.remove("is-loading");
   }
+  syncPlannedQrDownloadUi(false);
+}
+
+/**
+ * @param {boolean} ready
+ */
+function syncPlannedQrDownloadUi(ready) {
+  if (plannedQrDownloadBtn instanceof HTMLButtonElement) {
+    plannedQrDownloadBtn.hidden = !ready;
+    plannedQrDownloadBtn.disabled = !ready;
+  }
+  if (plannedQrDownloadHintEl instanceof HTMLElement) {
+    plannedQrDownloadHintEl.hidden = !ready;
+  }
+}
+
+async function onPlannedQrDownloadClick() {
+  if (!signingSession || !activeIntent?.planned_item_qr_ids?.[0]) {
+    setStatus("Print file is not ready yet — wait for preview to finish.", true);
+    return;
+  }
+  const profileId = signingSession.profile_id;
+  const qrId = activeIntent.planned_item_qr_ids[0];
+  const printArtifactId = activeIntent.planned_print_artifact_ids?.[0] ?? null;
+  const display = productDisplay();
+  if (!(plannedQrDownloadBtn instanceof HTMLButtonElement)) return;
+  plannedQrDownloadBtn.disabled = true;
+  setStatus("Preparing print file…");
+  try {
+    const { scanUrl, svg } = await fetchPrintArtifactSvg({
+      apiOrigin: resolverApiOrigin(),
+      profileId,
+      qrId,
+      printArtifactId,
+      printFrameBackground: glitchArtifactIntentPrintFrameBackground(
+        selectedColor,
+        selectedGlitchPrintFrameBackground
+      ),
+      printVariantId: display?.printVariantId || null,
+    });
+    const filename = printArtifactDownloadFilename(profileId, qrId);
+    triggerSvgDownload(svg, filename);
+    setStatus(`Downloaded ${filename} · ${scanUrl}`);
+  } catch (err) {
+    setStatus(err instanceof Error ? err.message : "Could not download print file.", true);
+  } finally {
+    if (plannedQrDownloadBtn instanceof HTMLButtonElement) {
+      plannedQrDownloadBtn.disabled = false;
+    }
+  }
 }
 
 function hideGlitchPlannedQrPreview() {
@@ -876,6 +933,7 @@ async function syncGlitchPlannedQrPreview(scanUrl) {
           : "Your planned live-object QR — white card print preview",
     });
     plannedQrImgEl.hidden = false;
+    syncPlannedQrDownloadUi(Boolean(activeIntent?.planned_item_qr_ids?.[0]));
   } catch {
     hideGlitchPlannedQrPreview();
   } finally {
@@ -1446,6 +1504,9 @@ async function init() {
   });
   checkoutBtn?.addEventListener("click", () => {
     void onCheckoutClick();
+  });
+  plannedQrDownloadBtn?.addEventListener("click", () => {
+    void onPlannedQrDownloadClick();
   });
   function resyncCheckoutFromStorage() {
     const product = selectedProduct();
