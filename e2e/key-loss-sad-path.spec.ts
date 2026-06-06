@@ -58,6 +58,14 @@ async function expectNoKeylessHcCreated(page: import("@playwright/test").Page) {
   expect(session.ok).toBe(true);
 }
 
+async function openCreatedRestoreTools(page: import("@playwright/test").Page) {
+  const details = page.locator("#created-view-restore-tools");
+  await expect(details).toBeVisible();
+  await details.evaluate((el) => {
+    if (el instanceof HTMLDetailsElement) el.open = true;
+  });
+}
+
 async function stubCardRoutes(page: import("@playwright/test").Page) {
   await page.route("**/.well-known/hc/v1/health**", (route) =>
     route.fulfill({
@@ -142,7 +150,7 @@ test.describe("key-loss sad paths", () => {
 
     await page.getByRole("tab", { name: "Settings" }).click();
     await expect(page.locator("#created-tab-advanced #created-deploy-print")).toBeVisible();
-    await expect(page.locator("#created-view-restore-tools")).toBeVisible();
+    await openCreatedRestoreTools(page);
     await expect(page.locator("#created-view-restore-tools summary")).toContainText("Recovery code");
     await expect(page.locator("#import-recovery-form")).toBeVisible();
     await expect(page.locator("#no-session")).toBeHidden();
@@ -213,6 +221,7 @@ test.describe("key-loss sad paths", () => {
 
     await page.getByRole("tab", { name: "Settings" }).click();
     await expect(page.locator("#created-view-manage-lead")).toBeVisible();
+    await openCreatedRestoreTools(page);
     await expect(page.locator("#import-recovery-form")).toBeVisible();
   });
 
