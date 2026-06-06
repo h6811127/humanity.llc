@@ -1073,6 +1073,34 @@
             </div>
           </details>
 
+          <section
+            class="created-tags-collection device-boot-gated"
+            id="created-tags-collection"
+            hidden
+            aria-labelledby="created-tags-count"
+          >
+            <header class="created-tags-collection-header">
+              <h2 class="created-tags-collection-title" id="created-tags-count">Attached QRs</h2>
+              <p class="form-hint created-tags-collection-lead" id="created-tags-lead"></p>
+            </header>
+            <div class="created-tags-collection-toolbar">
+              <button
+                type="button"
+                class="btn-secondary"
+                id="created-tags-add-btn"
+                hidden
+              >
+                Add QR
+              </button>
+            </div>
+            <ul
+              class="created-tags-collection-list hub-card-list"
+              id="created-tags-list"
+              hidden
+            ></ul>
+            <p class="form-hint created-tags-collection-empty" id="created-tags-empty" hidden></p>
+          </section>
+
           <details
             class="created-child-object-add-hub flow-disclosure"
             id="child-object-add-hub"
@@ -2463,8 +2491,49 @@
         <p class="form-status" id="device-hub-qr-scanner-status" role="status" hidden></p>
       </div>
     </dialog>
+
+    <div id="created-tags-manage-root" class="created-tags-manage-root" hidden inert>
+      <button
+        type="button"
+        id="created-tags-manage-backdrop"
+        class="created-tags-manage-backdrop"
+        aria-label="Close manage panel"
+        hidden
+      ></button>
+      <div
+        id="created-tags-manage-panel"
+        class="created-tags-manage-panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="created-tags-manage-title"
+        hidden
+      >
+        <div class="created-tags-manage-panel-header">
+          <button
+            type="button"
+            class="btn-icon created-tags-manage-close"
+            id="created-tags-manage-close"
+            aria-label="Close"
+          >
+            ×
+          </button>
+          <h2 class="created-tags-manage-title" id="created-tags-manage-title">Manage attached QR</h2>
+          <p class="form-hint created-tags-manage-subtitle" id="created-tags-manage-subtitle"></p>
+        </div>
+        <p class="created-tags-manage-name" id="created-tags-manage-name"></p>
+        <p class="created-tags-manage-status" id="created-tags-manage-status" role="status"></p>
+        <div class="created-tags-manage-actions">
+          <a class="btn-primary" id="created-tags-manage-open-scan" hidden>Open scan page</a>
+          <button type="button" class="btn-secondary" id="created-tags-manage-update-status" hidden>
+            Update status
+          </button>
+        </div>
+        <p class="form-hint created-tags-manage-advanced" id="created-tags-manage-advanced"></p>
+      </div>
+    </div>
+
     <script src="/js/device-status-bootstrap.mjs?v=94" type="module"></script>
     <script src="/js/created-hub.mjs?v=5" type="module"></script>
-    <script type="module" src="/js/created.mjs?v=90"></script>
+    <script type="module" src="/js/created.mjs?v=91"></script>
   </body>
 </html>
