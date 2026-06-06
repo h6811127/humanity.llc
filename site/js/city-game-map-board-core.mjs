@@ -5,7 +5,10 @@
 
 import { buildBoardFilterSummaryHtml } from "./city-game-map-filter-summary-core.mjs";
 import { buildStateFilterHtml, deriveNodeBoardStates } from "./city-game-map-state-filter-core.mjs";
-import { isDenseMapBoard } from "./city-game-map-interaction-core.mjs";
+import {
+  buildMapSelectionBarHtml,
+  isDenseMapBoard,
+} from "./city-game-map-interaction-core.mjs";
 import { buildTypeFilterHtml } from "./city-game-map-type-filter-core.mjs";
 import { comprehensionPrimaryNodeId } from "./city-game-player-guide-core.mjs";
 
@@ -944,6 +947,7 @@ export function buildMapPlacesSectionHtml(season, copy, launchCopy) {
       </div>
       ${buildBoardFilterSummaryHtml()}
     </details>
+    ${buildMapSelectionBarHtml()}
     <div class="city-game-map-list-scroll">
       ${buildMapNodeListHtml(season, launchCopy)}
     </div>

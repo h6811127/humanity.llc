@@ -128,3 +128,62 @@ export function isMapPinInteractive(pin) {
 export function shouldScrollSketchForRowFocus(matchMedia) {
   return matchMedia(CITY_GAME_MAP_MOBILE_SKETCH_MEDIA);
 }
+
+/**
+ * Places-section sketch above the list; falls back to advanced district sketch.
+ * @param {{ querySelector?: (sel: string) => Element | null }} boardRoot
+ * @returns {HTMLElement | null}
+ */
+export function resolvePrimarySketchFigure(boardRoot) {
+  if (!boardRoot || typeof boardRoot.querySelector !== "function") return null;
+  const mobile = boardRoot.querySelector(".city-game-map-mobile-sketch");
+  if (mobile) return /** @type {HTMLElement} */ (mobile);
+  const district = boardRoot.querySelector("#district-sketch .city-game-map-figure");
+  return district ? /** @type {HTMLElement} */ (district) : null;
+}
+
+/**
+ * Prefer the mobile-sketch pin when both mobile and advanced sketches exist.
+ * @param {{ querySelector?: (sel: string) => Element | null }} boardRoot
+ * @param {string | null | undefined} nodeId
+ * @returns {Element | null}
+ */
+export function resolveSketchPin(boardRoot, nodeId) {
+  const id = String(nodeId ?? "").trim();
+  if (!id || !boardRoot || typeof boardRoot.querySelector !== "function") return null;
+  const esc = typeof CSS !== "undefined" && CSS.escape ? CSS.escape(id) : id;
+  const mobilePin = boardRoot.querySelector(
+    `.city-game-map-mobile-sketch .city-game-map-pin[data-node-id="${esc}"]`
+  );
+  if (mobilePin) return mobilePin;
+  return boardRoot.querySelector(`.city-game-map-pin[data-node-id="${esc}"]`);
+}
+
+/**
+ * @param {string | null | undefined} title
+ * @param {string | null | undefined} meta
+ * @returns {{ title: string; meta: string }}
+ */
+export function resolveSelectionBarCopy(title, meta) {
+  const resolvedTitle = String(title ?? "").trim();
+  const resolvedMeta = String(meta ?? "").trim();
+  return {
+    title: resolvedTitle || "Selected place",
+    meta: resolvedMeta,
+  };
+}
+
+/**
+ * Hidden until a place is selected; lives between mobile sketch and list scroll.
+ * @returns {string}
+ */
+export function buildMapSelectionBarHtml() {
+  return `<div class="city-game-map-selection-bar" data-selection-bar hidden role="region" aria-label="Selected place" aria-live="polite">
+  <div class="city-game-map-selection-bar-main">
+    <p class="city-game-map-selection-bar-kicker">Selected place</p>
+    <p class="city-game-map-selection-bar-title" data-selection-title></p>
+    <p class="city-game-map-selection-bar-meta" data-selection-meta hidden></p>
+  </div>
+  <button type="button" class="city-game-map-selection-bar-action" data-show-on-sketch>Show on sketch</button>
+</div>`;
+}
