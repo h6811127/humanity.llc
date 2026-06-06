@@ -55,6 +55,34 @@ export function seasonJsonPublicUrl(basename) {
 
 /**
  * @param {Record<string, unknown>} season
+ */
+export function publicListingFromSeasonConfig(season) {
+  const raw = season.public_listing;
+  if (!raw || typeof raw !== "object") {
+    return {
+      listed: false,
+      title: null,
+      summary: null,
+      region: null,
+      category: null,
+    };
+  }
+  const listing = /** @type {Record<string, unknown>} */ (raw);
+  const categoryRaw = listing.category;
+  return {
+    listed: listing.listed === true,
+    title: typeof listing.title === "string" && listing.title.trim() ? listing.title.trim() : null,
+    summary:
+      typeof listing.summary === "string" && listing.summary.trim() ? listing.summary.trim() : null,
+    region:
+      typeof listing.region === "string" && listing.region.trim() ? listing.region.trim() : null,
+    category:
+      typeof categoryRaw === "string" && categoryRaw.trim() ? categoryRaw.trim() : null,
+  };
+}
+
+/**
+ * @param {Record<string, unknown>} season
  * @param {string} basename
  */
 export function seasonIndexEntryFromConfig(season, basename) {
@@ -63,6 +91,7 @@ export function seasonIndexEntryFromConfig(season, basename) {
   const rootRaw = season.season_root_profile_id;
   const seasonRootProfileId =
     typeof rootRaw === "string" && rootRaw.trim() ? rootRaw.trim() : null;
+  const public_listing = publicListingFromSeasonConfig(season);
   return {
     season_id: String(season.season_id ?? ""),
     title: String(season.title ?? season.season_id ?? ""),
@@ -73,6 +102,7 @@ export function seasonIndexEntryFromConfig(season, basename) {
     season_root_profile_id: seasonRootProfileId,
     json_url: seasonJsonPublicUrl(basename),
     json_basename: basename,
+    public_listing,
   };
 }
 

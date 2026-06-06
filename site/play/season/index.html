@@ -6,15 +6,15 @@
       name="viewport"
       content="width=device-width, initial-scale=1, viewport-fit=cover"
     />
-    <title>City games · humanity.llc</title>
+    <title>Find public networks · humanity.llc</title>
     <meta
       name="description"
-      content="Weekend city games. Public object state, cooperation-first play, no app and no accounts."
+      content="Find public live-object networks that organizers chose to list. Search by city or name. Not a map, feed, or scan history."
     />
-    <meta name="robots" content="noindex, nofollow" />
     <meta name="theme-color" content="#ffffff" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=142" />
+    <link rel="stylesheet" href="/styles.css?v=157" />
+    <link rel="stylesheet" href="/css/public-networks-portal.css?v=2" />
   </head>
   <body>
     <div class="page">
@@ -26,33 +26,56 @@
         <a class="top-create" href="/create/">Create</a>
       </header>
 
-      <main class="screen screen-landing">
+      <main class="screen screen-landing public-networks-screen">
         <section class="hero hero-compact">
-          <p class="hero-eyebrow">Physical-world multiplayer</p>
-          <h1>City games</h1>
+          <p class="hero-eyebrow">Public network discovery</p>
+          <h1>Find public networks</h1>
           <p class="hero-line">
-            Each city runs a <strong>weekend season</strong>. Stickers at public places show live
-            signed state. No app. No account. No personal scoreboard.
+            Open public networks that expose live places, game nodes, resources, or status.
+            Listed networks share <strong>signed public state</strong> you can open without an
+            account. This is not a map, social feed, or scan history.
           </p>
         </section>
 
-        <section class="idea-section" aria-labelledby="city-games-list-title">
-          <h2 class="group-label" id="city-games-list-title">Registered seasons</h2>
-          <ul class="list list-compact" id="city-game-season-list">
-            <li class="list-row">
-              <span class="list-content">
-                <span class="list-sub">Loading seasons…</span>
-              </span>
-            </li>
-          </ul>
+        <section class="public-networks-toolbar idea-section" aria-label="Search and filter">
+          <label class="form-label" for="public-networks-search">Search public networks</label>
+          <input
+            class="form-input public-networks-search"
+            id="public-networks-search"
+            type="search"
+            name="q"
+            autocomplete="off"
+            placeholder="City, name, or keyword"
+          />
+          <p class="form-hint public-networks-toolbar-hint">Only intentionally listed networks appear here.</p>
+          <div
+            class="public-networks-categories"
+            id="public-networks-categories"
+            role="group"
+            aria-label="Categories"
+          ></div>
         </section>
 
-        <p class="idea-footnote">
-          Research:
-          <a href="/what-can-a-qr-do/physical-world-multiplayer/">physical-world multiplayer</a>
+        <section class="idea-section" aria-labelledby="public-networks-results-title">
+          <h2 class="group-label" id="public-networks-results-title">Listed networks</h2>
+          <p class="form-hint public-networks-toolbar-hint">
+            One live network today: Cedar Rapids. Prototype and coming soon cards preview future
+            network formats.
+          </p>
+          <div class="public-networks-results" id="public-networks-results">
+            <p class="public-networks-loading">Loading public networks…</p>
+          </div>
+          <p class="public-networks-empty" id="public-networks-empty" hidden></p>
+        </section>
+
+        <p class="idea-footnote public-networks-footnote">
+          A network is a shared board of places. Open a board to browse places, then scan a sticker
+          at a place to read or update live status. Unlisted networks stay reachable by direct link
+          or QR only.
+          <a href="/what-can-a-qr-do/physical-world-multiplayer/">Physical-world multiplayer</a>
         </p>
       </main>
     </div>
-    <script type="module" src="/js/city-game-season-portal.mjs?v=1"></script>
+    <script type="module" src="/js/public-networks-portal.mjs?v=2"></script>
   </body>
 </html>
