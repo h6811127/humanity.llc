@@ -2,6 +2,7 @@
  * Season create fork UI on /create/?intent=game (step 20 slice 4).
  */
 
+import { isCreateEntryGateActive } from "./create-entry-state.mjs";
 import {
   GAME_SEASON_ACCOUNT_PARAM,
   GAME_SEASON_FORK_DEDICATED,
@@ -44,10 +45,11 @@ export function syncCreateSeasonForkUi(searchParams) {
     wizard.hidden = showFork;
   }
   if (formMain instanceof HTMLElement) {
-    formMain.hidden = showFork;
+    formMain.hidden = showFork || isCreateEntryGateActive();
   }
   if (submitBtn instanceof HTMLButtonElement) {
     submitBtn.disabled = showFork;
+    if (isCreateEntryGateActive()) submitBtn.hidden = true;
   }
 
   if (!showFork) return;

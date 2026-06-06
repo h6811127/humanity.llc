@@ -41,6 +41,7 @@ export function wearRootManifesto(handle, manifesto) {
  */
 export function resolveWearSubmitStrategy(ctx) {
   if (!isWearCreateIntent(ctx.searchParams)) return "standard";
+  if (ctx.gateBypass) return "create_wear_card";
   const preferredRoot = pickPreferredGeneralRoot(listGeneralRootsWithKeys(ctx.walletEntries));
   if (preferredRoot) return "redirect_live";
   return "create_wear_card";

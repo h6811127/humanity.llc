@@ -114,9 +114,9 @@ test.describe("create entry chooser (step 11)", () => {
 
     await expect(page.locator("#create-entry-chooser")).toBeVisible();
     await expect(page.locator("#create-form-panel")).toBeHidden();
-    await expect(page.getByText("Your @handle")).toBeVisible();
-    await expect(page.getByText("Live status on something")).toBeVisible();
-    await expect(page.getByText("Live status on you")).toBeVisible();
+    await expect(page.getByRole("button", { name: /^Your @handle/ })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Live status on something/ })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Live status on you/ })).toBeVisible();
     await expect(page.getByText("Play the city game")).toHaveCount(0);
     await expect(page.getByRole("link", { name: /Cedar Rapids city board/i })).toBeVisible();
   });
@@ -142,12 +142,14 @@ test.describe("create entry chooser (step 11)", () => {
     await expect(page.locator("#submit")).toHaveText(/season @handle/i);
   });
 
-  test("season fork existing path continues on saved deploy root", async ({ page }) => {
+  test("season fork existing path shows entry gate when deploy root exists", async ({ page }) => {
     await seedGeneralRootWallet(page);
     await page.goto("/create/?intent=game&season_account=existing");
 
+    await expect(page.locator("#create-entry-gate")).toBeVisible();
     await expect(page.locator("#game-season-id-block")).toBeHidden();
-    await expect(page.locator("#submit")).toHaveText(/Open @river_studio to set up season/i);
+    await expect(page.locator("#create-form-main-fields")).toBeHidden();
+    await expect(page.locator("#submit")).toBeHidden();
   });
 
   test("wear BYOP link opens form with intent=wear", async ({ page }) => {
@@ -186,12 +188,14 @@ test.describe("create entry chooser (step 11)", () => {
     await expect(page.locator("#create-game-season-wizard")).toBeHidden();
   });
 
-  test("deploy room redirects to Live when general root exists", async ({ page }) => {
+  test("deploy room shows entry gate when general root exists", async ({ page }) => {
     await seedGeneralRootWallet(page);
     await page.goto("/create/?intent=deploy");
 
-    await expect(page.locator("#create-deploy-wizard")).toBeVisible();
-    await expect(page.locator("#submit")).toHaveText("Open @river_studio to add sign");
+    await expect(page.locator("#create-entry-gate")).toBeVisible();
+    await expect(page.locator("#create-entry-gate-primary")).toContainText("@river_studio");
+    await expect(page.locator("#create-form-main-fields")).toBeHidden();
+    await expect(page.locator("#submit")).toBeHidden();
   });
 });
 
@@ -218,12 +222,12 @@ test.describe("topology convergence — field-kit deep links", () => {
     await expect(page.locator("#deploy-object-label-title")).toHaveText("What is this tag on?");
   });
 
-  test("template deep link with saved root offers Live redirect", async ({ page }) => {
+  test("template deep link with saved root shows entry gate", async ({ page }) => {
     await seedGeneralRootWallet(page);
     await page.goto("/create/?template=status_plate");
 
-    await expect(page.locator("#create-deploy-wizard")).toBeVisible();
-    await expect(page.locator("#submit")).toHaveText("Open @river_studio to add sign");
+    await expect(page.locator("#create-entry-gate")).toBeVisible();
+    await expect(page.locator("#create-form-main-fields")).toBeHidden();
   });
 });
 

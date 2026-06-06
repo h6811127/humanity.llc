@@ -422,6 +422,27 @@
         </section>
 
         <div id="create-form-panel" hidden>
+        <section
+          class="create-entry-gate flow-section device-boot-gated"
+          id="create-entry-gate"
+          hidden
+          aria-labelledby="create-entry-gate-title"
+        >
+          <div class="hc-emphasis-card hc-emphasis-card--info create-entry-gate-card">
+            <div class="hc-emphasis-card__main">
+              <span class="hc-emphasis-card__dot hc-emphasis-card__dot--info" aria-hidden="true"></span>
+              <div class="hc-emphasis-card__copy">
+                <p class="hc-emphasis-card__eyebrow" id="create-entry-gate-eyebrow"></p>
+                <p class="hc-emphasis-card__title" id="create-entry-gate-title"></p>
+                <p class="hc-emphasis-card__detail" id="create-entry-gate-body"></p>
+              </div>
+            </div>
+            <div class="create-entry-gate-actions">
+              <a href="#" class="btn-primary" id="create-entry-gate-primary" role="button"></a>
+              <button type="button" class="btn-secondary" id="create-entry-gate-secondary" hidden></button>
+            </div>
+          </div>
+        </section>
         <p class="create-entry-back-wrap">
           <button type="button" class="btn-text create-entry-back" id="create-entry-back">
             ← All ways to start

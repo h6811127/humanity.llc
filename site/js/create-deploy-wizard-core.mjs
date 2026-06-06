@@ -83,10 +83,13 @@ export function parseDeployChildFields(template, fields) {
  * @returns {DeploySubmitStrategy}
  */
 export function resolveDeploySubmitStrategy(ctx) {
-  const { searchParams, template, walletEntries } = ctx;
+  const { searchParams, template, walletEntries, gateBypass = false } = ctx;
   const isPilot = template === "status_plate" || template === "lost_item_relay";
   if (!isDeployWizardIntent(searchParams) || !isPilot) {
     return "standard";
+  }
+  if (gateBypass) {
+    return "root_and_child";
   }
   const preferredRoot = pickPreferredGeneralRoot(listGeneralRootsWithKeys(walletEntries));
   if (preferredRoot) {

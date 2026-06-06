@@ -2,6 +2,8 @@
  * Wear BYOP create wizard UI (step 15).
  */
 
+import { isCreateEntryGateActive } from "./create-entry-state.mjs";
+import { readCreateEntryGateBypass } from "./create-entry-state-core.mjs";
 import { loadWallet } from "./device-wallet.mjs";
 import {
   listGeneralRootsWithKeys,
@@ -53,11 +55,14 @@ export function syncCreateWearWizardUi(searchParams) {
     }
   }
 
-  if (!submitBtn || !active) return;
+  if (!submitBtn || !active || isCreateEntryGateActive()) return;
+
+  const gateBypass = readCreateEntryGateBypass(sessionStorage, searchParams);
 
   const strategy = resolveWearSubmitStrategy({
     searchParams,
     walletEntries: loadWallet(),
+    gateBypass,
   });
   const preferredRoot = pickPreferredGeneralRoot(listGeneralRootsWithKeys(loadWallet()));
   const label = wearSubmitButtonLabel(strategy, preferredRoot);

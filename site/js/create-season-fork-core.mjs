@@ -41,6 +41,13 @@ export function readGameSeasonForkChoice(searchParams) {
 export function resolveGameSeasonSubmitStrategy(ctx) {
   if (!isGameSeasonCreateIntent(ctx.searchParams)) return "standard";
 
+  if (ctx.gateBypass) {
+    const fork = readGameSeasonForkChoice(ctx.searchParams);
+    if (!fork) return "fork_choose";
+    if (fork === GAME_SEASON_FORK_EXISTING) return "create_dual_skin_root";
+    return "create_season_only_root";
+  }
+
   const seasonRoot = pickPreferredGameSeasonRoot(ctx.walletEntries);
   if (seasonRoot) return "redirect_live";
 

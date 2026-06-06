@@ -366,7 +366,7 @@ Slice 1 shipped add-hub filter only; **list policy** is slice 2+.
 | **2** | **Room switcher** on `/created/` + persist per `profile_id`; policy reads `active_room` | **Shipped** — `steward-active-room-core.mjs`, `created-room-switcher.mjs` |
 | **3** | **Add vs list** policy — lists show all children; “managed under Doors” badges | **Shipped** — `steward-child-object-list-policy-core.mjs`, `created-child-object-section-ui.mjs` |
 | **4** | **Season create fork** + honest beat when organizer key added to deploy root | **Shipped** — `create-season-fork-core.mjs`, `steward-season-key-honest-beat-core.mjs` |
-| **5** | **Five entry states** — remove mid-form wallet branch on create; unlock-first screens | Planned |
+| **5** | **Five entry states** — remove mid-form wallet branch on create; unlock-first screens | **Shipped** — `create-entry-state-core.mjs`, entry gate on `/create/` |
 | **6** | **Season progressive checklist**; wear track chooser; season id off create | Planned |
 | **7** | Capability-driven scan templates per room | Planned |
 
@@ -402,7 +402,7 @@ Defer full URL split (`/created/deploy/` etc.) until switcher + checklist prove 
 | Room switcher | Slice 2 | — |
 | “Not in this room” copy | Slices 2–3 (crosshint + list badges) | — |
 | Season checklist | Focus param only | Slice 6 |
-| Five entry states | Partial | Mid-form wallet branching remains |
+| Five entry states | Slice 5 shipped | Mid-form wallet branching removed for deploy/wear/season redirect paths |
 | Capability-driven scan | L2 partial in resolver | Templates not fully room-aware |
 
 **WS-QUALITY exit:** 5 steward comprehension sessions without “I thought it worked but…” on keys / room confusion — [`CORE_PRODUCT_LOOP.md`](CORE_PRODUCT_LOOP.md) Q3.

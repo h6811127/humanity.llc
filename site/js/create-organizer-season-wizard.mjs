@@ -2,6 +2,8 @@
  * Organizer season create wizard UI (step 14).
  */
 
+import { isCreateEntryGateActive } from "./create-entry-state.mjs";
+import { readCreateEntryGateBypass } from "./create-entry-state-core.mjs";
 import { syncCreateSeasonForkUi } from "./create-season-fork.mjs";
 import { resolveGameSeasonSubmitStrategy } from "./create-season-fork-core.mjs";
 import {
@@ -35,8 +37,9 @@ const GAME_SEASON_FORK_HERO = {
 export function syncCreateOrganizerSeasonWizardUi(searchParams) {
   const active = isGameSeasonCreateIntent(searchParams);
   const walletEntries = loadWallet();
+  const gateBypass = readCreateEntryGateBypass(sessionStorage, searchParams);
   const strategy = active
-    ? resolveGameSeasonSubmitStrategy({ searchParams, walletEntries })
+    ? resolveGameSeasonSubmitStrategy({ searchParams, walletEntries, gateBypass })
     : "standard";
   const showFork = active && strategy === "fork_choose";
 
@@ -77,7 +80,7 @@ export function syncCreateOrganizerSeasonWizardUi(searchParams) {
     }
   }
 
-  if (!submitBtn || !active) {
+  if (!submitBtn || !active || isCreateEntryGateActive()) {
     if (submitBtn && !active && !isGameSeasonCreateIntent(searchParams)) {
       /* leave deploy/general labels to other sync */
     }
