@@ -947,8 +947,8 @@ export function buildMapPlacesSectionHtml(season, copy, launchCopy) {
       </div>
       ${buildBoardFilterSummaryHtml()}
     </details>
-    ${buildMapSelectionBarHtml()}
     <div class="city-game-map-list-scroll">
+      ${buildMapSelectionBarHtml()}
       ${buildMapNodeListHtml(season, launchCopy)}
     </div>
   </div>

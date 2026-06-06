@@ -61,6 +61,7 @@ describe("city-game-map-interaction-core", () => {
     expect(styles).toContain(".city-game-map-node-row[hidden]");
     expect(styles).toContain(".city-game-map-selection-bar");
     expect(styles).toContain(".city-game-map-selection-bar-action");
+    expect(styles).toContain(".city-game-map-board--place-selected");
   });
 
   it("accepts SVG pin targets on board click", () => {
@@ -75,6 +76,7 @@ describe("city-game-map-interaction-core", () => {
     expect(src).toContain("applyBoardFilterVisibility");
     expect(src).toContain("readMapBoardNodeQueryParam");
     expect(src).toContain("syncSelectionFeedbackBar");
+    expect(src).toContain("city-game-map-board--place-selected");
     expect(src).toContain("[data-show-on-sketch]");
     expect(src).not.toContain("scrollSketchOnRow");
     expect(src).not.toMatch(/scrollSketch:\s*scrollSketchOnRow/);

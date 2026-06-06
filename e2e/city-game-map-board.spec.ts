@@ -564,18 +564,21 @@ test.describe("city game map board", () => {
 
     const order = await board.locator(".city-game-map-list-panel").evaluate((panel) => {
       const sketch = panel.querySelector(".city-game-map-mobile-sketch");
-      const bar = panel.querySelector("[data-selection-bar]");
       const list = panel.querySelector(".city-game-map-list-scroll");
-      if (!sketch || !bar || !list) return null;
+      const bar = list?.querySelector("[data-selection-bar]");
+      const firstRow = list?.querySelector(".city-game-map-node-row");
+      if (!sketch || !bar || !list || !firstRow) return null;
       const following = Node.DOCUMENT_POSITION_FOLLOWING;
       return {
-        sketchBeforeBar: Boolean(sketch.compareDocumentPosition(bar) & following),
-        barBeforeList: Boolean(bar.compareDocumentPosition(list) & following),
+        sketchBeforeList: Boolean(sketch.compareDocumentPosition(list) & following),
+        barInsideList: list.contains(bar),
+        barBeforeRow: Boolean(bar.compareDocumentPosition(firstRow) & following),
       };
     });
 
-    expect(order?.sketchBeforeBar).toBe(true);
-    expect(order?.barBeforeList).toBe(true);
+    expect(order?.sketchBeforeList).toBe(true);
+    expect(order?.barInsideList).toBe(true);
+    expect(order?.barBeforeRow).toBe(true);
   });
 
   test("legacy #city-state hash redirects to dedicated map page", async ({ page }) => {

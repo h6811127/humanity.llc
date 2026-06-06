@@ -184,6 +184,8 @@ export function buildMapSelectionBarHtml() {
     <p class="city-game-map-selection-bar-title" data-selection-title></p>
     <p class="city-game-map-selection-bar-meta" data-selection-meta hidden></p>
   </div>
-  <button type="button" class="city-game-map-selection-bar-action" data-show-on-sketch>Show on sketch</button>
+  <div class="city-game-map-selection-bar-actions">
+    <button type="button" class="city-game-map-selection-bar-action" data-show-on-sketch>Show on sketch</button>
+  </div>
 </div>`;
 }
