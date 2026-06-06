@@ -49,9 +49,11 @@ describe("season-window", () => {
   });
 
   it("exposes scan and contribute copy for closed windows", () => {
-    expect(seasonWindowChip("before")).toContain("not open");
+    expect(seasonWindowChip("before", TEST_WINDOW)).toContain("Season opens");
+    expect(seasonWindowChip("before", TEST_WINDOW)).toContain("Scans work now");
     expect(seasonWindowChip("after")).toContain("ended");
     expect(seasonWindowScanNote("after")).toContain("Season 1 has ended");
+    expect(seasonWindowScanNote("before", TEST_WINDOW)).toContain("Scans work now");
     expect(seasonWindowContributeMessage("before")).toContain("not opened");
   });
 

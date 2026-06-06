@@ -9,6 +9,7 @@ import {
 } from "./city-game-map-filter-core.mjs";
 import {
   isMapPinInteractive,
+  readMapBoardNodeQueryParam,
   resolveMapNodeHighlight,
   shouldScrollSketchForRowFocus,
 } from "./city-game-map-interaction-core.mjs";
@@ -241,4 +242,15 @@ export function bootCityGameMapInteraction(boardRoot, season) {
   );
 
   applyBoardFilterVisibility(boardRoot);
+
+  if (typeof window !== "undefined") {
+    const nodeFromQuery = readMapBoardNodeQueryParam(window.location.search);
+    if (nodeFromQuery) {
+      selectMapNode(boardRoot, nodeFromQuery, {
+        toggle: false,
+        scrollList: true,
+        scrollSketch: scrollSketchOnRow,
+      });
+    }
+  }
 }

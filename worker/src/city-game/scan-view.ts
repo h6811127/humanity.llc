@@ -29,6 +29,8 @@ export type GameNodeScanContext = {
   enabled: boolean;
   mode: GameNodeScanMode;
   seasonId: string;
+  /** Season graph node id for board deep links (`?node=`). */
+  nodeId: string | null;
   nodeRole: string;
   district: string | null;
   gameMeta: GameMeta;
@@ -233,6 +235,38 @@ export function gameNodeCoopHint(
   return null;
 }
 
+/** Player-facing next step on game scan onboarding band. */
+export function gameScanNextActionLine(
+  gameNode: GameNodeScanContext,
+  opts: {
+    contributeAvailable?: boolean;
+    pledgeAvailable?: boolean;
+  } = {}
+): string {
+  if (gameNode.seasonWindowPhase === "before") {
+    return "Open the city board to plan your route before the season opens.";
+  }
+  if (gameNode.seasonWindowPhase === "after") {
+    return "Browse the board for final public state — progression is paused.";
+  }
+  if (opts.pledgeAvailable) {
+    return "Pledge a faction on this device, then follow relays on the board.";
+  }
+  if (opts.contributeAvailable) {
+    if (gameNode.contributeMode === "capture" || gameNode.contributeMode === "reinforce") {
+      return "Capture or reinforce this relay, or open the board to see who holds the city.";
+    }
+    if (gameNode.contributeMode === "scarcity") {
+      return "Claim a sunset pass here, or scout the board for the next seal.";
+    }
+    if (gameNode.contributeMode === "fragment") {
+      return "Register this fragment, then check the board for what is still missing.";
+    }
+    return "Add your visit to unlock the clue for everyone, or scout ahead on the board.";
+  }
+  return "Open the city board to see how this spot connects to the weekend route.";
+}
+
 export function parseGameNodeFields(documentJson: string | null | undefined): {
   seasonId: string;
   nodeRole: string;
@@ -293,8 +327,12 @@ export function resolveGameNodeScanContext(input: {
   const seasonWindowPhase = resolveSeasonWindowPhase(now, season);
   const streams = fields.objectStreams.length ? fields.objectStreams : input.objectStreams;
 
+  const nodeId =
+    input.objectId != null ? seasonNodeIdForObject(input.objectId, season) : null;
+
   const base = {
     seasonId: fields.seasonId,
+    nodeId,
     nodeRole: fields.nodeRole,
     district: fields.district,
     gameMeta: fields.gameMeta,
@@ -304,9 +342,6 @@ export function resolveGameNodeScanContext(input: {
     vouchGate: null as GameVouchGate | null,
     seasonWindowPhase,
   };
-
-  const nodeId =
-    input.objectId != null ? seasonNodeIdForObject(input.objectId, season) : null;
   const pledgeFaction = seasonNodePledgeFaction(nodeId, season);
   const contributeMode = gameNodeContributeMode(
     nodeId,
