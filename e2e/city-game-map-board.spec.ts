@@ -525,6 +525,7 @@ test.describe("city game map board", () => {
     const board = page.locator(".city-game-map-board");
     await expect(board).toBeVisible({ timeout: 15_000 });
 
+    await openBoardFilters(board);
     await board
       .locator(".city-game-map-type-filter")
       .getByRole("button", { name: /Relays/ })

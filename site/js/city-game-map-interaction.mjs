@@ -319,7 +319,6 @@ export function bootCityGameMapInteraction(boardRoot, season) {
       selectMapNode(boardRoot, nodeFromQuery, {
         toggle: false,
         scrollList: true,
-        scrollSketch: scrollSketchOnRow,
       });
     }
   }
