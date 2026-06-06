@@ -81,12 +81,31 @@ describe("created-first-revoke-gate", () => {
     Object.defineProperty(globalThis, "document", {
       configurable: true,
       value: {
+        body: { dataset: {} },
         getElementById: (id: string) => elements[id] ?? null,
       },
     });
 
     syncUpdateStatusTaskGate("profile_a", { pilot_template: "general" });
     expect(elements["created-live-scanners-see"].hidden).toBe(false);
+    expect(elements["created-scanners-see-gate-hint"].hidden).toBe(true);
+  });
+
+  it("keeps scanners-see hidden in view-only workspace after dashboard sync", () => {
+    const elements: Record<string, { hidden: boolean }> = {
+      "created-live-scanners-see": { hidden: true },
+      "created-scanners-see-gate-hint": { hidden: false },
+    };
+    Object.defineProperty(globalThis, "document", {
+      configurable: true,
+      value: {
+        body: { dataset: { createdMode: "view" } },
+        getElementById: (id: string) => elements[id] ?? null,
+      },
+    });
+
+    syncUpdateStatusTaskGate("profile_a", { pilot_template: "general" });
+    expect(elements["created-live-scanners-see"].hidden).toBe(true);
     expect(elements["created-scanners-see-gate-hint"].hidden).toBe(true);
   });
 

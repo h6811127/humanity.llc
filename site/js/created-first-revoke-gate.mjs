@@ -106,6 +106,12 @@ export function isScannersSeeUnlocked(profileId, session = null) {
 export function syncUpdateStatusTaskGate(profileId, session = null) {
   const scannersSee = document.getElementById("created-live-scanners-see");
   const hint = document.getElementById("created-scanners-see-gate-hint");
+  // View-only workspace hides signing Live blocks; do not re-open after dashboard sync.
+  if (typeof document !== "undefined" && document.body?.dataset.createdMode === "view") {
+    if (scannersSee) scannersSee.hidden = true;
+    if (hint) hint.hidden = true;
+    return;
+  }
   const unlocked = isScannersSeeUnlocked(profileId, session);
   if (scannersSee) scannersSee.hidden = !unlocked;
   if (hint) hint.hidden = unlocked;
