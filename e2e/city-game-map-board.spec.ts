@@ -98,7 +98,7 @@ test.describe("city game map board", () => {
     await expect(page.getByRole("link", { name: "Rules", exact: true })).toBeVisible();
 
     await expect(board.getByText("Help wake the city.")).toBeVisible();
-    await expect(board.locator("#city-game-map-mission-progress")).toBeVisible();
+    await expect(board.locator("#city-game-map-progress")).toBeVisible();
     await expect(board.getByText("Relays unclaimed · Finale dormant")).toBeVisible();
     await expect(board.locator("#city-game-map-mission .city-game-map-mission-privacy")).toContainText(
       "No account. No GPS. No visit log."
@@ -122,7 +122,7 @@ test.describe("city game map board", () => {
     await expect(board.getByText("Start at Riverwalk River Lantern.")).toBeVisible();
 
     await expect(board).toHaveAttribute("data-snapshot-loaded", "1");
-    await expect(board.locator("#city-game-map-mission-progress")).toHaveText("1 / 3 fragments recovered");
+    await expect(board.locator("#city-game-map-progress")).toHaveText("1 / 3 fragments recovered");
     await expect(board.locator("#city-game-map-spotlight-count")).toHaveText("14 / 20");
     await expect(board.locator("#city-game-map-live-state")).toBeVisible();
     await expect(board.getByText("What changes when the city wakes")).toBeVisible();
