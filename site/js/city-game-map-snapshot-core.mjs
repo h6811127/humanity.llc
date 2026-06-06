@@ -196,9 +196,8 @@ function shouldOmitFogRow(nodeId, role, mapVisibility, rumored) {
  */
 export function applyMissionSummaryFromSnapshot(boardRoot, snapshot) {
   const mission = boardRoot.querySelector("#city-game-map-mission");
-  const progressEl = boardRoot.querySelector("#city-game-map-mission-progress");
+  const progressEl = boardRoot.querySelector("#city-game-map-progress");
   const worldEl = boardRoot.querySelector("#city-game-map-mission-world");
-  const lobbyProgress = boardRoot.querySelector("#city-game-map-progress");
 
   const lobby = boardRoot.querySelector(".city-game-map-lobby");
   const dataset =
@@ -210,7 +209,6 @@ export function applyMissionSummaryFromSnapshot(boardRoot, snapshot) {
   const progress = formatProgressLine(finale, copy);
 
   if (progressEl && "textContent" in progressEl) progressEl.textContent = progress;
-  if (lobbyProgress && "textContent" in lobbyProgress) lobbyProgress.textContent = progress;
 
   const worldDefault =
     mission instanceof HTMLElement && mission.dataset.worldDefault?.trim()
