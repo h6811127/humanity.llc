@@ -8,17 +8,21 @@ import {
 } from "./create-entry-chooser-core.mjs";
 
 /**
- * @param {"chooser" | "form"} mode
+ * @param {"chooser" | "form" | "gate"} mode
  */
 export function applyCreateEntryView(mode) {
   const chooserEl = document.getElementById("create-entry-chooser");
   const panelEl = document.getElementById("create-form-panel");
+  const gateEl = document.getElementById("create-entry-gate");
   if (chooserEl) chooserEl.hidden = mode !== "chooser";
-  if (panelEl) panelEl.hidden = mode !== "form";
+  if (panelEl) panelEl.hidden = mode === "chooser";
+  if (gateEl) gateEl.hidden = mode !== "gate";
 }
 
 export function showCreateFormPanel() {
   applyCreateEntryView("form");
+  const gateEl = document.getElementById("create-entry-gate");
+  if (gateEl) gateEl.hidden = true;
 }
 
 export function showCreateEntryChooserPanel() {

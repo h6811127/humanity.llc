@@ -45,6 +45,12 @@ import {
 import { syncCreateWearWizardUi } from "./create-wear-wizard.mjs";
 import { syncCreateGeneralRoomUi } from "./create-general-room-wizard.mjs";
 import {
+  bindCreateEntryGateActions,
+  isCreateEntryGateActive,
+  syncCreateEntryGate,
+} from "./create-entry-state.mjs";
+import { readCreateEntryGateBypass } from "./create-entry-state-core.mjs";
+import {
   redirectToWearPrintOnLive,
   runWearCardCreate,
 } from "./create-wear-submit.mjs";
@@ -180,6 +186,7 @@ function setTemplate(template) {
   syncCreateWearWizardUi(searchParams);
   syncCreateGeneralRoomUi(searchParams);
   syncCreateCustodyModeUi({ scrollOrganizerCallout: isGameSeasonCreateIntent(searchParams) });
+  syncCreateEntryGate(searchParams, template, { ephemeralBrowsing });
 }
 
 function buildManifestoLine() {
@@ -631,6 +638,9 @@ function readValidatedCreateInput() {
 
 async function submitCreate(e, opts = {}) {
   e?.preventDefault();
+  if (isCreateEntryGateActive()) {
+    return;
+  }
   if (ephemeralBrowsing) {
     setStatus(EPHEMERAL_BROWSING_CREATE_BLOCKED, true);
     return;
@@ -642,9 +652,11 @@ async function submitCreate(e, opts = {}) {
     logCreateSubmit("submit:start", { path: location.pathname + location.search });
     const input = readValidatedCreateInput();
     const searchParams = new URLSearchParams(location.search);
+    const gateBypass = readCreateEntryGateBypass(sessionStorage, searchParams);
     const gameStrategy = resolveGameSeasonSubmitStrategy({
       searchParams,
       walletEntries: loadWallet(),
+      gateBypass,
     });
 
     if (gameStrategy === "fork_choose") {
@@ -693,6 +705,7 @@ async function submitCreate(e, opts = {}) {
     const wearStrategy = resolveWearSubmitStrategy({
       searchParams,
       walletEntries: loadWallet(),
+      gateBypass,
     });
 
     if (wearStrategy === "redirect_live") {
@@ -718,6 +731,7 @@ async function submitCreate(e, opts = {}) {
       searchParams,
       template: activeTemplate,
       walletEntries: loadWallet(),
+      gateBypass,
     });
 
     if (strategy === "redirect_live") {
@@ -851,6 +865,15 @@ function openGeneralAccountForm() {
 }
 
 function bootstrapCreateEntry() {
+  bindCreateEntryGateActions(() => ({
+    searchParams: new URLSearchParams(location.search),
+    template: activeTemplate,
+    ephemeralBrowsing,
+    onBypass: () => {
+      setTemplate(activeTemplate);
+    },
+  }));
+
   if (shouldSkipCreateEntryChooser(createSearchParams)) {
     showCreateFormPanel();
     setTemplate(defaultTemplateForCreateEntry(createSearchParams));

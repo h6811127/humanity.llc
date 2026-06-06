@@ -85,6 +85,22 @@ describe("resolveDeploySubmitStrategy", () => {
     ).toBe("redirect_live");
   });
 
+  it("uses root_and_child when entry gate bypass is active", () => {
+    expect(
+      resolveDeploySubmitStrategy({
+        ...base,
+        gateBypass: true,
+        walletEntries: [
+          {
+            pilot_template: "general",
+            profile_id: "prof_root",
+            owner_private_key_b58: "priv",
+          },
+        ],
+      })
+    ).toBe("root_and_child");
+  });
+
   it("uses root_and_child even when legacy compat disclosure is open (flat_legacy retired)", () => {
     expect(resolveDeploySubmitStrategy(base)).toBe("root_and_child");
   });

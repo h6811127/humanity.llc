@@ -2,6 +2,8 @@
  * Deploy-intent create wizard UI sync.
  */
 
+import { isCreateEntryGateActive } from "./create-entry-state.mjs";
+import { readCreateEntryGateBypass } from "./create-entry-state-core.mjs";
 import { loadWallet } from "./device-wallet.mjs";
 import {
   listGeneralRootsWithKeys,
@@ -73,10 +75,15 @@ export function syncCreateDeployWizardUi(searchParams, template) {
     return;
   }
 
+  if (isCreateEntryGateActive()) return;
+
+  const gateBypass = readCreateEntryGateBypass(sessionStorage, searchParams);
+
   const strategy = resolveDeploySubmitStrategy({
     searchParams,
     template,
     walletEntries: loadWallet(),
+    gateBypass,
   });
   const preferredRoot = pickPreferredGeneralRoot(listGeneralRootsWithKeys(loadWallet()));
   const label = deploySubmitButtonLabel(template, strategy, preferredRoot);

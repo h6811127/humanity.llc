@@ -8074,6 +8074,24 @@ html[data-theme="dark"] .landing-launch-doors-lead {
   font-size: 14px;
 }
 
+.create-entry-gate {
+  margin-bottom: 16px;
+}
+
+.create-entry-gate-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.create-entry-gate-actions .btn-primary,
+.create-entry-gate-actions .btn-secondary {
+  width: 100%;
+  text-align: center;
+  text-decoration: none;
+}
+
 .create-entry-chooser .list-action .create-entry-door-btn,
 .create-entry-chooser .list-action .create-entry-door-link {
   display: flex;
