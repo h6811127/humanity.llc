@@ -11,8 +11,65 @@ import {
   isMapPinInteractive,
   readMapBoardNodeQueryParam,
   resolveMapNodeHighlight,
-  shouldScrollSketchForRowFocus,
+  resolvePrimarySketchFigure,
+  resolveSelectionBarCopy,
+  resolveSketchPin,
 } from "./city-game-map-interaction-core.mjs";
+
+/**
+ * @param {HTMLElement} boardRoot
+ * @param {string | null | undefined} nodeId
+ */
+function syncSelectionFeedbackBar(boardRoot, nodeId) {
+  const bar = boardRoot.querySelector("[data-selection-bar]");
+  if (!(bar instanceof HTMLElement)) return;
+
+  const id = String(nodeId ?? "").trim();
+  if (!id) {
+    bar.hidden = true;
+    delete bar.dataset.selectionNodeId;
+    return;
+  }
+
+  const row = boardRoot.querySelector(
+    `.city-game-map-node-row[data-node-id="${CSS.escape(id)}"]`
+  );
+  if (!(row instanceof HTMLElement)) {
+    bar.hidden = true;
+    delete bar.dataset.selectionNodeId;
+    return;
+  }
+
+  const titleEl = bar.querySelector("[data-selection-title]");
+  const metaEl = bar.querySelector("[data-selection-meta]");
+  const titleRow = row.querySelector(".city-game-map-node-title");
+  const metaRow = row.querySelector(".city-game-map-node-meta");
+  const copy = resolveSelectionBarCopy(
+    titleRow instanceof HTMLElement ? titleRow.textContent : "",
+    metaRow instanceof HTMLElement ? metaRow.textContent : ""
+  );
+
+  if (titleEl instanceof HTMLElement) titleEl.textContent = copy.title;
+  if (metaEl instanceof HTMLElement) {
+    if (copy.meta) {
+      metaEl.textContent = copy.meta;
+      metaEl.hidden = false;
+    } else {
+      metaEl.textContent = "";
+      metaEl.hidden = true;
+    }
+  }
+
+  bar.dataset.selectionNodeId = id;
+  bar.hidden = false;
+}
+
+/**
+ * @param {HTMLElement} boardRoot
+ */
+function refreshSelectionFeedbackBar(boardRoot) {
+  syncSelectionFeedbackBar(boardRoot, boardRoot.dataset.highlightNodeId ?? null);
+}
 
 /**
  * @param {HTMLElement} boardRoot
@@ -42,6 +99,8 @@ function setHighlightNode(boardRoot, nodeId) {
       labelEl.setAttribute("visibility", "hidden");
     }
   }
+
+  syncSelectionFeedbackBar(boardRoot, nodeId ?? null);
 
   if (!nodeId) return;
 
@@ -81,23 +140,32 @@ function scrollListRowIntoView(boardRoot, nodeId) {
  * @param {string} nodeId
  */
 function scrollSketchToPin(boardRoot, nodeId) {
-  const sketch = boardRoot.querySelector(".city-game-map-mobile-sketch");
+  const sketch = resolvePrimarySketchFigure(boardRoot);
   if (sketch instanceof HTMLElement) {
-    sketch.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    sketch.scrollIntoView({ block: "start", behavior: "smooth" });
   }
 
-  const pin = boardRoot.querySelector(
-    `.city-game-map-pin[data-node-id="${CSS.escape(nodeId)}"]`
-  );
-  if (pin instanceof SVGGElement && isMapPinInteractive(pin)) {
-    pin.scrollIntoView({ block: "nearest", behavior: "smooth", inline: "nearest" });
+  const pin = resolveSketchPin(boardRoot, nodeId);
+  if (!(pin instanceof SVGGElement) || !isMapPinInteractive(pin)) return;
+
+  const revealPin = () => {
+    pin.scrollIntoView({ block: "center", behavior: "smooth", inline: "nearest" });
+  };
+
+  if (typeof requestAnimationFrame === "function") {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(revealPin);
+    });
+    return;
   }
+
+  revealPin();
 }
 
 /**
  * @param {HTMLElement} boardRoot
  * @param {string | null | undefined} nodeId
- * @param {{ scrollList?: boolean, scrollSketch?: boolean, toggle?: boolean }} [opts]
+ * @param {{ scrollList?: boolean, toggle?: boolean }} [opts]
  */
 function selectMapNode(boardRoot, nodeId, opts = {}) {
   const id = String(nodeId ?? "").trim();
@@ -121,7 +189,6 @@ function selectMapNode(boardRoot, nodeId, opts = {}) {
   boardRoot.dataset.highlightSource = "row";
 
   if (opts.scrollList) scrollListRowIntoView(boardRoot, nextId);
-  if (opts.scrollSketch) scrollSketchToPin(boardRoot, nextId);
 }
 
 /**
@@ -158,10 +225,6 @@ function selectMapPin(boardRoot, nodeId) {
 export function bootCityGameMapInteraction(boardRoot, season) {
   if (!boardRoot || !season) return;
 
-  const scrollSketchOnRow =
-    typeof window !== "undefined" &&
-    shouldScrollSketchForRowFocus((query) => window.matchMedia(query).matches);
-
   const typeToolbar = boardRoot.querySelector(".city-game-map-type-filter");
   if (typeToolbar instanceof HTMLElement) {
     typeToolbar.addEventListener("click", (event) => {
@@ -171,6 +234,7 @@ export function bootCityGameMapInteraction(boardRoot, season) {
       if (!(btn instanceof HTMLButtonElement)) return;
       const typeId = btn.dataset.typeFilter ?? "all";
       setTypeFilter(boardRoot, typeId);
+      refreshSelectionFeedbackBar(boardRoot);
     });
   }
 
@@ -183,6 +247,7 @@ export function bootCityGameMapInteraction(boardRoot, season) {
       if (!(btn instanceof HTMLButtonElement)) return;
       const stateId = btn.dataset.stateFilter ?? "all";
       setStateFilter(boardRoot, stateId);
+      refreshSelectionFeedbackBar(boardRoot);
     });
   }
 
@@ -202,6 +267,13 @@ export function bootCityGameMapInteraction(boardRoot, season) {
 
     if (target.closest("[data-filter-clear]")) {
       clearBoardFilters(boardRoot);
+      refreshSelectionFeedbackBar(boardRoot);
+      return;
+    }
+
+    if (target.closest("[data-show-on-sketch]")) {
+      const nodeId = boardRoot.dataset.highlightNodeId;
+      if (nodeId) scrollSketchToPin(boardRoot, nodeId);
       return;
     }
 
@@ -218,7 +290,6 @@ export function bootCityGameMapInteraction(boardRoot, season) {
     const row = target.closest(".city-game-map-node-row");
     if (row instanceof HTMLElement && row.dataset.nodeId) {
       selectMapNode(boardRoot, row.dataset.nodeId, {
-        scrollSketch: scrollSketchOnRow,
         toggle: false,
       });
     }
@@ -233,7 +304,6 @@ export function bootCityGameMapInteraction(boardRoot, season) {
       const row = target.closest(".city-game-map-node-row");
       if (row instanceof HTMLElement && row.dataset.nodeId) {
         selectMapNode(boardRoot, row.dataset.nodeId, {
-          scrollSketch: scrollSketchOnRow,
           toggle: false,
         });
       }

@@ -415,6 +415,168 @@ test.describe("city game map board", () => {
     await expect(row).toHaveAttribute("aria-current", "true");
   });
 
+  test("place row tap does not auto-scroll sketch on mobile", async ({ page }) => {
+    await mockSeasonSnapshot(page, mockSnapshotBody());
+    await page.setViewportSize({ width: 390, height: 844 });
+
+    await page.goto("/play/cedar-rapids/map/");
+
+    const board = page.locator(".city-game-map-board");
+    await expect(board).toBeVisible({ timeout: 15_000 });
+
+    const sketch = board.locator(".city-game-map-mobile-sketch");
+    const row = board.locator('.city-game-map-node-row[data-node-id="node_04"]');
+
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await row.locator(".city-game-map-node-title").click();
+
+    const sketchTop = await sketch.evaluate((el) => el.getBoundingClientRect().top);
+    expect(sketchTop).toBeLessThan(0);
+    await expect(board.locator("[data-selection-bar]")).toBeVisible();
+  });
+
+  test("place row selection shows sticky feedback bar with district context", async ({
+    page,
+  }) => {
+    await mockSeasonSnapshot(page, mockSnapshotBody());
+    await page.setViewportSize({ width: 390, height: 844 });
+
+    await page.goto("/play/cedar-rapids/map/");
+
+    const board = page.locator(".city-game-map-board");
+    await expect(board).toBeVisible({ timeout: 15_000 });
+
+    const bar = board.locator("[data-selection-bar]");
+    await expect(bar).toBeHidden();
+
+    const row = board.locator('.city-game-map-node-row[data-node-id="node_04"]');
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await row.locator(".city-game-map-node-title").click();
+
+    await expect(board).toHaveAttribute("data-highlight-node-id", "node_04");
+    await expect(bar).toBeVisible();
+    await expect(bar.locator("[data-selection-title]")).toHaveText("Riverwalk River Lantern");
+    await expect(bar.locator("[data-selection-meta]")).toContainText(/River spine/);
+    await expect(bar.getByRole("button", { name: "Show on sketch" })).toBeVisible();
+  });
+
+  test("show on sketch scrolls mobile sketch into viewport", async ({ page }) => {
+    await mockSeasonSnapshot(page, mockSnapshotBody());
+    await page.setViewportSize({ width: 390, height: 844 });
+
+    await page.goto("/play/cedar-rapids/map/");
+
+    const board = page.locator(".city-game-map-board");
+    await expect(board).toBeVisible({ timeout: 15_000 });
+
+    const sketch = board.locator(".city-game-map-mobile-sketch");
+    const pin = board.locator(
+      '.city-game-map-mobile-sketch .city-game-map-pin[data-node-id="node_04"]'
+    );
+    const row = board.locator('.city-game-map-node-row[data-node-id="node_04"]');
+
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await row.locator(".city-game-map-node-title").click();
+    await expect(board.locator("[data-selection-bar]")).toBeVisible();
+
+    const before = await sketch.evaluate((el) => {
+      const rect = el.getBoundingClientRect();
+      return { top: rect.top, visible: rect.top >= 0 && rect.bottom <= window.innerHeight };
+    });
+    expect(before.visible).toBe(false);
+
+    await board.getByRole("button", { name: "Show on sketch" }).click();
+    await page.waitForTimeout(600);
+
+    const after = await sketch.evaluate((el) => {
+      const rect = el.getBoundingClientRect();
+      return { top: rect.top, inViewport: rect.top >= -8 && rect.bottom <= window.innerHeight + 8 };
+    });
+    expect(after.inViewport).toBe(true);
+    expect(after.top).toBeGreaterThan(before.top);
+    await expect(pin).toHaveClass(/city-game-map-pin--highlight/);
+  });
+
+  test("selection feedback bar hides when highlight clears", async ({ page }) => {
+    await mockSeasonSnapshot(page, mockSnapshotBody());
+
+    await page.goto("/play/cedar-rapids/map/");
+
+    const board = page.locator(".city-game-map-board");
+    await expect(board).toBeVisible({ timeout: 15_000 });
+
+    const bar = board.locator("[data-selection-bar]");
+    const pin = districtSketchPin(board, "node_04");
+    await openDistrictSketch(board);
+
+    await clickMapPin(pin);
+    await expect(bar).toBeVisible();
+
+    await clickMapPin(pin);
+    await expect(bar).toBeHidden();
+  });
+
+  test("selection feedback bar works with active type filter", async ({ page }) => {
+    await mockSeasonSnapshot(page, mockSnapshotBody());
+    await page.setViewportSize({ width: 390, height: 844 });
+
+    await page.goto("/play/cedar-rapids/map/");
+
+    const board = page.locator(".city-game-map-board");
+    await expect(board).toBeVisible({ timeout: 15_000 });
+
+    await board
+      .locator(".city-game-map-type-filter")
+      .getByRole("button", { name: /Relays/ })
+      .click();
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+
+    const row = board.locator('.city-game-map-node-row[data-node-id="node_01"]');
+    await expect(row).toBeVisible();
+    await row.locator(".city-game-map-node-title").click();
+
+    const bar = board.locator("[data-selection-bar]");
+    await expect(bar).toBeVisible();
+    await expect(bar.locator("[data-selection-title]")).toHaveText("NewBo relay arch");
+
+    await bar.getByRole("button", { name: "Show on sketch" }).click();
+    await page.waitForTimeout(600);
+
+    const sketchInView = await board.locator(".city-game-map-mobile-sketch").evaluate((el) => {
+      const rect = el.getBoundingClientRect();
+      return rect.top >= -8 && rect.bottom <= window.innerHeight + 8;
+    });
+    expect(sketchInView).toBe(true);
+  });
+
+  test("mobile layout keeps sketch above selection bar and list", async ({ page }) => {
+    await mockSeasonSnapshot(page, mockSnapshotBody());
+    await page.setViewportSize({ width: 390, height: 844 });
+
+    await page.goto("/play/cedar-rapids/map/");
+
+    const board = page.locator(".city-game-map-board");
+    await expect(board).toBeVisible({ timeout: 15_000 });
+
+    const row = board.locator('.city-game-map-node-row[data-node-id="node_04"]');
+    await row.locator(".city-game-map-node-title").click();
+
+    const order = await board.locator(".city-game-map-list-panel").evaluate((panel) => {
+      const sketch = panel.querySelector(".city-game-map-mobile-sketch");
+      const bar = panel.querySelector("[data-selection-bar]");
+      const list = panel.querySelector(".city-game-map-list-scroll");
+      if (!sketch || !bar || !list) return null;
+      const following = Node.DOCUMENT_POSITION_FOLLOWING;
+      return {
+        sketchBeforeBar: Boolean(sketch.compareDocumentPosition(bar) & following),
+        barBeforeList: Boolean(bar.compareDocumentPosition(list) & following),
+      };
+    });
+
+    expect(order?.sketchBeforeBar).toBe(true);
+    expect(order?.barBeforeList).toBe(true);
+  });
+
   test("legacy #city-state hash redirects to dedicated map page", async ({ page }) => {
     await mockSeasonSnapshot(page, mockSnapshotBody());
 

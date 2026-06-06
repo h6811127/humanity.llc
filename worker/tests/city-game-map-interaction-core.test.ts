@@ -7,11 +7,15 @@ import { describe, expect, it } from "vitest";
 import {
   buildDistrictFilterHtml,
   buildDistrictFilterOptions,
+  buildMapSelectionBarHtml,
   CITY_GAME_MAP_DENSE_NODE_THRESHOLD,
   isDenseMapBoard,
   isMapPinInteractive,
   readMapBoardNodeQueryParam,
   resolveMapNodeHighlight,
+  resolvePrimarySketchFigure,
+  resolveSelectionBarCopy,
+  resolveSketchPin,
   shouldScrollSketchForRowFocus,
 } from "../../site/js/city-game-map-interaction-core.mjs";
 import { validateMapLayout } from "../../site/js/city-game-map-board-core.mjs";
@@ -55,6 +59,8 @@ describe("city-game-map-interaction-core", () => {
     expect(styles).toContain(".city-game-map-list-scroll");
     expect(styles).toContain(".city-game-map-filter-clear");
     expect(styles).toContain(".city-game-map-node-row[hidden]");
+    expect(styles).toContain(".city-game-map-selection-bar");
+    expect(styles).toContain(".city-game-map-selection-bar-action");
   });
 
   it("accepts SVG pin targets on board click", () => {
@@ -68,6 +74,10 @@ describe("city-game-map-interaction-core", () => {
     expect(src).toContain("clearBoardFilters");
     expect(src).toContain("applyBoardFilterVisibility");
     expect(src).toContain("readMapBoardNodeQueryParam");
+    expect(src).toContain("syncSelectionFeedbackBar");
+    expect(src).toContain("[data-show-on-sketch]");
+    expect(src).not.toContain("scrollSketchOnRow");
+    expect(src).not.toMatch(/scrollSketch:\s*scrollSketchOnRow/);
   });
 
   it("resolveMapNodeHighlight toggles off repeat selection", () => {
@@ -107,6 +117,51 @@ describe("city-game-map-interaction-core", () => {
   it("shouldScrollSketchForRowFocus matches mobile stack media", () => {
     expect(shouldScrollSketchForRowFocus(() => true)).toBe(true);
     expect(shouldScrollSketchForRowFocus(() => false)).toBe(false);
+  });
+
+  it("buildMapSelectionBarHtml seeds hidden sticky feedback shell", () => {
+    const html = buildMapSelectionBarHtml();
+    expect(html).toContain("data-selection-bar");
+    expect(html).toContain('data-show-on-sketch');
+    expect(html).toContain("Show on sketch");
+    expect(html).toContain("Selected place");
+    expect(html).toContain('role="region"');
+    expect(html).toContain(" hidden");
+  });
+
+  it("resolveSelectionBarCopy prefers row title and meta", () => {
+    expect(resolveSelectionBarCopy("Riverwalk River Lantern", "River spine · Clue")).toEqual({
+      title: "Riverwalk River Lantern",
+      meta: "River spine · Clue",
+    });
+    expect(resolveSelectionBarCopy("", "")).toEqual({
+      title: "Selected place",
+      meta: "",
+    });
+  });
+
+  it("resolvePrimarySketchFigure prefers mobile sketch over advanced figure", () => {
+    const mobileSketch = { tagName: "FIGURE" };
+    const districtFigure = { tagName: "FIGURE" };
+    const boardRoot = {
+      querySelector: (sel: string) => {
+        if (sel === ".city-game-map-mobile-sketch") return mobileSketch;
+        if (sel === "#district-sketch .city-game-map-figure") return districtFigure;
+        return null;
+      },
+    };
+    expect(resolvePrimarySketchFigure(boardRoot)).toBe(mobileSketch);
+  });
+
+  it("resolveSketchPin prefers mobile sketch pin", () => {
+    const mobilePin = { tagName: "g", hidden: false, hasAttribute: () => false };
+    const boardRoot = {
+      querySelector: (sel: string) => {
+        if (sel.startsWith(".city-game-map-mobile-sketch")) return mobilePin;
+        return null;
+      },
+    };
+    expect(resolveSketchPin(boardRoot, "node_04")).toBe(mobilePin);
   });
 });
 
