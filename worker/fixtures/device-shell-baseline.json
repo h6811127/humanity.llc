@@ -4,11 +4,11 @@
   "phase": "smooth_mode_phase_0",
   "asset_version": 94,
   "module_count": 86,
-  "js_bytes_total": 563034,
+  "js_bytes_total": 562999,
   "shell_css_bytes_total": 78910,
-  "landing_css_bytes_total": 353349,
-  "transfer_bytes_shell_graph": 641944,
-  "transfer_bytes_landing_first_paint": 916383,
+  "landing_css_bytes_total": 360344,
+  "transfer_bytes_shell_graph": 641909,
+  "transfer_bytes_landing_first_paint": 923343,
   "js_modules": [
     {
       "file": "js/device-status-bootstrap.mjs",
@@ -284,7 +284,7 @@
     },
     {
       "file": "js/device-hub-ui.mjs",
-      "bytes": 96478
+      "bytes": 96443
     },
     {
       "file": "js/device-hub-card-row-core.mjs",

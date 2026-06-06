@@ -3,6 +3,8 @@
  */
 
 import { prepareAddObjectHashFocus } from "./created-child-object-add-hub.mjs";
+import { isCreatedCollectionFlagEnabled } from "./created-collection-flag-core.mjs";
+import { shouldDeferLegacyUpdateStatusPanelFocus } from "./created-update-status-route-core.mjs";
 import {
   childObjectHubFocusHash,
   childObjectIdFromHubFocusHash,
@@ -104,6 +106,14 @@ function focusChildObjectRow(select, objectId) {
 export function applyCreatedHashRoute(select, hash = location.hash) {
   const key = hash.replace(/^#/, "");
   if (!key) {
+    select("now");
+    return;
+  }
+  const collectionFlagEnabled = isCreatedCollectionFlagEnabled(
+    new URLSearchParams(location.search),
+    localStorage
+  );
+  if (shouldDeferLegacyUpdateStatusPanelFocus(collectionFlagEnabled, key)) {
     select("now");
     return;
   }

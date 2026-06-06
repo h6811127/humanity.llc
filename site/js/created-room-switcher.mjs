@@ -79,6 +79,42 @@ function syncManagingContext(show, handle) {
 }
 
 /**
+ * Promote room switcher into Collection shell when collection flag is on.
+ *
+ * @param {{
+ *   profileId: string;
+ *   session: Record<string, unknown> | null | undefined;
+ *   collectionFlagEnabled: boolean;
+ * }} input
+ */
+export function syncCreatedCollectionRoomSwitcherPlacement(input) {
+  const wrap = document.getElementById("created-room-switcher-wrap");
+  const slot = document.getElementById("created-collection-room-slot");
+  const addHubBody = document.querySelector("#child-object-add-hub .created-child-add-hub-body");
+  if (!wrap || !slot || !addHubBody) return;
+
+  const show = shouldShowStewardRoomSwitcher(input.session);
+  const handle =
+    typeof input.session?.handle === "string" && input.session.handle.trim()
+      ? input.session.handle
+      : "";
+
+  if (input.collectionFlagEnabled && show) {
+    if (wrap.parentElement !== slot) slot.appendChild(wrap);
+    wrap.classList.add("created-room-switcher-promoted");
+    wrap.hidden = false;
+    syncManagingContext(true, handle);
+    return;
+  }
+
+  wrap.classList.remove("created-room-switcher-promoted");
+  if (wrap.parentElement !== addHubBody) {
+    addHubBody.insertBefore(wrap, addHubBody.firstChild);
+  }
+  syncDemotedRoomSwitcherVisibility(input.profileId, show);
+}
+
+/**
  * @param {string | null | undefined} profileId
  * @param {boolean} showDemotedControls
  */

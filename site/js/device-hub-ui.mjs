@@ -119,7 +119,6 @@ import {
   hubCardTitle,
 } from "./device-hub-card-row-core.mjs?v=94";
 import {
-  childObjectHubFocusHash,
   hubChildObjectIconHtml,
   hubChildObjectIdentityLine,
   hubChildObjectRootHandle,
@@ -1771,7 +1770,7 @@ function bindHubChildObjectRowHandlers() {
       } catch {
         /* ignore */
       }
-      openCardControlPage(entry, childObjectHubFocusHash(objectId), { returnUrl });
+      openCardControlPage(entry, "update-status", { returnUrl, objectId });
     });
   });
 }

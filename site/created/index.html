@@ -566,6 +566,103 @@
             </div>
           </section>
 
+          <div
+            class="created-collection-room-slot device-boot-gated"
+            id="created-collection-room-slot"
+            hidden
+          ></div>
+
+          <section
+            class="created-collection-root device-boot-gated"
+            id="created-collection-root"
+            hidden
+            aria-label="Scan points"
+          >
+            <header class="created-account-strip" id="created-account-strip">
+              <p class="created-account-strip-heading" id="created-account-strip-heading">
+                Managing this account
+              </p>
+              <p class="created-account-strip-meta" id="created-account-strip-meta"></p>
+              <p class="created-account-strip-backup" id="created-account-strip-backup"></p>
+            </header>
+            <div class="created-collection-toolbar">
+              <button
+                type="button"
+                class="btn-secondary"
+                id="created-collection-add-btn"
+                hidden
+              >
+                Add scan point
+              </button>
+            </div>
+            <p
+              class="created-collection-stale-banner hc-notice-body"
+              id="created-collection-stale-banner"
+              hidden
+            >
+              Scan point not found.
+              <button type="button" class="btn-link" id="created-collection-stale-back">
+                Back to scan points
+              </button>
+            </p>
+            <ul
+              class="created-collection-list hub-card-list"
+              id="created-collection-list"
+              hidden
+            ></ul>
+            <p class="form-hint created-collection-empty" id="created-collection-empty" hidden>
+              No scan points yet.
+            </p>
+          </section>
+
+          <section
+            class="created-focused-object-root device-boot-gated"
+            id="created-focused-object-root"
+            hidden
+            aria-label="Focused scan point"
+          >
+            <div
+              class="created-focused-object-stale"
+              id="created-focused-object-stale"
+              hidden
+            >
+              <p class="hc-notice-body" id="created-focused-object-stale-message">
+                Scan point not found.
+              </p>
+              <button type="button" class="btn-link" id="created-focused-object-stale-back">
+                Back to scan points
+              </button>
+            </div>
+            <div id="created-focused-object-content" hidden>
+              <div class="created-focused-object-header">
+                <button type="button" class="btn-link" id="created-focused-object-back">
+                  Back to scan points
+                </button>
+                <div class="created-focused-object-badges">
+                  <span class="created-focused-object-type-badge" id="created-focused-object-type-badge"></span>
+                  <span class="created-focused-object-room-badge" id="created-focused-object-room-badge" hidden></span>
+                </div>
+                <h2 class="created-focused-object-title" id="created-focused-object-title"></h2>
+                <p class="created-focused-object-status" id="created-focused-object-status" role="status"></p>
+                <p class="form-hint created-focused-object-recency" id="created-focused-object-recency" hidden></p>
+              </div>
+              <p class="form-hint created-focused-object-readonly-note" id="created-focused-object-readonly-note" hidden></p>
+              <form class="compact-form created-focused-object-form" id="created-focused-object-form" novalidate>
+                <div id="created-focused-object-fields"></div>
+                <p class="form-hint created-focused-object-publish-status" id="created-focused-object-publish-status" hidden role="status"></p>
+                <div class="created-focused-object-actions">
+                  <button type="submit" class="btn-primary" id="created-focused-object-publish">
+                    Publish update
+                  </button>
+                  <a class="btn-secondary" id="created-focused-object-open-scan" hidden>Open scan page</a>
+                  <button type="button" class="btn-secondary" id="created-focused-object-copy-scan" hidden>
+                    Copy scan link
+                  </button>
+                </div>
+              </form>
+            </div>
+          </section>
+
           <section class="created-live-cockpit device-boot-gated" aria-label="Live object">
             <div class="created-live-status-strip" id="created-live-status-strip" role="status">
               <span class="created-live-status-chip" id="created-live-network-chip" hidden>Live on network</span>

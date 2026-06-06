@@ -141,8 +141,19 @@ import {
   createdHumanTrustIconInput,
   shouldShowCreatedStewardReviewQueue,
 } from "./created-verification-boot-core.mjs";
+import {
+  isCreatedCollectionFlagEnabled,
+  syncCreatedCollectionFlagDataset,
+} from "./created-collection-flag-core.mjs";
+import { initCreatedCollection } from "./created-collection.mjs";
+import { initCreatedFocusedObject } from "./created-focused-object.mjs";
+import { syncUpdateStatusCollectionRouteFromWindow } from "./created-update-status-route.mjs";
 
 const params = new URLSearchParams(location.search);
+syncCreatedCollectionFlagDataset(
+  document,
+  isCreatedCollectionFlagEnabled(params, localStorage)
+);
 const profileIdParam = params.get("profile_id")?.trim() || null;
 const qrIdParam = params.get("qr_id")?.trim() || null;
 const freshParam = params.get("fresh") === "1";
@@ -310,6 +321,7 @@ const scanOrigin =
     : location.origin;
 
 const profileId = gate.profileId;
+syncUpdateStatusCollectionRouteFromWindow(window, profileId, localStorage, sessionStorage);
 let activeQrId = gate.qrId;
 let activeScanUrl = resolveDualQrScanUrl(
   data?.scan_url,
@@ -453,6 +465,8 @@ function syncLiveCockpit() {
   }
 
   syncQrPreview();
+  createdCollectionCtl?.refresh?.();
+  createdFocusedObjectCtl?.refresh?.();
   window.dispatchEvent(new Event("hc-created-live-cta-sync"));
 }
 
@@ -484,6 +498,10 @@ let workspaceMode = "view";
 let dashboardWired = false;
 /** @type {ReturnType<typeof initCreatedRoomSwitcher> | null} */
 let createdRoomSwitcher = null;
+/** @type {ReturnType<typeof initCreatedCollection> | null} */
+let createdCollectionCtl = null;
+/** @type {ReturnType<typeof initCreatedFocusedObject> | null} */
+let createdFocusedObjectCtl = null;
 let ownerToolsBootstrapped = false;
 let downloadQrClick = null;
 /** @type {ReturnType<typeof initCreatedLiveObjectCard> | null} */
@@ -514,12 +532,62 @@ function refreshGameSeasonSetupPresentation() {
   if (anchor) anchor.hidden = false;
 }
 
+function refreshCreatedPresentation() {
+  createdCollectionCtl?.refresh?.();
+  createdFocusedObjectCtl?.refresh?.();
+}
+
 function onStewardRoomApplied(room) {
   syncChildObjectAddHub(loadSession(), { profileId, activeRoom: room });
   childObjectCtl?.refresh?.();
   lostItemRelayCtl?.refresh?.();
   gameNodeCtl?.refresh?.();
+  refreshCreatedPresentation();
   refreshGameSeasonSetupPresentation();
+}
+
+function wireCreatedFocusedObject() {
+  if (!profileId || createdFocusedObjectCtl) return;
+  createdFocusedObjectCtl = initCreatedFocusedObject({
+    profileId,
+    getSession: loadSession,
+    setSession: applyCreatedSessionState,
+    getSigningKeys: currentSigningKeys,
+    showError,
+    isViewOnly: () => workspaceMode === "view",
+    onPublished: () => {
+      refreshCreatedPresentation();
+      syncLiveCockpit();
+    },
+  });
+}
+
+function wireCreatedPresentation() {
+  wireCreatedRoomSwitcher();
+  wireCreatedCollection();
+  wireCreatedFocusedObject();
+  syncCreatedRoomSwitcher(profileId, loadSession());
+}
+
+function wireCreatedCollection() {
+  if (!profileId || createdCollectionCtl) return;
+  createdCollectionCtl = initCreatedCollection({
+    profileId,
+    getSession: loadSession,
+    getReachabilityLine: () => {
+      const chip = document.getElementById("created-live-network-chip");
+      if (chip instanceof HTMLElement && !chip.hidden) {
+        const chipText = chip.textContent?.trim();
+        if (chipText) return chipText;
+      }
+      const status = document.getElementById("network-card-status");
+      const statusText = status?.textContent?.trim();
+      if (statusText && statusText !== "Checking…" && statusText !== " - ") {
+        return statusText;
+      }
+      return null;
+    },
+  });
 }
 
 function wireCreatedRoomSwitcher() {
@@ -1213,6 +1281,8 @@ async function refreshNetworkStatus() {
     setResolverReachable(false);
   }
   updateHeroMeta();
+  createdCollectionCtl?.refresh?.();
+  createdFocusedObjectCtl?.refresh?.();
 }
 
 let createdBfcacheResumeBound = false;
@@ -1573,6 +1643,7 @@ async function bootstrapViewRestoreTools() {
   });
   revoke?.refresh();
   void refreshNetworkStatus();
+  wireCreatedPresentation();
 }
 
 async function bootstrapOwnerTools() {
@@ -1800,8 +1871,7 @@ async function bootstrapOwnerTools() {
   });
   void manifestoUpdate;
 
-  wireCreatedRoomSwitcher();
-  syncCreatedRoomSwitcher(profileId, loadSession());
+  wireCreatedPresentation();
 
   const session = loadSession();
   applyPilotTemplateUi(session);

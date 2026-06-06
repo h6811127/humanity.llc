@@ -6710,6 +6710,132 @@ body.page-wallet .device-hub-status-key {
   color: var(--text);
 }
 
+.created-room-switcher-promoted .created-room-switcher-demoted-label,
+.created-room-switcher-promoted .created-room-switcher-demoted-lead {
+  display: none;
+}
+
+.created-room-switcher-promoted {
+  margin: 0 0 12px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+}
+
+.created-collection-room-slot[hidden] {
+  display: none !important;
+}
+
+.created-collection-root[hidden] {
+  display: none !important;
+}
+
+.created-account-strip {
+  margin: 0 0 14px;
+}
+
+.created-account-strip-heading {
+  margin: 0 0 4px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.created-account-strip-meta,
+.created-account-strip-backup {
+  margin: 0;
+  font-size: 14px;
+  color: var(--grey);
+}
+
+.created-account-strip-backup {
+  margin-top: 4px;
+}
+
+.created-collection-toolbar {
+  margin: 0 0 12px;
+}
+
+.created-collection-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.created-collection-row {
+  cursor: pointer;
+}
+
+.created-collection-row:focus-visible {
+  outline: 2px solid var(--accent, #007aff);
+  outline-offset: 2px;
+}
+
+.created-collection-stale-banner {
+  margin: 0 0 12px;
+}
+
+.created-collection-empty {
+  margin: 0;
+}
+
+.created-live-cockpit[hidden] {
+  display: none !important;
+}
+
+.created-focused-object-root[hidden] {
+  display: none !important;
+}
+
+.created-focused-object-header {
+  margin: 0 0 16px;
+}
+
+.created-focused-object-title {
+  margin: 8px 0 4px;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.created-focused-object-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--grey);
+}
+
+.created-focused-object-type-badge,
+.created-focused-object-room-badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(118, 118, 128, 0.12);
+}
+
+.created-focused-object-status {
+  margin: 0;
+  font-size: 14px;
+}
+
+.created-focused-object-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.created-focused-object-field + .created-focused-object-field {
+  margin-top: 12px;
+}
+
+.created-focused-object-publish-status {
+  margin: 8px 0 0;
+}
+
+.created-focused-object-stale {
+  margin: 0 0 12px;
+}
+
 .created-room-switcher-demoted {
   margin: 0 0 16px;
   padding: 12px 14px;
@@ -10921,9 +11047,80 @@ body.device-shell-created .flow-keys-group .list-row {
 }
 
 .city-game-map-live-state .city-game-map-mission {
-  padding: 0;
-  border: 0;
-  background: transparent;
+  padding: 14px 16px;
+  border: 1px solid rgba(219, 27, 67, 0.18);
+  background: linear-gradient(
+    180deg,
+    rgba(219, 27, 67, 0.07) 0%,
+    rgba(255, 255, 255, 0.98) 100%
+  );
+}
+
+.city-game-map-mission-objective {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.45;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.82);
+}
+
+.city-game-map-mission-consequence {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 700;
+  color: var(--red);
+}
+
+.city-game-map-spotlight-chain {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--grey);
+}
+
+.city-game-map-how-details {
+  margin-top: 4px;
+}
+
+.city-game-map-how-summary {
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--map-ink-soft, rgba(0, 0, 0, 0.68));
+  padding: 6px 0;
+  list-style: none;
+}
+
+.city-game-map-how-summary::-webkit-details-marker {
+  display: none;
+}
+
+.city-game-map-how-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 4px;
+}
+
+.city-game-map-route-row--next {
+  border-style: solid;
+  border-color: rgba(219, 27, 67, 0.28);
+  background: rgba(219, 27, 67, 0.06);
+}
+
+.city-game-map-route-row--next .city-game-map-route-state {
+  color: var(--red);
+}
+
+.city-game-map-start-callout-chain {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  font-weight: 700;
+  color: var(--red);
 }
 
 .city-game-map-wake-loop {
@@ -10956,7 +11153,8 @@ body.device-shell-created .flow-keys-group .list-row {
   margin: 6px 0 10px;
 }
 
-.city-game-map-route-list {
+.city-game-map-route-list,
+.city-game-map-unlock-list {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -11705,6 +11903,89 @@ body.device-shell-created .flow-keys-group .list-row {
   height: auto;
   min-height: 11rem;
   display: block;
+}
+
+.city-game-map-selection-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding: 12px 14px;
+  border: 1px solid rgba(219, 27, 67, 0.32);
+  border-radius: 14px;
+  background: linear-gradient(
+    180deg,
+    rgba(219, 27, 67, 0.1) 0%,
+    rgba(255, 255, 255, 0.98) 100%
+  );
+  box-shadow: 0 8px 24px rgba(219, 27, 67, 0.12);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.city-game-map-selection-bar[hidden] {
+  display: none;
+}
+
+.city-game-map-selection-bar-kicker {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--red);
+}
+
+.city-game-map-selection-bar-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.3;
+  color: var(--black);
+}
+
+.city-game-map-selection-bar-meta {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.35;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.62);
+}
+
+.city-game-map-selection-bar-meta[hidden] {
+  display: none;
+}
+
+.city-game-map-selection-bar-action {
+  align-self: flex-start;
+  appearance: none;
+  -webkit-appearance: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  padding: 9px 14px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--red);
+  color: var(--white);
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(219, 27, 67, 0.28);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.city-game-map-selection-bar-action:focus {
+  outline: none;
+}
+
+.city-game-map-selection-bar-action:focus-visible {
+  outline: 2px solid rgba(219, 27, 67, 0.55);
+  outline-offset: 2px;
+}
+
+.city-game-map-selection-bar-action:active {
+  transform: scale(0.98);
 }
 
 .city-game-map-edge--soft {

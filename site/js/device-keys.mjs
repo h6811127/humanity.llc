@@ -1,5 +1,7 @@
 import { mergeOwnershipSeatbeltFields } from "./created-first-session-gate-core.mjs";
 import { sanitizeCreatedReturnUrl } from "./device-created-return-url-core.mjs";
+import { applyCreatedControlPageTarget } from "./created-control-page-url-core.mjs";
+import { isCreatedCollectionFlagEnabled } from "./created-collection-flag-core.mjs";
 
 export { sanitizeCreatedReturnUrl } from "./device-created-return-url-core.mjs";
 import { logDeviceActivity, walletEntryForActivity } from "./device-activity.mjs";
@@ -206,14 +208,19 @@ export function openCardNowPage(entry, opts = {}) {
  * Open /created/ focused on a control panel (Advanced tab or live-proof strip).
  * @param {Record<string, unknown>} entry
  * @param {string} focus Panel hash without # (e.g. update-status, revoke, rotate-qr, live-proof)
- * @param {{ returnUrl?: string | null }} [opts]
+ * @param {{ returnUrl?: string | null, objectId?: string | null, skipActivate?: boolean }} [opts]
  */
 export function openCardControlPage(entry, focus, opts = {}) {
   const url = createdPageUrlForEntry(entry, opts);
   if (!url) return false;
-  if (focus && focus !== "now") {
-    url.hash = focus;
-  }
+  applyCreatedControlPageTarget(url, {
+    focus,
+    objectId: opts.objectId,
+    collectionFlagEnabled: isCreatedCollectionFlagEnabled(
+      new URLSearchParams(location.search),
+      localStorage
+    ),
+  });
   navigateTo(url.href);
   return true;
 }
