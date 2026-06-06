@@ -13,7 +13,7 @@ export const CREATED_TAGS_MANAGE_PANEL_TITLE = "Manage attached QR";
 export const CREATED_TAGS_MANAGE_OPEN_SCAN_LABEL = "Open scan page";
 export const CREATED_TAGS_MANAGE_UPDATE_STATUS_LABEL = "Update status";
 export const CREATED_TAGS_MANAGE_ADVANCED_CUE =
-  "Advanced editor below for custody, time policy, and disable.";
+  "Advanced controls are still available below.";
 
 /**
  * @param {unknown} objectType

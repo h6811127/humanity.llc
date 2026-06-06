@@ -16,6 +16,7 @@ import {
 } from "./created-deploy-success-focus-core.mjs";
 import { stewardPresentationExtras } from "./steward-active-room-core.mjs";
 import { CREATED_ADD_HUB_SUMMARY } from "./created-display-labels-core.mjs";
+import { expandTagsAdvancedEditor } from "./created-tags-advanced-editor-expand.mjs";
 
 const ADD_HUB_SECTION_IDS = [
   "child-object-add-status-plate",
@@ -38,14 +39,7 @@ export function prepareAddObjectHashFocus(focusKey) {
   if (!sectionId) return false;
 
   mountChildObjectAddHubSections();
-
-  const hub = document.getElementById("child-object-add-hub");
-  if (hub instanceof HTMLDetailsElement) {
-    hub.hidden = false;
-    hub.open = true;
-  } else if (hub instanceof HTMLElement) {
-    hub.hidden = false;
-  }
+  expandTagsAdvancedEditor({ scrollTargetId: sectionId });
 
   const section = document.getElementById(sectionId);
   if (!(section instanceof HTMLElement)) return false;

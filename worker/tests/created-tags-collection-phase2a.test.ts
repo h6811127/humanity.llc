@@ -131,7 +131,7 @@ describe("created-tags-collection Phase 2A manage panel", () => {
   it("exports action labels and advanced editor cue", () => {
     expect(CREATED_TAGS_MANAGE_OPEN_SCAN_LABEL).toBe("Open scan page");
     expect(CREATED_TAGS_MANAGE_UPDATE_STATUS_LABEL).toBe("Update status");
-    expect(CREATED_TAGS_MANAGE_ADVANCED_CUE).toContain("Advanced editor below");
+    expect(CREATED_TAGS_MANAGE_ADVANCED_CUE).toContain("Advanced controls");
   });
 
   it("maps inline editor targets for update status handoff", () => {

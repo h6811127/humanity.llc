@@ -148,6 +148,7 @@ import {
 import { initCreatedCollection } from "./created-collection.mjs";
 import { initCreatedFocusedObject } from "./created-focused-object.mjs";
 import { initCreatedTagsCollection } from "./created-tags-collection.mjs";
+import { initCreatedTagsAdvancedEditor } from "./created-tags-advanced-editor.mjs";
 import {
   isCreatedTagsCollectionFlagEnabled,
   syncCreatedTagsCollectionFlagDataset,
@@ -517,6 +518,8 @@ let downloadQrClick = null;
 let liveObjectCardCtl = null;
 /** @type {ReturnType<typeof initCreatedTagsCollection> | null} */
 let tagsCollectionCtl = null;
+/** @type {ReturnType<typeof initCreatedTagsAdvancedEditor> | null} */
+let tagsAdvancedEditorCtl = null;
 
 function prepareGameSeasonSetupLandingFromUrl() {
   if (isGameSeasonSetupFocus(params)) {
@@ -547,6 +550,7 @@ function refreshCreatedPresentation() {
   createdCollectionCtl?.refresh?.();
   createdFocusedObjectCtl?.refresh?.();
   tagsCollectionCtl?.refresh?.();
+  tagsAdvancedEditorCtl?.refresh?.();
 }
 
 function onStewardRoomApplied(room) {
@@ -555,6 +559,7 @@ function onStewardRoomApplied(room) {
   lostItemRelayCtl?.refresh?.();
   gameNodeCtl?.refresh?.();
   tagsCollectionCtl?.refresh?.();
+  tagsAdvancedEditorCtl?.refresh?.();
   refreshCreatedPresentation();
   refreshGameSeasonSetupPresentation();
 }
@@ -579,6 +584,7 @@ function wireCreatedPresentation() {
   wireCreatedRoomSwitcher();
   wireCreatedCollection();
   wireCreatedTagsCollection();
+  wireCreatedTagsAdvancedEditor();
   wireCreatedFocusedObject();
   syncCreatedRoomSwitcher(profileId, loadSession());
 }
@@ -589,6 +595,14 @@ function wireCreatedTagsCollection() {
     profileId,
     getSession: loadSession,
     showError,
+  });
+}
+
+function wireCreatedTagsAdvancedEditor() {
+  if (!profileId || tagsAdvancedEditorCtl) return;
+  tagsAdvancedEditorCtl = initCreatedTagsAdvancedEditor({
+    profileId,
+    getSession: loadSession,
   });
 }
 
