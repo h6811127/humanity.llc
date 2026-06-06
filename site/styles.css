@@ -6778,6 +6778,141 @@ body.page-wallet .device-hub-status-key {
   margin: 0;
 }
 
+.created-tags-collection[hidden] {
+  display: none !important;
+}
+
+.created-tags-collection-header {
+  margin: 0 0 12px;
+}
+
+.created-tags-collection-title {
+  margin: 0 0 4px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.created-tags-collection-lead {
+  margin: 0;
+}
+
+.created-tags-collection-toolbar {
+  margin: 0 0 12px;
+}
+
+.created-tags-collection-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.created-tags-collection-row--interactive {
+  cursor: pointer;
+}
+
+.created-tags-collection-row--interactive:focus-visible {
+  outline: 2px solid var(--accent, #007aff);
+  outline-offset: 2px;
+}
+
+.created-tags-collection-empty {
+  margin: 0;
+}
+
+.created-tags-manage-root[hidden] {
+  display: none !important;
+}
+
+body.created-tags-manage-open {
+  overflow: hidden;
+}
+
+.created-tags-manage-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.created-tags-manage-backdrop[hidden] {
+  display: none !important;
+}
+
+.created-tags-manage-panel {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  z-index: 1201;
+  width: min(100%, 480px);
+  max-height: min(85vh, 560px);
+  overflow: auto;
+  padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+  border-radius: 16px 16px 0 0;
+  background: var(--surface, #fff);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.18);
+  transform: translateX(-50%);
+}
+
+.created-tags-manage-panel[hidden] {
+  display: none !important;
+}
+
+.created-tags-manage-panel-header {
+  position: relative;
+  margin-bottom: 12px;
+  padding-right: 36px;
+}
+
+.created-tags-manage-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.created-tags-manage-title {
+  margin: 0 0 4px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.created-tags-manage-subtitle {
+  margin: 0;
+}
+
+.created-tags-manage-name {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.created-tags-manage-status {
+  margin: 0 0 16px;
+  font-size: 14px;
+  color: var(--grey);
+}
+
+.created-tags-manage-status[data-tone="ok"] {
+  color: var(--text, inherit);
+}
+
+.created-tags-manage-status[data-tone="warn"] {
+  color: var(--warn, #c60);
+}
+
+.created-tags-manage-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.created-tags-manage-advanced {
+  margin: 0;
+}
+
 .created-live-cockpit[hidden] {
   display: none !important;
 }

@@ -1,5 +1,7 @@
 /** Device-local index of child objects created under a root profile. */
 
+import { dispatchCreatedTagsCollectionSync } from "./created-tags-collection-sync-core.mjs";
+
 export const CHILD_OBJECTS_STORAGE_KEY = "hc_child_objects_v1";
 
 /**
@@ -113,6 +115,7 @@ export function rowsFromNetworkChildObjects(profileId, networkObjects, buildScan
 export function writeChildObjectRows(storage, profileId, rows) {
   const next = rows.filter(isChildObjectRow);
   storage.setItem(childObjectsBucketKey(profileId), JSON.stringify(next));
+  dispatchCreatedTagsCollectionSync();
   return next;
 }
 
@@ -130,6 +133,7 @@ export function appendChildObjectRow(storage, profileId, row) {
   );
   const next = [...rows, row];
   storage.setItem(childObjectsBucketKey(profileId), JSON.stringify(next));
+  dispatchCreatedTagsCollectionSync();
   return next;
 }
 
@@ -156,5 +160,6 @@ export function updateChildObjectRow(storage, profileId, objectId, patch) {
   const next = [...rows];
   next[index] = updated;
   storage.setItem(childObjectsBucketKey(profileId), JSON.stringify(next));
+  dispatchCreatedTagsCollectionSync();
   return next;
 }

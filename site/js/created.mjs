@@ -147,12 +147,21 @@ import {
 } from "./created-collection-flag-core.mjs";
 import { initCreatedCollection } from "./created-collection.mjs";
 import { initCreatedFocusedObject } from "./created-focused-object.mjs";
+import { initCreatedTagsCollection } from "./created-tags-collection.mjs";
+import {
+  isCreatedTagsCollectionFlagEnabled,
+  syncCreatedTagsCollectionFlagDataset,
+} from "./created-tags-collection-flag-core.mjs";
 import { syncUpdateStatusCollectionRouteFromWindow } from "./created-update-status-route.mjs";
 
 const params = new URLSearchParams(location.search);
 syncCreatedCollectionFlagDataset(
   document,
   isCreatedCollectionFlagEnabled(params, localStorage)
+);
+syncCreatedTagsCollectionFlagDataset(
+  document,
+  isCreatedTagsCollectionFlagEnabled(params, localStorage)
 );
 const profileIdParam = params.get("profile_id")?.trim() || null;
 const qrIdParam = params.get("qr_id")?.trim() || null;
@@ -506,6 +515,8 @@ let ownerToolsBootstrapped = false;
 let downloadQrClick = null;
 /** @type {ReturnType<typeof initCreatedLiveObjectCard> | null} */
 let liveObjectCardCtl = null;
+/** @type {ReturnType<typeof initCreatedTagsCollection> | null} */
+let tagsCollectionCtl = null;
 
 function prepareGameSeasonSetupLandingFromUrl() {
   if (isGameSeasonSetupFocus(params)) {
@@ -535,6 +546,7 @@ function refreshGameSeasonSetupPresentation() {
 function refreshCreatedPresentation() {
   createdCollectionCtl?.refresh?.();
   createdFocusedObjectCtl?.refresh?.();
+  tagsCollectionCtl?.refresh?.();
 }
 
 function onStewardRoomApplied(room) {
@@ -542,6 +554,7 @@ function onStewardRoomApplied(room) {
   childObjectCtl?.refresh?.();
   lostItemRelayCtl?.refresh?.();
   gameNodeCtl?.refresh?.();
+  tagsCollectionCtl?.refresh?.();
   refreshCreatedPresentation();
   refreshGameSeasonSetupPresentation();
 }
@@ -565,8 +578,18 @@ function wireCreatedFocusedObject() {
 function wireCreatedPresentation() {
   wireCreatedRoomSwitcher();
   wireCreatedCollection();
+  wireCreatedTagsCollection();
   wireCreatedFocusedObject();
   syncCreatedRoomSwitcher(profileId, loadSession());
+}
+
+function wireCreatedTagsCollection() {
+  if (!profileId || tagsCollectionCtl) return;
+  tagsCollectionCtl = initCreatedTagsCollection({
+    profileId,
+    getSession: loadSession,
+    showError,
+  });
 }
 
 function wireCreatedCollection() {
