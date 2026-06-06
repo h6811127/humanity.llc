@@ -477,18 +477,21 @@ export function applySnapshotToMapBoard(boardRoot, snapshot) {
   }
 
   const edges = Array.isArray(snapshot.unlock_edges) ? snapshot.unlock_edges : [];
+  const primaryNode = boardRoot.dataset.primaryNode?.trim() ?? "";
   for (const edge of edges) {
     if (!edge?.from || !edge?.to) continue;
     const selector = `[data-edge-from="${edge.from}"][data-edge-to="${edge.to}"]`;
     const satisfied = Boolean(edge.satisfied);
+    const isNext = !satisfied && primaryNode && edge.from === primaryNode;
     for (const el of boardRoot.querySelectorAll(selector)) {
       el.classList.toggle("city-game-map-edge--satisfied", satisfied);
       if (el instanceof HTMLElement) {
         el.classList.toggle("city-game-map-route-row--unlocked", satisfied);
-        el.dataset.routeLocked = satisfied ? "false" : "true";
+        el.classList.toggle("city-game-map-route-row--next", isNext);
+        el.dataset.routeLocked = satisfied || isNext ? "false" : "true";
         const stateEl = el.querySelector(".city-game-map-route-state");
         if (stateEl instanceof HTMLElement) {
-          stateEl.textContent = satisfied ? "Unlocked" : "Locked";
+          stateEl.textContent = satisfied ? "Open" : isNext ? "Next" : "Locked";
         }
       }
     }

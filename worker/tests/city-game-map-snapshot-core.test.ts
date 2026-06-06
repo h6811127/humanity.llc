@@ -14,6 +14,7 @@ import {
   isSchematicPinFogged,
   signalWarSummaryLines,
   applyLobbyProgressFromSnapshot,
+  applySnapshotToMapBoard,
   applySpotlightFromSnapshot,
 } from "../../site/js/city-game-map-snapshot-core.mjs";
 import {
@@ -191,6 +192,71 @@ describe("city-game map snapshot core", () => {
       "Wake the city"
     );
     expect(line).toBe("Wake the city: 3 / 3 fragments — complete");
+  });
+
+  it("applySnapshotToMapBoard labels routes Next, Open, and Locked from primary node", () => {
+    if (typeof globalThis.HTMLElement === "undefined") {
+      globalThis.HTMLElement = class HTMLElement {} as typeof HTMLElement;
+    }
+
+    /**
+     * @returns {{ el: HTMLElement; classes: Set<string>; stateEl: { textContent: string } }}
+     */
+    function mockRouteRow() {
+      const el = new HTMLElement();
+      const classes = new Set<string>();
+      el.classList = {
+        toggle(cls: string, on?: boolean) {
+          if (on) classes.add(cls);
+          else classes.delete(cls);
+        },
+      } as DOMTokenList;
+      el.dataset = {} as DOMStringMap;
+      const stateEl = new HTMLElement();
+      stateEl.textContent = "";
+      el.querySelector = ((sel: string) =>
+        sel === ".city-game-map-route-state" ? stateEl : null) as typeof el.querySelector;
+      return { el, classes, stateEl };
+    }
+
+    const nextRow = mockRouteRow();
+    const openRow = mockRouteRow();
+    const lockedRow = mockRouteRow();
+
+    const boardRoot = {
+      dataset: { primaryNode: "node_04" },
+      querySelectorAll(selector: string) {
+        if (selector === ".city-game-map-node-row[data-node-id]") return [];
+        if (selector === ".city-game-map-pin[data-node-id]") return [];
+        if (selector === '[data-edge-from="node_04"][data-edge-to="node_07"]') return [nextRow.el];
+        if (selector === '[data-edge-from="node_04"][data-edge-to="node_13"]') return [openRow.el];
+        if (selector === '[data-edge-from="node_07"][data-edge-to="node_13"]') return [lockedRow.el];
+        return [];
+      },
+      querySelector() {
+        return null;
+      },
+    };
+
+    applySnapshotToMapBoard(/** @type {HTMLElement} */ (boardRoot), {
+      unlock_edges: [
+        { from: "node_04", to: "node_07", satisfied: false },
+        { from: "node_04", to: "node_13", satisfied: true },
+        { from: "node_07", to: "node_13", satisfied: false },
+      ],
+    });
+
+    expect(nextRow.stateEl.textContent).toBe("Next");
+    expect(nextRow.classes.has("city-game-map-route-row--next")).toBe(true);
+    expect(nextRow.el.dataset.routeLocked).toBe("false");
+
+    expect(openRow.stateEl.textContent).toBe("Open");
+    expect(openRow.classes.has("city-game-map-route-row--unlocked")).toBe(true);
+    expect(openRow.el.dataset.routeLocked).toBe("false");
+
+    expect(lockedRow.stateEl.textContent).toBe("Locked");
+    expect(lockedRow.classes.has("city-game-map-route-row--next")).toBe(false);
+    expect(lockedRow.el.dataset.routeLocked).toBe("true");
   });
 
   it("empty snapshot fog keeps schematic pins visible and hittable (RC1)", () => {

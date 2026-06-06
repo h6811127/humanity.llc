@@ -319,6 +319,49 @@ describe("city-game-map-filter-core", () => {
     expect(visible[0]?.boardStates).toBe("needs_action");
   });
 
+  it("keeps fog-omitted rows hidden when filters reset to all", () => {
+    const row = {
+      role: "relay_gate",
+      boardStates: "needs_action",
+      boardVisibility: "public",
+      hidden: true,
+      fogOmitted: true,
+    };
+    const boardRoot = {
+      dataset: { activeType: "all", activeState: "all", activeExplore: "all", activeDistrict: "all" },
+      querySelectorAll(selector: string) {
+        if (selector !== ".city-game-map-node-row[data-node-id]") return [];
+        return [
+          {
+            getAttribute(name: string) {
+              if (name === "data-role") return row.role;
+              if (name === "data-board-states") return row.boardStates;
+              if (name === "data-board-visibility") return row.boardVisibility;
+              return null;
+            },
+            get hidden() {
+              return row.hidden;
+            },
+            set hidden(value) {
+              row.hidden = Boolean(value);
+            },
+            classList: {
+              contains(cls: string) {
+                return cls === "city-game-map-node-row--fog-omitted" && row.fogOmitted;
+              },
+            },
+          },
+        ];
+      },
+      querySelector() {
+        return null;
+      },
+    };
+
+    applyBoardFilterVisibility(/** @type {HTMLElement} */ (boardRoot));
+    expect(row.hidden).toBe(true);
+  });
+
   it("clears to all places when filters reset to all", () => {
     const nodes = season.nodes.map(
       (row: { node_id: string; district: string; role: string }) => ({
