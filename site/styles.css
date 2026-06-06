@@ -12596,6 +12596,47 @@ body.device-shell-created .flow-keys-group .list-row {
   color: var(--red);
 }
 
+.city-game-map-node-card {
+  display: grid;
+  gap: 4px;
+  margin: 6px 0 0;
+}
+
+.city-game-map-node-card-line {
+  display: grid;
+  grid-template-columns: 3.25rem 1fr;
+  gap: 6px;
+  align-items: baseline;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.city-game-map-node-card-line.city-game-map-node-card-why {
+  margin-top: 4px;
+}
+
+.city-game-map-node-card-line .city-game-map-node-effect {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.city-game-map-node-card-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.city-game-map-node-card-scan .city-game-map-node-card-text {
+  color: rgba(0, 0, 0, 0.62);
+}
+
+.city-game-map-node-row--clue .city-game-map-node-card-scan .city-game-map-node-card-text {
+  font-style: italic;
+}
+
 .city-game-map-maps-link,
 .city-game-map-scan-link,
 .city-game-map-spotlight-hint {

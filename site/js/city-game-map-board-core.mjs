@@ -9,6 +9,10 @@ import {
   buildMapSelectionBarHtml,
   isDenseMapBoard,
 } from "./city-game-map-interaction-core.mjs";
+import {
+  buildMapNodeCardSlotsHtml,
+  buildNodeCardCopy,
+} from "./city-game-map-node-card-core.mjs";
 import { buildTypeFilterHtml } from "./city-game-map-type-filter-core.mjs";
 import { comprehensionPrimaryNodeId } from "./city-game-player-guide-core.mjs";
 
@@ -1142,6 +1146,12 @@ export function buildMapNodeListHtml(season, launchCopy = resolveLaunchCopy(seas
           const consequenceLine = mystery
             ? mystery.consequence
             : formatNodeConsequenceLine(nodeId, row.role, season);
+          const cardCopy = buildNodeCardCopy(row.role, season, {
+            nodeId,
+            why: consequenceLine,
+            mysteryTitle: mystery ? mystery.title : undefined,
+          });
+          const cardSlotsHtml = buildMapNodeCardSlotsHtml(cardCopy);
           const boardVisibility = staticVisibility === "public" ? "public" : "hidden";
           const boardStates =
             staticVisibility === "public"
@@ -1162,7 +1172,8 @@ export function buildMapNodeListHtml(season, launchCopy = resolveLaunchCopy(seas
           return `<li class="city-game-map-node-row${spotlightClass}${clueClass}${omittedClass}" data-node-id="${escapeMapHtml(nodeId)}" data-district="${escapeMapHtml(row.district ?? "")}" data-role="${role}" data-board-visibility="${boardVisibility}" data-board-states="${escapeMapHtml(boardStates)}" tabindex="0"${omittedAttr}>
   <span class="city-game-map-node-title">${escapeMapHtml(title)}</span>
   <span class="city-game-map-node-meta">${escapeMapHtml(districtLabel)} · ${escapeMapHtml(roleLabel)}</span>
-  <span class="city-game-map-node-effect" data-node-effect>${escapeMapHtml(consequenceLine)}</span>
+  ${cardSlotsHtml}
+  <p class="city-game-map-node-card-line city-game-map-node-card-why"><span class="city-game-map-node-card-label">Why go</span><span class="city-game-map-node-effect city-game-map-node-card-text" data-node-effect data-node-card-why>${escapeMapHtml(consequenceLine)}</span></p>
   <span class="city-game-map-node-actions">
     <span class="city-game-map-node-live">${primaryCta}</span>
     ${mapsLink}

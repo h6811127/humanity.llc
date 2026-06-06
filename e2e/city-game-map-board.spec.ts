@@ -134,6 +134,27 @@ test.describe("city game map board", () => {
     await expect(riverRow).toHaveCount(1);
     await expect(riverRow).toHaveClass(/city-game-map-node-row--spotlight/);
     await expect(riverRow.locator("[data-node-effect]")).toContainText("14 / 20");
+    await expect(riverRow.locator("[data-node-card-what]")).toContainText(/Clue drop/i);
+    await expect(riverRow.locator("[data-node-card-scan]")).toContainText(
+      /add one signal.*whole city/i
+    );
+  });
+
+  test("public node card explains what scanning does", async ({ page }) => {
+    await mockSeasonSnapshot(page, mockSnapshotBody());
+
+    await page.goto("/play/cedar-rapids/map/");
+
+    const board = page.locator(".city-game-map-board");
+    await expect(board).toBeVisible({ timeout: 15_000 });
+
+    const row = board.locator('.city-game-map-node-row[data-node-id="node_04"]');
+    await expect(row.locator("[data-node-card-what]")).toBeVisible();
+    await expect(row.locator("[data-node-card-why]")).toBeVisible();
+    await expect(row.locator("[data-node-card-scan]")).toContainText(
+      "Scan can add one signal; the board updates for the whole city."
+    );
+    await expect(row.getByText(/your progress|visit log|GPS|scan count/i)).toHaveCount(0);
   });
 
   test("type and state filters narrow places and schematic pins", async ({ page }) => {
@@ -486,13 +507,27 @@ test.describe("city game map board", () => {
     expect(before.visible).toBe(false);
 
     await board.getByRole("button", { name: "Show on sketch" }).click();
-    await page.waitForTimeout(600);
+
+    await expect
+      .poll(async () => {
+        return sketch.evaluate((el) => {
+          const rect = el.getBoundingClientRect();
+          const vh = window.innerHeight;
+          const intersects = rect.bottom > 8 && rect.top < vh - 8;
+          return intersects ? rect.top : null;
+        });
+      }, { timeout: 3000 })
+      .not.toBeNull();
 
     const after = await sketch.evaluate((el) => {
       const rect = el.getBoundingClientRect();
-      return { top: rect.top, inViewport: rect.top >= -8 && rect.bottom <= window.innerHeight + 8 };
+      const vh = window.innerHeight;
+      return {
+        top: rect.top,
+        intersects: rect.bottom > 8 && rect.top < vh - 8,
+      };
     });
-    expect(after.inViewport).toBe(true);
+    expect(after.intersects).toBe(true);
     expect(after.top).toBeGreaterThan(before.top);
     await expect(pin).toHaveClass(/city-game-map-pin--highlight/);
   });
@@ -541,13 +576,16 @@ test.describe("city game map board", () => {
     await expect(bar.locator("[data-selection-title]")).toHaveText("NewBo relay arch");
 
     await bar.getByRole("button", { name: "Show on sketch" }).click();
-    await page.waitForTimeout(600);
 
-    const sketchInView = await board.locator(".city-game-map-mobile-sketch").evaluate((el) => {
-      const rect = el.getBoundingClientRect();
-      return rect.top >= -8 && rect.bottom <= window.innerHeight + 8;
-    });
-    expect(sketchInView).toBe(true);
+    await expect
+      .poll(async () => {
+        return board.locator(".city-game-map-mobile-sketch").evaluate((el) => {
+          const rect = el.getBoundingClientRect();
+          const vh = window.innerHeight;
+          return rect.bottom > 8 && rect.top < vh - 8;
+        });
+      }, { timeout: 3000 })
+      .toBe(true);
   });
 
   test("mobile layout keeps sketch above selection bar and list", async ({ page }) => {
