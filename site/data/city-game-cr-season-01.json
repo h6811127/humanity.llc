@@ -2,6 +2,13 @@
   "season_id": "cr_season_01_wake",
   "title": "Wake the city · Signal War",
   "city": "Cedar Rapids, Iowa",
+  "public_listing": {
+    "listed": true,
+    "title": "Wake the city",
+    "summary": "Weekend live-object game across Cedar Rapids. Scan stickers for shared city state.",
+    "region": "Cedar Rapids, Iowa",
+    "category": "city_games"
+  },
   "status": "active",
   "season_root_profile_id": "CEenC57QN9qqnr2x5L89cbWt",
   "rules_path": "/play/cedar-rapids/",

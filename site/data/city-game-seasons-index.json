@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-06-05T15:04:27.850Z",
+  "generated_at": "2026-06-06T14:45:56.573Z",
   "seasons": [
     {
       "season_id": "cr_season_01_wake",
@@ -11,7 +11,14 @@
       "slug": "cedar-rapids",
       "season_root_profile_id": "CEenC57QN9qqnr2x5L89cbWt",
       "json_url": "/data/city-game-cr-season-01.json",
-      "json_basename": "city-game-cr-season-01.json"
+      "json_basename": "city-game-cr-season-01.json",
+      "public_listing": {
+        "listed": true,
+        "title": "Wake the city",
+        "summary": "Weekend live-object game across Cedar Rapids. Scan stickers for shared city state.",
+        "region": "Cedar Rapids, Iowa",
+        "category": "city_games"
+      }
     },
     {
       "season_id": "example_city_season_01",
@@ -22,7 +29,14 @@
       "slug": "example-city",
       "season_root_profile_id": null,
       "json_url": "/data/city-game-example-season-01.json",
-      "json_basename": "city-game-example-season-01.json"
+      "json_basename": "city-game-example-season-01.json",
+      "public_listing": {
+        "listed": false,
+        "title": null,
+        "summary": null,
+        "region": null,
+        "category": "city_games"
+      }
     }
   ]
 }

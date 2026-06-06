@@ -2,6 +2,10 @@
   "season_id": "example_city_season_01",
   "title": "Wake the grid",
   "city": "Example City (template)",
+  "public_listing": {
+    "listed": false,
+    "category": "city_games"
+  },
   "status": "planned",
   "season_root_profile_id": null,
   "rules_path": "/play/example-city/",

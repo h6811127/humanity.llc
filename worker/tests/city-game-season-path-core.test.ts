@@ -37,7 +37,7 @@ describe("city-game season path core", () => {
     expect(bySlug?.config.season_id).toBe("cr_season_01_wake");
   });
 
-  it("builds index entries with json_url", () => {
+  it("builds index entries with json_url and public_listing", () => {
     const configs = loadAllSeasonConfigs(root);
     const pilot = configs.find((c) => c.season_id === "cr_season_01_wake");
     expect(pilot).toBeTruthy();
@@ -45,6 +45,8 @@ describe("city-game season path core", () => {
     expect(entry.json_url).toBe(seasonJsonPublicUrl("city-game-cr-season-01.json"));
     expect(entry.slug).toBe("cedar-rapids");
     expect(entry.season_root_profile_id).toBe(pilot!.season_root_profile_id ?? null);
+    expect(entry.public_listing?.listed).toBe(true);
+    expect(entry.public_listing?.category).toBe("city_games");
   });
 
   it("seasonLaunchContext maps rules_path to play + comprehension paths", () => {

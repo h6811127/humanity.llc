@@ -1,0 +1,154 @@
+import { describe, expect, it } from "vitest";
+
+import {
+  buildPublicNetworkCardModel,
+  buildPublicNetworkVisionCardModel,
+  filterPublicNetworkCards,
+  listedPublicNetworkRows,
+  publicNetworkVisionCardModels,
+  publicNetworkWindowStatusLabel,
+  publicNetworksEmptyMessage,
+  PUBLIC_NETWORK_OPEN_BOARD_CTA,
+  renderPublicNetworkCard,
+  renderPublicNetworkResults,
+} from "../../site/js/public-networks-portal-core.mjs";
+
+const cedarIndexRow = {
+  season_id: "cr_season_01_wake",
+  title: "Wake the city · Signal War",
+  city: "Cedar Rapids, Iowa",
+  rules_path: "/play/cedar-rapids/",
+  public_listing: {
+    listed: true,
+    title: "Wake the city",
+    summary: "Weekend live-object game across Cedar Rapids.",
+    region: "Cedar Rapids, Iowa",
+    category: "city_games",
+  },
+};
+
+const templateRow = {
+  season_id: "example_city_season_01",
+  title: "Wake the grid",
+  city: "Example City (template)",
+  rules_path: "/play/example-city/",
+  public_listing: { listed: false, category: "city_games" },
+};
+
+describe("public-networks-portal-core", () => {
+  it("lists only public_listing.listed rows", () => {
+    const listed = listedPublicNetworkRows([cedarIndexRow, templateRow]);
+    expect(listed).toHaveLength(1);
+    expect(listed[0].season_id).toBe("cr_season_01_wake");
+  });
+
+  it("builds Cedar Rapids card with board open href and live status when window open", () => {
+    const card = buildPublicNetworkCardModel(cedarIndexRow, {
+      status: "active",
+      window: {
+        starts_at: "2020-01-01T00:00:00-05:00",
+        ends_at: "2099-01-01T00:00:00-05:00",
+      },
+    });
+    expect(card.name).toBe("Wake the city");
+    expect(card.place).toBe("Cedar Rapids, Iowa");
+    expect(card.openHref).toBe("/play/cedar-rapids/map/");
+    expect(card.rulesHref).toBe("/play/cedar-rapids/");
+    expect(card.statusLabel).toBe("Live now");
+    expect(card.category).toBe("city_games");
+  });
+
+  it("filters by search query and category chips", () => {
+    const cards = [
+      buildPublicNetworkCardModel(cedarIndexRow, {
+        window: { starts_at: null, ends_at: null },
+      }),
+    ];
+    expect(filterPublicNetworkCards(cards, { query: "cedar" })).toHaveLength(1);
+    expect(filterPublicNetworkCards(cards, { query: "denver" })).toHaveLength(0);
+    expect(filterPublicNetworkCards(cards, { category: "city_games" })).toHaveLength(1);
+    expect(filterPublicNetworkCards(cards, { category: "markets" })).toHaveLength(0);
+  });
+
+  it("labels pre-window seasons with board-open copy", () => {
+    expect(publicNetworkWindowStatusLabel("before")).toBe("Play opens soon · board open now");
+    const card = buildPublicNetworkCardModel(cedarIndexRow, {
+      window: {
+        starts_at: "2099-06-06T18:00:00-05:00",
+        ends_at: "2099-09-01T22:00:00-05:00",
+      },
+    });
+    expect(card.statusLabel).toBe("Play opens soon · board open now");
+  });
+
+  it("renders Open board CTA on live Cedar Rapids card", () => {
+    const card = buildPublicNetworkCardModel(cedarIndexRow, {
+      window: { starts_at: null, ends_at: null },
+    });
+    const html = renderPublicNetworkCard(card);
+    expect(html).toContain(PUBLIC_NETWORK_OPEN_BOARD_CTA);
+    expect(html).toContain('href="/play/cedar-rapids/map/"');
+    expect(html).toContain('data-network-live="true"');
+    expect(html).toContain("Wake the city");
+    expect(html).toContain("City game");
+    expect(html).toContain("Weekend live-object game across Cedar Rapids.");
+  });
+
+  it("vision cards do not present as live networks", () => {
+    const vision = publicNetworkVisionCardModels();
+    expect(vision.length).toBeGreaterThanOrEqual(2);
+    for (const card of vision) {
+      expect(card.isLive).toBe(false);
+      const html = renderPublicNetworkCard(card);
+      expect(html).toContain('data-network-live="false"');
+      expect(html).toContain("public-networks-card--vision");
+      expect(html).not.toContain('href="/play/');
+      expect(html).not.toContain("Live now");
+      expect(html).toMatch(/Prototype|Coming soon/);
+    }
+  });
+
+  it("filters vision cards by category without treating them as live", () => {
+    const live = buildPublicNetworkCardModel(cedarIndexRow, {
+      window: { starts_at: null, ends_at: null },
+    });
+    const cards = [live, ...publicNetworkVisionCardModels()];
+    const markets = filterPublicNetworkCards(cards, { category: "markets" });
+    expect(markets).toHaveLength(1);
+    expect(markets[0].isLive).toBe(false);
+    expect(markets[0].name).toMatch(/market/i);
+  });
+
+  it("buildPublicNetworkVisionCardModel marks prototype vs coming soon", () => {
+    const prototype = buildPublicNetworkVisionCardModel({
+      id: "test_proto",
+      name: "Test market",
+      place: "Prototype",
+      category: "markets",
+      summary: "Summary",
+      availability: "prototype",
+    });
+    expect(prototype.statusLabel).toBe("Prototype");
+    const soon = buildPublicNetworkVisionCardModel({
+      id: "test_soon",
+      name: "Test event",
+      place: "Soon",
+      category: "events",
+      summary: "Summary",
+      availability: "coming_soon",
+    });
+    expect(soon.statusLabel).toBe("Coming soon");
+  });
+
+  it("returns category-aware empty messages", () => {
+    expect(publicNetworksEmptyMessage({ hasListed: false })).toMatch(/No public networks listed yet/);
+    expect(publicNetworksEmptyMessage({ hasListed: true, category: "markets" })).toMatch(
+      /Markets/
+    );
+    expect(publicNetworksEmptyMessage({ hasListed: true, query: "foo" })).toMatch(/match that search/);
+  });
+
+  it("renderPublicNetworkResults returns empty string for no cards", () => {
+    expect(renderPublicNetworkResults([])).toBe("");
+  });
+});

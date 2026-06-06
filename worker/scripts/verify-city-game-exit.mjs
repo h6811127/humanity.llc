@@ -106,6 +106,7 @@ if (!skipTests) {
     "worker/tests/city-game-faction-badge.test.ts",
     "worker/tests/city-game-debrief-core.test.ts",
     "worker/tests/map-node-snapshot.test.ts",
+    "worker/tests/board-node-scan-parity.test.ts",
     "worker/tests/city-game-map-snapshot-core.test.ts",
     "worker/tests/city-game-contribute-load.test.ts",
     "worker/tests/quorum-contribute.test.ts",
