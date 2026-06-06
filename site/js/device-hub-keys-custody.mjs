@@ -226,14 +226,16 @@ function renderPanelHtml(state) {
       return `
         <li class="list-row device-hub-keys-custody-row device-hub-keys-custody-row--${row.kind}" data-hub-custody-row="${index}" data-hub-searchable="${escapeHtml(searchable)}">
           <div class="device-hub-keys-custody-row-inner">
-            <span class="list-icon list-icon-tone-${tone}" aria-hidden="true">
-              <span class="device-hub-keys-custody-dot"></span>
-            </span>
-            <span class="list-content">
-              <span class="list-title">${escapeHtml(row.title)}</span>
-              <span class="list-sub">${escapeHtml(row.subtitle)}</span>
-            </span>
-            ${actions ? `<span class="device-hub-keys-custody-actions">${actions}</span>` : ""}
+            <div class="device-hub-keys-custody-row-head">
+              <span class="list-icon list-icon-tone-${tone}" aria-hidden="true">
+                <span class="device-hub-keys-custody-dot"></span>
+              </span>
+              <div class="device-hub-keys-custody-row-copy">
+                <span class="list-title">${escapeHtml(row.title)}</span>
+                <span class="list-sub">${escapeHtml(row.subtitle)}</span>
+              </div>
+            </div>
+            ${actions ? `<div class="device-hub-keys-custody-actions">${actions}</div>` : ""}
           </div>
         </li>`;
     })

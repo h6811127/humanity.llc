@@ -8,6 +8,14 @@ import { keysCustodyHtml } from "../../site/js/device-keys-custody.mjs";
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 
 describe("device-keys-custody-html", () => {
+  it("hub custody rows stack copy and actions in separate blocks", () => {
+    const src = readFileSync(join(root, "site/js/device-hub-keys-custody.mjs"), "utf8");
+    expect(src).toContain("device-hub-keys-custody-row-head");
+    expect(src).toContain("device-hub-keys-custody-row-copy");
+    expect(src).toContain('<div class="device-hub-keys-custody-actions">');
+    expect(src).not.toContain('<span class="device-hub-keys-custody-actions">');
+  });
+
   it("hub and wallet variants use info emphasis cards with secondary acknowledge", () => {
     const hub = keysCustodyHtml("hub");
     expect(hub).toContain("hc-emphasis-card--info");
@@ -184,6 +192,15 @@ describe("device-keys-custody-html", () => {
     );
     expect(styles).toMatch(
       /\.device-keys-custody\.hc-emphasis-card \.hc-emphasis-card__cta--secondary[\s\S]*min-height:\s*44px/
+    );
+    expect(styles).toMatch(
+      /\.device-hub-keys-custody-row-inner[\s\S]*flex-direction:\s*column/
+    );
+    expect(styles).toMatch(
+      /@media \(max-width: 767px\)[\s\S]*\.device-hub-keys-custody-row-head[\s\S]*flex-direction:\s*column/
+    );
+    expect(styles).toMatch(
+      /\.device-hub-keys-custody-row-copy[\s\S]*min-width:\s*0/
     );
 
     const emphasis = readFileSync(join(root, "site/css/hc-emphasis-card.css"), "utf8");
