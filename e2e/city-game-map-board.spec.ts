@@ -103,11 +103,11 @@ test.describe("city game map board", () => {
     await expect(board.locator("#city-game-map-mission .city-game-map-mission-privacy")).toContainText(
       "No account. No GPS. No visit log."
     );
-    await expect(board.getByText("Find a live sticker")).toBeVisible();
-    await expect(board.getByText("See what changed")).toBeVisible();
+    await expect(board.locator(".city-game-map-wake-loop")).toBeVisible();
     await expect(
-      board.getByText("Each place can reveal a different live state or action.")
+      board.getByText("Scans add signals toward shared fragments — the board updates for everyone.")
     ).toBeVisible();
+    await expect(board.getByText("How scanning works")).toBeVisible();
     await expect(board.getByRole("heading", { name: "Riverwalk River Lantern" })).toBeVisible();
     await expect(board.getByText("Find the River Lantern and add one signal.")).toBeVisible();
     await expect(board.locator("#city-game-map-spotlight .city-game-map-spotlight-effect")).toContainText(
