@@ -1,8 +1,15 @@
 import { PROFILE_ID_REGEX } from "../crypto";
 import { errorResponse, jsonResponse, requestOrigin } from "../http/resolver";
-import { getApprovedPrintCatalog, getPrintCatalogProduct } from "./print-catalog";
+import {
+  getApprovedPrintCatalog,
+  getPrintCatalogProduct,
+  GLITCH_HOODIE_STORE_PRODUCT_ID,
+  GLITCH_HOODIE_TEMPLATE_ID,
+} from "./print-catalog";
 import { renderPrintArtworkFromScanUrl } from "../resolver/scan-qr";
 import { QR_ID_REGEX } from "../resolver/scan-state";
+import { resolveArtifactIntentPrintFrameBackground } from "./print-frame-background";
+import type { BuyerPrintFrameBackground } from "./print-frame-background";
 
 interface PrintArtifactRequest {
   profile_id?: unknown;
@@ -10,6 +17,8 @@ interface PrintArtifactRequest {
   print_artifact_id?: unknown;
   template_id?: unknown;
   variant_id?: unknown;
+  print_variant_id?: unknown;
+  print_frame_background?: unknown;
 }
 
 function scanUrl(origin: string, profileId: string, qrId: string): string {
@@ -46,10 +55,26 @@ export async function handlePostPrintArtifacts(request: Request): Promise<Respon
     return errorResponse("UNKNOWN_TEMPLATE", "Unknown print template_id.", 422);
   }
 
+  const printVariantId =
+    typeof body.print_variant_id === "string"
+      ? body.print_variant_id.trim()
+      : typeof body.variant_id === "string"
+        ? body.variant_id.trim()
+        : "";
+
+  let printFrameBackground: BuyerPrintFrameBackground | null = null;
+  if (templateId === GLITCH_HOODIE_TEMPLATE_ID) {
+    printFrameBackground = resolveArtifactIntentPrintFrameBackground({
+      product_id: GLITCH_HOODIE_STORE_PRODUCT_ID,
+      print_variant_id: printVariantId || null,
+      print_frame_background: body.print_frame_background,
+    });
+  }
+
   const url = scanUrl(requestOrigin(request), profileId, qrId);
   let svg: string;
   try {
-    svg = await renderPrintArtworkFromScanUrl(url, templateId);
+    svg = await renderPrintArtworkFromScanUrl(url, templateId, printFrameBackground);
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Artwork generation failed.";
     return errorResponse("PRINT_QR_SCAN_FAILED", msg, 422);
@@ -68,6 +93,9 @@ export async function handlePostPrintArtifacts(request: Request): Promise<Respon
         format: "svg",
         bytes: svg.length,
       },
+      artwork_svg: svg,
+      ...(printFrameBackground ? { print_frame_background: printFrameBackground } : {}),
+      ...(printVariantId ? { print_variant_id: printVariantId } : {}),
       preview_url: printArtifactId
         ? `${requestOrigin(request)}/print/previews/${printArtifactId}`
         : null,

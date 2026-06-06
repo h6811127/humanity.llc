@@ -32,6 +32,7 @@ describe("print handlers (O-002)", () => {
       scan_url: string;
       qr_scan_status: string;
       artwork: { format: string; bytes: number };
+      artwork_svg: string;
     };
     expect(res.status).toBe(200);
     expect(json.scan_url).toContain(PROFILE);
@@ -39,5 +40,27 @@ describe("print handlers (O-002)", () => {
     expect(json.qr_scan_status).toBe("passed");
     expect(json.artwork.format).toBe("svg");
     expect(json.artwork.bytes).toBeGreaterThan(500);
+    expect(json.artwork_svg).toContain("<svg");
+    expect(json.artwork.bytes).toBe(json.artwork_svg.length);
+  });
+
+  it("POST /v1/print/artifacts honors glitch print_frame_background", async () => {
+    const res = await handlePostPrintArtifacts(
+      new Request("https://humanity.llc/v1/print/artifacts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          profile_id: PROFILE,
+          qr_id: QR,
+          template_id: "hc-glitch-hoodie-v1",
+          print_frame_background: "full",
+          print_variant_id: "navy-m",
+        }),
+      })
+    );
+    const json = (await res.json()) as { print_frame_background: string; artwork_svg: string };
+    expect(res.status).toBe(200);
+    expect(json.print_frame_background).toBe("full");
+    expect(json.artwork_svg).toContain("<svg");
   });
 });

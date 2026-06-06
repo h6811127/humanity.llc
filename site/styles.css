@@ -5677,6 +5677,18 @@ html[data-landing-focus="on"] .screen-landing {
   display: none;
 }
 
+.shop-customize-planned-qr-download {
+  width: 100%;
+  max-width: 280px;
+}
+
+.shop-customize-planned-qr-download-hint {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: center;
+}
+
 .shop-customize-mock__photo {
   display: block;
   width: 100%;
