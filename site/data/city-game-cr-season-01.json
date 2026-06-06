@@ -72,6 +72,11 @@
     "fog_lead_signal_war": "Some pins stay hidden until the city claims them.",
     "fog_lead_rumor_only": "The sketch shows rumored spots only — scan to find the rest.",
     "roles_summary": "Place types",
+    "section_live_state_title": "Live city state",
+    "wake_loop_title": "What changes when the city wakes",
+    "section_activity_title": "City activity",
+    "routes_preview_title": "Routes waking with the city",
+    "filters_summary": "Filter places",
     "launch": {
       "hero_steps": [
         "Find a live sticker",

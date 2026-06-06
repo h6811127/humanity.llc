@@ -4,6 +4,7 @@
  */
 import { applyBoardFilterVisibility } from "./city-game-map-filter-core.mjs";
 import {
+  COOPERATIVE_BOARD_ROLES,
   escapeMapHtml,
   formatHookLine,
   formatMysteryNodeCopy,
@@ -12,6 +13,7 @@ import {
   formatStaticWorldStatusLine,
   MAP_ROW_SCAN_HINT,
   resolveRowScanCta,
+  seasonRumoredNodeIds,
 } from "./city-game-map-board-core.mjs";
 import { deriveNodeBoardStates } from "./city-game-map-state-filter-core.mjs";
 
@@ -137,14 +139,55 @@ export function formatNodeEffectFromSnapshot(nodeId, role, snap, season) {
  * @param {string} role
  * @param {Record<string, unknown>} season
  */
-export function applyMysteryRowPresentation(row, role, season) {
+export function applyMysteryRowPresentation(row, nodeId, role, season) {
   if (!(row instanceof HTMLElement)) return;
-  const mystery = formatMysteryNodeCopy(role, season);
+  const mystery = formatMysteryNodeCopy(nodeId, role, season);
   const titleEl = row.querySelector(".city-game-map-node-title");
   const effectEl = row.querySelector("[data-node-effect]");
   if (titleEl) titleEl.textContent = mystery.title;
   if (effectEl) effectEl.textContent = mystery.consequence;
-  row.classList.add("city-game-map-node-row--hidden");
+  row.classList.add("city-game-map-node-row--clue");
+}
+
+/**
+ * @param {HTMLElement} boardRoot
+ * @param {string} mapVisibility
+ */
+function rumoredNodeSet(boardRoot, mapVisibility) {
+  const rumoredRaw =
+    boardRoot instanceof HTMLElement && boardRoot.dataset.rumoredNodes
+      ? boardRoot.dataset.rumoredNodes
+      : "";
+  const fromBoard = new Set(
+    rumoredRaw
+      .split(",")
+      .map((id) => id.trim())
+      .filter(Boolean)
+  );
+  if (fromBoard.size) return fromBoard;
+  if (mapVisibility === "public") return new Set();
+  return seasonRumoredNodeIds({});
+}
+
+/**
+ * @param {string | null | undefined} nodeId
+ * @param {string | null | undefined} role
+ * @param {string} mapVisibility
+ * @param {Set<string>} rumored
+ */
+function shouldOmitFogRow(nodeId, role, mapVisibility, rumored) {
+  if (mapVisibility === "public") return false;
+  const id = String(nodeId ?? "").trim();
+  const roleId = String(role ?? "").trim();
+  if (!id || !roleId) return false;
+  if (COOPERATIVE_BOARD_ROLES.has(roleId)) return false;
+  if (roleId === "relay_gate") {
+    return mapVisibility === "signal_war" && !rumored.has(id);
+  }
+  if (mapVisibility === "rumor_only") {
+    return !rumored.has(id);
+  }
+  return true;
 }
 
 /**
@@ -331,6 +374,7 @@ export function applySnapshotToMapBoard(boardRoot, snapshot) {
   };
   const mapVisibility =
     typeof snapshot.map_visibility === "string" ? snapshot.map_visibility.trim() : "public";
+  const rumored = rumoredNodeSet(boardRoot, mapVisibility);
 
   for (const row of boardRoot.querySelectorAll(".city-game-map-node-row[data-node-id]")) {
     const nodeId = row.getAttribute("data-node-id");
@@ -342,11 +386,57 @@ export function applySnapshotToMapBoard(boardRoot, snapshot) {
     const ctaLabel = resolveRowScanCta(role);
     const effectEl = row.querySelector("[data-node-effect]");
 
+    if (mapVisibility === "public" || snap) {
+      if (row instanceof HTMLElement) {
+        row.hidden = false;
+        row.classList.remove("city-game-map-node-row--fog-omitted");
+      }
+    }
+
     if (!snap && mapVisibility !== "public") {
+      if (shouldOmitFogRow(nodeId, role, mapVisibility, rumored)) {
+        if (row instanceof HTMLElement) {
+          row.hidden = true;
+          row.classList.add("city-game-map-node-row--fog-omitted");
+        }
+        row.setAttribute("data-board-visibility", "hidden");
+        row.setAttribute("data-board-states", "locked");
+        row.classList.remove("city-game-map-node-row--live");
+        row.classList.remove("city-game-map-node-row--maintenance");
+        row.classList.remove("city-game-map-node-row--revoked");
+        continue;
+      }
+      if (role === "relay_gate" || rumored.has(nodeId)) {
+        row.setAttribute("data-board-visibility", "hidden");
+        row.setAttribute("data-board-states", "locked");
+        applyMysteryRowPresentation(row, nodeId, role, seasonCtx);
+        live.innerHTML = `<span class="city-game-map-live-hint city-game-map-row-cta">${escapeMapHtml(ctaLabel)}</span>`;
+        row.classList.remove("city-game-map-node-row--live");
+        row.classList.remove("city-game-map-node-row--maintenance");
+        row.classList.remove("city-game-map-node-row--revoked");
+        continue;
+      }
+      if (COOPERATIVE_BOARD_ROLES.has(String(role ?? ""))) {
+        row.setAttribute("data-board-visibility", "public");
+        row.setAttribute(
+          "data-board-states",
+          deriveNodeBoardStates(null, role).join(" ")
+        );
+        if (effectEl instanceof HTMLElement) {
+          effectEl.textContent = formatNodeConsequenceLine(nodeId, role, seasonCtx);
+        }
+        live.innerHTML = `<span class="city-game-map-live-hint city-game-map-row-cta">${escapeMapHtml(ctaLabel)}</span>`;
+        row.classList.remove("city-game-map-node-row--live");
+        row.classList.remove("city-game-map-node-row--maintenance");
+        row.classList.remove("city-game-map-node-row--revoked");
+        continue;
+      }
       row.setAttribute("data-board-visibility", "hidden");
       row.setAttribute("data-board-states", "locked");
-      applyMysteryRowPresentation(row, role, seasonCtx);
-      live.innerHTML = `<span class="city-game-map-live-hint city-game-map-row-cta">${escapeMapHtml(ctaLabel)}</span>`;
+      if (row instanceof HTMLElement) {
+        row.hidden = true;
+        row.classList.add("city-game-map-node-row--fog-omitted");
+      }
       row.classList.remove("city-game-map-node-row--live");
       row.classList.remove("city-game-map-node-row--maintenance");
       row.classList.remove("city-game-map-node-row--revoked");
@@ -354,9 +444,15 @@ export function applySnapshotToMapBoard(boardRoot, snapshot) {
     }
 
     row.classList.remove("city-game-map-node-row--hidden");
+    row.classList.remove("city-game-map-node-row--clue");
     row.setAttribute("data-board-visibility", "public");
     const boardStates = deriveNodeBoardStates(snap, role);
     row.setAttribute("data-board-states", boardStates.join(" "));
+
+    const titleEl = row.querySelector(".city-game-map-node-title");
+    if (titleEl instanceof HTMLElement && snap?.label) {
+      titleEl.textContent = String(snap.label);
+    }
 
     if (effectEl instanceof HTMLElement) {
       effectEl.textContent = formatNodeEffectFromSnapshot(nodeId, role, snap, seasonCtx);
@@ -384,8 +480,17 @@ export function applySnapshotToMapBoard(boardRoot, snapshot) {
   for (const edge of edges) {
     if (!edge?.from || !edge?.to) continue;
     const selector = `[data-edge-from="${edge.from}"][data-edge-to="${edge.to}"]`;
+    const satisfied = Boolean(edge.satisfied);
     for (const el of boardRoot.querySelectorAll(selector)) {
-      el.classList.toggle("city-game-map-edge--satisfied", Boolean(edge.satisfied));
+      el.classList.toggle("city-game-map-edge--satisfied", satisfied);
+      if (el instanceof HTMLElement) {
+        el.classList.toggle("city-game-map-route-row--unlocked", satisfied);
+        el.dataset.routeLocked = satisfied ? "false" : "true";
+        const stateEl = el.querySelector(".city-game-map-route-state");
+        if (stateEl instanceof HTMLElement) {
+          stateEl.textContent = satisfied ? "Unlocked" : "Locked";
+        }
+      }
     }
   }
 

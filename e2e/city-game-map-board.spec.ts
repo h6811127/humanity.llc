@@ -60,6 +60,12 @@ async function mockSeasonSnapshot(page: Page, body: Record<string, unknown>) {
   await page.route(`**${SNAPSHOT_PATH}`, fulfill);
 }
 
+async function openBoardFilters(board: ReturnType<Page["locator"]>) {
+  await board.locator("#city-game-map-filters").evaluate((el) => {
+    if (el instanceof HTMLDetailsElement) el.open = true;
+  });
+}
+
 async function openDistrictSketch(board: ReturnType<Page["locator"]>) {
   await board.locator("#city-game-map-advanced").evaluate((el) => {
     if (el instanceof HTMLDetailsElement) el.open = true;
@@ -112,15 +118,18 @@ test.describe("city game map board", () => {
     );
     await expect(board.getByText(/back of the sticker|enter code|Add to the city/i)).toHaveCount(0);
     await expect(board.locator("#city-game-map-places")).toBeVisible();
-    await expect(board.locator(".city-game-map-browse-filters")).toBeVisible();
+    await expect(board.locator("#city-game-map-filters")).toBeVisible();
     await expect(board.getByText("Start at Riverwalk River Lantern.")).toBeVisible();
 
     await expect(board).toHaveAttribute("data-snapshot-loaded", "1");
     await expect(board.locator("#city-game-map-mission-progress")).toHaveText("1 / 3 fragments recovered");
     await expect(board.locator("#city-game-map-spotlight-count")).toHaveText("14 / 20");
-    await expect(board.locator("#city-game-map-changed")).toHaveJSProperty("open", true);
+    await expect(board.locator("#city-game-map-live-state")).toBeVisible();
+    await expect(board.getByText("What changes when the city wakes")).toBeVisible();
+    await expect(board.locator("#city-game-map-activity")).toBeVisible();
     await expect(board.locator("#city-game-map-progress")).toHaveText("1 / 3 fragments recovered");
-    await expect(board.locator("#city-game-map-changed")).toContainText("Something is stirring.");
+    await expect(board.locator("#city-game-map-live-state")).toContainText("Something is stirring.");
+    await expect(board.getByText("Routes waking with the city")).toBeVisible();
     const riverRow = board.locator('.city-game-map-node-row[data-node-id="node_04"]');
     await expect(riverRow).toHaveCount(1);
     await expect(riverRow).toHaveClass(/city-game-map-node-row--spotlight/);
@@ -135,6 +144,8 @@ test.describe("city game map board", () => {
     const board = page.locator(".city-game-map-board");
     await expect(board).toBeVisible({ timeout: 15_000 });
     await expect(board).toHaveAttribute("data-snapshot-loaded", "1");
+
+    await openBoardFilters(board);
 
     const typeFilter = board.locator(".city-game-map-type-filter");
     await expect(typeFilter.getByRole("button", { name: /Relays 17/ })).toBeVisible();
@@ -180,6 +191,8 @@ test.describe("city game map board", () => {
     const board = page.locator(".city-game-map-board");
     await expect(board).toBeVisible({ timeout: 15_000 });
     await expect(board).toHaveAttribute("data-snapshot-loaded", "1");
+
+    await openBoardFilters(board);
 
     const typeFilter = board.locator(".city-game-map-type-filter");
     const stateFilter = board.locator(".city-game-map-state-filter");
@@ -254,6 +267,7 @@ test.describe("city game map board", () => {
     });
     expect(maxHeight).toBe(0);
 
+    await openBoardFilters(board);
     await board.locator(".city-game-map-type-filter").getByRole("button", { name: /Relays/ }).click();
     const summary = board.locator("#city-game-map-filter-summary");
     await expect(summary).toBeVisible();
@@ -416,26 +430,27 @@ test.describe("city game map board", () => {
 
     const spotlight = board.locator("#city-game-map-spotlight");
     const placesList = board.locator("#city-game-map-places");
-    const changedSummary = board.locator("#city-game-map-changed .city-game-map-changed-summary");
+    const activity = board.locator("#city-game-map-activity");
 
-    await expect(board.getByRole("heading", { name: "Quest log" })).toBeVisible();
-    await expect(changedSummary).toBeVisible();
+    await expect(board.getByRole("heading", { name: "Live city state" })).toBeVisible();
+    await expect(board.getByRole("heading", { name: "City activity" })).toBeVisible();
+    await expect(activity).toBeVisible();
 
     const spotlightBox = await spotlight.boundingBox();
     const placesBox = await placesList.boundingBox();
-    const changedBox = await changedSummary.boundingBox();
+    const activityBox = await activity.boundingBox();
     const advancedBox = await advanced.boundingBox();
 
     expect(spotlightBox?.width ?? 0).toBeGreaterThan(280);
     expect(placesBox?.width ?? 0).toBeGreaterThan(280);
-    expect(changedBox?.width ?? 0).toBeGreaterThan(280);
+    expect(activityBox?.width ?? 0).toBeGreaterThan(280);
     expect(advancedBox?.width ?? 0).toBeGreaterThan(280);
 
     expect((spotlightBox?.y ?? 0) + (spotlightBox?.height ?? 0)).toBeLessThanOrEqual(
-      (changedBox?.y ?? 0) + 24
+      (activityBox?.y ?? 0) + 24
     );
-    expect((placesBox?.y ?? 0)).toBeGreaterThan((changedBox?.y ?? 0) - 24);
-    expect((changedBox?.y ?? 0) + (changedBox?.height ?? 0)).toBeLessThanOrEqual(
+    expect((placesBox?.y ?? 0)).toBeGreaterThan((activityBox?.y ?? 0) - 24);
+    expect((activityBox?.y ?? 0) + (activityBox?.height ?? 0)).toBeLessThanOrEqual(
       (advancedBox?.y ?? 0) + 24
     );
 

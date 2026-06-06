@@ -9,7 +9,9 @@ import {
   buildMapBoardInnerHtml,
   buildMapSchematicSvg,
   buildMapsSearchUrl,
+  formatMysteryNodeCopy,
   formatNodeEffectLine,
+  nodeRowStaticVisibility,
   resolveRowScanCta,
   validateMapLayout,
 } from "../../site/js/city-game-map-board-core.mjs";
@@ -122,11 +124,17 @@ describe("city-game map board render", () => {
     expect(html).not.toContain("city-game-map-wayfinding");
     expect(html).not.toContain("Pick a district");
     expect(html).not.toContain("Scan when you arrive");
-    expect(html).toContain('id="city-game-map-changed"');
-    expect(html).toContain('id="city-game-map-changed" open');
-    expect(html).toContain("What changed");
-    expect(html).toContain("Quest log");
-    expect(html).toContain("city-game-map-state");
+    expect(html).toContain('id="city-game-map-live-state"');
+    expect(html).toContain("Live city state");
+    expect(html).toContain("What changes when the city wakes");
+    expect(html).toContain("city-game-map-wake-loop");
+    expect(html).toContain('id="city-game-map-activity"');
+    expect(html).toContain("City activity");
+    expect(html).toContain("city-game-map-routes-preview");
+    expect(html).toContain("Routes waking with the city");
+    expect(html).toContain('id="city-game-map-filters"');
+    expect(html).toContain("Filter places");
+    expect(html).not.toContain('id="city-game-map-changed"');
     expect(html).toContain("Places");
     expect(html).toContain("city-game-map-list-scroll");
     expect(html).toContain("city-game-map-mobile-sketch");
@@ -180,6 +188,32 @@ describe("city-game map board render", () => {
     expect(html).not.toContain("node_04 ·");
     expect(html).not.toContain("Live count loading");
     expect(html).not.toContain("River Lantern tracks one shared city count.");
+  });
+});
+
+describe("city-game map board gameplay framing", () => {
+  it("gives rumored hidden relays unique clue copy instead of repeated filler", () => {
+    const mystery = formatMysteryNodeCopy("node_08", "relay_gate", season);
+    expect(mystery.title).toMatch(/Rumored relay/i);
+    expect(mystery.title).not.toBe("Hidden relay");
+    expect(mystery.consequence).toContain("Czech Village square bench");
+    expect(mystery.consequence).not.toBe("Reveals when the city claims a network hold");
+  });
+
+  it("omits unclaimed relay rows from the static list under signal_war fog", () => {
+    expect(nodeRowStaticVisibility(season, { node_id: "node_01", role: "relay_gate" })).toBe(
+      "omitted"
+    );
+    expect(nodeRowStaticVisibility(season, { node_id: "node_08", role: "relay_gate" })).toBe(
+      "clue"
+    );
+    expect(nodeRowStaticVisibility(season, { node_id: "node_07", role: "lore_archive" })).toBe(
+      "public"
+    );
+    const html = buildMapBoardInnerHtml(season);
+    expect(html).toContain("Rumored relay · Czech Village");
+    const hiddenRelayMatches = html.match(/Hidden relay/g) ?? [];
+    expect(hiddenRelayMatches.length).toBe(0);
   });
 });
 
