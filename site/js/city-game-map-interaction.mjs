@@ -28,6 +28,7 @@ function syncSelectionFeedbackBar(boardRoot, nodeId) {
   if (!id) {
     bar.hidden = true;
     delete bar.dataset.selectionNodeId;
+    boardRoot.classList.remove("city-game-map-board--place-selected");
     return;
   }
 
@@ -37,6 +38,7 @@ function syncSelectionFeedbackBar(boardRoot, nodeId) {
   if (!(row instanceof HTMLElement)) {
     bar.hidden = true;
     delete bar.dataset.selectionNodeId;
+    boardRoot.classList.remove("city-game-map-board--place-selected");
     return;
   }
 
@@ -62,6 +64,7 @@ function syncSelectionFeedbackBar(boardRoot, nodeId) {
 
   bar.dataset.selectionNodeId = id;
   bar.hidden = false;
+  boardRoot.classList.add("city-game-map-board--place-selected");
 }
 
 /**

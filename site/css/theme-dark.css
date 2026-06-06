@@ -1354,3 +1354,34 @@ html[data-theme="dark"] .city-game-map-node-row:focus-visible {
   background: rgba(255, 77, 109, 0.1);
   box-shadow: 0 0 0 2px rgba(255, 77, 109, 0.16);
 }
+
+html[data-theme="dark"] .city-game-map-selection-bar {
+  background: var(--map-surface);
+  border-color: var(--map-line);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+html[data-theme="dark"] .city-game-map-selection-bar-title {
+  color: var(--shell-label);
+}
+
+html[data-theme="dark"] .city-game-map-selection-bar-meta {
+  color: var(--shell-muted);
+}
+
+html[data-theme="dark"] .city-game-map-selection-bar-action {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 77, 109, 0.35);
+  color: rgba(255, 140, 160, 0.98);
+}
+
+html[data-theme="dark"] .city-game-map-board--place-selected .city-game-map-node-row--highlight {
+  border-color: var(--map-line);
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: none;
+  border-left-color: rgba(255, 77, 109, 0.85);
+}
+
+html[data-theme="dark"] .city-game-map-board--place-selected .city-game-map-node-row--highlight:focus-visible {
+  box-shadow: 0 0 0 2px rgba(255, 77, 109, 0.28);
+}
