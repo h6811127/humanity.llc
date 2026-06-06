@@ -4,6 +4,12 @@ import { renderScanPage } from "../src/resolver/scan-html";
 import { buildScanViewModel } from "../src/resolver/scan-state";
 import { defaultSeason } from "../src/city-game/season-loader";
 import {
+  gameScanPrivacyTagline,
+  seasonBoardPath,
+  seasonBoardPathWithNode,
+} from "../src/city-game/season-config";
+import { seasonWindowOnboardingStatus } from "../src/city-game/season-window";
+import {
   GAME_NODE_FORBIDDEN_COPY,
   GAME_NODE_SCAN_FOOT,
   GAME_NODE_SCAN_PRIVACY_NOTE,
@@ -138,6 +144,7 @@ describe("city game scan view", () => {
 
     expect(vm.gameNode?.mode).toBe("game");
     expect(vm.gameNode?.roleEyebrow).toContain("NewBo");
+    expect(vm.gameNode?.nodeId).toBe("node_01");
 
     const html = await renderScanPage(vm, "https://humanity.llc");
     expect(html).toContain("NewBo relay arch");
@@ -145,10 +152,18 @@ describe("city game scan view", () => {
     expect(html).toContain("Red team");
     expect(html).toContain(GAME_NODE_SCAN_FOOT);
     expect(html).toContain(GAME_NODE_SCAN_PRIVACY_NOTE);
-    expect(html).toContain("Season rules + city board");
-    expect(html).toContain("/play/cedar-rapids/");
+    expect(html).toContain("scan-game-onboarding");
+    expect(html).toContain("Wake the city · Signal War");
+    expect(html).toContain("Open city board");
+    expect(html).toContain('href="/play/cedar-rapids/map/?node=node_01"');
+    expect(html).toContain('href="/play/cedar-rapids/"');
+    expect(html).toMatch(/>\s*Season rules\s*</);
+    expect(html).toContain("No account. No GPS. No visit log.");
+    expect(html).toContain("scan-game-privacy-tagline");
     expect(html).toContain("scan-game-privacy-note");
-    expect(html).toContain("scan-game-coop-hint");
+    expect(html).toContain("scan-game-trust-details");
+    expect(html).toContain("Trust &amp; privacy");
+    expect(html).toContain("scan-game-state-details");
   });
 
   it("applies bulletin schedule to relay scan streams when season window is open", () => {
@@ -719,7 +734,9 @@ describe("city game scan view", () => {
     expect(vmBefore.gameNode?.mode).toBe("dormant");
     expect(vmBefore.gameNode?.seasonWindowPhase).toBe("before");
     const htmlBefore = await renderScanPage(vmBefore, "https://humanity.llc");
-    expect(htmlBefore).toContain("Season not open yet");
+    expect(htmlBefore).toContain("Season opens");
+    expect(htmlBefore).toContain("Plan your route on the city board");
+    expect(htmlBefore).not.toContain("Season not open yet");
     expect(htmlBefore).not.toContain("Contribute to quorum");
 
     const vmAfter = buildScanViewModel(
@@ -772,5 +789,46 @@ describe("city game scan view", () => {
     const html = await renderScanPage(vm, "https://humanity.llc");
     expect(html).not.toContain("has not opened yet");
     expect(html).toContain("scan-game-contribute");
+  });
+});
+
+describe("game scan onboarding", () => {
+  it("resolves board path from rules path", () => {
+    expect(seasonBoardPath("/play/cedar-rapids/")).toBe("/play/cedar-rapids/map/");
+    expect(seasonBoardPath("/play/example-city/")).toBe("/play/example-city/map/");
+    expect(seasonBoardPath("")).toBeNull();
+  });
+
+  it("appends node deep link for scanned locations", () => {
+    expect(seasonBoardPathWithNode("/play/cedar-rapids/", "node_01")).toBe(
+      "/play/cedar-rapids/map/?node=node_01"
+    );
+    expect(seasonBoardPathWithNode("/play/cedar-rapids/", null)).toBe(
+      "/play/cedar-rapids/map/"
+    );
+  });
+
+  it("uses season map_copy privacy tagline when present", () => {
+    expect(gameScanPrivacyTagline(defaultSeason())).toBe("No account. No GPS. No visit log.");
+    expect(
+      gameScanPrivacyTagline({
+        ...defaultSeason(),
+        map_copy: { privacy_note: "Custom privacy line." },
+      } as ReturnType<typeof defaultSeason>)
+    ).toBe("Custom privacy line.");
+  });
+
+  it("exposes actionable pre-season onboarding status", () => {
+    const season = {
+      ...defaultSeason(),
+      window: {
+        starts_at: "2026-06-06T18:00:00-05:00",
+        ends_at: "2026-06-08T22:00:00-05:00",
+      },
+    };
+    const status = seasonWindowOnboardingStatus("before", season);
+    expect(status).toContain("Season opens");
+    expect(status).toContain("Scans work now");
+    expect(status).toContain("Plan your route on the city board");
   });
 });

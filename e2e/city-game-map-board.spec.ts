@@ -277,6 +277,21 @@ test.describe("city game map board", () => {
     await expect(summary.locator("[data-filter-summary-scope]")).toContainText(/Relays · \d+ places/);
   });
 
+  test("?node= deep link highlights scanned location on load", async ({ page }) => {
+    await mockSeasonSnapshot(page, mockSnapshotBody());
+
+    await page.goto("/play/cedar-rapids/map/?node=node_04");
+
+    const board = page.locator(".city-game-map-board");
+    await expect(board).toBeVisible({ timeout: 15_000 });
+    await expect(board).toHaveAttribute("data-snapshot-loaded", "1");
+
+    const row = board.locator('.city-game-map-node-row[data-node-id="node_04"]');
+    await expect(board).toHaveAttribute("data-highlight-node-id", "node_04");
+    await expect(row).toHaveClass(/city-game-map-node-row--highlight/);
+    await expect(row).toHaveAttribute("aria-current", "true");
+  });
+
   test("schematic pin click highlights matching place row", async ({ page }) => {
     await mockSeasonSnapshot(page, mockSnapshotBody());
 

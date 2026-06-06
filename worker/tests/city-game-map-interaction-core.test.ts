@@ -10,6 +10,7 @@ import {
   CITY_GAME_MAP_DENSE_NODE_THRESHOLD,
   isDenseMapBoard,
   isMapPinInteractive,
+  readMapBoardNodeQueryParam,
   resolveMapNodeHighlight,
   shouldScrollSketchForRowFocus,
 } from "../../site/js/city-game-map-interaction-core.mjs";
@@ -66,12 +67,20 @@ describe("city-game-map-interaction-core", () => {
     expect(src).toContain("setTypeFilter");
     expect(src).toContain("clearBoardFilters");
     expect(src).toContain("applyBoardFilterVisibility");
+    expect(src).toContain("readMapBoardNodeQueryParam");
   });
 
   it("resolveMapNodeHighlight toggles off repeat selection", () => {
     expect(resolveMapNodeHighlight(null, "node_04")).toBe("node_04");
     expect(resolveMapNodeHighlight("node_04", "node_04")).toBeNull();
     expect(resolveMapNodeHighlight("node_04", "node_07")).toBe("node_07");
+  });
+
+  it("readMapBoardNodeQueryParam parses ?node= deep links", () => {
+    expect(readMapBoardNodeQueryParam("?node=node_01")).toBe("node_01");
+    expect(readMapBoardNodeQueryParam("?node=node_04&foo=bar")).toBe("node_04");
+    expect(readMapBoardNodeQueryParam("")).toBeNull();
+    expect(readMapBoardNodeQueryParam("?district=newbo")).toBeNull();
   });
 
   it("isMapPinInteractive rejects filter-hidden pins only", () => {

@@ -68,15 +68,62 @@ export function isSeasonContributeOpen(
   return false;
 }
 
-export function seasonWindowChip(phase: SeasonWindowPhase): string | null {
-  if (phase === "before") return "Season not open yet";
+/** Player-facing open date for pre-season scan + board copy. */
+export function formatSeasonOpenDate(startsAt: string | null | undefined): string | null {
+  const ms = parseWindowInstant(startsAt);
+  if (ms == null) return null;
+  try {
+    return new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      timeZone: "America/Chicago",
+      timeZoneName: "short",
+    }).format(new Date(ms));
+  } catch {
+    return null;
+  }
+}
+
+export function seasonWindowChip(
+  phase: SeasonWindowPhase,
+  season?: SeasonWindowConfig
+): string | null {
+  if (phase === "before") {
+    const dateLabel = formatSeasonOpenDate(season?.window?.starts_at);
+    return dateLabel
+      ? `Season opens ${dateLabel}. Scans work now.`
+      : "Season opens soon. Scans work now.";
+  }
   if (phase === "after") return "Season ended — game paused";
   return null;
 }
 
-export function seasonWindowScanNote(phase: SeasonWindowPhase): string | null {
+/** Full status line for game scan onboarding band. */
+export function seasonWindowOnboardingStatus(
+  phase: SeasonWindowPhase,
+  season?: SeasonWindowConfig
+): string {
+  if (phase === "open" || phase === "unset") {
+    return "Season open — follow the city board for live relay holds and clues.";
+  }
   if (phase === "before") {
-    return "Wake the city has not opened yet — this object stays readable until the season window begins.";
+    const dateLabel = formatSeasonOpenDate(season?.window?.starts_at);
+    const openPart = dateLabel ? `Season opens ${dateLabel}.` : "Season opens soon.";
+    return `${openPart} Scans work now. Plan your route on the city board.`;
+  }
+  return "Season ended — game paused. Public object state remains on the board.";
+}
+
+export function seasonWindowScanNote(
+  phase: SeasonWindowPhase,
+  season?: SeasonWindowConfig
+): string | null {
+  if (phase === "before") {
+    const dateLabel = formatSeasonOpenDate(season?.window?.starts_at);
+    const openPart = dateLabel ? `Season opens ${dateLabel}.` : "Season opens soon.";
+    return `${openPart} Scans work now — object state is readable before play opens.`;
   }
   if (phase === "after") {
     return "Season 1 has ended — public object state remains, but game progression is paused.";

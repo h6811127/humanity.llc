@@ -91,6 +91,19 @@ export function buildDistrictFilterHtml(season) {
  * @param {string | null | undefined} clickedNodeId
  * @returns {string | null}
  */
+/**
+ * Read `?node=` deep link from a board URL search string.
+ * @param {string} [search]
+ * @returns {string | null}
+ */
+export function readMapBoardNodeQueryParam(search = "") {
+  const raw = String(search ?? "").trim();
+  if (!raw) return null;
+  const params = new URLSearchParams(raw.startsWith("?") ? raw.slice(1) : raw);
+  const node = params.get("node")?.trim();
+  return node || null;
+}
+
 export function resolveMapNodeHighlight(currentNodeId, clickedNodeId) {
   const id = String(clickedNodeId ?? "").trim();
   if (!id) return null;

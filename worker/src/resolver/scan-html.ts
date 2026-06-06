@@ -55,6 +55,7 @@ import {
   GAME_NODE_SCAN_FOOT,
   GAME_NODE_SCAN_PRIVACY_NOTE,
   gameNodeContributeEyebrow,
+  gameScanNextActionLine,
   type GameNodeScanContext,
 } from "../city-game/scan-view";
 import {
@@ -62,7 +63,15 @@ import {
   factionRelayStatusLabel,
   isGameFactionHold,
 } from "../city-game/factions";
-import { seasonWindowChip, seasonWindowScanNote } from "../city-game/season-window";
+import {
+  seasonWindowChip,
+  seasonWindowOnboardingStatus,
+  seasonWindowScanNote,
+} from "../city-game/season-window";
+import {
+  gameScanPrivacyTagline,
+  seasonBoardPathWithNode,
+} from "../city-game/season-config";
 import { resolveSeasonById } from "../city-game/season-loader";
 import {
   credentialCodeFromScanUrl,
@@ -140,7 +149,8 @@ function gameNodeMutedCopy(
     return `<p class="scan-game-care-note" role="note">Game bulletins are muted while maintenance is live on the care stream.</p>`;
   }
   if (archive?.state === "season_not_open" || archive?.state === "season_ended") {
-    const note = seasonWindowScanNote(gameNode.seasonWindowPhase);
+    const season = resolveSeasonById(gameNode.seasonId);
+    const note = seasonWindowScanNote(gameNode.seasonWindowPhase, season ?? undefined);
     return note
       ? `<p class="scan-game-dormant-note" role="note">${escapeHtml(note)}</p>`
       : "";
@@ -155,7 +165,7 @@ function gameNodeMutedCopy(
 }
 
 /** Response header  -  confirms pass-card scan UI (not legacy .block layout). */
-export const SCAN_UI_VERSION = "pass-v40";
+export const SCAN_UI_VERSION = "pass-v41";
 
 /**
  * Public scan UI  -  flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
@@ -205,10 +215,7 @@ export async function renderScanPage(
     <main class="screen scan-screen">
       ${renderScanHeroSection(vm, safety, pageOrigin, qrMarkup)}
       ${renderScanActorBand(vm, pageOrigin)}
-      ${renderScanTrustModules(vm, safety)}
-      ${renderLimitsSettings(vm, pageOrigin)}
-      ${renderTrustGroups(vm, pageOrigin)}
-      ${renderScanUrlControl(vm)}
+      ${renderScanPostHeroTrust(vm, safety, pageOrigin)}
       ${renderFooter(vm, pageOrigin)}
     </main>
   </div>
@@ -300,23 +307,110 @@ function renderScanPageChrome(origin: string): string {
 </div>`;
 }
 
-/** Live check hero — merges scanner safety + status panel (docs/M3_SCAN_PAGE_UI.md Phase 1). */
-function renderGameNodeRulesLink(gameNode: GameNodeScanContext): string {
+function isGameNodeOnboardingScan(vm: ScanViewModel): boolean {
+  return Boolean(vm.gameNode?.enabled && vm.gameNode.mode !== "fallback");
+}
+
+/** Game-first onboarding band — city-game nodes only (scan front door). */
+function renderGameNodeOnboardingBand(
+  vm: ScanViewModel,
+  gameNode: GameNodeScanContext
+): string {
   const season = resolveSeasonById(gameNode.seasonId);
   const rulesPath = season?.rules_path?.trim() || "/play/season/";
-  const title = season?.title?.trim() || "City game";
-  const city = season?.city?.trim();
-  const label = city ? `${title} · ${city}` : title;
-  return `<p class="scan-game-rules-link" role="navigation"><a href="${escapeHtml(rulesPath)}">Season rules + city board</a><span class="scan-game-rules-link-meta"> · ${escapeHtml(label)}</span></p>`;
+  const boardPath =
+    seasonBoardPathWithNode(rulesPath, gameNode.nodeId) ??
+    `${rulesPath.replace(/\/?$/, "/")}map/`;
+  const identity = season?.title?.trim() || "Wake the city · Signal War";
+  const { display } = scanHeroDisplay(vm);
+  const locationName =
+    display.kind === "status_plate"
+      ? display.objectLabel
+      : vm.manifestoLine?.split("\n")[0]?.trim() ?? "Game node";
+  const stateLine =
+    display.kind === "status_plate"
+      ? display.statusLine
+      : vm.manifestoLine?.split("\n").slice(1).join(" ").trim() ?? "";
+  const seasonStatus = seasonWindowOnboardingStatus(
+    gameNode.seasonWindowPhase,
+    season ?? undefined
+  );
+  const consequence = gameNode.coopHint?.trim() ?? stateLine;
+  const contributeCap = findScanCapability(vm.capabilities, "contribute");
+  const nextAction = gameScanNextActionLine(gameNode, {
+    contributeAvailable: Boolean(contributeCap?.available && contributeCap),
+    pledgeAvailable: gameNode.showsPledge,
+  });
+  const tagline = gameScanPrivacyTagline(season);
+  const stateBlock = stateLine && stateLine !== consequence
+    ? `<p class="scan-game-onboarding-state">${escapeHtml(stateLine)}</p>`
+    : "";
+  return `<section class="scan-game-onboarding" aria-labelledby="scan-game-onboarding-heading">
+  <p class="scan-game-onboarding-identity">${escapeHtml(identity)}</p>
+  <p class="scan-game-onboarding-season">${escapeHtml(seasonStatus)}</p>
+  <h1 class="scan-game-onboarding-location" id="scan-game-onboarding-heading">${escapeHtml(locationName)}</h1>
+  <p class="scan-game-onboarding-role">${escapeHtml(gameNode.roleEyebrow)}</p>
+  ${stateBlock}
+  ${consequence ? `<p class="scan-game-onboarding-consequence" role="note">${escapeHtml(consequence)}</p>` : ""}
+  <p class="scan-game-onboarding-next">${escapeHtml(nextAction)}</p>
+  <div class="scan-game-onboarding-actions" role="navigation" aria-label="City game next steps">
+    <a class="scan-game-onboarding-cta scan-game-onboarding-cta--primary" href="${escapeHtml(boardPath)}">Open city board</a>
+    <a class="scan-game-onboarding-cta scan-game-onboarding-cta--secondary" href="${escapeHtml(rulesPath)}">Season rules</a>
+  </div>
+  <p class="scan-game-privacy-tagline" role="note">${escapeHtml(tagline)}</p>
+</section>`;
+}
+
+function renderGameNodeCollapsedState(
+  vm: ScanViewModel,
+  gameNode: GameNodeScanContext
+): string {
+  const season = resolveSeasonById(gameNode.seasonId);
+  const streams = renderObjectStreamsBlock(vm.objectStreams);
+  const steward = renderStewardStrip(vm);
+  const metaChips = renderGameNodeMetaChips(gameNode, season ?? undefined);
+  const muted = gameNodeMutedCopy(vm, gameNode);
+  const parts = [muted, streams, metaChips, steward].filter(Boolean);
+  if (!parts.length) return "";
+  return `<details class="scan-game-state-details">
+  <summary class="scan-game-state-summary">Live object details</summary>
+  <div class="scan-game-state-panel">
+${parts.join("\n")}
+  </div>
+</details>`;
 }
 
 function renderScanHeroFootBlock(vm: ScanViewModel, foot: string): string {
-  if (vm.gameNode?.enabled && vm.gameNode.mode !== "fallback") {
-    return `${renderGameNodeRulesLink(vm.gameNode)}
-  <p class="scan-hero-foot">${escapeHtml(GAME_NODE_SCAN_FOOT)}</p>
+  if (isGameNodeOnboardingScan(vm)) {
+    return `<p class="scan-hero-foot">${escapeHtml(GAME_NODE_SCAN_FOOT)}</p>
   <p class="scan-game-privacy-note" role="note">${escapeHtml(GAME_NODE_SCAN_PRIVACY_NOTE)}</p>`;
   }
   return foot ? `<p class="scan-hero-foot">${escapeHtml(foot)}</p>` : "";
+}
+
+function renderScanPostHeroTrust(
+  vm: ScanViewModel,
+  safety: ScanSafetyModel,
+  origin: string
+): string {
+  const blocks = [
+    renderScanTrustModules(vm, safety),
+    renderLimitsSettings(vm, origin),
+    renderTrustGroups(vm, origin),
+    renderScanUrlControl(vm),
+  ]
+    .filter(Boolean)
+    .join("\n");
+  if (!blocks) return "";
+  if (isGameNodeOnboardingScan(vm)) {
+    return `<details class="scan-game-trust-details">
+  <summary class="scan-game-trust-summary">Trust &amp; privacy</summary>
+  <div class="scan-game-trust-panel">
+${blocks}
+  </div>
+</details>`;
+  }
+  return blocks;
 }
 
 function renderScanHeroSection(
@@ -349,7 +443,9 @@ function renderScanHeroSection(
   const resolverRow = safety.objectSignatureVerified
     ? `<p class="scan-safety-resolver scan-arrive-item scan-arrive-item--hidden">${escapeHtml(SCAN_SAFETY_RESOLVER_VERIFIED_COPY)}</p>`
     : "";
-  const chipsBlock = renderScanHeroMetaDetails(vm, safety);
+  const chipsBlock = isGameNodeOnboardingScan(vm)
+    ? ""
+    : renderScanHeroMetaDetails(vm, safety);
   const footBlock = renderScanHeroFootBlock(vm, foot);
   const lostItemCreateHint =
     isScanCapabilityAvailable(vm.capabilities, "offer")
@@ -549,10 +645,14 @@ function renderLostItemOfferBlock(vm: ScanViewModel): string {
 </section>`;
 }
 
-function renderGameNodeMetaChips(gameNode: GameNodeScanContext): string {
+function renderGameNodeMetaChips(
+  gameNode: GameNodeScanContext,
+  season?: ReturnType<typeof resolveSeasonById>,
+  opts: { omitVouch?: boolean } = {}
+): string {
   const chips: string[] = [];
   const meta = gameNode.gameMeta;
-  const windowChip = seasonWindowChip(gameNode.seasonWindowPhase);
+  const windowChip = seasonWindowChip(gameNode.seasonWindowPhase, season ?? undefined);
   if (windowChip) chips.push(windowChip);
 
   if (gameNode.mode === "care_pause") {
@@ -585,18 +685,20 @@ function renderGameNodeMetaChips(gameNode: GameNodeScanContext): string {
   if (meta.unlocked_by.length) {
     chips.push(`Unlocked by ${meta.unlocked_by.join(", ")}`);
   }
-  if (gameNode.vouchGate) {
-    if (gameNode.vouchGate.met) {
-      chips.push(
-        `Witness vouch live · ${gameNode.vouchGate.satisfied.join(", ")}`
-      );
-    } else if (gameNode.vouchGate.pending.length) {
-      chips.push(
-        `Vouch pending from ${gameNode.vouchGate.pending.join(", ")}`
-      );
+  if (!opts.omitVouch) {
+    if (gameNode.vouchGate) {
+      if (gameNode.vouchGate.met) {
+        chips.push(
+          `Witness vouch live · ${gameNode.vouchGate.satisfied.join(", ")}`
+        );
+      } else if (gameNode.vouchGate.pending.length) {
+        chips.push(
+          `Vouch pending from ${gameNode.vouchGate.pending.join(", ")}`
+        );
+      }
+    } else if (meta.vouch_requires.length) {
+      chips.push(`Vouch required from ${meta.vouch_requires.join(", ")}`);
     }
-  } else if (meta.vouch_requires.length) {
-    chips.push(`Vouch required from ${meta.vouch_requires.join(", ")}`);
   }
   if (!chips.length) return "";
   const items = chips
@@ -729,32 +831,9 @@ function renderGameContributeBlock(vm: ScanViewModel): string {
 
 function buildGameNodeScanHero(vm: ScanViewModel): { main: string; foot: string } {
   const gameNode = vm.gameNode!;
-  const { display } = scanHeroDisplay(vm);
-  const label =
-    display.kind === "status_plate"
-      ? display.objectLabel
-      : vm.manifestoLine?.split("\n")[0]?.trim() ?? "Game node";
-  const stateLine =
-    display.kind === "status_plate"
-      ? display.statusLine
-      : vm.manifestoLine?.split("\n").slice(1).join(" ").trim() ?? "";
-  const steward = renderStewardStrip(vm);
-  const streams = renderObjectStreamsBlock(vm.objectStreams);
-  const metaChips = renderGameNodeMetaChips(gameNode);
-  const coopHint = gameNode.coopHint
-    ? `<p class="scan-game-coop-hint" role="note">${escapeHtml(gameNode.coopHint)}</p>`
-    : "";
-  const mutedGameCopy = gameNodeMutedCopy(vm, gameNode);
-
   return {
-    main: `<p class="scan-hero-eyebrow">${escapeHtml(gameNode.roleEyebrow)}</p>
-    <h1 class="scan-hero-title">${escapeHtml(label)}</h1>
-    ${stateLine ? `<p class="scan-hero-line">${escapeHtml(stateLine)}</p>` : ""}
-    ${mutedGameCopy}
-    ${streams}
-    ${metaChips}
-    ${coopHint}
-    ${steward}`,
+    main: `${renderGameNodeOnboardingBand(vm, gameNode)}
+    ${renderGameNodeCollapsedState(vm, gameNode)}`,
     foot: GAME_NODE_SCAN_FOOT,
   };
 }

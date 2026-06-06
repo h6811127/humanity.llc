@@ -79,6 +79,33 @@ function graphFor(season: CrSeasonConfig) {
   return networkGraphFromConfig(season);
 }
 
+/** Canonical city board URL for a season (shareable, no hash). */
+export function seasonBoardPath(rulesPath: string | null | undefined): string | null {
+  const trimmed = String(rulesPath ?? "").trim();
+  const match = trimmed.match(/^\/play\/([^/]+)\/?$/);
+  return match?.[1] ? `/play/${match[1]}/map/` : null;
+}
+
+/** Board URL with scanned node deep link (`?node=`). */
+export function seasonBoardPathWithNode(
+  rulesPath: string | null | undefined,
+  nodeId?: string | null
+): string | null {
+  const base = seasonBoardPath(rulesPath);
+  if (!base) return null;
+  const id = String(nodeId ?? "").trim();
+  return id ? `${base}?node=${encodeURIComponent(id)}` : base;
+}
+
+const GAME_SCAN_PRIVACY_TAGLINE_DEFAULT = "No account. No GPS. No visit log.";
+
+/** Player-facing privacy punchline from season map copy, with pilot default. */
+export function gameScanPrivacyTagline(season: CrSeasonConfig | null | undefined): string {
+  const fromSeason = (season as { map_copy?: { privacy_note?: string } } | null | undefined)
+    ?.map_copy?.privacy_note?.trim();
+  return fromSeason || GAME_SCAN_PRIVACY_TAGLINE_DEFAULT;
+}
+
 export function seasonNodeRow(
   nodeId: string,
   season: CrSeasonConfig = CR_SEASON_01

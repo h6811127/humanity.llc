@@ -1,4 +1,26 @@
-/* Scan + landing pass card  -  bundled into Worker HTML. Keep in sync with styles.css pass block. */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#ffffff" />
+  <title>@season_root · humanity.llc</title>
+  <meta name="description" content="Current status for this place on the network." />
+  <link rel="icon" href="https://humanity.llc/assets/red_qr_transparent_bg.png" type="image/png" />
+  <script>
+(function () {
+  try {
+    if (localStorage.getItem("hc_theme") === "dark") {
+      document.documentElement.dataset.theme = "dark";
+      document.documentElement.style.colorScheme = "dark";
+      var m = document.querySelector('meta[name="theme-color"]');
+      if (m) m.setAttribute("content", "#000000");
+    }
+  } catch (e) {}
+})();
+</script>
+  <style>/* Scan + landing pass card  -  bundled into Worker HTML. Keep in sync with styles.css pass block. */
 
 :root {
   --red: #db1b43;
@@ -3764,3 +3786,582 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
   border: 0.5px solid rgba(255, 255, 255, 0.14);
   box-shadow: none;
 }
+
+/* hc-emphasis-card — raised device notices (docs/HC_EMPHASIS_CARD_ROLLOUT.md) */
+.hc-emphasis-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--hc-emphasis-card-gap-row) var(--hc-emphasis-card-gap-section);
+  margin: 0 0 12px;
+  padding: var(--hc-emphasis-card-padding-block) var(--hc-emphasis-card-padding-inline);
+  border-radius: 14px;
+  border: 0.5px solid var(--hc-emphasis-card-border-neutral);
+  outline: none;
+  box-shadow: var(--hc-emphasis-card-shadow);
+  -webkit-backdrop-filter: var(--hc-emphasis-card-backdrop);
+  backdrop-filter: var(--hc-emphasis-card-backdrop);
+}
+
+.hc-emphasis-card[hidden] {
+  display: none !important;
+}
+
+.hc-emphasis-card--active {
+  background: var(--hc-emphasis-card-fill-active-glass);
+  border-color: var(--hc-emphasis-card-border-active);
+}
+
+.hc-emphasis-card--info {
+  background: var(--hc-emphasis-card-fill-info-glass);
+  border-color: var(--hc-emphasis-card-border-info);
+}
+
+.hc-emphasis-card--warn {
+  background: var(--hc-emphasis-card-fill-warn-glass);
+  border-color: var(--hc-emphasis-card-border-warn);
+}
+
+.hc-emphasis-card--urgent {
+  background: var(--hc-emphasis-card-fill-urgent-glass);
+  border-color: var(--hc-emphasis-card-border-urgent);
+}
+
+.hc-emphasis-card__main {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--hc-emphasis-card-gap-dot);
+  min-width: 0;
+  flex: 1 1 12rem;
+}
+
+.hc-emphasis-card__copy {
+  min-width: 0;
+}
+
+.hc-emphasis-card__eyebrow {
+  margin: 0 0 var(--hc-emphasis-card-gap-eyebrow);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: var(--hc-emphasis-card-eyebrow-tracking, 0.025em);
+  text-transform: uppercase;
+}
+
+.hc-emphasis-card--active .hc-emphasis-card__eyebrow {
+  color: var(--hc-emphasis-card-eyebrow-active);
+}
+
+.hc-emphasis-card--info .hc-emphasis-card__eyebrow {
+  color: var(--hc-emphasis-card-eyebrow-info);
+}
+
+.hc-emphasis-card--warn .hc-emphasis-card__eyebrow {
+  color: var(--hc-emphasis-card-eyebrow-warn);
+}
+
+.hc-emphasis-card--urgent .hc-emphasis-card__eyebrow {
+  color: var(--hc-emphasis-card-eyebrow-urgent);
+}
+
+.hc-emphasis-card__title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--hc-emphasis-card-title-fg);
+  line-height: 1.2;
+}
+
+.hc-emphasis-card__detail {
+  margin: var(--hc-emphasis-card-gap-copy) 0 0;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--hc-emphasis-card-detail-fg);
+}
+
+.hc-emphasis-card__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: var(--hc-emphasis-card-cta-padding, 7px 11px);
+  border: none;
+  border-radius: var(--hc-emphasis-card-cta-radius, 10px);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+  background: var(--red);
+  box-shadow: 0 1px 2px rgba(219, 27, 67, 0.25);
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hc-emphasis-card__cta:active {
+  opacity: 0.88;
+  transform: scale(0.98);
+}
+
+.hc-emphasis-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  max-width: 100%;
+  /* Wrap-safe spacing (Safari flex gap + overflow); 4px + 4px = 8px between pills */
+  margin: -4px;
+}
+
+.hc-emphasis-card__actions > * {
+  margin: 4px;
+}
+
+.hc-emphasis-card__cta--secondary {
+  padding: var(--hc-emphasis-card-cta-secondary-padding, 6px 10px);
+  color: var(--hc-emphasis-card-title-fg);
+  background: rgba(120, 120, 128, 0.12);
+  border: 0.5px solid rgba(60, 60, 67, 0.2);
+  box-shadow: none;
+}
+
+.hc-emphasis-card__cta--secondary:active {
+  opacity: 0.82;
+}
+
+.hc-emphasis-card__dot {
+  width: 9px;
+  height: 9px;
+  margin-top: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.hc-emphasis-card__dot--success {
+  background: #34c759;
+  box-shadow: 0 0 0 3px rgba(52, 199, 89, 0.22);
+}
+
+.hc-emphasis-card__dot--info {
+  background: #007aff;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+}
+
+.hc-emphasis-card__dot--warn {
+  background: #ff9500;
+  box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.22);
+}
+
+.hc-emphasis-card__dot--urgent {
+  background: #ff3b30;
+  box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.22);
+}
+
+/* Opaque fallback when blur is unavailable or user prefers reduced transparency */
+@supports not (
+  (-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))
+) {
+  .hc-emphasis-card--active {
+    background: var(--hc-emphasis-card-fill-active);
+  }
+
+  .hc-emphasis-card--info {
+    background: var(--hc-emphasis-card-fill-info);
+  }
+
+  .hc-emphasis-card--warn {
+    background: var(--hc-emphasis-card-fill-warn);
+  }
+
+  .hc-emphasis-card--urgent {
+    background: var(--hc-emphasis-card-fill-urgent);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .hc-emphasis-card {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .hc-emphasis-card--active {
+    background: var(--hc-emphasis-card-fill-active);
+  }
+
+  .hc-emphasis-card--info {
+    background: var(--hc-emphasis-card-fill-info);
+  }
+
+  .hc-emphasis-card--warn {
+    background: var(--hc-emphasis-card-fill-warn);
+  }
+
+  .hc-emphasis-card--urgent {
+    background: var(--hc-emphasis-card-fill-urgent);
+  }
+}
+</style>
+</head>
+<body>
+  <div class="page scan-page">
+    <div class="scan-page-chrome">
+  <div class="scan-page-status-cluster">
+    <a class="scan-page-dot" id="scan-page-dot-btn" href="https://humanity.llc/" aria-label="humanity.llc home">
+      <span class="pass-dot" id="scan-page-dot" aria-hidden="true"></span>
+    </a>
+    <div class="scan-page-dot-glance" id="scan-page-dot-glance" role="dialog" aria-label="Your device on this scan" hidden>
+      <div class="scan-page-dot-explainer" id="scan-page-dot-explainer" aria-live="polite"></div>
+      <a class="scan-page-dot-home" id="scan-page-dot-home" href="https://humanity.llc/">humanity.llc home</a>
+    </div>
+  </div>
+</div>
+    <div class="scan-cross-tab-banner" id="scan-cross-tab-banner" role="status" hidden></div>
+    <div class="scan-steward-preview-return" id="scan-steward-preview-return" hidden>
+      <a id="scan-steward-preview-return-link" class="scan-steward-preview-return-link" href="#">Back</a>
+    </div>
+    <p class="scan-offline-banner" id="scan-offline-banner" role="status" hidden>Offline - status may be stale; refresh when connected.</p>
+    <p class="scan-truth-unverified-banner" id="scan-truth-unverified-banner" role="alert" hidden></p>
+    <p class="scan-freshness-banner" id="scan-freshness-banner" role="status" hidden data-fetched-at="2026-06-06T03:42:48.263Z" data-max-age-seconds="30" data-source="resolver">This response was built by the resolver at fetch time. Cached or offline copies may be older — open the URL again for current signed state.</p>
+    <main class="screen scan-screen">
+      <div class="scan-pass-layer">
+<article class="scan-hero scan-status-panel scan-safety-header scan-live-check--pending" id="scan-safety-header" aria-label="Live check" data-profile-id="CEenC57QN9qqnr2x5L89cbWt" data-qr-id="qr_capture_onboarding" data-ssr-scan-kind="active" data-object-id="obj_cr_node_01_newbo" data-scan-active="1">
+  <header class="scan-hero-head">
+    <p class="scan-hero-host scan-hero-wordmark" translate="no">humanity.llc</p>
+    <div class="scan-safety-strip scan-safety-strip--live scan-arrive-strip" role="status" data-arrive-label="Active">
+      <span class="scan-safety-strip-icon" aria-hidden="true"></span>
+      <span class="scan-safety-strip-label scan-arrive-status-label">Active</span>
+    </div>
+  </header>
+  <div class="scan-hero-body">
+    <section class="scan-game-onboarding" aria-labelledby="scan-game-onboarding-heading">
+  <p class="scan-arrive-item scan-arrive-item--hidden scan-game-onboarding-identity">Wake the city · Signal War</p>
+  <p class="scan-arrive-item scan-arrive-item--hidden scan-game-onboarding-season">Season opens Jun 6, 6:00 PM CDT. Scans work now. Plan your route on the city board.</p>
+  <h1 class="scan-arrive-item scan-arrive-item--hidden scan-game-onboarding-location" id="scan-game-onboarding-heading">NewBo relay arch</h1>
+  <p class="scan-arrive-item scan-arrive-item--hidden scan-game-onboarding-role">NewBo · Relay · gate</p>
+  
+  <p class="scan-arrive-item scan-arrive-item--hidden scan-game-onboarding-consequence" role="note">Red team holds the relay</p>
+  <p class="scan-arrive-item scan-arrive-item--hidden scan-game-onboarding-next">Open the city board to plan your route before the season opens.</p>
+  <div class="scan-game-onboarding-actions" role="navigation" aria-label="City game next steps">
+    <a class="scan-game-onboarding-cta scan-game-onboarding-cta--primary" href="/play/cedar-rapids/map/?node=node_01">Open city board</a>
+    <a class="scan-game-onboarding-cta scan-game-onboarding-cta--secondary" href="/play/cedar-rapids/">Season rules</a>
+  </div>
+  <p class="scan-arrive-item scan-arrive-item--hidden scan-game-privacy-tagline" role="note">No account. No GPS. No visit log.</p>
+</section>
+    <details class="scan-game-state-details">
+  <summary class="scan-game-state-summary">Live object details</summary>
+  <div class="scan-game-state-panel">
+<p class="scan-arrive-item scan-arrive-item--hidden scan-game-dormant-note" role="note">Season opens Jun 6, 6:00 PM CDT. Scans work now — object state is readable before play opens.</p>
+<ul class="scan-arrive-item scan-arrive-item--hidden scan-object-streams" aria-label="Object details">
+<li class="scan-object-stream">
+  <span class="scan-object-stream-label">Controller</span>
+  <span class="scan-object-stream-value">Red team</span>
+</li>
+<li class="scan-object-stream">
+  <span class="scan-object-stream-label">Relay status</span>
+  <span class="scan-object-stream-value">Open · 18 min</span>
+</li>
+</ul>
+<p class="scan-arrive-item scan-arrive-item--hidden scan-object-streams-limit" role="note">Extra object details are steward-signed public copy on this object — not verified facts, outside summaries, or proof someone scanned.</p>
+<ul class="scan-arrive-item scan-arrive-item--hidden scan-game-chips" aria-label="Game state"><li class="scan-game-chip">Season opens Jun 6, 6:00 PM CDT. Scans work now.</li>
+<li class="scan-game-chip">Relay · Held · Red team</li></ul>
+<p class="scan-arrive-item scan-arrive-item--hidden scan-hero-steward">Controlled by @season_root</p>
+  </div>
+</details>
+  </div>
+  
+  <p class="scan-hero-limit scan-arrive-limits scan-arrive-limits--hidden" role="note">This QR resolves to a Humanity Card. It does not prove the person holding this item is the card owner.</p>
+  
+  <p class="scan-safety-first-seen" id="scan-safety-first-seen" hidden></p>
+  <p class="scan-hero-foot">This scan shows public object state — not who scanned, player scores, or location history.</p>
+  <p class="scan-game-privacy-note" role="note">Opening this QR is not logged. If you choose to contribute, a public count on this object updates — not your identity.</p>
+  
+  
+  
+  
+  
+  
+  
+</article>
+</div>
+      <section id="scan-actor-band" class="scan-actor-band scan-actor-band--hidden" hidden aria-label="Your device on this scan">
+  <h2 class="scan-actor-band-title">Saved control</h2>
+  <p class="scan-actor-band-lead">You can vouch or open your cards from here.</p>
+  <div class="scan-actor-band-actions">
+    <button type="button" class="scan-actor-band-primary" id="scan-actor-band-restore" hidden>Restore control here</button>
+    <button type="button" class="scan-actor-band-primary" id="scan-actor-band-vouch">Go to vouch</button>
+    <a class="scan-actor-band-secondary" href="https://humanity.llc/wallet/">My objects</a>
+  </div>
+</section>
+      <details class="scan-game-trust-details">
+  <summary class="scan-game-trust-summary">Trust &amp; privacy</summary>
+  <div class="scan-game-trust-panel">
+<div class="scan-trust-modules scan-trust-layer"><section class="scan-proves" aria-label="What this scan shows">
+  <h2 class="scan-module-label">What this scan shows</h2>
+  <ul class="scan-proves-list"><li>Live status returned from humanity.llc at scan time</li><li>Revocable per card and per printed-item QR on the network</li></ul>
+</section></div>
+<details class="scan-limits-settings scan-trust-layer scan-limits-layer" id="scan-limits-settings">
+  <summary class="scan-limits-summary">
+    <span class="list-icon list-icon-tone-orange" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+    <span class="scan-limits-summary-text">
+      <span class="scan-limits-summary-title">What this scan does not prove</span>
+      <span class="scan-limits-summary-sub">Tap for ownership, ID, KYC, employment, and age</span>
+    </span>
+    <span class="list-chevron" aria-hidden="true">›</span>
+  </summary>
+  <div class="scan-limits-panel">
+    <ul class="scan-limits-list">
+      <li>Legal identity, government ID, KYC, or background checks</li>
+      <li>Employment eligibility, age verification, or a hidden trust score</li>
+      <li>That social vouches were honest or complete</li>
+      <li>Permanent ownership of a physical item (lifecycle transitions can change state)</li>
+      <li>Who scanned, when, or where  -  this page returns object state, not a people trail</li>
+      <li>Extra object details are steward-signed public copy on this object — not verified facts, outside summaries, or proof someone scanned.</li>
+      
+    </ul>
+    <p class="scan-limits-meta">No scan analytics on this page. <a href="https://humanity.llc/data-policy.html">Operator data policy</a> · <a href="https://humanity.llc/architecture.html">Architecture</a></p>
+  </div>
+</details>
+<section class="scan-trust-tools" aria-labelledby="scan-trust-tools-heading">
+  <header class="scan-trust-tools-head">
+    <h2 id="scan-trust-tools-heading" class="scan-trust-tools-title">Check at scan time</h2>
+    <p class="scan-trust-tools-lead">Open a row for card, human trust, this QR, or live control.</p>
+  </header>
+  <div class="scan-trust-stack" aria-label="Trust details at scan time">
+<details class="group scan-group scan-group-card scan-trust-layer scan-trust-details">
+  <summary class="scan-group-summary">
+    <span class="list-icon list-icon-tone-green" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg></span>
+    <span class="scan-group-summary-text">
+      <span class="scan-group-summary-title">Card status</span>
+      <span class="scan-group-summary-peek">active</span>
+    </span>
+    <span class="scan-group-chevron" aria-hidden="true">›</span>
+  </summary>
+  <ul class="list">
+    <li class="list-row">
+  <span class="list-icon list-icon-tone-green" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg></span>
+  <span class="list-content">
+    <span class="list-title">Card active</span>
+    <span class="list-sub">Live public card fields at scan time</span>
+  </span>
+</li>
+<li class="list-row">
+  <span class="list-icon list-icon-tone-blue" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9h16"/><path d="M4 15h16"/><path d="M10 3 8 21"/><path d="M16 3l-2 18"/></svg></span>
+  <span class="list-content">
+    <span class="list-title">Profile ID</span>
+    <span class="list-sub">CEenC57QN9qqnr2x5L89cbWt</span>
+  </span>
+</li>
+  </ul>
+</details>
+<details class="group scan-group scan-group-human scan-trust-layer scan-trust-details">
+  <summary class="scan-group-summary">
+    <span class="list-icon list-icon-tone-slate" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+    <span class="scan-group-summary-text">
+      <span class="scan-group-summary-title">Human trust</span>
+      <span class="scan-group-summary-peek">Registered</span>
+    </span>
+    <span class="scan-group-chevron" aria-hidden="true">›</span>
+  </summary>
+  <ul class="list">
+    <li class="list-row" id="human-trust-row">
+  <span class="list-icon list-icon-tone-slate" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+  <span class="list-content">
+    <span class="list-title" id="human-trust-row-title">Registered</span>
+    <span class="list-sub" id="human-trust-row-sub">No accepted vouches yet  -  registered on this operator, not proof of humanity.</span>
+  </span>
+</li>
+  </ul>
+</details>
+<details class="group scan-group scan-group-qr scan-trust-layer scan-trust-details">
+  <summary class="scan-group-summary">
+    <span class="list-icon list-icon-tone-green" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M18 17h3v3h-3z"/><path d="M14 20h3"/></svg></span>
+    <span class="scan-group-summary-text">
+      <span class="scan-group-summary-title">This QR</span>
+      <span class="scan-group-summary-peek">QR active</span>
+    </span>
+    <span class="scan-group-chevron" aria-hidden="true">›</span>
+  </summary>
+  <ul class="list">
+    <li class="list-row">
+  <span class="list-icon list-icon-tone-green" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M18 17h3v3h-3z"/><path d="M14 20h3"/></svg></span>
+  <span class="list-content">
+    <span class="list-title">QR active</span>
+    <span class="list-sub">Child object. Revoke this scan link without disabling the account</span>
+  </span>
+</li>
+<li class="list-row">
+  <span class="list-icon list-icon-tone-green" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M18 17h3v3h-3z"/><path d="M14 20h3"/></svg></span>
+  <span class="list-content">
+    <span class="list-title">No calendar expiry</span>
+    <span class="list-sub">This object QR stays valid until the owner revokes or replaces it</span>
+  </span>
+</li>
+<li class="list-row">
+  <span class="list-icon list-icon-tone-blue" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9h16"/><path d="M4 15h16"/><path d="M10 3 8 21"/><path d="M16 3l-2 18"/></svg></span>
+  <span class="list-content">
+    <span class="list-title">Credential</span>
+    <span class="list-sub">qr_capture_onboarding</span>
+  </span>
+</li>
+<li class="list-row">
+  <span class="list-icon list-icon-tone-slate" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9h16"/><path d="M4 15h16"/><path d="M10 3 8 21"/><path d="M16 3l-2 18"/></svg></span>
+  <span class="list-content">
+    <span class="list-title">HC-KD8X-DV3M</span>
+    <span class="list-sub">Compare with print sticker · not secret</span>
+  </span>
+</li>
+  </ul>
+</details>
+<section class="group scan-group scan-group-vouch scan-trust-layer" aria-label="Issue vouch">
+  <h2 class="group-label">Vouch</h2>
+  <div id="vouch-explainer" class="hc-emphasis-card hc-emphasis-card--info vouch-explainer">
+    <div class="hc-emphasis-card__main">
+      <span class="hc-emphasis-card__dot hc-emphasis-card__dot--info" aria-hidden="true"></span>
+      <div class="hc-emphasis-card__copy">
+        <p class="hc-emphasis-card__eyebrow">Your control</p>
+        <p class="hc-emphasis-card__title">Checking this tab</p>
+        <p class="hc-emphasis-card__detail" id="vouch-explainer-copy">
+          Checking whether you have control of your identity in this tab. Steward and Vouched Human are network checks, separate from attestation. Use <strong>Attest as…</strong> or <a href="https://humanity.llc/wallet/">My objects</a>. Only the signed attestation is sent; your control stays on this device.
+        </p>
+      </div>
+    </div>
+    <div id="vouch-explainer-actions" class="hc-emphasis-card__actions vouch-explainer-actions" hidden></div>
+  </div>
+  <ul class="list vouch-list">
+    <li class="list-row vouch-row" id="vouch-row" hidden data-vouchee-profile-id="CEenC57QN9qqnr2x5L89cbWt">
+  <span class="list-content vouch-card-wrap">
+    <div class="vouch-card" id="vouch-interactive" hidden>
+      <div class="vouch-card-head">
+        <span class="list-icon list-icon-tone-green" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+        <div class="vouch-card-head-text">
+          <span class="vouch-eyebrow">Signed attestation</span>
+          <span class="vouch-title">Issue vouch</span>
+        </div>
+      </div>
+      <p class="vouch-lead">
+        Publish a signed statement that you know this person as a distinct human. Not government ID; visible on this network and revocable by you.
+      </p>
+      <label class="vouch-field-label" for="vouch-statement">Statement (public, max 280)</label>
+      <textarea class="vouch-statement" id="vouch-statement" maxlength="280" rows="4"></textarea>
+      <label class="vouch-confirm-label">
+        <input type="checkbox" id="vouch-confirm" />
+        <span>I met them in person. This vouch is public, revocable, and not legal identity proof.</span>
+      </label>
+      <button type="button" class="vouch-cta" id="vouch-submit">Sign and submit</button>
+      <div class="vouch-status-panel">
+        <p class="vouch-status" id="vouch-status" aria-live="polite"></p>
+      </div>
+    </div>
+    <div class="hc-emphasis-card hc-emphasis-card--warn vouch-ineligible" id="vouch-ineligible" hidden>
+      <div class="hc-emphasis-card__main">
+        <span class="hc-emphasis-card__dot hc-emphasis-card__dot--warn" aria-hidden="true"></span>
+        <div class="hc-emphasis-card__copy">
+          <p class="hc-emphasis-card__eyebrow">Unavailable</p>
+          <p class="hc-emphasis-card__title">Cannot issue vouch</p>
+          <p class="hc-emphasis-card__detail" id="vouch-ineligible-copy"></p>
+        </div>
+      </div>
+    </div>
+    <div class="hc-emphasis-card hc-emphasis-card--active vouch-success" id="vouch-success" hidden>
+      <div class="hc-emphasis-card__main">
+        <span class="hc-emphasis-card__dot hc-emphasis-card__dot--active" aria-hidden="true"></span>
+        <div class="hc-emphasis-card__copy">
+          <p class="hc-emphasis-card__eyebrow">Accepted</p>
+          <p class="hc-emphasis-card__title">Vouch recorded</p>
+          <p class="hc-emphasis-card__detail" id="vouch-success-copy">The signed vouch is on the network.</p>
+        </div>
+      </div>
+    </div>
+  </span>
+</li>
+  </ul>
+</section>
+  </div>
+</section>
+  </div>
+</details>
+      <footer class="scan-footer">
+  <a class="dock-btn dock-btn-primary" href="https://humanity.llc/create/">Create a live object</a>
+  <a class="dock-btn dock-btn-secondary" href="https://humanity.llc/">About humanity.llc</a>
+  <a class="scan-footer-link" href="https://humanity.llc/.well-known/hc/v1/cards/CEenC57QN9qqnr2x5L89cbWt">Public card JSON</a>
+</footer>
+    </main>
+  </div>
+  <script type="module" src="https://humanity.llc/js/scan-tab-keys.mjs?v=9"></script>
+  
+  <script type="module" src="https://humanity.llc/js/vouch-issue.mjs?v=15"></script>
+  
+  <script>
+(function () {
+  var el = document.getElementById("scan-offline-banner");
+  if (!el) return;
+  function apply() {
+    el.hidden = navigator.onLine !== false;
+  }
+  apply();
+  window.addEventListener("online", apply);
+  window.addEventListener("offline", apply);
+})();
+</script>
+  <script>
+(function () {
+  var el = document.getElementById("scan-freshness-banner");
+  if (!el) return;
+  var fetchedAt = el.getAttribute("data-fetched-at");
+  var maxAge = Number(el.getAttribute("data-max-age-seconds"));
+  var source = el.getAttribute("data-source") || "resolver";
+  if (!fetchedAt || !maxAge) return;
+  var fetchedMs = Date.parse(fetchedAt);
+  if (!Number.isFinite(fetchedMs)) return;
+  function apply() {
+    if (source !== "resolver") {
+      el.hidden = false;
+      return;
+    }
+    var ageSec = (Date.now() - fetchedMs) / 1000;
+    el.hidden = ageSec <= maxAge;
+  }
+  apply();
+  window.addEventListener("pageshow", apply);
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "visible") apply();
+  });
+})();
+</script>
+  <script>
+(function () {
+  var header = document.getElementById("scan-safety-header");
+  if (!header) return;
+  var pid = header.dataset.profileId;
+  var qid = header.dataset.qrId;
+  var firstEl = document.getElementById("scan-safety-first-seen");
+  if (pid && qid && firstEl) {
+    var key = "hc_first_scan_" + pid + "_" + qid;
+    var seen = false;
+    try { seen = sessionStorage.getItem(key) === "1"; } catch (e) {}
+    firstEl.textContent = seen
+      ? "You opened this before on this device"
+      : "First time you opened this object on this device";
+    firstEl.hidden = false;
+    if (!seen) {
+      try { sessionStorage.setItem(key, "1"); } catch (e) {}
+    }
+  }
+})();
+</script>
+  <script type="module" src="https://humanity.llc/js/scan-live-check-arrive.mjs?v=3"></script>
+  <script type="module" src="https://humanity.llc/js/scan-actor-band.mjs?v=3"></script>
+  <script type="module" src="https://humanity.llc/js/scan-ai-explain.mjs?v=1"></script>
+  <script type="module" src="https://humanity.llc/js/scan-merch-funnel.mjs?v=2"></script>
+  
+  
+  
+  
+  <script type="module" src="https://humanity.llc/js/scan-steward-preview-return.mjs?v=1"></script>
+</body>
+</html>
