@@ -215,22 +215,24 @@ test.describe("city game map board", () => {
     const summary = board.locator("#city-game-map-filter-summary");
     await expect(summary).toBeVisible();
     await expect(summary).toContainText("Viewing:");
-    await expect(summary.locator("[data-filter-summary-scope]")).toContainText(
-      "Relays · 17 places"
-    );
+    await expect(summary.locator("[data-filter-summary-scope]")).toContainText("Relays");
+    await expect(summary.locator("[data-filter-summary-count]")).toContainText("17 places");
+    await expect(board).toHaveClass(/city-game-map-board--filtered/);
 
     const needsBtn = stateFilter.getByRole("button", { name: "Needs action" });
     await needsBtn.click();
     await expect(needsBtn).toHaveAttribute("aria-pressed", "true");
     await expect(needsBtn).toHaveClass(/city-game-map-filter-btn--active/);
     await expect(summary.locator("[data-filter-summary-scope]")).toContainText(
-      /Relays · Needs action · \d+ places/
+      "Relays · Needs action"
     );
+    await expect(summary.locator("[data-filter-summary-count]")).toContainText(/\d+ places/);
 
     await summary.getByRole("button", { name: "Clear filters" }).click();
     await expect(board).toHaveAttribute("data-active-type", "all");
     await expect(board).toHaveAttribute("data-active-state", "all");
     await expect(summary).toBeHidden();
+    await expect(board).not.toHaveClass(/city-game-map-board--filtered/);
     await expect(relayBtn).toHaveAttribute("aria-pressed", "false");
     await expect(relayBtn).not.toHaveClass(/city-game-map-filter-btn--active/);
     await expect(needsBtn).toHaveAttribute("aria-pressed", "false");
@@ -274,7 +276,8 @@ test.describe("city game map board", () => {
 
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
     await expect(summary).toBeVisible();
-    await expect(summary.locator("[data-filter-summary-scope]")).toContainText(/Relays · \d+ places/);
+    await expect(summary.locator("[data-filter-summary-scope]")).toContainText("Relays");
+    await expect(summary.locator("[data-filter-summary-count]")).toContainText(/\d+ places/);
   });
 
   test("?node= deep link highlights scanned location on load", async ({ page }) => {

@@ -47,11 +47,12 @@ function mockBoardRoot(nodes) {
     rowRefs: rows.filter((row) => row.district === district),
   }));
 
-  /** @type {{ hidden: boolean; scopeText: string; countText: string }} */
+  /** @type {{ hidden: boolean; scopeText: string; countText: string; countHidden: boolean }} */
   const summary = {
     hidden: true,
     scopeText: "",
     countText: "",
+    countHidden: true,
   };
 
   /** @type {Record<string, { label: string }>} */
@@ -105,6 +106,9 @@ function mockBoardRoot(nodes) {
       activeState: "all",
       activeExplore: "all",
       activeDistrict: "all",
+    },
+    classList: {
+      toggle() {},
     },
     querySelectorAll(selector) {
       if (selector === ".city-game-map-node-row[data-node-id]") {
@@ -192,7 +196,12 @@ function mockBoardRoot(nodes) {
                 set textContent(value) {
                   summary.countText = String(value ?? "");
                 },
-                hidden: true,
+                get hidden() {
+                  return summary.countHidden;
+                },
+                set hidden(value) {
+                  summary.countHidden = Boolean(value);
+                },
               };
             }
             return null;
@@ -408,7 +417,7 @@ describe("city-game-map-filter-core", () => {
     expect(html).toContain("city-game-map-start-callout");
   });
 
-  it("syncBoardFilterSummary merges type, state, and count into scope line", () => {
+  it("syncBoardFilterSummary splits scope labels and place count", () => {
     const nodes = season.nodes.map(
       (row: { node_id: string; district: string; role: string }) => ({
         node_id: row.node_id,
@@ -424,10 +433,10 @@ describe("city-game-map-filter-core", () => {
 
     expect(summary.hidden).toBe(false);
     const visible = rows.filter((row) => !row.hidden).length;
-    expect(summary.scopeText).toContain("Relays");
-    expect(summary.scopeText).toContain("Needs action");
-    expect(summary.scopeText).toContain(
+    expect(summary.scopeText).toBe("Relays · Needs action");
+    expect(summary.countText).toBe(
       visible === 1 ? "1 place" : `${visible} places`
     );
+    expect(summary.countHidden).toBe(false);
   });
 });
