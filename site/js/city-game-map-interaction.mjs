@@ -152,7 +152,7 @@ function scrollSketchToPin(boardRoot, nodeId) {
   if (!(pin instanceof SVGGElement) || !isMapPinInteractive(pin)) return;
 
   const revealPin = () => {
-    pin.scrollIntoView({ block: "center", behavior: "smooth", inline: "nearest" });
+    pin.scrollIntoView({ block: "nearest", behavior: "smooth", inline: "nearest" });
   };
 
   if (typeof requestAnimationFrame === "function") {

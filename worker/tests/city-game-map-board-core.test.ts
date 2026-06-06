@@ -149,6 +149,8 @@ describe("city-game map board render", () => {
     expect(html).not.toContain("Unlock paths");
     expect(html).toContain("City goals");
     expect(html).toContain("city-game-map-node-effect");
+    expect(html).toContain("data-node-card-what");
+    expect(html).toContain("data-node-card-scan");
     expect(html).toContain(" · Relay");
     if (isDenseMapBoard(season)) {
       expect(html).toContain("city-game-map-board--dense");
