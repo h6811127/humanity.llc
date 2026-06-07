@@ -512,9 +512,8 @@
         <section class="hero hero-tight" data-landing-tutorial>
           <h1>An internet for physical places and objects.</h1>
           <p class="hero-tagline">
-            Create public networks in the physical world — one live sticker at a time. Any camera
-            reads <strong>today’s signed state</strong>. Communities run the network; scans are not
-            tracked by default.
+            Print once. Update from your phone.<br />
+            Turn stickers, door plates, clothing, and public spaces into live network endpoints communities can run.
           </p>
           <ul class="landing-trust-chips" aria-label="Trust at a glance">
             <li class="landing-trust-chip">No account</li>
@@ -524,18 +523,70 @@
         </section>
 
         <section
+          class="landing-try-live-object"
+          id="landing-try-live-object"
+          aria-labelledby="landing-try-live-object-title"
+          data-landing-tutorial
+        >
+          <h2 class="group-label" id="landing-try-live-object-title">Try a live object</h2>
+          <p class="group-intro short">These are live scan pages running today.</p>
+          <ul class="list list-compact">
+            <li class="list-row list-action">
+              <a href="/c/r4YyNEWJvVwWNMETzXfGjFyL?q=qr_8w7zHCPHisXvTnar">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Studio door</span>
+                  <span class="list-sub">Open · Thu–Sun until 9 PM</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/c/isLDJtqFMk3Ti9XaHe26xf14?q=qr_BBGB3VF7pCX5gy8t">
+                <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Lost item relay</span>
+                  <span class="list-sub">House keys relay</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/c/mht4JbKX7Q9L5owpNw9wnAC8?q=qr_3JNFm4wMGyrcm1e9">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Tool library</span>
+                  <span class="list-sub">Live object · current hours</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+          <p class="example-note">
+            A website is online. A live object is attached to a door, bench, hoodie, tool, or public
+            place.
+          </p>
+        </section>
+
+        <section
           class="hero hero-tight landing-hero-primitive"
           id="landing-hero-primitive"
           aria-labelledby="landing-hero-primitive-title"
           data-landing-tutorial
         >
-          <p class="section-kicker">Building block · Public programmable objects</p>
+          <p class="section-kicker">Building block</p>
           <h2 class="group-label" id="landing-hero-primitive-title">
             The sticker stays.<br />The status changes.
           </h2>
           <p class="hero-tagline">
-            Print once on a plate, hoodie, or city sticker. You update or revoke from your phone —
-            the printed link stays the same.
+            The printed link stays the same. The public state can change: open, closed, revoked,
+            limited, claimed, or routed.
           </p>
         </section>
 
@@ -650,7 +701,7 @@
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><path d="M7 7h.01"/></svg>
                 </span>
                 <span class="list-content">
-                  <span class="list-title">Wear live status</span>
+                  <span class="list-title">Wear a live object</span>
                   <span class="list-sub"
                     >Glitch hoodie — your QR, your line, change it from Live without reprinting</span
                   >
@@ -722,7 +773,11 @@
         >
           <h2 class="landing-how-it-works-title" id="landing-how-it-works-title">How a live sticker works</h2>
           <p class="landing-how-it-works-lead">
-            Print once. Any camera can read <strong>current</strong> signed status - no app required.
+            Print once. Any camera can read the current public status — no app required.
+          </p>
+          <p class="landing-how-it-works-note landing-how-it-works-signed-state">
+            Signed state means the current public status was published by the object’s steward, not
+            inferred from who scanned it.
           </p>
           <div class="flow-strip flow-strip--model">
             <div class="flow-step">
@@ -897,7 +952,8 @@
                 Physical software objects
               </h2>
               <p class="hc-emphasis-card__detail landing-framing-lead">
-                Each QR is a live endpoint — status and revocation can change after print.
+                Public programmable objects — each QR is a live endpoint — status and revocation can
+                change after print.
                 <a href="/what-can-a-qr-do/physical-software-objects/">Read more</a>
               </p>
             </div>
