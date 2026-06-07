@@ -15,7 +15,7 @@ import {
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 
 const LANDING_META_SNIPPET =
-  "Public programmable objects. Live, revocable status on physical tags";
+  "Public networks for physical places. Live stickers you control from your phone";
 
 describe("landing messaging (Step 3)", () => {
   it("landing meta and OG align with messaging matrix", () => {
@@ -26,33 +26,47 @@ describe("landing messaging (Step 3)", () => {
     expect(html).not.toContain("Live public objects. Not identity, not social media");
   });
 
-  it("landing hero uses hook H1 and public programmable kicker", () => {
+  it("landing hero leads with network vision H1 and primitive sticker H2", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
+    expect(html).toContain("An internet for physical places and objects.");
+    expect(html).toContain("Create public networks in the physical world");
     expect(html).toContain("Public programmable objects");
     expect(html).toContain("The sticker stays.<br />The status changes.");
+    expect(html).toContain('id="landing-hero-primitive"');
     expect(html).not.toContain("Live state<br />on real objects.");
     expect(html).not.toContain("A network OS for physical objects");
   });
 
-  it("landing three-door launch section links status, hoodie, and city game", () => {
+  it("landing launch section links place, deploy, and wear doors in network-first order", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
     expect(html).toContain('id="launch-doors"');
-    expect(html).toContain("Three ways in");
+    expect(html).toContain("Start here");
     expect(html).toContain("/create/?intent=deploy");
     expect(html).toContain("/shop/customize/?product=glitch_hoodie_v1");
     expect(html).toContain("/play/cedar-rapids/");
-    expect(html).toContain("Live status on something");
-    expect(html).toContain("Live status on you");
-    expect(html).toContain("Play the city game");
+    expect(html).toContain("Explore a live place");
+    expect(html).toContain("Add an object to the network");
+    expect(html).toContain("Wear live status");
+    expect(html).not.toContain("Three ways in");
+    expect(html).not.toContain("Live status on something");
+    expect(html).not.toContain("Play the city game");
+
+    const doorsListStart = html.indexOf('class="list list-compact landing-launch-doors-list"');
+    const placeIdx = html.indexOf("Explore a live place", doorsListStart);
+    const deployIdx = html.indexOf("Add an object to the network", doorsListStart);
+    const wearIdx = html.indexOf("Wear live status", doorsListStart);
+    expect(placeIdx).toBeGreaterThan(doorsListStart);
+    expect(deployIdx).toBeGreaterThan(placeIdx);
+    expect(wearIdx).toBeGreaterThan(deployIdx);
   });
 
   it("landing title and founder note bridge mission and what ships today", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
-    expect(html).toContain("humanity.llc · Live objects on physical tags");
+    expect(html).toContain("humanity.llc · Public networks for live places");
     expect(html).toContain("Why this exists");
     expect(html).toContain("Why humanity.llc?");
-    expect(html).toContain("webpages that are difficult to edit");
-    expect(html).toContain("One primitive, many uses");
+    expect(html).toContain("live places instead");
+    expect(html).toContain("The building block is simple");
     expect(html).toContain("hoodie displaying today's mood");
     expect(html).toContain("trust you can check (what the scan shows right now)");
     expect(html).toContain("an experiment in portable trust and revocable public identity");
@@ -77,7 +91,7 @@ describe("landing messaging (Step 3)", () => {
     expect(merchIdx).toBeGreaterThan(howIdx);
     expect(founderIdx).toBeGreaterThan(merchIdx);
     expect(html).toContain("landing-merch-preview");
-    expect(html).toContain("One use · live object on a sweatshirt");
+    expect(html).toContain("Wearable example");
     expect(html).toContain("/images/landing/navy-glitch-hoodie-transparent-back.jpg");
     expect(html).toContain("transparent QR");
     expect(html).toContain("https://humanity.llc/c/nSVXWPqgRFEhGPjxyRzidF6s?q=qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5");
