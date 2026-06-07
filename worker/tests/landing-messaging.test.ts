@@ -29,10 +29,15 @@ describe("landing messaging (Step 3)", () => {
   it("landing hero leads with network vision H1 and primitive sticker H2", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
     expect(html).toContain("An internet for physical places and objects.");
-    expect(html).toContain("Create public networks in the physical world");
+    expect(html).toContain("Print once. Update from your phone.");
+    expect(html).toContain("live network endpoints communities can run");
+    expect(html).toContain('id="landing-try-live-object"');
+    expect(html).toContain("Try a live object");
     expect(html).toContain("Public programmable objects");
     expect(html).toContain("The sticker stays.<br />The status changes.");
     expect(html).toContain('id="landing-hero-primitive"');
+    expect(html).not.toContain("Create public networks in the physical world");
+    expect(html).not.toContain("today\u2019s signed state");
     expect(html).not.toContain("Live state<br />on real objects.");
     expect(html).not.toContain("A network OS for physical objects");
   });
@@ -46,7 +51,8 @@ describe("landing messaging (Step 3)", () => {
     expect(html).toContain("/play/cedar-rapids/");
     expect(html).toContain("Explore a live place");
     expect(html).toContain("Add an object to the network");
-    expect(html).toContain("Wear live status");
+    expect(html).toContain("Wear a live object");
+    expect(html).not.toContain("Wear live status");
     expect(html).not.toContain("Three ways in");
     expect(html).not.toContain("Live status on something");
     expect(html).not.toContain("Play the city game");
@@ -54,7 +60,7 @@ describe("landing messaging (Step 3)", () => {
     const doorsListStart = html.indexOf('class="list list-compact landing-launch-doors-list"');
     const placeIdx = html.indexOf("Explore a live place", doorsListStart);
     const deployIdx = html.indexOf("Add an object to the network", doorsListStart);
-    const wearIdx = html.indexOf("Wear live status", doorsListStart);
+    const wearIdx = html.indexOf("Wear a live object", doorsListStart);
     expect(placeIdx).toBeGreaterThan(doorsListStart);
     expect(deployIdx).toBeGreaterThan(placeIdx);
     expect(wearIdx).toBeGreaterThan(deployIdx);
@@ -123,7 +129,7 @@ describe("public marketing clarity (AI step 5)", () => {
 
     expect(publicCopy).toContain("Public programmable objects");
     expect(publicCopy).toContain("The sticker stays.<br />The status changes.");
-    expect(publicCopy).toContain("today\u2019s signed state");
+    expect(publicCopy).toContain("Signed state means the current public status was published");
     expect(publicCopy).toContain("No passive scan tracking by default.");
     expect(publicCopy).not.toMatch(/\bAI\b|artificial intelligence|AI profiles|we have AI/i);
   });
