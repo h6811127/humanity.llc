@@ -7,25 +7,31 @@
  */
 
 /** Bump when hero / launch doors copy or structure changes intentionally. */
-export const LANDING_COPY_CONTRACT_VERSION = 1;
+export const LANDING_COPY_CONTRACT_VERSION = 2;
 
 export const LANDING_STYLES_CACHE_BUST = "152";
 
 export const LANDING_REQUIRED_SNIPPETS = [
+  "An internet for physical places and objects.",
+  "Create public networks in the physical world",
   "Public programmable objects",
   "The sticker stays.<br />The status changes.",
+  'id="landing-hero-primitive"',
+  'id="landing-live-networks-title"',
+  "Connected public networks",
   'id="launch-doors"',
   "landing-launch-doors-list",
-  "Three ways in",
-  "Live status on something",
-  "Live status on you",
-  "Play the city game",
+  "Start here",
+  "Explore a live place",
+  "Add an object to the network",
+  "Wear live status",
   "/create/?intent=deploy",
   "/shop/customize/?product=glitch_hoodie_v1",
   "/play/cedar-rapids/",
   "landing-hero-privacy",
   'id="landing-how-it-works-title"',
-  'id="one-use-title">Live status objects',
+  "How a live sticker works",
+  'id="one-use-title">Start with one object',
   `styles.css?v=${LANDING_STYLES_CACHE_BUST}`,
 ];
 
@@ -34,10 +40,15 @@ export const LANDING_FORBIDDEN_SNIPPETS = [
   "Live state<br />on real objects.",
   'class="hc-emphasis-card__cta landing-hero-btn-primary"',
   "One use · status plate",
+  "Three ways in",
+  "Live status on something",
+  "Live status on you",
+  "Play the city game",
 ];
 
 /** Launch doors must appear before How it works in document order. */
 export const LANDING_SECTION_ORDER_MARKERS = [
+  'id="landing-live-networks-title"',
   'id="launch-doors"',
   'id="landing-how-it-works-title"',
 ];

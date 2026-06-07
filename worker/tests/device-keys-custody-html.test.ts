@@ -81,7 +81,8 @@ describe("device-keys-custody-html", () => {
 
   it("landing uses ownership trust chip not keys in browser", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
-    expect(html).toContain("Control on your device");
+    expect(html).toContain("Community-run networks");
+    expect(html).toContain("No account");
     expect(html).not.toContain("Keys in your browser");
     expect(html).toContain("How saved controls work");
     expect(html).toContain("Saved controls");

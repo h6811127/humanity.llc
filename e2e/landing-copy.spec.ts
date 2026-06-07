@@ -5,22 +5,31 @@ import { expect, test } from "@playwright/test";
  * @see site/js/landing-copy-contract.mjs
  */
 test.describe("landing copy contract", () => {
-  test("hero and three ways in are visible on /", async ({ page }) => {
+  test("vision hero, primitive sticker line, and start-here doors are visible on /", async ({
+    page,
+  }) => {
     await page.goto("/");
     await expect(
-      page.getByRole("heading", { level: 1, name: /The sticker stays/i })
+      page.getByRole("heading", {
+        level: 1,
+        name: /An internet for physical places and objects/i,
+      })
     ).toBeVisible();
-    await expect(page.getByText("The status changes.")).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Three ways in" })).toBeVisible();
-    await expect(page.getByRole("link", { name: /Live status on something/i })).toBeVisible();
-    await expect(page.getByRole("link", { name: /Live status on you/i })).toBeVisible();
-    await expect(page.getByRole("link", { name: /Play the city game/i })).toBeVisible();
+    await expect(
+      page.getByRole("heading", {
+        name: /The sticker stays\. The status changes\./i,
+      })
+    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Start here" })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Explore a live place/i })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Add an object to the network/i })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Wear live status/i })).toBeVisible();
     await expect(page.getByText("Live state on real objects")).toHaveCount(0);
   });
 
-  test("launch door opens status plate create", async ({ page }) => {
+  test("launch door opens deploy create", async ({ page }) => {
     await page.goto("/");
-    await page.getByRole("link", { name: /Live status on something/i }).click();
+    await page.getByRole("link", { name: /Add an object to the network/i }).click();
     await expect(page).toHaveURL(/\/create\/\?intent=deploy/);
   });
 });

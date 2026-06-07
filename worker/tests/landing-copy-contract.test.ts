@@ -35,11 +35,14 @@ describe("landing copy contract (regression lock)", () => {
     });
   }
 
-  it("launch doors precede How it works in DOM order", () => {
-    const [launch, how] = LANDING_SECTION_ORDER_MARKERS;
-    expect(html.indexOf(launch)).toBeGreaterThan(-1);
-    expect(html.indexOf(how)).toBeGreaterThan(-1);
-    expect(html.indexOf(launch)).toBeLessThan(html.indexOf(how));
+  it("landing sections appear in narrative DOM order", () => {
+    let prev = -1;
+    for (const marker of LANDING_SECTION_ORDER_MARKERS) {
+      const idx = html.indexOf(marker);
+      expect(idx).toBeGreaterThan(-1);
+      expect(idx).toBeGreaterThan(prev);
+      prev = idx;
+    }
   });
 
   it("styles include launch-doors layout rules", () => {
