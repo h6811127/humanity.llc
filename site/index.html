@@ -6,10 +6,10 @@
       name="viewport"
       content="width=device-width, initial-scale=1, viewport-fit=cover"
     />
-    <title>humanity.llc · Public networks for live places</title>
+    <title>humanity.llc · Check what's true right now</title>
     <meta
       name="description"
-      content="Public networks for physical places. Live stickers you control from your phone — browser-native. No passive scan tracking by default."
+      content="Check what's true right now on real doors, tags, and places. Browse live public boards — games, open or paused resources, return paths and hours. No account. No scan trails."
     />
     <meta name="theme-color" content="#ffffff" />
     <meta name="color-scheme" content="light dark" />
@@ -76,13 +76,14 @@
       })();
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=5" />
-    <link rel="stylesheet" href="/styles.css?v=152" />
+    <link rel="stylesheet" href="/styles.css?v=153" />
+    <link rel="stylesheet" href="/css/public-networks-portal.css?v=4" />
     <link rel="stylesheet" href="/css/device-shell.css?v=94" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=32" />
-    <meta property="og:title" content="humanity.llc · Public networks for live places" />
+    <meta property="og:title" content="humanity.llc · Check what's true right now" />
     <meta
       property="og:description"
-      content="Public networks for physical places. Live stickers you control from your phone — browser-native. No passive scan tracking by default."
+      content="Current public truth on real doors, tags, and places. Browse live boards before you knock, pick up, or show up. No scan trails."
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://humanity.llc" />
@@ -507,628 +508,129 @@
         </div>
       </section>
 
-      <!-- landing-copy-contract: vision hero + primitive + #launch-doors — see site/js/landing-copy-contract.mjs -->
-      <main class="screen screen-landing">
-        <section class="hero hero-tight" data-landing-tutorial>
-          <h1>An internet for physical places and objects.</h1>
-          <p class="hero-tagline">
-            Print once. Update from your phone.<br />
-            Turn stickers, door plates, clothing, and public spaces into live network endpoints communities can run.
+      <!-- landing-copy-contract: human-first discovery dashboard — see site/js/landing-copy-contract.mjs -->
+      <main class="screen screen-landing public-networks-screen">
+        <section class="hero hero-tight hero-compact landing-discovery-hero" data-landing-tutorial>
+          <h1>Check what's true right now before you knock, pick up, or show up.</h1>
+          <p class="hero-line">
+            Current public truth on real doors, tags, and places — published by whoever maintains
+            them, not guessed from who walked by.
           </p>
           <ul class="landing-trust-chips" aria-label="Trust at a glance">
             <li class="landing-trust-chip">No account</li>
-            <li class="landing-trust-chip">Community-run networks</li>
+            <li class="landing-trust-chip">Community-run boards</li>
             <li class="landing-trust-chip">No scan surveillance</li>
           </ul>
         </section>
 
         <section
-          class="landing-try-live-object"
-          id="landing-try-live-object"
-          aria-labelledby="landing-try-live-object-title"
-          data-landing-tutorial
+          class="landing-entry-shelves idea-section"
+          id="landing-entry-shelves"
+          aria-labelledby="landing-entry-shelves-title"
         >
-          <h2 class="group-label" id="landing-try-live-object-title">Try a live object</h2>
-          <p class="group-intro short">These are live scan pages running today.</p>
-          <ul class="list list-compact">
-            <li class="list-row list-action">
-              <a href="/c/r4YyNEWJvVwWNMETzXfGjFyL?q=qr_8w7zHCPHisXvTnar">
-                <span class="list-icon list-icon-tone-red" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">Studio door</span>
-                  <span class="list-sub">Open · Thu–Sun until 9 PM</span>
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </a>
+          <h2 class="group-label" id="landing-entry-shelves-title">Browse by need</h2>
+          <ul class="landing-entry-shelves-list">
+            <li class="landing-entry-shelf" id="landing-shelf-live-now">
+              <h3 class="landing-entry-shelf-title">Live now</h3>
+              <p class="landing-entry-shelf-copy">
+                Weekend games, festivals, and shared play — what's happening around town this
+                season.
+              </p>
             </li>
-            <li class="list-row list-action">
-              <a href="/c/isLDJtqFMk3Ti9XaHe26xf14?q=qr_BBGB3VF7pCX5gy8t">
-                <span class="list-icon list-icon-tone-green" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">Lost item relay</span>
-                  <span class="list-sub">House keys relay</span>
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </a>
+            <li class="landing-entry-shelf" id="landing-shelf-open-paused">
+              <h3 class="landing-entry-shelf-title">Open or paused</h3>
+              <p class="landing-entry-shelf-copy">
+                Cooling centers, shelters, supply points — signed open, closed, or paused status
+                you can trust before you go.
+              </p>
             </li>
-            <li class="list-row list-action">
-              <a href="/c/mht4JbKX7Q9L5owpNw9wnAC8?q=qr_3JNFm4wMGyrcm1e9">
-                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">Tool library</span>
-                  <span class="list-sub">Live object · current hours</span>
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </a>
+            <li class="landing-entry-shelf" id="landing-shelf-return-hours">
+              <h3 class="landing-entry-shelf-title">Return, relay, hours</h3>
+              <p class="landing-entry-shelf-copy">
+                Door plates, lost-item return paths, market stalls — hours and messages that
+                change without reprinting.
+              </p>
             </li>
           </ul>
-          <p class="example-note">
-            A website is online. A live object is attached to a door, bench, hoodie, tool, or public
-            place.
-          </p>
         </section>
 
-        <section
-          class="hero hero-tight landing-hero-primitive"
-          id="landing-hero-primitive"
-          aria-labelledby="landing-hero-primitive-title"
-          data-landing-tutorial
-        >
-          <p class="section-kicker">Building block</p>
-          <h2 class="group-label" id="landing-hero-primitive-title">
-            The sticker stays.<br />The status changes.
-          </h2>
-          <p class="hero-tagline">
-            The printed link stays the same. The public state can change: open, closed, revoked,
-            limited, claimed, or routed.
+        <section class="public-networks-toolbar idea-section" aria-label="Search and filter">
+          <label class="form-label" for="public-networks-search">Search live places and boards</label>
+          <input
+            class="form-input public-networks-search"
+            id="public-networks-search"
+            type="search"
+            name="q"
+            autocomplete="off"
+            placeholder="City, name, or keyword"
+          />
+          <p class="form-hint public-networks-toolbar-hint">
+            Public boards group live places by community. Only intentionally listed boards appear
+            here — not a map, feed, or scan history.
           </p>
+          <div
+            class="public-networks-categories"
+            id="public-networks-categories"
+            role="group"
+            aria-label="Categories"
+          ></div>
         </section>
 
-        <section
-          class="landing-live-networks"
-          aria-labelledby="landing-live-networks-title"
-          data-landing-tutorial
-        >
-          <p class="section-kicker">Live places</p>
-          <h2 class="group-label" id="landing-live-networks-title">Connected public networks</h2>
-          <p class="group-intro short">
-            Many stickers can share one world. A studio district, a city game, a mutual-aid
-            corridor — each is a <strong>live place</strong> where scanners read what’s true right
-            now, not a webpage frozen at print time.
+        <section class="idea-section" aria-labelledby="public-networks-results-title">
+          <h2 class="group-label" id="public-networks-results-title">Public live boards</h2>
+          <p class="form-hint public-networks-results-lead">
+            Open a board to browse places, then check what's true on site. Cards map to the shelves
+            above — city games, resources, markets, and events.
           </p>
-          <ul class="list list-compact">
-            <li class="list-row list-action">
-              <a href="/play/cedar-rapids/">
-                <span class="list-icon list-icon-tone-gold" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">City game</span>
-                  <span class="list-sub"
-                    >Cedar Rapids — scan stickers around town; shared world state unlocks together</span
-                  >
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </a>
-            </li>
-            <li class="list-row list-action">
-              <a href="/create/?intent=deploy">
-                <span class="list-icon list-icon-tone-green" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">Live building</span>
-                  <span class="list-sub"
-                    >Door plates and tags that share one steward network</span
-                  >
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </a>
-            </li>
-            <li class="list-row list-action">
-              <a href="/what-can-a-qr-do/civic-protest-infrastructure/">
-                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">Campaign grid</span>
-                  <span class="list-sub"
-                    >Posters you revoke when the drive ends — plate still resolves honestly</span
-                  >
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </a>
-            </li>
-          </ul>
-          <p class="example-note">
-            A network’s <strong>vitality</strong> is what scanners can read right now — which routes
-            are awake, which objects are live, optional public counts on game nodes. Not who scanned,
-            not where. Communities can operate their own infrastructure — control stays on steward
-            devices.
-          </p>
-        </section>
-
-        <section
-          class="landing-launch-doors"
-          id="launch-doors"
-          aria-labelledby="landing-launch-doors-title"
-          data-landing-tutorial
-        >
-          <h2 class="landing-launch-doors-title" id="landing-launch-doors-title">
-            Start here
-          </h2>
-          <p class="landing-launch-doors-lead">
-            One building block — a single object or a whole live place. Pick how you want to start.
-          </p>
-          <ul class="list list-compact landing-launch-doors-list">
-            <li class="list-row list-action">
-              <a href="/play/cedar-rapids/">
-                <span class="list-icon list-icon-tone-gold" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">Explore a live place</span>
-                  <span class="list-sub"
-                    >Cedar Rapids — scan stickers around town, unlock shared world state together</span
-                  >
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </a>
-            </li>
-            <li class="list-row list-action">
-              <a href="/create/?intent=deploy">
-                <span class="list-icon list-icon-tone-green" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">Add an object to the network</span>
-                  <span class="list-sub"
-                    >Door plate, desk tag, lost-item relay — open, closed, return message</span
-                  >
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </a>
-            </li>
-            <li class="list-row list-action">
-              <a href="/shop/customize/?product=glitch_hoodie_v1">
-                <span class="list-icon list-icon-tone-red" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><path d="M7 7h.01"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">Wear a live object</span>
-                  <span class="list-sub"
-                    >Glitch hoodie — your QR, your line, change it from Live without reprinting</span
-                  >
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </a>
-            </li>
-          </ul>
-          <p class="landing-launch-doors-note">
-            <a href="/case-study/">See the full loop</a> ·
-            <a href="/what-can-a-qr-do.html">More use cases</a>
-          </p>
-        </section>
-
-        <section class="hero hero-tight landing-hero-privacy" data-landing-tutorial aria-label="Scan privacy">
-          <div class="landing-privacy-split" role="group">
-            <div class="landing-privacy-grid">
-              <article
-                class="hc-emphasis-card hc-emphasis-card--active landing-framing landing-framing--compact landing-privacy-card"
-              >
-                <div class="hc-emphasis-card__main">
-                  <span
-                    class="hc-emphasis-card__dot hc-emphasis-card__dot--success"
-                    aria-hidden="true"
-                  ></span>
-                  <div class="hc-emphasis-card__copy">
-                    <p class="hc-emphasis-card__eyebrow">No scan surveillance</p>
-                    <h2 class="hc-emphasis-card__title landing-framing-title">No scan tracking</h2>
-                    <ul class="landing-privacy-list">
-                      <li>Opening a QR is not logged by default</li>
-                      <li>No trail of who scanned, when, or where</li>
-                      <li>No heatmaps, streaks, or player dossiers</li>
-                    </ul>
-                  </div>
-                </div>
-              </article>
-              <article
-                class="hc-emphasis-card hc-emphasis-card--info landing-framing landing-framing--compact landing-privacy-card"
-              >
-                <div class="hc-emphasis-card__main">
-                  <span
-                    class="hc-emphasis-card__dot hc-emphasis-card__dot--info"
-                    aria-hidden="true"
-                  ></span>
-                  <div class="hc-emphasis-card__copy">
-                    <p class="hc-emphasis-card__eyebrow">Visible on scan</p>
-                    <h2 class="hc-emphasis-card__title landing-framing-title">Public object state</h2>
-                    <ul class="landing-privacy-list">
-                      <li>
-                        Live signed status on the object — who holds a relay, which route is awake
-                      </li>
-                      <li>
-                        Optional game contributions update a <strong>public count</strong> on the
-                        object
-                      </li>
-                      <li>Contributions are voluntary — not your identity</li>
-                    </ul>
-                  </div>
-                </div>
-              </article>
-            </div>
+          <div class="public-networks-results" id="public-networks-results">
+            <p class="public-networks-loading">Loading live boards…</p>
           </div>
+          <p class="public-networks-empty" id="public-networks-empty" hidden></p>
         </section>
 
         <section
-          class="landing-how-it-works"
-          aria-labelledby="landing-how-it-works-title"
-          data-landing-tutorial
+          class="landing-start-object-cta"
+          id="landing-start-object-cta"
+          aria-label="Create a live object"
         >
-          <h2 class="landing-how-it-works-title" id="landing-how-it-works-title">How a live sticker works</h2>
-          <p class="landing-how-it-works-lead">
-            Print once. Any camera can read the current public status — no app required.
+          <a class="landing-hero-btn landing-hero-btn-primary" href="/create/">Start with one live object</a>
+          <p class="landing-start-object-cta-note">
+            Print once. Update from your phone. The sticker stays — the status changes.
           </p>
-          <p class="landing-how-it-works-note landing-how-it-works-signed-state">
-            Signed state means the current public status was published by the object’s steward, not
-            inferred from who scanned it.
-          </p>
-          <div class="flow-strip flow-strip--model">
-            <div class="flow-step">
-              <div class="flow-object">
-                <div class="flow-door">
-                  <span class="flow-plaque">
-                    <img src="/assets/red_qr_transparent_bg.png" width="28" height="28" alt="" />
+        </section>
+
+        <details class="landing-disclosure-card" id="landing-learn-trust">
+          <summary class="landing-disclosure-card-summary">
+            <span class="list-icon list-icon-tone-trust" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </span>
+            <span class="landing-disclosure-card-text">
+              <span class="landing-disclosure-card-title">Privacy and signed state</span>
+              <span class="landing-disclosure-card-sub">No scan trails · no behavioral dossiers · public status only</span>
+            </span>
+            <span class="list-chevron" aria-hidden="true">›</span>
+          </summary>
+          <div class="landing-disclosure-card-body">
+            <p class="group-intro short">
+              Opening a link is not logged by default. Live status is steward-signed — not inferred
+              from who scanned it. No scan trails. No behavioral dossiers.
+            </p>
+            <ul class="list list-compact">
+              <li class="list-row list-action">
+                <a href="/architecture.html">
+                  <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="6" rx="1"/><rect x="2" y="15" width="20" height="6" rx="1"/></svg>
                   </span>
-                </div>
-              </div>
-              <p class="flow-label">Print</p>
-              <p class="flow-caption">Plate, tag, sticker</p>
-            </div>
-
-            <div class="flow-arrow" aria-hidden="true">→</div>
-
-            <div class="flow-step">
-              <div class="flow-object flow-phone" aria-hidden="true">
-                <span class="flow-scan-line"></span>
-                <span class="flow-phone-notch"></span>
-              </div>
-              <p class="flow-label">Scan</p>
-              <p class="flow-caption">Any camera, no app</p>
-            </div>
-
-            <div class="flow-arrow" aria-hidden="true">→</div>
-
-            <div class="flow-step">
-              <div class="flow-object flow-state" aria-hidden="true">
-                <span class="flow-state-dot live"></span>
-                <span class="flow-state-text">Active</span>
-              </div>
-              <p class="flow-label">Verify</p>
-              <p class="flow-caption">Active, revoked, or limited</p>
-            </div>
-          </div>
-          <p class="landing-how-it-works-note">
-            The printed URL stays the same. You change what scanners see when status changes.
-          </p>
-        </section>
-
-        <section
-          class="landing-merch-preview"
-          aria-labelledby="landing-merch-preview-title"
-          data-landing-tutorial
-        >
-          <p class="section-kicker">Apparel</p>
-          <h2 class="group-label" id="landing-merch-preview-title">
-            Wearable example
-          </h2>
-          <p class="group-intro short">
-            A navy hoodie with a <strong>transparent QR</strong> on the back — fabric shows through
-            the code. The printed link stays fixed; you change what strangers read from your phone.
-          </p>
-          <figure class="landing-merch-preview__figure">
-            <a
-              class="landing-merch-preview__link"
-              href="https://humanity.llc/c/nSVXWPqgRFEhGPjxyRzidF6s?q=qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5"
-              rel="noopener"
-            >
-              <img
-                class="landing-merch-preview__img"
-                src="/images/landing/navy-glitch-hoodie-transparent-back.jpg"
-                width="600"
-                height="600"
-                alt="Navy sweatshirt back with a transparent live-object QR that scans to humanity.llc"
-                loading="lazy"
-                decoding="async"
-              />
-            </a>
-            <figcaption class="landing-merch-preview__caption">
-              Sample Glitch hoodie · transparent print · tap to open the live scan page
-            </figcaption>
-          </figure>
-          <ul class="list list-compact landing-merch-preview__actions">
-            <li class="list-row list-action">
-              <a href="/shop/customize/?product=glitch_hoodie_v1">
-                <span class="list-icon list-icon-tone-red" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><path d="M7 7h.01"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">Preview your QR on a hoodie</span>
-                  <span class="list-sub">Customize size, color, and print frame before checkout</span>
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </a>
-            </li>
-            <li class="list-row list-action">
-              <a href="/shop/">
-                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">Shop founding merch</span>
-                  <span class="list-sub">Glitch LIVE QR hoodie and founding purse</span>
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </a>
-            </li>
-          </ul>
-        </section>
-
-        <section
-          class="hc-emphasis-card hc-emphasis-card--info landing-founder-note landing-framing landing-framing--compact"
-          aria-labelledby="founder-note-title"
-          data-landing-tutorial
-        >
-          <div class="hc-emphasis-card__main">
-            <span class="hc-emphasis-card__dot hc-emphasis-card__dot--info" aria-hidden="true"></span>
-            <div class="hc-emphasis-card__copy">
-              <p class="hc-emphasis-card__eyebrow">Why this exists</p>
-              <h2 class="hc-emphasis-card__title landing-framing-title" id="founder-note-title">
-                Why humanity.llc?
-              </h2>
-              <p class="hc-emphasis-card__detail landing-framing-lead">
-                Public networks need objects that stay readable after print. Most QR codes link to
-                webpages that are hard to edit. I want live places instead: many stickers sharing one
-                world, each with a current state the steward controls from their phone.
-              </p>
-              <p class="hc-emphasis-card__detail landing-framing-lead">
-                The building block is simple — the sticker stays, the status changes. One primitive,
-                many uses. A studio door with live hours, a worksite with today's tasks, a mutual-aid
-                poster you revoke when the funds run dry, a bench in a city-wide game, a hoodie displaying today's mood. These are all different problems with the same tool underneath.
-                <a href="/what-can-a-qr-do.html">Use-case walkthroughs</a> ·
-                <a href="/what-can-a-qr-do/design-space/">Expanded design space</a>.
-              </p>
-              <p class="hc-emphasis-card__detail landing-framing-lead">
-                Underneath I want trust you can check (what the scan shows right now), take back (revoke a sticker or link without reprinting), and keep (control stays on your device, no account). I started with QR because you can print it - the same live-status idea works for NFC, Bluetooth, whatever gets someone to the current answer. humanity.llc is where I'm running it today. Humanity Commons is an experiment in portable trust and revocable public identity - belonging and vouching you can inspect, running as one network, many networks, or both. Live QR creation and state management work today. The rest is in progress.
-              </p>
-            </div>
-          </div>
-          <div class="hc-emphasis-card__actions landing-framing-more-actions">
-            <a
-              class="hc-emphasis-card__cta hc-emphasis-card__cta--secondary landing-framing-more-link"
-              href="/features-available-now.html"
-            >
-              <span class="list-icon list-icon-tone-green" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
-              </span>
-              <span class="landing-framing-more-text">
-                <span class="landing-framing-more-title">See what's live</span>
-                <span class="landing-framing-more-sub">Create, scan, revoke, hub - full feature list</span>
-              </span>
-              <span class="landing-framing-more-chevron" aria-hidden="true">›</span>
-            </a>
-            <a
-              class="hc-emphasis-card__cta hc-emphasis-card__cta--secondary landing-framing-more-link"
-              href="/studio/"
-            >
-              <span class="list-icon list-icon-tone-blue" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
-              </span>
-              <span class="landing-framing-more-text">
-                <span class="landing-framing-more-title">Notes on the build</span>
-                <span class="landing-framing-more-sub">Door plate, keys without accounts, why stickers are software</span>
-              </span>
-              <span class="landing-framing-more-chevron" aria-hidden="true">›</span>
-            </a>
-          </div>
-        </section>
-
-        <section
-          class="hc-emphasis-card hc-emphasis-card--info landing-framing landing-framing--compact"
-          aria-labelledby="framing-title"
-          data-landing-tutorial
-        >
-          <div class="hc-emphasis-card__main">
-            <span class="hc-emphasis-card__dot hc-emphasis-card__dot--info" aria-hidden="true"></span>
-            <div class="hc-emphasis-card__copy">
-              <p class="hc-emphasis-card__eyebrow">Physical objects</p>
-              <h2 class="hc-emphasis-card__title landing-framing-title" id="framing-title">
-                Physical software objects
-              </h2>
-              <p class="hc-emphasis-card__detail landing-framing-lead">
-                Public programmable objects — each QR is a live endpoint — status and revocation can
-                change after print.
-                <a href="/what-can-a-qr-do/physical-software-objects/">Read more</a>
-              </p>
-            </div>
-          </div>
-          <div class="hc-emphasis-card__actions landing-framing-more-actions">
-            <a
-              class="hc-emphasis-card__cta hc-emphasis-card__cta--secondary landing-framing-more-link"
-              href="/what-can-a-qr-do/design-space/"
-            >
-              <span class="list-icon list-icon-tone-gold" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
-              </span>
-              <span class="landing-framing-more-text">
-                <span class="landing-framing-more-title">Expanded design space</span>
-                <span class="landing-framing-more-sub">Verbs, blind spots, networks, open questions</span>
-              </span>
-              <span class="landing-framing-more-chevron" aria-hidden="true">›</span>
-            </a>
-            <a
-              class="hc-emphasis-card__cta hc-emphasis-card__cta--secondary landing-framing-more-link"
-              href="/what-can-a-qr-do.html"
-            >
-              <span class="list-icon list-icon-tone-gold" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
-              </span>
-              <span class="landing-framing-more-text">
-                <span class="landing-framing-more-title">What else can a QR do?</span>
-                <span class="landing-framing-more-sub">More ideas on live physical objects</span>
-              </span>
-              <span class="landing-framing-more-chevron" aria-hidden="true">›</span>
-            </a>
-          </div>
-        </section>
-
-        <section
-          class="example-flow studio-one-use"
-          aria-labelledby="one-use-title"
-          data-landing-tutorial
-        >
-          <p class="section-kicker">Launch</p>
-          <h2 class="group-label" id="one-use-title">Start with one object</h2>
-          <p class="group-intro short">
-            Start with a <strong>door plate or tag</strong> — open, closed, return message — or add
-            more objects under one root card. Same primitive as the hoodie and city game stickers.
-          </p>
-
-          <details class="landing-disclosure-card studio-use-cases-disclosure">
-            <summary class="landing-disclosure-card-summary">
-              <span class="list-icon list-icon-tone-red" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
-              </span>
-              <span class="landing-disclosure-card-text">
-                <span class="landing-disclosure-card-title">Example uses on a door plate</span>
-                <span class="landing-disclosure-card-sub">Door scan, run state, hours, revoke visibility</span>
-              </span>
-              <span class="list-chevron" aria-hidden="true">›</span>
-            </summary>
-            <div class="landing-disclosure-card-body">
-            <ul class="list list-compact studio-use-cases-list">
-            <li class="list-row studio-use-case-row">
-              <span class="list-icon list-icon-tone-red" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
-              </span>
-              <span class="list-content">
-                <span class="list-title">Door scan</span>
-                <span class="list-sub">“Open Thu–Sun · back at 7” before someone pulls the handle</span>
-              </span>
-            </li>
-            <li class="list-row studio-use-case-row">
-              <span class="list-icon list-icon-tone-green" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v4"/><path d="M12 18v4"/><circle cx="12" cy="12" r="4"/></svg>
-              </span>
-              <span class="list-content">
-                <span class="list-title">Run state</span>
-                <span class="list-sub">Flip to closed or done for the night from your card page</span>
-              </span>
-            </li>
-            <li class="list-row studio-use-case-row">
-              <span class="list-icon list-icon-tone-gold" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-              </span>
-              <span class="list-content">
-                <span class="list-title">Special hours</span>
-                <span class="list-sub">One signed line for open studio, critique night, or a holiday</span>
-              </span>
-            </li>
-            <li class="list-row studio-use-case-row">
-              <span class="list-icon list-icon-tone-blue" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-              </span>
-              <span class="list-content">
-                <span class="list-title">Guest wayfinding</span>
-                <span class="list-sub">Object name and status when the studio shares a building entrance</span>
-              </span>
-            </li>
-            <li class="list-row studio-use-case-row">
-              <span class="list-icon list-icon-tone-slate" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-              </span>
-              <span class="list-content">
-                <span class="list-title">After revoke</span>
-                <span class="list-sub">Plate still resolves; scanners see revoked, not a dead 404</span>
-              </span>
-            </li>
+                  <span class="list-content">
+                    <span class="list-title">Architecture &amp; security</span>
+                    <span class="list-sub">Threat models, failure modes, and tradeoffs</span>
+                  </span>
+                  <span class="list-chevron" aria-hidden="true">›</span>
+                </a>
+              </li>
             </ul>
-            </div>
-          </details>
-
-          <p class="example-note">
-            Tomorrow the same plate can read <em>revoked</em> or <em>limited</em>. No reprint required.
-          </p>
-
-          <ul class="list list-compact studio-one-use-actions">
-            <li class="list-row list-action" id="one-use-live-scan-row" hidden>
-              <a id="one-use-live-scan-link" href="#">
-                <span class="list-icon list-icon-tone-red" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">Try a status plate scan</span>
-                  <span class="list-sub" id="one-use-live-scan-sub">Public status plate on the network</span>
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </a>
-            </li>
-            <li class="list-row list-action" id="one-use-live-object-scan-row" hidden>
-              <a id="one-use-live-object-scan-link" href="#">
-                <span class="list-icon list-icon-tone-red" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">Try a live object scan</span>
-                  <span class="list-sub" id="one-use-live-object-scan-sub">Public live object on the network</span>
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </a>
-            </li>
-            <li class="list-row list-action" id="one-use-lost-item-scan-row" hidden>
-              <a id="one-use-lost-item-scan-link" href="#">
-                <span class="list-icon list-icon-tone-red" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">Try a lost item relay scan</span>
-                  <span class="list-sub" id="one-use-lost-item-scan-sub">Public return relay on the network</span>
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </a>
-            </li>
-            <li class="list-row list-action">
-              <a href="/create/?intent=deploy">
-                <span class="list-icon list-icon-tone-green" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">Add a status plate</span>
-                  <span class="list-sub">@handle first · add signs, tags, and wearables from Live</span>
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </a>
-            </li>
-            <li class="list-row list-action">
-              <a href="/studio/">
-                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">Studio blog</span>
-                  <span class="list-sub">Cards on building this site &amp; the door plate</span>
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </a>
-            </li>
-          </ul>
-        </section>
+          </div>
+        </details>
 
         <section
           class="landing-device-settings device-prefs-boot-gated"
@@ -1441,41 +943,6 @@
           </div>
         </details>
 
-        <section class="group pilot-more-ideas" aria-label="More ideas" data-landing-tutorial>
-          <p class="group-intro short">
-            One primitive  -  current signed status on any camera. Use-case walkthroughs and the
-            <a href="/what-can-a-qr-do/design-space/">expanded design space</a> (research, not all
-            shipping yet).
-          </p>
-        </section>
-
-        <section
-          class="hc-emphasis-card hc-emphasis-card--urgent landing-final-cta"
-          aria-label="Get started"
-          data-landing-tutorial
-        >
-          <div class="hc-emphasis-card__main">
-            <span class="hc-emphasis-card__dot hc-emphasis-card__dot--urgent" aria-hidden="true"></span>
-            <div class="hc-emphasis-card__copy">
-              <p class="hc-emphasis-card__eyebrow">Get started</p>
-              <h2 class="hc-emphasis-card__title landing-final-cta-title">Ready to try it?</h2>
-              <p class="hc-emphasis-card__detail landing-final-cta-lead">
-                Create a live object, save ownership on this device, and print a QR that always resolves to
-                current status.
-              </p>
-            </div>
-          </div>
-          <div class="hc-emphasis-card__actions landing-final-cta-actions">
-            <a
-              class="hc-emphasis-card__cta landing-final-cta-btn"
-              href="/create/"
-              >Create your first live object</a
-            >
-          </div>
-          <p class="landing-final-cta-foot">
-            Not legal ID · not scan analytics ·
-            <a href="/architecture.html">open protocol details</a>
-          </p>
         </section>
 
         <details class="landing-disclosure-card landing-essentials landing-docs-full" id="landing-docs-full">
@@ -1650,8 +1117,6 @@
     <script src="/js/landing-focus.mjs?v=5" type="module"></script>
     <script src="/js/device-status-bootstrap.mjs?v=94" type="module"></script>
     <script src="/js/landing-device-hub.mjs?v=14" type="module"></script>
-    <script src="/js/landing-showcase.mjs?v=2" type="module"></script>
-    <script src="/js/landing-showcase-live-object.mjs?v=1" type="module"></script>
-    <script src="/js/landing-showcase-lost-item.mjs?v=1" type="module"></script>
+    <script src="/js/public-networks-portal.mjs?v=4" type="module"></script>
   </body>
 </html>

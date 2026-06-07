@@ -98,6 +98,70 @@ export function publicNetworkWindowStatusLabel(phase) {
 /** Primary CTA label for listed networks with an open board href. */
 export const PUBLIC_NETWORK_OPEN_BOARD_CTA = "Open board";
 
+/** Optional schematic / board preview art by season id (static assets only). */
+export const PUBLIC_NETWORK_SEASON_PREVIEW_ART = {
+  cr_season_01_wake: "/dev/find-public-networks-qa/cedar-rapids-board-open.png",
+};
+
+/**
+ * @param {Record<string, unknown> | null | undefined} seasonConfig
+ */
+export function countSeasonPlaces(seasonConfig) {
+  if (!seasonConfig || typeof seasonConfig !== "object") return null;
+  const nodes = seasonConfig.nodes;
+  if (!Array.isArray(nodes)) return null;
+  return nodes.length;
+}
+
+/**
+ * @param {Record<string, unknown> | null | undefined} seasonConfig
+ */
+export function countSeasonLiveObjects(seasonConfig) {
+  const places = countSeasonPlaces(seasonConfig);
+  if (places == null) return null;
+  return places;
+}
+
+/**
+ * @param {string} seasonId
+ */
+export function publicNetworkPreviewArtForSeason(seasonId) {
+  return (
+    PUBLIC_NETWORK_SEASON_PREVIEW_ART[
+      /** @type {keyof typeof PUBLIC_NETWORK_SEASON_PREVIEW_ART} */ (seasonId)
+    ] ?? null
+  );
+}
+
+/**
+ * @param {{ placeCount?: number | null; objectCount?: number | null; isLive?: boolean }} card
+ */
+export function formatPublicNetworkStatsLine(card) {
+  const parts = [];
+  if (card.placeCount != null && card.placeCount > 0) {
+    parts.push(`${card.placeCount} place${card.placeCount === 1 ? "" : "s"}`);
+  }
+  if (card.objectCount != null && card.objectCount > 0) {
+    parts.push(`${card.objectCount} live object${card.objectCount === 1 ? "" : "s"}`);
+  }
+  return parts.join(" · ");
+}
+
+/**
+ * @param {string} category
+ */
+export function renderPublicNetworkSchematicPreview(category) {
+  const stroke =
+    category === "city_games"
+      ? "#e63946"
+      : category === "resources"
+        ? "#60a5fa"
+        : category === "markets"
+          ? "#a78bfa"
+          : "#94a3b8";
+  return `<div class="public-networks-card__schematic" aria-hidden="true"><svg viewBox="0 0 320 120" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="120" fill="rgba(0,0,0,0.04)"/><g fill="${stroke}" opacity="0.55"><circle cx="60" cy="60" r="5"/><circle cx="130" cy="40" r="5"/><circle cx="200" cy="72" r="5"/><circle cx="260" cy="52" r="5"/></g><polyline points="60,60 130,40 200,72 260,52" fill="none" stroke="${stroke}" stroke-width="1.5" opacity="0.35"/></svg></div>`;
+}
+
 /**
  * @param {"unset" | "before" | "open" | "after"} phase
  */
@@ -138,8 +202,14 @@ export function buildPublicNetworkCardModel(row, seasonConfig = null, now = new 
       category
     )] ?? "Network";
 
+  const seasonId = String(row.season_id ?? "");
+  const placeCount = countSeasonPlaces(seasonConfig);
+  const objectCount = countSeasonLiveObjects(seasonConfig);
+  const previewArt = publicNetworkPreviewArtForSeason(seasonId);
+  const statsLine = formatPublicNetworkStatsLine({ placeCount, objectCount, isLive: true });
+
   return {
-    season_id: String(row.season_id ?? ""),
+    season_id: seasonId,
     name,
     place,
     summary,
@@ -151,6 +221,10 @@ export function buildPublicNetworkCardModel(row, seasonConfig = null, now = new 
     statusClass: publicNetworkWindowStatusClass(phase),
     openHref: boardPath,
     rulesHref: rulesPath || null,
+    placeCount,
+    objectCount,
+    previewArt,
+    statsLine,
     searchText,
   };
 }
@@ -187,6 +261,10 @@ export function buildPublicNetworkVisionCardModel(row) {
     statusClass,
     openHref: null,
     rulesHref: null,
+    placeCount: null,
+    objectCount: null,
+    previewArt: null,
+    statsLine: "",
     searchText,
   };
 }
@@ -240,6 +318,13 @@ export function renderPublicNetworkCategoryChips(activeCategory, allCards) {
 /**
  * @param {ReturnType<typeof buildPublicNetworkCardModel>} card
  */
+export function renderPublicNetworkCardPreview(card) {
+  if (card.previewArt) {
+    return `<div class="public-networks-card__preview"><img src="${escapePublicNetworksHtml(card.previewArt)}" alt="" loading="lazy" decoding="async" /></div>`;
+  }
+  return renderPublicNetworkSchematicPreview(card.category);
+}
+
 export function renderPublicNetworkCard(card) {
   const rulesLink = card.rulesHref
     ? `<a class="public-networks-card__secondary" href="${escapePublicNetworksHtml(card.rulesHref)}">Rules</a>`
@@ -248,16 +333,23 @@ export function renderPublicNetworkCard(card) {
   const cta = card.isLive && card.openHref
     ? `<a class="landing-hero-btn landing-hero-btn-primary public-networks-card__cta" href="${escapePublicNetworksHtml(card.openHref)}">${escapePublicNetworksHtml(PUBLIC_NETWORK_OPEN_BOARD_CTA)}</a>`
     : `<span class="landing-hero-btn landing-hero-btn-primary public-networks-card__cta public-networks-card__cta--disabled" aria-disabled="true">${escapePublicNetworksHtml(card.statusLabel)}</span>`;
-  return `<article class="public-networks-card${card.isLive ? "" : " public-networks-card--vision"}" data-season-id="${escapePublicNetworksHtml(card.season_id)}" data-category="${escapePublicNetworksHtml(card.category)}"${liveAttr}>
+  const statsLine = card.statsLine
+    ? `<p class="public-networks-card__stats">${escapePublicNetworksHtml(card.statsLine)}</p>`
+    : "";
+  return `<article class="public-networks-card public-networks-card--rich${card.isLive ? "" : " public-networks-card--vision"}" data-season-id="${escapePublicNetworksHtml(card.season_id)}" data-category="${escapePublicNetworksHtml(card.category)}"${liveAttr}>
+  ${renderPublicNetworkCardPreview(card)}
+  <div class="public-networks-card__body">
   <div class="public-networks-card__head">
     <h3 class="public-networks-card__title">${escapePublicNetworksHtml(card.name)}</h3>
     <span class="public-networks-card__status ${card.statusClass}">${escapePublicNetworksHtml(card.statusLabel)}</span>
   </div>
   <p class="public-networks-card__meta"><span class="public-networks-card__kind">${escapePublicNetworksHtml(card.categoryLabel)}</span><span class="public-networks-card__scope">${escapePublicNetworksHtml(card.place)}</span></p>
+  ${statsLine}
   <p class="public-networks-card__summary">${escapePublicNetworksHtml(card.summary)}</p>
   <div class="public-networks-card__actions">
     ${cta}
     ${rulesLink}
+  </div>
   </div>
 </article>`;
 }

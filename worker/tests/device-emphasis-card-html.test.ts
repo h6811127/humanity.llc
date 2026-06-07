@@ -33,18 +33,16 @@ describe("device-emphasis-card-html", () => {
   it("landing index busts styles.css cache when spacing changes", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
     expect(html).toContain('href="/css/hc-emphasis-card.css?v=5"');
-    expect(html).toContain("styles.css?v=152");
+    expect(html).toContain("styles.css?v=153");
   });
 
-  it("landing final CTA uses urgent emphasis card and standard CTA", () => {
+  it("landing discovery CTA uses primary hero button to create", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
-    expect(html).toContain("hc-emphasis-card--urgent landing-final-cta");
-    expect(html).toContain("hc-emphasis-card__cta landing-final-cta-btn");
+    expect(html).toContain('id="landing-start-object-cta"');
+    expect(html).toContain("Start with one live object");
+    expect(html).toContain('href="/create/"');
+    expect(html).not.toContain("landing-final-cta");
     expect(html).not.toContain("landing-cta-glass");
-    expect(html).not.toMatch(/landing-final-cta-btn[^>]*landing-hero-btn/);
-    expect(html).not.toMatch(
-      /landing-final-cta[^>]*>\s*<h2 class="landing-final-cta-title"/
-    );
   });
 
   it("emphasis card spacing tokens on :root and component css", () => {
@@ -73,20 +71,20 @@ describe("device-emphasis-card-html", () => {
     );
   });
 
-  it("landing framing uses info emphasis card and secondary row link", () => {
+  it("landing index does not use legacy framing emphasis cards", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
-    expect(html).toContain("hc-emphasis-card--info landing-framing");
-    expect(html).toContain("hc-emphasis-card__cta--secondary landing-framing-more-link");
-    expect(html).toContain("landing-framing-more-actions");
+    expect(html).not.toContain("hc-emphasis-card--info landing-framing");
+    expect(html).not.toContain("landing-framing-more-actions");
     expect(html).not.toContain("landing-cta-glass");
     expect(html).not.toContain('class="landing-framing-tab"');
   });
 
-  it("landing launch doors replace single hero primary CTA", () => {
+  it("landing discovery dashboard replaces launch doors", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
-    expect(html).toContain('id="launch-doors"');
-    expect(html).toContain("landing-launch-doors-list");
-    expect(html).not.toContain('class="hc-emphasis-card__cta landing-hero-btn-primary"');
+    expect(html).toContain('id="public-networks-search"');
+    expect(html).toContain('id="public-networks-results"');
+    expect(html).not.toContain('id="launch-doors"');
+    expect(html).not.toContain("landing-launch-doors-list");
   });
 
   it("emphasis card phase B tokens and CTA metrics in component css", () => {

@@ -14,6 +14,7 @@ import {
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const indexPath = join(root, "site/index.html");
 const stylesPath = join(root, "site/styles.css");
+const portalStylesPath = join(root, "site/css/public-networks-portal.css");
 
 describe("landing copy contract (regression lock)", () => {
   const html = readFileSync(indexPath, "utf8");
@@ -45,9 +46,11 @@ describe("landing copy contract (regression lock)", () => {
     }
   });
 
-  it("styles include launch-doors layout rules", () => {
-    expect(styles).toContain(".landing-launch-doors-title");
-    expect(styles).toContain(".landing-hero-privacy");
+  it("discovery dashboard styles include hero, shelves, and create CTA layout", () => {
+    const portalStyles = readFileSync(portalStylesPath, "utf8");
+    expect(portalStyles).toContain(".landing-discovery-hero");
+    expect(portalStyles).toContain(".landing-entry-shelves");
+    expect(portalStyles).toContain(".landing-start-object-cta");
   });
 
   it("index.html documents contract anchor comment", () => {

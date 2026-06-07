@@ -14,94 +14,55 @@ import {
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 
-const LANDING_META_SNIPPET =
-  "Public networks for physical places. Live stickers you control from your phone";
-
 describe("landing messaging (Step 3)", () => {
-  it("landing meta and OG align with messaging matrix", () => {
+  it("landing meta and OG align with human-first public truth framing", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
-    expect(html).toContain(LANDING_META_SNIPPET);
-    expect(html).toContain("No passive scan tracking by default.");
+    expect(html).toContain("Check what's true right now");
+    expect(html).toContain("No scan trails");
     expect(html).not.toContain("Physical objects with programmable social state");
     expect(html).not.toContain("Live public objects. Not identity, not social media");
   });
 
-  it("landing hero leads with network vision H1 and primitive sticker H2", () => {
+  it("landing hero leads with human truth line and entry shelves", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
-    expect(html).toContain("An internet for physical places and objects.");
-    expect(html).toContain("Print once. Update from your phone.");
-    expect(html).toContain("live network endpoints communities can run");
-    expect(html).toContain('id="landing-try-live-object"');
-    expect(html).toContain("Try a live object");
-    expect(html).toContain("Public programmable objects");
-    expect(html).toContain("The sticker stays.<br />The status changes.");
-    expect(html).toContain('id="landing-hero-primitive"');
-    expect(html).not.toContain("Create public networks in the physical world");
-    expect(html).not.toContain("today\u2019s signed state");
+    expect(html).toContain(
+      "Check what's true right now before you knock, pick up, or show up."
+    );
+    expect(html).toContain("Current public truth on real doors, tags, and places");
+    expect(html).toContain('id="landing-entry-shelves"');
+    expect(html).toContain("Live now");
+    expect(html).toContain("Open or paused");
+    expect(html).toContain("Return, relay, hours");
+    expect(html).toContain("Search live places and boards");
+    expect(html).toContain("Public live boards");
+    expect(html).toContain('id="public-networks-search"');
+    expect(html).toContain('id="public-networks-results"');
+    expect(html).toContain('id="landing-start-object-cta"');
+    expect(html).toContain("Start with one live object");
+    expect(html).toContain('href="/create/"');
+    expect(html).toContain("landing-trust-chips");
+    expect(html).toContain("No scan surveillance");
+    expect(html).toContain("No behavioral dossiers");
+    expect(html).not.toContain("<h1>Find public networks</h1>");
+    expect(html).not.toContain("Listed networks");
+    expect(html).not.toContain("An internet for physical places and objects.");
+    expect(html).not.toContain('id="launch-doors"');
+    expect(html).not.toContain("Try a live object");
     expect(html).not.toContain("Live state<br />on real objects.");
-    expect(html).not.toContain("A network OS for physical objects");
   });
 
-  it("landing launch section links place, deploy, and wear doors in network-first order", () => {
+  it("landing loads public networks portal script and styles", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
-    expect(html).toContain('id="launch-doors"');
-    expect(html).toContain("Start here");
-    expect(html).toContain("/create/?intent=deploy");
-    expect(html).toContain("/shop/customize/?product=glitch_hoodie_v1");
-    expect(html).toContain("/play/cedar-rapids/");
-    expect(html).toContain("Explore a live place");
-    expect(html).toContain("Add an object to the network");
-    expect(html).toContain("Wear a live object");
-    expect(html).not.toContain("Wear live status");
-    expect(html).not.toContain("Three ways in");
-    expect(html).not.toContain("Live status on something");
-    expect(html).not.toContain("Play the city game");
-
-    const doorsListStart = html.indexOf('class="list list-compact landing-launch-doors-list"');
-    const placeIdx = html.indexOf("Explore a live place", doorsListStart);
-    const deployIdx = html.indexOf("Add an object to the network", doorsListStart);
-    const wearIdx = html.indexOf("Wear a live object", doorsListStart);
-    expect(placeIdx).toBeGreaterThan(doorsListStart);
-    expect(deployIdx).toBeGreaterThan(placeIdx);
-    expect(wearIdx).toBeGreaterThan(deployIdx);
+    expect(html).toContain("public-networks-portal.css?v=4");
+    expect(html).toContain("public-networks-portal.mjs?v=4");
+    expect(html).not.toContain("landing-showcase.mjs");
   });
 
-  it("landing title and founder note bridge mission and what ships today", () => {
+  it("landing title reflects human truth framing not infrastructure headline", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
-    expect(html).toContain("humanity.llc · Public networks for live places");
-    expect(html).toContain("Why this exists");
-    expect(html).toContain("Why humanity.llc?");
-    expect(html).toContain("live places instead");
-    expect(html).toContain("The building block is simple");
-    expect(html).toContain("hoodie displaying today's mood");
-    expect(html).toContain("trust you can check (what the scan shows right now)");
-    expect(html).toContain("an experiment in portable trust and revocable public identity");
-    expect(html).toContain("belonging and vouching you can inspect");
-    expect(html).toContain("one network, many networks, or both");
-    expect(html).not.toContain("shared trust layer for the internet");
-    expect(html).not.toContain("online social democracy");
-    expect(html).not.toContain("one company's feed");
-    expect(html).toContain("See what's live");
-    expect(html).toContain("Notes on the build");
-    expect(html).toContain("Humanity Commons");
-    expect(html).toContain("/features-available-now.html");
-    expect(html).toContain("/studio/");
-  });
-
-  it("landing intro includes navy sweatshirt transparent QR preview after How it works", () => {
-    const html = readFileSync(join(root, "site/index.html"), "utf8");
-    const howIdx = html.indexOf('id="landing-how-it-works-title"');
-    const merchIdx = html.indexOf('id="landing-merch-preview-title"');
-    const founderIdx = html.indexOf('id="founder-note-title"');
-    expect(howIdx).toBeGreaterThan(-1);
-    expect(merchIdx).toBeGreaterThan(howIdx);
-    expect(founderIdx).toBeGreaterThan(merchIdx);
-    expect(html).toContain("landing-merch-preview");
-    expect(html).toContain("Wearable example");
-    expect(html).toContain("/images/landing/navy-glitch-hoodie-transparent-back.jpg");
-    expect(html).toContain("transparent QR");
-    expect(html).toContain("https://humanity.llc/c/nSVXWPqgRFEhGPjxyRzidF6s?q=qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5");
-    expect(html).toContain("/shop/customize/?product=glitch_hoodie_v1");
+    expect(html).toContain("humanity.llc · Check what's true right now");
+    expect(html).not.toContain("humanity.llc · Find public networks");
+    expect(html).not.toContain('id="founder-note-title"');
   });
 
   it("create page exposes hero ids for template copy sync", () => {
@@ -122,15 +83,12 @@ describe("landing messaging (Step 3)", () => {
 });
 
 describe("public marketing clarity (AI step 5)", () => {
-  it("landing and create copy lead with signed state instead of AI language", () => {
+  it("landing and create copy avoid AI language", () => {
     const landing = readFileSync(join(root, "site/index.html"), "utf8");
     const create = readFileSync(join(root, "site/create/index.html"), "utf8");
     const publicCopy = `${landing}\n${create}`;
 
-    expect(publicCopy).toContain("Public programmable objects");
-    expect(publicCopy).toContain("The sticker stays.<br />The status changes.");
-    expect(publicCopy).toContain("Signed state means the current public status was published");
-    expect(publicCopy).toContain("No passive scan tracking by default.");
+    expect(publicCopy).toContain("The sticker stays — the status changes.");
     expect(publicCopy).not.toMatch(/\bAI\b|artificial intelligence|AI profiles|we have AI/i);
   });
 

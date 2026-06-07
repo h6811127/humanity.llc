@@ -3,8 +3,11 @@ import { describe, expect, it } from "vitest";
 import {
   buildPublicNetworkCardModel,
   buildPublicNetworkVisionCardModel,
+  countSeasonPlaces,
   filterPublicNetworkCards,
+  formatPublicNetworkStatsLine,
   listedPublicNetworkRows,
+  publicNetworkPreviewArtForSeason,
   publicNetworkVisionCardModels,
   publicNetworkWindowStatusLabel,
   publicNetworksEmptyMessage,
@@ -92,9 +95,30 @@ describe("public-networks-portal-core", () => {
     expect(html).toContain("Wake the city");
     expect(html).toContain("City game");
     expect(html).toContain("Weekend live-object game across Cedar Rapids.");
+    expect(html).toContain("public-networks-card--rich");
   });
 
-  it("vision cards do not present as live networks", () => {
+  it("counts places and renders stats plus board preview art for listed seasons", () => {
+    const seasonConfig = {
+      window: { starts_at: null, ends_at: null },
+      nodes: [{ node_id: "a" }, { node_id: "b" }, { node_id: "c" }],
+    };
+    expect(countSeasonPlaces(seasonConfig)).toBe(3);
+    expect(formatPublicNetworkStatsLine({ placeCount: 3, objectCount: 3 })).toBe(
+      "3 places · 3 live objects"
+    );
+    expect(publicNetworkPreviewArtForSeason("cr_season_01_wake")).toMatch(
+      /cedar-rapids-board-open/
+    );
+    const card = buildPublicNetworkCardModel(cedarIndexRow, seasonConfig);
+    expect(card.statsLine).toBe("3 places · 3 live objects");
+    const html = renderPublicNetworkCard(card);
+    expect(html).toContain("3 places · 3 live objects");
+    expect(html).toContain("public-networks-card__preview");
+    expect(html).toContain("cedar-rapids-board-open.png");
+  });
+
+  it("vision cards render schematic preview without stats row", () => {
     const vision = publicNetworkVisionCardModels();
     expect(vision.length).toBeGreaterThanOrEqual(2);
     for (const card of vision) {
@@ -102,6 +126,8 @@ describe("public-networks-portal-core", () => {
       const html = renderPublicNetworkCard(card);
       expect(html).toContain('data-network-live="false"');
       expect(html).toContain("public-networks-card--vision");
+      expect(html).toContain("public-networks-card__schematic");
+      expect(html).not.toContain("public-networks-card__stats");
       expect(html).not.toContain('href="/play/');
       expect(html).not.toContain("Live now");
       expect(html).toMatch(/Prototype|Coming soon/);
