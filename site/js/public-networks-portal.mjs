@@ -1,5 +1,5 @@
 /**
- * Find public networks — /play/season/
+ * Find public networks — `/` and `/play/season/`
  */
 import { CITY_GAME_SEASONS_INDEX_URL } from "./city-game-season-resolve.mjs";
 import {
