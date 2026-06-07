@@ -15,8 +15,11 @@ test.describe("landing copy contract", () => {
         name: /An internet for physical places and objects/i,
       })
     ).toBeVisible();
-    await expect(page.getByRole("heading", { name: /The sticker stays/i })).toBeVisible();
-    await expect(page.getByText("The status changes.")).toBeVisible();
+    await expect(
+      page.getByRole("heading", {
+        name: /The sticker stays\. The status changes\./i,
+      })
+    ).toBeVisible();
     await expect(page.getByRole("heading", { name: "Start here" })).toBeVisible();
     await expect(page.getByRole("link", { name: /Explore a live place/i })).toBeVisible();
     await expect(page.getByRole("link", { name: /Add an object to the network/i })).toBeVisible();
