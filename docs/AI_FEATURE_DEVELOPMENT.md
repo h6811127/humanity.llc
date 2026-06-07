@@ -192,6 +192,9 @@ npm run worker:bundle-scan     # after site/scan-pass.css changes
 
 | Path | Role |
 |------|------|
+| [`AI_ECOSYSTEM_RESEARCH.md`](AI_ECOSYSTEM_RESEARCH.md) | Strategic audit — L1/L2/L3, scale, durability (research only) |
+| [`LAYER3_PERSONAL_AGENCY.md`](LAYER3_PERSONAL_AGENCY.md) | On-device agency — steward + participant (research only) |
+| [`IDENTITY_DURABILITY_ONTOLOGY.md`](IDENTITY_DURABILITY_ONTOLOGY.md) | Authority / Object / Network / Pattern persistence |
 | [`AI_L3_EXPLAIN_SNAPSHOT.md`](AI_L3_EXPLAIN_SNAPSHOT.md) | P1 reader spec |
 | [`AI_L3_DRAFT_MANIFESTO.md`](AI_L3_DRAFT_MANIFESTO.md) | P2 API spec (UI retired) |
 | [`LOCALIZED_OBJECT_INTELLIGENCE_BOUNDARY.md`](LOCALIZED_OBJECT_INTELLIGENCE_BOUNDARY.md) | L0–L3 boundary |
