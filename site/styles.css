@@ -11178,6 +11178,83 @@ body.device-shell-created .flow-keys-group .list-row {
   color: var(--red);
 }
 
+.city-game-network-subhead {
+  font-size: 0.95rem;
+  font-weight: 650;
+  margin: 16px 0 8px;
+}
+
+.city-game-signer-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  margin: 0 0 12px;
+}
+
+.city-game-signer-table th,
+.city-game-signer-table td {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.city-game-signer-table th {
+  background: rgba(0, 0, 0, 0.04);
+  font-weight: 600;
+}
+
+.city-game-mechanics-deep > summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.city-game-mechanics-deep > summary::-webkit-details-marker {
+  display: none;
+}
+
+.city-game-map-spine {
+  padding: 14px 16px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--map-line, rgba(0, 0, 0, 0.1));
+  background: var(--map-surface, #fff);
+}
+
+.city-game-map-spine-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.city-game-map-spine-row {
+  display: grid;
+  gap: 2px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.city-game-map-spine-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.city-game-map-spine-label {
+  font-weight: 650;
+  font-size: 0.95rem;
+}
+
+.city-game-map-spine-lesson {
+  font-size: 0.85rem;
+  color: rgba(0, 0, 0, 0.62);
+}
+
+.city-game-map-spine-scan {
+  font-size: 0.8rem;
+  color: var(--red, #db1b43);
+}
+
 .city-game-map-board {
   --map-ink: var(--black);
   --map-ink-soft: rgba(0, 0, 0, 0.68);

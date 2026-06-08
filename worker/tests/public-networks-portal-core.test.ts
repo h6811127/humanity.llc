@@ -11,6 +11,7 @@ import {
   publicNetworkVisionCardModels,
   publicNetworkWindowStatusLabel,
   publicNetworksEmptyMessage,
+  PUBLIC_NETWORK_ABOUT_NETWORK_CTA,
   PUBLIC_NETWORK_OPEN_BOARD_CTA,
   renderPublicNetworkCard,
   renderPublicNetworkResults,
@@ -90,6 +91,8 @@ describe("public-networks-portal-core", () => {
     });
     const html = renderPublicNetworkCard(card);
     expect(html).toContain(PUBLIC_NETWORK_OPEN_BOARD_CTA);
+    expect(html).toContain(PUBLIC_NETWORK_ABOUT_NETWORK_CTA);
+    expect(html).toContain('href="/play/cedar-rapids/"');
     expect(html).toContain('href="/play/cedar-rapids/map/"');
     expect(html).toContain('data-network-live="true"');
     expect(html).toContain("Wake the city");

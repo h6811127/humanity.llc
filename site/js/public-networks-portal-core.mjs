@@ -95,6 +95,9 @@ export function publicNetworkWindowStatusLabel(phase) {
   return "Listed";
 }
 
+/** Secondary CTA on live network cards — charter before board for strangers. */
+export const PUBLIC_NETWORK_ABOUT_NETWORK_CTA = "About this network";
+
 /** Primary CTA label for listed networks with an open board href. */
 export const PUBLIC_NETWORK_OPEN_BOARD_CTA = "Open board";
 
@@ -327,7 +330,7 @@ export function renderPublicNetworkCardPreview(card) {
 
 export function renderPublicNetworkCard(card) {
   const rulesLink = card.rulesHref
-    ? `<a class="public-networks-card__secondary" href="${escapePublicNetworksHtml(card.rulesHref)}">Rules</a>`
+    ? `<a class="public-networks-card__secondary" href="${escapePublicNetworksHtml(card.rulesHref)}">${escapePublicNetworksHtml(PUBLIC_NETWORK_ABOUT_NETWORK_CTA)}</a>`
     : "";
   const liveAttr = card.isLive ? ' data-network-live="true"' : ' data-network-live="false"';
   const cta = card.isLive && card.openHref

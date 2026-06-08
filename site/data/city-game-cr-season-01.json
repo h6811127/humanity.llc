@@ -5,13 +5,56 @@
   "public_listing": {
     "listed": true,
     "title": "Wake the city",
-    "summary": "Weekend live-object game across Cedar Rapids. Scan stickers for shared city state.",
+    "summary": "Public network — shared board of real places with signed live state. Cooperative play on the same resolver as door status plates.",
     "region": "Cedar Rapids, Iowa",
     "category": "city_games"
+  },
+  "network_charter": {
+    "eyebrow": "Public network · Cedar Rapids",
+    "title": "Wake the city",
+    "definition": "A public network is a shared board of real places whose current truth is signed and readable by anyone.",
+    "operator_line": "Operated by humanity.llc (reference operator) for Cedar Rapids Season 1.",
+    "board_intro": "Shared signed truth for everyone on this board — not personal progress or GPS tracking.",
+    "status_plate_scan_url": "https://humanity.llc/c/r4YyNEWJvVwWNMETzXfGjFyL?q=qr_8w7zHCPHisXvTnar",
+    "game_node_scan_url": "https://humanity.llc/c/CEenC57QN9qqnr2x5L89cbWt?q=qr_aV3BcFtid5NBfCuM",
+    "signers": [
+      {
+        "stream": "Game",
+        "who": "Season operator",
+        "may_sign": "Bulletins, unlock progress, faction relay holds"
+      },
+      {
+        "stream": "Care",
+        "who": "Place stewards",
+        "may_sign": "Maintenance pause, safety notices"
+      },
+      {
+        "stream": "Place",
+        "who": "Venue stewards",
+        "may_sign": "Hours, door status, guestbook lines"
+      },
+      {
+        "stream": "Lifecycle",
+        "who": "Season operator",
+        "may_sign": "Season window, dormancy, archive sleep"
+      }
+    ],
+    "what_stays": [
+      "Game overlays sleep (factions, unlocks, finale contests).",
+      "Place canon stays (landmark names, guestbook lines, care history).",
+      "Stickers keep resolving — scans still show signed state under published rules."
+    ],
+    "spine_lessons": {
+      "node_04": "Collective unlock — city progress, not a personal win",
+      "node_07": "Trust path without account signup",
+      "node_02": "Sanctuary — regroup with no capture",
+      "node_14": "Care pause beats game bulletins for safety truth"
+    }
   },
   "status": "active",
   "season_root_profile_id": "CEenC57QN9qqnr2x5L89cbWt",
   "rules_path": "/play/cedar-rapids/",
+  "debrief_path": "/play/cedar-rapids/debrief/",
   "window": {
     "starts_at": "2026-06-06T18:00:00-05:00",
     "ends_at": "2026-09-01T22:00:00-05:00"
@@ -40,7 +83,8 @@
   },
   "map_copy": {
     "title": "Wake the city",
-    "subtitle": "Weekend mission board · read-only",
+    "subtitle": "Public state board · read-only",
+    "board_intro": "Shared signed truth for everyone on this board — not personal progress or GPS tracking.",
     "hero_objective": "The city is asleep. Find fragments before the weekend ends.",
     "hook": "The city is asleep.",
     "hook_stirring": "Something is stirring.",
@@ -69,7 +113,7 @@
     "privacy_note": "No account. No GPS. No visit log.",
     "world_status_default": "Relays unclaimed · Finale dormant",
     "unlock_intro": "Goals unlock when the city completes them together — not when you personally check boxes.",
-    "section_state_title": "Quest log",
+    "section_state_title": "Live headlines",
     "section_places_title": "Places",
     "section_goals_title": "City goals",
     "advanced_summary": "Routes & unlocks",
