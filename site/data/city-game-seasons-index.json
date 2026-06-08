@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-06-06T14:45:56.573Z",
+  "generated_at": "2026-06-08T19:07:21.636Z",
   "seasons": [
     {
       "season_id": "cr_season_01_wake",
@@ -15,7 +15,7 @@
       "public_listing": {
         "listed": true,
         "title": "Wake the city",
-        "summary": "Weekend live-object game across Cedar Rapids. Scan stickers for shared city state.",
+        "summary": "Public network — shared board of real places with signed live state. Cooperative play on the same resolver as door status plates.",
         "region": "Cedar Rapids, Iowa",
         "category": "city_games"
       }

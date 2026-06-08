@@ -3,6 +3,7 @@
  * @see docs/CITY_GAME_MAP_DASHBOARD.md
  */
 import { buildPlayerGuideListHtml, resolvePlayerGuide } from "./city-game-player-guide-core.mjs";
+import { buildNetworkCharterSectionHtml, resolveNetworkCharter } from "./city-game-reference-network-core.mjs";
 import { resolvePlayPageSeason } from "./city-game-season-resolve.mjs";
 import { bootCityGameSeasonBanners } from "./city-game-season-banner-core.mjs";
 import { seasonBoardPath } from "./city-game-season-path-shared.mjs";
@@ -58,6 +59,23 @@ export async function bootCityGamePlayPage(root = document) {
   }
   if (heroSubline instanceof HTMLElement) {
     heroSubline.innerHTML = resolvePlayerGuide(season).heroSubline;
+  }
+
+  const charterMount = root.getElementById("city-game-network-charter-mount");
+  if (charterMount instanceof HTMLElement) {
+    charterMount.innerHTML = buildNetworkCharterSectionHtml(season);
+  }
+
+  const heroEyebrow = root.querySelector(".hero-compact .hero-eyebrow");
+  const heroTitle = root.querySelector(".hero-compact h1");
+  if (season.network_charter && typeof season.network_charter === "object") {
+    const charter = resolveNetworkCharter(season);
+    if (heroEyebrow instanceof HTMLElement) {
+      heroEyebrow.textContent = charter.eyebrow;
+    }
+    if (heroTitle instanceof HTMLElement) {
+      heroTitle.textContent = charter.title;
+    }
   }
 
   if (redirectCityStateHashToBoardPage(season)) {

@@ -16,12 +16,17 @@ import {
   findLaunchChecklistRow,
   launchChecklistRowIsSigned,
 } from "./city-game-launch-checklist-core.mjs";
+import {
+  assessLo4KitReady,
+  LO4_KIT_REL as LO4_REFERENCE_KIT_REL,
+} from "./city-game-reference-network-kit-core.mjs";
 
 export const WS_LIVE_COORDINATION_REL = "docs/PRODUCT_WORKSTREAM_COORDINATION.md";
 export const LIVE_OBJECT_ARCH_REL = "docs/LIVE_OBJECT_ARCHITECTURE.md";
 export const STATUS_PLATE_PILOT_REL = "docs/STATUS_PLATE_PILOT.md";
 export const LOST_ITEM_PILOT_REL = "docs/LOST_ITEM_RELAY_PILOT.md";
 export const LO1_KIT_REL = "site/dev/ws-live-lo1-comprehension.html";
+export const LO4_KIT_REL = LO4_REFERENCE_KIT_REL;
 
 /** @typedef {{ id: string; label: string; met: boolean; detail: string; human?: boolean }} GateRow */
 
@@ -284,7 +289,7 @@ export function assessWsLiveLo3Footprint(root) {
 }
 
 /**
- * LO-4 / LO-1 kit — field walk page for printed pilots.
+ * LO-1 kit — field walk page for printed pilots.
  * @param {string} root
  */
 export function assessWsLiveLo1Kit(root) {
@@ -297,16 +302,72 @@ export function assessWsLiveLo1Kit(root) {
         met: kitExists,
         detail: kitExists ? "run npm run ws-live:lo1-kit" : "missing — run npm run ws-live:lo1-kit",
       },
-      {
-        id: "LO-4-integrated-comprehension",
-        label: "LO-4 integrated stranger walk (human)",
-        met: false,
-        detail: "≥1 game node scan + 1 status plate scan — manual; use LO-1 kit + city-game comprehension",
-        human: true,
-      },
     ],
     engineeringMet: kitExists,
   };
+}
+
+/**
+ * LO-4 — reference network teaching package (engineering → human C2 sign-off).
+ * @param {string} root
+ */
+export function assessWsLiveLo4ReferenceNetwork(root) {
+  const kitExists = existsSync(join(root, LO4_KIT_REL));
+  const coreRel = "site/js/city-game-reference-network-core.mjs";
+  const coreTestRel = "worker/tests/city-game-reference-network-core.test.ts";
+  const coreExists = existsSync(join(root, coreRel));
+  const coreTestExists = existsSync(join(root, coreTestRel));
+  const coreSource = readRepoFile(root, coreRel) ?? "";
+  const scorecardMet =
+    coreSource.includes("LO4_SCORECARD_ROWS") &&
+    coreSource.includes('"RN-1"') &&
+    coreSource.includes('"RN-5"');
+  const teaching = assessLo4KitReady(root);
+
+  /** @type {GateRow[]} */
+  const rows = [
+    {
+      id: "LO-4-kit-page",
+      label: LO4_KIT_REL,
+      met: kitExists,
+      detail: kitExists
+        ? "npm run city-game:reference-network-kit"
+        : "missing — npm run city-game:reference-network-kit",
+    },
+    {
+      id: "LO-4-reference-network-core",
+      label: coreRel,
+      met: coreExists && coreTestExists,
+      detail:
+        coreExists && coreTestExists
+          ? `${coreTestRel} regression`
+          : "core module or test missing",
+    },
+    {
+      id: "LO-4-rn-scorecard",
+      label: "RN-1–RN-5 scorecard documented",
+      met: scorecardMet,
+      detail: scorecardMet ? "LO4_SCORECARD_ROWS in reference-network-core" : "scorecard rows missing",
+    },
+    {
+      id: "LO-4-teaching-package",
+      label: "Seven-surface teaching package (season JSON)",
+      met: teaching.ready,
+      detail: teaching.ready
+        ? "network_charter + spine probes valid"
+        : teaching.issues.join("; ") || "validation failed",
+    },
+    {
+      id: "LO-4-integrated-comprehension",
+      label: "LO-4 integrated stranger walk (human · C2)",
+      met: false,
+      detail: `≥${teaching.minStrangers} strangers · rules-first · RN-1–RN-5 · game node + status plate · ${LO4_KIT_REL}`,
+      human: true,
+    },
+  ];
+
+  const engineeringMet = rows.filter((r) => !r.human).every((r) => r.met);
+  return { rows, engineeringMet };
 }
 
 /**
@@ -338,6 +399,7 @@ export function assessWsLiveLo5PublicCopy(root) {
  *   lo2: ReturnType<typeof assessWsLiveLo2FieldLaunch>;
  *   lo3: ReturnType<typeof assessWsLiveLo3Footprint>;
  *   lo1Kit: ReturnType<typeof assessWsLiveLo1Kit>;
+ *   lo4: ReturnType<typeof assessWsLiveLo4ReferenceNetwork>;
  *   lo5: ReturnType<typeof assessWsLiveLo5PublicCopy>;
  * }} input
  */
@@ -345,7 +407,8 @@ export function wsLiveEngineeringReady(input) {
   return (
     input.order1.engineeringMet &&
     input.layers.engineeringMet &&
-    input.lo1Kit.engineeringMet
+    input.lo1Kit.engineeringMet &&
+    input.lo4.engineeringMet
   );
 }
 
@@ -356,6 +419,7 @@ export function wsLiveEngineeringReady(input) {
  *   lo2: ReturnType<typeof assessWsLiveLo2FieldLaunch>;
  *   lo3: ReturnType<typeof assessWsLiveLo3Footprint>;
  *   lo1Kit: ReturnType<typeof assessWsLiveLo1Kit>;
+ *   lo4: ReturnType<typeof assessWsLiveLo4ReferenceNetwork>;
  *   lo5: ReturnType<typeof assessWsLiveLo5PublicCopy>;
  * }} input
  */
@@ -394,8 +458,14 @@ export function formatWsLivePreflightReport(input) {
     lines.push(`  ${prefix} ${row.label} — ${row.detail}`);
   }
 
-  lines.push("", "── LO-4 / LO-5 ──");
-  for (const row of [...input.lo1Kit.rows.filter((r) => r.id.startsWith("LO-4")), ...input.lo5.rows]) {
+  lines.push("", "── LO-4 reference network (C2 engineering → human) ──");
+  for (const row of input.lo4.rows) {
+    const prefix = row.human ? "☐ human" : row.met ? "☑" : "☐";
+    lines.push(`  ${prefix} ${row.label} — ${row.detail}`);
+  }
+
+  lines.push("", "── LO-5 ──");
+  for (const row of input.lo5.rows) {
     const prefix = row.human ? "☐ human" : row.met ? "☑" : "☐";
     lines.push(`  ${prefix} ${row.label} — ${row.detail}`);
   }
@@ -408,8 +478,9 @@ export function formatWsLivePreflightReport(input) {
       : "✗ WS-LIVE engineering preflight FAIL — fix ☐ rows above",
     "",
     "Next commands:",
-    "  npm run ws-live:lo1-kit          # regenerate LO-1 field walk (phones)",
-    "  npm run verify:live:fast         # CI belt",
+    "  npm run ws-live:lo1-kit                 # regenerate LO-1 field walk (phones)",
+    "  npm run city-game:reference-network-kit # regenerate LO-4 teaching kit",
+    "  npm run verify:live:fast                # CI belt",
     "  npm run verify:live              # pre-merge belt",
     "  npm run city-game:launch-preflight  # LO-2 detail"
   );
@@ -426,6 +497,7 @@ export function assessWsLivePreflight(root) {
   const lo2 = assessWsLiveLo2FieldLaunch(root);
   const lo3 = assessWsLiveLo3Footprint(root);
   const lo1Kit = assessWsLiveLo1Kit(root);
+  const lo4 = assessWsLiveLo4ReferenceNetwork(root);
   const lo5 = assessWsLiveLo5PublicCopy(root);
-  return { order1, layers, lo2, lo3, lo1Kit, lo5 };
+  return { order1, layers, lo2, lo3, lo1Kit, lo4, lo5 };
 }

@@ -22,6 +22,12 @@ describe("city game map page boot", () => {
     );
   });
 
+  it("resolves board context view before snapshot poll", () => {
+    expect(mapPageCoreSrc).toContain('import { resolveBoardContextView } from "./city-game-board-context-core.mjs"');
+    expect(mapPageCoreSrc).toContain("const contextView = resolveBoardContextView(season)");
+    expect(mapPageCoreSrc).toContain("contextView.snapshot.season_id");
+  });
+
   it("dedicated map page uses single boot script", () => {
     expect(mapPageHtml).toContain("city-game-map-page.mjs");
     expect(mapPageHtml.match(/city-game-map-page\.mjs/g)?.length).toBe(1);

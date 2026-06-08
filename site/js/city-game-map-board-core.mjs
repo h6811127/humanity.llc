@@ -13,8 +13,10 @@ import {
   buildMapNodeCardSlotsHtml,
   buildNodeCardCopy,
 } from "./city-game-map-node-card-core.mjs";
+import { resolveBoardContextView } from "./city-game-board-context-core.mjs";
 import { buildTypeFilterHtml } from "./city-game-map-type-filter-core.mjs";
 import { comprehensionPrimaryNodeId } from "./city-game-player-guide-core.mjs";
+import { buildMapReferenceSpineHtml } from "./city-game-reference-network-core.mjs";
 
 /** Default row hint before snapshot chips replace the live cell. */
 export const MAP_ROW_SCAN_HINT = "Scan sticker there";
@@ -428,6 +430,7 @@ export function resolveMapCopy(season) {
       c.section_activity_title?.trim() || DEFAULT_MAP_COPY.section_activity_title,
     routes_preview_title: c.routes_preview_title?.trim() || DEFAULT_MAP_COPY.routes_preview_title,
     filters_summary: c.filters_summary?.trim() || DEFAULT_MAP_COPY.filters_summary,
+    board_intro: c.board_intro?.trim() || "",
   };
 }
 
@@ -1328,31 +1331,37 @@ export function isLaunchMapBoard(season) {
 
 /**
  * @param {Record<string, unknown>} season
+ * @param {ReturnType<typeof resolveBoardContextView>} [contextView]
  * @returns {string}
  */
-export function buildMapBoardInnerHtml(season) {
+export function buildMapBoardInnerHtml(season, contextView = resolveBoardContextView(season)) {
   const copy = resolveMapCopy(season);
   const launchCopy = resolveLaunchCopy(season);
   const dense = isDenseMapBoard(season);
   const launchClass = isLaunchMapBoard(season) ? " city-game-map-board--launch" : "";
   const denseClass = dense ? " city-game-map-board--dense" : "";
-  const primaryNode = isLaunchMapBoard(season) ? comprehensionPrimaryNodeId(season) : "";
+  const primaryNode = contextView.spine.primary_entry_id || "";
   const primaryAttr = primaryNode
     ? ` data-primary-node="${escapeMapHtml(primaryNode)}"`
     : "";
   const mapVisibility = seasonMapVisibility(season);
   const rumoredAttr = [...seasonRumoredNodeIds(season)].join(",");
+  const contextId = escapeMapHtml(contextView.context_id);
+  const contextKind = escapeMapHtml(contextView.context_kind);
+  const memberCount = contextView.members.length;
 
-  return `<div class="city-game-map-board${launchClass}${denseClass}" data-active-type="all" data-active-state="all" data-active-district="all" data-active-explore="all" data-map-visibility="${escapeMapHtml(mapVisibility)}" data-rumored-nodes="${escapeMapHtml(rumoredAttr)}"${primaryAttr}>
+  return `<div class="city-game-map-board${launchClass}${denseClass}" data-context-id="${contextId}" data-context-kind="${contextKind}" data-member-count="${memberCount}" data-snapshot-path="${escapeMapHtml(contextView.snapshot.path)}" data-active-type="all" data-active-state="all" data-active-district="all" data-active-explore="all" data-map-visibility="${escapeMapHtml(mapVisibility)}" data-rumored-nodes="${escapeMapHtml(rumoredAttr)}"${primaryAttr}>
   ${buildMapLiveStateHtml(season, copy)}
   ${buildMapWakeLoopHtml(season, copy)}
   <section class="city-game-map-places city-game-map-places--primary" aria-labelledby="city-game-map-spotlight-title">
     ${buildMapFirstPaintHtml(season, launchCopy)}
   </section>
+  ${buildMapReferenceSpineHtml(season)}
   ${buildMapRoutesPreviewHtml(season, copy)}
   ${buildMapActivityHtml(season, copy)}
   ${buildMapPlacesSectionHtml(season, copy, launchCopy)}
   ${buildMapAdvancedHtml(season, copy)}
+  <div id="city-game-map-debrief-mount" hidden aria-hidden="true"></div>
 </div>`;
 }
 
@@ -1367,13 +1376,14 @@ export function showMapBoardError(mount, message) {
 /**
  * @param {HTMLElement} mount
  * @param {Record<string, unknown>} season
+ * @param {ReturnType<typeof resolveBoardContextView>} [contextView]
  */
-export function renderMapBoard(mount, season) {
+export function renderMapBoard(mount, season, contextView = resolveBoardContextView(season)) {
   const layoutIssues = validateMapLayout(season);
   if (layoutIssues.length) {
     mount.innerHTML = `<p class="city-game-map-error" role="alert">City board unavailable: season map layout incomplete.</p>`;
-    return { ok: false, issues: layoutIssues };
+    return { ok: false, issues: layoutIssues, contextView: null };
   }
-  mount.innerHTML = buildMapBoardInnerHtml(season);
-  return { ok: true, issues: [] };
+  mount.innerHTML = buildMapBoardInnerHtml(season, contextView);
+  return { ok: true, issues: [], contextView };
 }

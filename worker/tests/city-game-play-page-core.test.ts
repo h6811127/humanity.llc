@@ -41,4 +41,13 @@ describe("city game play page integration", () => {
     expect(rulesHtml).not.toContain("city-game-map-board.mjs");
     expect(rulesHtml).not.toContain("city-game-season-banner.mjs");
   });
+
+  it("rules page includes network charter mount and teaching order", () => {
+    expect(rulesHtml).toContain('id="city-game-network-charter-mount"');
+    expect(rulesHtml).toContain("Public network · Cedar Rapids");
+    expect(rulesHtml).toContain("city-game-mechanics-deep");
+    expect(rulesHtml.indexOf("rules-prove-title")).toBeLessThan(
+      rulesHtml.indexOf("rules-start-title")
+    );
+  });
 });

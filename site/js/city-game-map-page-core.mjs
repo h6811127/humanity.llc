@@ -2,6 +2,8 @@
  * Boot city board pages — snapshot board, M4 list↔pin interaction, season banner.
  * @see docs/CITY_GAME_MAP_DASHBOARD.md
  */
+import { applyDebriefBoardCta } from "./city-game-debrief-board-core.mjs";
+import { resolveBoardContextView } from "./city-game-board-context-core.mjs";
 import { renderMapBoard, showMapBoardError } from "./city-game-map-board-core.mjs";
 import { bootCityGameMapInteraction } from "./city-game-map-interaction.mjs";
 import { bootCityGameMapSnapshot } from "./city-game-map-snapshot.mjs";
@@ -31,12 +33,14 @@ export async function bootCityGameMapPage(root = document) {
     return { ok: false, season: null };
   }
 
+  const contextView = resolveBoardContextView(season);
+
   if (mount instanceof HTMLElement) {
-    const result = renderMapBoard(mount, season);
+    const result = renderMapBoard(mount, season, contextView);
     if (!result.ok) {
       console.warn("[city-game-map-page] map layout", result.issues);
       await bootCityGameSeasonBanners(root);
-      return { ok: false, season };
+      return { ok: false, season, contextView: null };
     }
 
     const boardRoot = mount.querySelector(".city-game-map-board");
@@ -44,11 +48,12 @@ export async function bootCityGameMapPage(root = document) {
       bootCityGameMapInteraction(boardRoot, season);
       bootCityGameMapSnapshot(
         boardRoot,
-        String(season.season_id ?? resolved?.seasonId ?? "")
+        contextView.snapshot.season_id || String(resolved?.seasonId ?? "")
       );
+      applyDebriefBoardCta(boardRoot, season);
     }
   }
 
   await bootCityGameSeasonBanners(root);
-  return { ok: true, season };
+  return { ok: true, season, contextView };
 }

@@ -7,7 +7,7 @@
  */
 
 /** Bump when hero / discovery dashboard copy or structure changes intentionally. */
-export const LANDING_COPY_CONTRACT_VERSION = 5;
+export const LANDING_COPY_CONTRACT_VERSION = 6;
 
 export const LANDING_STYLES_CACHE_BUST = "153";
 
@@ -25,6 +25,8 @@ export const LANDING_REQUIRED_SNIPPETS = [
   'id="public-networks-search"',
   "Public live boards",
   'id="public-networks-results"',
+  "About Wake the City",
+  "reference public network",
   'id="landing-start-object-cta"',
   "Start with one live object",
   'href="/create/"',

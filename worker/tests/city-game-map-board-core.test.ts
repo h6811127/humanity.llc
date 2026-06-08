@@ -113,6 +113,9 @@ describe("city-game map board render", () => {
     expect(html).toContain("Live count opens when play starts.");
     expect(html).toContain("city-game-map-board--launch");
     expect(html).toContain('data-primary-node="node_04"');
+    expect(html).toContain('data-context-id="cr_season_01_wake"');
+    expect(html).toContain('data-context-kind="network"');
+    expect(html).toContain('data-snapshot-path="/.well-known/hc/v1/seasons/cr_season_01_wake/snapshot"');
     expect(html).toContain("city-game-map-node-row--spotlight");
     expect(html).toContain('id="city-game-map-places"');
     expect(html).not.toContain('id="city-game-map-browse"');
