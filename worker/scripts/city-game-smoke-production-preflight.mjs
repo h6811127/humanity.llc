@@ -16,6 +16,7 @@ import {
   formatProductionSmokePreflightReport,
   spotExpectationsForProductionProbe,
   selectProductionSmokeNodes,
+  resolveProductionSmokeSeed,
 } from "./city-game-smoke-production-core.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
@@ -38,7 +39,7 @@ async function probeSpotNodes(seed, season) {
     const expect = expectations[node.node_id] ?? {};
     const result = assessGameScanHtml(html, {
       nodeId: node.node_id,
-      requireCoopHint: expect.requireCoopHint ?? false,
+      requireOnboarding: expect.requireOnboarding ?? false,
       requireContributeBlock: expect.requireContributeBlock ?? false,
       expectDormant: expect.expectDormant ?? false,
     });
@@ -54,16 +55,17 @@ async function main() {
   const season = existsSync(seasonJsonPath)
     ? JSON.parse(readFileSync(seasonJsonPath, "utf8"))
     : null;
+  const smokeSeed = resolveProductionSmokeSeed(productionSeed, season);
 
-  const c4 = assessProductionSmokePreflight({ productionSeed });
+  const c4 = assessProductionSmokePreflight({ productionSeed, season });
   let probeOk = null;
 
-  if (probe && c4.ready) {
+  if (probe && c4.ready && smokeSeed) {
     const health = await fetch(`${apiOrigin}/.well-known/hc/v1/health`).catch(() => null);
     if (!health?.ok) {
       probeOk = false;
     } else {
-      probeOk = await probeSpotNodes(productionSeed, season);
+      probeOk = await probeSpotNodes(smokeSeed, season);
     }
   }
 

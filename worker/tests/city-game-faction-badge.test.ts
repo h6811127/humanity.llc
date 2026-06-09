@@ -9,7 +9,7 @@ import { buildScanViewModel } from "../src/resolver/scan-state";
 import type { CardRow, QrCredentialRow, VerificationSummaryRow } from "../src/db/types";
 import { CITY_GAME_SEASON_OPEN_NOW } from "./city-game-fixture-profile";
 
-const PROFILE = "CEenC57QN9qqnr2x5L89cbWt";
+const PROFILE = "GcP3Ee17yGqMHdidhEVMYBzq";
 const QR = "qr_factionBadgeTest01";
 const PA = "pa_factionBadgeWrist01";
 

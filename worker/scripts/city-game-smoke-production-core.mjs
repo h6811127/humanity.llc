@@ -165,6 +165,33 @@ export function launchChecklistE5Signed(content) {
 }
 
 /**
+ * Build smoke seed from production seed file or aligned season JSON scan_urls.
+ * @param {{
+ *   profile_id?: string;
+ *   nodes?: Array<{ node_id?: string; scan_url?: string; label?: string; public_label?: string }>;
+ * } | null | undefined} productionSeed
+ * @param {Record<string, unknown> | null | undefined} season
+ */
+export function resolveProductionSmokeSeed(productionSeed, season) {
+  if (productionSeed?.nodes?.length) {
+    return productionSeed;
+  }
+  const seasonRoot = String(season?.season_root_profile_id ?? "").trim();
+  const seasonNodes = Array.isArray(season?.nodes) ? season.nodes : [];
+  const nodes = seasonNodes
+    .filter((row) => row.node_id && row.scan_url && String(row.scan_url).includes(`/c/${seasonRoot}`))
+    .map((row) => ({
+      node_id: String(row.node_id),
+      scan_url: String(row.scan_url),
+      public_label: String(row.label ?? row.public_label ?? row.node_id),
+    }));
+  if (!seasonRoot || !nodes.length) {
+    return null;
+  }
+  return { profile_id: seasonRoot, nodes };
+}
+
+/**
  * @param {{
  *   productionSeed?: { nodes?: Array<{ node_id?: string; scan_url?: string }> } | null;
  *   checkAll?: boolean;
@@ -180,31 +207,41 @@ export function selectProductionSmokeNodes(input) {
 /**
  * @param {{
  *   productionSeed?: { nodes?: Array<{ node_id?: string; scan_url?: string }> } | null;
+ *   season?: Record<string, unknown> | null;
  * }} input
  */
 export function assessProductionSmokePreflight(input) {
   const issues = [];
   const warnings = [];
-  const nodes = input.productionSeed?.nodes ?? [];
+  const seed = resolveProductionSmokeSeed(input.productionSeed, input.season);
+  const nodes = seed?.nodes ?? [];
   const count = nodes.filter((n) => n.node_id && n.scan_url).length;
+  const seedSource = input.productionSeed?.nodes?.length
+    ? "production-seed"
+    : seed
+      ? "season-json"
+      : "none";
 
-  if (!input.productionSeed) {
+  if (!seed) {
     issues.push(
-      "Missing worker/.local/city-game-production-seed.json — npm run city-game:seed-production -- --confirm-production"
+      "Missing production scan URLs — add worker/.local/city-game-production-seed.json or align season JSON scan_urls to prod root"
     );
+  } else if (seedSource === "season-json") {
+    warnings.push("Using season JSON scan_urls (no production-seed.json on disk)");
   } else if (count < INSTALL_QA_REQUIRED_NODE_COUNT) {
     warnings.push(`Production seed has ${count}/${INSTALL_QA_REQUIRED_NODE_COUNT} scan URLs`);
   }
 
-  const spot = selectProductionSmokeNodes({ productionSeed: input.productionSeed, checkAll: false });
-  if (input.productionSeed && !spot.length) {
-    issues.push(`Production seed missing spot nodes: ${INSTALL_QA_SPOT_NODE_IDS.join(", ")}`);
+  const spot = selectProductionSmokeNodes({ productionSeed: seed, checkAll: false });
+  if (seed && !spot.length) {
+    issues.push(`Production scan URLs missing spot nodes: ${INSTALL_QA_SPOT_NODE_IDS.join(", ")}`);
   }
 
   return {
     ready: issues.length === 0,
     nodeCount: count,
     spotCount: spot.length,
+    seedSource,
     issues,
     warnings,
   };
@@ -223,7 +260,10 @@ export function assessProductionSmokePreflight(input) {
  */
 export function formatProductionSmokePreflightReport(c4) {
   const lines = ["Cedar Rapids · production scan smoke preflight (C4)", ""];
-  lines.push(`C4 engineering: ${c4.ready ? "☑" : "☐"} production seed + spot scan URLs`);
+  lines.push(`C4 engineering: ${c4.ready ? "☑" : "☐"} production scan URLs + spot nodes`);
+  if (c4.seedSource) {
+    lines.push(`  Scan URL source: ${c4.seedSource}`);
+  }
   lines.push(`  Nodes with scan_url: ${c4.nodeCount}/${INSTALL_QA_REQUIRED_NODE_COUNT}`);
   lines.push(`  Spot nodes (${INSTALL_QA_SPOT_NODE_IDS.join(", ")}): ${c4.spotCount}`);
   if (c4.probeOk === true) {

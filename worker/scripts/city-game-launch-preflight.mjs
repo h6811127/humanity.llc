@@ -171,7 +171,7 @@ async function main() {
     ? readFileSync(launchChecklistPath, "utf8")
     : "";
 
-  const c4Engineering = assessProductionSmokePreflight({ productionSeed });
+  const c4Engineering = assessProductionSmokePreflight({ productionSeed, season });
   const c4SignedOff = launchChecklistE5Signed(launchChecklistDoc);
   const marketsLiveCityBoard = surfacesMarketLiveCityBoard({
     rulesHtml,

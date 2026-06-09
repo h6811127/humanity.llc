@@ -261,6 +261,23 @@ function scanUrlMapFromSeedNodes(nodes) {
 }
 
 /**
+ * @param {Record<string, unknown>} season
+ */
+function scanUrlMapFromSeasonNodes(season) {
+  const seasonRoot = String(season.season_root_profile_id ?? "").trim();
+  const nodes = Array.isArray(season.nodes) ? season.nodes : [];
+  /** @type {Record<string, string>} */
+  const out = {};
+  for (const row of nodes) {
+    if (!row.node_id || !row.scan_url) continue;
+    const url = String(row.scan_url);
+    if (seasonRoot && !url.includes(`/c/${seasonRoot}`)) continue;
+    out[String(row.node_id)] = url;
+  }
+  return out;
+}
+
+/**
  * Pick production scan URLs for comprehension kit generation.
  * Prefers production seed when profile matches season JSON; falls back to local seed when aligned.
  * @param {Record<string, unknown>} season
@@ -318,6 +335,16 @@ export function resolveProductionScanUrlByNode(season, sources) {
     return {
       scanUrlByNode: qrPack,
       source: "qr-pack",
+      seasonRoot,
+      prodProfile,
+      localProfile,
+    };
+  }
+  const fromSeason = scanUrlMapFromSeasonNodes(season);
+  if (seasonRoot && Object.keys(fromSeason).length) {
+    return {
+      scanUrlByNode: fromSeason,
+      source: "season-json",
       seasonRoot,
       prodProfile,
       localProfile,

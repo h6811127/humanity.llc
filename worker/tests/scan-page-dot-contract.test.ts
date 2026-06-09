@@ -11,7 +11,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 
 describe("scan page device dot contract", () => {
   it("ships progressive dot UI version", () => {
-    expect(SCAN_UI_VERSION).toBe("pass-v41");
+    expect(SCAN_UI_VERSION).toBe("pass-v42");
   });
 
   it("bundles glance popover CSS from site/scan-pass.css", () => {

@@ -24,7 +24,7 @@ const rulesHtml = readFileSync(join(root, RULES_PAGE_REL), "utf8");
 const launchSeason = {
   season_id: "cr_season_01_wake",
   title: "Wake the city",
-  season_root_profile_id: "CEenC57QN9qqnr2x5L89cbWt",
+  season_root_profile_id: "GcP3Ee17yGqMHdidhEVMYBzq",
   window: {
     starts_at: "2026-06-06T18:00:00-05:00",
     ends_at: "2026-06-08T22:00:00-05:00",

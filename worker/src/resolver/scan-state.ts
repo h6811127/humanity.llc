@@ -19,6 +19,7 @@ import { buildScanCapabilities } from "../live-object/scan-capabilities";
 import type { ObjectPublicStream } from "../validation/object-streams";
 import type { GameNodeScanContext } from "../city-game/scan-view";
 import { composeChildObjectScanState } from "../live-object/compose-child-object-scan";
+import { composeScanTrustContext, type ScanTrustContext } from "./scan-trust-compose";
 import { composeCardScanState } from "../live-object/compose-card-scan-state";
 import type { ObjectCustodyScanContext } from "../live-object/custody";
 import type { ObjectTimePolicyScanContext } from "../live-object/time-policy";
@@ -117,6 +118,8 @@ export interface ScanViewModel {
   /** Interaction verbs for this scan — HTML + status JSON (Order 3). */
   capabilities: ScanCapability[];
   gameNode: GameNodeScanContext | null;
+  /** WS-REALITY — proves / limits / signers / charter for network-enrolled scans. */
+  scanTrust: ScanTrustContext | null;
 }
 
 /** Canonical HTTPS scan target for this request. */
@@ -315,6 +318,13 @@ export function buildScanViewModel(
       ...objectCard,
       manifesto_line: childObjectManifestoLine(scanChild),
     };
+    const scanTrust = composeScanTrustContext({
+      gameNode: composed.gameNode,
+      childObjectType: child.object_type,
+      objectStreams: composed.objectStreams,
+      season,
+      streamPolicyPhase: composed.streamPolicy?.phase ?? null,
+    });
     const vm = baseView(
       {
         kind: "active",
@@ -336,6 +346,7 @@ export function buildScanViewModel(
         childTimePolicy: composed.childTimePolicy,
         childCustody: composed.childCustody,
         gameNode: composed.gameNode,
+        scanTrust,
       },
       origin,
       now
@@ -624,6 +635,7 @@ interface BaseViewInput {
   childTimePolicy?: ObjectTimePolicyScanContext | null;
   childCustody?: ObjectCustodyScanContext | null;
   gameNode?: GameNodeScanContext | null;
+  scanTrust?: ScanTrustContext | null;
 }
 
 function baseView(input: BaseViewInput, origin: string, now: Date = new Date()): ScanViewModel {
@@ -687,6 +699,7 @@ function baseView(input: BaseViewInput, origin: string, now: Date = new Date()):
     childCustody: input.childCustody ?? null,
     capabilities: [],
     gameNode: input.gameNode ?? null,
+    scanTrust: input.scanTrust ?? null,
   };
   return { ...vm, capabilities: buildScanCapabilities(vm, now) };
 }

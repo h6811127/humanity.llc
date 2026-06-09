@@ -104,13 +104,13 @@ Run `npm run city-game:comprehension-kit` — the page includes this block with 
 4. Ask **GT-1–GT-6** from the scan (and rules if needed).
 5. Send **`/play/cedar-rapids/map/`** — ask **GT-7**.
 
-**Production URLs (2026-06-03):**
+**Production URLs (2026-06-09):**
 
 | Step | URL |
 |------|-----|
 | Rules | https://humanity.llc/play/cedar-rapids/ |
 | Operator kit (you) | https://humanity.llc/play/cedar-rapids/comprehension/ |
-| Primary scan (node_04) | https://humanity.llc/c/CEenC57QN9qqnr2x5L89cbWt?q=qr_aV3BcFtid5NBfCuM |
+| Primary scan (node_04) | https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_aMr8qJGBF9xpC1gu |
 | City board (GT-7) | https://humanity.llc/play/cedar-rapids/map/ |
 **Optional spot checks** (second pass or strong testers only — links on kit page):
 
@@ -141,7 +141,7 @@ Run `npm run city-game:comprehension-kit` — the page includes this block with 
 After their wayfinding replies, send:
 
 > **Step 3:** Scan this sticker URL:  
-> https://humanity.llc/c/CEenC57QN9qqnr2x5L89cbWt?q=qr_aV3BcFtid5NBfCuM
+> https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_aMr8qJGBF9xpC1gu
 >
 > Then:  
 > 1) Did **you** win, or did the **city** unlock something together?  

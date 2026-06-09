@@ -162,7 +162,8 @@ describe("city game scan view", () => {
     expect(html).toContain("scan-game-privacy-tagline");
     expect(html).toContain("scan-game-privacy-note");
     expect(html).toContain("scan-game-trust-details");
-    expect(html).toContain("Trust &amp; privacy");
+    expect(html).toContain("Check at scan time");
+    expect(html).toContain("scan-trust-network");
     expect(html).toContain("scan-game-state-details");
   });
 

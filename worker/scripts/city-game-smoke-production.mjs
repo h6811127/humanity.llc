@@ -20,6 +20,7 @@ import {
   selectProductionSmokeNodes,
   productionSmokeExpectationsForNode,
   isSeasonPlayOpenForSmoke,
+  resolveProductionSmokeSeed,
 } from "./city-game-smoke-production-core.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
@@ -38,15 +39,19 @@ async function main() {
   }
 
   if (!existsSync(prodSeedPath)) {
-    console.error("Missing production seed:", prodSeedPath);
-    console.error("Run: npm run city-game:seed-production -- --confirm-production");
-    process.exit(1);
+    console.warn("Missing production seed:", prodSeedPath);
+    console.warn("Falling back to season JSON scan_urls when aligned to season_root_profile_id.\n");
   }
 
-  const seed = JSON.parse(readFileSync(prodSeedPath, "utf8"));
+  const rawSeed = existsSync(prodSeedPath) ? JSON.parse(readFileSync(prodSeedPath, "utf8")) : null;
   const season = existsSync(seasonJsonPath)
     ? JSON.parse(readFileSync(seasonJsonPath, "utf8"))
     : null;
+  const seed = resolveProductionSmokeSeed(rawSeed, season);
+  if (!seed) {
+    console.error("No production scan URLs — add production seed or align season JSON.");
+    process.exit(1);
+  }
   const preLaunch = !isSeasonPlayOpenForSmoke(season);
   const targets = selectProductionSmokeNodes({ productionSeed: seed, checkAll });
   if (!targets.length) {
@@ -81,7 +86,7 @@ async function main() {
     const result = assessGameScanHtml(html, {
       nodeId: node.node_id,
       label: preLaunch ? undefined : node.public_label,
-      requireCoopHint: expect.requireCoopHint ?? false,
+      requireOnboarding: expect.requireOnboarding ?? false,
       requireContributeBlock: expect.requireContributeBlock ?? false,
       expectDormant: expect.expectDormant ?? false,
     });

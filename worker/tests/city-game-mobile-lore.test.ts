@@ -18,7 +18,7 @@ const season = JSON.parse(
   readFileSync(join(root, "site/data/city-game-cr-season-01.json"), "utf8")
 );
 
-const PROFILE = "CEenC57QN9qqnr2x5L89cbWt";
+const PROFILE = "GcP3Ee17yGqMHdidhEVMYBzq";
 const QR = "qr_mobileLoreTest001";
 const PA = "pa_glitchHoodieCourier01";
 

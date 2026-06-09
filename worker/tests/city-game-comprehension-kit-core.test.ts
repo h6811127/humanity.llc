@@ -101,6 +101,24 @@ describe("city-game-comprehension-kit-core", () => {
     expect(kit[0]?.label).toBe("Riverwalk River Lantern");
   });
 
+  it("resolves production scan URLs from season JSON when seeds missing", () => {
+    const season = {
+      season_root_profile_id: "GcP3Ee17yGqMHdidhEVMYBzq",
+      nodes: [
+        {
+          node_id: "node_04",
+          scan_url: "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_aMr8qJGBF9xpC1gu",
+        },
+      ],
+    };
+    const resolved = resolveProductionScanUrlByNode(season, {
+      productionSeed: null,
+      localSeed: null,
+    });
+    expect(resolved.source).toBe("season-json");
+    expect(resolved.scanUrlByNode.node_04).toContain("GcP3Ee17yGqMHdidhEVMYBzq");
+  });
+
   it("resolves production scan URLs from local seed when season root matches", () => {
     const season = { season_root_profile_id: "CEenC57QN9qqnr2x5L89cbWt" };
     const resolved = resolveProductionScanUrlByNode(season, {

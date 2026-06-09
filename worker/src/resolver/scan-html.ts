@@ -4,6 +4,7 @@ import {
   parseManifestoDisplay,
   resolveScanHeroDisplay,
 } from "./manifesto-display";
+import type { ScanTrustContext } from "./scan-trust-compose";
 import {
   findScanCapability,
   gameContributeModeFromCapability,
@@ -165,7 +166,7 @@ function gameNodeMutedCopy(
 }
 
 /** Response header  -  confirms pass-card scan UI (not legacy .block layout). */
-export const SCAN_UI_VERSION = "pass-v41";
+export const SCAN_UI_VERSION = "pass-v42";
 
 /**
  * Public scan UI  -  flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
@@ -393,16 +394,28 @@ function renderScanPostHeroTrust(
   safety: ScanSafetyModel,
   origin: string
 ): string {
-  const blocks = [
-    renderScanTrustModules(vm, safety),
-    renderLimitsSettings(vm, origin),
-    renderTrustGroups(vm, origin),
-    renderScanUrlControl(vm),
-  ]
-    .filter(Boolean)
-    .join("\n");
-  if (!blocks) return "";
+  const trustModules = renderScanTrustModules(vm, safety);
+  const limits = renderLimitsSettings(vm, origin);
+  const groups = renderTrustGroups(vm, origin);
+  const showLink = renderScanUrlControl(vm);
+  const deepBlocks = [limits, groups, showLink].filter(Boolean).join("\n");
+
   if (isGameNodeOnboardingScan(vm)) {
+    if (vm.scanTrust) {
+      const collapsible = deepBlocks
+        ? `<details class="scan-game-trust-details">
+  <summary class="scan-game-trust-summary">Check at scan time</summary>
+  <div class="scan-game-trust-panel">
+${deepBlocks}
+  </div>
+</details>`
+        : "";
+      return [trustModules, collapsible].filter(Boolean).join("\n");
+    }
+    const blocks = [trustModules, limits, groups, showLink]
+      .filter(Boolean)
+      .join("\n");
+    if (!blocks) return "";
     return `<details class="scan-game-trust-details">
   <summary class="scan-game-trust-summary">Trust &amp; privacy</summary>
   <div class="scan-game-trust-panel">
@@ -410,6 +423,10 @@ ${blocks}
   </div>
 </details>`;
   }
+  const blocks = [trustModules, limits, groups, showLink]
+    .filter(Boolean)
+    .join("\n");
+  if (!blocks) return "";
   return blocks;
 }
 
@@ -1074,9 +1091,86 @@ function renderScanTrustModules(
   safety: ScanSafetyModel
 ): string {
   if (vm.kind !== "active" || vm.minimalScan) return "";
+  if (vm.scanTrust) {
+    return renderNetworkScanTrustModules(vm.scanTrust, vm, safety);
+  }
   const proves = renderScanProvesModule(vm, safety);
   if (!proves) return "";
   return `<div class="scan-trust-modules scan-trust-layer">${proves}</div>`;
+}
+
+function renderNetworkScanTrustModules(
+  trust: ScanTrustContext,
+  vm: ScanViewModel,
+  safety: ScanSafetyModel
+): string {
+  const proves = renderScanProvesList(trust.proves, vm, safety);
+  const limits = renderScanDoesNotProveModule(trust.doesNotProve);
+  const signedBy = renderScanSignedByModule(trust.signedBy);
+  const charter = renderScanCharterFragmentModule(trust.charterFragment);
+  const parts = [proves, limits, signedBy, charter].filter(Boolean);
+  if (!parts.length) return "";
+  return `<div class="scan-trust-modules scan-trust-layer scan-trust-network">${parts.join("\n")}</div>`;
+}
+
+function renderScanProvesList(
+  lines: string[],
+  vm: ScanViewModel,
+  safety: ScanSafetyModel
+): string {
+  const items = [...lines];
+  if (safety.objectSignatureVerified && !items.some((l) => l.includes("Signed"))) {
+    items.splice(1, 0, SCAN_SAFETY_RESOLVER_VERIFIED_COPY);
+  }
+  if (!items.length) return "";
+  const rows = items.map((line) => `<li>${escapeHtml(line)}</li>`).join("");
+  return `<section class="scan-proves" aria-label="What this scan shows">
+  <h2 class="scan-module-label">What this scan shows</h2>
+  <ul class="scan-proves-list">${rows}</ul>
+</section>`;
+}
+
+function renderScanDoesNotProveModule(lines: string[]): string {
+  if (!lines.length) return "";
+  const rows = lines.map((line) => `<li>${escapeHtml(line)}</li>`).join("");
+  return `<section class="scan-does-not-prove" aria-label="What this scan does not prove">
+  <h2 class="scan-module-label">${escapeHtml(SCAN_LIMITS_DISCLOSURE_TITLE)}</h2>
+  <ul class="scan-does-not-prove-list">${rows}</ul>
+</section>`;
+}
+
+function renderScanSignedByModule(
+  signers: ScanTrustContext["signedBy"]
+): string {
+  if (!signers.length) return "";
+  const rows = signers
+    .map(
+      (row) =>
+        `<li><strong>${escapeHtml(row.stream)}</strong> — ${escapeHtml(row.who)} may sign ${escapeHtml(row.may_sign)}</li>`
+    )
+    .join("");
+  return `<section class="scan-signed-by" aria-label="Who signed this composed state">
+  <h2 class="scan-module-label">Who may sign what you see</h2>
+  <ul class="scan-signed-by-list">${rows}</ul>
+</section>`;
+}
+
+function renderScanCharterFragmentModule(
+  fragment: ScanTrustContext["charterFragment"]
+): string {
+  const rulesHref = fragment.rulesPath.startsWith("/")
+    ? fragment.rulesPath
+    : `/${fragment.rulesPath}`;
+  const lesson = fragment.pointerLesson
+    ? `<p class="scan-charter-lesson" role="note">${escapeHtml(fragment.pointerLesson)}</p>`
+    : "";
+  return `<section class="scan-charter-fragment" aria-label="Network charter at this pointer">
+  <h2 class="scan-module-label">Network rule at this pointer</h2>
+  <p class="scan-charter-operator">${escapeHtml(fragment.operatorLine)}</p>
+  <p class="scan-charter-definition">${escapeHtml(fragment.definition)}</p>
+  ${lesson}
+  <p class="scan-charter-rules"><a href="${escapeHtml(rulesHref)}">Full network charter</a></p>
+</section>`;
 }
 
 function renderScanProvesModule(

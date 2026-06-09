@@ -92,6 +92,7 @@ if (!skipTests) {
     "worker/tests/city-game-launch-checklist-core.test.ts",
     "worker/tests/city-game-map-board-b13-core.test.ts",
     "worker/tests/city-game-smoke-production-core.test.ts",
+    "worker/tests/city-game-verify-production-root-core.test.ts",
     "worker/tests/city-game-bulletin-schedule.test.ts",
     "worker/tests/city-game-route-window-schedule.test.ts",
     "worker/tests/city-game-player-guide-core.test.ts",
@@ -132,6 +133,11 @@ console.log("\n=== city-game season verify ===\n");
 const verifyArgs = ["worker/scripts/verify-city-game-season.mjs"];
 if (requireLaunch) verifyArgs.push("--require-launch");
 run("node", verifyArgs);
+
+if (requireLaunch) {
+  console.log("\n=== city-game verify production root ===\n");
+  run("npm", ["run", "city-game:verify-production-root"]);
+}
 
 console.log("\n=== city-game scaffold play pages ===\n");
 run("node", ["worker/scripts/city-game-scaffold-play.mjs", "--all", "--check"]);

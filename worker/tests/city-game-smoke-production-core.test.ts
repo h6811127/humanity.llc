@@ -38,10 +38,10 @@ describe("city-game-smoke-production-core", () => {
     expect(c4.spotCount).toBe(3);
   });
 
-  it("blocks when production seed missing", () => {
-    const c4 = assessProductionSmokePreflight({ productionSeed: null });
+  it("blocks when production seed missing and season JSON has no scan URLs", () => {
+    const c4 = assessProductionSmokePreflight({ productionSeed: null, season: {} });
     expect(c4.ready).toBe(false);
-    expect(c4.issues[0]).toContain("production-seed");
+    expect(c4.issues[0]).toContain("Missing production scan URLs");
   });
 
   it("applies launch checklist E5 pass marker", () => {
@@ -93,7 +93,7 @@ ${LAUNCH_CHECKLIST_E5_PENDING}`;
     });
   });
 
-  it("uses onboarding / contribute layout when season window is open", () => {
+  it("uses onboarding / contribute layout when season window is open (not legacy coop-hint)", () => {
     const season = {
       window: {
         starts_at: "2020-06-06T18:00:00-05:00",
@@ -101,10 +101,26 @@ ${LAUNCH_CHECKLIST_E5_PENDING}`;
       },
     };
     expect(isSeasonPlayOpenForSmoke(season, new Date("2026-06-03T12:00:00Z"))).toBe(true);
-    expect(spotExpectationsForProductionProbe(season, new Date("2026-06-03T12:00:00Z")).node_04).toEqual({
+    const node04 = spotExpectationsForProductionProbe(season, new Date("2026-06-03T12:00:00Z")).node_04;
+    expect(node04).toEqual({
       requireOnboarding: true,
       requireContributeBlock: true,
     });
+    expect(node04).not.toHaveProperty("requireCoopHint");
+  });
+
+  it("assesses preflight ready from season JSON when production seed missing", () => {
+    const season = {
+      season_root_profile_id: "GcP3Ee17yGqMHdidhEVMYBzq",
+      nodes: Array.from({ length: 15 }, (_, i) => ({
+        node_id: `node_${String(i + 1).padStart(2, "0")}`,
+        label: `Node ${i + 1}`,
+        scan_url: `https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_${i}`,
+      })),
+    };
+    const c4 = assessProductionSmokePreflight({ productionSeed: null, season });
+    expect(c4.ready).toBe(true);
+    expect(c4.seedSource).toBe("season-json");
   });
 
   it("expects dormant for any node when season window is pre-launch (--all)", () => {

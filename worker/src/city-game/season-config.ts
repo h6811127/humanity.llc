@@ -48,12 +48,32 @@ export type LiveMapTickerConfig = {
   max_headlines?: number;
 };
 
+export type NetworkCharterSignerRow = {
+  stream: string;
+  who: string;
+  may_sign: string;
+};
+
+export type NetworkCharterConfig = {
+  eyebrow?: string;
+  title?: string;
+  definition?: string;
+  operator_line?: string;
+  board_intro?: string;
+  signers?: NetworkCharterSignerRow[];
+  what_stays?: string[];
+  spine_lessons?: Record<string, string>;
+  status_plate_scan_url?: string;
+  game_node_scan_url?: string;
+};
+
 export type CrSeasonConfig = {
   season_id: string;
   title?: string;
   city?: string;
   status?: string;
   season_root_profile_id?: string | null;
+  network_charter?: NetworkCharterConfig;
   rules_path?: string;
   auto_rules_page?: boolean;
   /** District slugs for map + game_node validation (city-specific). */

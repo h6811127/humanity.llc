@@ -204,6 +204,7 @@
     "city-game:smoke-production": "node worker/scripts/city-game-smoke-production.mjs",
     "city-game:smoke-production-preflight": "node worker/scripts/city-game-smoke-production-preflight.mjs",
     "city-game:smoke-production-sign-off": "node worker/scripts/city-game-smoke-production-sign-off.mjs",
+    "city-game:verify-production-root": "node worker/scripts/city-game-verify-production-root.mjs",
     "city-game:launch-preflight": "node worker/scripts/city-game-launch-preflight.mjs",
     "city-game:self-serve-staging-preflight": "node worker/scripts/city-game-self-serve-staging-preflight.mjs",
     "city-game:operator-ops-preflight": "node worker/scripts/city-game-operator-ops-preflight.mjs",
