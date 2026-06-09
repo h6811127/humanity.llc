@@ -4,6 +4,7 @@
  */
 import { applyDebriefBoardCta } from "./city-game-debrief-board-core.mjs";
 import { resolveBoardContextView } from "./city-game-board-context-core.mjs";
+import { discoveryPinIndexRelForSeason } from "./discovery-pin-projection-core.mjs";
 import { renderMapBoard, showMapBoardError } from "./city-game-map-board-core.mjs";
 import { bootCityGameMapInteraction } from "./city-game-map-interaction.mjs";
 import { bootCityGameMapSnapshot } from "./city-game-map-snapshot.mjs";
@@ -26,34 +27,44 @@ export async function bootCityGameMapPage(root = document) {
     const res = await fetch(resolved.jsonUrl, { cache: "no-store" });
     if (!res.ok) throw new Error(`season fetch ${res.status}`);
     season = await res.json();
+
+    /** @type {import("./discovery-pin-projection-core.mjs").DiscoveryPinIndex | null} */
+    let pinIndex = null;
+    const pinIndexUrl = discoveryPinIndexRelForSeason(season);
+    try {
+      const pinRes = await fetch(pinIndexUrl, { cache: "no-store" });
+      if (pinRes.ok) pinIndex = await pinRes.json();
+    } catch {
+      pinIndex = null;
+    }
+
+    const contextView = resolveBoardContextView(season, { pinIndex });
+
+    if (mount instanceof HTMLElement) {
+      const result = renderMapBoard(mount, season, contextView);
+      if (!result.ok) {
+        console.warn("[city-game-map-page] map layout", result.issues);
+        await bootCityGameSeasonBanners(root);
+        return { ok: false, season, contextView: null };
+      }
+
+      const boardRoot = mount.querySelector(".city-game-map-board");
+      if (boardRoot instanceof HTMLElement) {
+        bootCityGameMapInteraction(boardRoot, season);
+        bootCityGameMapSnapshot(
+          boardRoot,
+          contextView.snapshot.season_id || String(resolved?.seasonId ?? "")
+        );
+        applyDebriefBoardCta(boardRoot, season);
+      }
+    }
+
+    await bootCityGameSeasonBanners(root);
+    return { ok: true, season, contextView };
   } catch (err) {
     console.warn("[city-game-map-page]", err);
     if (mount) showMapBoardError(mount, "City board could not load.");
     await bootCityGameSeasonBanners(root);
     return { ok: false, season: null };
   }
-
-  const contextView = resolveBoardContextView(season);
-
-  if (mount instanceof HTMLElement) {
-    const result = renderMapBoard(mount, season, contextView);
-    if (!result.ok) {
-      console.warn("[city-game-map-page] map layout", result.issues);
-      await bootCityGameSeasonBanners(root);
-      return { ok: false, season, contextView: null };
-    }
-
-    const boardRoot = mount.querySelector(".city-game-map-board");
-    if (boardRoot instanceof HTMLElement) {
-      bootCityGameMapInteraction(boardRoot, season);
-      bootCityGameMapSnapshot(
-        boardRoot,
-        contextView.snapshot.season_id || String(resolved?.seasonId ?? "")
-      );
-      applyDebriefBoardCta(boardRoot, season);
-    }
-  }
-
-  await bootCityGameSeasonBanners(root);
-  return { ok: true, season, contextView };
 }

@@ -866,17 +866,18 @@ export function buildMapPrivacyInlineHtml(launchCopy) {
 /**
  * @param {Record<string, unknown>} season
  */
-export function resolveSpotlightNode(season) {
+export function resolveSpotlightNode(season, contextView = null) {
   const nodeId = comprehensionPrimaryNodeId(season);
-  return nodeRows(season).find((row) => row?.node_id === nodeId) ?? null;
+  return nodeRows(season, contextView).find((row) => row?.node_id === nodeId) ?? null;
 }
 
 /**
  * @param {Record<string, unknown>} season
  * @param {ReturnType<typeof resolveLaunchCopy>} launchCopy
+ * @param {ReturnType<typeof resolveBoardContextView> | null} [contextView]
  */
-export function buildMapSpotlightHtml(season, launchCopy) {
-  const row = resolveSpotlightNode(season);
+export function buildMapSpotlightHtml(season, launchCopy, contextView = null) {
+  const row = resolveSpotlightNode(season, contextView);
   if (!row) return "";
 
   const nodeId = String(row.node_id ?? "");
@@ -919,9 +920,9 @@ export function buildMapSpotlightHtml(season, launchCopy) {
  * @param {Record<string, unknown>} season
  * @param {ReturnType<typeof resolveLaunchCopy>} launchCopy
  */
-export function buildMapFirstPaintHtml(season, launchCopy) {
+export function buildMapFirstPaintHtml(season, launchCopy, contextView = null) {
   return `<div class="city-game-map-first-paint">
-    ${buildMapSpotlightHtml(season, launchCopy)}
+    ${buildMapSpotlightHtml(season, launchCopy, contextView)}
     <details class="city-game-map-how-details">
       <summary class="city-game-map-how-summary">How scanning works</summary>
       <div class="city-game-map-how-body">
@@ -937,13 +938,13 @@ export function buildMapFirstPaintHtml(season, launchCopy) {
  * @param {ReturnType<typeof resolveMapCopy>} copy
  * @param {ReturnType<typeof resolveLaunchCopy>} launchCopy
  */
-export function buildMapPlacesSectionHtml(season, copy, launchCopy) {
+export function buildMapPlacesSectionHtml(season, copy, launchCopy, contextView = null) {
   return `<section class="city-game-map-places-list" id="city-game-map-places" aria-labelledby="city-game-map-list-title">
   ${buildMapStartHereCalloutHtml(season, launchCopy)}
   <div class="city-game-map-list-panel">
     <h2 class="city-game-map-list-title" id="city-game-map-list-title">${escapeMapHtml(copy.section_places_title)}</h2>
     <figure class="city-game-map-mobile-sketch" aria-label="District sketch">
-      ${buildMapSchematicSvg(season, { hidePinLabels: true, hideZoneLabels: true, mobileSketch: true })}
+      ${buildMapSchematicSvg(season, { hidePinLabels: true, hideZoneLabels: true, mobileSketch: true }, contextView)}
       <figcaption class="city-game-map-figcaption">${escapeMapHtml(copy.diagram_note)} Dashed dots are locked or fogged — tap after picking a place.</figcaption>
     </figure>
     <details class="city-game-map-filters-details" id="city-game-map-filters">
@@ -956,7 +957,7 @@ export function buildMapPlacesSectionHtml(season, copy, launchCopy) {
     </details>
     <div class="city-game-map-list-scroll">
       ${buildMapSelectionBarHtml()}
-      ${buildMapNodeListHtml(season, launchCopy)}
+      ${buildMapNodeListHtml(season, launchCopy, contextView)}
     </div>
   </div>
 </section>`;
@@ -1005,9 +1006,12 @@ function nodePositionMap(season) {
 }
 
 /**
+ * Place rows — pin lens (context.place_rows) or season.nodes fallback.
  * @param {Record<string, unknown>} season
+ * @param {ReturnType<typeof resolveBoardContextView> | null} [contextView]
  */
-function nodeRows(season) {
+function nodeRows(season, contextView = null) {
+  if (contextView?.place_rows?.length) return contextView.place_rows;
   return Array.isArray(season.nodes) ? season.nodes : [];
 }
 
@@ -1032,12 +1036,12 @@ export function buildMapRolesLegendHtml(copy) {
 /**
  * @param {Record<string, unknown>} season
  */
-export function buildMapSchematicSvg(season, options = {}) {
+export function buildMapSchematicSvg(season, options = {}, contextView = null) {
   const hidePinLabels = Boolean(options.hidePinLabels);
   const hideZoneLabels = Boolean(options.hideZoneLabels);
   const mobileSketch = Boolean(options.mobileSketch);
   const positions = nodePositionMap(season);
-  const rows = nodeRows(season);
+  const rows = nodeRows(season, contextView);
   const edges = Array.isArray(season.unlock_edges) ? season.unlock_edges : [];
 
   const edgeLines = edges
@@ -1108,9 +1112,9 @@ ${pins}
 /**
  * @param {Record<string, unknown>} season
  */
-export function buildMapNodeListHtml(season, launchCopy = resolveLaunchCopy(season)) {
+export function buildMapNodeListHtml(season, launchCopy = resolveLaunchCopy(season), contextView = null) {
   const spotlightId = comprehensionPrimaryNodeId(season);
-  const rows = nodeRows(season);
+  const rows = nodeRows(season, contextView);
   const byDistrict = new Map();
   for (const row of rows) {
     const district = row.district ?? "other";
@@ -1242,7 +1246,7 @@ export function buildFogLegendHtml(season) {
  * @param {Record<string, unknown>} season
  * @param {ReturnType<typeof resolveMapCopy>} copy
  */
-export function buildMapAdvancedHtml(season, copy) {
+export function buildMapAdvancedHtml(season, copy, contextView = null) {
   const sketchSummary = copy.sketch_summary;
   const dense = isDenseMapBoard(season);
   return `<details class="city-game-map-advanced" id="city-game-map-advanced">
@@ -1257,7 +1261,7 @@ export function buildMapAdvancedHtml(season, copy) {
       <summary class="city-game-map-sketch-summary">${escapeMapHtml(sketchSummary)}</summary>
       <div class="city-game-map-sketch-block">
         <figure class="city-game-map-figure">
-          ${buildMapSchematicSvg(season, { hidePinLabels: dense })}
+          ${buildMapSchematicSvg(season, { hidePinLabels: dense }, contextView)}
           <figcaption class="city-game-map-figcaption">${escapeMapHtml(copy.diagram_note)}</figcaption>
         </figure>
       </div>
@@ -1349,18 +1353,19 @@ export function buildMapBoardInnerHtml(season, contextView = resolveBoardContext
   const contextId = escapeMapHtml(contextView.context_id);
   const contextKind = escapeMapHtml(contextView.context_kind);
   const memberCount = contextView.members.length;
+  const pinRegion = escapeMapHtml(String(contextView.pin_region ?? ""));
 
-  return `<div class="city-game-map-board${launchClass}${denseClass}" data-context-id="${contextId}" data-context-kind="${contextKind}" data-member-count="${memberCount}" data-snapshot-path="${escapeMapHtml(contextView.snapshot.path)}" data-active-type="all" data-active-state="all" data-active-district="all" data-active-explore="all" data-map-visibility="${escapeMapHtml(mapVisibility)}" data-rumored-nodes="${escapeMapHtml(rumoredAttr)}"${primaryAttr}>
+  return `<div class="city-game-map-board${launchClass}${denseClass}" data-context-id="${contextId}" data-context-kind="${contextKind}" data-member-count="${memberCount}" data-pin-region="${pinRegion}" data-pin-lens="1" data-snapshot-path="${escapeMapHtml(contextView.snapshot.path)}" data-active-type="all" data-active-state="all" data-active-district="all" data-active-explore="all" data-map-visibility="${escapeMapHtml(mapVisibility)}" data-rumored-nodes="${escapeMapHtml(rumoredAttr)}"${primaryAttr}>
   ${buildMapLiveStateHtml(season, copy)}
   ${buildMapWakeLoopHtml(season, copy)}
   <section class="city-game-map-places city-game-map-places--primary" aria-labelledby="city-game-map-spotlight-title">
-    ${buildMapFirstPaintHtml(season, launchCopy)}
+    ${buildMapFirstPaintHtml(season, launchCopy, contextView)}
   </section>
   ${buildMapReferenceSpineHtml(season)}
   ${buildMapRoutesPreviewHtml(season, copy)}
   ${buildMapActivityHtml(season, copy)}
-  ${buildMapPlacesSectionHtml(season, copy, launchCopy)}
-  ${buildMapAdvancedHtml(season, copy)}
+  ${buildMapPlacesSectionHtml(season, copy, launchCopy, contextView)}
+  ${buildMapAdvancedHtml(season, copy, contextView)}
   <div id="city-game-map-debrief-mount" hidden aria-hidden="true"></div>
 </div>`;
 }

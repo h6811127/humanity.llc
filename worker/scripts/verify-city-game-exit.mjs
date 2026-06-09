@@ -43,6 +43,9 @@ if (!allowedCounts.has(nodeCount)) {
 console.log("=== city-game build registry ===\n");
 run("npm", ["run", "city-game:build-registry"]);
 
+console.log("=== discovery pin index (WS-DISCOVER-P0) ===\n");
+run("npm", ["run", "discover:rebuild-pins", "--", "--check"]);
+
 if (!skipTests) {
   console.log("=== city-game vitest ===\n");
   run("npm", [
@@ -95,6 +98,7 @@ if (!skipTests) {
     "worker/tests/city-game-play-page-core.test.ts",
     "worker/tests/city-game-map-page-core.test.ts",
     "worker/tests/city-game-board-context-core.test.ts",
+    "worker/tests/discovery-pin-projection-core.test.ts",
     "worker/tests/city-game-map-board-core.test.ts",
     "worker/tests/city-game-map-node-card-core.test.ts",
     "worker/tests/city-game-map-explore-core.test.ts",

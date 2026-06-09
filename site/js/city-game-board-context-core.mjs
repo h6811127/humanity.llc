@@ -5,6 +5,10 @@
  */
 
 import {
+  discoveryPinsForNetworkLens,
+  resolveDiscoveryRegionFromSeason,
+} from "./discovery-pin-projection-core.mjs";
+import {
   comprehensionPrimaryNodeId,
   resolveComprehensionProbeNodes,
 } from "./city-game-player-guide-core.mjs";
@@ -99,10 +103,63 @@ export function resolveBoardContextFilters(season) {
 }
 
 /**
- * Neutral member rows enrolled in this context (season nodes today).
+ * Map DiscoveryPin rows to board context members (network lens).
+ * @param {import("./discovery-pin-projection-core.mjs").DiscoveryPin[]} pins
  * @param {Record<string, unknown>} season
  */
-export function resolveBoardContextMembers(season) {
+export function resolveBoardContextMembersFromPins(pins, season) {
+  const positions = layoutPositions(season);
+  const nodeById = new Map(
+    seasonNodeRows(season).map((row) => [String(row?.node_id ?? "").trim(), row])
+  );
+
+  return pins
+    .map((pin) => {
+      const entryId = String(pin.facets?.entry_id ?? "").trim();
+      const node = entryId ? nodeById.get(entryId) : null;
+      const pos = entryId ? positions[entryId] : null;
+      const layout =
+        pos && typeof pos.x === "number" && typeof pos.y === "number"
+          ? { x: pos.x, y: pos.y }
+          : null;
+      const scanUrl =
+        node && typeof node.scan_url === "string" && node.scan_url.trim()
+          ? node.scan_url.trim()
+          : null;
+      const mapsQuery =
+        node && typeof node.maps_query === "string" && node.maps_query.trim()
+          ? node.maps_query.trim()
+          : null;
+      return {
+        pin_id: pin.pin_id,
+        entry_id: entryId,
+        object_id: pin.primary_object_id ?? pin.object_ids[0] ?? null,
+        label: pin.display_label,
+        category: pin.facets?.role ?? pin.facets?.category ?? "",
+        group: pin.facets?.district ?? null,
+        layout,
+        scan_url: scanUrl,
+        maps_query: mapsQuery,
+      };
+    })
+    .filter((row) => row.entry_id);
+}
+
+/**
+ * Neutral member rows enrolled in this context — DiscoveryPin lens when index supplied.
+ * @param {Record<string, unknown>} season
+ * @param {{ pinIndex?: import("./discovery-pin-projection-core.mjs").DiscoveryPinIndex | null; networkId?: string }} [opts]
+ */
+export function resolveBoardContextMembers(season, opts = {}) {
+  const seasonId = String(season.season_id ?? "").trim();
+  const networkId = opts.networkId?.trim() || seasonId;
+  const pinIndex = opts.pinIndex ?? null;
+
+  if (pinIndex?.pins?.length) {
+    const pins = discoveryPinsForNetworkLens(pinIndex, networkId);
+    if (pins.length) return resolveBoardContextMembersFromPins(pins, season);
+  }
+
   const positions = layoutPositions(season);
   return seasonNodeRows(season).map((row) => {
     const entryId = String(row?.node_id ?? "").trim();
@@ -134,6 +191,22 @@ export function resolveBoardContextMembers(season) {
 }
 
 /**
+ * Node-shaped place rows for map board HTML builders (from context members).
+ * @param {ReturnType<typeof resolveBoardContextView>} context
+ */
+export function boardContextPlaceRows(context) {
+  return context.members.map((member) => ({
+    node_id: member.entry_id,
+    object_id: member.object_id,
+    role: member.category,
+    district: member.group ?? undefined,
+    label: member.label,
+    scan_url: member.scan_url ?? undefined,
+    maps_query: member.maps_query ?? undefined,
+  }));
+}
+
+/**
  * Cross-member dependency hints (unlock edges today).
  * @param {Record<string, unknown>} season
  */
@@ -151,8 +224,9 @@ export function resolveBoardContextEdges(season) {
 /**
  * Full context view contract for map board surfaces.
  * @param {Record<string, unknown>} season
+ * @param {{ pinIndex?: import("./discovery-pin-projection-core.mjs").DiscoveryPinIndex | null }} [opts]
  */
-export function resolveBoardContextView(season) {
+export function resolveBoardContextView(season, opts = {}) {
   const seasonId = String(season.season_id ?? "").trim();
   const listing =
     season.public_listing && typeof season.public_listing === "object"
@@ -173,16 +247,27 @@ export function resolveBoardContextView(season) {
       ? BOARD_CONTEXT_KIND_NETWORK
       : BOARD_CONTEXT_KIND_NETWORK;
 
+  const members = resolveBoardContextMembers(season, {
+    pinIndex: opts.pinIndex ?? null,
+    networkId: seasonId,
+  });
+
   return {
     context_id: seasonId,
     context_kind: contextKind,
     title,
-    region: listing?.region?.trim() || String(season.city ?? "").trim() || null,
-    members: resolveBoardContextMembers(season),
+    region:
+      listing?.region?.trim() ||
+      resolveDiscoveryRegionFromSeason(season) ||
+      String(season.city ?? "").trim() ||
+      null,
+    members,
+    place_rows: boardContextPlaceRows({ members }),
     edges: resolveBoardContextEdges(season),
     filters: resolveBoardContextFilters(season),
     spine: resolveBoardContextSpine(season),
     snapshot: resolveBoardContextSnapshotRef(season, seasonId),
+    pin_region: resolveDiscoveryRegionFromSeason(season),
   };
 }
 

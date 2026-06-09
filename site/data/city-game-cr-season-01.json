@@ -16,7 +16,7 @@
     "operator_line": "Operated by humanity.llc (reference operator) for Cedar Rapids Season 1.",
     "board_intro": "Shared signed truth for everyone on this board — not personal progress or GPS tracking.",
     "status_plate_scan_url": "https://humanity.llc/c/r4YyNEWJvVwWNMETzXfGjFyL?q=qr_8w7zHCPHisXvTnar",
-    "game_node_scan_url": "https://humanity.llc/c/CEenC57QN9qqnr2x5L89cbWt?q=qr_aV3BcFtid5NBfCuM",
+    "game_node_scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_aMr8qJGBF9xpC1gu",
     "signers": [
       {
         "stream": "Game",
@@ -52,7 +52,7 @@
     }
   },
   "status": "active",
-  "season_root_profile_id": "CEenC57QN9qqnr2x5L89cbWt",
+  "season_root_profile_id": "GcP3Ee17yGqMHdidhEVMYBzq",
   "rules_path": "/play/cedar-rapids/",
   "debrief_path": "/play/cedar-rapids/debrief/",
   "window": {
@@ -70,14 +70,38 @@
     "explore_by": {
       "label": "Explore by",
       "types": {
-        "relay_gate": { "label": "Relay", "order": 1 },
-        "lore_archive": { "label": "Story", "order": 2 },
-        "sanctuary": { "label": "Regroup", "order": 3 },
-        "temp_drop": { "label": "Clue", "order": 4 },
-        "witness": { "label": "Sunset", "order": 5 },
-        "route_splitter": { "label": "Route", "order": 6 },
-        "finale": { "label": "Finale", "order": 7 },
-        "care_loop": { "label": "Care", "order": 8 }
+        "relay_gate": {
+          "label": "Relay",
+          "order": 1
+        },
+        "lore_archive": {
+          "label": "Story",
+          "order": 2
+        },
+        "sanctuary": {
+          "label": "Regroup",
+          "order": 3
+        },
+        "temp_drop": {
+          "label": "Clue",
+          "order": 4
+        },
+        "witness": {
+          "label": "Sunset",
+          "order": 5
+        },
+        "route_splitter": {
+          "label": "Route",
+          "order": 6
+        },
+        "finale": {
+          "label": "Finale",
+          "order": 7
+        },
+        "care_loop": {
+          "label": "Care",
+          "order": 8
+        }
       }
     }
   },
@@ -705,105 +729,135 @@
       "object_id": "obj_cr_node_01_newbo",
       "role": "relay_gate",
       "district": "newbo",
-      "label": "NewBo relay arch"
+      "label": "NewBo relay arch",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_i2wDobB1ER8uwU7p",
+      "qr_id": "qr_i2wDobB1ER8uwU7p"
     },
     {
       "node_id": "node_02",
       "object_id": "obj_cr_node_02_cafe",
       "role": "sanctuary",
       "district": "newbo",
-      "label": "NewBo café window"
+      "label": "NewBo café window",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_4MWgvGjHJwACQyzL",
+      "qr_id": "qr_4MWgvGjHJwACQyzL"
     },
     {
       "node_id": "node_03",
       "object_id": "obj_cr_node_03_mural",
       "role": "lore_archive",
       "district": "newbo",
-      "label": "NewBo mural alley"
+      "label": "NewBo mural alley",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_kYvgwkE45TVRM7gA",
+      "qr_id": "qr_kYvgwkE45TVRM7gA"
     },
     {
       "node_id": "node_04",
       "object_id": "obj_cr_node_04_river",
       "role": "temp_drop",
       "district": "river_spine",
-      "label": "Riverwalk River Lantern"
+      "label": "Riverwalk River Lantern",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_aMr8qJGBF9xpC1gu",
+      "qr_id": "qr_aMr8qJGBF9xpC1gu"
     },
     {
       "node_id": "node_05",
       "object_id": "obj_cr_node_05_bridge",
       "role": "relay_gate",
       "district": "river_spine",
-      "label": "16th Avenue bridge"
+      "label": "16th Avenue bridge",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_MgVVr3PkvrLdrcdE",
+      "qr_id": "qr_MgVVr3PkvrLdrcdE"
     },
     {
       "node_id": "node_06",
       "object_id": "obj_cr_node_06_skywalk",
       "role": "route_splitter",
       "district": "downtown",
-      "label": "Skywalk note"
+      "label": "Skywalk note",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_ZuKg5m41VQ8U6wRt",
+      "qr_id": "qr_ZuKg5m41VQ8U6wRt"
     },
     {
       "node_id": "node_07",
       "object_id": "obj_cr_node_07_cabinet",
       "role": "lore_archive",
       "district": "czech_village",
-      "label": "Czech Village cabinet"
+      "label": "Czech Village cabinet",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_gEPR1PfPPB2z3ze1",
+      "qr_id": "qr_gEPR1PfPPB2z3ze1"
     },
     {
       "node_id": "node_08",
       "object_id": "obj_cr_node_08_bench",
       "role": "relay_gate",
       "district": "czech_village",
-      "label": "Czech Village square bench"
+      "label": "Czech Village square bench",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_sED4HfJ6MDG6B8Hs",
+      "qr_id": "qr_sED4HfJ6MDG6B8Hs"
     },
     {
       "node_id": "node_09",
       "object_id": "obj_cr_node_09_mural",
       "role": "lore_archive",
       "district": "czech_village",
-      "label": "Czech Village mural"
+      "label": "Czech Village mural",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_SWKEw6h8PALTvntf",
+      "qr_id": "qr_SWKEw6h8PALTvntf"
     },
     {
       "node_id": "node_10",
       "object_id": "obj_cr_node_10_library",
       "role": "witness",
       "district": "downtown",
-      "label": "Library witness seal"
+      "label": "Library witness seal",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_6zs7Jej5m4ZV4U7e",
+      "qr_id": "qr_6zs7Jej5m4ZV4U7e"
     },
     {
       "node_id": "node_11",
       "object_id": "obj_cr_node_11_marker",
       "role": "route_splitter",
       "district": "greene_square",
-      "label": "Greene Square marker"
+      "label": "Greene Square marker",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_v2ygsD2q3PsB2yNe",
+      "qr_id": "qr_v2ygsD2q3PsB2yNe"
     },
     {
       "node_id": "node_12",
       "object_id": "obj_cr_node_12_bench",
       "role": "sanctuary",
       "district": "greene_square",
-      "label": "Greene Square bench"
+      "label": "Greene Square bench",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_EjEU54z5ZeB7pn11",
+      "qr_id": "qr_EjEU54z5ZeB7pn11"
     },
     {
       "node_id": "node_13",
       "object_id": "obj_cr_node_13_finale",
       "role": "finale",
       "district": "downtown",
-      "label": "Downtown alley arch"
+      "label": "Downtown alley arch",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_29SRXSWhApTQ26Yc",
+      "qr_id": "qr_29SRXSWhApTQ26Yc"
     },
     {
       "node_id": "node_14",
       "object_id": "obj_cr_node_14_fountain",
       "role": "care_loop",
       "district": "river_spine",
-      "label": "River fountain / rain garden"
+      "label": "River fountain / rain garden",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_36xJG7ZUwQ5Kiz4b",
+      "qr_id": "qr_36xJG7ZUwQ5Kiz4b"
     },
     {
       "node_id": "node_15",
       "object_id": "obj_cr_node_15_steps",
       "role": "relay_gate",
       "district": "downtown",
-      "label": "Downtown market steps"
+      "label": "Downtown market steps",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_7UZngWMazwXaD2TB",
+      "qr_id": "qr_7UZngWMazwXaD2TB"
     },
     {
       "node_id": "node_16",
@@ -813,7 +867,9 @@
       "faction": "red",
       "install_wave": "open",
       "district": "newbo",
-      "label": "Red treaty · NewBo depot wall"
+      "label": "Red treaty · NewBo depot wall",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_NsXwHe69fhKMbdEA",
+      "qr_id": "qr_NsXwHe69fhKMbdEA"
     },
     {
       "node_id": "node_17",
@@ -823,7 +879,9 @@
       "faction": "blue",
       "install_wave": "open",
       "district": "downtown",
-      "label": "Blue treaty · Downtown postcard row"
+      "label": "Blue treaty · Downtown postcard row",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_2nrDB2utBRNAmCXy",
+      "qr_id": "qr_2nrDB2utBRNAmCXy"
     },
     {
       "node_id": "node_18",
@@ -833,7 +891,9 @@
       "faction": "green",
       "install_wave": "open",
       "district": "greene_square",
-      "label": "Green treaty · Greene pavilion"
+      "label": "Green treaty · Greene pavilion",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_7fh7wWwv9hFq46G8",
+      "qr_id": "qr_7fh7wWwv9hFq46G8"
     },
     {
       "node_id": "node_19",
@@ -843,7 +903,9 @@
       "faction": "yellow",
       "install_wave": "open",
       "district": "czech_village",
-      "label": "Yellow treaty · heritage house stoop"
+      "label": "Yellow treaty · heritage house stoop",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_iYKDB1C4WYc8xtbs",
+      "qr_id": "qr_iYKDB1C4WYc8xtbs"
     },
     {
       "node_id": "node_20",
@@ -852,7 +914,9 @@
       "node_class": "artifact",
       "install_wave": "open",
       "district": "river_spine",
-      "label": "Ward cache · levee post"
+      "label": "Ward cache · levee post",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_csZprWzpsWmrNR2v",
+      "qr_id": "qr_csZprWzpsWmrNR2v"
     },
     {
       "node_id": "node_21",
@@ -861,7 +925,9 @@
       "node_class": "artifact",
       "install_wave": "open",
       "district": "downtown",
-      "label": "Signal stone · alley niche"
+      "label": "Signal stone · alley niche",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_8oviYNANKgbkAiB4",
+      "qr_id": "qr_8oviYNANKgbkAiB4"
     },
     {
       "node_id": "node_22",
@@ -870,7 +936,9 @@
       "node_class": "artifact",
       "install_wave": "open",
       "district": "newbo",
-      "label": "Glitch coil · market threshold"
+      "label": "Glitch coil · market threshold",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_F71Vbt7zo8p7H3C3",
+      "qr_id": "qr_F71Vbt7zo8p7H3C3"
     },
     {
       "node_id": "node_23",
@@ -879,7 +947,9 @@
       "node_class": "resource",
       "install_wave": "open",
       "district": "downtown",
-      "label": "Museum intel · study hall door"
+      "label": "Museum intel · study hall door",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_52fPGh687ShyPMiH",
+      "qr_id": "qr_52fPGh687ShyPMiH"
     },
     {
       "node_id": "node_24",
@@ -888,7 +958,9 @@
       "node_class": "resource",
       "install_wave": "open",
       "district": "river_spine",
-      "label": "River clue · amphitheater rail"
+      "label": "River clue · amphitheater rail",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_GgjBL2Y4A4dV8qbk",
+      "qr_id": "qr_GgjBL2Y4A4dV8qbk"
     },
     {
       "node_id": "node_25",
@@ -897,7 +969,9 @@
       "node_class": "resource",
       "install_wave": "open",
       "district": "czech_village",
-      "label": "Heritage clue · museum walk"
+      "label": "Heritage clue · museum walk",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_GzTHHAVNaGPhHgLo",
+      "qr_id": "qr_GzTHHAVNaGPhHgLo"
     },
     {
       "node_id": "node_26",
@@ -906,7 +980,9 @@
       "node_class": "resource",
       "install_wave": "open",
       "district": "downtown",
-      "label": "Archives scarcity · witness desk"
+      "label": "Archives scarcity · witness desk",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_2wXKzyzm38TetVje",
+      "qr_id": "qr_2wXKzyzm38TetVje"
     },
     {
       "node_id": "node_27",
@@ -915,7 +991,9 @@
       "node_class": "resource",
       "install_wave": "open",
       "district": "greene_square",
-      "label": "Fest drop · square pop-up"
+      "label": "Fest drop · square pop-up",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_xC1RqFbK9Me6QCU2",
+      "qr_id": "qr_xC1RqFbK9Me6QCU2"
     },
     {
       "node_id": "node_28",
@@ -924,7 +1002,9 @@
       "node_class": "resource",
       "install_wave": "open",
       "district": "newbo",
-      "label": "Courier witness · chalk board"
+      "label": "Courier witness · chalk board",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_7xkKKkLK65W6M7g4",
+      "qr_id": "qr_7xkKKkLK65W6M7g4"
     },
     {
       "node_id": "node_29",
@@ -933,7 +1013,9 @@
       "node_class": "world_event",
       "install_wave": "open",
       "district": "downtown",
-      "label": "Plaza switch · dormant until mid-season"
+      "label": "Plaza switch · dormant until mid-season",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_H8tLLvkawKtFvj9G",
+      "qr_id": "qr_H8tLLvkawKtFvj9G"
     },
     {
       "node_id": "node_30",
@@ -942,7 +1024,9 @@
       "node_class": "world_event",
       "install_wave": "open",
       "district": "river_spine",
-      "label": "Night market · dormant Friday beat"
+      "label": "Night market · dormant Friday beat",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_ZvfpFtvaTk1ATNNG",
+      "qr_id": "qr_ZvfpFtvaTk1ATNNG"
     },
     {
       "node_id": "node_31",
@@ -951,7 +1035,9 @@
       "node_class": "common_relay",
       "install_wave": "open",
       "district": "newbo",
-      "label": "CSPS hall relay gate"
+      "label": "CSPS hall relay gate",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_UQixt1ERV9j5c1RC",
+      "qr_id": "qr_UQixt1ERV9j5c1RC"
     },
     {
       "node_id": "node_32",
@@ -960,7 +1046,9 @@
       "node_class": "common_relay",
       "install_wave": "open",
       "district": "newbo",
-      "label": "NewBo trailhead relay"
+      "label": "NewBo trailhead relay",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_Rq3F8SiiMheMLaea",
+      "qr_id": "qr_Rq3F8SiiMheMLaea"
     },
     {
       "node_id": "node_33",
@@ -969,7 +1057,9 @@
       "node_class": "common_relay",
       "install_wave": "open",
       "district": "downtown",
-      "label": "Paramount alley relay"
+      "label": "Paramount alley relay",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_UF93NKJj8pjUiBo1",
+      "qr_id": "qr_UF93NKJj8pjUiBo1"
     },
     {
       "node_id": "node_34",
@@ -978,7 +1068,9 @@
       "node_class": "common_relay",
       "install_wave": "open",
       "district": "downtown",
-      "label": "Third Avenue corridor relay"
+      "label": "Third Avenue corridor relay",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_zWg8KRG5r7cGWbaF",
+      "qr_id": "qr_zWg8KRG5r7cGWbaF"
     },
     {
       "node_id": "node_35",
@@ -987,7 +1079,9 @@
       "node_class": "common_relay",
       "install_wave": "open",
       "district": "downtown",
-      "label": "Ground transport hub relay"
+      "label": "Ground transport hub relay",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_bpjRGoq9Z9aToz63",
+      "qr_id": "qr_bpjRGoq9Z9aToz63"
     },
     {
       "node_id": "node_36",
@@ -996,7 +1090,9 @@
       "node_class": "common_relay",
       "install_wave": "open",
       "district": "czech_village",
-      "label": "Czech Museum plaza relay"
+      "label": "Czech Museum plaza relay",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_RKkMJZv3Lf2Q9HU8",
+      "qr_id": "qr_RKkMJZv3Lf2Q9HU8"
     },
     {
       "node_id": "node_37",
@@ -1005,7 +1101,9 @@
       "node_class": "common_relay",
       "install_wave": "open",
       "district": "czech_village",
-      "label": "Village bakery window relay"
+      "label": "Village bakery window relay",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_CFM5QQD7Y5aLQ56f",
+      "qr_id": "qr_CFM5QQD7Y5aLQ56f"
     },
     {
       "node_id": "node_38",
@@ -1014,7 +1112,9 @@
       "node_class": "common_relay",
       "install_wave": "open",
       "district": "river_spine",
-      "label": "McGrath amphitheater relay"
+      "label": "McGrath amphitheater relay",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_Sx3qshu4ReNnZSSP",
+      "qr_id": "qr_Sx3qshu4ReNnZSSP"
     },
     {
       "node_id": "node_39",
@@ -1023,7 +1123,9 @@
       "node_class": "common_relay",
       "install_wave": "open",
       "district": "river_spine",
-      "label": "River trail mile marker relay"
+      "label": "River trail mile marker relay",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_D66xNzu6LLyn3i27",
+      "qr_id": "qr_D66xNzu6LLyn3i27"
     },
     {
       "node_id": "node_40",
@@ -1032,7 +1134,9 @@
       "node_class": "common_relay",
       "install_wave": "open",
       "district": "greene_square",
-      "label": "Greene summer stage relay"
+      "label": "Greene summer stage relay",
+      "scan_url": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_6ZxKCyz1m2grbtpi",
+      "qr_id": "qr_6ZxKCyz1m2grbtpi"
     }
   ],
   "signal_war": {

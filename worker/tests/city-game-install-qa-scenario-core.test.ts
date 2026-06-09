@@ -9,7 +9,7 @@ import {
 } from "../scripts/city-game-install-qa-scenario-core.mjs";
 import { INSTALL_QA_E2_PENDING } from "../scripts/city-game-install-qa-core.mjs";
 
-const sampleHtml = `<main><p class="scan-game-coop-hint">coop</p><p>${GAME_NODE_SCAN_FOOT}</p></main>`;
+const sampleHtml = `<main><section class="scan-game-onboarding"></section><article data-game-contribute="1"></article><p>${GAME_NODE_SCAN_FOOT}</p></main>`;
 
 function sampleNodes() {
   return [
@@ -50,7 +50,7 @@ describe("city-game-install-qa-scenario-core", () => {
       nodes: sampleNodes(),
       fetchHtml: async (url) => {
         const html = url.includes("node_04")
-          ? `<main><p class="scan-game-coop-hint">coop</p><div class="scan-game-contribute"></div><p>${GAME_NODE_SCAN_FOOT}</p></main>`
+          ? `<main><section class="scan-game-onboarding"></section><article data-game-contribute="1"></article><div class="scan-game-contribute"></div><p>${GAME_NODE_SCAN_FOOT}</p></main>`
           : sampleHtml;
         return { ok: true, status: 200, html };
       },

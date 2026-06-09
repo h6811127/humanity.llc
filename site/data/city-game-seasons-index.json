@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-06-08T19:07:21.636Z",
+  "generated_at": "2026-06-09T15:18:15.872Z",
   "seasons": [
     {
       "season_id": "cr_season_01_wake",
@@ -9,7 +9,7 @@
       "status": "active",
       "rules_path": "/play/cedar-rapids/",
       "slug": "cedar-rapids",
-      "season_root_profile_id": "CEenC57QN9qqnr2x5L89cbWt",
+      "season_root_profile_id": "GcP3Ee17yGqMHdidhEVMYBzq",
       "json_url": "/data/city-game-cr-season-01.json",
       "json_basename": "city-game-cr-season-01.json",
       "public_listing": {

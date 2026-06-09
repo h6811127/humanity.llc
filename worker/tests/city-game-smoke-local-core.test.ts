@@ -9,49 +9,70 @@ import {
   resolveSmokeScanUrl,
 } from "../scripts/city-game-smoke-local-core.mjs";
 
-describe("city-game-smoke-local-core", () => {
-  it("passes game scan HTML without meta chips (node_01 shape)", () => {
-    const html = `<html><head><style>.scan-game-dormant-note { color: red; }</style></head><main>
-      <h1 class="scan-hero-title">NewBo relay arch</h1>
-      <p class="scan-game-coop-hint" role="note">Regroup hint</p>
+const ONBOARDING_MAIN = (extra = "") => `<main>
+      <article data-game-contribute="1" data-game-contribute-mode="fragment">
+      <section class="scan-game-onboarding" aria-labelledby="scan-game-onboarding-title">
+        <h2 id="scan-game-onboarding-title">How this place works</h2>
+      </section>
+      ${extra}
       <p class="scan-hero-foot">${GAME_NODE_SCAN_FOOT}</p>
-    </main></html>`;
-    expect(assessGameScanHtml(html, { nodeId: "node_01", label: "NewBo relay arch", requireCoopHint: true })).toEqual({
-      ok: true,
-    });
+      </article>
+    </main>`;
+
+describe("city-game-smoke-local-core", () => {
+  it("passes production onboarding layout (node_01 shape)", () => {
+    const html = `<html><head></head><body>${ONBOARDING_MAIN(
+      '<h1 class="scan-hero-title">NewBo relay arch</h1>'
+    )}</body></html>`;
+    expect(
+      assessGameScanHtml(html, {
+        nodeId: "node_01",
+        label: "NewBo relay arch",
+        requireOnboarding: true,
+      })
+    ).toEqual({ ok: true });
   });
 
-  it("passes game scan HTML with meta chips (node_04 shape)", () => {
-    const html = `<main>
+  it("passes onboarding with contribute block (node_04 shape)", () => {
+    const html = ONBOARDING_MAIN(`
       <h1 class="scan-hero-title">Riverwalk River Lantern</h1>
-      <ul class="scan-game-chips"><li class="scan-game-chip">Collective 4/20</li></ul>
       <section class="scan-game-contribute" id="scan-game-contribute"></section>
-      <p class="scan-game-coop-hint" role="note">Share the seed clue outward</p>
-      <p class="scan-hero-foot">${GAME_NODE_SCAN_FOOT}</p>
-    </main>`;
+    `);
     expect(
       assessGameScanHtml(html, {
         nodeId: "node_04",
         label: "Riverwalk River Lantern",
-        requireCoopHint: true,
+        requireOnboarding: true,
         requireContributeBlock: true,
       })
     ).toEqual({ ok: true });
   });
 
-  it("passes pre-window node_04 without contribute form when collective copy present", () => {
+  it("passes node_04 when data-game-contribute attr carries collective mode", () => {
     const html = `<main>
-      <h1 class="scan-hero-title">Riverwalk River Lantern</h1>
-      <p class="scan-game-coop-hint" role="note">When enough people contribute together, the next clue unlocks for everyone.</p>
+      <article data-game-contribute="1" data-game-contribute-mode="quorum">
+      <section class="scan-game-onboarding"></section>
+      <section class="scan-game-contribute" id="scan-game-contribute"></section>
       <p class="scan-hero-foot">${GAME_NODE_SCAN_FOOT}</p>
+      </article>
     </main>`;
     expect(
       assessGameScanHtml(html, {
         nodeId: "node_04",
-        requireCoopHint: true,
+        requireOnboarding: true,
         requireContributeBlock: true,
       })
     ).toEqual({ ok: true });
+  });
+
+  it("still supports legacy coop-hint checks when explicitly requested", () => {
+    const html = `<main>
+      <p class="scan-game-coop-hint" role="note">Regroup hint</p>
+      <p class="scan-hero-foot">${GAME_NODE_SCAN_FOOT}</p>
+    </main>`;
+    expect(assessGameScanHtml(html, { nodeId: "node_01", requireCoopHint: true })).toEqual({
+      ok: true,
+    });
   });
 
   it("ignores dormant CSS outside main", () => {

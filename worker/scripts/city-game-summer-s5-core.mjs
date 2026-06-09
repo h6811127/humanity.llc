@@ -7,8 +7,8 @@ import {
   validateMobileLoreEnrollmentList,
 } from "./city-game-mobile-lore-core.mjs";
 
-/** Profile that owns pilot print_artifact QRs (matches local season root). */
-export const SUMMER_S5_OWNER_PROFILE_ID = "CEenC57QN9qqnr2x5L89cbWt";
+/** Profile that owns pilot print_artifact QRs (production season root). */
+export const SUMMER_S5_OWNER_PROFILE_ID = "GcP3Ee17yGqMHdidhEVMYBzq";
 
 export const SUMMER_S5_MIN_FACTION_BADGES = 4;
 

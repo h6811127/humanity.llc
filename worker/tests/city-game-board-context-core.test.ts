@@ -13,6 +13,7 @@ import {
   resolveBoardContextSpine,
   resolveBoardContextView,
 } from "../../site/js/city-game-board-context-core.mjs";
+import { projectDiscoveryPinIndexFromSeason } from "../../site/js/discovery-pin-projection-core.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const season = JSON.parse(
@@ -21,11 +22,13 @@ const season = JSON.parse(
 
 describe("city-game board context view", () => {
   it("resolves Cedar Rapids season as a network context view", () => {
-    const context = resolveBoardContextView(season);
+    const pinIndex = projectDiscoveryPinIndexFromSeason(season);
+    const context = resolveBoardContextView(season, { pinIndex });
     expect(context.context_id).toBe("cr_season_01_wake");
     expect(context.context_kind).toBe("network");
     expect(context.title).toBe("Wake the city");
-    expect(context.members.length).toBeGreaterThan(0);
+    expect(context.members.length).toBe(40);
+    expect(context.place_rows.length).toBe(40);
     expect(context.members.every((row) => row.entry_id && row.label && row.category)).toBe(true);
     expect(context.edges.length).toBeGreaterThan(0);
     expect(context.filters.categories.some((chip) => chip.id === "all")).toBe(true);
@@ -33,7 +36,8 @@ describe("city-game board context view", () => {
   });
 
   it("maps season nodes to neutral members with layout and scan handles", () => {
-    const members = resolveBoardContextMembers(season);
+    const pinIndex = projectDiscoveryPinIndexFromSeason(season);
+    const members = resolveBoardContextMembers(season, { pinIndex });
     const lantern = members.find((row) => row.entry_id === "node_04");
     expect(lantern).toMatchObject({
       entry_id: "node_04",
@@ -42,7 +46,7 @@ describe("city-game board context view", () => {
       group: "river_spine",
     });
     expect(lantern?.layout).toMatchObject({ x: expect.any(Number), y: expect.any(Number) });
-    expect(lantern?.scan_url).toBeNull();
+    expect(lantern?.scan_url).toContain("GcP3Ee17yGqMHdidhEVMYBzq");
   });
 
   it("reuses comprehension_kit spine for primary and probe entries", () => {

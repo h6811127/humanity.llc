@@ -186,6 +186,7 @@
     "city-game:local-env": "node worker/scripts/city-game-local-env.mjs",
     "city-game:lan-hub": "node worker/scripts/city-game-lan-hub.mjs",
     "city-game:comprehension-kit": "node worker/scripts/city-game-comprehension-kit.mjs",
+    "discover:rebuild-pins": "node worker/scripts/discovery-pin-rebuild.mjs",
     "city-game:reference-network-kit": "node worker/scripts/city-game-reference-network-kit.mjs",
     "city-game:comprehension-preflight": "node worker/scripts/city-game-comprehension-preflight.mjs",
     "city-game:comprehension-sign-off": "node worker/scripts/city-game-comprehension-sign-off.mjs",

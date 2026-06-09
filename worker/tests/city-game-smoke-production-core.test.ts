@@ -93,7 +93,7 @@ ${LAUNCH_CHECKLIST_E5_PENDING}`;
     });
   });
 
-  it("uses coop/contribute spot checks when season window is open", () => {
+  it("uses onboarding / contribute layout when season window is open", () => {
     const season = {
       window: {
         starts_at: "2020-06-06T18:00:00-05:00",
@@ -102,7 +102,7 @@ ${LAUNCH_CHECKLIST_E5_PENDING}`;
     };
     expect(isSeasonPlayOpenForSmoke(season, new Date("2026-06-03T12:00:00Z"))).toBe(true);
     expect(spotExpectationsForProductionProbe(season, new Date("2026-06-03T12:00:00Z")).node_04).toEqual({
-      requireCoopHint: true,
+      requireOnboarding: true,
       requireContributeBlock: true,
     });
   });

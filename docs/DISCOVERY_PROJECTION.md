@@ -1,6 +1,6 @@
 # Discovery projection
 
-**Status:** Strategic spec — discovery plane only · **not implemented**  
+**Status:** Strategic spec — discovery plane · **P0 projection in progress** (WS-DISCOVER-P0)  
 **Audience:** Product, frontend, operators, agents  
 **Scope:** Public browse, near-me planning, board map lenses — **no resolver, scan, or network-graph changes**
 
@@ -346,14 +346,16 @@ Discovery plane targets the second without changing resolver cardinality.
 
 ## Promotion path (research → implementation)
 
-Before engineering:
+**WS-DISCOVER-P0 (in progress):** DiscoveryPin projection + Cedar Rapids board reads pins through the `cr_season_01_wake` network lens. Committed pin index at `site/data/discovery-cedar-rapids-iowa.json` (regenerate: `npm run discover:rebuild-pins`). No geo, no `/discover/` routes, no resolver scan changes in P0.
+
+Before later engineering:
 
 1. Object-level `public_listing` schema aligned with season listing ([`public-networks-portal-core.mjs`](../site/js/public-networks-portal-core.mjs) pattern).
 2. Privacy review against [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md).
 3. Map dashboard spec updated to reference pin lens ([`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md)) — when implementation starts, not before.
 4. Tests: index rebuild idempotency, excluded types, delisting, no scan logging hooks.
 
-**Until then:** this doc is **canonical intent only**; resolver and scan behavior remain as shipped.
+**Until P1+ ships:** pin projection is index-only; resolver and scan behavior remain as shipped.
 
 ---
 

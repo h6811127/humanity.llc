@@ -25,18 +25,18 @@ export const INSTALL_QA_SCENARIO_NODE_IDS = [
   "node_14",
 ];
 
-/** @type {Record<string, { requireCoopHint?: boolean; requireContributeBlock?: boolean; expectDormant?: boolean }>} */
+/** @type {Record<string, { requireCoopHint?: boolean; requireOnboarding?: boolean; requireContributeBlock?: boolean; expectDormant?: boolean }>} */
 export const INSTALL_QA_SPOT_EXPECTATIONS = {
-  node_01: { requireCoopHint: true },
-  node_04: { requireCoopHint: true, requireContributeBlock: true },
-  node_07: { requireCoopHint: true },
+  node_01: { requireOnboarding: true },
+  node_04: { requireOnboarding: true, requireContributeBlock: true },
+  node_07: { requireOnboarding: true },
 };
 
-/** @type {Record<string, { requireCoopHint?: boolean; requireContributeBlock?: boolean; expectDormant?: boolean }>} */
+/** @type {Record<string, { requireCoopHint?: boolean; requireOnboarding?: boolean; requireContributeBlock?: boolean; expectDormant?: boolean }>} */
 export const INSTALL_QA_SCENARIO_EXPECTATIONS = {
   ...INSTALL_QA_SPOT_EXPECTATIONS,
-  node_02: { requireCoopHint: true },
-  node_12: { requireCoopHint: true },
+  node_02: { requireOnboarding: true },
+  node_12: { requireOnboarding: true },
 };
 
 /** Manual follow-ups after HTTP baseline (operator flips / contribute on phone). */
@@ -93,7 +93,7 @@ export function forbiddenCopyInMain(main, term) {
 
 /**
  * @param {string} html
- * @param {{ nodeId: string; label?: string; requireCoopHint?: boolean; requireContributeBlock?: boolean; expectDormant?: boolean }} opts
+ * @param {{ nodeId: string; label?: string; requireCoopHint?: boolean; requireOnboarding?: boolean; requireContributeBlock?: boolean; expectDormant?: boolean }} opts
  * @returns {{ ok: true } | { ok: false; reason: string }}
  */
 export function assessGameScanHtml(html, opts) {
@@ -133,12 +133,25 @@ export function assessGameScanHtml(html, opts) {
     return { ok: false, reason: `${opts.nodeId}: expected scan-game-coop-hint` };
   }
 
+  if (opts.requireOnboarding) {
+    const hasOnboarding = hasRenderedClass(main, "scan-game-onboarding");
+    const hasContributeAttr = /data-game-contribute="1"/.test(main);
+    if (!hasOnboarding && !hasContributeAttr) {
+      return {
+        ok: false,
+        reason: `${opts.nodeId}: expected scan-game-onboarding or data-game-contribute`,
+      };
+    }
+  }
+
   if (opts.requireContributeBlock) {
     const hasContribute =
       hasRenderedClass(main, "scan-game-contribute") || /id="scan-game-contribute"/.test(main);
     if (!hasContribute) {
       const hasCollectiveProgress =
         hasRenderedClass(main, "scan-game-coop-hint") ||
+        hasRenderedClass(main, "scan-game-onboarding") ||
+        /data-game-contribute="1"/.test(main) ||
         /shared count for the whole city/i.test(main) ||
         /when enough people contribute/i.test(main);
       if (!hasCollectiveProgress) {
