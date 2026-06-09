@@ -132,12 +132,13 @@ test.describe("create entry chooser (step 11)", () => {
     await expect(page.locator("#create-hero-title")).toHaveText("Organize a live season");
   });
 
-  test("season fork dedicated path shows season id field", async ({ page }) => {
+  test("season fork dedicated path hides season id — names season on Live", async ({ page }) => {
     await page.goto("/create/?intent=game&season_account=dedicated");
 
     await expect(page.locator("#create-game-season-fork")).toBeHidden();
     await expect(page.locator("#create-game-season-wizard")).toBeVisible();
-    await expect(page.locator("#game-season-id-block")).toBeVisible();
+    await expect(page.locator("#game-season-id-block")).toHaveCount(0);
+    await expect(page.locator("#game-season-redirect-hint")).toBeVisible();
     await expect(page.locator("#enable-organizer-revoke")).toBeChecked();
     await expect(page.locator("#submit")).toHaveText(/season @handle/i);
   });
@@ -147,18 +148,22 @@ test.describe("create entry chooser (step 11)", () => {
     await page.goto("/create/?intent=game&season_account=existing");
 
     await expect(page.locator("#create-entry-gate")).toBeVisible();
-    await expect(page.locator("#game-season-id-block")).toBeHidden();
+    await expect(page.locator("#game-season-id-block")).toHaveCount(0);
     await expect(page.locator("#create-form-main-fields")).toBeHidden();
     await expect(page.locator("#submit")).toBeHidden();
   });
 
-  test("wear BYOP link opens form with intent=wear", async ({ page }) => {
+  test("wear BYOP link opens track chooser before form", async ({ page }) => {
     await page.goto("/create/?intent=wear");
 
     await expect(page.locator("#create-form-panel")).toBeVisible();
     await expect(page).toHaveURL(/intent=wear/);
-    await expect(page.locator("#create-wear-wizard")).toBeVisible();
+    await expect(page.locator("#create-wear-track-chooser")).toBeVisible();
+    await expect(page.locator("#create-wear-wizard")).toBeHidden();
     await expect(page.locator("#create-hero-title")).toHaveText("Print your own QR wear");
+
+    await page.getByRole("button", { name: /Print your own \(BYOP\)/i }).click();
+    await expect(page.locator("#create-wear-wizard")).toBeVisible();
   });
 
   test("general account door opens form with intent=general", async ({ page }) => {

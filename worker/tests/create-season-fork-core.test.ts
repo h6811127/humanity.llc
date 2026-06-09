@@ -98,9 +98,10 @@ describe("fork ui helpers", () => {
     expect(gameSeasonSubmitButtonLabel("create_season_only_root")).toContain("season @handle");
   });
 
-  it("hides season id for dual skin and existing account paths", () => {
+  it("never shows season id on /create/ — canonical home is Live When panel", () => {
     expect(gameSeasonIdFieldUiState("create_dual_skin_root").showSeasonIdField).toBe(false);
     expect(gameSeasonIdFieldUiState("use_existing_account").showSeasonIdField).toBe(false);
-    expect(gameSeasonIdFieldUiState("create_season_only_root").showSeasonIdField).toBe(true);
+    expect(gameSeasonIdFieldUiState("create_season_only_root").showSeasonIdField).toBe(false);
+    expect(gameSeasonIdFieldUiState("create_season_only_root").redirectHint).toContain("Live");
   });
 });

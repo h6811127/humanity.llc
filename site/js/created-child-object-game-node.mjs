@@ -181,6 +181,19 @@ export function initCreatedGameNode(ctx) {
   /** @type {Map<string, { json_url?: string }>} */
   const seasonById = new Map();
 
+  /**
+   * @param {string} seasonId
+   */
+  function ensureSeasonSelectOption(seasonId) {
+    if (!(seasonSelect instanceof HTMLSelectElement) || !seasonId) return;
+    if (seasonById.has(seasonId)) return;
+    seasonById.set(seasonId, { season_id: seasonId });
+    const opt = document.createElement("option");
+    opt.value = seasonId;
+    opt.textContent = `Your season · ${seasonId}`;
+    seasonSelect.append(opt);
+  }
+
   async function loadSeasonIndex() {
     if (!(seasonSelect instanceof HTMLSelectElement)) return;
     try {
@@ -206,11 +219,9 @@ export function initCreatedGameNode(ctx) {
       }
       const remembered = readRememberedGameSeasonId(ctx.profileId);
       if (remembered) {
-        const hasOption = [...seasonSelect.options].some((opt) => opt.value === remembered);
-        if (hasOption) {
-          seasonSelect.value = remembered;
-          await refreshDistrictsForSeason(remembered);
-        }
+        ensureSeasonSelectOption(remembered);
+        seasonSelect.value = remembered;
+        await refreshDistrictsForSeason(remembered);
       }
     } catch {
       /* index optional offline */

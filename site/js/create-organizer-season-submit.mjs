@@ -8,9 +8,7 @@ import {
   createdGameSeasonSetupHref,
   gameSeasonRootManifesto,
   markGameSeasonSetupFlow,
-  parseGameSeasonIdField,
   pickPreferredGameSeasonRoot,
-  rememberGameSeasonIdForProfile,
 } from "./create-organizer-season-core.mjs";
 import { handoffToCreatedForWalletEntry } from "./create-live-handoff.mjs";
 import {
@@ -77,10 +75,9 @@ export async function redirectToDeployRootSeasonSetup() {
  * }} ctx
  */
 export async function runGameSeasonRootCreate(ctx) {
-  const seasonId = parseGameSeasonIdField(ctx.seasonId);
   const createResult = await ctx.runCreateCard({
     handle: ctx.handle,
-    manifesto: gameSeasonRootManifesto(ctx.handle, seasonId),
+    manifesto: gameSeasonRootManifesto(ctx.handle, ""),
     wantRecovery: ctx.wantRecovery,
     pilotTemplate: "general",
     qrValidityDays: ctx.qrValidityDays,
@@ -88,8 +85,6 @@ export async function runGameSeasonRootCreate(ctx) {
     objectStreams: [],
     navigate: false,
   });
-
-  rememberGameSeasonIdForProfile(createResult.profileId, seasonId);
 
   const href = createdGameSeasonSetupHref(
     {

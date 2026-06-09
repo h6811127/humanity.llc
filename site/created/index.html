@@ -566,6 +566,13 @@
             </div>
           </section>
 
+          <section
+            class="created-season-progressive-checklist flow-form-section device-boot-gated"
+            id="created-season-progressive-checklist"
+            hidden
+            aria-labelledby="created-season-progressive-checklist-title"
+          ></section>
+
           <div
             class="created-collection-room-slot device-boot-gated"
             id="created-collection-room-slot"
@@ -1329,6 +1336,31 @@
               data-child-object-add-chrome
               novalidate
             >
+              <div
+                class="created-season-when-panel flow-form-section"
+                id="created-season-when-panel"
+                hidden
+                aria-labelledby="created-season-when-panel-title"
+              >
+                <h3 class="group-label" id="created-season-when-panel-title">When · season id</h3>
+                <p class="form-hint">
+                  Name your season here — not on the create form. Used when registering checkpoints.
+                </p>
+                <label class="form-label" for="child-object-season-when-id">Season id</label>
+                <input
+                  class="form-input"
+                  id="child-object-season-when-id"
+                  name="season_when_id"
+                  maxlength="48"
+                  placeholder="my_city_season_01"
+                  autocomplete="off"
+                  autocapitalize="off"
+                  autocorrect="off"
+                  spellcheck="false"
+                  inputmode="text"
+                />
+                <p class="form-hint" id="child-object-season-when-status" hidden role="status"></p>
+              </div>
               <label class="form-label" for="child-object-game-node-season">Season</label>
               <select class="form-input" id="child-object-game-node-season" required></select>
               <label class="form-label" for="child-object-game-node-label">Place name</label>

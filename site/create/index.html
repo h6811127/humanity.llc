@@ -508,26 +508,19 @@
               Continue on Live to add checkpoints and publish rules.
             </p>
             <p class="form-hint" id="game-season-redirect-hint" hidden></p>
-            <div id="game-season-id-block">
-              <label class="form-label" for="game-season-id">Season id</label>
-              <input
-                class="form-input"
-                id="game-season-id"
-                name="game_season_id"
-                maxlength="48"
-                placeholder="my_city_season_01"
-                autocomplete="off"
-                autocapitalize="off"
-                autocorrect="off"
-                spellcheck="false"
-                inputmode="text"
-                enterkeyhint="next"
-                required
-              />
-              <p class="form-hint">
-                Lowercase slug (letters, numbers, underscores). Used when registering game nodes.
-              </p>
-            </div>
+          </section>
+
+          <section
+            class="flow-form-section flow-inset-fields create-wear-track-chooser-section"
+            id="create-wear-track-chooser"
+            hidden
+            aria-labelledby="create-wear-track-chooser-title"
+          >
+            <h2 class="group-label" id="create-wear-track-chooser-title">Which wear track?</h2>
+            <p class="form-hint create-wear-track-prompt">
+              Pick one — lifecycle and expiry differ. You cannot merge both on one QR.
+            </p>
+            <div class="create-wear-track-list" role="group" aria-label="Wear track"></div>
           </section>
 
           <section

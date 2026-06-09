@@ -43,6 +43,10 @@ import {
   resolveWearSubmitStrategy,
 } from "./create-wear-wizard-core.mjs";
 import { syncCreateWearWizardUi } from "./create-wear-wizard.mjs";
+import {
+  syncCreateWearTrackChooserUi,
+  wearTrackBlocksSubmit,
+} from "./create-wear-track-chooser.mjs";
 import { syncCreateGeneralRoomUi } from "./create-general-room-wizard.mjs";
 import {
   bindCreateEntryGateActions,
@@ -183,6 +187,7 @@ function setTemplate(template) {
   syncCreateFlowConvergence(template);
   syncCreateDeployWizardUi(searchParams, template);
   syncCreateOrganizerSeasonWizardUi(searchParams);
+  syncCreateWearTrackChooserUi(searchParams);
   syncCreateWearWizardUi(searchParams);
   syncCreateGeneralRoomUi(searchParams);
   syncCreateCustodyModeUi({ scrollOrganizerCallout: isGameSeasonCreateIntent(searchParams) });
@@ -691,10 +696,8 @@ async function submitCreate(e, opts = {}) {
 
     if (gameStrategy === "create_season_only_root") {
       setStatus("Setting up season @handle…");
-      const seasonId = document.getElementById("game-season-id")?.value ?? "";
       await runGameSeasonRootCreate({
         handle: input.handle,
-        seasonId,
         wantRecovery: input.wantRecovery,
         qrValidityDays: input.qrValidityDays,
         runCreateCard,
@@ -707,6 +710,10 @@ async function submitCreate(e, opts = {}) {
       walletEntries: loadWallet(),
       gateBypass,
     });
+
+    if (isWearCreateIntent(searchParams) && wearTrackBlocksSubmit(searchParams)) {
+      throw new Error("Choose print-your-own or fulfilled garment before continuing.");
+    }
 
     if (wearStrategy === "redirect_live") {
       const wearRoot = pickPreferredGeneralRoot(listGeneralRootsWithKeys(loadWallet()));
@@ -895,6 +902,7 @@ window.addEventListener("hc-device-hub-changed", () => {
     syncCreateOrganizerSeasonWizardUi(searchParams);
   }
   if (isWearCreateIntent(searchParams)) {
+    syncCreateWearTrackChooserUi(searchParams);
     syncCreateWearWizardUi(searchParams);
   }
 });

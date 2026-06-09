@@ -367,7 +367,7 @@ Slice 1 shipped add-hub filter only; **list policy** is slice 2+.
 | **3** | **Add vs list** policy — lists show all children; “managed under Doors” badges | **Shipped** — `steward-child-object-list-policy-core.mjs`, `created-child-object-section-ui.mjs` |
 | **4** | **Season create fork** + honest beat when organizer key added to deploy root | **Shipped** — `create-season-fork-core.mjs`, `steward-season-key-honest-beat-core.mjs` |
 | **5** | **Five entry states** — remove mid-form wallet branch on create; unlock-first screens | **Shipped** — `create-entry-state-core.mjs`, entry gate on `/create/` |
-| **6** | **Season progressive checklist**; wear track chooser; season id off create | Planned |
+| **6** | **Season progressive checklist**; wear track chooser; season id off create | **Shipped** — `created-season-progressive-checklist*.mjs`, `create-wear-track-chooser*.mjs`, season id on Live When panel |
 | **7** | Capability-driven scan templates per room | Planned |
 
 Defer full URL split (`/created/deploy/` etc.) until switcher + checklist prove comprehension on single `/created/`.
@@ -395,13 +395,13 @@ Defer full URL split (`/created/deploy/` etc.) until switcher + checklist prove 
 | Three launch doors | Steps 10–11 | — |
 | Deploy object-first create | Step 12 | Wallet-branch submit strategies |
 | Hub “My objects” | Step 13 | Room switcher not on control |
-| Season create entry | Step 14 | Season id on create; fork not shipped |
-| Wear BYOP link | Step 15 | Wear room not isolated; no track chooser |
+| Season create entry | Step 14 + slice 6 | — |
+| Wear BYOP link | Step 15 + slice 6 | Wear room isolation polish |
 | **Q1 identity** | Slice 4 | Season-only second-root path at create |
 | Presentation policy (add) | Slices 1–3 | — |
 | Room switcher | Slice 2 | — |
 | “Not in this room” copy | Slices 2–3 (crosshint + list badges) | — |
-| Season checklist | Focus param only | Slice 6 |
+| Season checklist | Slice 6 shipped | — |
 | Five entry states | Slice 5 shipped | Mid-form wallet branching removed for deploy/wear/season redirect paths |
 | Capability-driven scan | L2 partial in resolver | Templates not fully room-aware |
 

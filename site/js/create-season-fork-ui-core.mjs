@@ -24,44 +24,14 @@ export function gameSeasonSubmitButtonLabel(strategy, preferredRoot) {
 }
 
 /**
- * Season id field on /create/?intent=game — hide (not disable) when continuing on Live.
+ * Season id on /create/ is removed (Step 20 slice 6). Canonical home: /created/ When panel.
  * @param {GameSeasonSubmitStrategy} strategy
  */
-export function gameSeasonIdFieldUiState(strategy) {
-  if (strategy === "redirect_live") {
-    return {
-      showSeasonIdField: false,
-      redirectHint:
-        "You already have a season saved on this device. Tap below to continue season setup.",
-      inputRequired: false,
-    };
-  }
-  if (strategy === "use_existing_account") {
-    return {
-      showSeasonIdField: false,
-      redirectHint:
-        "Continue on your saved @handle. Name the season when you add your first checkpoint.",
-      inputRequired: false,
-    };
-  }
-  if (strategy === "create_dual_skin_root") {
-    return {
-      showSeasonIdField: false,
-      redirectHint:
-        "One @handle for signs and season scan points. Name the season when you add your first checkpoint.",
-      inputRequired: false,
-    };
-  }
-  if (strategy === "create_season_only_root") {
-    return {
-      showSeasonIdField: true,
-      redirectHint: "",
-      inputRequired: true,
-    };
-  }
+export function gameSeasonIdFieldUiState(_strategy) {
   return {
     showSeasonIdField: false,
-    redirectHint: "",
+    redirectHint:
+      "Name your season on Live under When — or when you register your first checkpoint.",
     inputRequired: false,
   };
 }

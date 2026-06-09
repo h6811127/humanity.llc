@@ -109,13 +109,15 @@ import {
   focusSeasonSetupChecklist,
   wireCreatedSeasonSetupCtaClick,
 } from "./created-season-setup-cta.mjs";
+import { syncSeasonProgressiveChecklist } from "./created-season-progressive-checklist.mjs";
+import { initCreatedSeasonWhenPanel } from "./created-season-when-panel.mjs";
 import { syncCreatedPageDisplayLabels, syncChildObjectAddSectionLabels } from "./created-display-labels.mjs";
 import { formatCreatedQrStatusPhrase } from "./created-qr-status-copy-core.mjs";
 import {
   initCreatedRoomSwitcher,
   syncCreatedRoomSwitcher,
 } from "./created-room-switcher.mjs";
-import { STEWARD_ROOM_DOORS, STEWARD_ROOM_SEASON } from "./steward-active-room-core.mjs";
+import { STEWARD_ROOM_DOORS, STEWARD_ROOM_SEASON, getBoundStewardActiveRoom } from "./steward-active-room-core.mjs";
 import { applyGameSeasonSetupFocus } from "./created-game-season-setup-focus.mjs";
 import { applyDeploySuccessFocus, reapplyDeploySuccessPresentationChrome } from "./created-deploy-success-focus.mjs";
 import { isDeploySuccessLanding, deployEndpointTypeFromParams, deploySuccessObjectIdFromParams, writeDeploySuccessPresentationState } from "./created-deploy-success-focus-core.mjs";
@@ -524,10 +526,42 @@ function prepareGameSeasonSetupLandingFromUrl() {
   }
 }
 
+/** @type {ReturnType<typeof initCreatedSeasonWhenPanel> | null} */
+let seasonWhenPanelCtl = null;
+
+function refreshSeasonSlice6Presentation() {
+  if (!profileId) return;
+  const activeRoom = getBoundStewardActiveRoom(profileId);
+  const session = loadSession();
+  const ctx = {
+    profileId,
+    session,
+    activeRoom,
+    getActiveRoom: () => getBoundStewardActiveRoom(profileId),
+  };
+  syncSeasonProgressiveChecklist(ctx);
+  if (!seasonWhenPanelCtl) {
+    seasonWhenPanelCtl = initCreatedSeasonWhenPanel({
+      ...ctx,
+      onSeasonIdSaved: () => {
+        syncSeasonProgressiveChecklist({
+          profileId,
+          session: loadSession(),
+          activeRoom: getBoundStewardActiveRoom(profileId),
+        });
+        gameNodeCtl?.refresh?.();
+      },
+    });
+  } else {
+    seasonWhenPanelCtl.refresh?.();
+  }
+}
+
 function refreshGameSeasonSetupPresentation() {
   mountChildObjectAddHubSections();
   syncChildObjectAddHub(loadSession());
   syncGameSeasonSetupPanel(loadSession(), profileId || "");
+  refreshSeasonSlice6Presentation();
   if (!isGameSeasonSetupFlowActive()) return;
   if (profileId && isFirstControlSessionActive(profileId, sessionStorage)) {
     return;
