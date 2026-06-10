@@ -436,7 +436,7 @@ test.describe("Production readiness QA", () => {
     await bootClean(page);
     await stubHealth(page);
     await stubCreateResolver(page);
-    await page.goto(`${BASE}/create/?intent=wear`);
+    await page.goto(`${BASE}/create/?intent=wear&wear_track=byop`);
     await dismissOverlays(page);
     await page.locator("#handle").fill(`qa_wear_${Date.now().toString(36).slice(-6)}`);
     await page.locator("#manifesto").fill("Live on what I wear");
@@ -454,13 +454,15 @@ test.describe("Production readiness QA", () => {
     await page.goto(`${BASE}/create/?intent=game&season_account=dedicated`);
     await dismissOverlays(page);
     await page.locator("#handle").fill(`qa_season_${Date.now().toString(36).slice(-6)}`);
-    await page.locator("#game-season-id").fill("qa_summer_2026");
     await page.locator("#manifesto").fill("Summer season");
     await page.locator("#submit").click();
     await page.waitForURL(/\/created\/.*fresh=1/, { timeout: 25_000 });
     await expect(page.getByRole("heading", { name: "Set up your season" })).toBeVisible({
       timeout: 15_000,
     });
+    await page.locator("#child-object-season-when-id").fill("qa_summer_2026");
+    await page.locator("#child-object-season-when-id").blur();
+    await expect(page.locator("#child-object-season-when-status")).toContainText("qa_summer_2026");
   });
 
   test("5. LO-1 kit page", async ({ page }) => {
