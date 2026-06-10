@@ -83,7 +83,10 @@ function buildProvesLines(input: {
     items.push(
       "Care stream wins while maintenance is live — safety truth beats game bulletins"
     );
-  } else if (input.streams.some((s) => s.class === "narrative" || s.id === "bulletin")) {
+  } else if (
+    input.streamPolicyPhase === "game_scheduled" &&
+    input.streams.some((s) => s.class === "narrative" || s.id === "bulletin")
+  ) {
     items.push("Signed game bulletins published under season operator rules");
   }
   if (input.streams.some((s) => s.class === "care" || s.id === "care")) {

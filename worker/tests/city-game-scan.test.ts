@@ -734,9 +734,15 @@ describe("city game scan view", () => {
     );
     expect(vmBefore.gameNode?.mode).toBe("dormant");
     expect(vmBefore.gameNode?.seasonWindowPhase).toBe("before");
+    expect(vmBefore.scanTrust?.proves).not.toContain(
+      "Signed game bulletins published under season operator rules"
+    );
     const htmlBefore = await renderScanPage(vmBefore, "https://humanity.llc");
     expect(htmlBefore).toContain("Season opens");
     expect(htmlBefore).toContain("Plan your route on the city board");
+    expect(htmlBefore).not.toContain(
+      "Signed game bulletins published under season operator rules"
+    );
     expect(htmlBefore).not.toContain("Season not open yet");
     expect(htmlBefore).not.toContain("Contribute to quorum");
 

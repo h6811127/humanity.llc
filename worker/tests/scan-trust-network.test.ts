@@ -158,6 +158,9 @@ describe("scan trust network (WS-REALITY)", () => {
     expect(trust!.signedBy.some((row) => row.stream === "Game")).toBe(true);
     expect(trust!.signedBy.some((row) => row.stream === "Care")).toBe(true);
     expect(trust!.proves.some((line) => line.includes("Collective progress"))).toBe(true);
+    expect(trust!.proves).toContain(
+      "Signed game bulletins published under season operator rules"
+    );
     expect(trust!.doesNotProve.some((line) => line.includes("people trail"))).toBe(true);
   });
 
