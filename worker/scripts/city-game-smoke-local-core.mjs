@@ -149,7 +149,6 @@ export function assessGameScanHtml(html, opts) {
       hasRenderedClass(main, "scan-game-contribute") || /id="scan-game-contribute"/.test(main);
     if (!hasContribute) {
       const hasCollectiveProgress =
-        hasRenderedClass(main, "scan-game-coop-hint") ||
         hasRenderedClass(main, "scan-game-onboarding") ||
         /data-game-contribute="1"/.test(main) ||
         /shared count for the whole city/i.test(main) ||
