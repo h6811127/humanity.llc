@@ -163,6 +163,7 @@ WS-E (Phase E /created/ setup — needs WS-REV entitlements UI)
 | **WS-LIVE** | Live objects MVP (umbrella) | Five-layer Orders **1–6** · **LO-1–LO-5** exit gates · PSO + Cedar Rapids | Sub-tracks below; [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) |
 | **WS-QUALITY** | Core loop verify · fix · UX (WS-LIVE sub-track) | Q0 belt ☑ · Q1 loop inventory · Q2 P0 repair · Q3 polish · Q4 custody deprecation ☑ | Gates **steward path** (L1–L4, L6–L7) — see [WS-LIVE gating](#gating-revised) |
 | **WS-NOTIF** | Unified notifications (TIF) | **Closed** — in-app shipped; **P0-N2 OS non-functional** | **No agent** — reopen only with explicit transport workstream |
+| **WS-ONTOLOGY** | Semantic model canon | Identity + Address + Interpretation in [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) § Semantic model; durability companion [`IDENTITY_DURABILITY_ONTOLOGY.md`](IDENTITY_DURABILITY_ONTOLOGY.md) | **Doc-only · non-blocking** — informs WS-REALITY copy and product thesis |
 
 **Do not duplicate:** city-game local dev bundle on branch `#109` / uncommitted WIP (`city-game:dev`, `launch-preflight`, comprehension kit) — coordinate in **Active branches** before overlapping scripts.
 
@@ -196,6 +197,21 @@ WS-E (Phase E /created/ setup — needs WS-REV entitlements UI)
 | **Status** | **☑ 2026-06-03** — exit criteria met; hand off to WS-REV |
 | **Regression** | `npm run build` (site) · spot-check links from [`AGENTS.md`](../AGENTS.md) |
 | **Do not touch** | `worker/src/**` except comments pointing at docs (prefer zero code) |
+
+---
+
+### WS-ONTOLOGY — Semantic model (doc-only)
+
+| | |
+|--|--|
+| **Canonical home** | [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) § [Semantic model — Identity + Address + Interpretation](LIVE_OBJECT_ARCHITECTURE.md#semantic-model--identity--address--interpretation) |
+| **Companion** | [`IDENTITY_DURABILITY_ONTOLOGY.md`](IDENTITY_DURABILITY_ONTOLOGY.md) (durability tiers · discovery planes — defers semantic primitives to canon home) |
+| **In scope** | Storage vs semantic tables · charter under Interpretation · implementation-artifact mapping · agent checklist · cross-links in DISCOVERY_PROJECTION · AI · DEMOCRATIC_INFRASTRUCTURE |
+| **Out of scope** | Resolver code · season JSON · scan UI · discovery implementation · production mint |
+| **Exit criteria** | Single canon home named · charter ≠ Identity taxonomy · pins/places outside resolver primitives · no mutex violations |
+| **Status** | **☑ 2026-06-07** — Agent D tick; doc-only |
+| **Regression** | `npm run build` (link spot-check) |
+| **Blocks** | Nothing — informs WS-REALITY and product narrative only |
 
 ---
 

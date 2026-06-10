@@ -1,10 +1,25 @@
 # Identity durability ontology
 
-**Status:** Strategic research — informs discovery and L3; **not protocol law**  
+**Status:** Canonical companion — durability + discovery alignment; **semantic primitives** live in [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) § [Semantic model — Identity + Address + Interpretation](LIVE_OBJECT_ARCHITECTURE.md#semantic-model--identity--address--interpretation) (WS-ONTOLOGY)  
 **Audience:** Product, protocol, discovery plane, agents  
-**Parent:** [`AI_ECOSYSTEM_RESEARCH.md`](AI_ECOSYSTEM_RESEARCH.md) · [`DISCOVERY_PROJECTION.md`](DISCOVERY_PROJECTION.md) · [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md)
+**Parent:** [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) · [`DISCOVERY_PROJECTION.md`](DISCOVERY_PROJECTION.md) · [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md)
 
 > **Method:** For each scenario, what still means something after season ends, QR rotates, steward changes, or physical replacement. The **long-lived identity** is what you would cite in a link or archive a year later.
+
+**Do not duplicate:** Identity / Address / Interpretation definitions, charter classification, and the reduction diagram are **only** in LIVE_OBJECT_ARCHITECTURE § Semantic model. This doc covers **durability tiers**, **identity planes**, and **discovery indexing** — how long-lived referents map onto those semantics.
+
+---
+
+## Alignment with semantic model
+
+| Semantic primitive | Durability question this doc answers |
+|--------------------|--------------------------------------|
+| **Identity** | Which `profile_id` / `object_id` survives QR rotation, steward change, season end? |
+| **Address** | `qr_id` is **Tier 4** — pointer/moment; rotatable without destroying identity |
+| **Interpretation** | Charter + protocol persist as **rules**; season window may end while place canon on identity remains |
+| **Representation** | Never durable — scan output is emergent at interaction time |
+
+Charter-bearing roots and season archives are **Identity** (long-lived) carrying **Interpretation** policy (charter), not a fourth primitive.
 
 ---
 
@@ -26,19 +41,21 @@ Place/Site — discovery projection only when multi-object geo dedupe required
 Pattern < State < Credential < Network < Object ≈ Authority
 ```
 
-Site does **not** form its own tier. Place durability is carried by Object (`public_label`, place streams), Authority (institution), or Network (season-bound registry).
+Site does **not** form its own tier. Place durability is carried by Identity (`public_label`, place streams), Authority (institution), or charter-bound network registry — not by a resolver primitive called “place.”
 
 ---
 
 ## Three identity planes
 
-| Plane | Question | IDs |
-|-------|----------|-----|
-| **Resolver** | What does this URL resolve to? | `profile_id`, `object_id`, `qr_id`, `season_id` |
-| **Human** | What do people mean in language? | `@handle`, landmark label, org name |
-| **Discovery** | What row do I browse before scan? | Projection / index entry (not yet protocol) |
+| Plane | Question | IDs | vs semantic model |
+|-------|----------|-----|-------------------|
+| **Resolver** | What does this URL resolve to? | `profile_id`, `object_id`, `qr_id`, `season_id` | Identity + Address at scan entry |
+| **Human** | What do people mean in language? | `@handle`, landmark label, org name | Labels on Identity; not resolver truth |
+| **Discovery** | What row do I browse before scan? | `pin_id` (projection only) | **Outside** Identity/Address/Interpretation — index geometry |
 
-Resolver = truth. Human = language. Discovery = index geometry.
+Resolver = truth at scan time. Human = language. Discovery = index geometry — optional, opt-in, discardable without deleting Identity.
+
+See [`DISCOVERY_PROJECTION.md`](DISCOVERY_PROJECTION.md) § Boundary rule — pins do not change what a scan proves.
 
 ---
 
@@ -66,7 +83,7 @@ Resolver = truth. Human = language. Discovery = index geometry.
 | Pattern | Docs only | `/what-can-a-qr-do/…` |
 | Site | Conditional | Only if multi-object dedupe required |
 
-Stable URLs attach to **signed document identity**—not composed State.
+Stable URLs attach to **signed document identity**—not composed Representation.
 
 ---
 
@@ -94,7 +111,7 @@ Stable URLs attach to **signed document identity**—not composed State.
 | Network | Cartographer, chronicle | Player modeling, heatmaps |
 | Credential/State | — | Persistent memory |
 
-**Canonical intelligence unit:** **Tiered Public Record Context (TPRC)**—lowest tier that fully answers the question, plus optional upward composition.
+**Canonical intelligence unit:** **Tiered Public Record Context (TPRC)**—lowest tier that fully answers the question, plus optional upward composition. Defeating “AI as truth” = show **Interpret** trace (signed Identity state + charter), not generative Representation — [`AI_FEATURE_DEVELOPMENT.md`](AI_FEATURE_DEVELOPMENT.md).
 
 ---
 
@@ -106,7 +123,7 @@ Add **PlaceRef** (index join only) only when all are true:
 2. Object-first or Authority-first index produces duplicate/confusing rows
 3. Succession across object replacement needs explicit lineage beyond single-object `succession`
 
-Until then: **Object + Authority + Network** carry identity; Site is optimization, not primitive.
+Until then: **Identity + Authority + charter-bound network** carry referents; Site is discovery optimization, not a resolver semantic primitive.
 
 ---
 
@@ -115,11 +132,12 @@ Until then: **Object + Authority + Network** carry identity; Site is optimizatio
 - **Resolver identity** does not change
 - **Human identity** uses landmark language (“library,” “Czech Village bench”)
 - **Discovery identity** needs projection rows merging object + overlapping network lenses
-- Object remains resolver truth; place emerges as **human-facing projection**, not new signed primitive
+- Identity remains resolver truth; place emerges as **human-facing projection**, not new signed primitive
 
 ---
 
 ## Related
 
+- [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) § [Semantic model](LIVE_OBJECT_ARCHITECTURE.md#semantic-model--identity--address--interpretation) — **canonical** Identity + Address + Interpretation
 - [`DISCOVERY_PROJECTION.md`](DISCOVERY_PROJECTION.md) — discovery plane spec
 - [`LAYER3_PERSONAL_AGENCY.md`](LAYER3_PERSONAL_AGENCY.md) — participant follows/pins

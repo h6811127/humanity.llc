@@ -5,7 +5,7 @@
 **Audience:** Product, resolver, frontend, operators, agents  
 **Public catalog (research):** [`QR_DESIGN_SPACE.md`](QR_DESIGN_SPACE.md) · [`site/what-can-a-qr-do/design-space/`](../site/what-can-a-qr-do/design-space/index.html)  
 **Trust boundaries:** [`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md) · [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md)  
-**Object model:** [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) · [`V1_IMPLEMENTATION_CONTRACTS.md`](V1_IMPLEMENTATION_CONTRACTS.md)
+**Object model:** [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) · [`V1_IMPLEMENTATION_CONTRACTS.md`](V1_IMPLEMENTATION_CONTRACTS.md) · **Semantic ontology:** § [Semantic model — Identity + Address + Interpretation](#semantic-model--identity--address--interpretation) · companion [`IDENTITY_DURABILITY_ONTOLOGY.md`](IDENTITY_DURABILITY_ONTOLOGY.md)
 
 ---
 
@@ -28,6 +28,84 @@
 > A **live object** is an HTTPS endpoint (usually reached via QR) that returns **current, revocable, signed public state** — composed from a root card, optional child object, streams, time policy, and optional network overlay.
 
 The printed URL stays fixed. Resolver truth changes.
+
+---
+
+## Semantic model — Identity + Address + Interpretation
+
+**Canonical home** for this ontology (WS-ONTOLOGY). The [five-layer stack](#five-layers) below is **engineering composition** inside Interpretation; it does not replace these three semantic roles. Durability tiers and discovery planes: [`IDENTITY_DURABILITY_ONTOLOGY.md`](IDENTITY_DURABILITY_ONTOLOGY.md).
+
+### Storage vs semantic primitives
+
+| Storage (resolver persistence) | Semantic (meaning at scan time) | Role |
+|--------------------------------|----------------------------------|------|
+| **Entity** — signed documents, `profile_id` / `object_id`, lifecycle | **Identity** — durable truth bearer | What state attaches to |
+| **Locator** — QR row, `/c/…?q=…`, scope, revocable binding | **Address** — stable pointer → identity context | How scan enters the graph |
+| *(no third storage species)* | **Interpretation** — composition grammar | How state becomes public meaning |
+| Charter bytes may persist **as** entity documents | **Charter** — domain-scoped interpretation **policy** | Constitution for one trust domain |
+| — | **Representation** — scan HTML / status JSON | **Emergent** output, not stored |
+
+**Entity + Locator** are sufficient to **store** data. They are **not** sufficient to answer *what does this pointer mean right now?* — that requires **Interpretation**.
+
+### Interpretation tiers
+
+| Tier | What it is | Where it lives |
+|------|------------|----------------|
+| **Base protocol** | Global resolver grammar: signature verification, lifecycle phases, stream precedence (e.g. care > game), verbs, limits copy | Spec · [`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md) · `buildScanViewModel` in `scan-state.ts` |
+| **Domain charter** | Signed policy for one constituted trust domain: season window, signer roles, quorum, membership, overlay refs | Season JSON · charter-bearing root · [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) authority model |
+
+Charter is **storage-reducible** (bytes on an entity) but **semantically non-reducible** to Identity taxonomy — it is not a “profile” like `status_plate` vs `game_node`. It determines **how** truth is composed, not **what** one place attests.
+
+```text
+Representation = Interpret( Address → Identity graph , Charter , Context )
+
+                    ┌── Representation (scan view — emergent)
+                    │
+        ┌───────────▼──────────────────────────┐
+        │     INTERPRETATION                    │
+        │  base protocol + domain charter       │
+        └───────────┬──────────────────────────┘
+                    │ reads
+     ADDRESS ──binds──► IDENTITY (root · child · charter bearer)
+```
+
+**Five-layer map:** L1 = Identity graph · L2 = protocol verbs · L3 = stream precedence (protocol) · L4 = time policy (charter + identity) · L5 = network overlay (charter + graph rules).
+
+### Web analogy (durable abstraction)
+
+| Web | humanity.llc (semantic) |
+|-----|-------------------------|
+| Resource | Identity |
+| URI | Address |
+| Protocol (HTTP + policy) | Interpretation (base protocol + charter) |
+| Response body | Representation |
+
+### Implementation artifacts → semantic layer
+
+| Artifact | Semantic layer | Shipped vs emergent |
+|----------|----------------|---------------------|
+| `object_type` (`status_plate`, `game_node`, …) | Identity **profile** (implementation label) | Shipped |
+| `qr_id`, scope, D1 QR row | Address | Shipped |
+| `buildScanViewModel`, stream precedence | Base protocol | Shipped |
+| `site/data/city-game-*.json`, season overlay | Domain charter | Shipped |
+| `network_charter` / rules copy (when present) | Domain charter | Partial / emergent |
+| Vouch documents, unlock edges | Identity + refs; meaning via protocol | Shipped |
+| `DiscoveryPin`, `place_ref`, geo browse | **Outside** resolver meaning — discovery plane | Spec / in progress · [`DISCOVERY_PROJECTION.md`](DISCOVERY_PROJECTION.md) |
+| “Place”, “network type” (game, market, fund) | **Emergent** — human/discovery labels + charter profiles | Presentation |
+
+Places and discovery pins are **not** resolver semantic primitives. Networks as product nouns are **constituted domains** — charter + overlay, not a parallel storage species.
+
+### One-sentence durability test
+
+> A pointer means something at scan time when an **address** selects **identities** whose signed state is composed by a **published interpretation** (protocol + charter) into a bounded **representation**.
+
+### Agent checklist (which layer am I touching?)
+
+1. **Identity** — new object kind, signed fields, lifecycle, custody? → L1 · [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md)
+2. **Address** — new pointer scope, QR revoke, URL shape? → Locator binding · Technical Standards
+3. **Interpretation** — precedence, verbs, season rules, governance? → Protocol spec and/or charter schema · do not hide in `object_type` alone
+4. **Representation** — scan copy, board UI? → Must trace to Interpret(Identity, Charter) · [`AI_FEATURE_DEVELOPMENT.md`](AI_FEATURE_DEVELOPMENT.md) (readers ≠ truth)
+5. **Discovery** — browse, pins, near-me? → Discovery plane only · must not fork scan proof
 
 ---
 

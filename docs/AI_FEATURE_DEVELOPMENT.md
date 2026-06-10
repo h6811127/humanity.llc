@@ -22,7 +22,7 @@ Humanity Commons responds to the AI era by making **accountable, signed, revocab
 
 **Public line:** No AI profiles. No ghostwriting. Signed state only.
 
-See [`VOUCH_TRUST_POSITIONING.md`](VOUCH_TRUST_POSITIONING.md) · [`DEMOCRATIC_INFRASTRUCTURE.md`](DEMOCRATIC_INFRASTRUCTURE.md) · [`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md).
+See [`VOUCH_TRUST_POSITIONING.md`](VOUCH_TRUST_POSITIONING.md) · [`DEMOCRATIC_INFRASTRUCTURE.md`](DEMOCRATIC_INFRASTRUCTURE.md) · [`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md) · [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) § [Semantic model](LIVE_OBJECT_ARCHITECTURE.md#semantic-model--identity--address--interpretation) (Interpretation vs Representation).
 
 ---
 
@@ -59,6 +59,7 @@ Canonical boundary: [`LOCALIZED_OBJECT_INTELLIGENCE_BOUNDARY.md`](LOCALIZED_OBJE
 - **Revocable** — root and child lifecycle stay explicit
 - **Read-only at scan** — strangers consume resolver state by default
 - **No generative resolver truth** — model text is never stored in D1 or shown without an explicit non-signed label
+- **Interpretation trace** — any reader (L3 P1 “Plain language”) must remain separable from Representation; defeat AI-as-truth by surfacing signed Identity state + charter limits, not by generating hero copy · [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) § [Semantic model](LIVE_OBJECT_ARCHITECTURE.md#semantic-model--identity--address--interpretation)
 
 ---
 

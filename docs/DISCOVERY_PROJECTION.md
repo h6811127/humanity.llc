@@ -1,6 +1,6 @@
 # Discovery projection
 
-**Status:** Strategic spec — discovery plane · **P0 projection in progress** (WS-DISCOVER-P0)  
+**Status:** Strategic spec — discovery plane · **P0 shipped** (WS-DISCOVER-P0, 2026-06-09) · P1+ not started  
 **Audience:** Product, frontend, operators, agents  
 **Scope:** Public browse, near-me planning, board map lenses — **no resolver, scan, or network-graph changes**
 
@@ -32,6 +32,8 @@ DISCOVERY PLANE (this doc)
 ```
 
 Anything that changes **what a scan proves**, **who may sign**, or **network graph evaluation** is out of scope.
+
+**Semantic boundary (WS-ONTOLOGY):** Discovery pins, places, and geo browse live in the **discovery plane** — they are **not** resolver semantic primitives (Identity, Address, Interpretation). Pins **project** Identity rows for human planning; they do not compose scan meaning. Canonical model: [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) § [Semantic model — Identity + Address + Interpretation](LIVE_OBJECT_ARCHITECTURE.md#semantic-model--identity--address--interpretation). Durability tiers: [`IDENTITY_DURABILITY_ONTOLOGY.md`](IDENTITY_DURABILITY_ONTOLOGY.md).
 
 ---
 
@@ -346,9 +348,11 @@ Discovery plane targets the second without changing resolver cardinality.
 
 ## Promotion path (research → implementation)
 
-**WS-DISCOVER-P0 (in progress):** DiscoveryPin projection + Cedar Rapids board reads pins through the `cr_season_01_wake` network lens. Committed pin index at `site/data/discovery-cedar-rapids-iowa.json` (regenerate: `npm run discover:rebuild-pins`). No geo, no `/discover/` routes, no resolver scan changes in P0.
+**WS-DISCOVER-P0 (☑ shipped):** DiscoveryPin projection + Cedar Rapids board reads pins through the `cr_season_01_wake` network lens (`data-pin-lens="1"` on board context). Committed pin index at `site/data/discovery-cedar-rapids-iowa.json` — **40 pins / 40 season nodes** after GcP3 wave-open JSON. Regenerate: `npm run discover:rebuild-pins`. **CI:** `npm run verify:city-game` runs `discover:rebuild-pins -- --check` via [`verify-city-game-exit.mjs`](../worker/scripts/verify-city-game-exit.mjs) — fails on pin drift. No geo, no `/discover/` routes, no resolver scan changes in P0.
 
-Before later engineering:
+**P1+ (not started):** object-level `public_listing`, geo near-me, `/discover/` routes — escalate only after INTEGRATOR confirms LO-4 human gate plan.
+
+Before P1 engineering:
 
 1. Object-level `public_listing` schema aligned with season listing ([`public-networks-portal-core.mjs`](../site/js/public-networks-portal-core.mjs) pattern).
 2. Privacy review against [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md).
@@ -368,4 +372,5 @@ Before later engineering:
 | No scan analytics | [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md) · [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) |
 | City board policy | [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) |
 | Public search deferred in v1 slice | [`V1_IMPLEMENTATION_CONTRACTS.md`](V1_IMPLEMENTATION_CONTRACTS.md) |
-| Identity durability (Site falsified) | Prior ontology review — pins implement **discovery** only |
+| Identity durability (Site falsified) | [`IDENTITY_DURABILITY_ONTOLOGY.md`](IDENTITY_DURABILITY_ONTOLOGY.md) — pins implement **discovery** only |
+| Semantic model (Identity + Address + Interpretation) | [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) § [Semantic model](LIVE_OBJECT_ARCHITECTURE.md#semantic-model--identity--address--interpretation) |

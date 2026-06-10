@@ -10,7 +10,8 @@
 **Vouch positioning (AI era):** `docs/VOUCH_TRUST_POSITIONING.md`  -  accountability over global biometric uniqueness; what vouch proves for integrators.  
 **Vouch threat model:** `docs/VOUCH_THREAT_MODEL.md`  -  adversarial catalog and operator playbook.  
 **Scanner UX (recognition, safety chrome, redirects):** `docs/SCANNER_EXPERIENCE.md`  
-**Product language (plain default, honest limits):** `docs/PRODUCT_LANGUAGE_STRATEGY.md`
+**Product language (plain default, honest limits):** `docs/PRODUCT_LANGUAGE_STRATEGY.md`  
+**Semantic ontology (Identity + Address + Interpretation):** [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) § [Semantic model](LIVE_OBJECT_ARCHITECTURE.md#semantic-model--identity--address--interpretation)
 
 ---
 

@@ -3,7 +3,7 @@
 **Status:** Canonical product direction  
 **Purpose:** State what Humanity Commons is building, what it is not, and why a revocable QR is useful when the first scan page looks simple.
 
-**Related:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`, `docs/V1_PRODUCT_TRUST_MODEL.md`, `docs/SKEPTIC_FAQ.md`
+**Related:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`, `docs/V1_PRODUCT_TRUST_MODEL.md`, `docs/SKEPTIC_FAQ.md`, [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) § [Semantic model — Identity + Address + Interpretation](LIVE_OBJECT_ARCHITECTURE.md#semantic-model--identity--address--interpretation)
 
 ---
 
@@ -38,6 +38,8 @@ The product is not “Linktree with a red QR.” The product is a **live trust o
 4. **What does this scan explicitly not prove?** (no legal ID, no “holder owns this sticker” from QR alone)
 
 Revocation matters because **physical trust leaks**: stolen stickers, lost cards, breakups, expelled members, compromised keys. A profile link cannot say “this printed item is dead” without you trusting the platform forever. A resolver can.
+
+Constituted trust domains (networks, co-ops, seasons) differ by **published interpretation** — domain charter plugged into the shared resolver protocol — not by forking storage. See [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) § [Semantic model](LIVE_OBJECT_ARCHITECTURE.md#semantic-model--identity--address--interpretation).
 
 **Owner actions (distinct  -  not one “revoke” button):** **Revoke QR** (one pointer), **Disable card** (whole profile off), **Suspend** (governance only), and (future) **Delete**. Vocabulary, scan copy, and physical-ID warnings: `docs/REVOKE_AND_LIFECYCLE_V1.md`.
 
