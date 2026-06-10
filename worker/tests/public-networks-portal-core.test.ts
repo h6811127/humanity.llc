@@ -5,6 +5,7 @@ import {
   buildPublicNetworkVisionCardModel,
   countSeasonPlaces,
   filterPublicNetworkCards,
+  formatPublicNetworkStateHero,
   formatPublicNetworkStatsLine,
   listedPublicNetworkRows,
   publicNetworkPreviewArtForSeason,
@@ -99,11 +100,49 @@ describe("public-networks-portal-core", () => {
     expect(html).toContain("City game");
     expect(html).toContain("Weekend live-object game across Cedar Rapids.");
     expect(html).toContain("public-networks-card--rich");
+    expect(html).toContain("public-networks-card--state-first");
+  });
+
+  it("formats state hero from status and stats", () => {
+    expect(
+      formatPublicNetworkStateHero({ statusLabel: "Live now", statsLine: "40 places · 40 live objects" })
+    ).toBe("Live now · 40 places · 40 live objects");
+    expect(formatPublicNetworkStateHero({ statusLabel: "Coming soon", statsLine: "" })).toBe(
+      "Coming soon"
+    );
+  });
+
+  it("state-first card DOM order: identity → state → actions → details", () => {
+    const card = buildPublicNetworkCardModel(cedarIndexRow, {
+      window: {
+        starts_at: "2020-01-01T00:00:00-05:00",
+        ends_at: "2099-01-01T00:00:00-05:00",
+      },
+      nodes: [{ node_id: "a" }, { node_id: "b" }],
+    });
+    const html = renderPublicNetworkCard(card);
+    const entity = html.indexOf('data-state-first="entity"');
+    const state = html.indexOf('data-state-first="current-state"');
+    const actions = html.indexOf('data-state-first="actions"');
+    const details = html.indexOf('data-state-first="details"');
+    expect(entity).toBeGreaterThan(-1);
+    expect(state).toBeGreaterThan(entity);
+    expect(actions).toBeGreaterThan(state);
+    expect(details).toBeGreaterThan(actions);
+    expect(html.indexOf("Live now · 2 places")).toBeLessThan(html.indexOf(PUBLIC_NETWORK_OPEN_BOARD_CTA));
+    expect(html.indexOf(PUBLIC_NETWORK_OPEN_BOARD_CTA)).toBeLessThan(
+      html.indexOf("Weekend live-object game across Cedar Rapids.")
+    );
+    expect(html).not.toContain("public-networks-card__head");
+    expect(html).not.toContain('class="public-networks-card__stats"');
   });
 
   it("counts places and renders stats plus board preview art for listed seasons", () => {
     const seasonConfig = {
-      window: { starts_at: null, ends_at: null },
+      window: {
+        starts_at: "2020-01-01T00:00:00-05:00",
+        ends_at: "2099-01-01T00:00:00-05:00",
+      },
       nodes: [{ node_id: "a" }, { node_id: "b" }, { node_id: "c" }],
     };
     expect(countSeasonPlaces(seasonConfig)).toBe(3);
@@ -116,7 +155,8 @@ describe("public-networks-portal-core", () => {
     const card = buildPublicNetworkCardModel(cedarIndexRow, seasonConfig);
     expect(card.statsLine).toBe("3 places · 3 live objects");
     const html = renderPublicNetworkCard(card);
-    expect(html).toContain("3 places · 3 live objects");
+    expect(html).toContain("Live now · 3 places · 3 live objects");
+    expect(html).toContain('data-state-first="current-state"');
     expect(html).toContain("public-networks-card__preview");
     expect(html).toContain("cedar-rapids-board-open.png");
   });
@@ -130,10 +170,16 @@ describe("public-networks-portal-core", () => {
       expect(html).toContain('data-network-live="false"');
       expect(html).toContain("public-networks-card--vision");
       expect(html).toContain("public-networks-card__schematic");
-      expect(html).not.toContain("public-networks-card__stats");
+      expect(html).not.toContain('class="public-networks-card__stats"');
       expect(html).not.toContain('href="/play/');
       expect(html).not.toContain("Live now");
       expect(html).toMatch(/Prototype|Coming soon/);
+      expect(html).toContain('data-state-first="current-state"');
+      const state = html.indexOf('data-state-first="current-state"');
+      const actions = html.indexOf('data-state-first="actions"');
+      const details = html.indexOf('data-state-first="details"');
+      expect(state).toBeLessThan(actions);
+      expect(actions).toBeLessThan(details);
     }
   });
 

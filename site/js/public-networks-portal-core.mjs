@@ -151,6 +151,17 @@ export function formatPublicNetworkStatsLine(card) {
 }
 
 /**
+ * State-first hero line: window/status label, optional place/object counts.
+ * @param {{ statusLabel?: string; statsLine?: string }} card
+ */
+export function formatPublicNetworkStateHero(card) {
+  const status = String(card.statusLabel ?? "").trim();
+  const stats = String(card.statsLine ?? "").trim();
+  if (status && stats) return `${status} · ${stats}`;
+  return status || stats || "";
+}
+
+/**
  * @param {string} category
  */
 export function renderPublicNetworkSchematicPreview(category) {
@@ -210,6 +221,9 @@ export function buildPublicNetworkCardModel(row, seasonConfig = null, now = new 
   const objectCount = countSeasonLiveObjects(seasonConfig);
   const previewArt = publicNetworkPreviewArtForSeason(seasonId);
   const statsLine = formatPublicNetworkStatsLine({ placeCount, objectCount, isLive: true });
+  const statusLabel = publicNetworkWindowStatusLabel(phase);
+  const statusClass = publicNetworkWindowStatusClass(phase);
+  const stateHeroLine = formatPublicNetworkStateHero({ statusLabel, statsLine });
 
   return {
     season_id: seasonId,
@@ -220,8 +234,9 @@ export function buildPublicNetworkCardModel(row, seasonConfig = null, now = new 
     categoryLabel,
     phase,
     isLive: true,
-    statusLabel: publicNetworkWindowStatusLabel(phase),
-    statusClass: publicNetworkWindowStatusClass(phase),
+    statusLabel,
+    statusClass,
+    stateHeroLine,
     openHref: boardPath,
     rulesHref: rulesPath || null,
     placeCount,
@@ -251,6 +266,8 @@ export function buildPublicNetworkVisionCardModel(row) {
     .join(" ")
     .toLowerCase();
 
+  const stateHeroLine = formatPublicNetworkStateHero({ statusLabel, statsLine: "" });
+
   return {
     season_id: row.id,
     name: row.name,
@@ -262,6 +279,7 @@ export function buildPublicNetworkVisionCardModel(row) {
     isLive: false,
     statusLabel,
     statusClass,
+    stateHeroLine,
     openHref: null,
     rulesHref: null,
     placeCount: null,
@@ -336,23 +354,28 @@ export function renderPublicNetworkCard(card) {
   const cta = card.isLive && card.openHref
     ? `<a class="landing-hero-btn landing-hero-btn-primary public-networks-card__cta" href="${escapePublicNetworksHtml(card.openHref)}">${escapePublicNetworksHtml(PUBLIC_NETWORK_OPEN_BOARD_CTA)}</a>`
     : `<span class="landing-hero-btn landing-hero-btn-primary public-networks-card__cta public-networks-card__cta--disabled" aria-disabled="true">${escapePublicNetworksHtml(card.statusLabel)}</span>`;
-  const statsLine = card.statsLine
-    ? `<p class="public-networks-card__stats">${escapePublicNetworksHtml(card.statsLine)}</p>`
+  const stateHeroLine =
+    String(card.stateHeroLine ?? "").trim() ||
+    formatPublicNetworkStateHero({
+      statusLabel: card.statusLabel,
+      statsLine: card.statsLine,
+    });
+  const stateHero = stateHeroLine
+    ? `<p class="public-networks-card__state-hero ${card.statusClass}" data-state-first="current-state">${escapePublicNetworksHtml(stateHeroLine)}</p>`
     : "";
-  return `<article class="public-networks-card public-networks-card--rich${card.isLive ? "" : " public-networks-card--vision"}" data-season-id="${escapePublicNetworksHtml(card.season_id)}" data-category="${escapePublicNetworksHtml(card.category)}"${liveAttr}>
+  return `<article class="public-networks-card public-networks-card--rich public-networks-card--state-first${card.isLive ? "" : " public-networks-card--vision"}" data-season-id="${escapePublicNetworksHtml(card.season_id)}" data-category="${escapePublicNetworksHtml(card.category)}"${liveAttr}>
   ${renderPublicNetworkCardPreview(card)}
   <div class="public-networks-card__body">
-  <div class="public-networks-card__head">
+  <div class="public-networks-card__identity" data-state-first="entity">
     <h3 class="public-networks-card__title">${escapePublicNetworksHtml(card.name)}</h3>
-    <span class="public-networks-card__status ${card.statusClass}">${escapePublicNetworksHtml(card.statusLabel)}</span>
+    <p class="public-networks-card__meta"><span class="public-networks-card__kind">${escapePublicNetworksHtml(card.categoryLabel)}</span><span class="public-networks-card__scope">${escapePublicNetworksHtml(card.place)}</span></p>
   </div>
-  <p class="public-networks-card__meta"><span class="public-networks-card__kind">${escapePublicNetworksHtml(card.categoryLabel)}</span><span class="public-networks-card__scope">${escapePublicNetworksHtml(card.place)}</span></p>
-  ${statsLine}
-  <p class="public-networks-card__summary">${escapePublicNetworksHtml(card.summary)}</p>
-  <div class="public-networks-card__actions">
+  ${stateHero}
+  <div class="public-networks-card__actions" data-state-first="actions">
     ${cta}
     ${rulesLink}
   </div>
+  <p class="public-networks-card__summary" data-state-first="details">${escapePublicNetworksHtml(card.summary)}</p>
   </div>
 </article>`;
 }

@@ -113,6 +113,18 @@
   letter-spacing: 0.01em;
 }
 
+.public-networks-card__identity {
+  display: block;
+}
+
+.public-networks-card__state-hero {
+  margin: 10px 0 0;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+}
+
 .landing-discovery-hero .hero-line {
   max-width: 24em;
   font-size: 16px;
@@ -202,13 +214,6 @@ html[data-theme="dark"] .landing-entry-shelf {
   margin-bottom: 10px;
 }
 
-.public-networks-card__head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-}
-
 .public-networks-card__title {
   margin: 0;
   font-size: 18px;
@@ -216,36 +221,24 @@ html[data-theme="dark"] .landing-entry-shelf {
   letter-spacing: -0.02em;
 }
 
-.public-networks-card__status {
-  flex-shrink: 0;
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1.2;
-  padding: 5px 10px;
-  border-radius: var(--radius-pill);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-.public-networks-card__status--live {
+.public-networks-card__state-hero.public-networks-card__status--live {
   color: #0f6b3d;
-  border-color: rgba(15, 107, 61, 0.22);
-  background: rgba(15, 107, 61, 0.08);
 }
 
-.public-networks-card__status--soon {
+.public-networks-card__state-hero.public-networks-card__status--soon {
   color: #8a5a00;
-  border-color: rgba(138, 90, 0, 0.22);
-  background: rgba(138, 90, 0, 0.08);
 }
 
-.public-networks-card__status--ended {
+.public-networks-card__state-hero.public-networks-card__status--ended {
   color: rgba(0, 0, 0, 0.55);
 }
 
-.public-networks-card__status--prototype {
+.public-networks-card__state-hero.public-networks-card__status--listed {
+  color: rgba(0, 0, 0, 0.62);
+}
+
+.public-networks-card__state-hero.public-networks-card__status--prototype {
   color: #4a5568;
-  border-color: rgba(74, 85, 104, 0.22);
-  background: rgba(74, 85, 104, 0.08);
 }
 
 .public-networks-card__meta {
@@ -253,7 +246,7 @@ html[data-theme="dark"] .landing-entry-shelf {
   flex-wrap: wrap;
   align-items: center;
   gap: 6px 10px;
-  margin: 8px 0 0;
+  margin: 6px 0 0;
   font-size: 13px;
   line-height: 1.35;
 }
@@ -287,9 +280,10 @@ html[data-theme="dark"] .landing-entry-shelf {
 }
 
 .public-networks-card__summary {
-  margin: 8px 0 0;
-  font-size: 15px;
+  margin: 12px 0 0;
+  font-size: 14px;
   line-height: 1.45;
+  color: var(--text-muted, rgba(0, 0, 0, 0.62));
 }
 
 .public-networks-card__actions {
@@ -297,7 +291,7 @@ html[data-theme="dark"] .landing-entry-shelf {
   flex-wrap: wrap;
   align-items: center;
   gap: 10px;
-  margin-top: 14px;
+  margin-top: 12px;
 }
 
 .public-networks-card__cta {
@@ -339,5 +333,22 @@ html[data-theme="dark"] .public-networks-card__schematic {
 
 html[data-theme="dark"] .public-networks-loading,
 html[data-theme="dark"] .public-networks-empty {
+  color: rgba(255, 255, 255, 0.62);
+}
+
+html[data-theme="dark"] .public-networks-card__state-hero.public-networks-card__status--live {
+  color: #6ee7a8;
+}
+
+html[data-theme="dark"] .public-networks-card__state-hero.public-networks-card__status--soon {
+  color: #f5d565;
+}
+
+html[data-theme="dark"] .public-networks-card__state-hero.public-networks-card__status--ended,
+html[data-theme="dark"] .public-networks-card__state-hero.public-networks-card__status--listed {
+  color: rgba(255, 255, 255, 0.62);
+}
+
+html[data-theme="dark"] .public-networks-card__summary {
   color: rgba(255, 255, 255, 0.62);
 }
