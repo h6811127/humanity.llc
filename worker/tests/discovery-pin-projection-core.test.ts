@@ -85,6 +85,20 @@ describe("discovery-pin-projection-core", () => {
     ).toBeNull();
   });
 
+  it("skips object-level delisted nodes before emitting public pins", () => {
+    const node = {
+      node_id: "x4",
+      object_id: "obj_x4",
+      object_type: "game_node",
+      label: "Quiet checkpoint",
+      role: "relay_gate",
+      public_listing: { listed: false },
+    };
+
+    expect(isNodeDiscoveryIndexable(node)).toBe(false);
+    expect(projectDiscoveryPinFromSeasonNode(node, "cedar-rapids-iowa", "v1")).toBeNull();
+  });
+
   it("delisted season omits network_ids on pins", () => {
     const delisted = {
       ...season,

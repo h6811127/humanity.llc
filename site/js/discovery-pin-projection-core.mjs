@@ -163,7 +163,7 @@ export function selectPrimaryObjectId(pin, opts = {}) {
  * @returns {DiscoveryPin | null}
  */
 export function projectDiscoveryPinFromSeasonNode(node, region, indexVersion, opts = {}) {
-  if (!isNodeDiscoveryIndexable(node, { objectListed: true })) return null;
+  if (!isNodeDiscoveryIndexable(node)) return null;
 
   const entryId = String(node.node_id ?? "").trim();
   const objectId = String(node.object_id ?? "").trim();
