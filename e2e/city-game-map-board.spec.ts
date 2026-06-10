@@ -95,7 +95,8 @@ test.describe("city game map board", () => {
     await expect(board).toBeVisible({ timeout: 15_000 });
     await expect(page.locator(".city-game-map-loading")).toHaveCount(0);
     await expect(page.getByRole("heading", { level: 1 })).toContainText(/wake the city/i);
-    await expect(page.getByRole("link", { name: "Rules", exact: true })).toBeVisible();
+    await expect(page.getByRole("link", { name: "About this network" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Full rules" })).toBeVisible();
 
     await expect(board.getByText("Help wake the city.")).toBeVisible();
     await expect(board.locator("#city-game-map-progress")).toBeVisible();

@@ -1385,3 +1385,26 @@ html[data-theme="dark"] .city-game-map-board--place-selected .city-game-map-node
 html[data-theme="dark"] .city-game-map-board--place-selected .city-game-map-node-row--highlight:focus-visible {
   box-shadow: 0 0 0 2px rgba(255, 77, 109, 0.28);
 }
+
+/* SF-2 state-first node row band — dark contrast */
+html[data-theme="dark"] .city-game-map-node-row {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+html[data-theme="dark"] .city-game-map-node-meta {
+  color: rgba(235, 235, 245, 0.62);
+}
+
+html[data-theme="dark"] .city-game-map-node-row .city-game-map-node-card-label {
+  color: rgba(235, 235, 245, 0.45);
+}
+
+html[data-theme="dark"] .city-game-map-node-row--state-first .city-game-map-node-card-state .city-game-map-node-effect,
+html[data-theme="dark"] .city-game-map-node-row .city-game-map-node-card-line .city-game-map-node-effect {
+  color: rgba(235, 235, 245, 0.92);
+}
+
+html[data-theme="dark"] .city-game-map-node-row--maintenance {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.18);
+}

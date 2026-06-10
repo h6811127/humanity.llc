@@ -94,11 +94,22 @@ describe("city-game-map-node-card-core", () => {
 
   it("board shell renders card slots for node_04", () => {
     const html = buildMapBoardInnerHtml(season);
-    expect(html).toContain('data-node-id="node_04"');
-    expect(html).toContain("data-node-card-what");
-    expect(html).toContain("data-node-card-why");
-    expect(html).toContain("data-node-card-scan");
-    expect(html).toContain("Clue drop — signals here count toward shared city progress.");
-    expect(html).toContain("Scan can add one signal; the board updates for the whole city.");
+    const rowMatch = html.match(
+      /<li class="city-game-map-node-row[^"]*"[^>]*data-node-id="node_04"[\s\S]*?<\/li>/
+    );
+    expect(rowMatch).toBeTruthy();
+    const node04 = rowMatch?.[0] ?? "";
+    expect(node04).toContain("data-node-card-what");
+    expect(node04).toContain("data-node-card-why");
+    expect(node04).toContain("data-node-card-scan");
+    expect(node04).toContain("Current state");
+    expect(node04).not.toContain(">Why go<");
+    expect(node04).toContain("Clue drop — signals here count toward shared city progress.");
+    expect(node04).toContain("Scan can add one signal; the board updates for the whole city.");
+    const state = node04.indexOf('data-state-first="current-state"');
+    const details = node04.indexOf('data-state-first="details"');
+    expect(state).toBeGreaterThan(-1);
+    expect(details).toBeGreaterThan(state);
+    expect(node04.indexOf("data-node-effect")).toBeLessThan(node04.indexOf("data-node-card-what"));
   });
 });

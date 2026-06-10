@@ -259,6 +259,85 @@ describe("city-game map snapshot core", () => {
     expect(lockedRow.el.dataset.routeLocked).toBe("true");
   });
 
+  it("applySnapshotToMapBoard preserves state-first selectors on node rows", () => {
+    if (typeof globalThis.HTMLElement === "undefined") {
+      globalThis.HTMLElement = class HTMLElement {} as typeof HTMLElement;
+    }
+
+    const effectEl = new HTMLElement();
+    effectEl.textContent = "Static consequence";
+    const liveEl = new HTMLElement();
+    liveEl.innerHTML = '<span class="city-game-map-live-hint">Scan sticker there</span>';
+
+    const rowClasses = new Set<string>();
+    const rowAttrs = new Map([
+      ["data-node-id", "node_04"],
+      ["data-role", "temp_drop"],
+      ["data-board-visibility", "public"],
+      ["data-board-states", "live"],
+    ]);
+    const row = {
+      hidden: false,
+      getAttribute(name: string) {
+        return rowAttrs.get(name) ?? null;
+      },
+      setAttribute(name: string, value: string) {
+        rowAttrs.set(name, value);
+      },
+      classList: {
+        add(cls: string) {
+          rowClasses.add(cls);
+        },
+        remove(cls: string) {
+          rowClasses.delete(cls);
+        },
+        toggle(cls: string, on?: boolean) {
+          if (on) rowClasses.add(cls);
+          else rowClasses.delete(cls);
+        },
+      },
+      querySelector(sel: string) {
+        if (sel === "[data-node-effect]") return effectEl;
+        if (sel === ".city-game-map-node-live") return liveEl;
+        if (sel === ".city-game-map-node-title") return null;
+        return null;
+      },
+    };
+
+    const boardRoot = {
+      dataset: { rumoredNodes: "", primaryNode: "node_04" },
+      querySelectorAll(selector: string) {
+        if (selector === ".city-game-map-node-row[data-node-id]") return [row];
+        if (selector === ".city-game-map-pin[data-node-id]") return [];
+        return [];
+      },
+      querySelector() {
+        return null;
+      },
+    };
+
+    applySnapshotToMapBoard(/** @type {HTMLElement} */ (boardRoot), {
+      map_visibility: "public",
+      generated_at: "2026-06-07T18:00:00.000Z",
+      nodes: [
+        {
+          node_id: "node_04",
+          label: "Riverwalk River Lantern",
+          scan_url: "https://humanity.llc/c/test?q=qr_04",
+          chips: [{ kind: "collective", label: "City progress", value: "14 / 20" }],
+          lifecycle: "active",
+        },
+      ],
+      unlock_edges: [],
+    });
+
+    expect(effectEl.textContent).toContain("14 / 20");
+    expect(liveEl.innerHTML).toContain("city-game-map-scan-link");
+    expect(liveEl.innerHTML).toContain("https://humanity.llc/c/test?q=qr_04");
+    expect(rowClasses.has("city-game-map-node-row--live")).toBe(true);
+    expect(rowAttrs.get("data-board-visibility")).toBe("public");
+  });
+
   it("empty snapshot fog keeps schematic pins visible and hittable (RC1)", () => {
     expect(isSchematicPinFogged("node_04", null)).toBe(true);
     expect(isSchematicPinFogged("node_04", { chips: [] })).toBe(false);

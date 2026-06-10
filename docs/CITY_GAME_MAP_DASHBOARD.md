@@ -347,6 +347,7 @@ When launch surfaces market a **live** city board (`#city-state` + live chips co
 
 | Gate | Status | Date |
 |------|--------|------|
+| SF-2 state-first node rows (engineering + visual QA) | ☑ Complete | 2026-06-10 |
 | B13 privacy review (snapshot JSON shape + no visit/player fields) | ☐ Pending | |
 
 **Engineering:** `npm run city-game:map-board-b13-preflight` (B14 + GT-7 log + row above)  
@@ -360,4 +361,5 @@ When launch surfaces market a **live** city board (`#city-state` + live chips co
 |------|-------|
 | 2026-06-02 | **M2–M3 shipped** — snapshot API, live chips, headline ticker, launch-surfaces board links, GT-7 comprehension kit |
 | 2026-06-02 | **M1 shipped** — `map_layout` + `map_copy` in season JSON; `/play/cedar-rapids/#city-state`; `site/js/city-game-map-board*.mjs`; `verify:city-game` layout tests |
+| 2026-06-10 | **SF-2 visually complete** — state-first node rows + dark-theme contrast; ready for B13 human sign-off (`city-game:map-board-b13-preflight`) |
 | 2026-06-02 | Initial canonical plan — M1 static / M2 snapshot / M3 headlines; policy boundaries; API sketch; risks R-19–R-20, gates B13–B15 |

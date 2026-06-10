@@ -195,6 +195,35 @@ describe("city-game map board render", () => {
     expect(html).not.toContain("node_04 ·");
     expect(html).not.toContain("Live count loading");
     expect(html).not.toContain("River Lantern tracks one shared city count.");
+    expect(html).toContain("city-game-map-node-row--state-first");
+    expect(html).toContain('data-state-first="entity"');
+    expect(html).toContain('data-state-first="current-state"');
+    expect(html).toContain('data-state-first="actions"');
+    expect(html).toContain('data-state-first="details"');
+    expect(html).toContain("Current state");
+    expect(html).not.toContain(">Why go<");
+  });
+
+  it("state-first node row DOM order: entity → state → actions → details", () => {
+    const html = buildMapBoardInnerHtml(season);
+    const rowMatch = html.match(
+      /<li class="city-game-map-node-row[^"]*"[^>]*data-node-id="node_04"[\s\S]*?<\/li>/
+    );
+    expect(rowMatch).toBeTruthy();
+    const node04 = rowMatch?.[0] ?? "";
+    const entity = node04.indexOf('data-state-first="entity"');
+    const state = node04.indexOf('data-state-first="current-state"');
+    const actions = node04.indexOf('data-state-first="actions"');
+    const details = node04.indexOf('data-state-first="details"');
+    const what = node04.indexOf("data-node-card-what");
+    const effect = node04.indexOf("data-node-effect");
+    const scanCta = node04.indexOf("Find this drop");
+    expect(entity).toBeGreaterThan(-1);
+    expect(state).toBeGreaterThan(entity);
+    expect(actions).toBeGreaterThan(state);
+    expect(details).toBeGreaterThan(actions);
+    expect(effect).toBeLessThan(what);
+    expect(scanCta).toBeLessThan(what);
   });
 });
 

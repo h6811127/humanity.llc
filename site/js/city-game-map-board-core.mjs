@@ -1176,15 +1176,17 @@ export function buildMapNodeListHtml(season, launchCopy = resolveLaunchCopy(seas
             staticVisibility === "clue"
               ? ""
               : `<a class="city-game-map-maps-link city-game-map-maps-link--secondary" href="${escapeMapHtml(mapsUrl)}" target="_blank" rel="noopener noreferrer">Open in Maps</a>`;
-          return `<li class="city-game-map-node-row${spotlightClass}${clueClass}${omittedClass}" data-node-id="${escapeMapHtml(nodeId)}" data-district="${escapeMapHtml(row.district ?? "")}" data-role="${role}" data-board-visibility="${boardVisibility}" data-board-states="${escapeMapHtml(boardStates)}" tabindex="0"${omittedAttr}>
-  <span class="city-game-map-node-title">${escapeMapHtml(title)}</span>
-  <span class="city-game-map-node-meta">${escapeMapHtml(districtLabel)} · ${escapeMapHtml(roleLabel)}</span>
-  ${cardSlotsHtml}
-  <p class="city-game-map-node-card-line city-game-map-node-card-why"><span class="city-game-map-node-card-label">Why go</span><span class="city-game-map-node-effect city-game-map-node-card-text" data-node-effect data-node-card-why>${escapeMapHtml(consequenceLine)}</span></p>
-  <span class="city-game-map-node-actions">
+          return `<li class="city-game-map-node-row city-game-map-node-row--state-first${spotlightClass}${clueClass}${omittedClass}" data-node-id="${escapeMapHtml(nodeId)}" data-district="${escapeMapHtml(row.district ?? "")}" data-role="${role}" data-board-visibility="${boardVisibility}" data-board-states="${escapeMapHtml(boardStates)}" tabindex="0"${omittedAttr}>
+  <div class="city-game-map-node-identity" data-state-first="entity">
+    <span class="city-game-map-node-title">${escapeMapHtml(title)}</span>
+    <span class="city-game-map-node-meta">${escapeMapHtml(districtLabel)} · ${escapeMapHtml(roleLabel)}</span>
+  </div>
+  <p class="city-game-map-node-card-line city-game-map-node-card-state city-game-map-node-card-why" data-state-first="current-state"><span class="city-game-map-node-card-label">Current state</span><span class="city-game-map-node-effect city-game-map-node-card-text" data-node-effect data-node-card-why>${escapeMapHtml(consequenceLine)}</span></p>
+  <span class="city-game-map-node-actions" data-state-first="actions">
     <span class="city-game-map-node-live">${primaryCta}</span>
     ${mapsLink}
   </span>
+  <div class="city-game-map-node-details" data-state-first="details">${cardSlotsHtml}</div>
 </li>`;
         })
         .join("");

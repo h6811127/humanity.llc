@@ -12625,6 +12625,12 @@ body.device-shell-created .flow-keys-group .list-row {
   -webkit-tap-highlight-color: transparent;
 }
 
+.city-game-map-node-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .city-game-map-node-row:focus {
   outline: none;
 }
@@ -12730,6 +12736,32 @@ body.device-shell-created .flow-keys-group .list-row {
   color: rgba(0, 0, 0, 0.76);
 }
 
+.city-game-map-node-row--state-first .city-game-map-node-card-line.city-game-map-node-card-state {
+  margin: 6px 0 0;
+}
+
+.city-game-map-node-row--state-first .city-game-map-node-card-state .city-game-map-node-card-label {
+  white-space: nowrap;
+}
+
+.city-game-map-node-row--state-first .city-game-map-node-card-state .city-game-map-node-effect {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.84);
+}
+
+.city-game-map-node-row--state-first .city-game-map-node-actions {
+  margin-top: 8px;
+}
+
+.city-game-map-node-details {
+  margin-top: 8px;
+}
+
+.city-game-map-node-details:empty {
+  display: none;
+}
+
 .city-game-map-node-tags {
   display: flex;
   flex-wrap: wrap;
@@ -12778,7 +12810,7 @@ body.device-shell-created .flow-keys-group .list-row {
 }
 
 .city-game-map-node-card-line.city-game-map-node-card-why {
-  margin-top: 4px;
+  margin-top: 0;
 }
 
 .city-game-map-node-card-line .city-game-map-node-effect {
