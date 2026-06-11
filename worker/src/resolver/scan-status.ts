@@ -1,5 +1,6 @@
 import { loadScanContext, type ScanContext } from "../db/scan";
 import { checkCardResolutionRateLimit, hashIp } from "../db/rate-limit";
+import { resolveSeasonForProfile } from "../city-game/season-loader";
 import { PROFILE_ID_REGEX } from "../crypto";
 import { jsonResponseWithWeakEtag } from "../http/conditional-json";
 import {
@@ -51,6 +52,11 @@ import {
 import { AI_EXPLAIN_ENDPOINT } from "./ai-explain-snapshot";
 
 export { BEARER_WARNING };
+
+type ScanStatusGameEnv = {
+  CITY_GAME_ENABLED?: string;
+  CITY_GAME_LOCAL_PLAY_OPEN?: string;
+};
 
 export interface ScanStatusBody {
   version: string;
@@ -258,7 +264,8 @@ export { httpStatusForScanKind };
 export async function handleGetScanStatus(
   request: Request,
   db: D1Database,
-  profileId: string
+  profileId: string,
+  env: ScanStatusGameEnv = {}
 ): Promise<Response> {
   const ipHash = await hashIp(clientIp(request));
   const rate = await checkCardResolutionRateLimit(db, ipHash);
@@ -306,7 +313,15 @@ export async function handleGetScanStatus(
       );
     }
     const ctx = await loadScanContext(db, profileId, qrId);
-    const vm = buildScanViewModel(profileId, qrId, ctx, origin);
+    const now = new Date();
+    const season = resolveSeasonForProfile(profileId) ?? undefined;
+    const vm = buildScanViewModel(profileId, qrId, ctx, origin, now, {
+      env: {
+        CITY_GAME_ENABLED: env.CITY_GAME_ENABLED,
+        CITY_GAME_LOCAL_PLAY_OPEN: env.CITY_GAME_LOCAL_PLAY_OPEN,
+      },
+      season,
+    });
     return guardScanResponse(request, await statusResponse(request, vm));
   }
 
