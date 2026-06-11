@@ -161,6 +161,53 @@ describe("scan trust network (WS-REALITY)", () => {
     expect(trust!.doesNotProve.some((line) => line.includes("people trail"))).toBe(true);
   });
 
+  it("uses care-pause trust proof instead of game bulletin claims", () => {
+    const season = defaultSeason();
+    const trust = composeScanTrustContext({
+      gameNode: {
+        enabled: true,
+        mode: "game",
+        seasonId: "cr_season_01_wake",
+        nodeId: "node_14",
+        nodeRole: "care_loop",
+        district: "downtown",
+        gameMeta: {
+          visible_until: null,
+          compromised: false,
+          collective_progress: null,
+          collective_target: null,
+          unlocked_by: [],
+          vouch_requires: [],
+          vouch_active_for: [],
+          scarcity_remaining: null,
+          fragment_id: null,
+        },
+        coopHint: null,
+        showsPledge: false,
+        pledgeFaction: null,
+        roleEyebrow: "Downtown · Care loop",
+        showsContribute: false,
+        contributeMode: null,
+        contributeSiteCodePlaceholder: null,
+        vouchGate: null,
+        seasonWindowPhase: "open",
+      },
+      childObjectType: "game_node",
+      objectStreams: [
+        { id: "bulletin", class: "narrative", label: "Bulletin", value: "Game copy muted" },
+        { id: "care", class: "care", label: "Maintenance", value: "Closed for repair" },
+      ],
+      season,
+      streamPolicyPhase: "care_pause",
+    });
+
+    expect(trust).not.toBeNull();
+    expect(trust!.proves.some((line) => line.includes("Care stream wins"))).toBe(true);
+    expect(trust!.proves.some((line) => line.includes("Signed game bulletins"))).toBe(false);
+    expect(trust!.signedBy.some((row) => row.stream === "Game")).toBe(true);
+    expect(trust!.signedBy.some((row) => row.stream === "Care")).toBe(true);
+  });
+
   it("renders four trust modules on game node scan HTML", async () => {
     const vm = buildScanViewModel(
       PROFILE,
