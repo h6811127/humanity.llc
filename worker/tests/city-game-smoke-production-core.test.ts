@@ -7,6 +7,7 @@ import {
   launchChecklistE5Signed,
   LAUNCH_CHECKLIST_E5_PENDING,
   parseProductionSmokeSignOffArgs,
+  resolveProductionSmokeSeed,
   resolveProductionSmokeSignOffResult,
   selectProductionSmokeNodes,
   spotExpectationsForProductionProbe,
@@ -121,6 +122,56 @@ ${LAUNCH_CHECKLIST_E5_PENDING}`;
     const c4 = assessProductionSmokePreflight({ productionSeed: null, season });
     expect(c4.ready).toBe(true);
     expect(c4.seedSource).toBe("season-json");
+  });
+
+  it("keeps only season JSON scan URLs aligned to the production root", () => {
+    const seed = resolveProductionSmokeSeed(null, {
+      season_root_profile_id: "GcP3Ee17yGqMHdidhEVMYBzq",
+      nodes: [
+        {
+          node_id: "node_04",
+          label: "Old root relay",
+          scan_url: "https://humanity.llc/c/CEenC57QN9qqnr2x5L89cbWt?q=qr_old",
+        },
+        {
+          node_id: "node_07",
+          label: "Current root relay",
+          scan_url: "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_new",
+        },
+      ],
+    });
+
+    expect(seed).toEqual({
+      profile_id: "GcP3Ee17yGqMHdidhEVMYBzq",
+      nodes: [
+        {
+          node_id: "node_07",
+          public_label: "Current root relay",
+          scan_url: "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_new",
+        },
+      ],
+    });
+  });
+
+  it("blocks preflight when every season JSON scan URL points at a stale root", () => {
+    const c4 = assessProductionSmokePreflight({
+      productionSeed: null,
+      season: {
+        season_root_profile_id: "GcP3Ee17yGqMHdidhEVMYBzq",
+        nodes: [
+          {
+            node_id: "node_04",
+            label: "Old root relay",
+            scan_url: "https://humanity.llc/c/CEenC57QN9qqnr2x5L89cbWt?q=qr_old",
+          },
+        ],
+      },
+    });
+
+    expect(c4.ready).toBe(false);
+    expect(c4.seedSource).toBe("none");
+    expect(c4.nodeCount).toBe(0);
+    expect(c4.issues[0]).toContain("Missing production scan URLs");
   });
 
   it("expects dormant for any node when season window is pre-launch (--all)", () => {
