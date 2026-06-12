@@ -1,4 +1,4 @@
-import { loadScanContext, type ScanContext } from "../db/scan";
+import type { ScanContext } from "../db/scan";
 import { checkCardResolutionRateLimit, hashIp } from "../db/rate-limit";
 import { PROFILE_ID_REGEX } from "../crypto";
 import { jsonResponseWithWeakEtag } from "../http/conditional-json";
@@ -12,13 +12,16 @@ import {
 } from "../http/resolver";
 import {
   buildCardOnlyScanViewModel,
-  buildScanViewModel,
   httpStatusForScanKind,
   malformedScanView,
   QR_ID_REGEX,
   type ScanPageKind,
   type ScanViewModel,
 } from "./scan-state";
+import {
+  buildScanViewModelWithContext,
+  type ScanCompositionEnv,
+} from "./scan-compose";
 import {
   governanceProcessUrls,
   originFromScanUrl,
@@ -257,11 +260,11 @@ export { httpStatusForScanKind };
  */
 export async function handleGetScanStatus(
   request: Request,
-  db: D1Database,
+  env: { DB: D1Database } & ScanCompositionEnv,
   profileId: string
 ): Promise<Response> {
   const ipHash = await hashIp(clientIp(request));
-  const rate = await checkCardResolutionRateLimit(db, ipHash);
+  const rate = await checkCardResolutionRateLimit(env.DB, ipHash);
   if (!rate.allowed) {
     return errorResponse(
       "RATE_LIMITED",
@@ -305,12 +308,19 @@ export async function handleGetScanStatus(
         await statusResponse(request, malformedScanView(profileId, qrId, origin))
       );
     }
-    const ctx = await loadScanContext(db, profileId, qrId);
-    const vm = buildScanViewModel(profileId, qrId, ctx, origin);
+    const now = new Date();
+    const { vm } = await buildScanViewModelWithContext(
+      env.DB,
+      profileId,
+      qrId,
+      origin,
+      now,
+      env
+    );
     return guardScanResponse(request, await statusResponse(request, vm));
   }
 
-  const card = await db
+  const card = await env.DB
     .prepare(
       `SELECT profile_id, public_key, handle, handle_normalized, manifesto_line,
               status, card_document_json, created_at, updated_at
@@ -321,7 +331,7 @@ export async function handleGetScanStatus(
 
   let verification: ScanContext["verification"] = null;
   if (card) {
-    verification = await db
+    verification = await env.DB
       .prepare(
         `SELECT profile_id, state, level, label, method, vouch_count,
                 latest_accepted_vouch_at, credential_ids_json, summary_document_json,

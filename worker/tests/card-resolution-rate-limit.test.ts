@@ -54,7 +54,7 @@ describe("card resolution rate limit (O2 step 1)", () => {
 
       const res = await handleGetScanStatus(
         new Request(url, { headers: { "CF-Connecting-IP": ip } }),
-        database,
+        { DB: database },
         "7Xk9mP2nQ4rT6vW8yZ1aB3cD5"
       );
       expect(res.status).toBe(429);

@@ -1,8 +1,13 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import worker from "../src";
 import type { ScanContext } from "../src/db/scan";
-import type { CardRow, QrCredentialRow, VerificationSummaryRow } from "../src/db/types";
+import type {
+  CardRow,
+  ChildObjectRow,
+  QrCredentialRow,
+  VerificationSummaryRow,
+} from "../src/db/types";
 import {
   BEARER_WARNING,
   httpStatusForScanKind,
@@ -16,9 +21,13 @@ import {
   malformedScanView,
 } from "../src/resolver/scan-state";
 import { d1WithRateLimitBuckets } from "./rate-limit-db-mock";
+import { CITY_GAME_SEASON_ROOT_PROFILE } from "./city-game-fixture-profile";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const QR = "qr_7Xk9mP2nQ4rT6vW8";
+const GAME_PROFILE = CITY_GAME_SEASON_ROOT_PROFILE;
+const GAME_QR = "qr_7Xk9mP2nQ4rT6vW9";
+const GAME_OBJECT_ID = "obj_cr_node_04_river";
 
 function card(overrides: Partial<CardRow> = {}): CardRow {
   return {
@@ -69,7 +78,57 @@ function summary(): VerificationSummaryRow {
   };
 }
 
+function gameChildDocument(overrides: Record<string, unknown> = {}) {
+  return JSON.stringify({
+    object_id: GAME_OBJECT_ID,
+    parent_profile_id: GAME_PROFILE,
+    object_type: "game_node",
+    public_label: "Riverwalk River Lantern",
+    public_state: "Signal count is rising",
+    status: "active",
+    season_id: "cr_season_01_wake",
+    node_role: "temp_drop",
+    district: "river_spine",
+    object_streams: [
+      { id: "territory", class: "place", label: "Place", value: "River spine" },
+      { id: "bulletin", class: "narrative", label: "Bulletin", value: "Awaiting season signal" },
+    ],
+    game_meta: {
+      visible_until: null,
+      compromised: false,
+      collective_progress: 1,
+      collective_target: 3,
+      unlocked_by: [],
+      vouch_requires: [],
+      vouch_active_for: [],
+      scarcity_remaining: null,
+      fragment_id: null,
+    },
+    created_at: "2026-06-01T12:00:00.000Z",
+    updated_at: "2026-06-01T12:05:00.000Z",
+    ...overrides,
+  });
+}
+
+function gameChildRow(): ChildObjectRow {
+  return {
+    object_id: GAME_OBJECT_ID,
+    parent_profile_id: GAME_PROFILE,
+    object_type: "game_node",
+    public_label: "Riverwalk River Lantern",
+    public_state: "Signal count is rising",
+    status: "active",
+    child_object_document_json: gameChildDocument(),
+    created_at: "2026-06-01T12:00:00.000Z",
+    updated_at: "2026-06-01T12:05:00.000Z",
+  };
+}
+
 describe("scan status JSON (M3.4)", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it("active scan with ?q matches scan view model kind and bearer limits", () => {
     const vm = buildScanViewModel(
       PROFILE,
@@ -290,7 +349,7 @@ describe("scan status JSON (M3.4)", () => {
     }));
     const res = await handleGetScanStatus(
       new Request("https://humanity.llc/.well-known/hc/v1/cards/not-valid/status?q=bad"),
-      db,
+      { DB: db },
       "not-valid"
     );
     const json = (await res.json()) as { scan: { kind: string }; hint?: string };
@@ -345,14 +404,14 @@ describe("scan status JSON (M3.4)", () => {
 
     const { handleGetScanStatus } = await import("../src/resolver/scan-status");
     const url = `https://humanity.llc/.well-known/hc/v1/cards/${PROFILE}/status?q=${QR}`;
-    const first = await handleGetScanStatus(new Request(url), db, PROFILE);
+    const first = await handleGetScanStatus(new Request(url), { DB: db }, PROFILE);
     const etag = first.headers.get("ETag");
     expect(first.status).toBe(200);
     expect(etag).toBeTruthy();
 
     const second = await handleGetScanStatus(
       new Request(url, { headers: { "If-None-Match": etag! } }),
-      db,
+      { DB: db },
       PROFILE
     );
     expect(second.status).toBe(304);
@@ -377,5 +436,59 @@ describe("scan status JSON (M3.4)", () => {
     expect(res.headers.get("Access-Control-Allow-Origin")).toBe(
       "http://localhost:8788"
     );
+  });
+
+  it("GET status through worker.fetch composes enabled city-game node capabilities", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-06-12T16:00:00.000Z"));
+
+    const gameCard = card({
+      profile_id: GAME_PROFILE,
+      handle: "season_root",
+      handle_normalized: "season_root",
+      manifesto_line: "Wake the city",
+    });
+    const gameQr = qr({
+      qr_id: GAME_QR,
+      profile_id: GAME_PROFILE,
+      scope: "child_object",
+      object_id: GAME_OBJECT_ID,
+      payload: `https://humanity.llc/c/${GAME_PROFILE}?q=${GAME_QR}`,
+      expires_at: null,
+    });
+    const gameVerification = { ...summary(), profile_id: GAME_PROFILE };
+    const child = gameChildRow();
+    const db = d1WithRateLimitBuckets((sql: string) => ({
+      bind: () => ({
+        first: async () => {
+          if (sql.includes("FROM cards")) return gameCard;
+          if (sql.includes("FROM qr_credentials")) return gameQr;
+          if (sql.includes("FROM child_objects")) return child;
+          if (sql.includes("verification_summaries")) return gameVerification;
+          return null;
+        },
+        run: async () => ({ meta: { changes: 0 } }),
+      }),
+    }));
+
+    const res = await worker.fetch(
+      new Request(
+        `https://humanity.llc/.well-known/hc/v1/cards/${GAME_PROFILE}/status?q=${GAME_QR}`
+      ),
+      { DB: db, CITY_GAME_ENABLED: "1" } as import("../src").Env,
+      { waitUntil: () => {} } as ExecutionContext
+    );
+    const body = (await res.json()) as {
+      scan: {
+        capabilities?: Array<{ verb: string; available: boolean; kind?: string }>;
+      };
+    };
+
+    expect(res.status).toBe(200);
+    expect(body.scan.capabilities).toContainEqual({
+      verb: "contribute",
+      available: true,
+      kind: "game_quorum",
+    });
   });
 });

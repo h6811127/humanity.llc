@@ -585,7 +585,7 @@ export default {
           jsonResponse({ error: "database_unconfigured" }, 503)
         );
       }
-      const res = await handleGetScanStatus(request, env.DB, statusMatch[1]!);
+      const res = await handleGetScanStatus(request, env, statusMatch[1]!);
       return withCors(request, res);
     }
 
