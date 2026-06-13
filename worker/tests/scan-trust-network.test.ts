@@ -5,6 +5,7 @@ import { composeScanTrustContext } from "../src/resolver/scan-trust-compose";
 import { buildScanViewModel } from "../src/resolver/scan-state";
 import { defaultSeason } from "../src/city-game/season-loader";
 import { SCAN_LIMITS_DISCLOSURE_TITLE } from "../../site/js/device-ownership-copy-core.mjs";
+import type { GameNodeScanContext } from "../src/city-game/scan-view";
 import type { CardRow, ChildObjectRow, QrCredentialRow, VerificationSummaryRow } from "../src/db/types";
 
 import { CITY_GAME_SEASON_ROOT_PROFILE } from "./city-game-fixture-profile";
@@ -111,6 +112,40 @@ function summary(): VerificationSummaryRow {
   };
 }
 
+function gameNodeContext(
+  overrides: Partial<GameNodeScanContext> = {}
+): GameNodeScanContext {
+  return {
+    enabled: true,
+    mode: "game",
+    seasonId: "cr_season_01_wake",
+    nodeId: "node_04",
+    nodeRole: "temp_drop",
+    district: "river_spine",
+    gameMeta: {
+      visible_until: null,
+      compromised: false,
+      collective_progress: 8,
+      collective_target: 20,
+      unlocked_by: [],
+      vouch_requires: [],
+      vouch_active_for: [],
+      scarcity_remaining: null,
+      fragment_id: null,
+    },
+    coopHint: null,
+    showsPledge: false,
+    pledgeFaction: null,
+    roleEyebrow: "River spine · Temp drop",
+    showsContribute: true,
+    contributeMode: "collective",
+    contributeSiteCodePlaceholder: "RIVER-04",
+    vouchGate: null,
+    seasonWindowPhase: "open",
+    ...overrides,
+  };
+}
+
 describe("scan trust network (WS-REALITY)", () => {
   it("composes charter fragment and signer rows for game node", () => {
     const season = defaultSeason();
@@ -159,6 +194,61 @@ describe("scan trust network (WS-REALITY)", () => {
     expect(trust!.signedBy.some((row) => row.stream === "Care")).toBe(true);
     expect(trust!.proves.some((line) => line.includes("Collective progress"))).toBe(true);
     expect(trust!.doesNotProve.some((line) => line.includes("people trail"))).toBe(true);
+  });
+
+  it("surfaces care precedence without claiming scheduled game bulletins", () => {
+    const trust = composeScanTrustContext({
+      gameNode: gameNodeContext(),
+      childObjectType: "game_node",
+      objectStreams: [
+        { id: "bulletin", class: "narrative", label: "Bulletin", value: "Share outward" },
+        { id: "care", class: "care", label: "Site", value: "Closed for flood cleanup" },
+      ],
+      season: defaultSeason(),
+      streamPolicyPhase: "care_pause",
+    });
+
+    expect(trust).not.toBeNull();
+    expect(trust!.signedBy.some((row) => row.stream === "Game")).toBe(true);
+    expect(trust!.signedBy.some((row) => row.stream === "Care")).toBe(true);
+    expect(trust!.proves).toContain(
+      "Care stream wins while maintenance is live — safety truth beats game bulletins"
+    );
+    expect(trust!.proves).toContain(
+      "Care or maintenance lines signed by place stewards when shown"
+    );
+    expect(trust!.proves).not.toContain(
+      "Signed game bulletins published under season operator rules"
+    );
+  });
+
+  it("omits the trust block for scans outside a season network", () => {
+    const season = defaultSeason();
+
+    expect(
+      composeScanTrustContext({
+        gameNode: null,
+        childObjectType: "status_plate",
+        objectStreams: [],
+        season,
+      })
+    ).toBeNull();
+    expect(
+      composeScanTrustContext({
+        gameNode: gameNodeContext({ seasonId: null }),
+        childObjectType: "game_node",
+        objectStreams: [],
+        season,
+      })
+    ).toBeNull();
+    expect(
+      composeScanTrustContext({
+        gameNode: gameNodeContext({ enabled: false }),
+        childObjectType: "status_plate",
+        objectStreams: [],
+        season,
+      })
+    ).toBeNull();
   });
 
   it("renders four trust modules on game node scan HTML", async () => {
