@@ -10,10 +10,11 @@
 import { spawnSync } from "node:child_process";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { resolveWsLiveVerifyMode } from "./ws-live-verify-core.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const argv = process.argv.slice(2);
-const fast = argv.includes("--fast") || !argv.includes("--full");
+const { fast } = resolveWsLiveVerifyMode(argv);
 
 /** @param {string} label @param {string[]} npmArgs */
 function step(label, npmArgs) {
