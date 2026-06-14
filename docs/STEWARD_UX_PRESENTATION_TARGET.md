@@ -24,7 +24,7 @@ This doc is the **canonical UX target** for what stewards should experience next
 - **Client steward state** model (wallet × session × room × `profile_id`) — testable  
 - **Architecture alignment**, risks, and open decisions (Q2–Q4)
 
-**Current UI gap:** Step 20 **slices 1–4** shipped (presentation policy, room switcher, add-vs-list, season create fork + honest beat). Still missing: five entry states, wear track chooser, season progressive checklist. Create deploy room isolation shipped; create flows may still branch on wallet mid-form. Implementation tracks remaining slices as **Step 20** (WS-QUALITY Q3+).
+**Current UI gap:** Step 20 **slices 1–7** shipped (presentation policy, room switcher, add-vs-list, season create fork + honest beat, five entry states, season checklist, wear track chooser, capability-driven scan templates). Create deploy room isolation shipped; remaining Step 20 work is comprehension proof and polish, not protocol change.
 
 ---
 
@@ -368,7 +368,7 @@ Slice 1 shipped add-hub filter only; **list policy** is slice 2+.
 | **4** | **Season create fork** + honest beat when organizer key added to deploy root | **Shipped** — `create-season-fork-core.mjs`, `steward-season-key-honest-beat-core.mjs` |
 | **5** | **Five entry states** — remove mid-form wallet branch on create; unlock-first screens | **Shipped** — `create-entry-state-core.mjs`, entry gate on `/create/` |
 | **6** | **Season progressive checklist**; wear track chooser; season id off create | **Shipped** — `created-season-progressive-checklist*.mjs`, `create-wear-track-chooser*.mjs`, season id on Live When panel |
-| **7** | Capability-driven scan templates per room | Planned |
+| **7** | Capability-driven scan templates per room | **Shipped** — `scan.capabilities[].read.kind` distinguishes `game_node` / `wear` from Doors/Card templates; `read.room` drives Season/Wear scan metadata |
 
 Defer full URL split (`/created/deploy/` etc.) until switcher + checklist prove comprehension on single `/created/`.
 
@@ -403,7 +403,7 @@ Defer full URL split (`/created/deploy/` etc.) until switcher + checklist prove 
 | “Not in this room” copy | Slices 2–3 (crosshint + list badges) | — |
 | Season checklist | Slice 6 shipped | — |
 | Five entry states | Slice 5 shipped | Mid-form wallet branching removed for deploy/wear/season redirect paths |
-| Capability-driven scan | L2 partial in resolver | Templates not fully room-aware |
+| Capability-driven scan | Slice 7 shipped | Comprehension proof still needed |
 
 **WS-QUALITY exit:** 5 steward comprehension sessions without “I thought it worked but…” on keys / room confusion — [`CORE_PRODUCT_LOOP.md`](CORE_PRODUCT_LOOP.md) Q3.
 

@@ -11,6 +11,13 @@ import type { ScanViewModel } from "../resolver/scan-state";
 import type { GameContributeMode } from "../city-game/unlock-engine";
 import { isCareStreamPaused } from "./stream-policy";
 
+export type ScanCapabilityRoom = "doors" | "season" | "wear" | "card";
+
+export type ScanReadKind =
+  | ScanHeroTemplate
+  | "game_node"
+  | "wear";
+
 export type ScanCapabilityVerb =
   | "read"
   | "request"
@@ -25,6 +32,8 @@ export type ScanCapability = {
   verb: ScanCapabilityVerb;
   available: boolean;
   kind?: string;
+  /** Step 20 presentation room for scanner-facing read templates. */
+  room?: ScanCapabilityRoom;
   reason?: string;
   state?: string;
   /** Trust stack rows below the hero — only on the `read` capability. */
@@ -83,15 +92,27 @@ export function shouldShowQrTrustGroup(
   return shouldShowTrustGroup(caps, "qr");
 }
 
-export function readHeroTemplate(caps: ScanCapability[]): ScanHeroTemplate | null {
+export function readHeroTemplate(caps: ScanCapability[]): ScanReadKind | null {
   const kind = findScanCapability(caps, "read")?.kind;
   if (
     kind === "status_plate" ||
     kind === "lost_item_relay" ||
     kind === "live_object" ||
-    kind === "personal_card"
+    kind === "personal_card" ||
+    kind === "game_node" ||
+    kind === "wear"
   ) {
     return kind;
+  }
+  return null;
+}
+
+export function readCapabilityRoom(
+  caps: ScanCapability[] | null | undefined
+): ScanCapabilityRoom | null {
+  const room = findScanCapability(caps ?? [], "read")?.room;
+  if (room === "doors" || room === "season" || room === "wear" || room === "card") {
+    return room;
   }
   return null;
 }
@@ -124,14 +145,40 @@ function readCapability(vm: ScanViewModel): ScanCapability {
     childPublicLabel: vm.childPublicLabel,
     childPublicState: vm.childPublicState,
   });
+  const kind = readKindForViewModel(vm, template);
+  const room = roomForReadKind(kind);
   const trust_groups = resolveTrustGroups(vm);
   return {
     verb: "read",
     available,
-    kind: template,
+    kind,
+    room,
     ...(trust_groups.length ? { trust_groups } : {}),
     ...(available ? {} : { reason: vm.kind }),
   };
+}
+
+function readKindForViewModel(
+  vm: ScanViewModel,
+  fallback: ScanHeroTemplate
+): ScanReadKind {
+  if (vm.gameNode?.enabled && vm.gameNode.mode !== "fallback") {
+    return "game_node";
+  }
+  if (
+    vm.qrScope === "print_artifact" &&
+    (fallback === "personal_card" || fallback === "live_object")
+  ) {
+    return "wear";
+  }
+  return fallback;
+}
+
+function roomForReadKind(kind: ScanReadKind): ScanCapabilityRoom {
+  if (kind === "game_node") return "season";
+  if (kind === "wear") return "wear";
+  if (kind === "personal_card") return "card";
+  return "doors";
 }
 
 function liveProofCapability(vm: ScanViewModel): ScanCapability | null {
