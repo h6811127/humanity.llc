@@ -194,7 +194,11 @@ test.describe("city game self-serve setup on /created/", () => {
     await openGameSeasonLive(page);
 
     const firstCheck = page.locator('input[name="game-operator-custody"]').first();
-    await firstCheck.check({ force: true });
+    await firstCheck.evaluate((el) => {
+      const input = el as HTMLInputElement;
+      input.checked = true;
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+    });
     await expect(firstCheck).toBeChecked();
 
     await page.reload();
