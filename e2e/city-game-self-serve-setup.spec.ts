@@ -193,6 +193,7 @@ test.describe("city game self-serve setup on /created/", () => {
     await seedGameSeasonControlSession(page, GAME_SEASON_ROOT);
     await openGameSeasonLive(page);
 
+    await page.locator("#child-object-game-node-setup summary").click();
     const firstCheck = page.locator('input[name="game-operator-custody"]').first();
     await firstCheck.check();
     await expect(firstCheck).toBeChecked();
