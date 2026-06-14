@@ -11,9 +11,14 @@
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  applySeasonRootSync,
+  shouldRefuseLocalSeasonRootSync,
+} from "./city-game-sync-season-root-core.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const useProduction = process.argv.includes("--production");
+const forceLocal = process.argv.includes("--force-local");
 const seedPath = join(
   root,
   useProduction
@@ -32,58 +37,33 @@ if (!existsSync(seedPath)) {
 }
 
 const seed = JSON.parse(readFileSync(seedPath, "utf8"));
-const profileId = seed.profile_id?.trim();
-if (!profileId) {
-  console.error("Seed has no profile_id");
+const season = JSON.parse(readFileSync(seasonPath, "utf8"));
+
+if (shouldRefuseLocalSeasonRootSync({ useProduction, forceLocal, season })) {
+  console.error(
+    "Refusing to sync local seed into production-bound season JSON. Use --production for the production seed, or --force-local when intentionally rewriting local dev URLs."
+  );
   process.exit(1);
 }
 
-const season = JSON.parse(readFileSync(seasonPath, "utf8"));
-const previous = season.season_root_profile_id?.trim() || null;
-
-/** @type {Map<string, { scan_url?: string; qr_id?: string }>} */
-const seedByNode = new Map(
-  (Array.isArray(seed.nodes) ? seed.nodes : [])
-    .filter((row) => row?.node_id)
-    .map((row) => [String(row.node_id), row])
-);
-
-let scanUrlsUpdated = 0;
-if (Array.isArray(season.nodes)) {
-  for (const node of season.nodes) {
-    const nodeId = String(node?.node_id ?? "").trim();
-    const seedRow = seedByNode.get(nodeId);
-    if (!seedRow?.scan_url) continue;
-    if (node.scan_url !== seedRow.scan_url) {
-      node.scan_url = seedRow.scan_url;
-      scanUrlsUpdated += 1;
-    }
-    if (seedRow.qr_id && node.qr_id !== seedRow.qr_id) {
-      node.qr_id = seedRow.qr_id;
-    }
-  }
+let result;
+try {
+  result = applySeasonRootSync({ season, seed });
+} catch (err) {
+  console.error(err instanceof Error ? err.message : String(err));
+  process.exit(1);
 }
 
-const node04 = seedByNode.get("node_04");
-if (
-  node04?.scan_url &&
-  season.network_charter &&
-  typeof season.network_charter === "object"
-) {
-  season.network_charter.game_node_scan_url = node04.scan_url;
-}
-
-season.season_root_profile_id = profileId;
-writeFileSync(seasonPath, `${JSON.stringify(season, null, 2)}\n`);
+writeFileSync(seasonPath, `${JSON.stringify(result.season, null, 2)}\n`);
 
 console.log(
   useProduction ? "Synced season JSON from production seed" : "Synced season JSON from local seed"
 );
 console.log("  path: %s", seasonPath);
-console.log("  season_root_profile_id was: %s", previous ?? "(null)");
-console.log("  season_root_profile_id now: %s", profileId);
+console.log("  season_root_profile_id was: %s", result.previous ?? "(null)");
+console.log("  season_root_profile_id now: %s", result.profileId);
 if (useProduction) {
-  console.log("  scan_url rows updated: %d", scanUrlsUpdated);
+  console.log("  scan_url rows updated: %d", result.scanUrlsUpdated);
   console.log("  network_charter.game_node_scan_url → node_04 production scan");
 }
 console.log("\nNext:");

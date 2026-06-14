@@ -238,6 +238,20 @@ export function initCreatedGameNode(ctx) {
     );
   }
 
+  /**
+   * @param {string} seasonIdRaw
+   */
+  async function selectSeasonId(seasonIdRaw) {
+    const seasonId = String(seasonIdRaw ?? "").trim();
+    if (!(seasonSelect instanceof HTMLSelectElement) || !seasonId) return;
+    ensureSeasonSelectOption(seasonId);
+    seasonSelect.value = seasonId;
+    await refreshDistrictsForSeason(seasonId);
+    await refreshBulkPanel(readChildObjectRows(localStorage, ctx.profileId));
+    rulesPublishCtl?.refresh?.();
+    setupGuideCtl?.refresh?.();
+  }
+
   seasonSelect?.addEventListener("change", () => {
     if (!(seasonSelect instanceof HTMLSelectElement)) return;
     void refreshDistrictsForSeason(seasonSelect.value.trim());
@@ -563,7 +577,9 @@ export function initCreatedGameNode(ctx) {
         labelInput instanceof HTMLInputElement ? labelInput.value : "",
         roleSelect.value,
         districtSelect instanceof HTMLSelectElement ? districtSelect.value : "",
-        seasonSelect instanceof HTMLSelectElement ? seasonSelect.value : ""
+        seasonSelect instanceof HTMLSelectElement && seasonSelect.value
+          ? seasonSelect.value
+          : readRememberedGameSeasonId(ctx.profileId)
       );
       const signedCreate = await signGameNodeChildObjectCreate({
         profileId: ctx.profileId,
@@ -720,5 +736,6 @@ export function initCreatedGameNode(ctx) {
       rulesPublishCtl?.refresh?.();
       setupGuideCtl?.refresh?.();
     },
+    selectSeasonId,
   };
 }
