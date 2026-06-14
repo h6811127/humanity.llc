@@ -118,6 +118,7 @@ async function openGameSeasonLive(page: Page) {
   await page.goto(url);
   await expect(page.locator("#created-control-root")).toBeVisible();
   await expect(page.getByRole("tab", { name: "What opens", selected: true })).toBeVisible();
+  await page.getByRole("button", { name: "Add first checkpoint" }).click();
 }
 
 async function selectExampleSeason(page: Page) {
