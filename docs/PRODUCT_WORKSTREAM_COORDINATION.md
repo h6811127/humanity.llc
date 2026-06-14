@@ -103,7 +103,7 @@ Mark ☑ in [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) § Reco
 | **LO-4** Integrated stranger comprehension | Scan **game node** (contribute/read) + **non-game object** (status plate) — same primitive, &lt;30s trust read | WS-CR + WS-QUALITY |
 | **LO-5** Public copy honesty | PSO + features pages reflect live vs research **after** LO-2 | WS-CR |
 
-**Deferred post-MVP (Order 6 implementation):** mesh/cache `freshness.source`, delegated child routes (G1–G5), `inherit` verb — spec-only until LO-1–LO-4 pass.
+**Deferred post-MVP (Order 6 exposure):** mesh/cache `freshness.source`, public delegated child issue/list/revoke routes + `/created/` UI (G1–G5), `inherit` verb — keep delegation prep dormant until LO-1–LO-4 pass and product gates clear.
 
 ### WS-LIVE regression block
 

@@ -1,10 +1,12 @@
-# Delegated child capability — document schema (step 17, docs-only)
+# Delegated child capability — document schema (step 17, dormant prep)
 
-**Status:** **Draft RFC** — no resolver routes, wallet storage, or steward UI until [`DELEGATED_CHILD_CAPABILITIES_GATE.md`](DELEGATED_CHILD_CAPABILITIES_GATE.md) **G1–G5** pass.
+**Status:** **Draft RFC + dormant implementation prep** — no public resolver route registration, wallet storage, hub prefetch, or steward UI exposure until [`DELEGATED_CHILD_CAPABILITIES_GATE.md`](DELEGATED_CHILD_CAPABILITIES_GATE.md) **G1–G5** pass.
 
-**Shape validation (spec-only):** `worker/src/live-object/delegation-spec.ts` · `worker/tests/live-object-delegation-spec.test.ts`
+**Shape validation:** `worker/src/live-object/delegation-spec.ts` · `worker/tests/live-object-delegation-spec.test.ts`
 
-**Access evaluation (spec-only, step 17 prep):** `evaluateDelegatedCapabilityAccess` · `worker/tests/delegated-child-capability.test.ts`
+**Access evaluation:** `evaluateDelegatedCapabilityAccess` · `worker/tests/delegated-child-capability.test.ts`
+
+**Dormant prep:** `worker/migrations/0034_delegated_capabilities.sql`, `worker/src/resolver/delegated-capability-routes.ts`, `worker/src/resolver/delegated-child-signer.ts`, and `site/js/created-delegated-capability*.mjs` exist for direct tests and future pilot wiring. They are intentionally not mounted in `worker/src/index.ts`, `site/created/index.html`, or `site/js/created.mjs`.
 
 **Canonical rules:** [`Technical Standards v1.0.md`](Technical%20Standards%20v1.0.md) §7A.1 · [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) § Delegated child capabilities (future).
 
@@ -88,9 +90,9 @@ Operations apply only within `scope` and before `expires_at`.
 
 ---
 
-## Resolver verification (when gates pass)
+## Resolver verification (dormant prep; expose only when gates pass)
 
-Before accepting a child-object mutation signed by `delegated_public_key`:
+The child-object route authorizer already implements the acceptance algorithm below for direct tests and seeded capability rows. Public issuance/list/revoke routes remain unregistered until G1–G5 pass. Before accepting a child-object mutation signed by `delegated_public_key`:
 
 1. Load active capability row for `(parent_profile_id, delegated_public_key)`.
 2. Verify `status === active` and `now < expires_at`.
@@ -103,11 +105,11 @@ Root owner or recovery key continues to work on all child routes without a capab
 
 ---
 
-## Steward UI (when gates pass)
+## Steward UI (dormant prep; expose only when gates pass)
 
 | Surface | Allowed |
 |---------|---------|
-| `/created/` **Manage** | Issue / revoke delegation for scoped object; show expiry + label |
+| `/created/` **Manage** | Issue / revoke delegation for scoped object; show expiry + label after the dormant panel is intentionally mounted |
 | `/created/` **Live** | No delegation issuance |
 | `/create/`, scan pages | **Never** |
 | Hub / **My cards** | Show optional “Delegated access active” on child row — no trust shield |
@@ -116,10 +118,10 @@ Copy pattern: **“Limited signer · expires {date}”** — not Steward / Vouch
 
 ---
 
-## D1 sketch (not migrated)
+## D1 storage (dormant migration)
 
 ```sql
--- Draft only — do not apply until G1–G5 pass.
+-- Dormant prep only — do not expose public issuance/list/revoke routes until G1–G5 pass.
 CREATE TABLE delegated_capabilities (
   capability_id TEXT PRIMARY KEY NOT NULL,
   parent_profile_id TEXT NOT NULL REFERENCES cards (profile_id),
@@ -137,18 +139,19 @@ CREATE TABLE delegated_capabilities (
 
 ---
 
-## Test plan (when gates pass)
+## Test plan
 
 | Case | Expect |
 |------|--------|
-| Scoped update succeeds | Volunteer updates one `object_id` before expiry |
+| Dormant exposure guard | No public route registration or `/created/` panel before G1–G5 |
+| Scoped update succeeds | Volunteer updates one `object_id` before expiry when a capability row is seeded |
 | Out-of-scope object | 403 |
 | Expired capability | 403 |
 | Root revoke capability | Delegated signer rejected immediately; root still works |
 | Delegated vouch attempt | 403, no side effects |
 | Escalation to root revoke | 403 |
 
-Vitest: `worker/tests/delegated-child-capability.test.ts` (access boundaries — **shipped**). Add resolver integration tests when routes land.
+Vitest: `worker/tests/delegated-child-capability.test.ts` (access boundaries), `worker/tests/delegated-child-resolver.test.ts` (seeded capability route auth), `worker/tests/delegated-capability-routes.test.ts` (dormant handler contract), and `worker/tests/delegated-capability-gate.test.ts` (unexposed public surface). Replace the exposure guard when product gates pass and route/UI wiring intentionally lands.
 
 ---
 
