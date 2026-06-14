@@ -190,9 +190,9 @@ describe("resolveCreateLiveRedirectContext", () => {
     });
   });
 
-  it("uses deploy relay handoff for lost-item relay field-kit links", () => {
+  it("uses deploy relay handoff for lost-item relay deploy room links", () => {
     const redirect = resolveCreateLiveRedirectContext({
-      searchParams: new URLSearchParams("template=lost_item_relay"),
+      searchParams: new URLSearchParams("intent=deploy"),
       template: "lost_item_relay",
       walletEntries: [GENERAL_ROOT],
     });
