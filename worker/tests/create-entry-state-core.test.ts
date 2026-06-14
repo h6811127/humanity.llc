@@ -2,10 +2,12 @@ import { describe, expect, it } from "vitest";
 
 import {
   CREATE_ENTRY_GATE_BYPASS_KEY,
+  findCrossTabBlockedRoot,
   isCreatePilotFieldKitEntry,
   readCreateEntryGateBypass,
   resolveCreateEntryGate,
   resolveCreateEntryStateId,
+  resolveCreateLiveRedirectContext,
   sessionHasKeysForPreferredRoot,
   writeCreateEntryGateBypass,
 } from "../../site/js/create-entry-state-core.mjs";
@@ -28,6 +30,26 @@ const SESSION_WITH_KEYS = {
   qr_id: GENERAL_ROOT.qr_id,
   handle: GENERAL_ROOT.handle,
   owner_private_key_b58: GENERAL_ROOT.owner_private_key_b58,
+};
+
+const DEVICE_UNLOCK_ROOT = {
+  ...GENERAL_ROOT,
+  profile_id: "prof_entry_state_device_unlock",
+  qr_id: "qr_entry_state_device_unlock",
+  owner_private_key_b58: "",
+  custody_mode: "device_unlock",
+  wrapped_owner_key: {
+    credential_id: "cred-entry-state",
+    ciphertext: "ciphertext-entry-state",
+  },
+};
+
+const SEASON_ROOT = {
+  ...GENERAL_ROOT,
+  profile_id: "prof_entry_state_season",
+  qr_id: "qr_entry_state_season",
+  handle: "season_ops",
+  issuer_public_key: "issuer-public-key-for-test",
 };
 
 /** @type {Storage} */
@@ -117,6 +139,68 @@ describe("resolveCreateEntryStateId", () => {
       })
     ).toBe("new_device");
   });
+
+  it("returns returning_wallet for saved device-unlock roots without plaintext keys", () => {
+    expect(
+      resolveCreateEntryStateId({
+        searchParams: new URLSearchParams("intent=wear"),
+        walletEntries: [DEVICE_UNLOCK_ROOT],
+        session: null,
+      })
+    ).toBe("returning_wallet");
+  });
+});
+
+describe("resolveCreateLiveRedirectContext", () => {
+  it("uses wear handoff for saved general roots on wear room entry", () => {
+    const redirect = resolveCreateLiveRedirectContext({
+      searchParams: new URLSearchParams("intent=wear"),
+      template: "",
+      walletEntries: [GENERAL_ROOT],
+    });
+
+    expect(redirect.strategy).toBe("redirect_live");
+    expect(redirect.preferredRoot).toBe(GENERAL_ROOT);
+    expect(redirect.handoffKind).toBe("wear");
+  });
+
+  it("uses season handoff for saved season roots and existing-account season forks", () => {
+    expect(
+      resolveCreateLiveRedirectContext({
+        searchParams: new URLSearchParams("intent=game"),
+        template: "",
+        walletEntries: [SEASON_ROOT],
+      })
+    ).toMatchObject({
+      strategy: "redirect_live",
+      preferredRoot: SEASON_ROOT,
+      handoffKind: "season",
+    });
+
+    expect(
+      resolveCreateLiveRedirectContext({
+        searchParams: new URLSearchParams("intent=game&season_account=existing"),
+        template: "",
+        walletEntries: [GENERAL_ROOT],
+      })
+    ).toMatchObject({
+      strategy: "use_existing_account",
+      preferredRoot: GENERAL_ROOT,
+      handoffKind: "season",
+    });
+  });
+
+  it("uses deploy relay handoff for lost-item relay field-kit links", () => {
+    const redirect = resolveCreateLiveRedirectContext({
+      searchParams: new URLSearchParams("template=lost_item_relay"),
+      template: "lost_item_relay",
+      walletEntries: [GENERAL_ROOT],
+    });
+
+    expect(redirect.strategy).toBe("redirect_live");
+    expect(redirect.preferredRoot).toBe(GENERAL_ROOT);
+    expect(redirect.handoffKind).toBe("deploy_relay");
+  });
 });
 
 describe("resolveCreateEntryGate", () => {
@@ -150,6 +234,62 @@ describe("resolveCreateEntryGate", () => {
     });
     expect(gate.showGate).toBe(false);
     expect(gate.stateId).toBe("new_device");
+  });
+
+  it("shows unlock_wallet gate for device-unlock roots without plaintext keys", () => {
+    const gate = resolveCreateEntryGate({
+      searchParams: new URLSearchParams("intent=wear"),
+      walletEntries: [DEVICE_UNLOCK_ROOT],
+      session: null,
+    });
+
+    expect(gate.showGate).toBe(true);
+    expect(gate.stateId).toBe("returning_wallet");
+    expect(gate.gateKind).toBe("unlock_wallet");
+    expect(gate.handoffKind).toBe("wear");
+    expect(gate.preferredRoot).toBe(DEVICE_UNLOCK_ROOT);
+  });
+
+  it("hides the gate when bypassed while preserving entry template resolution", () => {
+    const gate = resolveCreateEntryGate({
+      searchParams: new URLSearchParams("intent=deploy"),
+      walletEntries: [GENERAL_ROOT],
+      session: null,
+      gateBypass: true,
+    });
+
+    expect(gate).toMatchObject({
+      showGate: false,
+      stateId: "new_device",
+      gateKind: null,
+      preferredRoot: null,
+      handoffKind: null,
+      template: "status_plate",
+    });
+  });
+});
+
+describe("findCrossTabBlockedRoot", () => {
+  it("returns wallet rows whose signing keys are open in another tab", () => {
+    const blockedRoot = { profile_id: "prof_other_tab", handle: "other_tab" };
+
+    expect(
+      findCrossTabBlockedRoot({
+        walletEntries: [blockedRoot],
+        crossTabProfileIds: ["prof_other_tab"],
+        session: null,
+      })
+    ).toBe(blockedRoot);
+  });
+
+  it("ignores matching cross-tab rows when the current tab has signing keys", () => {
+    expect(
+      findCrossTabBlockedRoot({
+        walletEntries: [GENERAL_ROOT],
+        crossTabProfileIds: [GENERAL_ROOT.profile_id],
+        session: SESSION_WITH_KEYS,
+      })
+    ).toBeNull();
   });
 });
 

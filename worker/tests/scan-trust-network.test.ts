@@ -5,6 +5,7 @@ import { composeScanTrustContext } from "../src/resolver/scan-trust-compose";
 import { buildScanViewModel } from "../src/resolver/scan-state";
 import { defaultSeason } from "../src/city-game/season-loader";
 import { SCAN_LIMITS_DISCLOSURE_TITLE } from "../../site/js/device-ownership-copy-core.mjs";
+import type { GameNodeScanContext } from "../src/city-game/scan-view";
 import type { CardRow, ChildObjectRow, QrCredentialRow, VerificationSummaryRow } from "../src/db/types";
 
 import { CITY_GAME_SEASON_ROOT_PROFILE } from "./city-game-fixture-profile";
@@ -111,6 +112,47 @@ function summary(): VerificationSummaryRow {
   };
 }
 
+function gameNodeScanContext(
+  overrides: Partial<GameNodeScanContext> = {}
+): GameNodeScanContext {
+  const base: GameNodeScanContext = {
+    enabled: true,
+    mode: "game",
+    seasonId: "cr_season_01_wake",
+    nodeId: "node_04",
+    nodeRole: "temp_drop",
+    district: "river_spine",
+    gameMeta: {
+      visible_until: null,
+      compromised: false,
+      collective_progress: 8,
+      collective_target: 20,
+      unlocked_by: [],
+      vouch_requires: [],
+      vouch_active_for: [],
+      scarcity_remaining: null,
+      fragment_id: null,
+    },
+    coopHint: null,
+    showsPledge: false,
+    pledgeFaction: null,
+    roleEyebrow: "River spine · Temp drop",
+    showsContribute: true,
+    contributeMode: "collective",
+    contributeSiteCodePlaceholder: "RIVER-04",
+    vouchGate: null,
+    seasonWindowPhase: "open",
+  };
+  return {
+    ...base,
+    ...overrides,
+    gameMeta: {
+      ...base.gameMeta,
+      ...(overrides.gameMeta ?? {}),
+    },
+  };
+}
+
 describe("scan trust network (WS-REALITY)", () => {
   it("composes charter fragment and signer rows for game node", () => {
     const season = defaultSeason();
@@ -159,6 +201,82 @@ describe("scan trust network (WS-REALITY)", () => {
     expect(trust!.signedBy.some((row) => row.stream === "Care")).toBe(true);
     expect(trust!.proves.some((line) => line.includes("Collective progress"))).toBe(true);
     expect(trust!.doesNotProve.some((line) => line.includes("people trail"))).toBe(true);
+  });
+
+  it("omits trust context for non-network scans", () => {
+    const season = defaultSeason();
+
+    expect(
+      composeScanTrustContext({
+        gameNode: null,
+        childObjectType: "status_plate",
+        objectStreams: [],
+        season,
+      })
+    ).toBeNull();
+    expect(
+      composeScanTrustContext({
+        gameNode: gameNodeScanContext({ enabled: false }),
+        childObjectType: "status_plate",
+        objectStreams: [],
+        season,
+      })
+    ).toBeNull();
+    expect(
+      composeScanTrustContext({
+        gameNode: gameNodeScanContext({ seasonId: "" }),
+        childObjectType: "game_node",
+        objectStreams: [],
+        season,
+      })
+    ).toBeNull();
+  });
+
+  it("shows care-stream precedence instead of game bulletin proof during care pause", () => {
+    const trust = composeScanTrustContext({
+      gameNode: gameNodeScanContext({ mode: "care_pause" }),
+      childObjectType: "game_node",
+      objectStreams: [
+        { id: "bulletin", class: "narrative", label: "Bulletin", value: "Share outward" },
+      ],
+      season: defaultSeason(),
+      streamPolicyPhase: "care_pause",
+    });
+
+    expect(trust).not.toBeNull();
+    expect(trust!.proves.some((line) => line.includes("Care stream wins"))).toBe(true);
+    expect(trust!.proves.some((line) => line.includes("Signed game bulletins"))).toBe(false);
+    expect(trust!.signedBy.map((row) => row.stream)).toEqual(
+      expect.arrayContaining(["Game", "Care"])
+    );
+  });
+
+  it("adds witness disclaimer and clears pointer lesson when the season has no node lesson", () => {
+    const trust = composeScanTrustContext({
+      gameNode: gameNodeScanContext({
+        nodeId: "node_missing",
+        gameMeta: {
+          vouch_requires: ["node_01"],
+        },
+        vouchGate: {
+          required: ["node_01"],
+          satisfied: [],
+          pending: ["node_01"],
+          met: false,
+        },
+      }),
+      childObjectType: "game_node",
+      objectStreams: [],
+      season: defaultSeason(),
+    });
+
+    expect(trust).not.toBeNull();
+    expect(trust!.charterFragment.pointerLesson).toBeNull();
+    expect(
+      trust!.doesNotProve.some((line) =>
+        line.includes("Witness seals on nearby game nodes")
+      )
+    ).toBe(true);
   });
 
   it("renders four trust modules on game node scan HTML", async () => {
