@@ -8,7 +8,7 @@ const GAME_SEASON_ROOT = {
   profile_id: "profE2eGameSeason01",
   qr_id: "qr_e2e_game_season_01",
   handle: "example_game_ops",
-  manifesto_line: "Example City game season root",
+  manifesto_line: "City game season: Example City game season root",
   pilot_template: "general",
   issuer_public_key: "gameOpPubKeyTestOnlyxxxxxxxxxx",
   owner_public_key_b58: "pubkeyfortestonlyxxxxxxxxxxxx",
@@ -156,6 +156,20 @@ test.describe("city game self-serve setup on /created/", () => {
     await expect(page.locator("#child-object-game-node-rules")).toBeVisible();
     await expect(page.locator("#child-object-game-node-bulk")).toBeVisible();
     await expect(page.locator("#child-object-game-node-season")).toBeVisible();
+  });
+
+  test("saving When season id selects it for game node registration without reload", async ({
+    page,
+  }) => {
+    await seedGameSeasonControlSession(page, GAME_SEASON_ROOT);
+    await openGameSeasonLive(page);
+
+    await page.locator("#child-object-season-when-id").fill("my_city_season_01");
+    await page.locator("#child-object-season-when-id").blur();
+
+    const seasonSelect = page.locator("#child-object-game-node-season");
+    await expect(seasonSelect.locator('option[value="my_city_season_01"]')).toHaveCount(1);
+    await expect(seasonSelect).toHaveValue("my_city_season_01");
   });
 
   test("loads example season in picker and shows comprehension custody UI", async ({ page }) => {
