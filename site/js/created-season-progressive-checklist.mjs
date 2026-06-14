@@ -9,6 +9,7 @@ import {
 } from "./created-season-progressive-checklist-core.mjs";
 import { findWalletEntryByProfileId } from "./device-wallet.mjs";
 import { readChildObjectRows } from "./child-object-store-core.mjs";
+import { mountChildObjectAddHubSections } from "./created-child-object-add-hub.mjs";
 import { focusSeasonSetupChecklist } from "./created-season-setup-cta.mjs";
 import { SEASON_WHEN_PANEL_ID } from "./created-season-when-panel-core.mjs";
 
@@ -87,6 +88,14 @@ function renderProgressiveChecklist(panel, assessment, profileId) {
         }
       }
       if (assessment.activeStepId === "first_scan_point") {
+        mountChildObjectAddHubSections();
+        const addHub = document.getElementById("child-object-add-hub");
+        if (addHub instanceof HTMLDetailsElement) {
+          addHub.hidden = false;
+          addHub.open = true;
+        } else if (addHub instanceof HTMLElement) {
+          addHub.hidden = false;
+        }
         const whenPanel = document.getElementById(SEASON_WHEN_PANEL_ID);
         if (whenPanel instanceof HTMLElement) {
           whenPanel.scrollIntoView({ behavior: "smooth", block: "start" });
