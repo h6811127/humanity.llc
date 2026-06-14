@@ -202,6 +202,7 @@ test.describe("city game self-serve setup on /created/", () => {
     await expect(firstCheck).toBeChecked();
 
     await page.reload();
+    await page.getByRole("button", { name: "Add first checkpoint" }).click();
     await expect(page.locator("#child-object-add-game-node")).toBeVisible();
     await expect(page.locator('input[name="game-operator-custody"]').first()).toBeChecked();
   });
