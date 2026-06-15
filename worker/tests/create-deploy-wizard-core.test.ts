@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   DEPLOY_OBJECT_TYPE_OPTIONS,
+  deployNameStepCopy,
   deployObjectTypeOptionByTemplate,
   generalRootManifestoForDeploy,
   isCreateRoomIsolatedIntent,
@@ -79,6 +80,19 @@ describe("Simple Object Create object type step", () => {
     expect(normalizeDeployObjectTemplate("status_plate")).toBe("status_plate");
     expect(normalizeDeployObjectTemplate("unknown")).toBe("status_plate");
     expect(deployObjectTypeOptionByTemplate("lost_item_relay")?.title).toBe("Return tag");
+  });
+
+  it("names the next step by selected object type", () => {
+    expect(deployNameStepCopy("status_plate")).toMatchObject({
+      step: "Step 2 · Name it",
+      label: "Name this QR sign",
+      placeholder: "Studio door",
+    });
+    expect(deployNameStepCopy("lost_item_relay")).toMatchObject({
+      step: "Step 2 · Name it",
+      label: "Name this return tag",
+      placeholder: "House keys",
+    });
   });
 });
 

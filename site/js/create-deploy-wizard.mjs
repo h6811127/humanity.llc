@@ -11,6 +11,7 @@ import {
 } from "./create-flow-convergence-core.mjs";
 import {
   DEPLOY_OBJECT_TYPE_OPTIONS,
+  deployNameStepCopy,
   deploySubmitButtonLabel,
   isDeployRoomCreateIntent,
   isDeployWizardIntent,
@@ -29,6 +30,7 @@ export function syncCreateDeployWizardUi(searchParams, template) {
   const objectLabel = document.getElementById("deploy-object-label");
   const scannerLine = document.getElementById("deploy-scanner-line");
   const objectLabelHint = document.getElementById("deploy-object-label-hint");
+  const objectLabelStep = document.getElementById("deploy-name-step-label");
   const scannerLineLabel = document.getElementById("deploy-scanner-line-label");
   const scannerLineHint = document.getElementById("deploy-scanner-line-hint");
 
@@ -46,26 +48,26 @@ export function syncCreateDeployWizardUi(searchParams, template) {
   if (wearWizard && deployRoom) wearWizard.hidden = true;
 
   if (active && template === "lost_item_relay") {
-    if (objectLabel) objectLabel.placeholder = "House keys";
+    const nameCopy = deployNameStepCopy(template);
+    if (objectLabelStep) objectLabelStep.textContent = nameCopy.step;
+    if (objectLabel) objectLabel.placeholder = nameCopy.placeholder;
     if (scannerLine) scannerLine.placeholder = "Lost — contact owner through relay";
-    if (objectLabelHint) {
-      objectLabelHint.textContent = "Shown as the headline when someone scans — not your phone number.";
-    }
     const objectTitle = document.getElementById("deploy-object-label-title");
-    if (objectTitle) objectTitle.textContent = "What is this tag on?";
+    if (objectTitle) objectTitle.textContent = nameCopy.label;
+    if (objectLabelHint) objectLabelHint.textContent = nameCopy.hint;
     if (scannerLineLabel) scannerLineLabel.textContent = "What should finders see?";
     if (scannerLineHint) {
       scannerLineHint.textContent =
         "Return instructions only. Revoke when recovered or if the relay is abused.";
     }
   } else if (active) {
-    if (objectLabel) objectLabel.placeholder = "Studio door";
+    const nameCopy = deployNameStepCopy(template);
+    if (objectLabelStep) objectLabelStep.textContent = nameCopy.step;
+    if (objectLabel) objectLabel.placeholder = nameCopy.placeholder;
     if (scannerLine) scannerLine.placeholder = "Open · Thu–Sun until 9 PM";
-    if (objectLabelHint) {
-      objectLabelHint.textContent = "Shown as the headline when someone scans.";
-    }
     const objectTitle = document.getElementById("deploy-object-label-title");
-    if (objectTitle) objectTitle.textContent = "What is this on?";
+    if (objectTitle) objectTitle.textContent = nameCopy.label;
+    if (objectLabelHint) objectLabelHint.textContent = nameCopy.hint;
     if (scannerLineLabel) scannerLineLabel.textContent = "What should scanners see?";
     if (scannerLineHint) {
       scannerLineHint.textContent =

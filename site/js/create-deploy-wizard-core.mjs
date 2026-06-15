@@ -61,6 +61,27 @@ export function deployObjectTypeOptionByTemplate(template) {
 }
 
 /**
+ * @param {string | null | undefined} template
+ */
+export function deployNameStepCopy(template) {
+  const normalized = normalizeDeployObjectTemplate(template);
+  if (normalized === "lost_item_relay") {
+    return {
+      step: "Step 2 · Name it",
+      label: "Name this return tag",
+      placeholder: "House keys",
+      hint: "This becomes the scan headline. Do not put your phone number here.",
+    };
+  }
+  return {
+    step: "Step 2 · Name it",
+    label: "Name this QR sign",
+    placeholder: "Studio door",
+    hint: "This becomes the scan headline on the printed QR.",
+  };
+}
+
+/**
  * @param {URLSearchParams} searchParams
  */
 export function isDeployWizardIntent(searchParams) {
