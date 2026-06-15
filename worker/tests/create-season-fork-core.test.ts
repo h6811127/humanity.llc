@@ -1,5 +1,15 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+const walletMock = vi.hoisted(() => ({ entries: [] as unknown[] }));
+
+vi.mock("../../site/js/device-wallet.mjs", () => ({
+  loadWallet: () => walletMock.entries,
+}));
+
+vi.mock("../../site/js/create-entry-state.mjs", () => ({
+  isCreateEntryGateActive: () => false,
+}));
+
 import {
   GAME_SEASON_FORK_DEDICATED,
   GAME_SEASON_FORK_EXISTING,
@@ -139,12 +149,11 @@ describe("fork ui helpers", () => {
     const submit = new FakeHTMLButtonElement();
     const existingBtn = new FakeHTMLButtonElement();
     const dedicatedBtn = new FakeHTMLButtonElement();
-    const localStorage = makeStorage([["hc_wallet", JSON.stringify([seasonRoot])]]);
     const sessionStorage = makeStorage([[CREATE_ENTRY_GATE_BYPASS_KEY, "game|"]]);
+    walletMock.entries = [seasonRoot];
 
     vi.stubGlobal("HTMLElement", FakeHTMLElement);
     vi.stubGlobal("HTMLButtonElement", FakeHTMLButtonElement);
-    vi.stubGlobal("localStorage", localStorage);
     vi.stubGlobal("sessionStorage", sessionStorage);
     vi.stubGlobal("document", {
       getElementById: (id: string) => {
