@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   GAME_SEASON_FORK_DEDICATED,
@@ -12,6 +12,8 @@ import {
   gameSeasonIdFieldUiState,
   gameSeasonSubmitButtonLabel,
 } from "../../site/js/create-season-fork-ui-core.mjs";
+import { syncCreateSeasonForkUi } from "../../site/js/create-season-fork.mjs";
+import { CREATE_ENTRY_GATE_BYPASS_KEY } from "../../site/js/create-entry-state-core.mjs";
 
 const deployRoot = {
   pilot_template: "general",
@@ -25,6 +27,27 @@ const seasonRoot = {
   owner_private_key_b58: "priv",
   issuer_public_key: "org_pub",
 };
+
+class FakeHTMLElement {
+  hidden = false;
+}
+
+class FakeHTMLButtonElement extends FakeHTMLElement {
+  disabled = false;
+  dataset = {};
+  classList = { toggle: vi.fn() };
+  addEventListener = vi.fn();
+  setAttribute = vi.fn();
+  querySelector = vi.fn(() => ({ textContent: "" }));
+}
+
+function makeStorage(entries: [string, string][] = []) {
+  const store = new Map(entries);
+  return {
+    getItem: (key: string) => store.get(key) ?? null,
+    setItem: (key: string, value: string) => store.set(key, String(value)),
+  };
+}
 
 describe("resolveGameSeasonSubmitStrategy", () => {
   it("redirects when a season root with organizer key exists", () => {
@@ -81,6 +104,10 @@ describe("gameSeasonForkCardCopy", () => {
 });
 
 describe("fork ui helpers", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   it("shows fork panel only for fork_choose", () => {
     expect(shouldShowGameSeasonCreateFork("fork_choose")).toBe(true);
     expect(shouldShowGameSeasonCreateFork("create_dual_skin_root")).toBe(false);
@@ -103,5 +130,42 @@ describe("fork ui helpers", () => {
     expect(gameSeasonIdFieldUiState("use_existing_account").showSeasonIdField).toBe(false);
     expect(gameSeasonIdFieldUiState("create_season_only_root").showSeasonIdField).toBe(false);
     expect(gameSeasonIdFieldUiState("create_season_only_root").redirectHint).toContain("Live");
+  });
+
+  it("keeps fork chooser visible after entry-gate bypass with an existing season root", () => {
+    const forkPanel = new FakeHTMLElement();
+    const wizard = new FakeHTMLElement();
+    const formMain = new FakeHTMLElement();
+    const submit = new FakeHTMLButtonElement();
+    const existingBtn = new FakeHTMLButtonElement();
+    const dedicatedBtn = new FakeHTMLButtonElement();
+    const localStorage = makeStorage([["hc_wallet", JSON.stringify([seasonRoot])]]);
+    const sessionStorage = makeStorage([[CREATE_ENTRY_GATE_BYPASS_KEY, "game|"]]);
+
+    vi.stubGlobal("HTMLElement", FakeHTMLElement);
+    vi.stubGlobal("HTMLButtonElement", FakeHTMLButtonElement);
+    vi.stubGlobal("localStorage", localStorage);
+    vi.stubGlobal("sessionStorage", sessionStorage);
+    vi.stubGlobal("document", {
+      getElementById: (id: string) => {
+        if (id === "create-game-season-fork") return forkPanel;
+        if (id === "create-game-season-wizard") return wizard;
+        if (id === "create-form-main-fields") return formMain;
+        if (id === "submit") return submit;
+        if (id === "create-game-season-fork-existing") return existingBtn;
+        if (id === "create-game-season-fork-dedicated") return dedicatedBtn;
+        return null;
+      },
+    });
+
+    syncCreateSeasonForkUi(new URLSearchParams("intent=game"));
+
+    expect(forkPanel.hidden).toBe(false);
+    expect(wizard.hidden).toBe(true);
+    expect(formMain.hidden).toBe(true);
+    expect(submit.disabled).toBe(true);
+    expect(submit.hidden).toBe(false);
+    expect(existingBtn.addEventListener).toHaveBeenCalledWith("click", expect.any(Function));
+    expect(dedicatedBtn.addEventListener).toHaveBeenCalledWith("click", expect.any(Function));
   });
 });

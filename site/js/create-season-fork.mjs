@@ -12,6 +12,7 @@ import {
   resolveGameSeasonSubmitStrategy,
   shouldShowGameSeasonCreateFork,
 } from "./create-season-fork-core.mjs";
+import { readCreateEntryGateBypass } from "./create-entry-state-core.mjs";
 import { loadWallet } from "./device-wallet.mjs";
 
 /**
@@ -36,6 +37,7 @@ export function syncCreateSeasonForkUi(searchParams) {
   const strategy = resolveGameSeasonSubmitStrategy({
     searchParams,
     walletEntries: loadWallet(),
+    gateBypass: readCreateEntryGateBypass(sessionStorage, searchParams),
   });
   const showFork = shouldShowGameSeasonCreateFork(strategy);
   const selectedFork = readGameSeasonForkChoice(searchParams);
