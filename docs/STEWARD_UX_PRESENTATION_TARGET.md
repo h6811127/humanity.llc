@@ -78,6 +78,8 @@ Architecture already defines three public jobs ([`PRODUCT_POSITIONING_AND_LOOP_S
 
 **Question:** “What should a stranger see when they scan this sticker?”
 
+**First screen (Simple Object Create slice 1):** Choose **QR sign** or **Return tag**. Both stay in Doors; the choice only changes the labels, helper copy, signed child `object_type`, and scan verbs.
+
 | Step | Steward input | Maps to |
 |------|---------------|---------|
 | 1 | What is it on? | Child `public_label` |

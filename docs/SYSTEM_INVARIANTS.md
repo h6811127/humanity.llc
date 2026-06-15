@@ -105,7 +105,7 @@ Canonical inbox taxonomy: [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
 | Invariant | Detail |
 |-----------|--------|
 | Shipped (step 11) | Top-nav **Create** → **steward chooser** (account / general + deploy + wear). **Your line on the network** → `?intent=general` (handle + manifesto). Form panel: template tabs in collapsed **Examples and object types** for **field-kit** deep links (`?template=`) — not the first screen for room intents. Modules: `create-entry-chooser-core.mjs`, `create-entry-chooser.mjs`, `create-general-room-wizard.mjs`. |
-| Shipped (step 12) | Door 1 → `?intent=deploy` · object-first `#create-deploy-wizard` · submit routes: `root_and_child` \| `redirect_live` \| `flat_legacy`. Modules: `create-deploy-wizard-core.mjs`, `create-deploy-submit.mjs`. |
+| Shipped (step 12) | Door 1 → `?intent=deploy` · Simple Object Create first step chooses **QR sign** vs **Return tag** inside `#create-deploy-wizard` · submit routes: `root_and_child` \| `redirect_live` \| `flat_legacy`. Modules: `create-deploy-wizard-core.mjs`, `create-deploy-submit.mjs`. |
 | Shipped (step 20 slice — deploy room) | `?intent=deploy` hides cross-room UI (`#create-template-advanced`, season/wear wizards, convergence nudge) — same isolation pattern as `?intent=wear`. Field kits keep `?template=status_plate\|lost_item`. `isDeployRoomCreateIntent` in `create-deploy-wizard-core.mjs`. |
 | Primitive free | Core sign · publish · revoke is never paywalled; revenue is **carriers** (hoodie, print packs). See [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md). |
 | Pilots | `?template=status_plate` and `?template=lost_item` remain for field kits and legacy; not front-door positioning. |

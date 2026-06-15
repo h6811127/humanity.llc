@@ -18,6 +18,47 @@ import {
 } from "./created-child-object-core.mjs";
 
 /** @typedef {"standard" | "redirect_live" | "root_and_child"} DeploySubmitStrategy */
+/** @typedef {"status_plate" | "lost_item_relay"} DeployObjectTemplate */
+
+/**
+ * First step for Simple Object Create: choose what the QR is attached to.
+ * @type {ReadonlyArray<{
+ *   template: DeployObjectTemplate;
+ *   title: string;
+ *   sub: string;
+ * }>}
+ */
+export const DEPLOY_OBJECT_TYPE_OPTIONS = [
+  {
+    template: "status_plate",
+    title: "QR sign",
+    sub: "For a door, desk, shelf, booth, or place with status people should read.",
+  },
+  {
+    template: "lost_item_relay",
+    title: "Return tag",
+    sub: "For keys, bags, tools, or gear where finders can send a message.",
+  },
+];
+
+/**
+ * @param {string | null | undefined} template
+ * @returns {DeployObjectTemplate}
+ */
+export function normalizeDeployObjectTemplate(template) {
+  return template === "lost_item_relay" ? "lost_item_relay" : "status_plate";
+}
+
+/**
+ * @param {string | null | undefined} template
+ */
+export function deployObjectTypeOptionByTemplate(template) {
+  const normalized = normalizeDeployObjectTemplate(template);
+  return (
+    DEPLOY_OBJECT_TYPE_OPTIONS.find((option) => option.template === normalized) ??
+    DEPLOY_OBJECT_TYPE_OPTIONS[0]
+  );
+}
 
 /**
  * @param {URLSearchParams} searchParams

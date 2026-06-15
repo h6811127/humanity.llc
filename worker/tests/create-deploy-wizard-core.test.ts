@@ -1,10 +1,13 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  DEPLOY_OBJECT_TYPE_OPTIONS,
+  deployObjectTypeOptionByTemplate,
   generalRootManifestoForDeploy,
   isCreateRoomIsolatedIntent,
   isDeployRoomCreateIntent,
   isDeployWizardIntent,
+  normalizeDeployObjectTemplate,
   parseDeployChildFields,
   resolveDeploySubmitStrategy,
 } from "../../site/js/create-deploy-wizard-core.mjs";
@@ -56,6 +59,26 @@ describe("createHeroCopyForTemplate — deploy room", () => {
     );
     expect(copy.lead).not.toMatch(/legacy/i);
     expect(copy.lead).toMatch(/Live/i);
+  });
+});
+
+describe("Simple Object Create object type step", () => {
+  it("offers QR sign and return tag as deploy object types", () => {
+    expect(DEPLOY_OBJECT_TYPE_OPTIONS.map((option) => option.template)).toEqual([
+      "status_plate",
+      "lost_item_relay",
+    ]);
+    expect(DEPLOY_OBJECT_TYPE_OPTIONS.map((option) => option.title)).toEqual([
+      "QR sign",
+      "Return tag",
+    ]);
+  });
+
+  it("normalizes unknown deploy object templates to QR sign", () => {
+    expect(normalizeDeployObjectTemplate("lost_item_relay")).toBe("lost_item_relay");
+    expect(normalizeDeployObjectTemplate("status_plate")).toBe("status_plate");
+    expect(normalizeDeployObjectTemplate("unknown")).toBe("status_plate");
+    expect(deployObjectTypeOptionByTemplate("lost_item_relay")?.title).toBe("Return tag");
   });
 });
 

@@ -8125,6 +8125,46 @@ html[data-theme="dark"] .landing-launch-doors-lead {
   opacity: 0.85;
 }
 
+.create-deploy-object-type {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin: 0 0 18px;
+}
+
+.create-deploy-object-type-option {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.03);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.create-deploy-object-type-option.is-selected,
+.create-deploy-object-type-option[aria-pressed="true"] {
+  border-color: rgba(219, 27, 67, 0.42);
+  background: rgba(219, 27, 67, 0.08);
+}
+
+.create-deploy-object-type-title {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.create-deploy-object-type-sub {
+  font-size: 14px;
+  line-height: 1.35;
+  color: var(--text-muted, rgba(0, 0, 0, 0.55));
+}
+
 .landing-hero-privacy {
   padding-top: 0;
 }
