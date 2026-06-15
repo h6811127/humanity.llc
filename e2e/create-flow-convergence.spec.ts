@@ -20,6 +20,18 @@ const GENERAL_ROOT = {
   status: "active",
 };
 
+const GAME_SEASON_ROOT = {
+  ...GENERAL_ROOT,
+  id: "e2e_game_season_root",
+  label: "Season root",
+  profile_id: "profE2eGameSeasonRoot",
+  qr_id: "qr_e2e_game_season_root",
+  handle: "season_root",
+  manifesto_line: "City game season · @season_root",
+  issuer_public_key: "organizerpubkeyfortestonly",
+  scan_url: "http://127.0.0.1:8788/c/profE2eGameSeasonRoot?q=qr_e2e_game_season_root",
+};
+
 async function stubCreateShellHealth(page: Page) {
   await page.route("**/.well-known/hc/v1/health**", (route) =>
     route.fulfill({
@@ -35,6 +47,14 @@ async function seedGeneralRootWallet(page: Page) {
     localStorage.setItem("hc_wallet", JSON.stringify([entry]));
     localStorage.setItem("hc_keys_custody_notice_dismissed", "1");
   }, GENERAL_ROOT);
+}
+
+async function seedSeasonRootWithGateBypass(page: Page) {
+  await page.addInitScript((entry) => {
+    localStorage.setItem("hc_wallet", JSON.stringify([entry]));
+    localStorage.setItem("hc_keys_custody_notice_dismissed", "1");
+    sessionStorage.setItem("hc_create_entry_gate_bypass", "game|");
+  }, GAME_SEASON_ROOT);
 }
 
 const EXISTING_SIGN_CHILD = {
@@ -151,6 +171,21 @@ test.describe("create entry chooser (step 11)", () => {
     await expect(page.locator("#game-season-id-block")).toHaveCount(0);
     await expect(page.locator("#create-form-main-fields")).toBeHidden();
     await expect(page.locator("#submit")).toBeHidden();
+  });
+
+  test("season root gate bypass keeps fork chooser in control", async ({ page }) => {
+    await seedSeasonRootWithGateBypass(page);
+    await page.goto("/create/?intent=game");
+
+    await expect(page.locator("#create-game-season-fork")).toBeVisible();
+    await expect(page.locator("#create-game-season-wizard")).toBeHidden();
+    await expect(page.locator("#create-form-main-fields")).toBeHidden();
+    await expect(page.locator("#submit")).toBeDisabled();
+
+    await page.getByRole("button", { name: /Separate season @handle/i }).click();
+    await expect(page.locator("#create-game-season-fork")).toBeHidden();
+    await expect(page.locator("#create-game-season-wizard")).toBeVisible();
+    await expect(page.locator("#submit")).toHaveText(/season @handle/i);
   });
 
   test("wear BYOP link opens track chooser before form", async ({ page }) => {

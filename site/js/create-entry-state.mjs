@@ -32,6 +32,14 @@ export function isCreateEntryGateActive() {
   return entryGateActive;
 }
 
+function roomChooserOwnsFormVisibility() {
+  const seasonFork = document.getElementById("create-game-season-fork");
+  if (seasonFork instanceof HTMLElement && !seasonFork.hidden) return true;
+  const wearChooser = document.getElementById("create-wear-track-chooser");
+  if (wearChooser instanceof HTMLElement && !wearChooser.hidden) return true;
+  return false;
+}
+
 /**
  * @param {URLSearchParams} searchParams
  * @param {string} template
@@ -87,13 +95,15 @@ export function syncCreateEntryGate(searchParams, template, opts = {}) {
 
   if (!gateEl || !resolved.showGate || !resolved.preferredRoot) {
     if (gateEl) gateEl.hidden = true;
-    if (mainFields) mainFields.hidden = false;
-    if (formEl) formEl.hidden = false;
-    if (submitBtn) submitBtn.hidden = false;
-    const hero = document.querySelector("#create-form-panel .hero");
-    const demoStrip = document.querySelector("#create-form-panel .create-demo-strip");
-    if (hero) hero.hidden = false;
-    if (demoStrip) demoStrip.hidden = false;
+    if (!roomChooserOwnsFormVisibility()) {
+      if (mainFields) mainFields.hidden = false;
+      if (formEl) formEl.hidden = false;
+      if (submitBtn) submitBtn.hidden = false;
+      const hero = document.querySelector("#create-form-panel .hero");
+      const demoStrip = document.querySelector("#create-form-panel .create-demo-strip");
+      if (hero) hero.hidden = false;
+      if (demoStrip) demoStrip.hidden = false;
+    }
     return resolved;
   }
 
