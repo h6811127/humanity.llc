@@ -24,6 +24,11 @@ describe("create flow object_streams", () => {
     expect(html).toContain('id="create-entry-chooser"');
     expect(html).toContain('id="create-form-panel"');
     expect(html).toContain('id="create-deploy-wizard"');
+    expect(html).toContain('id="deploy-object-type-chooser"');
+    expect(html).toContain('aria-label="Choose object type"');
+    expect(html).toContain('id="deploy-name-step-label"');
+    expect(html).toContain("Step 2 · Name it");
+    expect(html).toContain("Name this QR sign");
     expect(html).not.toContain('id="create-template-advanced"');
     expect(html).not.toContain('id="create-flat-pilot-compat"');
     expect(html).not.toContain('id="create-add-object-nudge"');

@@ -31,6 +31,15 @@ describe("defaultTemplateForCreateEntry", () => {
     expect(
       defaultTemplateForCreateEntry(new URLSearchParams("intent=deploy"))
     ).toBe("status_plate");
+    expect(
+      defaultTemplateForCreateEntry(new URLSearchParams("intent=deploy&object=qr_sign"))
+    ).toBe("status_plate");
+  });
+
+  it("maps deploy return-tag object to lost item relay", () => {
+    expect(
+      defaultTemplateForCreateEntry(new URLSearchParams("intent=deploy&object=return_tag"))
+    ).toBe("lost_item_relay");
   });
 
   it("maps wear intent to general", () => {

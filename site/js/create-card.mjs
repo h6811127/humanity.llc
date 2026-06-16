@@ -11,7 +11,10 @@ import {
   showCreateFormPanel,
 } from "./create-entry-chooser.mjs";
 import { isDeployWizardIntent, resolveDeploySubmitStrategy } from "./create-deploy-wizard-core.mjs";
-import { syncCreateDeployWizardUi } from "./create-deploy-wizard.mjs";
+import {
+  initCreateDeployObjectTypeChooser,
+  syncCreateDeployWizardUi,
+} from "./create-deploy-wizard.mjs";
 import {
   redirectDeployToLiveAddObject,
   runDeployRootAndChildCreate,
@@ -192,6 +195,15 @@ function setTemplate(template) {
   syncCreateGeneralRoomUi(searchParams);
   syncCreateCustodyModeUi({ scrollOrganizerCallout: isGameSeasonCreateIntent(searchParams) });
   syncCreateEntryGate(searchParams, template, { ephemeralBrowsing });
+}
+
+function setDeployObjectTemplate(template) {
+  const url = new URL(location.href);
+  url.searchParams.delete("template");
+  url.searchParams.set("intent", "deploy");
+  url.searchParams.set("object", template === "lost_item_relay" ? "return_tag" : "qr_sign");
+  history.replaceState(null, "", `${url.pathname}${url.search}`);
+  setTemplate(template);
 }
 
 function buildManifestoLine() {
@@ -857,6 +869,7 @@ function openDeploySomethingForm() {
   showCreateFormPanel();
   const url = new URL(location.href);
   url.searchParams.delete("template");
+  url.searchParams.delete("object");
   url.searchParams.set("intent", "deploy");
   history.replaceState(null, "", `${url.pathname}${url.search}`);
   setTemplate("status_plate");
@@ -880,6 +893,9 @@ function bootstrapCreateEntry() {
       setTemplate(activeTemplate);
     },
   }));
+  initCreateDeployObjectTypeChooser({
+    onSelectTemplate: setDeployObjectTemplate,
+  });
 
   if (shouldSkipCreateEntryChooser(createSearchParams)) {
     showCreateFormPanel();

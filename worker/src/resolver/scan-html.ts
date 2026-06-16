@@ -9,6 +9,7 @@ import {
   findScanCapability,
   gameContributeModeFromCapability,
   isScanCapabilityAvailable,
+  readCapabilityRoom,
   readHeroTemplate,
   shouldShowLiveControlTrustGroup,
   shouldShowCardTrustGroup,
@@ -444,6 +445,10 @@ function renderScanHeroSection(
   const qrAttr = vm.qrId ? ` data-qr-id="${escapeHtml(vm.qrId)}"` : "";
   const scanActiveAttr = vm.kind === "active" ? ` data-scan-active="1"` : "";
   const ssrKindAttr = ` data-ssr-scan-kind="${escapeHtml(vm.kind)}"`;
+  const scanRoom = readCapabilityRoom(vm.capabilities);
+  const scanRoomAttr = scanRoom === "season" || scanRoom === "wear"
+    ? ` data-scan-room="${escapeHtml(scanRoom)}"`
+    : "";
   const merchFunnelAttr = isMerchFunnelScan(vm) ? ` data-merch-funnel="1"` : "";
   const objectAttr = vm.childObjectId
     ? ` data-object-id="${escapeHtml(vm.childObjectId)}"`
@@ -486,7 +491,7 @@ function renderScanHeroSection(
     : "";
 
   return `<div class="scan-pass-layer">
-<article class="scan-hero scan-status-panel scan-safety-header scan-live-check--pending" id="scan-safety-header" aria-label="Live check"${profileAttr}${qrAttr}${ssrKindAttr}${objectAttr}${scanActiveAttr}${merchFunnelAttr}${gameContributeAttr}${gamePledgeAttr}${lostItemOfferAttr}>
+<article class="scan-hero scan-status-panel scan-safety-header scan-live-check--pending" id="scan-safety-header" aria-label="Live check"${profileAttr}${qrAttr}${ssrKindAttr}${scanRoomAttr}${objectAttr}${scanActiveAttr}${merchFunnelAttr}${gameContributeAttr}${gamePledgeAttr}${lostItemOfferAttr}>
   <header class="scan-hero-head">
     ${renderScanHeroHost()}
     ${renderHeroStatusStrip(vm)}
@@ -1010,7 +1015,7 @@ function buildScanHeroMain(
   const { display } = scanHeroDisplay(vm);
   const readTemplate = readHeroTemplate(vm.capabilities);
 
-  if (vm.gameNode?.enabled && vm.gameNode.mode !== "fallback") {
+  if (readTemplate === "game_node" && vm.gameNode) {
     return buildGameNodeScanHero(vm);
   }
 
@@ -1049,7 +1054,7 @@ function buildScanHeroMain(
     };
   }
 
-  if (readTemplate === "live_object") {
+  if (readTemplate === "live_object" || readTemplate === "wear") {
     const line =
       display.kind === "general" && display.line
         ? display.line

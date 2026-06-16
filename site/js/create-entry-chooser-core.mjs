@@ -63,7 +63,11 @@ export function defaultTemplateForCreateEntry(searchParams) {
   const template = searchParams.get("template");
   if (template === "lost_item") return "lost_item_relay";
   if (template === "status_plate") return "status_plate";
-  if (searchParams.get("intent") === "deploy") return "status_plate";
+  if (searchParams.get("intent") === "deploy") {
+    return searchParams.get("object") === "return_tag"
+      ? "lost_item_relay"
+      : "status_plate";
+  }
   if (searchParams.get("intent") === "wear") return "general";
   if (searchParams.get("intent") === "general") return "general";
   return "general";

@@ -1,8 +1,15 @@
 import { describe, expect, it } from "vitest";
 
 import type { CardRow, ChildObjectRow, QrCredentialRow, VerificationSummaryRow } from "../src/db/types";
-import { buildScanCapabilities, findScanCapability, readTrustGroups, shouldShowLiveControlTrustGroup } from "../src/live-object/scan-capabilities";
+import {
+  buildScanCapabilities,
+  findScanCapability,
+  readCapabilityRoom,
+  readTrustGroups,
+  shouldShowLiveControlTrustGroup,
+} from "../src/live-object/scan-capabilities";
 import { scanLayoutForMinimalFailureTrust, scanLayoutForRevocationDisplay } from "../src/resolver/revocation-display";
+import { renderScanPage } from "../src/resolver/scan-html";
 import { scanStatusBodyFromViewModel } from "../src/resolver/scan-status";
 import { buildScanViewModel } from "../src/resolver/scan-state";
 import { CITY_GAME_SEASON_ROOT_PROFILE } from "./city-game-fixture-profile";
@@ -119,6 +126,10 @@ describe("buildScanCapabilities (Order 2 — Cedar Rapids verbs)", () => {
     const caps = buildScanCapabilities(vm, new Date("2026-06-07T18:00:00.000Z"));
 
     expect(caps.find((c) => c.verb === "read")).toMatchObject({ available: true });
+    expect(caps.find((c) => c.verb === "read")).toMatchObject({
+      kind: "game_node",
+      room: "season",
+    });
     expect(caps.find((c) => c.verb === "contribute")).toMatchObject({
       available: true,
       kind: "game_quorum",
@@ -183,6 +194,21 @@ describe("buildScanCapabilities (Order 2 — Cedar Rapids verbs)", () => {
     expect(body.scan.limits.scan_analytics).toBe(false);
   });
 
+  it("renders game node scans from the Season read capability", async () => {
+    const vm = gameScanVm(new Date("2026-06-07T18:00:00.000Z"));
+    expect(findScanCapability(vm.capabilities, "read")).toMatchObject({
+      kind: "game_node",
+      room: "season",
+    });
+    expect(readCapabilityRoom(vm.capabilities)).toBe("season");
+
+    const html = await renderScanPage(vm, "https://humanity.llc");
+    expect(html).toContain('data-scan-room="season"');
+    expect(html).toContain("Riverwalk River Lantern");
+    expect(html).toContain("scan-game-onboarding");
+    expect(html).toContain("Open city board");
+  });
+
   it("advertises offer verb on lost-item relay child scans", () => {
     const vm = buildScanViewModel(
       PROFILE,
@@ -235,6 +261,7 @@ describe("buildScanCapabilities (Order 2 — Cedar Rapids verbs)", () => {
     expect(findScanCapability(vm.capabilities, "read")).toMatchObject({
       available: true,
       kind: "lost_item_relay",
+      room: "doors",
     });
     expect(findScanCapability(vm.capabilities, "offer")).toMatchObject({
       available: true,
@@ -294,6 +321,7 @@ describe("buildScanCapabilities (Order 2 — Cedar Rapids verbs)", () => {
 
     expect(findScanCapability(vm.capabilities, "request")).toBeUndefined();
     expect(shouldShowLiveControlTrustGroup(vm.capabilities)).toBe(false);
+    expect(readCapabilityRoom(vm.capabilities)).toBe("doors");
   });
 });
 
@@ -337,6 +365,10 @@ describe("buildScanCapabilities (non-game scans)", () => {
 
     const caps = buildScanCapabilities(vm);
     expect(caps.find((c) => c.verb === "read")).toMatchObject({ available: true });
+    expect(caps.find((c) => c.verb === "read")).toMatchObject({
+      kind: "personal_card",
+      room: "card",
+    });
     expect(caps.find((c) => c.verb === "request")).toMatchObject({
       kind: "live_proof",
       available: false,
@@ -345,6 +377,52 @@ describe("buildScanCapabilities (non-game scans)", () => {
     expect(shouldShowLiveControlTrustGroup(caps)).toBe(true);
     expect(readTrustGroups(caps)).toEqual(["card", "human", "qr"]);
     expect(caps.some((c) => c.verb === "contribute")).toBe(false);
+  });
+
+  it("advertises Wear room on print artifact scans", () => {
+    const vm = buildScanViewModel(
+      "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+      "qr_7Xk9mP2nQ4rT6vW8",
+      {
+        card: {
+          profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+          public_key: "pk",
+          handle: "river_example",
+          handle_normalized: "river_example",
+          manifesto_line: "Open studio",
+          status: "active",
+          card_document_json: "{}",
+          created_at: "2026-05-16T17:00:00Z",
+          updated_at: "2026-05-16T17:00:00Z",
+        },
+        qr: {
+          qr_id: "qr_7Xk9mP2nQ4rT6vW8",
+          profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+          epoch: 1,
+          scope: "print_artifact",
+          print_artifact_id: "artifact_hoodie_1",
+          resolver_hint: "https://humanity.llc",
+          status: "active",
+          payload:
+            "https://humanity.llc/c/7Xk9mP2nQ4rT6vW8yZ1aB3cD5?q=qr_7Xk9mP2nQ4rT6vW8",
+          issued_at: "2026-05-16T17:00:00Z",
+          expires_at: null,
+          credential_document_json: "{}",
+          created_at: "2026-05-16T17:00:00Z",
+          updated_at: "2026-05-16T17:00:00Z",
+        },
+        verification: null,
+        revocationDisplay: null,
+      },
+      "https://humanity.llc"
+    );
+
+    expect(findScanCapability(vm.capabilities, "read")).toMatchObject({
+      available: true,
+      kind: "wear",
+      room: "wear",
+    });
+    expect(readCapabilityRoom(vm.capabilities)).toBe("wear");
   });
 
   it("omits human trust group on minimal failure layout", () => {
