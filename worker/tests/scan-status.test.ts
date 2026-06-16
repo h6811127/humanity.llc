@@ -420,7 +420,7 @@ describe("scan status JSON (M3.4)", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-06-07T12:00:00-05:00"));
     try {
-      const gameQr = "qr_statusGameEnv001";
+      const gameQr = "qr_statusGameEnvABC";
       const gameCard = card({
         profile_id: GAME_PROFILE,
         handle: "season_root",
