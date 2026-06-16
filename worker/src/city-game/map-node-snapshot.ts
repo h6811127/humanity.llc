@@ -1,5 +1,11 @@
 import type { ChildObjectRow } from "../db/types";
-import { composeChildObjectScanState } from "../live-object/compose-child-object-scan";
+import {
+  buildUniversalBoardNodeChips,
+  composeActiveBoardNodeReadModel,
+  resolveBoardNodeLifecycle,
+  resolveNonActiveBoardMapMode,
+  type BoardNodeChip,
+} from "../live-object/board-node-read-model";
 import type { GameMeta } from "./game-meta";
 import {
   resolveActiveBulletinSlot,
@@ -22,11 +28,7 @@ import { seasonWindowChip, type SeasonWindowPhase } from "./season-window";
 import { factionControllerLabel, isGameFactionHold } from "./factions";
 import { fragmentLatticeProgress } from "./unlock-engine";
 
-export type MapNodeChip = {
-  kind: string;
-  label: string;
-  value: string;
-};
+export type MapNodeChip = BoardNodeChip;
 
 export type MapNodeSnapshotRow = {
   node_id: string;
@@ -68,26 +70,6 @@ function mapScheduleSlots(input: {
   return { activeBulletin, activeRoute };
 }
 
-function childRowForCompose(
-  child: Pick<
-    ChildObjectRow,
-    "object_id" | "object_type" | "status" | "public_state" | "public_label" | "child_object_document_json"
-  >,
-  labelFallback: string
-): ChildObjectRow {
-  return {
-    object_id: child.object_id,
-    parent_profile_id: "",
-    object_type: child.object_type,
-    public_label: child.public_label?.trim() || labelFallback,
-    public_state: child.public_state,
-    status: child.status,
-    child_object_document_json: child.child_object_document_json,
-    created_at: "",
-    updated_at: "",
-  };
-}
-
 /** Derive aggregate-safe map row from a child object (same precedence as scan SSR). */
 export function deriveMapNodeSnapshot(input: {
   child: Pick<
@@ -112,31 +94,25 @@ export function deriveMapNodeSnapshot(input: {
   const fields = parseGameNodeFields(input.child.child_object_document_json);
   if (!fields || fields.seasonId !== input.season.season_id) return null;
 
-  const lifecycle: MapNodeSnapshotRow["lifecycle"] =
-    input.child.status === "revoked"
-      ? "revoked"
-      : input.child.status === "disabled"
-        ? "paused"
-        : "active";
+  const lifecycle = resolveBoardNodeLifecycle(input.child.status);
 
   let mapMode: MapNodeSnapshotRow["map_mode"] = "fallback";
   let publicState = input.child.public_state;
   let streamPolicy = null;
 
   if (lifecycle === "active") {
-    const composed = composeChildObjectScanState({
-      child: childRowForCompose(input.child, registry.label),
+    const composed = composeActiveBoardNodeReadModel({
+      child: input.child,
+      labelFallback: registry.label,
       season: input.season,
       env: input.env,
       now: input.now,
     });
     streamPolicy = composed.streamPolicy;
     publicState = composed.publicState;
-    mapMode = composed.gameNode?.mode ?? "fallback";
-  } else if (lifecycle === "revoked") {
-    mapMode = "revoked";
+    mapMode = composed.mapMode;
   } else {
-    mapMode = "care_pause";
+    mapMode = resolveNonActiveBoardMapMode(lifecycle);
   }
 
   const { activeBulletin, activeRoute } = mapScheduleSlots({
@@ -178,18 +154,12 @@ export function buildMapNodeChips(
   seasonWindowPhase: SeasonWindowPhase,
   opts: { rumored?: Set<string> } = {}
 ): MapNodeChip[] {
-  if (row.lifecycle === "revoked") {
-    return [{ kind: "revoked", label: "Status", value: "Revoked" }];
-  }
-  if (row.map_mode === "care_pause") {
-    return [
-      {
-        kind: "maintenance",
-        label: "Care",
-        value: row.public_state.trim() || "Maintenance pause",
-      },
-    ];
-  }
+  const universal = buildUniversalBoardNodeChips({
+    lifecycle: row.lifecycle,
+    map_mode: row.map_mode,
+    public_state: row.public_state,
+  });
+  if (universal) return universal;
 
   const chips: MapNodeChip[] = [];
   const meta = row.game_meta;
