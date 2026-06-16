@@ -52,4 +52,10 @@ describe("created season when panel", () => {
     expect(panelIdx).toBeLessThan(formStart);
     expect(html.slice(formStart, formEnd)).not.toContain('id="created-season-when-panel"');
   });
+
+  it("saves the When panel field on blur for keyboard setup flow", () => {
+    const src = readFileSync(join(process.cwd(), "site/js/created-season-when-panel.mjs"), "utf8");
+    expect(src).toContain('input.addEventListener("change", saveSeasonId)');
+    expect(src).toContain('input.addEventListener("blur", saveSeasonId)');
+  });
 });
