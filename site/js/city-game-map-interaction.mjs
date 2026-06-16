@@ -4,6 +4,7 @@
 import {
   applyBoardFilterVisibility,
   clearBoardFilters,
+  setDistrictFilter,
   setStateFilter,
   setTypeFilter,
 } from "./city-game-map-filter-core.mjs";
@@ -296,6 +297,20 @@ export function bootCityGameMapInteraction(boardRoot, season) {
     });
   }
 
+  const districtToolbar = boardRoot.querySelector(".city-game-map-district-filter");
+  if (districtToolbar instanceof HTMLElement) {
+    districtToolbar.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      const btn = target.closest("[data-district-filter]");
+      if (!(btn instanceof HTMLButtonElement)) return;
+      const districtId = btn.dataset.districtFilter ?? "all";
+      setDistrictFilter(boardRoot, districtId);
+      refreshSelectionFeedbackBar(boardRoot);
+      syncMapBoardUrl(boardRoot);
+    });
+  }
+
   boardRoot.addEventListener(
     "mousedown",
     (event) => {
@@ -336,7 +351,7 @@ export function bootCityGameMapInteraction(boardRoot, season) {
     }
 
     if (target.closest("a[href]")) return;
-    if (target.closest("[data-type-filter], [data-state-filter], [data-filter-clear]")) return;
+    if (target.closest("[data-type-filter], [data-state-filter], [data-district-filter], [data-filter-clear]")) return;
 
     const row = target.closest(".city-game-map-node-row");
     if (row instanceof HTMLElement && row.dataset.nodeId) {
@@ -371,6 +386,9 @@ export function bootCityGameMapInteraction(boardRoot, season) {
     }
     if (queryState.state !== "all") {
       setStateFilter(boardRoot, queryState.state);
+    }
+    if (queryState.district !== "all") {
+      setDistrictFilter(boardRoot, queryState.district);
     }
     if (queryState.node) {
       selectMapNode(boardRoot, queryState.node, {

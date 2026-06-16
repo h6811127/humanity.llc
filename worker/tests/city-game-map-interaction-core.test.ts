@@ -79,6 +79,7 @@ describe("city-game-map-interaction-core", () => {
     expect(src).toContain("clearBoardFilters");
     expect(src).toContain("applyBoardFilterVisibility");
     expect(src).toContain("readMapBoardQueryState");
+    expect(src).toContain("setDistrictFilter");
     expect(src).toContain("syncMapBoardUrl");
     expect(src).toContain("data-copy-board-link");
     expect(src).toContain("syncSelectionFeedbackBar");
@@ -140,39 +141,43 @@ describe("city-game-map-interaction-core", () => {
   });
 
   it("reads and builds shareable board URL state", () => {
-    expect(readMapBoardQueryState("?node=node_04&type=relay_gate&state=unlocked")).toEqual({
+    expect(readMapBoardQueryState("?node=node_04&type=relay_gate&state=unlocked&district=newbo")).toEqual({
       node: "node_04",
       type: "relay_gate",
       state: "unlocked",
+      district: "newbo",
     });
     expect(readMapBoardQueryState("?type=invalid")).toEqual({
       node: null,
       type: "all",
       state: "all",
+      district: "all",
     });
     expect(
       buildMapBoardSharePath("/play/cedar-rapids/map/", {
         node: "node_04",
         type: "relay_gate",
+        district: "river_spine",
         state: "all",
       })
-    ).toBe("/play/cedar-rapids/map/?node=node_04&type=relay_gate");
+    ).toBe("/play/cedar-rapids/map/?node=node_04&type=relay_gate&district=river_spine");
     expect(
       buildMapBoardAbsoluteShareUrl(
         "/play/cedar-rapids/map/",
-        { type: "hidden" },
+        { type: "hidden", district: "newbo" },
         "https://humanity.llc"
       )
-    ).toBe("https://humanity.llc/play/cedar-rapids/map/?type=hidden");
+    ).toBe("https://humanity.llc/play/cedar-rapids/map/?type=hidden&district=newbo");
     expect(
       readMapBoardShareStateFromRoot({
         dataset: {
           highlightNodeId: "node_01",
           activeType: "sanctuary",
           activeState: "unlocked",
+          activeDistrict: "newbo",
         },
       })
-    ).toEqual({ node: "node_01", type: "sanctuary", state: "unlocked" });
+    ).toEqual({ node: "node_01", type: "sanctuary", state: "unlocked", district: "newbo" });
   });
 
   it("resolveSelectionBarCopy prefers row title and meta", () => {

@@ -9,13 +9,7 @@ export {
   matchesTypeFilter as matchesExploreFilter,
 } from "./city-game-map-type-filter-core.mjs";
 
-/**
- * @param {string | null | undefined} districtId
- * @param {string | null | undefined} activeDistrict
- */
-export function matchesDistrictFilter(_districtId, _activeDistrict) {
-  return true;
-}
+export { matchesDistrictFilter } from "./city-game-map-filter-core.mjs";
 
 /**
  * @param {string | null | undefined} activeDistrict

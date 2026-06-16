@@ -7,6 +7,7 @@ import { buildBoardFilterSummaryHtml } from "./city-game-map-filter-summary-core
 import { buildStateFilterHtml, deriveNodeBoardStates } from "./city-game-map-state-filter-core.mjs";
 import {
   buildMapSelectionBarHtml,
+  buildDistrictFilterHtml,
   isDenseMapBoard,
 } from "./city-game-map-interaction-core.mjs";
 import {
@@ -939,6 +940,7 @@ export function buildMapFirstPaintHtml(season, launchCopy, contextView = null) {
  * @param {ReturnType<typeof resolveLaunchCopy>} launchCopy
  */
 export function buildMapPlacesSectionHtml(season, copy, launchCopy, contextView = null) {
+  const districtFilter = isDenseMapBoard(season) ? buildDistrictFilterHtml(season) : "";
   return `<section class="city-game-map-places-list" id="city-game-map-places" aria-labelledby="city-game-map-list-title">
   ${buildMapStartHereCalloutHtml(season, launchCopy)}
   <div class="city-game-map-list-panel">
@@ -950,6 +952,7 @@ export function buildMapPlacesSectionHtml(season, copy, launchCopy, contextView 
     <details class="city-game-map-filters-details" id="city-game-map-filters">
       <summary class="city-game-map-filters-summary">${escapeMapHtml(copy.filters_summary)}</summary>
       <div class="city-game-map-browse-filters">
+        ${districtFilter}
         ${buildTypeFilterHtml(season)}
         ${buildStateFilterHtml()}
       </div>

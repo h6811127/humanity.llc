@@ -5,11 +5,13 @@
 /**
  * @param {string | null | undefined} activeType
  * @param {string | null | undefined} activeState
+ * @param {string | null | undefined} [activeDistrict]
  */
-export function isBoardFilterActive(activeType, activeState) {
+export function isBoardFilterActive(activeType, activeState, activeDistrict) {
   const type = String(activeType ?? "all");
   const state = String(activeState ?? "all");
-  return type !== "all" || state !== "all";
+  const district = String(activeDistrict ?? "all");
+  return type !== "all" || state !== "all" || district !== "all";
 }
 
 /**

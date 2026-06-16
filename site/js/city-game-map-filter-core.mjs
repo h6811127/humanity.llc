@@ -1,14 +1,22 @@
 /**
- * City board filter visibility — type + world-state (AND).
+ * City board filter visibility — type + world-state + district (AND).
  */
 
 import { matchesBoardStateFilters } from "./city-game-map-state-filter-core.mjs";
 import { matchesBoardTypeFilters } from "./city-game-map-type-filter-core.mjs";
 import {
   formatBoardFilterCountLabel,
-  formatBoardFilterSummaryScope,
   isBoardFilterActive,
 } from "./city-game-map-filter-summary-core.mjs";
+
+/**
+ * @param {string | null | undefined} districtId
+ * @param {string | null | undefined} activeDistrict
+ */
+export function matchesDistrictFilter(districtId, activeDistrict) {
+  if (!activeDistrict || activeDistrict === "all") return true;
+  return String(districtId ?? "") === String(activeDistrict);
+}
 
 /**
  * @param {HTMLElement} boardRoot
@@ -57,8 +65,9 @@ export function syncBoardFilterSummary(boardRoot) {
 
   const typeId = boardRoot.dataset.activeType ?? boardRoot.dataset.activeExplore ?? "all";
   const stateId = boardRoot.dataset.activeState ?? "all";
+  const districtId = boardRoot.dataset.activeDistrict ?? "all";
 
-  if (!isBoardFilterActive(typeId, stateId)) {
+  if (!isBoardFilterActive(typeId, stateId, districtId)) {
     summary.hidden = true;
     if (summary.classList && typeof summary.classList.remove === "function") {
       summary.classList.remove("city-game-map-filter-summary--live");
@@ -79,20 +88,22 @@ export function syncBoardFilterSummary(boardRoot) {
     stateId === "all"
       ? null
       : readFilterButtonLabel(boardRoot, "data-state-filter", stateId, stateId);
+  const districtLabel =
+    districtId === "all"
+      ? null
+      : readFilterButtonLabel(boardRoot, "data-district-filter", districtId, districtId);
 
   const scopeEl = summary.querySelector("[data-filter-summary-scope]");
   const countEl = summary.querySelector("[data-filter-summary-count]");
   const count = countVisibleBoardNodes(boardRoot);
   const countLabel = formatBoardFilterCountLabel(count);
   const scopeParts = [];
+  if (districtId !== "all" && districtLabel) scopeParts.push(districtLabel);
   if (typeId !== "all") scopeParts.push(typeLabel);
   if (stateId !== "all" && stateLabel) scopeParts.push(stateLabel);
 
   if (scopeEl) {
-    scopeEl.textContent =
-      scopeParts.length > 0
-        ? formatBoardFilterSummaryScope(scopeParts[0], scopeParts[1] ?? null)
-        : typeLabel;
+    scopeEl.textContent = scopeParts.length > 0 ? scopeParts.join(" · ") : typeLabel;
   }
   if (countEl) {
     countEl.textContent = countLabel;
@@ -137,9 +148,14 @@ export function applyBoardFilterVisibility(boardRoot) {
     boardRoot.dataset.activeState && boardRoot.dataset.activeState !== "all"
       ? boardRoot.dataset.activeState
       : null;
+  const activeDistrict =
+    boardRoot.dataset.activeDistrict && boardRoot.dataset.activeDistrict !== "all"
+      ? boardRoot.dataset.activeDistrict
+      : null;
 
   for (const row of boardRoot.querySelectorAll(".city-game-map-node-row[data-node-id]")) {
     if (!row || typeof row !== "object" || typeof row.getAttribute !== "function") continue;
+    const districtMatch = matchesDistrictFilter(row.getAttribute("data-district"), activeDistrict);
     const typeMatch = matchesBoardTypeFilters(
       {
         role: row.getAttribute("data-role"),
@@ -153,7 +169,7 @@ export function applyBoardFilterVisibility(boardRoot) {
       },
       { activeState }
     );
-    const match = typeMatch && stateMatch;
+    const match = districtMatch && typeMatch && stateMatch;
     const fogOmitted =
       row &&
       typeof row === "object" &&
@@ -166,6 +182,7 @@ export function applyBoardFilterVisibility(boardRoot) {
 
   for (const pin of boardRoot.querySelectorAll(".city-game-map-pin[data-node-id]")) {
     if (!pin || typeof pin !== "object" || typeof pin.getAttribute !== "function") continue;
+    const districtMatch = matchesDistrictFilter(pin.getAttribute("data-district"), activeDistrict);
     const typeMatch = matchesBoardTypeFilters(
       {
         role: pin.getAttribute("data-role"),
@@ -179,7 +196,7 @@ export function applyBoardFilterVisibility(boardRoot) {
       },
       { activeState }
     );
-    setBoardFilterHidden(pin, !(typeMatch && stateMatch));
+    setBoardFilterHidden(pin, !(districtMatch && typeMatch && stateMatch));
   }
 
   for (const block of boardRoot.querySelectorAll(".city-game-map-district[data-district]")) {
@@ -251,13 +268,30 @@ export function syncStateFilterUi(boardRoot, stateId) {
   }
 }
 
-/** @deprecated District filter removed from primary board UI. */
-export function syncDistrictFilterUi(_boardRoot, _districtId) {}
+/**
+ * @param {HTMLElement} boardRoot
+ * @param {string} districtId
+ */
+export function syncDistrictFilterUi(boardRoot, districtId) {
+  const toolbar = boardRoot.querySelector(".city-game-map-district-filter");
+  if (!toolbar) return;
+  const emphasize = isBoardFilterChipEmphasized(districtId);
+  for (const btn of toolbar.querySelectorAll("[data-district-filter]")) {
+    if (!btn || typeof btn !== "object") continue;
+    const selected = btn.getAttribute("data-district-filter") === districtId;
+    if (typeof btn.setAttribute === "function") {
+      btn.setAttribute("aria-pressed", selected ? "true" : "false");
+    }
+    if (btn.classList && typeof btn.classList.toggle === "function") {
+      btn.classList.toggle("city-game-map-filter-btn--active", selected && emphasize);
+    }
+  }
+}
 
-/** @deprecated District filter removed from primary board UI. */
 export function setDistrictFilter(boardRoot, districtId) {
   boardRoot.dataset.activeDistrict = districtId;
   applyBoardFilterVisibility(boardRoot);
+  syncDistrictFilterUi(boardRoot, districtId);
 }
 
 /**
@@ -297,4 +331,5 @@ export function clearBoardFilters(boardRoot) {
   applyBoardFilterVisibility(boardRoot);
   syncTypeFilterUi(boardRoot, "all");
   syncStateFilterUi(boardRoot, "all");
+  syncDistrictFilterUi(boardRoot, "all");
 }

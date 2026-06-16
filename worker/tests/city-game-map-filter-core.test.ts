@@ -8,8 +8,11 @@ import { buildMapBoardInnerHtml } from "../../site/js/city-game-map-board-core.m
 import {
   applyBoardFilterVisibility,
   isBoardFilterChipEmphasized,
+  matchesDistrictFilter,
+  setDistrictFilter,
   setStateFilter,
   setTypeFilter,
+  syncDistrictFilterUi,
   syncStateFilterUi,
   syncTypeFilterUi,
 } from "../../site/js/city-game-map-filter-core.mjs";
@@ -403,11 +406,48 @@ describe("city-game-map-filter-core", () => {
     expect(blocks.find((b) => b.district === "newbo")?.hidden).toBe(true);
   });
 
+  it("setDistrictFilter limits visible rows to one district", () => {
+    const nodes = [
+      { node_id: "node_a", district: "downtown", role: "care_loop" },
+      { node_id: "node_b", district: "newbo", role: "relay_gate" },
+      { node_id: "node_c", district: "newbo", role: "witness" },
+    ];
+    const { boardRoot, rows } = mockBoardRoot(nodes);
+
+    setDistrictFilter(/** @type {HTMLElement} */ (boardRoot), "newbo");
+    expect(rows.filter((row) => !row.hidden).length).toBe(2);
+    expect(matchesDistrictFilter("newbo", "newbo")).toBe(true);
+    expect(matchesDistrictFilter("downtown", "newbo")).toBe(false);
+  });
+
+  it("syncDistrictFilterUi marks selected district chip", () => {
+    const boardRoot = {
+      querySelector() {
+        return {
+          querySelectorAll() {
+            return [
+              {
+                getAttribute(name) {
+                  return name === "data-district-filter" ? "newbo" : null;
+                },
+                setAttribute() {},
+                classList: { toggle() {} },
+              },
+            ];
+          },
+        };
+      },
+    };
+    syncDistrictFilterUi(/** @type {HTMLElement} */ (boardRoot), "newbo");
+  });
+
   it("board html includes type and state toolbars with data-role on rows", () => {
     const html = buildMapBoardInnerHtml(season);
     expect(html).toContain("city-game-map-type-filter");
     expect(html).toContain('data-type-filter="relay_gate"');
     expect(html).toContain("Relays");
+    expect(html).toContain("city-game-map-district-filter");
+    expect(html).toContain('data-district-filter="newbo"');
     expect(html).toContain("city-game-map-state-filter");
     expect(html).toContain('data-state-filter="needs_action"');
     expect(html).toContain('data-role="relay_gate"');

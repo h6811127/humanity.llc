@@ -13,6 +13,8 @@ describe("city-game-map-filter-summary-core", () => {
     expect(isBoardFilterActive("newbo", "all")).toBe(true);
     expect(isBoardFilterActive("all", "relay_gate")).toBe(true);
     expect(isBoardFilterActive("river_spine", "relay_gate")).toBe(true);
+    expect(isBoardFilterActive("all", "all", "newbo")).toBe(true);
+    expect(isBoardFilterActive("all", "all", "all")).toBe(false);
   });
 
   it("formats viewing scope and place count copy", () => {

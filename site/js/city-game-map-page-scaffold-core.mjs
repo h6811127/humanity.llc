@@ -10,7 +10,7 @@ import {
   seasonLaunchContext,
 } from "./city-game-season-path-shared.mjs";
 
-export const MAP_PAGE_SCRIPT = "/js/city-game-map-page.mjs?v=2";
+export const MAP_PAGE_SCRIPT = "/js/city-game-map-page.mjs?v=3";
 export const STYLES_HREF = "/styles.css?v=157";
 
 /**
