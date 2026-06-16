@@ -399,4 +399,16 @@ describe("created-child-object-game-node-core", () => {
     expect(src).toContain("registerChildObjectAndIssueScanLink");
     expect(src).toContain("child-object-game-node-bulk");
   });
+
+  it("created game node module accepts season id saved from the When panel", () => {
+    const gameNodeSrc = readFileSync(
+      join(process.cwd(), "site/js/created-child-object-game-node.mjs"),
+      "utf8"
+    );
+    const createdSrc = readFileSync(join(process.cwd(), "site/js/created.mjs"), "utf8");
+
+    expect(gameNodeSrc).toContain("async function selectSeasonId");
+    expect(gameNodeSrc).toContain("readRememberedGameSeasonId(ctx.profileId)");
+    expect(createdSrc).toContain("gameNodeCtl.selectSeasonId(seasonId)");
+  });
 });

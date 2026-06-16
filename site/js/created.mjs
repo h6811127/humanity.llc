@@ -543,13 +543,17 @@ function refreshSeasonSlice6Presentation() {
   if (!seasonWhenPanelCtl) {
     seasonWhenPanelCtl = initCreatedSeasonWhenPanel({
       ...ctx,
-      onSeasonIdSaved: () => {
+      onSeasonIdSaved: (seasonId) => {
         syncSeasonProgressiveChecklist({
           profileId,
           session: loadSession(),
           activeRoom: getBoundStewardActiveRoom(profileId),
         });
-        gameNodeCtl?.refresh?.();
+        if (typeof gameNodeCtl?.selectSeasonId === "function") {
+          void gameNodeCtl.selectSeasonId(seasonId);
+        } else {
+          gameNodeCtl?.refresh?.();
+        }
       },
     });
   } else {
