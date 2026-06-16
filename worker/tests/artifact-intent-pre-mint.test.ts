@@ -6,6 +6,7 @@ import {
   signDocument,
   withProtocolFields,
 } from "../src/crypto";
+import { validatePreMintCredentialsForIntent } from "../src/commerce/pre-mint-credentials";
 import { handlePostArtifactIntentPreMint } from "../src/resolver/artifact-intents";
 import type { ArtifactIntentRow } from "../src/db/artifact-intents";
 import { handlePostShopifyOrdersWebhook } from "../src/http/shopify-orders-webhook";
@@ -17,6 +18,8 @@ const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const INTENT = "ai_PreMintAutoMint01";
 const PLANNED_QR = "qr_8Yk9nQ3oR5sU7wX9zA2bC3dE6fG";
 const PLANNED_PA = "pa_testPreMintAuto919";
+const SECOND_PLANNED_QR = "qr_6Wn4rQ2oP8sT5vX7yA1bC3dE9fH";
+const SECOND_PLANNED_PA = "pa_testPreMintAuto920";
 const SECRET = "shpss_pre_mint_auto_mint";
 
 async function signPayload(payload: string): Promise<string> {
@@ -32,23 +35,36 @@ async function signPayload(payload: string): Promise<string> {
 }
 
 async function buildPrintArtifactCredential(
-  privateKey: CryptoKey,
-  publicKeyBase58: string
+  privateKey: Uint8Array,
+  publicKeyBase58: string,
+  overrides: Partial<{
+    qr_id: string;
+    profile_id: string;
+    nonce: string;
+    scope: string;
+    print_artifact_id: string;
+    expires_at: string | null;
+    status: string;
+    payload: string;
+  }> = {}
 ) {
+  const qrId = overrides.qr_id ?? PLANNED_QR;
+  const profileId = overrides.profile_id ?? PROFILE;
   return signDocument(
     withProtocolFields(
       {
-        qr_id: PLANNED_QR,
-        profile_id: PROFILE,
-        nonce: "nonce_preMintAutoMint1",
+        qr_id: qrId,
+        profile_id: profileId,
+        nonce: overrides.nonce ?? "nonce_preMintAutoMint1",
         epoch: 1,
-        scope: "print_artifact",
-        print_artifact_id: PLANNED_PA,
+        scope: overrides.scope ?? "print_artifact",
+        print_artifact_id: overrides.print_artifact_id ?? PLANNED_PA,
         resolver_hint: "https://humanity.llc",
         issued_at: "2026-05-16T17:00:00.000Z",
-        expires_at: null,
-        status: "active",
-        payload: `https://humanity.llc/c/${PROFILE}?q=${PLANNED_QR}`,
+        expires_at: overrides.expires_at ?? null,
+        status: overrides.status ?? "active",
+        payload:
+          overrides.payload ?? `https://humanity.llc/c/${profileId}?q=${qrId}`,
       },
       PAYLOAD_TYPES.QR_CREDENTIAL
     ),
@@ -56,7 +72,10 @@ async function buildPrintArtifactCredential(
   );
 }
 
-function intentRow(pendingMint: string | null = null): ArtifactIntentRow {
+function intentRow(
+  pendingMint: string | null = null,
+  overrides: Partial<ArtifactIntentRow> = {}
+): ArtifactIntentRow {
   return {
     artifact_intent_id: INTENT,
     profile_id: PROFILE,
@@ -70,6 +89,7 @@ function intentRow(pendingMint: string | null = null): ArtifactIntentRow {
     expires_at: "2099-01-01T00:00:00Z",
     created_at: "2026-05-16T17:00:00Z",
     updated_at: "2026-05-16T17:00:00Z",
+    ...overrides,
   };
 }
 
@@ -80,7 +100,11 @@ type DbState = {
   printOrders: Map<string, unknown>;
 };
 
-function dbFor(state: DbState, cardPublicKey: string): D1Database {
+function dbFor(
+  state: DbState,
+  cardPublicKey: string,
+  options: { cardStatus?: string; recoveryPublicKey?: string | null } = {}
+): D1Database {
   const activeByPa = new Map<string, string>();
 
   return {
@@ -110,11 +134,11 @@ function dbFor(state: DbState, cardPublicKey: string): D1Database {
           if (sql.includes("FROM cards WHERE profile_id = ?")) {
             return {
               public_key: cardPublicKey,
-              recovery_public_key: null,
+              recovery_public_key: options.recoveryPublicKey ?? null,
               handle: "river_example",
               handle_normalized: "river_example",
               manifesto_line: "Open studio",
-              status: "active",
+              status: options.cardStatus ?? "active",
               card_document_json: "{}",
               created_at: "2026-05-16T17:00:00Z",
               updated_at: "2026-05-16T17:00:00Z",
@@ -123,9 +147,9 @@ function dbFor(state: DbState, cardPublicKey: string): D1Database {
           if (sql.includes("issuer_public_key")) {
             return {
               public_key: cardPublicKey,
-              recovery_public_key: null,
+              recovery_public_key: options.recoveryPublicKey ?? null,
               issuer_public_key: null,
-              status: "active",
+              status: options.cardStatus ?? "active",
             };
           }
           if (sql.includes("print_artifact_id = ?")) {
@@ -218,6 +242,128 @@ function dbFor(state: DbState, cardPublicKey: string): D1Database {
 }
 
 const env = { SHOPIFY_WEBHOOK_SECRET: SECRET } as Env;
+
+describe("pre-mint credential validation", () => {
+  function validationRequest() {
+    return new Request(`https://humanity.llc/v1/store/artifact-intents/${INTENT}/pre-mint`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  function emptyDb(cardPublicKey: string, options?: Parameters<typeof dbFor>[2]) {
+    return dbFor(
+      {
+        intents: new Map([[INTENT, intentRow()]]),
+        orders: new Map(),
+        receipts: new Map(),
+        printOrders: new Map(),
+      },
+      cardPublicKey,
+      options
+    );
+  }
+
+  it("rejects credential batches whose count does not match the planned item quantity", async () => {
+    const { publicKeyBase58 } = await getTestKeypair();
+    const result = await validatePreMintCredentialsForIntent(
+      validationRequest(),
+      emptyDb(publicKeyBase58),
+      intentRow(),
+      [{}, {}]
+    );
+
+    expect(result).toMatchObject({
+      ok: false,
+      code: "PRE_MINT_COUNT_MISMATCH",
+      httpStatus: 422,
+    });
+  });
+
+  it("rejects credentials for QRs outside the artifact intent plan", async () => {
+    const { privateKey, publicKeyBase58 } = await getTestKeypair();
+    const credential = await buildPrintArtifactCredential(privateKey, publicKeyBase58, {
+      qr_id: SECOND_PLANNED_QR,
+      print_artifact_id: SECOND_PLANNED_PA,
+    });
+
+    const result = await validatePreMintCredentialsForIntent(
+      validationRequest(),
+      emptyDb(publicKeyBase58),
+      intentRow(),
+      [credential]
+    );
+
+    expect(result).toMatchObject({
+      ok: false,
+      code: "PLANNED_QR_MISMATCH",
+      httpStatus: 422,
+    });
+  });
+
+  it("rejects duplicate credentials even when the batch size matches the plan", async () => {
+    const { privateKey, publicKeyBase58 } = await getTestKeypair();
+    const credential = await buildPrintArtifactCredential(privateKey, publicKeyBase58);
+    const twoItemIntent = intentRow(null, {
+      quantity: 2,
+      planned_item_qr_ids_json: JSON.stringify([PLANNED_QR, SECOND_PLANNED_QR]),
+      planned_print_artifact_ids_json: JSON.stringify([PLANNED_PA, SECOND_PLANNED_PA]),
+    });
+
+    const result = await validatePreMintCredentialsForIntent(
+      validationRequest(),
+      emptyDb(publicKeyBase58),
+      twoItemIntent,
+      [credential, credential]
+    );
+
+    expect(result).toMatchObject({
+      ok: false,
+      code: "DUPLICATE_PLANNED_QR",
+      httpStatus: 422,
+    });
+  });
+
+  it("rejects pre-mint credentials when the source card is inactive", async () => {
+    const { privateKey, publicKeyBase58 } = await getTestKeypair();
+    const credential = await buildPrintArtifactCredential(privateKey, publicKeyBase58);
+
+    const result = await validatePreMintCredentialsForIntent(
+      validationRequest(),
+      emptyDb(publicKeyBase58, { cardStatus: "revoked" }),
+      intentRow(),
+      [credential]
+    );
+
+    expect(result).toMatchObject({
+      ok: false,
+      code: "CARD_UNAVAILABLE",
+      httpStatus: 410,
+    });
+  });
+
+  it("requires the owner key for stored post-payment mint credentials", async () => {
+    const { privateKey, publicKeyBase58 } = await getTestKeypair();
+    const credential = await buildPrintArtifactCredential(privateKey, publicKeyBase58);
+    const ownerPublicKey = publicKeyBase58.endsWith("1")
+      ? `${publicKeyBase58.slice(0, -1)}2`
+      : `${publicKeyBase58.slice(0, -1)}1`;
+
+    const result = await validatePreMintCredentialsForIntent(
+      validationRequest(),
+      emptyDb(ownerPublicKey, { recoveryPublicKey: publicKeyBase58 }),
+      intentRow(),
+      [credential]
+    );
+
+    expect(result).toMatchObject({
+      ok: false,
+      code: "INVALID_SIGNATURE",
+      message: "QR credential must be signed by the card owner key.",
+      httpStatus: 422,
+    });
+  });
+});
 
 describe("artifact intent pre-mint + paid webhook auto-mint", () => {
   afterEach(() => {
