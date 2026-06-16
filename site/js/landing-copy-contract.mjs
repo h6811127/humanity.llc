@@ -9,7 +9,7 @@
 /** Bump when hero / discovery dashboard copy or structure changes intentionally. */
 export const LANDING_COPY_CONTRACT_VERSION = 6;
 
-export const LANDING_STYLES_CACHE_BUST = "153";
+export const LANDING_STYLES_CACHE_BUST = "157";
 
 export const LANDING_REQUIRED_SNIPPETS = [
   "Check what's true right now before you knock, pick up, or show up.",
@@ -38,7 +38,7 @@ export const LANDING_REQUIRED_SNIPPETS = [
   "No behavioral dossiers",
   "The sticker stays — the status changes.",
   'id="landing-learn-trust"',
-  "public-networks-portal.css?v=4",
+  "public-networks-portal.css?v=6",
   `styles.css?v=${LANDING_STYLES_CACHE_BUST}`,
 ];
 

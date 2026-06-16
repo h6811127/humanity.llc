@@ -10,8 +10,8 @@ import {
   seasonLaunchContext,
 } from "./city-game-season-path-shared.mjs";
 
-export const MAP_PAGE_SCRIPT = "/js/city-game-map-page.mjs?v=1";
-export const STYLES_HREF = "/styles.css?v=148";
+export const MAP_PAGE_SCRIPT = "/js/city-game-map-page.mjs?v=2";
+export const STYLES_HREF = "/styles.css?v=157";
 
 /**
  * @param {string} value

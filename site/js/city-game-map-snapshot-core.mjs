@@ -456,6 +456,17 @@ export function applySnapshotToMapBoard(boardRoot, snapshot) {
       effectEl.textContent = formatNodeEffectFromSnapshot(nodeId, role, snap, seasonCtx);
     }
 
+    const chipsEl = row.querySelector("[data-node-chips]");
+    if (chipsEl instanceof HTMLElement) {
+      if (Array.isArray(snap?.chips) && snap.chips.length) {
+        chipsEl.innerHTML = buildNodeChipsHtml(snap.chips);
+        chipsEl.hidden = false;
+      } else {
+        chipsEl.innerHTML = "";
+        chipsEl.hidden = true;
+      }
+    }
+
     if (snap?.scan_url) {
       live.innerHTML = `<a class="city-game-map-scan-link city-game-map-row-cta" href="${escapeMapHtml(String(snap.scan_url))}">${escapeMapHtml(ctaLabel)}</a>`;
     } else {

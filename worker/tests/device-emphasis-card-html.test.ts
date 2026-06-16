@@ -10,6 +10,7 @@ import {
   escapeEmphasisHtml,
 } from "../../site/js/device-emphasis-card-html.mjs";
 import { DEVICE_SHELL_ASSET_VERSION, DEVICE_SHELL_CSS_VERSION } from "../../site/js/device-status-shell-modules.mjs";
+import { LANDING_STYLES_CACHE_BUST } from "../../site/js/landing-copy-contract.mjs";
 
 describe("device-emphasis-card-html", () => {
   it("escapes HTML in CTA labels", () => {
@@ -33,7 +34,7 @@ describe("device-emphasis-card-html", () => {
   it("landing index busts styles.css cache when spacing changes", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
     expect(html).toContain('href="/css/hc-emphasis-card.css?v=5"');
-    expect(html).toContain("styles.css?v=153");
+    expect(html).toContain(`styles.css?v=${LANDING_STYLES_CACHE_BUST}`);
   });
 
   it("landing discovery CTA uses primary hero button to create", () => {

@@ -104,6 +104,97 @@ export function readMapBoardNodeQueryParam(search = "") {
   return node || null;
 }
 
+const MAP_BOARD_TYPE_FILTER_IDS = new Set([
+  "all",
+  "relay_gate",
+  "lore",
+  "witness",
+  "sanctuary",
+  "care_loop",
+  "finale",
+  "hidden",
+]);
+
+const MAP_BOARD_STATE_FILTER_IDS = new Set([
+  "all",
+  "needs_action",
+  "unlocked",
+  "locked",
+  "changed_recently",
+  "care_paused",
+  "compromised",
+  "sanctuary_open",
+]);
+
+/**
+ * @param {string | null | undefined} value
+ * @param {Set<string>} allowed
+ * @returns {string}
+ */
+export function normalizeMapBoardFilterParam(value, allowed) {
+  const id = String(value ?? "").trim();
+  if (!id || id === "all") return "all";
+  return allowed.has(id) ? id : "all";
+}
+
+/**
+ * @param {string} [search]
+ * @returns {{ node: string | null; type: string; state: string }}
+ */
+export function readMapBoardQueryState(search = "") {
+  const raw = String(search ?? "").trim();
+  const params = new URLSearchParams(raw.startsWith("?") ? raw.slice(1) : raw);
+  const node = params.get("node")?.trim() || null;
+  const type = normalizeMapBoardFilterParam(params.get("type"), MAP_BOARD_TYPE_FILTER_IDS);
+  const state = normalizeMapBoardFilterParam(params.get("state"), MAP_BOARD_STATE_FILTER_IDS);
+  return { node, type, state };
+}
+
+/**
+ * @param {string} pathname
+ * @param {{ node?: string | null; type?: string; state?: string }} state
+ * @returns {string}
+ */
+export function buildMapBoardSharePath(pathname, state = {}) {
+  const path = String(pathname ?? "").trim() || "/";
+  const params = new URLSearchParams();
+  const node = String(state.node ?? "").trim();
+  const type = String(state.type ?? "all").trim() || "all";
+  const boardState = String(state.state ?? "all").trim() || "all";
+  if (node) params.set("node", node);
+  if (type && type !== "all") params.set("type", type);
+  if (boardState && boardState !== "all") params.set("state", boardState);
+  const qs = params.toString();
+  return qs ? `${path}?${qs}` : path;
+}
+
+/**
+ * @param {string} pathname
+ * @param {{ node?: string | null; type?: string; state?: string }} state
+ * @param {string} [origin]
+ * @returns {string}
+ */
+export function buildMapBoardAbsoluteShareUrl(pathname, state = {}, origin = "") {
+  const base = String(origin ?? "").replace(/\/$/, "");
+  const path = buildMapBoardSharePath(pathname, state);
+  return base ? `${base}${path}` : path;
+}
+
+/**
+ * @param {{ dataset?: DOMStringMap }} boardRoot
+ * @returns {{ node: string | null; type: string; state: string }}
+ */
+export function readMapBoardShareStateFromRoot(boardRoot) {
+  const node = boardRoot?.dataset?.highlightNodeId?.trim() || null;
+  const type = boardRoot?.dataset?.activeType ?? boardRoot?.dataset?.activeExplore ?? "all";
+  const state = boardRoot?.dataset?.activeState ?? "all";
+  return {
+    node,
+    type: String(type || "all"),
+    state: String(state || "all"),
+  };
+}
+
 export function resolveMapNodeHighlight(currentNodeId, clickedNodeId) {
   const id = String(clickedNodeId ?? "").trim();
   if (!id) return null;
@@ -186,6 +277,7 @@ export function buildMapSelectionBarHtml() {
   </div>
   <div class="city-game-map-selection-bar-actions">
     <button type="button" class="city-game-map-selection-bar-action" data-show-on-sketch>Show on sketch</button>
+    <button type="button" class="city-game-map-selection-bar-action" data-copy-board-link>Copy link</button>
   </div>
 </div>`;
 }

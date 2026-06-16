@@ -1181,6 +1181,7 @@ export function buildMapNodeListHtml(season, launchCopy = resolveLaunchCopy(seas
     <span class="city-game-map-node-title">${escapeMapHtml(title)}</span>
     <span class="city-game-map-node-meta">${escapeMapHtml(districtLabel)} · ${escapeMapHtml(roleLabel)}</span>
   </div>
+  <div class="city-game-map-node-chip-band" data-node-chips hidden aria-label="Live chips"></div>
   <p class="city-game-map-node-card-line city-game-map-node-card-state city-game-map-node-card-why" data-state-first="current-state"><span class="city-game-map-node-card-label">Current state</span><span class="city-game-map-node-effect city-game-map-node-card-text" data-node-effect data-node-card-why>${escapeMapHtml(consequenceLine)}</span></p>
   <span class="city-game-map-node-actions" data-state-first="actions">
     <span class="city-game-map-node-live">${primaryCta}</span>

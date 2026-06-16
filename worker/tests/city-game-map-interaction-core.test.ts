@@ -7,11 +7,15 @@ import { describe, expect, it } from "vitest";
 import {
   buildDistrictFilterHtml,
   buildDistrictFilterOptions,
+  buildMapBoardAbsoluteShareUrl,
+  buildMapBoardSharePath,
   buildMapSelectionBarHtml,
   CITY_GAME_MAP_DENSE_NODE_THRESHOLD,
   isDenseMapBoard,
   isMapPinInteractive,
   readMapBoardNodeQueryParam,
+  readMapBoardQueryState,
+  readMapBoardShareStateFromRoot,
   resolveMapNodeHighlight,
   resolvePrimarySketchFigure,
   resolveSelectionBarCopy,
@@ -74,7 +78,9 @@ describe("city-game-map-interaction-core", () => {
     expect(src).toContain("setTypeFilter");
     expect(src).toContain("clearBoardFilters");
     expect(src).toContain("applyBoardFilterVisibility");
-    expect(src).toContain("readMapBoardNodeQueryParam");
+    expect(src).toContain("readMapBoardQueryState");
+    expect(src).toContain("syncMapBoardUrl");
+    expect(src).toContain("data-copy-board-link");
     expect(src).toContain("syncSelectionFeedbackBar");
     expect(src).toContain("city-game-map-board--place-selected");
     expect(src).toContain("[data-show-on-sketch]");
@@ -126,9 +132,47 @@ describe("city-game-map-interaction-core", () => {
     expect(html).toContain("data-selection-bar");
     expect(html).toContain('data-show-on-sketch');
     expect(html).toContain("Show on sketch");
+    expect(html).toContain("data-copy-board-link");
+    expect(html).toContain("Copy link");
     expect(html).toContain("Selected place");
     expect(html).toContain('role="region"');
     expect(html).toContain(" hidden");
+  });
+
+  it("reads and builds shareable board URL state", () => {
+    expect(readMapBoardQueryState("?node=node_04&type=relay_gate&state=unlocked")).toEqual({
+      node: "node_04",
+      type: "relay_gate",
+      state: "unlocked",
+    });
+    expect(readMapBoardQueryState("?type=invalid")).toEqual({
+      node: null,
+      type: "all",
+      state: "all",
+    });
+    expect(
+      buildMapBoardSharePath("/play/cedar-rapids/map/", {
+        node: "node_04",
+        type: "relay_gate",
+        state: "all",
+      })
+    ).toBe("/play/cedar-rapids/map/?node=node_04&type=relay_gate");
+    expect(
+      buildMapBoardAbsoluteShareUrl(
+        "/play/cedar-rapids/map/",
+        { type: "hidden" },
+        "https://humanity.llc"
+      )
+    ).toBe("https://humanity.llc/play/cedar-rapids/map/?type=hidden");
+    expect(
+      readMapBoardShareStateFromRoot({
+        dataset: {
+          highlightNodeId: "node_01",
+          activeType: "sanctuary",
+          activeState: "unlocked",
+        },
+      })
+    ).toEqual({ node: "node_01", type: "sanctuary", state: "unlocked" });
   });
 
   it("resolveSelectionBarCopy prefers row title and meta", () => {

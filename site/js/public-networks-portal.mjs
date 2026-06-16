@@ -3,6 +3,13 @@
  */
 import { CITY_GAME_SEASONS_INDEX_URL } from "./city-game-season-resolve.mjs";
 import {
+  buildLandingCategoryUrl,
+  landingShelfIdForCategory,
+  readLandingCategoryQueryParam,
+  resolveLandingShelfCategory,
+  syncLiveNowShelfCopy,
+} from "./landing-entry-shelves-core.mjs";
+import {
   buildPublicNetworkCardModel,
   filterPublicNetworkCards,
   listedPublicNetworkRows,
@@ -42,15 +49,40 @@ async function loadPublicNetworkCards(rows) {
   );
 }
 
+/**
+ * @param {PublicNetworkCategoryFilter} category
+ */
+function syncLandingCategoryUrl(category) {
+  if (typeof window === "undefined" || typeof history?.replaceState !== "function") return;
+  const nextUrl = buildLandingCategoryUrl(category, window.location.pathname);
+  if (`${window.location.pathname}${window.location.search}` === nextUrl) return;
+  history.replaceState(null, "", nextUrl);
+}
+
+/**
+ * @param {PublicNetworkCategoryFilter} category
+ */
+function syncLandingShelfActiveState(category) {
+  const activeShelfId = landingShelfIdForCategory(category);
+  for (const btn of document.querySelectorAll("[data-landing-shelf]")) {
+    if (!(btn instanceof HTMLElement)) continue;
+    const shelfId = btn.getAttribute("data-landing-shelf");
+    const active = Boolean(activeShelfId && shelfId === activeShelfId);
+    btn.classList.toggle("landing-entry-shelf-btn--active", active);
+    btn.setAttribute("aria-pressed", active ? "true" : "false");
+  }
+}
+
 function bindPublicNetworksPortal(allCards) {
   const searchInput = document.getElementById("public-networks-search");
   const chipsRoot = document.getElementById("public-networks-categories");
   const resultsRoot = document.getElementById("public-networks-results");
   const emptyEl = document.getElementById("public-networks-empty");
+  const shelvesRoot = document.getElementById("landing-entry-shelves");
   if (!searchInput || !chipsRoot || !resultsRoot || !emptyEl) return;
 
   /** @type {PublicNetworkCategoryFilter} */
-  let activeCategory = "all";
+  let activeCategory = readLandingCategoryQueryParam(window.location.search);
 
   const render = () => {
     const query = searchInput.value;
@@ -64,6 +96,17 @@ function bindPublicNetworksPortal(allCards) {
       category: activeCategory,
       query,
     });
+    syncLandingShelfActiveState(activeCategory);
+    syncLandingCategoryUrl(activeCategory);
+  };
+
+  const setCategory = (category) => {
+    activeCategory = category;
+    render();
+    const toolbar = document.querySelector(".public-networks-toolbar");
+    if (toolbar instanceof HTMLElement) {
+      toolbar.scrollIntoView({ block: "start", behavior: "smooth" });
+    }
   };
 
   searchInput.addEventListener("input", render);
@@ -77,6 +120,18 @@ function bindPublicNetworksPortal(allCards) {
     activeCategory = /** @type {PublicNetworkCategoryFilter} */ (next);
     render();
   });
+
+  if (shelvesRoot instanceof HTMLElement) {
+    shelvesRoot.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      const button = target.closest("[data-landing-shelf]");
+      if (!(button instanceof HTMLButtonElement)) return;
+      const shelfId = button.getAttribute("data-landing-shelf");
+      if (!shelfId) return;
+      setCategory(resolveLandingShelfCategory(shelfId));
+    });
+  }
 
   render();
 }
@@ -92,6 +147,16 @@ async function bootPublicNetworksPortal() {
     const rows = Array.isArray(body.seasons) ? body.seasons : [];
     const liveCards = await loadPublicNetworkCards(rows);
     const cards = [...liveCards, ...publicNetworkVisionCardModels()];
+    const featuredLive = liveCards.find(
+      (card) => card.isLive && card.category === "city_games" && card.placeCount
+    );
+    if (featuredLive) {
+      syncLiveNowShelfCopy(document, {
+        seasonName: featuredLive.name,
+        placeCount: featuredLive.placeCount,
+        city: featuredLive.place?.split(",")[0]?.trim() || "Cedar Rapids",
+      });
+    }
     bindPublicNetworksPortal(cards);
   } catch (err) {
     console.warn("[public-networks-portal]", err);

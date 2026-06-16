@@ -3,6 +3,10 @@
  */
 import { resolveSeasonWindowPhase } from "./city-game-season-banner-core.mjs";
 import { seasonBoardPath } from "./city-game-season-path-shared.mjs";
+import {
+  buildPublicNetworkBoardQuickLinks,
+  renderPublicNetworkBoardQuickLinks,
+} from "./public-network-board-links-core.mjs";
 
 /** @typedef {"all" | "city_games" | "markets" | "events" | "resources"} PublicNetworkCategoryFilter */
 
@@ -225,6 +229,8 @@ export function buildPublicNetworkCardModel(row, seasonConfig = null, now = new 
   const statusClass = publicNetworkWindowStatusClass(phase);
   const stateHeroLine = formatPublicNetworkStateHero({ statusLabel, statsLine });
 
+  const boardQuickLinks = buildPublicNetworkBoardQuickLinks(boardPath, seasonId);
+
   return {
     season_id: seasonId,
     name,
@@ -239,6 +245,7 @@ export function buildPublicNetworkCardModel(row, seasonConfig = null, now = new 
     stateHeroLine,
     openHref: boardPath,
     rulesHref: rulesPath || null,
+    boardQuickLinks,
     placeCount,
     objectCount,
     previewArt,
@@ -282,6 +289,7 @@ export function buildPublicNetworkVisionCardModel(row) {
     stateHeroLine,
     openHref: null,
     rulesHref: null,
+    boardQuickLinks: [],
     placeCount: null,
     objectCount: null,
     previewArt: null,
@@ -363,6 +371,10 @@ export function renderPublicNetworkCard(card) {
   const stateHero = stateHeroLine
     ? `<p class="public-networks-card__state-hero ${card.statusClass}" data-state-first="current-state">${escapePublicNetworksHtml(stateHeroLine)}</p>`
     : "";
+  const boardLinks =
+    card.isLive && Array.isArray(card.boardQuickLinks) && card.boardQuickLinks.length
+      ? renderPublicNetworkBoardQuickLinks(card.boardQuickLinks, escapePublicNetworksHtml)
+      : "";
   return `<article class="public-networks-card public-networks-card--rich public-networks-card--state-first${card.isLive ? "" : " public-networks-card--vision"}" data-season-id="${escapePublicNetworksHtml(card.season_id)}" data-category="${escapePublicNetworksHtml(card.category)}"${liveAttr}>
   ${renderPublicNetworkCardPreview(card)}
   <div class="public-networks-card__body">
@@ -375,6 +387,7 @@ export function renderPublicNetworkCard(card) {
     ${cta}
     ${rulesLink}
   </div>
+  ${boardLinks}
   <p class="public-networks-card__summary" data-state-first="details">${escapePublicNetworksHtml(card.summary)}</p>
   </div>
 </article>`;

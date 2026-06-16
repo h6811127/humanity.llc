@@ -12683,6 +12683,14 @@ body.device-shell-created .flow-keys-group .list-row {
   opacity: 0.85;
 }
 
+.city-game-map-node-chip-band {
+  margin-top: 6px;
+}
+
+.city-game-map-node-chip-band[hidden] {
+  display: none;
+}
+
 .city-game-map-node-chips {
   list-style: none;
   margin: 0;

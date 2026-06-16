@@ -54,6 +54,7 @@ describe("public-networks-portal-core", () => {
         starts_at: "2020-01-01T00:00:00-05:00",
         ends_at: "2099-01-01T00:00:00-05:00",
       },
+      nodes: Array.from({ length: 40 }, (_, i) => ({ node_id: `node_${i + 1}` })),
     });
     expect(card.name).toBe("Wake the city");
     expect(card.place).toBe("Cedar Rapids, Iowa");
@@ -61,6 +62,9 @@ describe("public-networks-portal-core", () => {
     expect(card.rulesHref).toBe("/play/cedar-rapids/");
     expect(card.statusLabel).toBe("Live now");
     expect(card.category).toBe("city_games");
+    expect(card.placeCount).toBe(40);
+    expect(card.boardQuickLinks?.length).toBe(3);
+    expect(card.boardQuickLinks?.[0]?.href).toContain("type=relay_gate");
   });
 
   it("filters by search query and category chips", () => {
@@ -95,6 +99,9 @@ describe("public-networks-portal-core", () => {
     expect(html).toContain(PUBLIC_NETWORK_ABOUT_NETWORK_CTA);
     expect(html).toContain('href="/play/cedar-rapids/"');
     expect(html).toContain('href="/play/cedar-rapids/map/"');
+    expect(html).toContain("public-networks-card__board-links");
+    expect(html).toContain("Faction relays");
+    expect(html).toContain("?type=relay_gate");
     expect(html).toContain('data-network-live="true"');
     expect(html).toContain("Wake the city");
     expect(html).toContain("City game");

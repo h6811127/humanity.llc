@@ -266,6 +266,8 @@ describe("city-game map snapshot core", () => {
 
     const effectEl = new HTMLElement();
     effectEl.textContent = "Static consequence";
+    const chipsEl = new HTMLElement();
+    chipsEl.hidden = true;
     const liveEl = new HTMLElement();
     liveEl.innerHTML = '<span class="city-game-map-live-hint">Scan sticker there</span>';
 
@@ -298,6 +300,7 @@ describe("city-game map snapshot core", () => {
       },
       querySelector(sel: string) {
         if (sel === "[data-node-effect]") return effectEl;
+        if (sel === "[data-node-chips]") return chipsEl;
         if (sel === ".city-game-map-node-live") return liveEl;
         if (sel === ".city-game-map-node-title") return null;
         return null;
@@ -332,6 +335,9 @@ describe("city-game map snapshot core", () => {
     });
 
     expect(effectEl.textContent).toContain("14 / 20");
+    expect(chipsEl.hidden).toBe(false);
+    expect(chipsEl.innerHTML).toContain("city-game-map-node-chips");
+    expect(chipsEl.innerHTML).toContain("14 / 20");
     expect(liveEl.innerHTML).toContain("city-game-map-scan-link");
     expect(liveEl.innerHTML).toContain("https://humanity.llc/c/test?q=qr_04");
     expect(rowClasses.has("city-game-map-node-row--live")).toBe(true);

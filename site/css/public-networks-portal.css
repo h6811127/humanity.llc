@@ -151,13 +151,39 @@
 }
 
 .landing-entry-shelf {
-  padding: 14px 16px;
+  padding: 0;
   border-radius: var(--radius-lg, 16px);
   border: 1px solid rgba(0, 0, 0, 0.08);
   background: rgba(255, 255, 255, 0.92);
 }
 
+.landing-entry-shelf-btn {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 14px 16px;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+}
+
+.landing-entry-shelf-btn--active,
+.landing-entry-shelf-btn:focus-visible {
+  outline: 2px solid var(--red, #e63946);
+  outline-offset: -2px;
+}
+
+.landing-entry-shelf-btn--active {
+  border-color: var(--red, #e63946);
+  background: rgba(230, 57, 70, 0.06);
+}
+
 .landing-entry-shelf-title {
+  display: block;
   margin: 0;
   font-size: 15px;
   font-weight: 700;
@@ -165,6 +191,7 @@
 }
 
 .landing-entry-shelf-copy {
+  display: block;
   margin: 6px 0 0;
   font-size: 14px;
   line-height: 1.42;
@@ -178,6 +205,10 @@
 html[data-theme="dark"] .landing-entry-shelf {
   border-color: rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.04);
+}
+
+html[data-theme="dark"] .landing-entry-shelf-btn--active {
+  background: rgba(230, 57, 70, 0.14);
 }
 
 .landing-discovery-hero .landing-trust-chips {
@@ -304,6 +335,21 @@ html[data-theme="dark"] .landing-entry-shelf {
 
 .public-networks-card__secondary {
   font-size: 14px;
+  font-weight: 600;
+  color: var(--red);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.public-networks-card__board-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-top: 10px;
+}
+
+.public-networks-card__board-link {
+  font-size: 13px;
   font-weight: 600;
   color: var(--red);
   text-decoration: underline;

@@ -8,8 +8,10 @@ import {
   setTypeFilter,
 } from "./city-game-map-filter-core.mjs";
 import {
+  buildMapBoardAbsoluteShareUrl,
   isMapPinInteractive,
-  readMapBoardNodeQueryParam,
+  readMapBoardQueryState,
+  readMapBoardShareStateFromRoot,
   resolveMapNodeHighlight,
   resolvePrimarySketchFigure,
   resolveSelectionBarCopy,
@@ -104,6 +106,7 @@ function setHighlightNode(boardRoot, nodeId) {
   }
 
   syncSelectionFeedbackBar(boardRoot, nodeId ?? null);
+  syncMapBoardUrl(boardRoot);
 
   if (!nodeId) return;
 
@@ -163,6 +166,43 @@ function scrollSketchToPin(boardRoot, nodeId) {
   }
 
   revealPin();
+}
+
+/**
+ * @param {HTMLElement} boardRoot
+ */
+function syncMapBoardUrl(boardRoot) {
+  if (typeof window === "undefined" || typeof history?.replaceState !== "function") return;
+  const shareState = readMapBoardShareStateFromRoot(boardRoot);
+  const nextPath = buildMapBoardAbsoluteShareUrl(
+    window.location.pathname,
+    shareState,
+    ""
+  );
+  const current = `${window.location.pathname}${window.location.search}`;
+  if (current === nextPath) return;
+  history.replaceState(null, "", nextPath);
+}
+
+/**
+ * @param {HTMLElement} boardRoot
+ */
+async function copyMapBoardShareLink(boardRoot) {
+  const shareState = readMapBoardShareStateFromRoot(boardRoot);
+  const url = buildMapBoardAbsoluteShareUrl(
+    window.location.pathname,
+    shareState,
+    window.location.origin
+  );
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(url);
+      return;
+    }
+  } catch {
+    /* fall through */
+  }
+  window.prompt("Copy board link:", url);
 }
 
 /**
@@ -238,6 +278,7 @@ export function bootCityGameMapInteraction(boardRoot, season) {
       const typeId = btn.dataset.typeFilter ?? "all";
       setTypeFilter(boardRoot, typeId);
       refreshSelectionFeedbackBar(boardRoot);
+      syncMapBoardUrl(boardRoot);
     });
   }
 
@@ -251,6 +292,7 @@ export function bootCityGameMapInteraction(boardRoot, season) {
       const stateId = btn.dataset.stateFilter ?? "all";
       setStateFilter(boardRoot, stateId);
       refreshSelectionFeedbackBar(boardRoot);
+      syncMapBoardUrl(boardRoot);
     });
   }
 
@@ -271,6 +313,12 @@ export function bootCityGameMapInteraction(boardRoot, season) {
     if (target.closest("[data-filter-clear]")) {
       clearBoardFilters(boardRoot);
       refreshSelectionFeedbackBar(boardRoot);
+      syncMapBoardUrl(boardRoot);
+      return;
+    }
+
+    if (target.closest("[data-copy-board-link]")) {
+      void copyMapBoardShareLink(boardRoot);
       return;
     }
 
@@ -317,12 +365,20 @@ export function bootCityGameMapInteraction(boardRoot, season) {
   applyBoardFilterVisibility(boardRoot);
 
   if (typeof window !== "undefined") {
-    const nodeFromQuery = readMapBoardNodeQueryParam(window.location.search);
-    if (nodeFromQuery) {
-      selectMapNode(boardRoot, nodeFromQuery, {
+    const queryState = readMapBoardQueryState(window.location.search);
+    if (queryState.type !== "all") {
+      setTypeFilter(boardRoot, queryState.type);
+    }
+    if (queryState.state !== "all") {
+      setStateFilter(boardRoot, queryState.state);
+    }
+    if (queryState.node) {
+      selectMapNode(boardRoot, queryState.node, {
         toggle: false,
         scrollList: true,
       });
+    } else {
+      syncMapBoardUrl(boardRoot);
     }
   }
 }

@@ -76,8 +76,8 @@
       })();
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=5" />
-    <link rel="stylesheet" href="/styles.css?v=153" />
-    <link rel="stylesheet" href="/css/public-networks-portal.css?v=4" />
+    <link rel="stylesheet" href="/styles.css?v=157" />
+    <link rel="stylesheet" href="/css/public-networks-portal.css?v=6" />
     <link rel="stylesheet" href="/css/device-shell.css?v=94" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=32" />
     <meta property="og:title" content="humanity.llc · Check what's true right now" />
@@ -531,25 +531,46 @@
           <h2 class="group-label" id="landing-entry-shelves-title">Browse by need</h2>
           <ul class="landing-entry-shelves-list">
             <li class="landing-entry-shelf" id="landing-shelf-live-now">
-              <h3 class="landing-entry-shelf-title">Live now</h3>
-              <p class="landing-entry-shelf-copy">
-                Weekend games, festivals, and shared play — what's happening around town this
-                season.
-              </p>
+              <button
+                type="button"
+                class="landing-entry-shelf-btn"
+                data-landing-shelf="landing-shelf-live-now"
+                aria-pressed="false"
+              >
+                <span class="landing-entry-shelf-title">Live now</span>
+                <span class="landing-entry-shelf-copy">
+                  Weekend games, festivals, and shared play — what's happening around town this
+                  season.
+                </span>
+              </button>
             </li>
             <li class="landing-entry-shelf" id="landing-shelf-open-paused">
-              <h3 class="landing-entry-shelf-title">Open or paused</h3>
-              <p class="landing-entry-shelf-copy">
-                Cooling centers, shelters, supply points — signed open, closed, or paused status
-                you can trust before you go.
-              </p>
+              <button
+                type="button"
+                class="landing-entry-shelf-btn"
+                data-landing-shelf="landing-shelf-open-paused"
+                aria-pressed="false"
+              >
+                <span class="landing-entry-shelf-title">Open or paused</span>
+                <span class="landing-entry-shelf-copy">
+                  Cooling centers, shelters, supply points — signed open, closed, or paused status
+                  you can trust before you go.
+                </span>
+              </button>
             </li>
             <li class="landing-entry-shelf" id="landing-shelf-return-hours">
-              <h3 class="landing-entry-shelf-title">Return, relay, hours</h3>
-              <p class="landing-entry-shelf-copy">
-                Door plates, lost-item return paths, market stalls — hours and messages that
-                change without reprinting.
-              </p>
+              <button
+                type="button"
+                class="landing-entry-shelf-btn"
+                data-landing-shelf="landing-shelf-return-hours"
+                aria-pressed="false"
+              >
+                <span class="landing-entry-shelf-title">Return, relay, hours</span>
+                <span class="landing-entry-shelf-copy">
+                  Door plates, lost-item return paths, market stalls — hours and messages that
+                  change without reprinting.
+                </span>
+              </button>
             </li>
           </ul>
         </section>
@@ -1118,6 +1139,6 @@
     <script src="/js/landing-focus.mjs?v=5" type="module"></script>
     <script src="/js/device-status-bootstrap.mjs?v=94" type="module"></script>
     <script src="/js/landing-device-hub.mjs?v=14" type="module"></script>
-    <script src="/js/public-networks-portal.mjs?v=4" type="module"></script>
+    <script src="/js/public-networks-portal.mjs?v=6" type="module"></script>
   </body>
 </html>
