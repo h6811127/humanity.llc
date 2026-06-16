@@ -487,6 +487,32 @@
           </div>
         </section>
 
+        <section
+          class="created-season-when-panel flow-form-section device-boot-gated"
+          id="created-season-when-panel"
+          hidden
+          aria-labelledby="created-season-when-panel-title"
+        >
+          <h3 class="group-label" id="created-season-when-panel-title">When · season id</h3>
+          <p class="form-hint">
+            Name your season here — not on the create form. Used when registering checkpoints.
+          </p>
+          <label class="form-label" for="child-object-season-when-id">Season id</label>
+          <input
+            class="form-input"
+            id="child-object-season-when-id"
+            name="season_when_id"
+            maxlength="48"
+            placeholder="my_city_season_01"
+            autocomplete="off"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck="false"
+            inputmode="text"
+          />
+          <p class="form-hint" id="child-object-season-when-status" hidden role="status"></p>
+        </section>
+
         <div id="created-control-root" hidden>
         <nav class="created-tabs" role="tablist" aria-label="Saved item controls">
           <button
@@ -572,32 +598,6 @@
             hidden
             aria-labelledby="created-season-progressive-checklist-title"
           ></section>
-
-          <section
-            class="created-season-when-panel flow-form-section device-boot-gated"
-            id="created-season-when-panel"
-            hidden
-            aria-labelledby="created-season-when-panel-title"
-          >
-            <h3 class="group-label" id="created-season-when-panel-title">When · season id</h3>
-            <p class="form-hint">
-              Name your season here — not on the create form. Used when registering checkpoints.
-            </p>
-            <label class="form-label" for="child-object-season-when-id">Season id</label>
-            <input
-              class="form-input"
-              id="child-object-season-when-id"
-              name="season_when_id"
-              maxlength="48"
-              placeholder="my_city_season_01"
-              autocomplete="off"
-              autocapitalize="off"
-              autocorrect="off"
-              spellcheck="false"
-              inputmode="text"
-            />
-            <p class="form-hint" id="child-object-season-when-status" hidden role="status"></p>
-          </section>
 
           <div
             class="created-collection-room-slot device-boot-gated"
