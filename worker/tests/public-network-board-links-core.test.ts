@@ -11,11 +11,13 @@ describe("public-network-board-links-core", () => {
       "/play/cedar-rapids/map/",
       "cr_season_01_wake"
     );
-    expect(links).toHaveLength(3);
+    expect(links).toHaveLength(5);
     expect(links[0]).toEqual({
       label: "Faction relays",
       href: "/play/cedar-rapids/map/?type=relay_gate",
     });
+    expect(links[3].href).toBe("/play/cedar-rapids/map/?type=relay_gate&district=newbo");
+    expect(links[4].href).toBe("/play/cedar-rapids/map/?district=river_spine");
     expect(links[1].href).toBe("/play/cedar-rapids/map/?type=sanctuary");
     expect(links[2].href).toBe("/play/cedar-rapids/map/?type=hidden");
   });

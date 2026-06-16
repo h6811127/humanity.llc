@@ -162,6 +162,18 @@ export function readMapBoardQueryState(search = "") {
 }
 
 /**
+ * @param {{ type?: string; state?: string; district?: string }} state
+ * @returns {boolean}
+ */
+export function mapBoardUrlHasActiveFilters(state = {}) {
+  return (
+    String(state.type ?? "all") !== "all" ||
+    String(state.state ?? "all") !== "all" ||
+    String(state.district ?? "all") !== "all"
+  );
+}
+
+/**
  * @param {string} pathname
  * @param {{ node?: string | null; type?: string; state?: string; district?: string }} state
  * @returns {string}

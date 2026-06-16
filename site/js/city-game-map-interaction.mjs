@@ -13,6 +13,7 @@ import {
   isMapPinInteractive,
   readMapBoardQueryState,
   readMapBoardShareStateFromRoot,
+  mapBoardUrlHasActiveFilters,
   resolveMapNodeHighlight,
   resolvePrimarySketchFigure,
   resolveSelectionBarCopy,
@@ -264,6 +265,16 @@ function selectMapPin(boardRoot, nodeId) {
 
 /**
  * @param {HTMLElement} boardRoot
+ * @param {{ type?: string; state?: string; district?: string }} queryState
+ */
+function openMapFiltersPanelIfFiltered(boardRoot, queryState) {
+  if (!mapBoardUrlHasActiveFilters(queryState)) return;
+  const details = boardRoot.querySelector("#city-game-map-filters");
+  if (details instanceof HTMLDetailsElement) details.open = true;
+}
+
+/**
+ * @param {HTMLElement} boardRoot
  * @param {Record<string, unknown>} season
  */
 export function bootCityGameMapInteraction(boardRoot, season) {
@@ -390,6 +401,7 @@ export function bootCityGameMapInteraction(boardRoot, season) {
     if (queryState.district !== "all") {
       setDistrictFilter(boardRoot, queryState.district);
     }
+    openMapFiltersPanelIfFiltered(boardRoot, queryState);
     if (queryState.node) {
       selectMapNode(boardRoot, queryState.node, {
         toggle: false,

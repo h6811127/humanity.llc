@@ -14,6 +14,7 @@ import {
   isDenseMapBoard,
   isMapPinInteractive,
   readMapBoardNodeQueryParam,
+  mapBoardUrlHasActiveFilters,
   readMapBoardQueryState,
   readMapBoardShareStateFromRoot,
   resolveMapNodeHighlight,
@@ -80,6 +81,7 @@ describe("city-game-map-interaction-core", () => {
     expect(src).toContain("applyBoardFilterVisibility");
     expect(src).toContain("readMapBoardQueryState");
     expect(src).toContain("setDistrictFilter");
+    expect(src).toContain("openMapFiltersPanelIfFiltered");
     expect(src).toContain("syncMapBoardUrl");
     expect(src).toContain("data-copy-board-link");
     expect(src).toContain("syncSelectionFeedbackBar");
@@ -87,6 +89,14 @@ describe("city-game-map-interaction-core", () => {
     expect(src).toContain("[data-show-on-sketch]");
     expect(src).not.toContain("scrollSketchOnRow");
     expect(src).not.toMatch(/scrollSketch:\s*scrollSketchOnRow/);
+  });
+
+  it("mapBoardUrlHasActiveFilters detects narrowed filter state", () => {
+    expect(mapBoardUrlHasActiveFilters({ type: "relay_gate" })).toBe(true);
+    expect(mapBoardUrlHasActiveFilters({ district: "newbo" })).toBe(true);
+    expect(mapBoardUrlHasActiveFilters({ type: "all", state: "all", district: "all" })).toBe(
+      false
+    );
   });
 
   it("resolveMapNodeHighlight toggles off repeat selection", () => {

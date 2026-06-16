@@ -5,12 +5,14 @@ import { buildMapBoardSharePath } from "./city-game-map-interaction-core.mjs";
 
 /** @typedef {{ label: string; href: string }} PublicNetworkBoardQuickLink */
 
-/** @type {Record<string, Array<{ label: string; type?: string; state?: string }>>} */
+/** @type {Record<string, Array<{ label: string; type?: string; state?: string; district?: string }>>} */
 export const PUBLIC_NETWORK_BOARD_QUICK_LINK_SPECS = {
   cr_season_01_wake: [
     { label: "Faction relays", type: "relay_gate" },
     { label: "Sanctuaries", type: "sanctuary" },
     { label: "Hidden relays", type: "hidden" },
+    { label: "NewBo relays", type: "relay_gate", district: "newbo" },
+    { label: "River spine", district: "river_spine" },
   ],
 };
 
@@ -32,6 +34,7 @@ export function buildPublicNetworkBoardQuickLinks(boardPath, seasonId) {
     href: buildMapBoardSharePath(path, {
       type: spec.type ?? "all",
       state: spec.state ?? "all",
+      district: spec.district ?? "all",
     }),
   }));
 }

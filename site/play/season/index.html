@@ -14,7 +14,7 @@
     <meta name="theme-color" content="#ffffff" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
     <link rel="stylesheet" href="/styles.css?v=157" />
-    <link rel="stylesheet" href="/css/public-networks-portal.css?v=2" />
+    <link rel="stylesheet" href="/css/public-networks-portal.css?v=6" />
   </head>
   <body>
     <div class="page">
@@ -35,6 +35,58 @@
             Listed networks share <strong>signed public state</strong> you can open without an
             account. This is not a map, social feed, or scan history.
           </p>
+        </section>
+
+        <section
+          class="landing-entry-shelves idea-section"
+          id="landing-entry-shelves"
+          aria-labelledby="landing-entry-shelves-title"
+        >
+          <h2 class="group-label" id="landing-entry-shelves-title">Browse by need</h2>
+          <ul class="landing-entry-shelves-list">
+            <li class="landing-entry-shelf" id="landing-shelf-live-now">
+              <button
+                type="button"
+                class="landing-entry-shelf-btn"
+                data-landing-shelf="landing-shelf-live-now"
+                aria-pressed="false"
+              >
+                <span class="landing-entry-shelf-title">Live now</span>
+                <span class="landing-entry-shelf-copy">
+                  Weekend games, festivals, and shared play — what's happening around town this
+                  season.
+                </span>
+              </button>
+            </li>
+            <li class="landing-entry-shelf" id="landing-shelf-open-paused">
+              <button
+                type="button"
+                class="landing-entry-shelf-btn"
+                data-landing-shelf="landing-shelf-open-paused"
+                aria-pressed="false"
+              >
+                <span class="landing-entry-shelf-title">Open or paused</span>
+                <span class="landing-entry-shelf-copy">
+                  Cooling centers, shelters, supply points — signed open, closed, or paused status
+                  you can trust before you go.
+                </span>
+              </button>
+            </li>
+            <li class="landing-entry-shelf" id="landing-shelf-return-hours">
+              <button
+                type="button"
+                class="landing-entry-shelf-btn"
+                data-landing-shelf="landing-shelf-return-hours"
+                aria-pressed="false"
+              >
+                <span class="landing-entry-shelf-title">Return, relay, hours</span>
+                <span class="landing-entry-shelf-copy">
+                  Door plates, lost-item return paths, market stalls — hours and messages that
+                  change without reprinting.
+                </span>
+              </button>
+            </li>
+          </ul>
         </section>
 
         <section class="public-networks-toolbar idea-section" aria-label="Search and filter">
@@ -76,6 +128,6 @@
         </p>
       </main>
     </div>
-    <script type="module" src="/js/public-networks-portal.mjs?v=2"></script>
+    <script type="module" src="/js/public-networks-portal.mjs?v=6"></script>
   </body>
 </html>

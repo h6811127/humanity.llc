@@ -63,8 +63,9 @@ describe("public-networks-portal-core", () => {
     expect(card.statusLabel).toBe("Live now");
     expect(card.category).toBe("city_games");
     expect(card.placeCount).toBe(40);
-    expect(card.boardQuickLinks?.length).toBe(3);
+    expect(card.boardQuickLinks?.length).toBe(5);
     expect(card.boardQuickLinks?.[0]?.href).toContain("type=relay_gate");
+    expect(card.boardQuickLinks?.[3]?.href).toContain("district=newbo");
   });
 
   it("filters by search query and category chips", () => {
