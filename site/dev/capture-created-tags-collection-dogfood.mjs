@@ -236,7 +236,7 @@ async function seedCreatedPage(page, childRows) {
   }, { rootCard: DOGFOOD_ROOT, childRows });
 
   const url = `${baseURL}/created/?profile_id=${DOGFOOD_ROOT.profile_id}&qr_id=${DOGFOOD_ROOT.qr_id}&tags_collection=1`;
-  await page.goto(url, { waitUntil: "networkidle" });
+  await page.goto(url, { waitUntil: "domcontentloaded" });
   await page.waitForSelector("#created-control-root:not([hidden])", { timeout: 20_000 });
   await waitForTagsCollectionReady(page);
   await dismissWelcomePopover(page);
@@ -355,6 +355,40 @@ function validateAudit(audit, expectedCount) {
   return errors;
 }
 
+/**
+ * @param {import("@playwright/test").Page} page
+ */
+/** Open Advanced editor so legacy inline controls are visible (Phase 2B demotion). */
+async function expandAdvancedEditor(page) {
+  await page.evaluate(() => {
+    const advanced = document.getElementById("created-tags-advanced-editor");
+    const hub = document.getElementById("child-object-add-hub");
+    if (advanced instanceof HTMLDetailsElement) advanced.open = true;
+    if (hub instanceof HTMLDetailsElement) hub.open = true;
+  });
+  await page.waitForSelector(".child-object-plate-disable", { state: "visible", timeout: 10_000 });
+}
+
+async function readAdvancedAudit(page) {
+  return page.evaluate(() => {
+    const advanced = document.getElementById("created-tags-advanced-editor");
+    const hub = document.getElementById("child-object-add-hub");
+    return {
+      demotionActive: document.body.classList.contains("created-tags-advanced-demotion"),
+      advancedVisible: advanced instanceof HTMLElement && !advanced.hidden,
+      advancedOpen: advanced instanceof HTMLDetailsElement ? advanced.open : null,
+      hubOpen: hub instanceof HTMLDetailsElement ? hub.open : null,
+      hubInsideAdvanced: hub?.parentElement?.id === "created-tags-advanced-editor",
+      legacyPlateForms: document.querySelectorAll(
+        "#child-object-status-plate-list .child-object-plate-update-form"
+      ).length,
+      legacyRelayForms: document.querySelectorAll(
+        "#child-object-lost-item-list .child-object-relay-update-form"
+      ).length,
+    };
+  });
+}
+
 mkdirSync(outDir, { recursive: true });
 
 const browser = await chromium.launch();
@@ -435,12 +469,97 @@ report.phase2a = {
     collectionHiddenWithCollectionFlag,
 };
 
+await seedCreatedPage(page, buildChildRows(1));
+await page.waitForFunction(
+  () => document.body.classList.contains("created-tags-advanced-demotion"),
+  null,
+  { timeout: 10_000 }
+);
+const advancedAtN1 = await readAdvancedAudit(page);
+await page.locator("#created-tags-advanced-editor").screenshot({
+  path: join(outDir, "01-tags-advanced-collapsed.png"),
+});
+
+await seedCreatedPage(page, buildChildRows(0));
+await page.waitForFunction(
+  () => document.body.classList.contains("created-tags-advanced-demotion"),
+  null,
+  { timeout: 10_000 }
+);
+const advancedAtN0 = await readAdvancedAudit(page);
+await page.locator("#created-tags-advanced-editor").screenshot({
+  path: join(outDir, "00-tags-advanced-open-default.png"),
+});
+
+await seedCreatedPage(page, []);
+await page.locator("#created-tags-add-btn").click();
+await page.waitForFunction(
+  () => {
+    const advanced = document.getElementById("created-tags-advanced-editor");
+    return advanced instanceof HTMLDetailsElement && advanced.open;
+  },
+  null,
+  { timeout: 10_000 }
+);
+await page.locator("#child-object-add-status-plate").screenshot({
+  path: join(outDir, "01-tags-advanced-expanded-add.png"),
+});
+const addQrExpandsAdvanced = await readAdvancedAudit(page);
+
+await seedCreatedPage(page, buildChildRows(1));
+await page.locator(".created-tags-collection-row--interactive").first().click();
+await page.waitForSelector("#created-tags-manage-panel:not([hidden])", { timeout: 10_000 });
+await page.locator("#created-tags-manage-update-status").click();
+await page.waitForFunction(
+  () => {
+    const advanced = document.getElementById("created-tags-advanced-editor");
+    const input = document.querySelector(
+      '.child-object-plate-update-form input[name="public_state"]'
+    );
+    return advanced instanceof HTMLDetailsElement && advanced.open && input instanceof HTMLElement;
+  },
+  null,
+  { timeout: 10_000 }
+);
+await page.locator("#child-object-status-plate-list").screenshot({
+  path: join(outDir, "01-tags-advanced-expanded-update.png"),
+});
+const updateStatusExpandsAdvanced = await readAdvancedAudit(page);
+
+report.phase2b = {
+  advancedCollapsedAtN1:
+    advancedAtN1.demotionActive &&
+    advancedAtN1.advancedVisible &&
+    advancedAtN1.advancedOpen === false &&
+    advancedAtN1.hubInsideAdvanced,
+  advancedOpenAtN0:
+    advancedAtN0.demotionActive && advancedAtN0.advancedOpen === true && advancedAtN0.hubOpen === true,
+  addQrExpandsAdvanced: addQrExpandsAdvanced.advancedOpen === true && addQrExpandsAdvanced.hubOpen === true,
+  updateStatusExpandsAdvanced:
+    updateStatusExpandsAdvanced.advancedOpen === true &&
+    updateStatusExpandsAdvanced.legacyPlateForms >= 1,
+  legacyControlsReachable:
+    updateStatusExpandsAdvanced.legacyPlateForms + updateStatusExpandsAdvanced.legacyRelayForms >= 1,
+  ok: false,
+};
+report.phase2b.ok =
+  report.phase2b.advancedCollapsedAtN1 &&
+  report.phase2b.advancedOpenAtN0 &&
+  report.phase2b.addQrExpandsAdvanced &&
+  report.phase2b.updateStatusExpandsAdvanced &&
+  report.phase2b.legacyControlsReachable;
+
 await seedCreatedPage(page, []);
 const beforeAdd = await readCollectionAudit(page);
 await page.locator("#created-tags-add-btn").click();
-await page.locator("#child-object-add-hub").evaluate((el) => {
-  if (el instanceof HTMLDetailsElement) el.open = true;
-});
+await page.waitForFunction(
+  () => {
+    const advanced = document.getElementById("created-tags-advanced-editor");
+    return advanced instanceof HTMLDetailsElement && advanced.open;
+  },
+  null,
+  { timeout: 10_000 }
+);
 await page.waitForSelector("#child-object-add-status-plate:not([hidden])", { timeout: 10_000 });
 await page.locator("#child-object-plate-label").fill("Courtyard sign");
 await page.locator("#child-object-plate-state").fill("Open for tours");
@@ -457,6 +576,7 @@ const afterAdd = await readCollectionAudit(page);
 await page.locator("#created-tags-collection").screenshot({
   path: join(outDir, "sync-live-add.png"),
 });
+await expandAdvancedEditor(page);
 await page.locator(".child-object-plate-disable").first().click();
 await page.waitForFunction(
   () => document.querySelectorAll(".created-tags-collection-row").length === 0,
@@ -483,7 +603,8 @@ report.ok =
   Object.values(report.counts).every((entry) => entry.ok) &&
   report.liveSync.addWithoutReload &&
   report.liveSync.disableWithoutReload &&
-  report.phase2a?.ok === true;
+  report.phase2a?.ok === true &&
+  report.phase2b?.ok === true;
 
 writeFileSync(join(outDir, "report.json"), `${JSON.stringify(report, null, 2)}\n`);
 

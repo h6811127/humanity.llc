@@ -17,6 +17,7 @@ import {
   createdTagsManageInlineEditorTarget,
   createdTagsManagePanelPresentation,
 } from "./created-tags-manage-panel-core.mjs";
+import { expandTagsAdvancedEditor } from "./created-tags-advanced-editor-expand.mjs";
 
 /**
  * @param {{ showError?: (msg: string) => void }} [ctx]
@@ -102,13 +103,7 @@ export function initCreatedTagsManagePanel(ctx = {}) {
     const target = createdTagsManageInlineEditorTarget(activeRow.object_type);
     if (!target?.canFocusUpdate || !objectId) return;
 
-    const hub = document.getElementById("child-object-add-hub");
-    if (hub instanceof HTMLDetailsElement) {
-      hub.hidden = false;
-      hub.open = true;
-    } else if (hub instanceof HTMLElement) {
-      hub.hidden = false;
-    }
+    expandTagsAdvancedEditor();
 
     const section = document.getElementById(target.sectionId);
     if (section instanceof HTMLElement) section.hidden = false;

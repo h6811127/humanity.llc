@@ -20,6 +20,7 @@ import {
   syncCreatedTagsCollectionFlagDataset,
 } from "./created-tags-collection-flag-core.mjs";
 import { initCreatedTagsManagePanel } from "./created-tags-manage-panel.mjs";
+import { expandTagsAdvancedEditor } from "./created-tags-advanced-editor-expand.mjs";
 
 /**
  * @param {{
@@ -49,14 +50,7 @@ export function initCreatedTagsCollection(ctx) {
   }
 
   function openAddHub() {
-    const hub = document.getElementById("child-object-add-hub");
-    if (hub instanceof HTMLDetailsElement) {
-      hub.hidden = false;
-      hub.open = true;
-    } else if (hub instanceof HTMLElement) {
-      hub.hidden = false;
-    }
-    hub?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    expandTagsAdvancedEditor({ scrollTargetId: "child-object-add-hub" });
   }
 
   /**

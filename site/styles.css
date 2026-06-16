@@ -6925,6 +6925,23 @@ body.created-tags-manage-open {
   margin: 0;
 }
 
+.created-tags-advanced-editor[hidden] {
+  display: none !important;
+}
+
+.created-tags-advanced-editor-summary {
+  margin: 0;
+}
+
+body.created-tags-advanced-demotion .created-tags-advanced-editor {
+  margin: 0 0 16px;
+}
+
+body.created-tags-advanced-demotion #child-object-add-hub > .created-child-object-add-hub-summary,
+body.created-tags-advanced-demotion #child-object-add-hub > #child-object-add-hub-sub {
+  display: none;
+}
+
 .created-live-cockpit[hidden] {
   display: none !important;
 }
