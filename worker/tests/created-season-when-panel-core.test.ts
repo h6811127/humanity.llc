@@ -1,4 +1,6 @@
 import { describe, expect, it, beforeEach, afterEach } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 
 import {
   persistSeasonWhenId,
@@ -35,5 +37,16 @@ describe("created season when panel", () => {
 
   it("rejects invalid season id slugs", () => {
     expect(() => persistSeasonWhenId("p2", "bad slug!")).toThrow();
+  });
+
+  it("keeps the When panel outside hidden game-node add chrome", () => {
+    const html = readFileSync(join(process.cwd(), "site/created/index.html"), "utf8");
+    const panelIdx = html.indexOf('id="created-season-when-panel"');
+    const formStart = html.indexOf('id="child-object-game-node-form"');
+    const formEnd = html.indexOf("</form>", formStart);
+    expect(panelIdx).toBeGreaterThan(-1);
+    expect(formStart).toBeGreaterThan(-1);
+    expect(panelIdx).toBeLessThan(formStart);
+    expect(html.slice(formStart, formEnd)).not.toContain('id="created-season-when-panel"');
   });
 });

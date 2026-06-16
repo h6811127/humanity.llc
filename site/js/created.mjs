@@ -531,7 +531,11 @@ let seasonWhenPanelCtl = null;
 
 function refreshSeasonSlice6Presentation() {
   if (!profileId) return;
-  const activeRoom = getBoundStewardActiveRoom(profileId);
+  const activeRoom =
+    getBoundStewardActiveRoom(profileId) ||
+    (params.get("room") === STEWARD_ROOM_SEASON || isGameSeasonSetupFocus(params)
+      ? STEWARD_ROOM_SEASON
+      : null);
   const session = loadSession();
   const ctx = {
     profileId,
@@ -1475,6 +1479,7 @@ if (workspaceMode === "setup" && profileId && activeQrId) {
     mode: workspaceMode,
     session: loadSession(),
   });
+  refreshSeasonSlice6Presentation();
 } else if (workspaceMode === "control" && profileId && activeQrId) {
   prepareGameSeasonSetupLandingFromUrl();
   setupCreatedDashboard();
