@@ -559,6 +559,10 @@ async function refreshNetwork(opts = {}) {
   if (!manual && shouldFollowerSkipAutoHealthFetch()) {
     markResolverHealthBootSettled();
     markDotBootstrapSettled();
+    setResolverHealthStatusForSinceVisit(networkStatus);
+    window.dispatchEvent(
+      new CustomEvent(RESOLVER_HEALTH_CHANGED, { detail: { networkStatus } })
+    );
     refreshSummary();
     return;
   }

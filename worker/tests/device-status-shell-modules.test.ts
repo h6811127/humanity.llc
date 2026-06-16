@@ -78,6 +78,12 @@ describe("device status shell module manifest", () => {
     expect(read("device-wallet-network.mjs")).toContain(
       `device-wallet-since-visit-gate.mjs?v=${v}`
     );
+    expect(read("device-live-control-inbox.mjs")).toContain(
+      `device-wallet-since-visit-gate.mjs?v=${v}`
+    );
+    expect(read("device-relay-offer-inbox.mjs")).toContain(
+      `device-wallet-since-visit-gate.mjs?v=${v}`
+    );
   });
 
   it("custody status graph cache-busts copy chain (partial-load regression)", () => {

@@ -21,7 +21,7 @@ import {
   hubInboxGroupVisibilityFromItems,
   liveProofPendingFromInbox,
   relayOfferPendingFromInbox,
-} from "./device-notification-delivery-core.mjs?v=93";
+} from "./device-notification-delivery-core.mjs?v=94";
 import { RELAY_OFFER_INBOX_CHANGED } from "./device-relay-offer-inbox-loader.mjs";
 
 function escapeHtml(s) {

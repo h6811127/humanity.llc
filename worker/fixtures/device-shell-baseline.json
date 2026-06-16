@@ -1,14 +1,14 @@
 {
   "schema": "device_shell_baseline_v1",
-  "generated_at": "2026-06-06",
+  "generated_at": "2026-06-16",
   "phase": "smooth_mode_phase_0",
   "asset_version": 94,
   "module_count": 86,
-  "js_bytes_total": 562999,
+  "js_bytes_total": 563167,
   "shell_css_bytes_total": 78910,
-  "landing_css_bytes_total": 360344,
-  "transfer_bytes_shell_graph": 641909,
-  "transfer_bytes_landing_first_paint": 923343,
+  "landing_css_bytes_total": 371894,
+  "transfer_bytes_shell_graph": 642077,
+  "transfer_bytes_landing_first_paint": 935061,
   "js_modules": [
     {
       "file": "js/device-status-bootstrap.mjs",
@@ -48,7 +48,7 @@
     },
     {
       "file": "js/device-status.mjs",
-      "bytes": 23675
+      "bytes": 23843
     },
     {
       "file": "js/device-hub-intro-coachmark.mjs",

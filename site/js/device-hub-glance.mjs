@@ -23,7 +23,7 @@ import {
   NETWORK_BASELINE_CHANGED,
   NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
-import { shouldSuppressCardDisabledSinceVisitAlerts } from "./device-wallet-since-visit-gate.mjs?v=93";
+import { shouldSuppressCardDisabledSinceVisitAlerts } from "./device-wallet-since-visit-gate.mjs?v=94";
 import {
   CARD_DISABLED_SINCE_VISIT_GLANCE_SUFFIX,
   cardDisabledSinceVisitVisible,

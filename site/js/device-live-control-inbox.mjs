@@ -43,7 +43,7 @@ import {
   isLiveControlPollLeaderTab,
   touchLiveControlPollLeader,
 } from "./device-live-control-poll-leader.mjs";
-import { getResolverHealthStatus } from "./device-wallet-since-visit-gate.mjs?v=93";
+import { getResolverHealthStatus } from "./device-wallet-since-visit-gate.mjs?v=94";
 import { selectLiveControlPollEntries } from "./device-wallet-scale-core.mjs";
 import {
   forwardLiveProofPushToServiceWorker,

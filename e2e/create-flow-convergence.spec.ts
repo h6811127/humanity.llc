@@ -154,6 +154,9 @@ test.describe("create entry chooser (step 11)", () => {
   });
 
   test("wear BYOP link opens track chooser before form", async ({ page }) => {
+    await page.addInitScript(() => {
+      sessionStorage.removeItem("hc_wear_track_choice:v1");
+    });
     await page.goto("/create/?intent=wear");
 
     await expect(page.locator("#create-form-panel")).toBeVisible();

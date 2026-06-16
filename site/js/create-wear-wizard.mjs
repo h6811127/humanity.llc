@@ -14,6 +14,10 @@ import {
   resolveWearSubmitStrategy,
   wearSubmitButtonLabel,
 } from "./create-wear-wizard-core.mjs";
+import {
+  resolveWearTrackChoice,
+  WEAR_TRACK_BYOP,
+} from "./create-wear-track-chooser-core.mjs";
 
 const WEAR_HERO = {
   title: "Print your own QR wear",
@@ -34,7 +38,10 @@ export function syncCreateWearWizardUi(searchParams) {
   const manifestoLabel = document.querySelector('label[for="manifesto"]');
   const manifestoHint = document.querySelector("#create-fields-general .form-hint");
 
-  if (wizard) wizard.hidden = !active;
+  const track = resolveWearTrackChoice({ searchParams, storage: sessionStorage });
+  const showWizard = active && track === WEAR_TRACK_BYOP;
+
+  if (wizard) wizard.hidden = !showWizard;
   if (demoStrip) demoStrip.hidden = active;
   if (active) {
     if (deployWizard) deployWizard.hidden = true;
