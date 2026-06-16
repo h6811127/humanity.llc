@@ -55,6 +55,8 @@ describe("created season when panel", () => {
 
   it("saves the When panel field on blur for keyboard setup flow", () => {
     const src = readFileSync(join(process.cwd(), "site/js/created-season-when-panel.mjs"), "utf8");
+    expect(src).toContain("input.disabled = false");
+    expect(src).toContain('input.setAttribute("aria-disabled", "false")');
     expect(src).toContain('input.addEventListener("change", saveSeasonId)');
     expect(src).toContain('input.addEventListener("blur", saveSeasonId)');
   });

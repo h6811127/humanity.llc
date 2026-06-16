@@ -35,6 +35,11 @@ export function initCreatedSeasonWhenPanel(ctx) {
     });
     panel.hidden = !show;
     panel.setAttribute("aria-hidden", show ? "false" : "true");
+    if (show) {
+      input.disabled = false;
+      input.removeAttribute("disabled");
+      input.setAttribute("aria-disabled", "false");
+    }
   }
 
   function syncValue() {
