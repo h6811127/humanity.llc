@@ -19,7 +19,7 @@ const INTENT = "ai_PreMintAutoMint01";
 const PLANNED_QR = "qr_8Yk9nQ3oR5sU7wX9zA2bC3dE6fG";
 const PLANNED_PA = "pa_testPreMintAuto919";
 const SECOND_PLANNED_QR = "qr_6Wn4rQ2oP8sT5vX7yA1bC3dE9fH";
-const SECOND_PLANNED_PA = "pa_testPreMintAuto920";
+const SECOND_PLANNED_PA = "pa_testPreMintAuto929";
 const SECRET = "shpss_pre_mint_auto_mint";
 
 async function signPayload(payload: string): Promise<string> {
@@ -358,7 +358,7 @@ describe("pre-mint credential validation", () => {
 
     expect(result).toMatchObject({
       ok: false,
-      code: "INVALID_SIGNATURE",
+      code: "CARD_INVALID_SIGNATURE",
       message: "QR credential must be signed by the card owner key.",
       httpStatus: 422,
     });
