@@ -31,6 +31,7 @@ import {
   CHILD_OBJECT_STATUS_DISABLED,
   isActiveGameNodeRow,
   parseGameNodeChildFields,
+  parseGameNodeSeasonId,
   shouldOfferAddGameNode,
 } from "../../site/js/created-child-object-game-node-core.mjs";
 
@@ -387,6 +388,15 @@ describe("created-child-object-game-node-core", () => {
     expect(payload.object_type).toBe("game_node");
     expect(payload.season_id).toBe("my_city_season_01");
     expect(payload.node_role).toBe("temp_drop");
+  });
+
+  it("validates game season ids before building game-node payloads", () => {
+    expect(parseGameNodeSeasonId("  my_city_season_01  ")).toBe("my_city_season_01");
+    expect(() => parseGameNodeSeasonId("My_City_Season_01")).toThrow(/lowercase slug/i);
+    expect(() => parseGameNodeSeasonId("1_city_season")).toThrow(/lowercase slug/i);
+    expect(() => parseGameNodeChildFields("Main square", "relay_gate", "", "")).toThrow(
+      /season id is required/i
+    );
   });
 
   it("created game node module wires register + issue flow", () => {
