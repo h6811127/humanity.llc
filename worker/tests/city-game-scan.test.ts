@@ -283,7 +283,8 @@ describe("city game scan view", () => {
 
     const html = await renderScanPage(vm, "https://humanity.llc");
     expect(html).not.toContain('data-scan-room="season"');
-    expect(html).not.toContain("scan-game-onboarding");
+    expect(html).not.toContain('<section class="scan-game-onboarding"');
+    expect(html).not.toContain("Open city board");
     expect(html).toContain("NewBo relay arch");
   });
 
