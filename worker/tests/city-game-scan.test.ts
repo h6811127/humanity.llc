@@ -4,6 +4,10 @@ import { renderScanPage } from "../src/resolver/scan-html";
 import { buildScanViewModel } from "../src/resolver/scan-state";
 import { defaultSeason } from "../src/city-game/season-loader";
 import {
+  findScanCapability,
+  readCapabilityRoom,
+} from "../src/live-object/scan-capabilities";
+import {
   gameScanPrivacyTagline,
   seasonBoardPath,
   seasonBoardPathWithNode,
@@ -253,7 +257,7 @@ describe("city game scan view", () => {
     expect(vm.gameNode?.coopHint).toContain("Wind route is live");
   });
 
-  it("falls back to status plate layout when city game flag is off", () => {
+  it("falls back to doors read metadata when city game flag is off", async () => {
     const vm = buildScanViewModel(
       PROFILE,
       QR,
@@ -270,6 +274,18 @@ describe("city game scan view", () => {
     );
 
     expect(vm.gameNode?.mode).toBe("fallback");
+    expect(findScanCapability(vm.capabilities, "read")).toMatchObject({
+      available: true,
+      kind: "status_plate",
+      room: "doors",
+    });
+    expect(readCapabilityRoom(vm.capabilities)).toBe("doors");
+
+    const html = await renderScanPage(vm, "https://humanity.llc");
+    expect(html).not.toContain('data-scan-room="season"');
+    expect(html).not.toContain('<section class="scan-game-onboarding"');
+    expect(html).not.toContain("Open city board");
+    expect(html).toContain("NewBo relay arch");
   });
 
   it("mutes game hero for care pause on maintenance stream", async () => {
