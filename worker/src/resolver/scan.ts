@@ -144,7 +144,7 @@ export async function handleGetScan(
   );
 }
 
-async function loadScanContextWithGameRepairs(
+export async function loadScanContextWithGameRepairs(
   db: D1Database,
   profileId: string,
   qrId: string,

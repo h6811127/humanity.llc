@@ -1,4 +1,5 @@
 import { loadScanContext, type ScanContext } from "../db/scan";
+import { resolveSeasonForProfile } from "../city-game/season-loader";
 import { checkCardResolutionRateLimit, hashIp } from "../db/rate-limit";
 import { PROFILE_ID_REGEX } from "../crypto";
 import { jsonResponseWithWeakEtag } from "../http/conditional-json";
@@ -28,6 +29,7 @@ import { deriveCredentialCodeSync } from "../../../site/js/qr-credential-code.mj
 import { scanContractErrorForKind } from "./scan-contract-error";
 import { scanMalformedStatusHint } from "./scan-malformed-hint";
 import { guardScanResponse, scanRedirectQueryBlocked } from "./scan-redirect-guard";
+import { loadScanContextWithGameRepairs } from "./scan";
 import {
   BEARER_WARNING,
   OBJECT_PUBLIC_SNAPSHOT_LIMIT,
@@ -122,6 +124,12 @@ export interface ScanStatusBody {
 }
 
 export type { GovernanceProcessUrls };
+
+export type ScanStatusEnv = {
+  DB: D1Database;
+  CITY_GAME_ENABLED?: string;
+  CITY_GAME_LOCAL_PLAY_OPEN?: string;
+};
 
 export function scanStatusBodyFromViewModel(
   vm: ScanViewModel,
@@ -257,11 +265,11 @@ export { httpStatusForScanKind };
  */
 export async function handleGetScanStatus(
   request: Request,
-  db: D1Database,
+  env: ScanStatusEnv,
   profileId: string
 ): Promise<Response> {
   const ipHash = await hashIp(clientIp(request));
-  const rate = await checkCardResolutionRateLimit(db, ipHash);
+  const rate = await checkCardResolutionRateLimit(env.DB, ipHash);
   if (!rate.allowed) {
     return errorResponse(
       "RATE_LIMITED",
@@ -277,6 +285,7 @@ export async function handleGetScanStatus(
   const url = new URL(request.url);
   const qrRaw = url.searchParams.get("q");
   const qrId = qrRaw?.trim() ?? null;
+  const now = new Date();
 
   if (scanRedirectQueryBlocked(url)) {
     return guardScanResponse(
@@ -305,12 +314,26 @@ export async function handleGetScanStatus(
         await statusResponse(request, malformedScanView(profileId, qrId, origin))
       );
     }
-    const ctx = await loadScanContext(db, profileId, qrId);
-    const vm = buildScanViewModel(profileId, qrId, ctx, origin);
-    return guardScanResponse(request, await statusResponse(request, vm));
+    const season = resolveSeasonForProfile(profileId);
+    const ctx = await loadScanContextWithGameRepairs(
+      env.DB,
+      profileId,
+      qrId,
+      now,
+      env,
+      season
+    );
+    const vm = buildScanViewModel(profileId, qrId, ctx, origin, now, {
+      env: {
+        CITY_GAME_ENABLED: env.CITY_GAME_ENABLED,
+        CITY_GAME_LOCAL_PLAY_OPEN: env.CITY_GAME_LOCAL_PLAY_OPEN,
+      },
+      season: season ?? undefined,
+    });
+    return guardScanResponse(request, await statusResponse(request, vm, now));
   }
 
-  const card = await db
+  const card = await env.DB
     .prepare(
       `SELECT profile_id, public_key, handle, handle_normalized, manifesto_line,
               status, card_document_json, created_at, updated_at
@@ -321,7 +344,7 @@ export async function handleGetScanStatus(
 
   let verification: ScanContext["verification"] = null;
   if (card) {
-    verification = await db
+    verification = await env.DB
       .prepare(
         `SELECT profile_id, state, level, label, method, vouch_count,
                 latest_accepted_vouch_at, credential_ids_json, summary_document_json,
@@ -333,15 +356,16 @@ export async function handleGetScanStatus(
   }
 
   const vm = buildCardOnlyScanViewModel(profileId, card ?? null, verification, origin);
-  return guardScanResponse(request, await statusResponse(request, vm));
+  return guardScanResponse(request, await statusResponse(request, vm, now));
 }
 
 async function statusResponse(
   request: Request,
-  vm: ScanViewModel
+  vm: ScanViewModel,
+  now: Date = new Date()
 ): Promise<Response> {
   const status = httpStatusForScanKind(vm.kind);
-  const body = scanStatusBodyFromViewModel(vm);
+  const body = scanStatusBodyFromViewModel(vm, now);
   const payload =
     vm.kind === "malformed"
       ? {

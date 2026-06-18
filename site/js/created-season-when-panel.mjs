@@ -35,6 +35,11 @@ export function initCreatedSeasonWhenPanel(ctx) {
     });
     panel.hidden = !show;
     panel.setAttribute("aria-hidden", show ? "false" : "true");
+    if (show) {
+      input.disabled = false;
+      input.removeAttribute("disabled");
+      input.setAttribute("aria-disabled", "false");
+    }
   }
 
   function syncValue() {
@@ -44,26 +49,29 @@ export function initCreatedSeasonWhenPanel(ctx) {
     }
   }
 
+  function saveSeasonId() {
+    const raw = input.value.trim();
+    if (!raw) return;
+    try {
+      const seasonId = persistSeasonWhenId(ctx.profileId, raw);
+      if (status instanceof HTMLElement) {
+        status.hidden = false;
+        status.textContent = `Season id saved: ${seasonId}`;
+      }
+      ctx.onSeasonIdSaved?.(seasonId);
+    } catch (err) {
+      if (status instanceof HTMLElement) {
+        status.hidden = false;
+        status.textContent =
+          err instanceof Error ? err.message : "Use lowercase letters, numbers, underscores.";
+      }
+    }
+  }
+
   if (input.dataset.wired !== "1") {
     input.dataset.wired = "1";
-    input.addEventListener("change", () => {
-      const raw = input.value.trim();
-      if (!raw) return;
-      try {
-        const seasonId = persistSeasonWhenId(ctx.profileId, raw);
-        if (status instanceof HTMLElement) {
-          status.hidden = false;
-          status.textContent = `Season id saved: ${seasonId}`;
-        }
-        ctx.onSeasonIdSaved?.(seasonId);
-      } catch (err) {
-        if (status instanceof HTMLElement) {
-          status.hidden = false;
-          status.textContent =
-            err instanceof Error ? err.message : "Use lowercase letters, numbers, underscores.";
-        }
-      }
-    });
+    input.addEventListener("change", saveSeasonId);
+    input.addEventListener("blur", saveSeasonId);
   }
 
   syncVisibility();
