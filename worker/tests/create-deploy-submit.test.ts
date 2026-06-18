@@ -8,6 +8,14 @@ vi.mock("../../site/js/child-object-register-issue.mjs", () => ({
   registerChildObjectAndIssueScanLink: mocks.registerChildObjectAndIssueScanLink,
 }));
 
+vi.mock("../../site/js/create-live-handoff.mjs", () => ({
+  handoffToCreatedForWalletEntry: vi.fn(),
+}));
+
+vi.mock("../../site/js/device-wallet.mjs", () => ({
+  loadWallet: vi.fn(() => []),
+}));
+
 function makeStorage() {
   const store = new Map<string, string>();
   return {
