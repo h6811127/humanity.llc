@@ -5,6 +5,7 @@
 import { appendChildObjectRow } from "./child-object-store-core.mjs";
 import { registerChildObjectAndIssueScanLink } from "./child-object-register-issue.mjs";
 import {
+  buildDeployIssueFailedCreatedUrl,
   buildDeploySuccessCreatedUrl,
 } from "./created-deploy-success-focus-core.mjs";
 import {
@@ -21,6 +22,41 @@ import { pickPreferredGeneralRoot, listGeneralRootsWithKeys } from "./create-flo
 import { handoffToCreatedForWalletEntry } from "./create-live-handoff.mjs";
 import { loadWallet } from "./device-wallet.mjs";
 
+function normalizeHandleForDeploy(value) {
+  return String(value || "").trim().replace(/^@/, "").toLowerCase();
+}
+
+/**
+ * @param {string} handle
+ * @param {Pick<Storage, "getItem">} [storage]
+ */
+export function readDeployRootSessionForRetry(handle, storage = sessionStorage) {
+  if (!storage) return null;
+  try {
+    const raw = storage.getItem("hc_created");
+    if (!raw) return null;
+    const session = JSON.parse(raw);
+    if (!session || typeof session !== "object") return null;
+    if (normalizeHandleForDeploy(session.handle) !== normalizeHandleForDeploy(handle)) return null;
+    const profileId =
+      typeof session.profile_id === "string" && session.profile_id.trim()
+        ? session.profile_id.trim()
+        : "";
+    const ownerPrivateKey =
+      typeof session.owner_private_key_b58 === "string" && session.owner_private_key_b58.trim()
+        ? session.owner_private_key_b58.trim()
+        : "";
+    const ownerPublicKey =
+      typeof session.owner_public_key_b58 === "string" && session.owner_public_key_b58.trim()
+        ? session.owner_public_key_b58.trim()
+        : "";
+    if (!profileId || !ownerPrivateKey || !ownerPublicKey) return null;
+    return { session, profileId, qrId: null };
+  } catch {
+    return null;
+  }
+}
+
 /**
  * @param {string} template
  * @param {ReturnType<typeof import("./create-form-validation-core.mjs").validateCreateFormFields> extends { ok: true } ? never : any} fields
@@ -36,16 +72,18 @@ export async function runDeployRootAndChildCreate(template, fields, ctx) {
   const { publicLabel, publicState } = parseDeployChildFields(template, fields);
   const objectType = childObjectTypeForDeployTemplate(template);
 
-  const createResult = await ctx.runCreateCard({
-    handle: ctx.handle,
-    manifesto: generalRootManifestoForDeploy(ctx.handle),
-    wantRecovery: ctx.wantRecovery,
-    pilotTemplate: "general",
-    qrValidityDays: ctx.qrValidityDays,
-    organizer: ctx.organizer,
-    objectStreams: [],
-    navigate: false,
-  });
+  const createResult =
+    readDeployRootSessionForRetry(ctx.handle) ??
+    (await ctx.runCreateCard({
+      handle: ctx.handle,
+      manifesto: generalRootManifestoForDeploy(ctx.handle),
+      wantRecovery: ctx.wantRecovery,
+      pilotTemplate: "general",
+      qrValidityDays: ctx.qrValidityDays,
+      organizer: ctx.organizer,
+      objectStreams: [],
+      navigate: false,
+    }));
 
   const session = createResult.session;
   const profileId = createResult.profileId;
@@ -75,16 +113,20 @@ export async function runDeployRootAndChildCreate(template, fields, ctx) {
       : {}),
   });
 
-  const qrId =
-    childResult.qrId || createResult.qrId;
   location.replace(
-    buildDeploySuccessCreatedUrl({
-      origin: location.origin,
-      profileId,
-      qrId,
-      objectId: childResult.objectId,
-      objectType,
-    })
+    childResult.issueFailed || !childResult.qrId
+      ? buildDeployIssueFailedCreatedUrl({
+          origin: location.origin,
+          profileId,
+          objectId: childResult.objectId,
+        })
+      : buildDeploySuccessCreatedUrl({
+          origin: location.origin,
+          profileId,
+          qrId: childResult.qrId,
+          objectId: childResult.objectId,
+          objectType,
+        })
   );
 }
 
