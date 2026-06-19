@@ -197,6 +197,8 @@ describe("syncSeasonProgressiveChecklist", () => {
     installChecklistDom(elements);
     installStorage();
 
+    const { resetWalletCachesForTests } = await import("../../site/js/device-wallet.mjs");
+    resetWalletCachesForTests();
     const { syncSeasonProgressiveChecklist } = await import(
       "../../site/js/created-season-progressive-checklist.mjs"
     );
