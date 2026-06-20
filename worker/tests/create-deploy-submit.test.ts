@@ -14,6 +14,10 @@ vi.mock("../../site/js/device-wallet.mjs", () => ({
   loadWallet: () => [],
 }));
 
+vi.mock("../../site/js/create-live-handoff.mjs", () => ({
+  handoffToCreatedForWalletEntry: vi.fn(),
+}));
+
 import { runDeployRootAndChildCreate } from "../../site/js/create-deploy-submit.mjs";
 
 function storageFor() {
