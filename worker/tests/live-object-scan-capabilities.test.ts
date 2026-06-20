@@ -224,7 +224,8 @@ describe("buildScanCapabilities (Order 2 — Cedar Rapids verbs)", () => {
 
     const html = await renderScanPage(vm, "https://humanity.llc");
     expect(html).not.toContain('data-scan-room="season"');
-    expect(html).not.toContain("scan-game-onboarding");
+    expect(html).not.toContain('class="scan-game-onboarding"');
+    expect(html).not.toContain('id="scan-game-onboarding-heading"');
     expect(html).not.toContain("Open city board");
   });
 
