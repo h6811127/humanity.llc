@@ -209,6 +209,25 @@ describe("buildScanCapabilities (Order 2 — Cedar Rapids verbs)", () => {
     expect(html).toContain("Open city board");
   });
 
+  it("does not advertise game-node read or contribute verbs when city game is disabled", async () => {
+    const vm = gameScanVm(new Date("2026-06-07T18:00:00.000Z"), {
+      CITY_GAME_ENABLED: "0",
+    });
+
+    expect(vm.gameNode?.mode).toBe("fallback");
+    expect(findScanCapability(vm.capabilities, "read")).not.toMatchObject({
+      kind: "game_node",
+      room: "season",
+    });
+    expect(readCapabilityRoom(vm.capabilities)).not.toBe("season");
+    expect(findScanCapability(vm.capabilities, "contribute")).toBeUndefined();
+
+    const html = await renderScanPage(vm, "https://humanity.llc");
+    expect(html).not.toContain('data-scan-room="season"');
+    expect(html).not.toContain("scan-game-onboarding");
+    expect(html).not.toContain("Open city board");
+  });
+
   it("advertises offer verb on lost-item relay child scans", () => {
     const vm = buildScanViewModel(
       PROFILE,
@@ -379,7 +398,7 @@ describe("buildScanCapabilities (non-game scans)", () => {
     expect(caps.some((c) => c.verb === "contribute")).toBe(false);
   });
 
-  it("advertises Wear room on print artifact scans", () => {
+  it("advertises and renders the Wear room on print artifact scans", async () => {
     const vm = buildScanViewModel(
       "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
       "qr_7Xk9mP2nQ4rT6vW8",
@@ -423,6 +442,9 @@ describe("buildScanCapabilities (non-game scans)", () => {
       room: "wear",
     });
     expect(readCapabilityRoom(vm.capabilities)).toBe("wear");
+
+    const html = await renderScanPage(vm, "https://humanity.llc");
+    expect(html).toContain('data-scan-room="wear"');
   });
 
   it("omits human trust group on minimal failure layout", () => {

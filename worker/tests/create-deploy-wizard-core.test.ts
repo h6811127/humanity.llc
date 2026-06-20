@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   DEPLOY_OBJECT_TYPE_OPTIONS,
+  childObjectTypeForDeployTemplate,
   deployNameStepCopy,
   deployObjectTypeOptionByTemplate,
   generalRootManifestoForDeploy,
@@ -12,6 +13,7 @@ import {
   parseDeployChildFields,
   resolveDeploySubmitStrategy,
 } from "../../site/js/create-deploy-wizard-core.mjs";
+import { CHILD_OBJECT_TYPE_LOST_ITEM_RELAY } from "../../site/js/created-child-object-core.mjs";
 import { createHeroCopyForTemplate } from "../../site/js/create-template-copy.mjs";
 
 describe("isDeployWizardIntent", () => {
@@ -165,6 +167,23 @@ describe("parseDeployChildFields", () => {
     ).toEqual({
       publicLabel: "Studio door",
       publicState: "Open until 9 PM",
+    });
+  });
+
+  it("maps return tag deploy fields to a lost-item relay child object", () => {
+    expect(childObjectTypeForDeployTemplate("lost_item_relay")).toBe(
+      CHILD_OBJECT_TYPE_LOST_ITEM_RELAY
+    );
+    expect(
+      parseDeployChildFields("lost_item_relay", {
+        objectLabel: "Studio door",
+        statusLine: "Open until 9 PM",
+        relayItem: "House keys",
+        relayMessage: "Lost — contact owner through relay",
+      })
+    ).toEqual({
+      publicLabel: "House keys",
+      publicState: "Lost — contact owner through relay",
     });
   });
 });
