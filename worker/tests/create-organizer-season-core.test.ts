@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   GAME_SEASON_SETUP_FOCUS,
@@ -9,8 +9,14 @@ import {
   isGameSeasonCustodySession,
   isGameSeasonSetupFocus,
   parseGameSeasonIdField,
+  readRememberedGameSeasonId,
+  rememberGameSeasonIdForProfile,
   walletEntryHasOrganizerIssuerKey,
 } from "../../site/js/create-organizer-season-core.mjs";
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 describe("isGameSeasonCreateIntent", () => {
   it("detects intent=game", () => {
@@ -53,6 +59,43 @@ describe("parseGameSeasonIdField", () => {
   it("validates slug", () => {
     expect(parseGameSeasonIdField("my_city_01")).toBe("my_city_01");
     expect(() => parseGameSeasonIdField("Bad Season")).toThrow();
+  });
+});
+
+describe("remembered game season id", () => {
+  it("round-trips a season id per profile for the game-node submit fallback", () => {
+    const storage = new Map();
+    vi.stubGlobal("sessionStorage", {
+      getItem(key) {
+        return storage.get(String(key)) ?? null;
+      },
+      setItem(key, value) {
+        storage.set(String(key), String(value));
+      },
+    });
+
+    rememberGameSeasonIdForProfile("profile_a", "my_city_season_01");
+
+    expect(readRememberedGameSeasonId("profile_a")).toBe("my_city_season_01");
+    expect(readRememberedGameSeasonId("profile_b")).toBe("");
+  });
+
+  it("ignores blank profile and season values", () => {
+    const storage = new Map();
+    vi.stubGlobal("sessionStorage", {
+      getItem(key) {
+        return storage.get(String(key)) ?? null;
+      },
+      setItem(key, value) {
+        storage.set(String(key), String(value));
+      },
+    });
+
+    rememberGameSeasonIdForProfile("", "my_city_season_01");
+    rememberGameSeasonIdForProfile("profile_a", "");
+
+    expect(storage.size).toBe(0);
+    expect(readRememberedGameSeasonId("")).toBe("");
   });
 });
 
