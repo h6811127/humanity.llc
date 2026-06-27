@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import * as ed from "@noble/ed25519";
 
 import {
@@ -15,10 +15,29 @@ import {
   handlePostChildObjectRevoke,
   handlePostChildObjectUpdate,
 } from "../src/resolver/child-objects";
+import {
+  registerSeasonConfig,
+  resetSeasonRegistryForTests,
+} from "../src/city-game/season-loader";
+import type { CrSeasonConfig } from "../src/city-game/season-config";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const OBJECT_ID = "obj_status_plate_001";
 const CREATED = "2026-05-16T17:00:00.000Z";
+
+afterEach(() => {
+  resetSeasonRegistryForTests();
+});
+
+function testSeasonConfig(seasonId: string): CrSeasonConfig {
+  return {
+    season_id: seasonId,
+    season_root_profile_id: PROFILE,
+    districts: ["river_spine"],
+    nodes: [],
+    unlock_edges: [],
+  };
+}
 
 async function randomKeypair() {
   const privateKey = ed.utils.randomPrivateKey();
@@ -239,6 +258,58 @@ describe("child object endpoints", () => {
       db.objects.get(objectId)?.child_object_document_json ?? "{}"
     ) as { custody?: { holder_label?: string } };
     expect(stored.custody?.holder_label).toBe("Finder at front desk");
+  });
+
+  it("rejects game_node create when season_id does not match the parent profile season", async () => {
+    const keys = await getTestKeypair();
+    const db = new ChildObjectDb();
+    db.parent.public_key = keys.publicKeyBase58;
+    registerSeasonConfig(testSeasonConfig("test_city_season_01"));
+    const object = await signedChildObject(keys, {
+      object_id: "obj_game_node_001",
+      object_type: "game_node",
+      public_label: "Wrong season relay",
+      public_state: "Dormant",
+      season_id: "other_city_season_01",
+      node_role: "relay_gate",
+      district: "river_spine",
+    });
+
+    const res = await handlePostChildObjectCreate(
+      requestFor(`/.well-known/hc/v1/cards/${PROFILE}/objects`, object),
+      db as unknown as D1Database,
+      PROFILE
+    );
+
+    expect(res.status).toBe(422);
+    const body = await res.json() as { error?: string };
+    expect(body.error).toBe("SEASON_MISMATCH");
+    expect(db.objects.has("obj_game_node_001")).toBe(false);
+  });
+
+  it("creates a game_node when season_id matches the parent profile season", async () => {
+    const keys = await getTestKeypair();
+    const db = new ChildObjectDb();
+    db.parent.public_key = keys.publicKeyBase58;
+    registerSeasonConfig(testSeasonConfig("test_city_season_01"));
+    const object = await signedChildObject(keys, {
+      object_id: "obj_game_node_001",
+      object_type: "game_node",
+      public_label: "River relay",
+      public_state: "Dormant",
+      season_id: "test_city_season_01",
+      node_role: "relay_gate",
+      district: "river_spine",
+    });
+
+    const res = await handlePostChildObjectCreate(
+      requestFor(`/.well-known/hc/v1/cards/${PROFILE}/objects`, object),
+      db as unknown as D1Database,
+      PROFILE
+    );
+
+    expect(res.status).toBe(201);
+    expect(db.objects.get("obj_game_node_001")?.object_type).toBe("game_node");
   });
 
   it("allows recovery key to update an active child object", async () => {
