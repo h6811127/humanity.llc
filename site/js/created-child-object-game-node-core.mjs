@@ -106,6 +106,23 @@ export function parseGameNodeSeasonId(seasonIdRaw) {
 }
 
 /**
+ * Submit-time season resolution: the visible picker wins, but a freshly saved
+ * When-panel id may be remembered before the picker has been hydrated.
+ * @param {unknown} selectedSeasonIdRaw
+ * @param {unknown} rememberedSeasonIdRaw
+ */
+export function resolveGameNodeSeasonIdForSubmit(
+  selectedSeasonIdRaw,
+  rememberedSeasonIdRaw
+) {
+  const selected =
+    typeof selectedSeasonIdRaw === "string" && selectedSeasonIdRaw
+      ? selectedSeasonIdRaw
+      : "";
+  return parseGameNodeSeasonId(selected || rememberedSeasonIdRaw);
+}
+
+/**
  * @param {unknown} publicLabelRaw
  * @param {unknown} nodeRoleRaw
  * @param {unknown} districtRaw

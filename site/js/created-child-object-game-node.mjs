@@ -11,6 +11,7 @@ import {
   fetchSeasonConfigHints,
   isActiveGameNodeRow,
   parseGameNodeChildFields,
+  resolveGameNodeSeasonIdForSubmit,
 } from "./created-child-object-game-node-core.mjs";
 import { stewardPresentationExtras } from "./steward-active-room-core.mjs";
 import {
@@ -577,9 +578,10 @@ export function initCreatedGameNode(ctx) {
         labelInput instanceof HTMLInputElement ? labelInput.value : "",
         roleSelect.value,
         districtSelect instanceof HTMLSelectElement ? districtSelect.value : "",
-        seasonSelect instanceof HTMLSelectElement && seasonSelect.value
-          ? seasonSelect.value
-          : readRememberedGameSeasonId(ctx.profileId)
+        resolveGameNodeSeasonIdForSubmit(
+          seasonSelect instanceof HTMLSelectElement ? seasonSelect.value : "",
+          readRememberedGameSeasonId(ctx.profileId)
+        )
       );
       const signedCreate = await signGameNodeChildObjectCreate({
         profileId: ctx.profileId,
