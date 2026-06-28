@@ -14,6 +14,7 @@ vi.mock("../../site/js/hc-sign.mjs", () => ({
 
 import {
   buildResolverConfirmedWalletPollMaps,
+  applyResolverNetworkSnapshot,
   getCachedNetworkQrScope,
   getCachedNetworkScanKind,
   getCachedNetworkStatus,
@@ -96,6 +97,30 @@ describe("isResolverConfirmedProfile", () => {
 
     expect(isResolverConfirmedProfile(PROFILE_A)).toBe(true);
     expect(isResolverConfirmedProfile(PROFILE_B)).toBe(false);
+  });
+
+  it("applies follower resolver snapshots without QR/link poll maps", () => {
+    expect(() =>
+      applyResolverNetworkSnapshot([
+        {
+          profile_id: PROFILE_A,
+          status: "active",
+          scanKind: "active",
+          qrScope: "print_artifact",
+          resolverConfirmed: true,
+          alertState: "active",
+        },
+      ])
+    ).not.toThrow();
+
+    expect(isResolverConfirmedProfile(PROFILE_A)).toBe(true);
+    expect(buildResolverConfirmedWalletPollMaps()?.scanKindMap[PROFILE_A]).toBe("active");
+    const wallet = JSON.parse(localStore.get("hc_wallet") || "[]");
+    expect(wallet[0]).toMatchObject({
+      status: "active",
+      scan_kind: "active",
+      qr_scope: "print_artifact",
+    });
   });
 
   it("persists resolver QR scope into cache and wallet row", async () => {
