@@ -208,6 +208,8 @@ export function applyResolverNetworkSnapshot(snapshotEntries, snapshotAt = Date.
   const alertStateMap = {};
   const scanKindMap = {};
   const qrScopeMap = {};
+  const qrIdMap = {};
+  const scanUrlMap = {};
   const resolverConfirmedMap = {};
 
   for (const row of snapshotEntries) {
