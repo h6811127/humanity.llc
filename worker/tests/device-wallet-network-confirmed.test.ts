@@ -114,8 +114,13 @@ describe("isResolverConfirmedProfile", () => {
     ).not.toThrow();
 
     expect(isResolverConfirmedProfile(PROFILE_A)).toBe(true);
-    expect(getCachedNetworkStatus(PROFILE_A)).toBe("active");
-    expect(getCachedNetworkQrScope(PROFILE_A)).toBe("print_artifact");
+    expect(buildResolverConfirmedWalletPollMaps()?.scanKindMap[PROFILE_A]).toBe("active");
+    const wallet = JSON.parse(localStore.get("hc_wallet") || "[]");
+    expect(wallet[0]).toMatchObject({
+      status: "active",
+      scan_kind: "active",
+      qr_scope: "print_artifact",
+    });
   });
 
   it("persists resolver QR scope into cache and wallet row", async () => {
