@@ -7,6 +7,67 @@ import {
 } from "../scripts/city-game-sync-season-root-core.mjs";
 
 describe("city-game-sync-season-root-core", () => {
+  it("detects production-bound scan URLs across charter fields and nodes only by origin", () => {
+    const productionCases = [
+      {
+        network_charter: {
+          status_plate_scan_url:
+            "https://www.humanity.llc/c/prod_root?q=qr_prod_status_plate",
+        },
+      },
+      {
+        network_charter: {
+          game_node_scan_url: " https://humanity.llc/c/prod_root?q=qr_prod_node_04 ",
+        },
+      },
+      {
+        nodes: [
+          {
+            node_id: "node_01",
+            scan_url: "https://www.humanity.llc/c/prod_root?q=qr_prod_node_01",
+          },
+        ],
+      },
+    ];
+
+    for (const season of productionCases) {
+      expect(seasonLooksProductionBound(season)).toBe(true);
+    }
+
+    const safeCases = [
+      {
+        network_charter: {
+          status_plate_scan_url: "http://127.0.0.1:8787/c/local_root?q=qr_local",
+          game_node_scan_url: "http://localhost:8787/c/local_root?q=qr_local_node_04",
+        },
+        nodes: [
+          {
+            node_id: "node_01",
+            scan_url: "https://example.invalid/c/local_root?q=qr_local_node_01",
+          },
+        ],
+      },
+      {
+        network_charter: {
+          game_node_scan_url:
+            "https://example.invalid/redirect?next=https%3A%2F%2Fhumanity.llc%2Fc%2Fprod_root",
+        },
+      },
+      {
+        nodes: [
+          {
+            node_id: "node_02",
+            scan_url: "https://humanity.llc.evil.example/c/prod_root?q=qr_prod_node_02",
+          },
+        ],
+      },
+    ];
+
+    for (const season of safeCases) {
+      expect(seasonLooksProductionBound(season)).toBe(false);
+    }
+  });
+
   it("refuses default local sync when season JSON is production-bound", () => {
     const season = {
       season_root_profile_id: "GcP3Ee17yGqMHdidhEVMYBzq",
