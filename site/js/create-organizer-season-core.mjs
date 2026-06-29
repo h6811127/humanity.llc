@@ -71,6 +71,18 @@ export function rememberGameSeasonIdForProfile(profileId, seasonId) {
 /**
  * @param {string} profileId
  */
+export function clearRememberedGameSeasonIdForProfile(profileId) {
+  if (!profileId) return;
+  try {
+    sessionStorage.removeItem(`${GAME_SEASON_ID_SESSION_PREFIX}${profileId}`);
+  } catch {
+    /* ignore */
+  }
+}
+
+/**
+ * @param {string} profileId
+ */
 export function readRememberedGameSeasonId(profileId) {
   if (!profileId) return "";
   try {

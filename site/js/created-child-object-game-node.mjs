@@ -11,6 +11,7 @@ import {
   fetchSeasonConfigHints,
   isActiveGameNodeRow,
   parseGameNodeChildFields,
+  resolveGameNodeSeasonId,
 } from "./created-child-object-game-node-core.mjs";
 import { stewardPresentationExtras } from "./steward-active-room-core.mjs";
 import {
@@ -50,7 +51,12 @@ import { initCreatedGameNodeRulesPublish } from "./created-child-object-game-nod
 import {
   initCreatedGameNodeSetupGuide,
 } from "./created-child-object-game-node-setup.mjs";
-import { readRememberedGameSeasonId } from "./create-organizer-season-core.mjs";
+import {
+  clearRememberedGameSeasonIdForProfile,
+  readRememberedGameSeasonId,
+  rememberGameSeasonIdForProfile,
+} from "./create-organizer-season-core.mjs";
+import { SEASON_WHEN_ID_INPUT_ID } from "./created-season-when-panel-core.mjs";
 
 /**
  * @param {string} profileId
@@ -180,14 +186,48 @@ export function initCreatedGameNode(ctx) {
 
   /** @type {Map<string, { json_url?: string }>} */
   const seasonById = new Map();
+  let seasonIndexLoadToken = 0;
+
+  /**
+   * @param {string} seasonId
+   */
+  function syncWhenPanelInput(seasonId) {
+    const input = document.getElementById(SEASON_WHEN_ID_INPUT_ID);
+    if (input instanceof HTMLInputElement) input.value = seasonId;
+  }
+
+  /**
+   * @param {unknown} seasonIdRaw
+   */
+  function rememberSelectedSeasonId(seasonIdRaw) {
+    const seasonId = typeof seasonIdRaw === "string" ? seasonIdRaw.trim() : "";
+    if (!seasonId) {
+      clearRememberedGameSeasonIdForProfile(ctx.profileId);
+      syncWhenPanelInput("");
+      return "";
+    }
+    const parsed = resolveGameNodeSeasonId(seasonId, "");
+    rememberGameSeasonIdForProfile(ctx.profileId, parsed);
+    syncWhenPanelInput(parsed);
+    return parsed;
+  }
+
+  function currentGameNodeSeasonId() {
+    return resolveGameNodeSeasonId(
+      seasonSelect instanceof HTMLSelectElement ? seasonSelect.value : "",
+      readRememberedGameSeasonId(ctx.profileId)
+    );
+  }
 
   /**
    * @param {string} seasonId
    */
   function ensureSeasonSelectOption(seasonId) {
     if (!(seasonSelect instanceof HTMLSelectElement) || !seasonId) return;
-    if (seasonById.has(seasonId)) return;
-    seasonById.set(seasonId, { season_id: seasonId });
+    if (!seasonById.has(seasonId)) {
+      seasonById.set(seasonId, { season_id: seasonId });
+    }
+    if ([...seasonSelect.options].some((opt) => opt.value === seasonId)) return;
     const opt = document.createElement("option");
     opt.value = seasonId;
     opt.textContent = `Your season · ${seasonId}`;
@@ -196,11 +236,14 @@ export function initCreatedGameNode(ctx) {
 
   async function loadSeasonIndex() {
     if (!(seasonSelect instanceof HTMLSelectElement)) return;
+    const loadToken = ++seasonIndexLoadToken;
     try {
       const res = await fetch("/data/city-game-seasons-index.json", { credentials: "omit" });
       if (!res.ok) return;
       const body = await res.json();
       const seasons = Array.isArray(body.seasons) ? body.seasons : [];
+      if (loadToken !== seasonIndexLoadToken) return;
+      const selectedBeforeRebuild = seasonSelect.value.trim();
       seasonSelect.replaceChildren();
       const placeholder = document.createElement("option");
       placeholder.value = "";
@@ -217,11 +260,12 @@ export function initCreatedGameNode(ctx) {
         opt.textContent = `${city} · ${seasonId}`;
         seasonSelect.append(opt);
       }
-      const remembered = readRememberedGameSeasonId(ctx.profileId);
-      if (remembered) {
-        ensureSeasonSelectOption(remembered);
-        seasonSelect.value = remembered;
-        await refreshDistrictsForSeason(remembered);
+      const seasonId = selectedBeforeRebuild || readRememberedGameSeasonId(ctx.profileId);
+      if (seasonId) {
+        ensureSeasonSelectOption(seasonId);
+        seasonSelect.value = seasonId;
+        rememberSelectedSeasonId(seasonId);
+        await refreshDistrictsForSeason(seasonId);
       }
     } catch {
       /* index optional offline */
@@ -243,9 +287,14 @@ export function initCreatedGameNode(ctx) {
    */
   async function selectSeasonId(seasonIdRaw) {
     const seasonId = String(seasonIdRaw ?? "").trim();
-    if (!(seasonSelect instanceof HTMLSelectElement) || !seasonId) return;
-    ensureSeasonSelectOption(seasonId);
-    seasonSelect.value = seasonId;
+    if (!(seasonSelect instanceof HTMLSelectElement)) return;
+    if (seasonId) {
+      ensureSeasonSelectOption(seasonId);
+      seasonSelect.value = seasonId;
+    } else {
+      seasonSelect.value = "";
+    }
+    rememberSelectedSeasonId(seasonId);
     await refreshDistrictsForSeason(seasonId);
     await refreshBulkPanel(readChildObjectRows(localStorage, ctx.profileId));
     rulesPublishCtl?.refresh?.();
@@ -254,8 +303,11 @@ export function initCreatedGameNode(ctx) {
 
   seasonSelect?.addEventListener("change", () => {
     if (!(seasonSelect instanceof HTMLSelectElement)) return;
-    void refreshDistrictsForSeason(seasonSelect.value.trim());
+    const seasonId = rememberSelectedSeasonId(seasonSelect.value);
+    void refreshDistrictsForSeason(seasonId);
     void refreshBulkPanel(readChildObjectRows(localStorage, ctx.profileId));
+    rulesPublishCtl?.refresh?.();
+    setupGuideCtl?.refresh?.();
   });
 
   function readBulkEditorRowsFromDom() {
@@ -577,9 +629,7 @@ export function initCreatedGameNode(ctx) {
         labelInput instanceof HTMLInputElement ? labelInput.value : "",
         roleSelect.value,
         districtSelect instanceof HTMLSelectElement ? districtSelect.value : "",
-        seasonSelect instanceof HTMLSelectElement && seasonSelect.value
-          ? seasonSelect.value
-          : readRememberedGameSeasonId(ctx.profileId)
+        currentGameNodeSeasonId()
       );
       const signedCreate = await signGameNodeChildObjectCreate({
         profileId: ctx.profileId,
@@ -642,8 +692,10 @@ export function initCreatedGameNode(ctx) {
       return;
     }
 
-    const seasonId = seasonSelect.value.trim();
-    if (!seasonId) {
+    let seasonId = "";
+    try {
+      seasonId = currentGameNodeSeasonId();
+    } catch {
       ctx.showError("Choose a season first.");
       return;
     }

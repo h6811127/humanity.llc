@@ -106,6 +106,17 @@ export function parseGameNodeSeasonId(seasonIdRaw) {
 }
 
 /**
+ * @param {unknown} selectedSeasonIdRaw
+ * @param {unknown} rememberedSeasonIdRaw
+ */
+export function resolveGameNodeSeasonId(selectedSeasonIdRaw, rememberedSeasonIdRaw) {
+  const selected =
+    typeof selectedSeasonIdRaw === "string" ? selectedSeasonIdRaw.trim() : "";
+  if (selected) return parseGameNodeSeasonId(selected);
+  return parseGameNodeSeasonId(rememberedSeasonIdRaw);
+}
+
+/**
  * @param {unknown} publicLabelRaw
  * @param {unknown} nodeRoleRaw
  * @param {unknown} districtRaw

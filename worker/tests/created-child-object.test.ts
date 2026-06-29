@@ -31,6 +31,7 @@ import {
   CHILD_OBJECT_STATUS_DISABLED,
   isActiveGameNodeRow,
   parseGameNodeChildFields,
+  resolveGameNodeSeasonId,
   shouldOfferAddGameNode,
 } from "../../site/js/created-child-object-game-node-core.mjs";
 
@@ -410,5 +411,13 @@ describe("created-child-object-game-node-core", () => {
     expect(gameNodeSrc).toContain("async function selectSeasonId");
     expect(gameNodeSrc).toContain("readRememberedGameSeasonId(ctx.profileId)");
     expect(createdSrc).toContain("gameNodeCtl.selectSeasonId(seasonId)");
+  });
+
+  it("resolves game node season id from the visible picker before remembered fallback", () => {
+    expect(resolveGameNodeSeasonId("example_city_season_01", "my_city_season_01")).toBe(
+      "example_city_season_01"
+    );
+    expect(resolveGameNodeSeasonId("", "my_city_season_01")).toBe("my_city_season_01");
+    expect(() => resolveGameNodeSeasonId("", "")).toThrow(/season id is required/i);
   });
 });

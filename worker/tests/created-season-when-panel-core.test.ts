@@ -18,6 +18,9 @@ describe("created season when panel", () => {
         setItem: (key, value) => {
           session.set(key, value);
         },
+        removeItem: (key) => {
+          session.delete(key);
+        },
       },
     });
   });
@@ -35,5 +38,14 @@ describe("created season when panel", () => {
 
   it("rejects invalid season id slugs", () => {
     expect(() => persistSeasonWhenId("p2", "bad slug!")).toThrow();
+  });
+
+  it("clears remembered season id for the profile", async () => {
+    const { clearSeasonWhenId } = await import(
+      "../../site/js/created-season-when-panel-core.mjs"
+    );
+    persistSeasonWhenId("p3", "my_season_01");
+    clearSeasonWhenId("p3");
+    expect(readSeasonWhenId("p3")).toBe("");
   });
 });

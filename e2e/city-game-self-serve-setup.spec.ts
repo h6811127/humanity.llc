@@ -173,6 +173,29 @@ test.describe("city game self-serve setup on /created/", () => {
     await expect(seasonSelect).toHaveValue("my_city_season_01");
   });
 
+  test("keeps When season id and game node picker in sync before bulk import", async ({
+    page,
+  }) => {
+    await seedGameSeasonControlSession(page, GAME_SEASON_ROOT);
+    await openGameSeasonLive(page);
+
+    const whenInput = page.locator("#child-object-season-when-id");
+    const seasonSelect = page.locator("#child-object-game-node-season");
+
+    await whenInput.fill("my_city_season_01");
+    await whenInput.blur();
+    await expect(seasonSelect).toHaveValue("my_city_season_01");
+
+    await selectExampleSeason(page);
+    await expect(whenInput).toHaveValue("example_city_season_01");
+
+    await whenInput.fill("");
+    await whenInput.blur();
+    await expect(seasonSelect).toHaveValue("");
+    await page.locator("#child-object-game-node-bulk summary").click();
+    await expect(page.locator("#child-object-game-node-bulk-submit")).toBeDisabled();
+  });
+
   test("loads example season in picker and shows comprehension custody UI", async ({ page }) => {
     await seedGameSeasonControlSession(page, GAME_SEASON_ROOT);
     await openGameSeasonLive(page);
