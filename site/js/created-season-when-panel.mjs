@@ -3,6 +3,7 @@
  */
 
 import {
+  clearSeasonWhenId,
   persistSeasonWhenId,
   readSeasonWhenId,
   SEASON_WHEN_ID_INPUT_ID,
@@ -48,7 +49,15 @@ export function initCreatedSeasonWhenPanel(ctx) {
     input.dataset.wired = "1";
     input.addEventListener("change", () => {
       const raw = input.value.trim();
-      if (!raw) return;
+      if (!raw) {
+        clearSeasonWhenId(ctx.profileId);
+        if (status instanceof HTMLElement) {
+          status.hidden = false;
+          status.textContent = "Season id cleared.";
+        }
+        ctx.onSeasonIdSaved?.("");
+        return;
+      }
       try {
         const seasonId = persistSeasonWhenId(ctx.profileId, raw);
         if (status instanceof HTMLElement) {

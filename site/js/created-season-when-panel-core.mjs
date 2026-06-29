@@ -5,6 +5,7 @@
 
 import { parseGameNodeSeasonId } from "./created-child-object-game-node-core.mjs";
 import {
+  clearRememberedGameSeasonIdForProfile,
   readRememberedGameSeasonId,
   rememberGameSeasonIdForProfile,
 } from "./create-organizer-season-core.mjs";
@@ -20,6 +21,13 @@ export function persistSeasonWhenId(profileId, raw) {
   const seasonId = parseGameNodeSeasonId(raw);
   rememberGameSeasonIdForProfile(profileId, seasonId);
   return seasonId;
+}
+
+/**
+ * @param {string} profileId
+ */
+export function clearSeasonWhenId(profileId) {
+  clearRememberedGameSeasonIdForProfile(profileId);
 }
 
 /**
