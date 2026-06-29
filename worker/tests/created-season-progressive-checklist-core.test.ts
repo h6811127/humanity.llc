@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   assessSeasonProgressiveChecklist,
+  countGameNodesWithScanUrl,
   countRegisteredGameNodes,
   shouldShowSeasonProgressiveChecklist,
 } from "../../site/js/created-season-progressive-checklist-core.mjs";
@@ -27,6 +28,54 @@ describe("assessSeasonProgressiveChecklist", () => {
         { object_type: "status_plate" },
       ])
     ).toBe(1);
+  });
+
+  it("keeps print active until a live game node has a scan URL", () => {
+    const inactiveRows = [
+      { object_type: "game_node", status: "active" },
+      {
+        object_type: "game_node",
+        status: "disabled",
+        scan_url: "https://example.test/c/off",
+      },
+      {
+        object_type: "game_node",
+        status: "revoked",
+        scan_url: "https://example.test/c/revoked",
+      },
+    ];
+
+    expect(countRegisteredGameNodes(inactiveRows)).toBe(1);
+    expect(countGameNodesWithScanUrl(inactiveRows)).toBe(0);
+
+    const result = assessSeasonProgressiveChecklist({
+      profileId: "p1",
+      walletEntry: { issuer_public_key: "org_pub" },
+      childObjectRows: inactiveRows,
+    });
+
+    expect(result.activeStepId).toBe("print");
+    expect(result.complete).toBe(false);
+    expect(result.steps.find((step) => step.id === "first_scan_point")?.done).toBe(true);
+    expect(result.steps.find((step) => step.id === "print")?.done).toBe(false);
+  });
+
+  it("completes once the first registered game node has a scan URL", () => {
+    const result = assessSeasonProgressiveChecklist({
+      profileId: "p1",
+      walletEntry: { organizer_public_key_b58: "org_pub" },
+      childObjectRows: [
+        {
+          object_type: "game_node",
+          status: "active",
+          scan_url: "https://example.test/c/node-1",
+        },
+      ],
+    });
+
+    expect(result.complete).toBe(true);
+    expect(result.activeStepId).toBeNull();
+    expect(result.steps.every((step) => step.done)).toBe(true);
   });
 });
 
