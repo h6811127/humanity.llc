@@ -20,13 +20,24 @@ import {
   STORAGE_PROMPT_DISMISS,
 } from "./device-browser-notifications-core.mjs?v=94";
 import { getLiveControlPendingCount } from "./device-live-control-inbox.mjs";
-import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=94";
+import { isWatchLiveProofEnabled } from "./device-hub-network-tools-core.mjs";
+import { listPollableWalletEntries } from "./device-wallet.mjs";
+import { logInboxDiagnostic, isInboxDiagnosticsEnabled } from "./device-inbox-diagnostics.mjs?v=94";
 import { applyOsNotificationsFromInbox } from "./device-notification-delivery.mjs?v=94";
 import { probeLiveControlInboxForBackgroundAlerts } from "./device-live-control-inbox.mjs?v=94";
+import {
+  getRelayOfferPendingCount,
+  loadRelayOfferInboxModule,
+  probeRelayOfferInboxForBackgroundAlerts,
+  walletHasActiveLostItemRelays,
+} from "./device-relay-offer-inbox-loader.mjs";
 import {
   LIVE_CONTROL_BACKGROUND_ALERT_POLL_MS,
   LIVE_CONTROL_POLL_MS_ACTIVE,
   liveControlBackgroundAlertPollShouldRun,
+  liveProofForegroundAlertPollShouldRun,
+  relayOfferAlertPollIntervalMs,
+  relayOfferAlertPollShouldRun,
 } from "./device-live-control-poll-scheduler.mjs";
 import { bindLiveProofNotificationNavListener } from "./device-live-proof-notification-nav.mjs";
 import { getResolverHealthStatus } from "./device-wallet-since-visit-gate.mjs";
@@ -34,8 +45,16 @@ import { isStewardPushHealthy } from "./device-steward-push.mjs";
 import {
   registerLiveProofServiceWorker,
   syncLiveProofServiceWorkerState,
+  deliverOsNotificationPlansToServiceWorker,
   teardownLiveProofServiceWorker,
 } from "./device-browser-notifications-sw.mjs";
+import {
+  syncStewardWebPushSubscription,
+  stewardWebPushTransportSnapshot,
+  clearStewardWebPushSubscription,
+} from "./device-steward-web-push.mjs";
+import { DEVICE_BOOT_READY_EVENT } from "./device-shell-boot.mjs";
+import { isDeviceBootReadyState } from "./device-shell-boot-core.mjs";
 
 const SESSION_OS_INTERACT = "hc_browser_notif_os_interact";
 const SW_POLL_NOW_DEFER_MS = 400;
@@ -54,8 +73,9 @@ export function setBrowserNotifEnabled(on) {
   }
   if (on) {
     void registerLiveProofServiceWorker();
-    syncBackgroundAlertPollTimer();
+    void loadRelayOfferInboxModule().finally(() => syncBackgroundAlertPollTimer());
   } else {
+    void clearStewardWebPushSubscription();
     void teardownLiveProofServiceWorker();
     clearBackgroundAlertPollTimer();
   }
@@ -109,10 +129,10 @@ export async function enableBrowserAlerts() {
     setBrowserNotifEnabled(true);
     await registerLiveProofServiceWorker();
     await syncLiveProofServiceWorkerState({ pollNow: false });
+    void syncStewardWebPushSubscription();
+    await loadRelayOfferInboxModule().catch(() => null);
     syncBackgroundAlertPollTimer();
-    if (document.visibilityState === "hidden") {
-      void probeAndDeliverBackgroundAlerts();
-    }
+    void probeAndDeliverBackgroundAlerts();
     logInboxDiagnostic({ type: "browser_alert_opt_in" });
     return true;
   }
@@ -269,7 +289,24 @@ function readOsInteractShown() {
   }
 }
 
-let backgroundProbeInFlight = false;
+let alertProbeSettleTimer = null;
+
+function scheduleAlertProbeWhenReady() {
+  syncBackgroundAlertPollTimer();
+  if (backgroundAlertPollShouldRun()) {
+    void probeAndDeliverBackgroundAlerts();
+  }
+}
+
+function scheduleAlertProbeSettle() {
+  if (alertProbeSettleTimer != null) {
+    clearTimeout(alertProbeSettleTimer);
+  }
+  alertProbeSettleTimer = setTimeout(() => {
+    alertProbeSettleTimer = null;
+    scheduleAlertProbeWhenReady();
+  }, SW_POLL_NOW_DEFER_MS);
+}
 /** @type {ReturnType<typeof setInterval> | null} */
 let backgroundAlertPollTimer = null;
 
@@ -278,9 +315,22 @@ function readBackgroundAlertPollContext() {
     alertsEnabled: isBrowserNotifEnabled(),
     permissionGranted: notificationPermission() === "granted",
     tabHidden: document.visibilityState === "hidden",
+    tabVisible: document.visibilityState === "visible",
+    watchEnabled: isWatchLiveProofEnabled(),
+    hasPollableCards: listPollableWalletEntries().length > 0,
     resolverHealth: getResolverHealthStatus(),
     stewardPushHealthy: isStewardPushHealthy(),
+    relayEligible: walletHasActiveLostItemRelays(),
   };
+}
+
+function backgroundAlertPollShouldRun(ctx = readBackgroundAlertPollContext()) {
+  if (!ctx.alertsEnabled) return false;
+  return (
+    liveControlBackgroundAlertPollShouldRun(ctx) ||
+    liveProofForegroundAlertPollShouldRun(ctx) ||
+    relayOfferAlertPollShouldRun(ctx)
+  );
 }
 
 function clearBackgroundAlertPollTimer() {
@@ -291,23 +341,24 @@ function clearBackgroundAlertPollTimer() {
 }
 
 function backgroundAlertPollIntervalMs() {
-  return getLiveControlPendingCount() > 0
-    ? LIVE_CONTROL_POLL_MS_ACTIVE
-    : LIVE_CONTROL_BACKGROUND_ALERT_POLL_MS;
+  if (getLiveControlPendingCount() > 0) return LIVE_CONTROL_POLL_MS_ACTIVE;
+  if (getRelayOfferPendingCount() > 0) {
+    return relayOfferAlertPollIntervalMs(getRelayOfferPendingCount());
+  }
+  return LIVE_CONTROL_BACKGROUND_ALERT_POLL_MS;
 }
 
 function armBackgroundAlertPollTimer() {
   clearBackgroundAlertPollTimer();
-  const ctx = readBackgroundAlertPollContext();
-  if (!liveControlBackgroundAlertPollShouldRun(ctx)) return;
+  if (!backgroundAlertPollShouldRun()) return;
 
   const tick = () => {
-    if (!liveControlBackgroundAlertPollShouldRun(readBackgroundAlertPollContext())) {
+    if (!backgroundAlertPollShouldRun()) {
       clearBackgroundAlertPollTimer();
       return;
     }
     void probeAndDeliverBackgroundAlerts().finally(() => {
-      if (!liveControlBackgroundAlertPollShouldRun(readBackgroundAlertPollContext())) {
+      if (!backgroundAlertPollShouldRun()) {
         clearBackgroundAlertPollTimer();
         return;
       }
@@ -319,8 +370,7 @@ function armBackgroundAlertPollTimer() {
 }
 
 function syncBackgroundAlertPollTimer() {
-  const ctx = readBackgroundAlertPollContext();
-  if (!liveControlBackgroundAlertPollShouldRun(ctx)) {
+  if (!backgroundAlertPollShouldRun()) {
     clearBackgroundAlertPollTimer();
     return;
   }
@@ -329,23 +379,45 @@ function syncBackgroundAlertPollTimer() {
 }
 
 function scheduleServiceWorkerPollNow() {
-  void syncLiveProofServiceWorkerState({ pollNow: true });
+  void syncLiveProofServiceWorkerState({ pollNow: true, flushPushCache: true });
   setTimeout(() => {
     if (document.visibilityState === "hidden") {
-      void syncLiveProofServiceWorkerState({ pollNow: true });
+      void syncLiveProofServiceWorkerState({ pollNow: true, flushPushCache: true });
     }
   }, SW_POLL_NOW_DEFER_MS);
 }
 
+/** Field P0-N2 snapshot when `localStorage.hc_inbox_diagnostics = "1"`. */
+export function notifyTransportFieldSnapshot() {
+  return {
+    browser_alerts: isBrowserNotifEnabled(),
+    permission: notificationPermission(),
+    tab_visible: document.visibilityState === "visible",
+    push_healthy: isStewardPushHealthy(),
+    live_proof_pending: getLiveControlPendingCount(),
+    relay_pending: getRelayOfferPendingCount(),
+    relay_eligible: walletHasActiveLostItemRelays(),
+    resolver_health: getResolverHealthStatus(),
+    web_push: stewardWebPushTransportSnapshot(),
+  };
+}
+
 async function probeAndDeliverBackgroundAlerts() {
   if (backgroundProbeInFlight) return;
-  if (!isBrowserNotifEnabled() || notificationPermission() !== "granted") {
-    void runOsDeliveryFromInbox();
-    return;
-  }
   backgroundProbeInFlight = true;
   try {
-    await probeLiveControlInboxForBackgroundAlerts();
+    if (isBrowserNotifEnabled()) {
+      const ctx = readBackgroundAlertPollContext();
+      if (
+        liveControlBackgroundAlertPollShouldRun(ctx) ||
+        liveProofForegroundAlertPollShouldRun(ctx)
+      ) {
+        await probeLiveControlInboxForBackgroundAlerts();
+      }
+      if (relayOfferAlertPollShouldRun(ctx)) {
+        await probeRelayOfferInboxForBackgroundAlerts();
+      }
+    }
     await runOsDeliveryFromInbox();
   } finally {
     backgroundProbeInFlight = false;
@@ -360,9 +432,6 @@ async function runOsDeliveryFromInbox() {
     tabVisible: document.visibilityState === "visible",
     interactShown: readOsInteractShown(),
     pageOrigin: location.origin,
-    onLiveProofClick: () => {
-      logInboxDiagnostic({ type: "os_notification_click" });
-    },
   });
   if (result.plans.some((p) => p.kind === "live_proof" && p.requireInteraction)) {
     try {
@@ -370,6 +439,15 @@ async function runOsDeliveryFromInbox() {
     } catch {
       /* ignore */
     }
+  }
+  if (result.plans.length > 0) {
+    if (document.visibilityState === "hidden") {
+      logInboxDiagnostic({
+        type: "os_delivery_sw",
+        plan_count: result.plans.length,
+      });
+    }
+    await deliverOsNotificationPlansToServiceWorker(result.plans);
   }
   if (document.visibilityState === "hidden") {
     scheduleServiceWorkerPollNow();
@@ -408,14 +486,26 @@ export function initBrowserNotifications() {
   if (browserNotifListenersBound) {
     mountBrowserNotifToggles();
     syncBrowserNotifPrompts();
+    syncBackgroundAlertPollTimer();
+    scheduleAlertProbeSettle();
     return;
   }
   browserNotifListenersBound = true;
+  if (isInboxDiagnosticsEnabled()) {
+    window.__hcNotifyTransportSnapshot = notifyTransportFieldSnapshot;
+    import("./device-steward-web-push.mjs").then((mod) => {
+      if (typeof mod.stewardWebPushSubscriptionEndpoint === "function") {
+        window.__hcWebPushSubscriptionEndpoint = () =>
+          mod.stewardWebPushSubscriptionEndpoint();
+      }
+    });
+  }
   mountBrowserNotifToggles();
   syncBrowserNotifPrompts();
   window.addEventListener("hc-device-hub-changed", () => {
     void runOsDeliveryFromInbox();
     syncBrowserNotifPrompts();
+    scheduleAlertProbeSettle();
   });
   window.addEventListener("hc-live-control-inbox-changed", () => {
     void runOsDeliveryFromInbox();
@@ -427,6 +517,12 @@ export function initBrowserNotifications() {
   window.addEventListener("hc-relay-offer-inbox-changed", () => {
     void runOsDeliveryFromInbox();
     syncBrowserNotifPrompts();
+    syncBackgroundAlertPollTimer();
+    if (document.visibilityState === "hidden") {
+      scheduleServiceWorkerPollNow();
+    } else {
+      void syncLiveProofServiceWorkerState({ pollNow: false });
+    }
   });
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "hidden") {
@@ -436,6 +532,10 @@ export function initBrowserNotifications() {
     } else {
       clearBackgroundAlertPollTimer();
       syncBrowserNotifPrompts();
+      syncBackgroundAlertPollTimer();
+      if (backgroundAlertPollShouldRun()) {
+        void probeAndDeliverBackgroundAlerts();
+      }
     }
   });
   window.addEventListener("pagehide", () => {
@@ -443,13 +543,31 @@ export function initBrowserNotifications() {
     void probeAndDeliverBackgroundAlerts();
     scheduleServiceWorkerPollNow();
   });
-  window.addEventListener("hc-resolver-health-changed", () => {
+  window.addEventListener("hc-resolver-health-changed", (e) => {
     syncBackgroundAlertPollTimer();
+    const detail =
+      e instanceof CustomEvent && e.detail && typeof e.detail === "object" ? e.detail : null;
+    const networkStatus = detail?.networkStatus;
+    if (networkStatus === "ok") {
+      scheduleAlertProbeSettle();
+    }
     if (isBrowserNotifEnabled() && notificationPermission() === "granted") {
       void syncLiveProofServiceWorkerState({ pollNow: false });
     }
   });
+  window.addEventListener(DEVICE_BOOT_READY_EVENT, () => {
+    scheduleAlertProbeSettle();
+  });
+  window.addEventListener("pageshow", () => {
+    syncBackgroundAlertPollTimer();
+    scheduleAlertProbeSettle();
+  });
   syncBackgroundAlertPollTimer();
+  queueMicrotask(() => {
+    if (isDeviceBootReadyState(document.body?.dataset?.boot)) {
+      scheduleAlertProbeSettle();
+    }
+  });
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => {
       mountBrowserNotifToggles();

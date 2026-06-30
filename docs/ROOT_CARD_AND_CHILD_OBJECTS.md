@@ -149,7 +149,7 @@ Steps 1–16 fixed the **custody bridge** (one root key, many objects). Steps 19
 
 | Step | Scope | Doc |
 |------|--------|-----|
-| **19** | Front door · landing · create chooser · hub “My objects” (partial shipped steps 11–15) | [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) § Front door strategy |
+| **19** | Front door · discovery landing · create chooser · hub “My objects” · **carriers row shipped** | [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) § Front door strategy |
 | **20** | Room-native control · presentation policy · scan templates · entry states | [`STEWARD_UX_PRESENTATION_TARGET.md`](STEWARD_UX_PRESENTATION_TARGET.md) |
 
 **Canonical UX target (step 20):** Three **job rooms** (deploy · wear · season) + **field kit** exception; **Q1 decided** — **one root per human default**, **dual UI skins** (Doors · Season) + optional **season-only account** at season entry; **room switcher** on control; **presentation policy** — add UI filtered by active room (season: game nodes only; doors: plates/relays); **existing children always listed** regardless of room.
@@ -344,7 +344,7 @@ Delegated capabilities must be root-signed, scoped, expiring, revocable, and cle
 
 18. **`game_node` self-serve UI (Phase E — post–Cedar Rapids pilot):** extend `/created/` Live with **Add game node** — register `object_type: game_node`, issue scan QR, season metadata editor, rules page publish. Reuses steps 6–16 signing and hub tree patterns. Terminal mint stays for CI/pilot only. Spec: [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) § Phase E.
 
-19. **Object-first front door (presentation — partial shipped):** landing Option A + top-nav Create Option B ([`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) steps 11–15). Deploy-intent create wizard; demote General/Status/Lost tabs; hub **My objects** copy; organizer season + wear BYOP entry. **No protocol changes** — UI routing and copy only.
+19. **Object-first front door (presentation — partial shipped):** discovery-first landing (boards dashboard) + top-nav Create Option B ([`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) steps 11–15). Deploy-intent create wizard; demote General/Status/Lost tabs; hub **My objects** copy; organizer season + wear BYOP entry. **Shipped:** `#landing-live-object-carriers` static row after public boards ([`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md)). **Retired:** `#launch-doors` three-row chooser on `/`. **No protocol changes** — UI routing and copy only.
 
 20. **Room-native steward control (presentation — in progress):** [`STEWARD_UX_PRESENTATION_TARGET.md`](STEWARD_UX_PRESENTATION_TARGET.md) — Q1 decided (one root + dual skins + season fork), room switcher, client state model, presentation policy (add vs list), five entry states, capability-driven scan. Slice 1 shipped (add-hub filter).
 

@@ -9,6 +9,7 @@ import {
   resolveLandingShelfCategory,
   syncLiveNowShelfCopy,
 } from "./landing-entry-shelves-core.mjs";
+import { hydrateLandingLiveObjectCarriers } from "./landing-live-object-carriers.mjs";
 import {
   buildPublicNetworkCardModel,
   filterPublicNetworkCards,
@@ -137,6 +138,8 @@ function bindPublicNetworksPortal(allCards) {
 }
 
 async function bootPublicNetworksPortal() {
+  void hydrateLandingLiveObjectCarriers(document);
+
   const resultsRoot = document.getElementById("public-networks-results");
   if (!resultsRoot) return;
 

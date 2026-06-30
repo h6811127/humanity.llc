@@ -7,6 +7,8 @@ import {
   auditComprehensionKitHtml,
   buildComprehensionKitHtml,
   buildComprehensionRunbookProductionUrlsBlock,
+  buildLocalComprehensionSurfaces,
+  buildProductionComprehensionSurfaces,
   formatComprehensionPreflightReport,
   formatLaunchPreflightReport,
   parseQrPackScanUrls,
@@ -51,11 +53,15 @@ describe("city-game-comprehension-kit-core", () => {
         quorum_spot: { title: "Riverwalk River Lantern", body: "Quorum" },
       },
       comprehension_kit: { primary_scan_node: "node_04" },
+      network_lens: { next_node_id: "node_04", play_spine: ["node_04"] },
     };
     const html = buildComprehensionKitHtml({
       host: "127.0.0.1",
       hubUrl: "http://127.0.0.1:8788/dev/city-game-lan-hub",
       rulesUrl: "https://humanity.llc/play/cedar-rapids/",
+      fieldWalkUrl: "https://humanity.llc/play/cedar-rapids/comprehension/gt8-field-walk.html",
+      playerFlowWalkUrl:
+        "https://humanity.llc/play/cedar-rapids/comprehension/player-flow-field-walk.html",
       kitNodes: [
         {
           node_id: "node_04",
@@ -75,7 +81,92 @@ describe("city-game-comprehension-kit-core", () => {
     expect(html).toContain("https://humanity.llc/c/p?q=qr_04");
     expect(html).toContain("GT-7");
     expect(html).toContain("/play/cedar-rapids/map/");
+    expect(html).toContain("gt8-field-walk.html");
+    expect(html).toContain("player-flow-field-walk.html");
     expect(html).toContain("noindex,nofollow");
+  });
+
+  it("buildProductionComprehensionSurfaces writes kit + field walk for network lens seasons", () => {
+    const season = {
+      season_id: "cr_season_01_wake",
+      city: "Cedar Rapids, Iowa",
+      rules_path: "/play/cedar-rapids/",
+      comprehension_kit: { primary_scan_node: "node_04" },
+      network_lens: { next_node_id: "node_04", play_spine: ["node_04"] },
+      nodes: [{ node_id: "node_04", label: "River Lantern" }],
+    };
+    const surfaces = buildProductionComprehensionSurfaces({
+      season,
+      rulesUrl: "https://humanity.llc/play/cedar-rapids/",
+      boardUrl: "https://humanity.llc/play/cedar-rapids/map/",
+      kitNodes: [
+        {
+          node_id: "node_04",
+          label: "River Lantern",
+          href: "https://humanity.llc/c/p?q=qr_04",
+          blurb: "GT-1",
+        },
+      ],
+    });
+    expect(surfaces.kitHtml).toContain("gt8-field-walk.html");
+    expect(surfaces.kitHtml).toContain("player-flow-field-walk.html");
+    expect(surfaces.kitHtml).toContain("dual-gate-walk.html");
+    expect(surfaces.fieldWalkHtml).toContain("GT-8 · 10 second orientation");
+    expect(surfaces.playerFlowWalkHtml).toContain("PD-1");
+    expect(surfaces.dualGateWalkHtml).toContain("Dual-gate cabinet field walk");
+    expect(surfaces.fieldWalkUrl).toContain("gt8-field-walk.html");
+    expect(surfaces.playerFlowWalkUrl).toContain("player-flow-field-walk.html");
+    expect(surfaces.dualGateWalkUrl).toContain("dual-gate-walk.html");
+  });
+
+  it("buildLocalComprehensionSurfaces writes LAN kit + field walk", () => {
+    const season = {
+      season_id: "cr_season_01_wake",
+      city: "Cedar Rapids, Iowa",
+      rules_path: "/play/cedar-rapids/",
+      comprehension_kit: { primary_scan_node: "node_04" },
+      network_lens: { next_node_id: "node_04", play_spine: ["node_04"] },
+      nodes: [{ node_id: "node_04", label: "River Lantern" }],
+    };
+    const surfaces = buildLocalComprehensionSurfaces({
+      season,
+      host: "192.168.1.5",
+      rulesUrl: "http://192.168.1.5:8788/play/cedar-rapids/",
+      boardUrl: "http://192.168.1.5:8788/play/cedar-rapids/map/",
+      kitNodes: [
+        {
+          node_id: "node_04",
+          label: "River Lantern",
+          href: "http://192.168.1.5:8787/c/p?q=qr_04",
+          blurb: "GT-1",
+        },
+      ],
+    });
+    expect(surfaces.kitHtml).toContain("gt8-field-walk.html");
+    expect(surfaces.kitHtml).toContain("player-flow-field-walk.html");
+    expect(surfaces.kitHtml).toContain("dual-gate-walk.html");
+    expect(surfaces.kitHtml).toContain("GT-8:");
+    expect(surfaces.fieldWalkHtml).toContain("GT-8 · 10 second orientation");
+    expect(surfaces.playerFlowWalkHtml).toContain("PD-1");
+    expect(surfaces.fieldWalkUrl).toBe(
+      "http://192.168.1.5:8788/dev/city-game-gt8-field-walk.html"
+    );
+    expect(surfaces.dualGateWalkUrl).toBe(
+      "http://192.168.1.5:8788/dev/ws-object-graph-v1/dual-gate-walk.html"
+    );
+  });
+
+  it("buildComprehensionRunbookProductionUrlsBlock includes field walk row", () => {
+    const block = buildComprehensionRunbookProductionUrlsBlock({
+      rulesUrl: "https://humanity.llc/play/cedar-rapids/",
+      kitUrl: "https://humanity.llc/play/cedar-rapids/comprehension/",
+      primaryScanUrl: "https://humanity.llc/c/p?q=qr",
+      boardUrl: "https://humanity.llc/play/cedar-rapids/map/",
+      fieldWalkUrl: "https://humanity.llc/play/cedar-rapids/comprehension/gt8-field-walk.html",
+      dateIso: "2026-06-21",
+    });
+    expect(block).toContain("GT-8 field walk");
+    expect(block).toContain("gt8-field-walk.html");
   });
 
   it("parses production scan URLs from QR pack markdown", () => {
@@ -169,6 +260,8 @@ describe("city-game-comprehension-kit-core", () => {
     const html = buildComprehensionKitHtml({
       host: "127.0.0.1",
       rulesUrl: "https://humanity.llc/play/cedar-rapids/",
+      playerFlowWalkUrl:
+        "https://humanity.llc/play/cedar-rapids/comprehension/player-flow-field-walk.html",
       kitNodes: [
         {
           node_id: "node_04",
@@ -204,6 +297,8 @@ describe("city-game-comprehension-kit-core", () => {
     const html = buildComprehensionKitHtml({
       host: "humanity.llc",
       rulesUrl: "https://humanity.llc/play/cedar-rapids/",
+      playerFlowWalkUrl:
+        "https://humanity.llc/play/cedar-rapids/comprehension/player-flow-field-walk.html",
       kitNodes: [
         {
           node_id: "node_04",
@@ -229,24 +324,30 @@ describe("city-game-comprehension-kit-core", () => {
     const season = {
       season_root_profile_id: "CEenC57QN9qqnr2x5L89cbWt",
       comprehension_kit: { primary_scan_node: "node_04" },
+      rules_path: "/play/cedar-rapids/",
+      network_lens: { next_node_id: "node_04", play_spine: ["node_04"] },
     };
-    const html = buildComprehensionKitHtml({
+    const kitNodes = [
+      {
+        node_id: "node_04",
+        label: "River Lantern",
+        href: "http://192.168.1.5:8787/c/CEenC57QN9qqnr2x5L89cbWt?q=qr_04",
+        blurb: "GT-1",
+      },
+    ];
+    const surfaces = buildLocalComprehensionSurfaces({
+      season,
       host: "192.168.1.5",
       rulesUrl: "http://192.168.1.5:8788/play/cedar-rapids/",
-      kitNodes: [
-        {
-          node_id: "node_04",
-          label: "River Lantern",
-          href: "http://192.168.1.5:8787/c/CEenC57QN9qqnr2x5L89cbWt?q=qr_04",
-          blurb: "GT-1",
-        },
-      ],
-      season,
+      boardUrl: "http://192.168.1.5:8788/play/cedar-rapids/map/",
+      kitNodes,
     });
     const result = assessComprehensionEngineeringReady({
       season,
       localSeed: true,
-      localDevPageHtml: html,
+      localDevPageHtml: surfaces.kitHtml,
+      localFieldWalkHtml: surfaces.fieldWalkHtml ?? null,
+      localPlayerFlowWalkHtml: surfaces.playerFlowWalkHtml ?? null,
       productionPageHtml: null,
     });
     expect(result.ready).toBe(true);
@@ -258,11 +359,16 @@ describe("city-game-comprehension-kit-core", () => {
       ready: true,
       localOk: true,
       productionOk: false,
+      fieldWalkOk: true,
+      playerFlowWalkOk: false,
+      dualGateWalkOk: true,
       issues: [],
       warnings: ["Production kit stale"],
       humanSignedOff: false,
     });
     expect(text).toContain("C2 engineering: ☑");
+    expect(text).toContain("Player flow walk:");
+    expect(text).toContain("player-flow-field-walk.html");
     expect(text).toContain("city-game:dev -- --lan");
     expect(text).toContain("comprehension-sign-off");
   });

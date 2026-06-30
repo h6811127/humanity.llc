@@ -9,6 +9,7 @@
  *   npm run verify:desk -- --full    # default belt + full Playwright suite
  *   npm run verify:desk -- --custody # + custody preflight / Vitest / E2E
  *   npm run verify:desk -- --city-game
+ *   npm run verify:desk -- --public-network-player-flow
  *
  * @see docs/PRODUCT_WORKSTREAM_COORDINATION.md · .github/workflows/verify-desk.yml
  */
@@ -23,6 +24,7 @@ const fast = argv.includes("--fast");
 const full = argv.includes("--full");
 const custody = argv.includes("--custody");
 const cityGame = argv.includes("--city-game");
+const playerFlow = argv.includes("--public-network-player-flow");
 
 /** @param {string} label @param {string[]} npmArgs */
 function step(label, npmArgs) {
@@ -45,6 +47,7 @@ if (fast) console.log("Mode: --fast (Vitest + verify:fast exits, no Playwright)\
 if (full) console.log("Mode: --full (+ entire Playwright suite)\n");
 if (custody) console.log("Mode: --custody\n");
 if (cityGame) console.log("Mode: --city-game\n");
+if (playerFlow) console.log("Mode: --public-network-player-flow\n");
 
 step("Vitest (full worker/tests)", ["run", "worker:test"]);
 
@@ -66,7 +69,9 @@ step("Safari keys / tab session Vitest", [
 
 step("Shell boot + status graph modules", ["run", "worker:test:shell-boot"]);
 
-step("Landing copy contract (sticker hero + launch doors)", ["run", "verify:landing"]);
+step("Landing copy contract (discovery dashboard)", ["run", "verify:landing"]);
+
+step("Public network player flow shells", ["run", "verify:public-network-player-flow:fast"]);
 
 if (custody) {
   step("Custody C1 preflight", ["run", "custody:c1-preflight"]);
@@ -77,6 +82,10 @@ if (cityGame) {
   step("City game verify", ["run", "verify:city-game"]);
 }
 
+if (playerFlow) {
+  step("Public network player flow (full + e2e)", ["run", "verify:public-network-player-flow"]);
+}
+
 step("Static site build check", ["run", "build"]);
 
 if (!fast) {
@@ -84,6 +93,7 @@ if (!fast) {
   step("Playwright — scan page dot", ["run", "e2e:scan-page-dot"]);
   step("Playwright — scan revoke freshness (M3.6)", ["run", "e2e:scan-revoke-freshness"]);
   step("Playwright — key-loss sad path", ["run", "e2e:key-loss-sad-path"]);
+  step("Playwright — public network player flow", ["run", "e2e:public-network-player-flow"]);
   step("Playwright — status dot + inbox", [
     "run",
     "e2e",

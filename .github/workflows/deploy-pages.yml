@@ -9,13 +9,19 @@ on:
       - "site/**"
       - "package.json"
       - "worker/tests/landing-*.test.ts"
+      - "worker/tests/public-network-player-flow-contract.test.ts"
       - "worker/scripts/verify-landing-copy.mjs"
+      - "worker/scripts/verify-public-network-player-flow-production.mjs"
       - "worker/scripts/ci-production-fetch.mjs"
+      - "site/js/public-network-player-flow-contract.mjs"
       - "worker/scripts/merch-rollout-shop-pdp-smoke.mjs"
       - "worker/tests/ci-production-fetch.test.ts"
       - "docs/CLOUDFLARE_CI_SECRETS.md"
       - "e2e/landing-copy.spec.ts"
       - ".github/workflows/deploy-pages.yml"
+      - "site/play/**/comprehension/**"
+      - "worker/scripts/ws-object-graph-prod-walk-preflight.mjs"
+      - "worker/scripts/ws-object-graph-prod-walk-preflight-core.mjs"
 
 jobs:
   deploy:
@@ -30,6 +36,8 @@ jobs:
       - run: npm run build
       - name: Landing copy contract (pre-deploy)
         run: npm run verify:landing
+      - name: Player flow shell contract (pre-deploy)
+        run: npm run verify:public-network-player-flow:fast
       - name: Deploy Pages
         run: npm run pages:deploy
         env:
@@ -41,9 +49,19 @@ jobs:
           SITE_ORIGIN: https://humanity.llc
           HC_CI_PAGES_ORIGIN: https://humanity-llc.pages.dev
           HC_CI_VERIFY_SECRET: ${{ secrets.HC_CI_VERIFY_SECRET }}
+      - name: Post-deploy player flow verify
+        run: npm run verify:public-network-player-flow:production
+        env:
+          SITE_ORIGIN: https://humanity.llc
+          HC_CI_PAGES_ORIGIN: https://humanity-llc.pages.dev
+          HC_CI_VERIFY_SECRET: ${{ secrets.HC_CI_VERIFY_SECRET }}
       - name: Post-deploy merch funnel verify (step 2)
         run: npm run merch-funnel:rollout:post-deploy -- --pages
         env:
           SITE_ORIGIN: https://humanity.llc
           HC_CI_PAGES_ORIGIN: https://humanity-llc.pages.dev
           HC_CI_VERIFY_SECRET: ${{ secrets.HC_CI_VERIFY_SECRET }}
+      - name: Post-deploy OG-2 dual-gate walk preflight
+        run: npm run ws-object-graph:prod-walk-preflight
+        env:
+          API_ORIGIN: https://humanity.llc

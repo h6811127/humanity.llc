@@ -21,6 +21,8 @@ import {
 import { seasonWindowChip, type SeasonWindowPhase } from "./season-window";
 import { factionControllerLabel, isGameFactionHold } from "./factions";
 import { fragmentLatticeProgress } from "./unlock-engine";
+import type { GameVouchGate } from "./vouch-graph";
+import { mapVouchChipValue, resolveWitnessGate } from "./witness-gate";
 
 export type MapNodeChip = {
   kind: string;
@@ -40,6 +42,8 @@ export type MapNodeSnapshotRow = {
   route_open: boolean | null;
   active_bulletin: BulletinScheduleSlot | null;
   active_route: RouteWindowSlot | null;
+  /** Witness vouch gate — same evaluation as scan SSR when witness index supplied. */
+  vouch_gate: GameVouchGate | null;
 };
 
 function mapScheduleSlots(input: {
@@ -102,6 +106,8 @@ export function deriveMapNodeSnapshot(input: {
   season: CrSeasonConfig;
   env: { CITY_GAME_ENABLED?: string };
   now: Date;
+  /** All active witness node metas for the season — enables vouch gate on board rows. */
+  witnessMetaByNodeId?: Record<string, GameMeta>;
 }): MapNodeSnapshotRow | null {
   if (input.child.object_type !== "game_node") return null;
   const nodeId = seasonNodeIdForObject(input.child.object_id, input.season);
@@ -129,6 +135,7 @@ export function deriveMapNodeSnapshot(input: {
       season: input.season,
       env: input.env,
       now: input.now,
+      vouchWitnesses: input.witnessMetaByNodeId,
     });
     streamPolicy = composed.streamPolicy;
     publicState = composed.publicState;
@@ -148,6 +155,12 @@ export function deriveMapNodeSnapshot(input: {
     season: input.season,
   });
 
+  const vouchGate = resolveWitnessGate({
+    targetNodeId: nodeId,
+    gameMeta: fields.gameMeta,
+    witnessMetaByNodeId: input.witnessMetaByNodeId ?? {},
+  });
+
   return {
     node_id: nodeId,
     label: registry.label,
@@ -162,6 +175,7 @@ export function deriveMapNodeSnapshot(input: {
       : null,
     active_bulletin: activeBulletin,
     active_route: activeRoute,
+    vouch_gate: vouchGate,
   };
 }
 
@@ -358,14 +372,12 @@ export function buildMapNodeChips(
     });
   }
 
-  if (meta.vouch_requires.length) {
-    const met = meta.vouch_requires.every((id) => meta.vouch_active_for.includes(id));
+  const vouchChip = mapVouchChipValue(meta, row.vouch_gate);
+  if (vouchChip) {
     chips.push({
       kind: "chapter",
       label: "Vouch",
-      value: met
-        ? "Path open"
-        : `Sealed · needs ${meta.vouch_requires.join(", ")}`,
+      value: vouchChip,
     });
   } else if (meta.unlocked_by.length && row.role !== "finale") {
     chips.push({

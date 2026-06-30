@@ -10,13 +10,23 @@ export const MAP_DASHBOARD_REL = "docs/CITY_GAME_MAP_DASHBOARD.md";
 export const COMPREHENSION_RUNBOOK_REL = "docs/CITY_GAME_COMPREHENSION_RUNBOOK.md";
 
 export const MAP_DASHBOARD_B13_PRIVACY_PENDING =
-  "| B13 privacy review (snapshot JSON shape + no visit/player fields) | ☐ Pending | |";
+  "| B13 privacy review (human sign-off) | ☐ Pending | |";
 
 export const LAUNCH_CHECKLIST_P6_PENDING =
   "| P6 | If marketing promises a **live city board**: **B13–B14** signed — [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) (optional at S1 **M1** static; required before **M2** snapshot) | ☐ |";
 
 /** Minimum GT-7 passes when launch surfaces market a live board. */
 export const B13_GT7_REQUIRED_TESTERS = 5;
+
+/** GT-8 orientation — ≥4/5 testers in SF-3 cohort (same runbook log). */
+export const SF3_GT8_REQUIRED_PASSES = 4;
+export const SF3_GT8_COHORT = 5;
+
+export const MAP_DASHBOARD_SF3_IMPLEMENTATION_PENDING =
+  "| SF-3 network lens — implementation + GT-8 | ☐ Pending | |";
+
+export const MAP_DASHBOARD_SF3_GT8_PENDING =
+  "| SF-3 GT-8 human orientation (≥4/5 testers, &lt;10s) | ☐ Pending | |";
 
 /**
  * @param {string} html
@@ -63,6 +73,44 @@ export function parseComprehensionGt7Passes(markdown) {
     passes.push(/☑/.test(gt7Cell));
   }
   return passes;
+}
+
+/**
+ * @param {string} markdown
+ * @returns {boolean[]}
+ */
+export function parseComprehensionGt8Passes(markdown) {
+  /** @type {boolean[]} */
+  const passes = [];
+  for (const line of String(markdown).split("\n")) {
+    if (!/^\|\s*\d+\s*\|/.test(line)) continue;
+    const cells = line.split("|").map((cell) => cell.trim());
+    const gt8Cell = cells[11] ?? "";
+    passes.push(/☑/.test(gt8Cell));
+  }
+  return passes;
+}
+
+/**
+ * @param {string} markdown
+ * @param {number} [minPasses]
+ * @param {number} [cohort]
+ */
+export function comprehensionGt8GateMet(
+  markdown,
+  minPasses = SF3_GT8_REQUIRED_PASSES,
+  cohort = SF3_GT8_COHORT
+) {
+  const passes = parseComprehensionGt8Passes(markdown);
+  const slice = passes.slice(0, cohort);
+  const passCount = slice.filter(Boolean).length;
+  return {
+    met: slice.length >= cohort && passCount >= minPasses,
+    passCount,
+    testerRows: passes.length,
+    required: minPasses,
+    cohort,
+  };
 }
 
 /**
@@ -116,6 +164,7 @@ export function launchChecklistRequiredGates(marketsLiveCityBoard) {
  * @param {{
  *   marketsLiveCityBoard: boolean;
  *   b14Ok?: boolean;
+ *   privacyAuditOk?: boolean;
  *   comprehensionRunbook?: string | null;
  *   mapDashboardDoc?: string | null;
  *   launchChecklistDoc?: string | null;
@@ -138,6 +187,7 @@ export function assessMapBoardB13Ready(input) {
   }
 
   const b14Ok = Boolean(input.b14Ok);
+  const privacyAuditOk = input.privacyAuditOk !== false;
   const gt7 = comprehensionGt7GateMet(input.comprehensionRunbook ?? "");
   const privacySigned = mapDashboardB13PrivacySigned(input.mapDashboardDoc ?? "");
   const p6Signed = launchChecklistP6Signed(input.launchChecklistDoc ?? "");
@@ -149,6 +199,11 @@ export function assessMapBoardB13Ready(input) {
   if (!b14Ok) {
     issues.push(
       "B14 — run npm run verify:city-game (snapshot + scan-analytics gate tests)"
+    );
+  }
+  if (!privacyAuditOk) {
+    issues.push(
+      "B13 privacy engineering — run npm run city-game:map-board-privacy-preflight"
     );
   }
   if (!gt7.met) {
@@ -166,13 +221,14 @@ export function assessMapBoardB13Ready(input) {
   }
 
   const humanB13 = gt7.met && privacySigned;
-  const ready = b14Ok && humanB13;
+  const ready = b14Ok && privacyAuditOk && humanB13;
 
   return {
     required: true,
     marketsLiveCityBoard: true,
     ready,
     b14Ok,
+    privacyAuditOk,
     gt7,
     privacySigned,
     p6Signed,
@@ -194,6 +250,7 @@ export function formatMapBoardB13PreflightReport(b13) {
   }
   lines.push("Live board marketing: ☑ detected (#city-state + live board copy)");
   lines.push(`  B14 engineering: ${b13.b14Ok ? "☑" : "☐"} verify:city-game snapshot + scan-analytics`);
+  lines.push(`  Privacy engineering: ${b13.privacyAuditOk ? "☑" : "☐"} map-board-privacy-preflight`);
   lines.push(
     `  GT-7 comprehension: ${b13.gt7.met ? "☑" : "☐"} ${b13.gt7.passCount}/${b13.gt7.required} testers`
   );
@@ -228,7 +285,7 @@ export function applyMapDashboardB13PrivacyPass(content, opts) {
   const detail = opts.detail ? ` (${opts.detail})` : "";
   return content.replace(
     MAP_DASHBOARD_B13_PRIVACY_PENDING,
-    `| B13 privacy review (snapshot JSON shape + no visit/player fields) | ☑ **${opts.dateIso}**${detail} |`
+    `| B13 privacy review (human sign-off) | ☑ **${opts.dateIso}**${detail} |`
   );
 }
 

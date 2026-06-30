@@ -26,6 +26,7 @@ import {
   type StripeSubscriptionLike,
 } from "../steward/billing-lifecycle";
 import { closeStewardPushConnectionsForAccount } from "../steward/push";
+import { deleteStewardWebPushSubscriptionsForAccount } from "../steward/web-push-db";
 
 export interface StripeWebhookEvent {
   id?: string;
@@ -39,6 +40,7 @@ async function finalizeExpiredAccount(
 ): Promise<void> {
   await revokeAllSessionsForAccount(db, accountId);
   closeStewardPushConnectionsForAccount(accountId);
+  await deleteStewardWebPushSubscriptionsForAccount(db, accountId);
 }
 
 async function applyBillingUpdate(

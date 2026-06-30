@@ -1,0 +1,20 @@
+{
+  "season_id": "cr_season_01_wake",
+  "generated_at": "2026-06-07T23:00:00.000Z",
+  "window_phase": "open",
+  "map_visibility": "signal_war",
+  "headlines": ["NewBo relay arch — unclaimed", "Finale lattice dormant"],
+  "nodes": [],
+  "signal_war": {
+    "faction_network_points": {
+      "red": 0,
+      "blue": 0,
+      "green": 0,
+      "yellow": 0
+    },
+    "dual_victory": {
+      "network_majority_relay_fraction": 0.5,
+      "paths": []
+    }
+  }
+}

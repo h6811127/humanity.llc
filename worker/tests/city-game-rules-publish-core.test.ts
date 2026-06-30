@@ -65,6 +65,20 @@ describe("city-game-rules-publish-core", () => {
     expect(merged.districts).toEqual(["harbor", "downtown"]);
   });
 
+  it("merges unlock_edges draft onto season for rules publish", () => {
+    const season = loadSeasonJsonFile(root, "city-game-example-season-01.json");
+    const merged = mergeOrganizerPublishSeason(
+      season,
+      {
+        unlock_edges: [{ from: "node_04", to: "node_05", label: "opens relay" }],
+      },
+      ""
+    );
+    expect(merged.unlock_edges).toEqual([
+      { from: "node_04", to: "node_05", label: "opens relay" },
+    ]);
+  });
+
   it("assesses example season ready when window and profile set", () => {
     const season = loadSeasonJsonFile(root, "city-game-example-season-01.json");
     expect(seasonSupportsBrowserRulesPublish(season)).toBe(true);

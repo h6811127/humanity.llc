@@ -1,6 +1,12 @@
 import { join } from "node:path";
 
-import { test, expect, type Route } from "@playwright/test";
+import { test, expect, type Page, type Route } from "@playwright/test";
+
+import {
+  createdPageUrl,
+  dismissShellIntroNotices,
+  stubCreatedCardResolver,
+} from "./helpers/created-resolver-stub";
 
 /**
  * Key-loss sad paths — view-only / backup import (K1, K2, K5).
@@ -66,46 +72,11 @@ async function openCreatedRestoreTools(page: import("@playwright/test").Page) {
   });
 }
 
-async function stubCardRoutes(page: import("@playwright/test").Page) {
-  await page.route("**/.well-known/hc/v1/health**", (route) =>
-    route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify({ status: "ok", database: "ok" }),
-    })
-  );
-
-  await page.route("**/.well-known/hc/v1/cards/**", async (route) => {
-    const url = route.request().url();
-    if (url.includes("/status")) {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({
-          scan: {
-            kind: "active",
-            profile_id: PROFILE_ID,
-            qr_id: QR_ID,
-            card: { status: "active", handle: "keyloss_e2e" },
-          },
-        }),
-      });
-      return;
-    }
-    if (url.includes(PROFILE_ID)) {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({
-          profile_id: PROFILE_ID,
-          handle: "keyloss_e2e",
-          status: "active",
-          qr: { active_qr_id: QR_ID },
-        }),
-      });
-      return;
-    }
-    await route.continue();
+async function stubCardRoutes(page: Page) {
+  await stubCreatedCardResolver(page, {
+    profileId: PROFILE_ID,
+    qrId: QR_ID,
+    handle: "keyloss_e2e",
   });
 }
 
@@ -132,8 +103,10 @@ test.describe("key-loss sad paths", () => {
 
   test("K1: revisit /created/ without tab keys shows view-only recovery guidance", async ({
     page,
+    baseURL,
   }) => {
-    await page.goto(`/created/?profile_id=${PROFILE_ID}&qr_id=${QR_ID}`);
+    await page.goto(createdPageUrl(baseURL!, PROFILE_ID, QR_ID));
+    await dismissShellIntroNotices(page);
 
     await expect(page.getByRole("heading", { name: "View this card" })).toBeVisible({
       timeout: 15_000,
@@ -160,7 +133,10 @@ test.describe("key-loss sad paths", () => {
     await expectNoKeylessHcCreated(page);
   });
 
-  test("K1b: wallet saved but tab empty shows restore-from-device copy", async ({ page }) => {
+  test("K1b: wallet saved but tab empty shows restore-from-device copy", async ({
+    page,
+    baseURL,
+  }) => {
     await page.addInitScript(
       ({ profileId, qrId }) => {
         localStorage.setItem(
@@ -182,7 +158,8 @@ test.describe("key-loss sad paths", () => {
       { profileId: PROFILE_ID, qrId: QR_ID }
     );
 
-    await page.goto(`/created/?profile_id=${PROFILE_ID}&qr_id=${QR_ID}`);
+    await page.goto(createdPageUrl(baseURL!, PROFILE_ID, QR_ID));
+    await dismissShellIntroNotices(page);
 
     await expect(page.getByRole("heading", { name: "View this card" })).toBeVisible({
       timeout: 15_000,
@@ -191,7 +168,10 @@ test.describe("key-loss sad paths", () => {
     await expectNoKeylessHcCreated(page);
   });
 
-  test("K5: wallet label without signing keys still view-only on /created/", async ({ page }) => {
+  test("K5: wallet label without signing keys still view-only on /created/", async ({
+    page,
+    baseURL,
+  }) => {
     await page.addInitScript(
       ({ profileId, qrId }) => {
         localStorage.setItem(
@@ -211,7 +191,8 @@ test.describe("key-loss sad paths", () => {
       { profileId: PROFILE_ID, qrId: QR_ID }
     );
 
-    await page.goto(`/created/?profile_id=${PROFILE_ID}&qr_id=${QR_ID}`);
+    await page.goto(createdPageUrl(baseURL!, PROFILE_ID, QR_ID));
+    await dismissShellIntroNotices(page);
 
     await expect(page.getByRole("heading", { name: "View this card" })).toBeVisible({
       timeout: 15_000,

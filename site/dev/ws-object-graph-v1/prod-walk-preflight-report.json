@@ -1,0 +1,22 @@
+{
+  "at": "2026-06-29T23:57:25.728Z",
+  "apiOrigin": "https://humanity.llc",
+  "urls": {
+    "apiOrigin": "https://humanity.llc",
+    "profileId": "GcP3Ee17yGqMHdidhEVMYBzq",
+    "cabinetQr": "qr_gEPR1PfPPB2z3ze1",
+    "cabinetScan": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_gEPR1PfPPB2z3ze1",
+    "cabinetStatus": "https://humanity.llc/.well-known/hc/v1/cards/GcP3Ee17yGqMHdidhEVMYBzq/status?q=qr_gEPR1PfPPB2z3ze1",
+    "libraryScan": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_6zs7Jej5m4ZV4U7e",
+    "riverScan": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_aMr8qJGBF9xpC1gu",
+    "walkUrl": "https://humanity.llc/play/cedar-rapids/comprehension/dual-gate-walk.html",
+    "comprehensionUrl": "https://humanity.llc/play/cedar-rapids/comprehension/"
+  },
+  "postWalk": true,
+  "readyForHumanWalk": true,
+  "readyPostWalk": true,
+  "scansReady": true,
+  "pagesLive": true,
+  "issues": [],
+  "warnings": []
+}

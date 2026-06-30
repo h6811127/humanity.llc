@@ -133,11 +133,14 @@ test.describe("shop product detail", () => {
 
   test("shop hub Customize Glitch hoodie link reaches customizer", async ({ page }) => {
     await page.goto("/shop/");
-    await page.getByRole("link", { name: "Customize Glitch hoodie" }).click();
+    await page
+      .getByLabel("Make it yours")
+      .getByRole("link", { name: "Customize Glitch hoodie" })
+      .click();
     await page.waitForURL(new RegExp(`/shop/customize/\\?product=${GLITCH_PRODUCT_ID}`), {
       timeout: 10_000,
     });
-    await expect(page.locator("#shop-customize-hero-title")).toContainText("Glitch LIVE QR hoodie", {
+    await expect(page.locator("#shop-customize-hero-title")).toContainText("Customize your live object", {
       timeout: 10_000,
     });
   });

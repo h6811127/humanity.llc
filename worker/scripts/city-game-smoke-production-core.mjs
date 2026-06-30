@@ -143,10 +143,15 @@ export function applyLaunchChecklistE5Pass(content, opts) {
   if (!line) {
     throw new Error("launch_checklist_e5_marker_missing");
   }
-  if (launchChecklistRowIsSigned(line)) {
-    return content;
-  }
   const detail = opts.nodes || "node_01, node_04, node_07";
+  if (launchChecklistRowIsSigned(line)) {
+    if (!opts.nodes) return content;
+    const refreshed = line.replace(
+      /\|\s*☑[^|]*\|$/,
+      `| ☑ **${opts.dateIso}** · ${detail} |`
+    );
+    return refreshed === line ? content : content.replace(line, refreshed);
+  }
   const updated = line.replace(
     /\|\s*☐[^|]*\|$/,
     `| ☑ **${opts.dateIso}** · ${detail} |`

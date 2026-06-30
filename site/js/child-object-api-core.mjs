@@ -24,6 +24,18 @@ export function childObjectGameContributePath(profileId, objectId) {
   return `/.well-known/hc/v1/cards/${encodeURIComponent(profileId)}/objects/${encodeURIComponent(objectId)}/game-contribute`;
 }
 
+export function relationshipEdgesListPath(profileId) {
+  return `/.well-known/hc/v1/cards/${encodeURIComponent(profileId)}/relationship-edges`;
+}
+
+export function relationshipEdgesIssuePath(profileId) {
+  return relationshipEdgesListPath(profileId);
+}
+
+export function relationshipEdgesRevokePath(profileId, edgeId) {
+  return `/.well-known/hc/v1/cards/${encodeURIComponent(profileId)}/relationship-edges/${encodeURIComponent(edgeId)}/revoke`;
+}
+
 /**
  * @param {string} origin
  * @param {string} path

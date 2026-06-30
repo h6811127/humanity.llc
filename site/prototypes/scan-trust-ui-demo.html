@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="/prototypes/scan-trust-ui-demo.css" />
   </head>
   <body>
-    <div class="page trust-demo-page">
+    <div class="page scan-page trust-demo-page" id="trust-demo-root">
       <header class="trust-demo-chrome">
         <a
           id="trust-demo-dot-btn"
@@ -23,7 +23,7 @@
       </header>
 
       <article
-        class="scan-hero scan-status-panel scan-safety-header"
+        class="scan-hero scan-status-panel scan-safety-header trust-demo-hero-v4"
         id="trust-demo-hero"
         aria-label="Live check"
       >
@@ -66,7 +66,42 @@
       <h2>Path 2 prototype</h2>
       <p>
         Functional demo for <code>docs/SCAN_PAGE_TRUST_UI.md</code> (not production scan HTML).
+        Glass v4 canvas lab: <code>docs/SCAN_HERO_CARD_VISUAL_SPEC.md</code> Phase 0.
       </p>
+      <p class="trust-demo-dev-section-label">Glass v4 canvas (Phase 0)</p>
+      <div class="trust-demo-dev-row" role="group" aria-label="Page canvas">
+        <button
+          type="button"
+          class="trust-demo-dev-btn"
+          data-trust-canvas="neutral"
+          aria-pressed="true"
+        >
+          Neutral depth
+        </button>
+        <button type="button" class="trust-demo-dev-btn" data-trust-canvas="red-frame">
+          Red frame
+        </button>
+        <button type="button" class="trust-demo-dev-btn" data-trust-canvas="red-vignette">
+          Red vignette
+        </button>
+      </div>
+      <div class="trust-demo-dev-row" role="group" aria-label="Hero glass opacity">
+        <button type="button" class="trust-demo-dev-btn" data-trust-glass="low">Glass 48%</button>
+        <button
+          type="button"
+          class="trust-demo-dev-btn"
+          data-trust-glass="mid"
+          aria-pressed="true"
+        >
+          Glass 55%
+        </button>
+        <button type="button" class="trust-demo-dev-btn" data-trust-glass="high">
+          Glass 70%
+        </button>
+        <button type="button" class="trust-demo-dev-btn" data-trust-glass="prod">
+          Production
+        </button>
+      </div>
       <div class="trust-demo-dev-row" role="group" aria-label="Timeline">
         <button type="button" class="trust-demo-dev-btn" data-trust-phase="idle">T+0</button>
         <button type="button" class="trust-demo-dev-btn" data-trust-phase="checking" aria-pressed="true">

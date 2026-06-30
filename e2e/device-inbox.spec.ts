@@ -267,6 +267,7 @@ test.describe("device inbox - background OS notification", () => {
   test.beforeEach(async ({ page, context }) => {
     await grantBrowserNotifications(context);
     await page.addInitScript((entry) => {
+      window.__hcE2eSwOsPlans = [];
       localStorage.setItem("hc_browser_notif", "on");
       localStorage.setItem("hc_browser_notif_prompt_dismissed", "1");
       localStorage.setItem("hc_watch_live_proof", "1");
@@ -277,13 +278,14 @@ test.describe("device inbox - background OS notification", () => {
     await page.route("**/.well-known/hc/v1/cards/**/live-control/challenges**", mockPendingChallenge);
   });
 
-  test("OS notification when tab hidden uses card title and sign deep link", async ({
+  test("OS notification when tab hidden uses SW delivery, not page Notification", async ({
     page,
   }) => {
     await page.goto("/wallet/");
     await expect(page.locator("#shell-notif-badge")).toBeVisible({ timeout: 15_000 });
 
     await page.evaluate(() => {
+      window.__hcE2eSwOsPlans = [];
       Object.defineProperty(document, "visibilityState", {
         configurable: true,
         get() {
@@ -295,16 +297,19 @@ test.describe("device inbox - background OS notification", () => {
     });
 
     await expect
-      .poll(async () =>
-        page.evaluate(() => (window.__hcE2eNotifications ?? []).length)
-      )
+      .poll(async () => page.evaluate(() => window.__hcE2eSwOsPlans?.length ?? 0))
       .toBeGreaterThan(0);
 
-    const notification = await page.evaluate(() => window.__hcE2eNotifications[0]);
-    expect(notification.title).toBe("E2E Test Card");
-    expect(notification.body).toMatch(/tap to sign/i);
+    expect(await page.evaluate(() => window.__hcE2eNotifications?.length ?? 0)).toBe(0);
 
-    await page.evaluate(() => window.__hcE2eNotifications[0].click());
+    const plan = await page.evaluate(() => window.__hcE2eSwOsPlans?.[0]);
+    expect(plan?.title).toBe("E2E Test Card");
+    expect(plan?.body).toMatch(/tap to sign/i);
+    expect(typeof plan?.href).toBe("string");
+
+    await page.evaluate((href) => {
+      location.href = href;
+    }, plan.href);
     await expect(page).toHaveURL(new RegExp(`live_challenge=${CHALLENGE_ID}`));
     await expect(page).toHaveURL(/profile_id=7Xk9mP2nQ4rT6vW8yZ1aB3cD5/);
   });
@@ -350,8 +355,10 @@ test.describe("device inbox - card disabled since visit", () => {
 
   test("badge and inbox sheet surface card disabled since last visit", async ({ page }) => {
     await page.goto("/wallet/");
-    await expect(page.getByText(/Network checked/i)).toBeVisible({ timeout: 15_000 });
     await expect(page.locator("body")).toHaveAttribute("data-boot", "ready", {
+      timeout: 15_000,
+    });
+    await expect(page.locator(".hub-card-status-label")).toContainText(/checked/i, {
       timeout: 15_000,
     });
     const badge = page.locator("#shell-notif-badge");

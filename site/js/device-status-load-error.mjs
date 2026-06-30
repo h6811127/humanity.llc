@@ -7,6 +7,7 @@ import {
   markDotBootstrapSettled,
   markDotBootReady,
 } from "./device-status-dot-boot.mjs";
+import { DEVICE_SHELL_ASSET_VERSION } from "./device-status-shell-modules.mjs";
 
 export const STATUS_LOAD_ERROR_POPOVER_ID = "device-status-load-error-popover";
 export const STATUS_LOAD_ERROR_DISMISS_ID = "device-status-load-error-dismiss";
@@ -162,6 +163,27 @@ function wireLoadErrorDotToggleHandler(dotBtn) {
   });
 }
 
+function wirePartialLoadHubOpen(dotBtn) {
+  if (!(dotBtn instanceof HTMLButtonElement)) return;
+  if (dotBtn.dataset.partialHubWired === "1") return;
+  dotBtn.dataset.partialHubWired = "1";
+  dotBtn.addEventListener(
+    "click",
+    (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      void import(
+        new URL(`./device-hub-sheet.mjs?v=${DEVICE_SHELL_ASSET_VERSION}`, import.meta.url).href
+      ).then((mod) => {
+        if (typeof mod.isHubSheet === "function" && mod.isHubSheet()) {
+          mod.setHubSheetOpen(true);
+        }
+      });
+    },
+    true
+  );
+}
+
 /**
  * Core loaded but device-status.mjs failed — hub still works; amber ring, no coach hijack.
  * @param {string} technicalMessage
@@ -175,6 +197,7 @@ export function wireStatusPartialLoadDot(technicalMessage) {
   }
   if (dotBtn instanceof HTMLButtonElement) {
     dotBtn.setAttribute("aria-label", STATUS_PARTIAL_LOAD_ARIA_LABEL);
+    wirePartialLoadHubOpen(dotBtn);
   }
   markDotBootstrapSettled();
   void import("./device-status-core.mjs").then((mod) => {

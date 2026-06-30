@@ -30,6 +30,7 @@ describe("merch-funnel-core (server)", () => {
     expect(normalizeMerchFunnelRef(" TIER0_SHOP ")).toBe("tier0_shop");
     expect(normalizeMerchFunnelRef("customize_hoodie")).toBe("customize_hoodie");
     expect(normalizeMerchFunnelRef("customize_glitch")).toBe("customize_glitch");
+    expect(normalizeMerchFunnelRef("created_control")).toBe("created_control");
     expect(normalizeMerchFunnelRef("unknown_campaign")).toBeNull();
     expect(normalizeMerchFunnelRef("")).toBeNull();
   });

@@ -4,6 +4,7 @@
  */
 
 export const HC_NOTIFICATION_NAVIGATE = "HC_NOTIFICATION_NAVIGATE";
+export const HC_SW_OPEN_INBOX = "HC_SW_OPEN_INBOX";
 export const PENDING_NOTIFICATION_NAV_STORAGE_KEY = "hc_pending_notification_href";
 
 /**

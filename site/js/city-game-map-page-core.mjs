@@ -10,6 +10,7 @@ import { bootCityGameMapInteraction } from "./city-game-map-interaction.mjs";
 import { bootCityGameMapSnapshot } from "./city-game-map-snapshot.mjs";
 import { resolvePlayPageSeason } from "./city-game-season-resolve.mjs";
 import { bootCityGameSeasonBanners } from "./city-game-season-banner-core.mjs";
+import { bootMapFirstVisitBanner } from "./city-game-map-first-visit-banner-core.mjs";
 
 /**
  * @param {Document | HTMLElement} [root]
@@ -27,6 +28,8 @@ export async function bootCityGameMapPage(root = document) {
     const res = await fetch(resolved.jsonUrl, { cache: "no-store" });
     if (!res.ok) throw new Error(`season fetch ${res.status}`);
     season = await res.json();
+
+    bootMapFirstVisitBanner(root, season);
 
     /** @type {import("./discovery-pin-projection-core.mjs").DiscoveryPinIndex | null} */
     let pinIndex = null;

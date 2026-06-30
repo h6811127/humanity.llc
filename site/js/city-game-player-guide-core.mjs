@@ -10,17 +10,17 @@ import { resolveSignalWarGuideSteps } from "./city-game-signal-war-core.mjs";
 
 const DEFAULT_STEPS = [
   {
-    title: "No required first stop",
-    body: "Walk until you spot a game sticker, or pick a place from the list below and head there. Any sticker works.",
+    title: "Express line, any sticker",
+    body: "The map marks a recommended first stop on the express line. Walk until you spot a game sticker, or pick a place from the list — any sticker works.",
   },
   {
     title: "Planning from home",
-    body: "Search place names in Apple Maps or Google Maps. The weekend board is a district sketch, not turn-by-turn directions.",
+    body: "Search place names in Apple Maps or Google Maps. The board is a district sketch, not turn-by-turn directions.",
   },
 ];
 
 const DEFAULT_HERO_SUBLINE =
-  'Open the <a href="/play/cedar-rapids/map/">weekend city board</a>. Every game spot, with Open in Maps links (scan each sticker for live chips).';
+  'Open the <a href="/play/cedar-rapids/map/">board</a>. Every game spot, with Open in Maps links (scan each sticker for live chips).';
 
 /**
  * @param {Record<string, unknown>} season
@@ -28,7 +28,7 @@ const DEFAULT_HERO_SUBLINE =
 function defaultHeroSubline(season) {
   const board =
     seasonBoardPath(String(season.rules_path ?? "")) ?? "/play/cedar-rapids/map/";
-  return `Open the <a href="${board}">weekend city board</a>. Every game spot, with Open in Maps links (scan each sticker for live chips).`;
+  return `Open the <a href="${board}">board</a>. Every game spot, with Open in Maps links (scan each sticker for live chips).`;
 }
 
 /**
@@ -94,23 +94,49 @@ export function resolvePlayerGuide(season) {
 }
 
 /**
+ * @param {{ title: string; body: string }} row
+ * @param {number} index
+ * @param {"info" | "active" | "warn"} variant
+ */
+function buildPlayerGuideEmphasisCardHtml(row, index, variant) {
+  const stepLabel = `Step ${index + 1}`;
+  return `<article class="city-game-rules-plate hc-emphasis-card hc-emphasis-card--${variant}">
+  <div class="hc-emphasis-card__main">
+    <div class="hc-emphasis-card__copy">
+      <p class="hc-emphasis-card__eyebrow">${escapeHtml(stepLabel)}</p>
+      <h3 class="hc-emphasis-card__title">${escapeHtml(row.title)}</h3>
+      <p class="hc-emphasis-card__detail">${escapeHtml(row.body)}</p>
+    </div>
+  </div>
+</article>`;
+}
+
+/**
+ * @param {string} title
+ */
+function playerGuideStepVariant(title) {
+  if (/signal war|fog|faction|relay|pledge|capture/i.test(title)) return "warn";
+  return "info";
+}
+
+/**
  * @param {Record<string, unknown>} season
  */
 export function buildPlayerGuideListHtml(season) {
   const { steps, quorumSpot } = resolvePlayerGuide(season);
-  const items = [...steps];
-  if (quorumSpot) items.push(quorumSpot);
-
-  return items
-    .map(
-      (row) => `<li class="list-row">
-  <span class="list-content">
-    <span class="list-title">${escapeHtml(row.title)}</span>
-    <span class="list-sub">${escapeHtml(row.body)}</span>
-  </span>
-</li>`
-    )
-    .join("");
+  const cards = steps.map((row, index) =>
+    buildPlayerGuideEmphasisCardHtml(row, index, playerGuideStepVariant(row.title))
+  );
+  if (quorumSpot) {
+    cards.push(
+      buildPlayerGuideEmphasisCardHtml(
+        quorumSpot,
+        steps.length,
+        "active"
+      )
+    );
+  }
+  return cards.join("");
 }
 
 /**
@@ -182,7 +208,7 @@ export function buildJamieWayfindingChecks(season) {
   return [
     {
       id: "GT-W1",
-      prompt: "How would you start? (any sticker / place list. No required first stop)",
+      prompt: "How would you start? (express line on map / any sticker / place list)",
     },
     {
       id: "GT-W2",

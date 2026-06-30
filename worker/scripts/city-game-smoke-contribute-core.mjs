@@ -83,6 +83,26 @@ export function readQuorumContributeResponse(body) {
 /**
  * @param {unknown} body
  */
+export function readWitnessContributeResponse(body) {
+  if (!body || typeof body !== "object") {
+    return { ok: false, reason: "empty contribute response" };
+  }
+  const json = /** @type {Record<string, unknown>} */ (body);
+  if (typeof json.error === "string") {
+    return { ok: false, reason: json.error, message: json.message };
+  }
+  return {
+    ok: true,
+    passIssued: json.pass_issued === true,
+    scarcityRemaining: Number(json.scarcity_remaining),
+    witnessDepleted: json.witness_depleted === true,
+    vouchTargets: Array.isArray(json.vouch_targets) ? json.vouch_targets.map(String) : [],
+  };
+}
+
+/**
+ * @param {unknown} body
+ */
 export function readFragmentContributeResponse(body) {
   if (!body || typeof body !== "object") {
     return { ok: false, reason: "empty contribute response" };

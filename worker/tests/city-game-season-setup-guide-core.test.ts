@@ -54,7 +54,18 @@ describe("city-game-season-setup-guide-core", () => {
     expect(checklist.gameNodeCount).toBe(1);
     expect(checklist.items.find((item) => item.id === "owner_backup")?.done).toBe(true);
     expect(checklist.items.find((item) => item.id === "game_operator_custody")?.done).toBe(true);
+    expect(checklist.items.find((item) => item.id === "scan_graph_published")?.done).toBe(false);
     expect(checklist.bulkImportBlocked).toBe(false);
+  });
+
+  it("marks scan graph checklist item when edges are live", () => {
+    const checklist = buildSelfServeSetupChecklist({
+      session: { profile_id: "profile_a", issuer_public_key: "abc123" },
+      childObjectRows: [],
+      custodyAck: {},
+      scanGraphPublishReady: true,
+    });
+    expect(checklist.items.find((item) => item.id === "scan_graph_published")?.done).toBe(true);
   });
 
   it("blocks bulk path when two objects exist without backup seatbelt", () => {

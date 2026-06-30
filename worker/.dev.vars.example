@@ -23,3 +23,8 @@ OPERATOR_AUDIT_TOKEN=dev-only-change-me
 # STRIPE_PRICE_HOSTED_STEWARD_V1=price_…
 # STRIPE_PRICE_HOSTED_GAME_SEASON_V1=price_…
 # STRIPE_WEBHOOK_SECRET=whsec_…   # stripe listen --forward-to localhost:8787/.well-known/hc/v1/operator/billing/webhook
+
+# Tier 2 Web Push (local notify:web-push:preflight -- --api http://127.0.0.1:8787)
+# npm run notify:web-push:vapid-keys  # or use vitest fixture keys below (dev only)
+# STEWARD_VAPID_PUBLIC_KEY=BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U
+# STEWARD_VAPID_PRIVATE_KEY=UUxI4O8-FbRPOA3_Z-vy_xYs9DIFYP5dYKI13sOJEvI

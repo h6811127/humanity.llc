@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WS-OBJECT-GRAPH · dual-gate field walk</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 42rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; }
+    h1 { font-size: 1.35rem; }
+    .walk-meta { color: #444; font-size: 0.95rem; }
+    .walk-step { border-top: 1px solid #ddd; padding-top: 1rem; margin-top: 1rem; }
+    .walk-expect { font-size: 0.95rem; }
+    .walk-site-code { font-size: 0.95rem; }
+    ul { padding-left: 1.2rem; }
+    a { word-break: break-all; }
+  </style>
+</head>
+<body>
+  <h1>Dual-gate cabinet field walk</h1>
+  <p class="walk-meta">Production · witness <code>edge_cr_witness_10_07</code> + unlock <code>edge_cr_unlock_04_07</code></p>
+  <p class="walk-site-code">Witness site code: <strong>CR-WITNS-4P</strong></p>
+  <p class="walk-site-code">Quorum site code: <strong>CR-LANTERN-7K</strong></p>
+  <h2>Scan URLs</h2>
+  <ul><li><a href="https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_gEPR1PfPPB2z3ze1">Czech Village cabinet</a></li>
+<li><a href="https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_6zs7Jej5m4ZV4U7e">Library witness seal</a></li>
+<li><a href="https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_aMr8qJGBF9xpC1gu">Riverwalk River Lantern</a></li></ul>
+  <section class="walk-step" id="D0">
+  <h2>D0 · Cabinet baseline</h2>
+  <p>Scan cabinet. Expand Live object details. Graph shows witness + unlock rows — both Missing. Legacy vouch chips hidden.</p>
+  <p class="walk-expect"><strong>Expect:</strong> Dual-gate graph · both edges pending</p>
+</section>
+<section class="walk-step" id="D1">
+  <h2>D1 · Library witness</h2>
+  <p>Scan library witness seal. Complete scarcity contribute (site code if printed). Return to cabinet status JSON — witness edge satisfied.</p>
+  <p class="walk-expect"><strong>Expect:</strong> Witness edge Live · unlock still Missing</p>
+</section>
+<section class="walk-step" id="D2">
+  <h2>D2 · River quorum</h2>
+  <p>Scan River Lantern. Complete quorum contribute. Return to cabinet — unlock edge satisfied.</p>
+  <p class="walk-expect"><strong>Expect:</strong> Unlock edge Live · witness already Live</p>
+</section>
+<section class="walk-step" id="D3">
+  <h2>D3 · Cabinet open</h2>
+  <p>Re-scan cabinet. Graph rows show Live (or hero opens). No legacy chips. Both edges in relationships[] satisfied.</p>
+  <p class="walk-expect"><strong>Expect:</strong> Dual-gate satisfied · cabinet path open</p>
+</section>
+  <p class="walk-meta">Automated belts: <code>npm run ws-object-graph:local-smoke -- --setup --seed --drill</code> · <code>npm run ws-object-graph:dual-gate-spine-local -- --setup --seed</code> (D0–D3) · <code>npm run ws-object-graph:prod-smoke -- --dark-check</code></p>
+</body>
+</html>

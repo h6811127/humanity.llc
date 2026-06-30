@@ -17,7 +17,7 @@
 
 **Operating constraint:** [`PHASE_A_STRANGER_PATH_PRIORITIES.md`](PHASE_A_STRANGER_PATH_PRIORITIES.md) — one vertical on real printed QRs beats expanding the public hub faster than pilots.
 
-**Front door (presentation):** Public entry is **Three ways in** — wear · deploy on something · play the city game ([`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md)). This five-layer map is **engineering composition**; stewards do not pick layers at create time. L1 object graph (root → child → QR) stays protocol truth; L5 network graph is **live game / season** for organizers only.
+**Front door (presentation):** Public entry is **discovery-first** on `/` — browse live boards, then **Live object carriers** row (shipped) and create row. Three jobs (wear · deploy · play) map to shop teaser, `/create/`, and boards/shelves — not **`#launch-doors`** ([`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md)). This five-layer map is **engineering composition**; stewards do not pick layers at create time. L1 object graph (root → child → QR) stays protocol truth; L5 network graph is **live game / season** for organizers only.
 
 **Steward UX target (step 20):** Room-native control maps each job to L1–L5 explicitly — deploy (L1–L3 + `request`/`offer`), wear (L1 `print_artifact` vs `card` lifecycle), season (L4–L5 + `contribute`). Design checklist and presentation policy: [`STEWARD_UX_PRESENTATION_TARGET.md`](STEWARD_UX_PRESENTATION_TARGET.md) § Layer map · § Presentation policy table.
 

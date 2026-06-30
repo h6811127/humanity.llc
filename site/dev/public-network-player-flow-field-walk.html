@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Player flow field walk · Cedar Rapids</title>
+  <style>
+    :root { color-scheme: light dark; font-family: system-ui, sans-serif; }
+    body { margin: 0; padding: 16px; max-width: 44rem; line-height: 1.45; }
+    h1 { font-size: 1.2rem; margin: 0 0 8px; }
+    h2 { font-size: 1rem; margin: 24px 0 10px; }
+    .lead { margin: 0 0 12px; color: #666; font-size: 0.95rem; }
+    .cta {
+      display: block; padding: 14px 16px; border-radius: 12px; margin: 0 0 10px;
+      background: #db1b43; color: #fff; text-decoration: none; font-weight: 600; text-align: center;
+    }
+    .cta-secondary { background: rgba(60,60,67,.12); color: inherit; font-weight: 500; }
+    .scenarios { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+    .scenarios li {
+      padding: 12px; border-radius: 10px; border: 1px solid rgba(60,60,67,.15); font-size: 0.9rem;
+    }
+    .scenarios p { margin: 6px 0 8px; color: #666; }
+    .check { font-size: 0.85rem; color: #666; }
+    .paths { font-size: 0.85rem; margin: 0; padding-left: 1.2rem; }
+    .paths li { margin: 4px 0; }
+  </style>
+</head>
+<body>
+  <h1>Agent D · Player flow field walk</h1>
+  <p class="lead">
+    Run with <strong>3+ un coached strangers</strong> on their own phones.
+    Mode: local dev.
+    Path: discover → What a scan proves → Open board → scan.
+  </p>
+  <p class="lead">LO-4 integrated walk (game + status plate scans): <a href="/play/cedar-rapids/teaching/">/play/cedar-rapids/teaching/</a></p>
+
+  <a class="cta" href="/">1 · Home discovery dashboard</a>
+  <a class="cta cta-secondary" href="/play/season/">2 · Public networks catalog</a>
+  <a class="cta cta-secondary" href="/play/cedar-rapids/#rules-prove-title">3 · What a scan proves</a>
+  <a class="cta cta-secondary" href="/play/cedar-rapids/map/">4 · Open board</a>
+  <a class="cta cta-secondary" href="/discover/cedar-rapids-iowa/">Browse places near me</a>
+
+  <h2>Send strangers (copy-paste)</h2>
+  <ol class="paths">
+    <li><a href="/">Home</a> or <a href="/play/season/">catalog</a> → Open board</li>
+    <li>Optional: <a href="/play/cedar-rapids/#rules-prove-title">What a scan proves</a></li>
+    <li>Board → dismiss intro → start callout → selection panel → scan link</li>
+  </ol>
+
+  <h2>Scorecard (each stranger)</h2>
+  <ul class="scenarios">
+<li>
+  <strong>PD-1 · Discover network</strong>
+  <p>From homepage or /play/season/, find Wake the city and open the board — no coaching.</p>
+  <label class="check"><input type="checkbox" disabled /> Pass</label>
+</li>
+<li>
+  <strong>PD-2 · What a scan proves</strong>
+  <p>From a catalog card or homepage, reach the rules charter #rules-prove-title section without search.</p>
+  <label class="check"><input type="checkbox" disabled /> Pass</label>
+</li>
+<li>
+  <strong>PD-3 · Board shell intro</strong>
+  <p>Dismiss the first-visit banner, tap the start callout, and open the selection panel.</p>
+  <label class="check"><input type="checkbox" disabled /> Pass</label>
+</li>
+<li>
+  <strong>PD-4 · First stop (world state)</strong>
+  <p>Name the suggested first place from the panel — collective state, not personal progress or GPS rank.</p>
+  <label class="check"><input type="checkbox" disabled /> Pass</label>
+</li>
+<li>
+  <strong>PD-5 · Scan handoff</strong>
+  <p>Find a scan link on a place row, or on a game scan see Open board + What a scan proves CTAs.</p>
+  <label class="check"><input type="checkbox" disabled /> Pass</label>
+</li>
+  </ul>
+
+  <h2>Human gate</h2>
+  <p class="lead">Sign after 3+ strangers pass PD-1–PD-5 on the path above. Engineering belt: <code>npm run verify:public-network-player-flow</code>.</p>
+</body>
+</html>

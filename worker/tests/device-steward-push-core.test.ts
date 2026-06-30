@@ -6,11 +6,16 @@ import {
   isStaleLiveProofPushEvent,
   parseSseMessageBlock,
   parseStewardPushEventPayload,
+  parseWebPushMessageData,
+  serializePushSubscriptionForSubscribe,
   shouldMaintainStewardPushConnection,
+  shouldMaintainStewardWebPushSubscription,
   STEWARD_PUSH_DOWN_FALLBACK_MS,
   STEWARD_PUSH_EVENT_CONNECTION_ACK,
   STEWARD_PUSH_EVENT_LIVE_PROOF_PENDING,
   stewardPushInFallbackCooldown,
+  stewardWebPushVapidPublicKeyFromCapabilities,
+  urlBase64ToUint8Array,
 } from "../../site/js/device-steward-push-core.mjs";
 
 describe("parseSseMessageBlock", () => {
@@ -87,5 +92,67 @@ describe("push payload helpers", () => {
     expect(
       isLiveProofPendingPushPayload({ type: STEWARD_PUSH_EVENT_LIVE_PROOF_PENDING })
     ).toBe(true);
+  });
+});
+
+describe("Tier 2 Web Push helpers", () => {
+  it("parseWebPushMessageData reads JSON push payloads", async () => {
+    const payload = await parseWebPushMessageData({
+      json: async () => ({
+        type: STEWARD_PUSH_EVENT_LIVE_PROOF_PENDING,
+        profile_id: "p1",
+        challenge_id: "c1",
+      }),
+    } as PushMessageData);
+    expect(payload?.profile_id).toBe("p1");
+    expect(payload?.challenge_id).toBe("c1");
+  });
+
+  it("shouldMaintainStewardWebPushSubscription requires VAPID key", () => {
+    expect(
+      shouldMaintainStewardWebPushSubscription({
+        pushEntitled: true,
+        browserAlertsEnabled: true,
+        hasSession: true,
+        vapidPublicKey: "abc",
+      })
+    ).toBe(true);
+    expect(
+      shouldMaintainStewardWebPushSubscription({
+        pushEntitled: true,
+        browserAlertsEnabled: true,
+        hasSession: true,
+        vapidPublicKey: "",
+      })
+    ).toBe(false);
+  });
+
+  it("stewardWebPushVapidPublicKeyFromCapabilities reads operator extension", () => {
+    expect(
+      stewardWebPushVapidPublicKeyFromCapabilities({
+        extensions: {
+          hosted_steward: {
+            web_push: { vapid_public_key: "  test-key  " },
+          },
+        },
+      })
+    ).toBe("test-key");
+  });
+
+  it("urlBase64ToUint8Array decodes URL-safe base64", () => {
+    const bytes = urlBase64ToUint8Array("AQID");
+    expect(Array.from(bytes)).toEqual([1, 2, 3]);
+  });
+
+  it("serializePushSubscriptionForSubscribe maps PushSubscription JSON", () => {
+    const body = serializePushSubscriptionForSubscribe({
+      expirationTime: null,
+      toJSON: () => ({
+        endpoint: "https://push.example/1",
+        keys: { p256dh: "p", auth: "a" },
+      }),
+    } as PushSubscription);
+    expect(body.endpoint).toBe("https://push.example/1");
+    expect(body.keys.auth).toBe("a");
   });
 });

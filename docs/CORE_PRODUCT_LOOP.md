@@ -4,7 +4,7 @@
 **Workstream ID:** **WS-QUALITY**  
 **Parent program:** **WS-LIVE** — [`PRODUCT_WORKSTREAM_COORDINATION.md`](PRODUCT_WORKSTREAM_COORDINATION.md) § WS-LIVE  
 **Coordination:** [`PRODUCT_WORKSTREAM_COORDINATION.md`](PRODUCT_WORKSTREAM_COORDINATION.md) § WS-QUALITY  
-**Last updated:** 2026-06-04
+**Last updated:** 2026-06-21
 
 ---
 
@@ -58,7 +58,7 @@ Q4 Rearchitecture gate    Only if Q3 leaves structural debt (written decision)
 | Phase | Exit criteria | Primary commands |
 |-------|---------------|------------------|
 | **Q0** | `npm run verify:desk:fast` green in CI; contributors run `verify:desk` before merge | `.github/workflows/verify-desk.yml` |
-| **Q1** | Loop table (§ below) has **owner** + **automated** + **manual** cell filled for every row | Audit against [`SAD_PATH_COVERAGE_AND_BACKLOG.md`](SAD_PATH_COVERAGE_AND_BACKLOG.md) |
+| **Q1** | Loop table (§ below) has **owner** + **automated** + **manual** cell filled for every row | `npm run ws-quality:q1-preflight` · audit [`SAD_PATH_COVERAGE_AND_BACKLOG.md`](SAD_PATH_COVERAGE_AND_BACKLOG.md) |
 | **Q2** | No open **P0** from [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) on local stack; belt + surface gates in PR template pass | `verify:desk` · targeted `e2e:*` per row |
 | **Q3** | 5 steward + 3 stranger comprehension sessions without “I thought it worked but…” on keys/save/revoke | `DEVICE_OS_QA` P0-1–P0-3, P0-W · optional `custody:phase0-kit` if create path touched |
 | **Q4** | Written **go / no-go** in this file § Rearchitecture gate; if go, child workstream with file ownership | — |
@@ -67,18 +67,21 @@ Q4 Rearchitecture gate    Only if Q3 leaves structural debt (written decision)
 
 ## Core loop inventory (Q1)
 
-Mark **☑** when automated + manual proof exist. Do not add nodes or game layers until **P0 column** is green.
+**Engineering:** ☑ `npm run ws-quality:q1-preflight` — L1–L8 npm scripts, test files, and manual QA doc anchors wired.  
+**Human:** ☐ run [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) P0 rows on local stack + production WebKit (**P0-W**).
 
-| ID | Journey step | Automated gate | Manual gate |
-|----|--------------|----------------|-------------|
-| **L1** | Create card (general + child object paths) | `worker:test` create/custody · `e2e:custody-create-*` if custody | `DEVICE_OS_QA` create flow · [`CUSTODY_WEBAUTHN_FALLBACK_QA.md`](CUSTODY_WEBAUTHN_FALLBACK_QA.md) if WebAuthn |
-| **L2** | Keys in tab → save to device | `ownership-restore:verify` · hub-restore Vitest | **P0-1** · **P0-2** |
-| **L3** | Hub / dot / inbox open | `verify:desk` shell-boot · `hub-card-disappeared:verify` | **P0-3** · **P1-SD** (scan dot) |
-| **L4** | `/created/` Live · manage · QR download | `worker:test:qr-branding` · created E2E | **P0-QR** |
-| **L5** | Stranger scan · live proof | `e2e:scan-page-dot` · `live-control-loop` | **P1-SD** · **H-12** if printed QA |
-| **L6** | Revoke QR / card | `worker:test` revoke · delegated revoke tests | Hub revoke nav · **P0-2** revoke panel |
-| **L7** | Safari keys / ITP / quiet tab | `worker:test` safari-keys · `e2e:safari-keys-persistence` | **P0-W** production WebKit |
-| **L8** | Steward scan handoff / PWA vouch | `steward-scan-handoff:verify` | **P1-PWA-V** prod WebKit |
+Mark **☑** in the manual column when human proof exists. Do not add nodes or game layers until **P0 column** is green.
+
+| ID | Journey step | Owner | Automated gate | Manual gate |
+|----|--------------|-------|----------------|-------------|
+| **L1** | Create card (general + child object paths) | WS-QUALITY | ☑ `e2e:custody-device-unlock` · create/child Vitest | **P0-1** · [`CUSTODY_WEBAUTHN_FALLBACK_QA.md`](CUSTODY_WEBAUTHN_FALLBACK_QA.md) if WebAuthn |
+| **L2** | Keys in tab → save to device | WS-QUALITY | ☑ `ownership-restore:verify` | **P0-1** · **P0-2** |
+| **L3** | Hub / dot / inbox open | WS-QUALITY | ☑ `verify:desk:fast` · `hub-card-disappeared:verify:fast` | **P0-3** · **P1-SD** (scan dot) |
+| **L4** | `/created/` Live · manage · QR download | WS-QUALITY | ☑ `worker:test:qr-branding` · `e2e:created-control` | **P0-QR** |
+| **L5** | Stranger scan · live proof | WS-QUALITY | ☑ `e2e:scan-page-dot` · `e2e:live-control-loop` | **P1-SD** · [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md) (H-12 passed 2026-05-30) |
+| **L6** | Revoke QR / card | WS-QUALITY | ☑ `e2e:scan-revoke-freshness` · revoke Vitest | Hub revoke nav · **P0-2** revoke panel |
+| **L7** | Safari keys / ITP / quiet tab | WS-QUALITY | ☑ `e2e:safari-keys-persistence` · quiet-tab Vitest | **P0-W** production WebKit |
+| **L8** | Steward scan handoff / PWA vouch | WS-QUALITY | ☑ `steward-scan-handoff:verify:fast` | **P1-PWA-V** prod WebKit |
 
 **Living backlog input:** [`SAD_PATH_COVERAGE_AND_BACKLOG.md`](SAD_PATH_COVERAGE_AND_BACKLOG.md) — file tickets only for **repeated** human confusion after Q2 fix.
 
@@ -116,11 +119,12 @@ Prefer **surgical** changes aligned with existing patterns:
 
 | Target | Comprehension pass signal |
 |--------|---------------------------|
-| Three launch doors stay abstract (not lost-item-led) | Strangers pick correct door in &lt;10s without protocol vocabulary |
+| Discovery landing stays utility-first (boards before commerce) | Strangers find live boards without marketing confusion |
+| **`#landing-live-object-carriers`** (shipped) teases `/shop/` only | No carousel; no checkout embed on `/` |
 | Top-nav Create = steward chooser (deploy + wear) | No one asks why they must pick “General” before a plate |
 | Deploy create = “what scanners read” | Stewards never say “root” or “child” unprompted |
 | Hoodie path vs BYOP create | Buyers understand shop vs print-your-own as **carrier**, same live primitive |
-| Game players vs organizers | Players use door 3; organizers find season setup without terminal mint |
+| Game players vs organizers | Players use boards/shelves; organizers find season setup without terminal mint |
 | **Step 20 — three rooms** | Stewards describe deploy / wear / season as separate jobs, not one card form |
 | **Step 20 — room switcher** | Stewards always know active room (Doors / Season / Wear); no “where did my plates go?” |
 | **Step 20 — one root default** | Solo stewards use one `@handle`; org seasons may choose season-only account |
@@ -128,7 +132,7 @@ Prefer **surgical** changes aligned with existing patterns:
 | **Step 20 — entry states** | No “field looks broken” reports from disabled/hidden inputs on mobile PWA |
 | **Step 20 — wear tracks** | Stewards understand fulfilled garment (no expiry) vs BYOP QR (may expire) before filling forms |
 
-**Architecture guardrails during Q3:** `verify:desk:fast` green; child objects stay out of `hc_wallet`; LO-1/LO-2 field kits exercise **deploy wizard (Path A)** plus **legacy flat regression (Path B)** — existing flat QRs keep scanning; no landing hero revert; presentation policy is UI-only; add UI filtered by room, lists show all children ([`STEWARD_UX_PRESENTATION_TARGET.md`](STEWARD_UX_PRESENTATION_TARGET.md) § Presentation policy table).
+**Architecture guardrails during Q3:** `verify:desk:fast` green; child objects stay out of `hc_wallet`; LO-1/LO-2 field kits exercise **deploy wizard (Path A)** plus **legacy flat regression (Path B)** — existing flat QRs keep scanning; no discovery-hero revert on `/`; presentation policy is UI-only; add UI filtered by room, lists show all children ([`STEWARD_UX_PRESENTATION_TARGET.md`](STEWARD_UX_PRESENTATION_TARGET.md) § Presentation policy table).
 
 ---
 
@@ -237,6 +241,7 @@ Environment: installed PWA, Android. Triage ID = **P1-MOTO-***. Status: **captur
 
 | Date | Note |
 |------|------|
+| 2026-06-21 | **Q1 engineering shipped** — `ws-quality:q1-preflight` + L1–L8 inventory table (owner + automated ☑) |
 | 2026-06-04 | View-only deprecation step 3 — hub/wallet/scan Open controls only |
 | 2026-06-04 | View-only deprecation step 2 — strip restore-in-tab UI; K1 recovery import only |
 | 2026-06-04 | View-only deprecation step 1 — created boot auto-activate + URL quiet rehydrate |

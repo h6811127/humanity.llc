@@ -19,6 +19,20 @@ export function matchesDistrictFilter(districtId, activeDistrict) {
 }
 
 /**
+ * Play-spine list lens hides non-spine rows; keep the highlighted row visible (SF-3).
+ * @param {{ spineNode?: string | null; nodeId?: string | null }} row
+ * @param {string | null | undefined} activeListLens
+ * @param {string | null | undefined} highlightNodeId
+ */
+export function matchesListLensFilter(row, activeListLens, highlightNodeId) {
+  if (String(activeListLens ?? "all") !== "spine") return true;
+  if (String(row?.spineNode ?? "") === "1") return true;
+  const id = String(row?.nodeId ?? "").trim();
+  const highlight = String(highlightNodeId ?? "").trim();
+  return Boolean(id && highlight && id === highlight);
+}
+
+/**
  * @param {HTMLElement} boardRoot
  */
 export function countVisibleBoardNodes(boardRoot) {
@@ -152,6 +166,8 @@ export function applyBoardFilterVisibility(boardRoot) {
     boardRoot.dataset.activeDistrict && boardRoot.dataset.activeDistrict !== "all"
       ? boardRoot.dataset.activeDistrict
       : null;
+  const activeListLens = boardRoot.dataset.activeListLens ?? "all";
+  const highlightNodeId = boardRoot.dataset.highlightNodeId ?? null;
 
   for (const row of boardRoot.querySelectorAll(".city-game-map-node-row[data-node-id]")) {
     if (!row || typeof row !== "object" || typeof row.getAttribute !== "function") continue;
@@ -169,7 +185,15 @@ export function applyBoardFilterVisibility(boardRoot) {
       },
       { activeState }
     );
-    const match = districtMatch && typeMatch && stateMatch;
+    const listLensMatch = matchesListLensFilter(
+      {
+        spineNode: row.getAttribute("data-spine-node"),
+        nodeId: row.getAttribute("data-node-id"),
+      },
+      activeListLens,
+      highlightNodeId
+    );
+    const match = districtMatch && typeMatch && stateMatch && listLensMatch;
     const fogOmitted =
       row &&
       typeof row === "object" &&
@@ -318,6 +342,35 @@ export function setStateFilter(boardRoot, stateId) {
   boardRoot.dataset.activeState = stateId;
   applyBoardFilterVisibility(boardRoot);
   syncStateFilterUi(boardRoot, stateId);
+}
+
+/**
+ * @param {HTMLElement} boardRoot
+ * @param {"spine" | "all"} lensId
+ */
+export function syncListLensUi(boardRoot, lensId) {
+  const toolbar = boardRoot.querySelector(".city-game-map-list-lens");
+  if (!toolbar) return;
+  for (const btn of toolbar.querySelectorAll("[data-list-lens]")) {
+    if (!btn || typeof btn !== "object") continue;
+    const selected = btn.getAttribute("data-list-lens") === lensId;
+    if (typeof btn.setAttribute === "function") {
+      btn.setAttribute("aria-pressed", selected ? "true" : "false");
+    }
+    if (btn.classList && typeof btn.classList.toggle === "function") {
+      btn.classList.toggle("city-game-map-list-lens-btn--active", selected);
+    }
+  }
+}
+
+/**
+ * @param {HTMLElement} boardRoot
+ * @param {"spine" | "all"} lensId
+ */
+export function setListLensFilter(boardRoot, lensId) {
+  boardRoot.dataset.activeListLens = lensId === "all" ? "all" : "spine";
+  applyBoardFilterVisibility(boardRoot);
+  syncListLensUi(boardRoot, boardRoot.dataset.activeListLens);
 }
 
 /**

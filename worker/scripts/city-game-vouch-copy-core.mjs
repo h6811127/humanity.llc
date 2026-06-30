@@ -66,7 +66,7 @@ export function auditGameNodeScanVouchCopy(scanMainHtml) {
         issues.push("Game chips block mentions human Issue vouch CTA");
       }
     }
-    if (!/Witness vouch|Vouch pending|Trust path still waiting|cooperation with nearby places/i.test(main)) {
+    if (!/Witness vouch|Vouch pending|Trust path still waiting|Not yet open|cooperation with nearby places/i.test(main)) {
       issues.push("Game vouch scan missing witness/trust-path copy");
     }
   }

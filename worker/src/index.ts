@@ -46,6 +46,11 @@ import {
   handlePostLostItemOffer,
   handlePostLostItemOfferOwner,
 } from "./resolver/lost-item-offer";
+import {
+  handleGetRelationshipEdges,
+  handlePostRelationshipEdgeIssue,
+  handlePostRelationshipEdgeRevoke,
+} from "./resolver/relationship-edge-routes";
 import { handlePostRotateQr } from "./resolver/rotate-qr";
 import { handlePostExtendQr } from "./resolver/extend-qr";
 import { handleGetScan } from "./resolver/scan";
@@ -78,6 +83,8 @@ import {
   handleGetOperatorPlans,
   handleGetStewardEntitlements,
   handleGetStewardPush,
+  handlePostStewardWebPushSubscribe,
+  handleDeleteStewardWebPushSubscribeRoute,
   handlePostStewardSession,
 } from "./resolver/steward-hosted";
 import { handlePostStewardBillingCheckout } from "./resolver/steward-billing-checkout";
@@ -298,6 +305,40 @@ export default {
         );
       }
       const res = await handleGetStewardPush(request, env, env.DB);
+      return withCors(request, res);
+    }
+    if (
+      path === "/.well-known/hc/v1/steward/push/subscribe" &&
+      request.method === "POST"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostStewardWebPushSubscribe(
+        request,
+        env,
+        env.DB
+      );
+      return withCors(request, res);
+    }
+    if (
+      path === "/.well-known/hc/v1/steward/push/subscribe" &&
+      request.method === "DELETE"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handleDeleteStewardWebPushSubscribeRoute(
+        request,
+        env,
+        env.DB
+      );
       return withCors(request, res);
     }
     if (
@@ -668,6 +709,53 @@ export default {
         );
       }
       const res = await handlePostCardUpdate(request, env.DB, updateMatch[1]!);
+      return withCors(request, res);
+    }
+
+    const relationshipEdgeRevokeMatch = path.match(
+      /^\/\.well-known\/hc\/v1\/cards\/([^/]+)\/relationship-edges\/([^/]+)\/revoke$/
+    );
+    if (relationshipEdgeRevokeMatch && request.method === "POST") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostRelationshipEdgeRevoke(
+        request,
+        env.DB,
+        relationshipEdgeRevokeMatch[1]!,
+        relationshipEdgeRevokeMatch[2]!
+      );
+      return withCors(request, res);
+    }
+
+    const relationshipEdgeMatch = path.match(
+      /^\/\.well-known\/hc\/v1\/cards\/([^/]+)\/relationship-edges$/
+    );
+    if (relationshipEdgeMatch && request.method === "GET") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handleGetRelationshipEdges(env.DB, relationshipEdgeMatch[1]!);
+      return withCors(request, res);
+    }
+    if (relationshipEdgeMatch && request.method === "POST") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostRelationshipEdgeIssue(
+        request,
+        env.DB,
+        relationshipEdgeMatch[1]!
+      );
       return withCors(request, res);
     }
 

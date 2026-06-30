@@ -8,6 +8,10 @@ import {
   jsonBasenameFromPublicUrl,
   readSeasonPublishDraft,
 } from "./city-game-rules-publish-core.mjs";
+import { assessScanGraphPublishForStaging } from "./created-relationship-edge-publish-core.mjs";
+import { fetchRelationshipEdges } from "./created-relationship-edge-publish.mjs";
+import { resolveSeasonTemplateRows } from "./city-game-season-template-core.mjs";
+import { normalizeUnlockEdgesDraft } from "./created-child-object-game-node-unlock-edges-core.mjs";
 import {
   buildOrganizerComprehensionBrief,
   buildSelfServeSetupChecklist,
@@ -182,6 +186,7 @@ export function initCreatedGameNodeSetupGuide(ctx) {
       ? readSeasonPublishDraft(localStorage, ctx.profileId, seasonId)
       : null;
     let rulesPublishReady = false;
+    let scanGraphPublishReady = false;
     if (seasonBody && jsonBasename) {
       const assessment = assessOrganizerRulesPublish(
         seasonBody,
@@ -190,6 +195,25 @@ export function initCreatedGameNodeSetupGuide(ctx) {
         draft
       );
       rulesPublishReady = assessment.ready;
+
+      const templateRows = resolveSeasonTemplateRows(seasonBody, seasonId);
+      const edges = normalizeUnlockEdgesDraft(
+        draft?.unlock_edges ?? seasonBody.unlock_edges
+      );
+      if (edges.length) {
+        try {
+          const liveEdges = await fetchRelationshipEdges(ctx.profileId);
+          const scan = assessScanGraphPublishForStaging(
+            seasonBody,
+            { ...draft, season_root_profile_id: ctx.profileId },
+            liveEdges,
+            ctx.profileId
+          );
+          scanGraphPublishReady = scan.ready === true;
+        } catch {
+          scanGraphPublishReady = false;
+        }
+      }
     }
 
     const rows = readChildObjectRows(localStorage, ctx.profileId);
@@ -199,6 +223,7 @@ export function initCreatedGameNodeSetupGuide(ctx) {
       childObjectRows: rows,
       custodyAck: readGameOperatorCustodyAck(localStorage, ctx.profileId),
       rulesPublishReady,
+      scanGraphPublishReady,
       season: seasonBody,
     });
 

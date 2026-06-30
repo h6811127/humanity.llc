@@ -8,6 +8,7 @@ import {
   seasonWantsAutoRulesPage,
   verifyPlayPageHtml,
 } from "./city-game-play-page-scaffold-core.mjs";
+import { normalizeUnlockEdgesDraft } from "./created-child-object-game-node-unlock-edges-core.mjs";
 import {
   applyRulesPageLaunchPatches,
   assessLaunchSurfacesReady,
@@ -155,6 +156,9 @@ export function mergeOrganizerPublishSeason(season, draft, profileId) {
     merged.districts = draft.districts
       .map((d) => (typeof d === "string" ? normalizeDistrictSlug(d) : ""))
       .filter(Boolean);
+  }
+  if (draft && "unlock_edges" in draft) {
+    merged.unlock_edges = normalizeUnlockEdgesDraft(draft.unlock_edges);
   }
   return merged;
 }

@@ -117,6 +117,49 @@ test.describe("WS-NOTIF N3 foreground attention strip", () => {
     await expect(page.locator("#device-foreground-attention")).toBeVisible();
   });
 
+});
+
+test.describe("P1-MOTO-21 browser alerts without Watch", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript((entry) => {
+      localStorage.removeItem("hc_watch_live_proof");
+      localStorage.setItem("hc_browser_notif", "on");
+      localStorage.setItem("hc_browser_notif_prompt_dismissed", "1");
+      localStorage.setItem("hc_wallet", JSON.stringify([entry]));
+    }, WALLET_ENTRY);
+    await page.route("**/.well-known/hc/v1/health**", mockHealth);
+    await page.route("**/.well-known/hc/v1/cards/**/status**", mockCardStatus);
+    await page.route("**/.well-known/hc/v1/cards/**/live-control/challenges**", mockPendingChallenge);
+  });
+
+  test("foreground strip when browser alerts on and Watch off", async ({ page }) => {
+    await page.goto("/");
+    await page.locator("#brand-status-dot").click();
+    await page.locator("#device-hub-network-tools-advanced summary").click();
+    await page.locator("#device-hub-check-live-proof-btn").click();
+
+    const strip = page.locator("#device-foreground-attention");
+    await expect(strip).toBeVisible({ timeout: 15_000 });
+    await expect(strip).toContainText(/Prove live control/i);
+    await expect(page.locator("#shell-notif-badge")).toBeVisible();
+    await expect(page.locator("#shell-notif-badge")).toHaveAttribute(
+      "data-inbox-chroma",
+      "live_proof"
+    );
+  });
+});
+
+test.describe("WS-NOTIF N3 created shell", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript((entry) => {
+      localStorage.setItem("hc_watch_live_proof", "1");
+      localStorage.setItem("hc_wallet", JSON.stringify([entry]));
+    }, WALLET_ENTRY);
+    await page.route("**/.well-known/hc/v1/health**", mockHealth);
+    await page.route("**/.well-known/hc/v1/cards/**/status**", mockCardStatus);
+    await page.route("**/.well-known/hc/v1/cards/**/live-control/challenges**", mockPendingChallenge);
+  });
+
   test("/created/ shell does not show foreground strip", async ({ page }) => {
     await page.goto(`/created/?profile_id=${WALLET_ENTRY.profile_id}&qr_id=${WALLET_ENTRY.qr_id}`);
     await page.waitForLoadState("networkidle");

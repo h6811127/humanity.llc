@@ -1,39 +1,44 @@
-import { describe, expect, it, beforeEach, afterEach } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import {
-  persistSeasonWhenId,
-  readSeasonWhenId,
-} from "../../site/js/created-season-when-panel-core.mjs";
+  readSeasonPublishDraft,
+  writeSeasonPublishDraft,
+} from "../../site/js/city-game-rules-publish-core.mjs";
+import { summarizeSeasonPublishDraftForWhenPanel } from "../../site/js/created-season-when-panel-core.mjs";
 
-describe("created season when panel", () => {
-  /** @type {Map<string, string>} */
-  let session;
-
-  beforeEach(() => {
-    session = new Map();
-    Object.defineProperty(globalThis, "sessionStorage", {
-      configurable: true,
-      value: {
-        getItem: (key) => session.get(key) ?? null,
-        setItem: (key, value) => {
-          session.set(key, value);
-        },
+describe("created-season-when-panel-core", () => {
+  it("summarizes publish draft window and unlock edges for When panel", () => {
+    const storage = {
+      /** @type {Record<string, string>} */
+      data: {},
+      getItem(key) {
+        return this.data[key] ?? null;
       },
+      setItem(key, value) {
+        this.data[key] = value;
+      },
+    };
+
+    writeSeasonPublishDraft(storage, "prof_when", "my_season_01", {
+      status: "planned",
+      window: {
+        starts_at: "2026-07-04T18:00:00.000Z",
+        ends_at: "2026-07-06T23:59:00.000Z",
+      },
+      unlock_edges: [{ from: "node_01", to: "node_02" }],
     });
-  });
 
-  afterEach(() => {
-    delete globalThis.sessionStorage;
-  });
+    const summary = summarizeSeasonPublishDraftForWhenPanel(
+      storage,
+      "prof_when",
+      "my_season_01"
+    );
+    expect(summary).toMatch(/Status: planned/);
+    expect(summary).toMatch(/unlock edge/);
+    expect(summary).toMatch(/Rules page/);
 
-  it("persists normalized season id per profile", () => {
-    const profileId = "profile_when_test";
-    const seasonId = persistSeasonWhenId(profileId, "my_season_01");
-    expect(seasonId).toBe("my_season_01");
-    expect(readSeasonWhenId(profileId)).toBe("my_season_01");
-  });
-
-  it("rejects invalid season id slugs", () => {
-    expect(() => persistSeasonWhenId("p2", "bad slug!")).toThrow();
+    expect(readSeasonPublishDraft(storage, "prof_when", "my_season_01")?.status).toBe(
+      "planned"
+    );
   });
 });

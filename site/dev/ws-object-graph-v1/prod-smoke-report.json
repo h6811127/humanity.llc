@@ -1,0 +1,38 @@
+{
+  "at": "2026-06-29T23:57:29.291Z",
+  "apiOrigin": "https://humanity.llc",
+  "cabinetScan": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_gEPR1PfPPB2z3ze1",
+  "libraryScan": "https://humanity.llc/c/GcP3Ee17yGqMHdidhEVMYBzq?q=qr_6zs7Jej5m4ZV4U7e",
+  "edges": [
+    "edge_cr_witness_10_07",
+    "edge_cr_unlock_04_07"
+  ],
+  "results": [
+    {
+      "step": "migration 0035",
+      "ok": true,
+      "detail": "relationship_edges table present"
+    },
+    {
+      "step": "D3 witness edge satisfied",
+      "ok": true,
+      "detail": "pass"
+    },
+    {
+      "step": "D3 unlock edge satisfied",
+      "ok": true,
+      "detail": "pass"
+    },
+    {
+      "step": "D3 dual-gate status JSON",
+      "ok": true,
+      "detail": "pass"
+    },
+    {
+      "step": "D3 dual-gate cabinet HTML",
+      "ok": true,
+      "detail": "pass"
+    }
+  ],
+  "go": true
+}

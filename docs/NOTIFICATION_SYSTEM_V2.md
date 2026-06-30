@@ -1,11 +1,11 @@
 # Notification system v2 — unified tiered inbox (WS-NOTIF)
 
-**Status:** **Engineering closed** — **N0–N5 ☑** · **N4 partial** (in-app only) · **Background OS alerts (P0-N2) — non-functional** on Android Chrome PWA (2026-06-04 field) — **do not invest** until a new workstream reopens transport · hosted push **E4** rollout gated by M4/M8  
+**Status:** **Engineering closed (in-app)** — **N0–N5 ☑** · **Background OS (P0-N2) — Tier 1 transport shipped (2026-06-23); field re-test required** on Android Chrome PWA · hosted push **E4** rollout gated by M4/M8  
 **Workstream ID:** **WS-NOTIF**  
 **Selected approach:** **Tiered inbox-first + foreground interrupt (TIF)**  
 **Coordination:** [`PRODUCT_WORKSTREAM_COORDINATION.md`](PRODUCT_WORKSTREAM_COORDINATION.md) · prior custody work: [`CORE_PRODUCT_LOOP.md`](CORE_PRODUCT_LOOP.md) § View-only deprecation  
 **Supersedes (incrementally):** parallel notify paths documented in [`DEVICE_INBOX.md`](DEVICE_INBOX.md) (v1 shipped layers remain valid; delivery is consolidated)  
-**Last updated:** 2026-06-04
+**Last updated:** 2026-06-23
 
 ---
 
@@ -24,19 +24,17 @@ We are **not** building a generic push platform, scan surveillance, or email in 
 
 ---
 
-## Known limitations (2026-06-04 — do not promise in product)
+## Known limitations (2026-06-23)
 
-| Surface | Status | What works today | What does **not** work |
-|---------|--------|------------------|------------------------|
-| **Background OS alert** (P0-N2) | **Non-functional** | Opt-in UI, inbox badge, hub rows, **foreground strip** when app is open | Reliable Chrome system notification when PWA is backgrounded or force-quit; tap-to-sign deep link from tray on Android PWA |
-| **SW `sw-live-proof.mjs`** | **Deferred with OS** | Code + tests in repo | Field-validated away-tab delivery on Android Chrome installed PWA |
+| Surface | Status | What works today | What does **not** work yet |
+|---------|--------|------------------|----------------------------|
+| **Background OS alert** (P0-N2) | **Field re-test** | Tier 1 transport in repo: SW-only when hidden, push cache, full-wallet SW probe, relay OS in SW; in-app strip + badge | **Not field-signed** on Android Chrome PWA until P0-N2 matrix passes |
+| **Force-quit / no page** | **Tier 2 engineering ☑ · field P0-N2-T2** | D1 subscription store, worker Web Push fan-out, SW `push` handler, client subscribe | **Not field-signed** until VAPID on operator + **P0-N2-T2** matrix passes |
 | **Hosted SSE push (E4)** | Rollout gated | TIF contract in repo (`notify:hosted-push`) | Production enablement — **M4/M8**, not WS-NOTIF |
 
-**Steward workaround until reopened:** Keep the app **foreground** (foreground strip + badge), use **Watch for live proof** + hub scope, or open the app when the dot/badge changes. Do **not** tell stewards that background alerts are shipped.
+**Steward workaround until P0-N2 passes:** Keep the app **foreground** (foreground strip + badge), use **Watch for live proof** + hub scope, or open the app when the dot/badge changes.
 
-**Tracking:** [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) **P0-N2** (blocked) · [`SAD_PATH_COVERAGE_AND_BACKLOG.md`](SAD_PATH_COVERAGE_AND_BACKLOG.md) **H-08** · WS-QUALITY **P1-MOTO-21** (foreground path only).
-
-**Next engineering owner:** [**WS-QUALITY**](CORE_PRODUCT_LOOP.md) — core loop Q2/Q3; Phase 2 SCALE/SW remains deprioritized until Q3 sign-off.
+**Tracking:** [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) **P0-N2** (tab hidden) · **P0-N2-T2** (force-quit) · `npm run notify:transport:tier1` · `npm run notify:web-push:tier2` · [`SAD_PATH_COVERAGE_AND_BACKLOG.md`](SAD_PATH_COVERAGE_AND_BACKLOG.md) **H-08**
 
 ---
 

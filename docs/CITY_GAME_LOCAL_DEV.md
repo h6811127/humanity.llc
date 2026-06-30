@@ -301,15 +301,23 @@ Self-serve seasons exit **1** from terminal mint scripts unless `--force`, `--ci
 
 ### E3 self-serve staging (Phase E gate)
 
-Human gate: organizer completes a **full 15-node season in the browser on staging** — no terminal mint.
+Human gate: organizer completes a **full season template in the browser on staging** — no terminal mint.
+
+| Track | Season | Node target |
+|-------|--------|---------------|
+| **Summer program (default)** | `cr_season_01_wake` | **40** nodes · browser staging on pilot season |
+| **Generic self-serve demo** | `example_city_season_01` | **15** nodes · `auto_rules_page` rules publish |
 
 ```bash
 npm run city-game:self-serve-staging-preflight
-npm run city-game:self-serve-staging-preflight -- --season example_city_season_01
+npm run city-game:self-serve-staging-preflight -- --season cr_season_01_wake
+npm run city-game:self-serve-staging-preflight -- --season example_city_season_01 --no-browser-staging
 API_ORIGIN=https://humanity.llc npm run city-game:self-serve-staging-preflight -- --profile-id <season_root_profile_id>
-npm run city-game:self-serve-staging-preflight -- --profile-id <id> --expect-complete   # sign-off when done
+npm run city-game:self-serve-staging-preflight -- --profile-id <id> --metadata-draft ./city-game-*-metadata-draft.json --expect-complete
 ```
 
-Walkthrough (browser only): `/create/` root → `/created/` bulk import 15 nodes → issue QRs → rules publish → deploy preview → spot-scan `node_01`, `node_04`, `node_07` on staging WebKit.
+Preflight defaults to **`cr_season_01_wake`** (40-node Cedar Rapids summer). Pass `--metadata-draft` with the JSON downloaded from **Route unlock edges → Download season metadata JSON** so window and unlock graph checks match your browser draft. With **`--profile-id`**, preflight also calls **`GET …/relationship-edges`** and blocks E3 until **Publish scan graph edges** has signed every draft edge on Live (witness + unlock). Cedar Rapids pilot uses **`--browser-staging`** (default for CR); self-serve example seasons pass **`--no-browser-staging`**.
+
+Walkthrough (browser only): `/create/` root → `/created/` bulk import full template → issue QRs → print/install pack → route unlock edges → **Publish scan graph edges** → rules publish (example) or launch window draft (CR) → deploy preview → spot-scan `node_01`, `node_04`, `node_07` on staging WebKit.
 
 **Multi-phone LAN:** `npm run city-game:lan-hub -- --write-dev-vars` → one bookmark on each phone.

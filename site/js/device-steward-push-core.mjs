@@ -144,3 +144,98 @@ export function stewardPushInFallbackCooldown(lastDownAt, now = Date.now()) {
   if (!lastDownAt) return false;
   return now - lastDownAt < STEWARD_PUSH_DOWN_FALLBACK_MS;
 }
+
+/**
+ * @param {PushMessageData | null | undefined} data
+ * @returns {Promise<StewardPushEventPayload | null>}
+ */
+export async function parseWebPushMessageData(data) {
+  if (!data) return null;
+  try {
+    const json = await data.json();
+    if (json && typeof json === "object") {
+      const type = typeof json.type === "string" ? json.type : "";
+      if (type) return /** @type {StewardPushEventPayload} */ (json);
+    }
+  } catch {
+    /* fall through to text */
+  }
+  try {
+    const text = await data.text();
+    return parseStewardPushEventPayload(text);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * @param {string} base64String URL-safe base64 VAPID public key
+ * @returns {Uint8Array}
+ */
+export function urlBase64ToUint8Array(base64String) {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+  const raw = atob(base64);
+  const out = new Uint8Array(raw.length);
+  for (let i = 0; i < raw.length; i += 1) out[i] = raw.charCodeAt(i);
+  return out;
+}
+
+/**
+ * @param {PushSubscription} subscription
+ */
+export function serializePushSubscriptionForSubscribe(subscription) {
+  const json = subscription.toJSON();
+  return {
+    endpoint: json.endpoint ?? "",
+    keys: {
+      p256dh: json.keys?.p256dh ?? "",
+      auth: json.keys?.auth ?? "",
+    },
+    expirationTime: subscription.expirationTime ?? null,
+  };
+}
+
+/**
+ * Web Push works without a visible tab (Tier 2 force-quit path).
+ *
+ * @param {{
+ *   pushEntitled: boolean,
+ *   browserAlertsEnabled: boolean,
+ *   hasSession: boolean,
+ *   vapidPublicKey?: string | null,
+ * }} input
+ */
+export function shouldMaintainStewardWebPushSubscription(input) {
+  if (!input.pushEntitled) return false;
+  if (!input.browserAlertsEnabled) return false;
+  if (!input.hasSession) return false;
+  const key =
+    typeof input.vapidPublicKey === "string" ? input.vapidPublicKey.trim() : "";
+  return key.length > 0;
+}
+
+/**
+ * @param {Record<string, unknown> | null | undefined} capabilitiesBody
+ */
+export function stewardWebPushVapidPublicKeyFromCapabilities(capabilitiesBody) {
+  const extensions =
+    capabilitiesBody?.extensions &&
+    typeof capabilitiesBody.extensions === "object"
+      ? capabilitiesBody.extensions
+      : null;
+  const hosted =
+    extensions?.hosted_steward &&
+    typeof extensions.hosted_steward === "object"
+      ? extensions.hosted_steward
+      : null;
+  const webPush =
+    hosted?.web_push && typeof hosted.web_push === "object"
+      ? hosted.web_push
+      : null;
+  const key =
+    typeof webPush?.vapid_public_key === "string"
+      ? webPush.vapid_public_key.trim()
+      : "";
+  return key || null;
+}

@@ -58,6 +58,13 @@
     0 8px 24px rgba(0, 0, 0, 0.08),
     0 18px 44px rgba(0, 0, 0, 0.1);
   --hc-scan-hero-fill: linear-gradient(160deg, #ffffff 0%, #fafafa 50%, #f5f5f7 100%);
+  --hc-scan-hero-fill-glass: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(250, 250, 252, 0.84) 50%,
+    rgba(245, 245, 247, 0.88) 100%
+  );
+  --hc-scan-hero-backdrop: blur(18px) saturate(1.12);
   --hc-scan-hero-border: rgba(60, 60, 67, 0.14);
   /* Trust-tool / vouch / list surfaces — docs/UI_COLOR_SCHEME_STANDARD.md § Scan page surfaces */
   --hc-scan-surface-bg: #ffffff;
@@ -1805,6 +1812,114 @@ a {
   color: rgba(60, 60, 67, 0.55);
 }
 
+.scan-game-onboarding {
+  margin: 0;
+  padding: 0;
+}
+
+.scan-game-onboarding-identity {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--red, #db1b43);
+}
+
+.scan-game-onboarding-season {
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.45;
+  font-weight: 600;
+  color: rgba(60, 60, 67, 0.78);
+}
+
+.scan-game-onboarding-location {
+  margin: 0 0 6px;
+  font-size: 26px;
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.scan-game-onboarding-role {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(60, 60, 67, 0.72);
+}
+
+.scan-game-onboarding-state,
+.scan-game-onboarding-consequence,
+.scan-game-onboarding-next {
+  margin: 0 0 8px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: rgba(60, 60, 67, 0.88);
+}
+
+.scan-game-onboarding-next {
+  font-weight: 600;
+}
+
+.scan-game-onboarding-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 14px 0 0;
+}
+
+.scan-game-onboarding-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-decoration: none;
+  border: 0.5px solid transparent;
+}
+
+.scan-game-onboarding-cta--primary {
+  background: var(--red, #db1b43);
+  color: #fff;
+}
+
+.scan-game-onboarding-cta--secondary {
+  background: rgba(60, 60, 67, 0.06);
+  color: rgba(60, 60, 67, 0.92);
+  border-color: rgba(60, 60, 67, 0.14);
+}
+
+.scan-game-onboarding .scan-game-privacy-tagline {
+  margin-top: 12px;
+}
+
+.scan-game-state-details,
+.scan-game-trust-details {
+  margin: 14px 0 0;
+  border-radius: 12px;
+  border: 0.5px solid rgba(60, 60, 67, 0.12);
+  background: rgba(60, 60, 67, 0.03);
+}
+
+.scan-game-state-summary,
+.scan-game-trust-summary {
+  padding: 12px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+}
+
+.scan-game-state-panel,
+.scan-game-trust-panel {
+  padding: 0 14px 14px;
+}
+
 .scan-game-rules-link {
   margin: 10px 0 0;
   font-size: 13px;
@@ -1821,11 +1936,16 @@ a {
   color: rgba(60, 60, 67, 0.62);
 }
 
-.scan-game-privacy-note {
+.scan-game-privacy-note,
+.scan-game-privacy-tagline {
   margin: 8px 0 0;
   font-size: 12px;
   line-height: 1.45;
   color: rgba(60, 60, 67, 0.62);
+}
+
+.scan-game-privacy-tagline {
+  font-weight: 600;
 }
 
 .scan-game-contribute {
@@ -3280,9 +3400,27 @@ body.scan-page-dot-glance-open {
 
 .scan-hero.scan-status-panel {
   padding: 22px 20px 18px;
-  background: var(--hc-scan-hero-fill);
+  background: var(--hc-scan-hero-fill-glass);
   border: 0.5px solid var(--hc-scan-hero-border);
   box-shadow: var(--hc-scan-hero-shadow);
+  -webkit-backdrop-filter: var(--hc-scan-hero-backdrop);
+  backdrop-filter: var(--hc-scan-hero-backdrop);
+}
+
+@supports not (
+  (-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))
+) {
+  .scan-hero.scan-status-panel {
+    background: var(--hc-scan-hero-fill);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .scan-hero.scan-status-panel {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: var(--hc-scan-hero-fill);
+  }
 }
 
 .scan-status-head {
@@ -3469,6 +3607,13 @@ html[data-theme="dark"] {
     0 10px 28px rgba(0, 0, 0, 0.52),
     0 20px 52px rgba(0, 0, 0, 0.36);
   --hc-scan-hero-fill: linear-gradient(160deg, #2c2c2e 0%, #1c1c1e 55%, #1a1a1c 100%);
+  --hc-scan-hero-fill-glass: linear-gradient(
+    160deg,
+    rgba(44, 44, 46, 0.86) 0%,
+    rgba(28, 28, 30, 0.8) 55%,
+    rgba(26, 26, 28, 0.84) 100%
+  );
+  --hc-scan-hero-backdrop: blur(18px) saturate(1.12);
   --hc-scan-hero-border: rgba(255, 255, 255, 0.12);
   --hc-emphasis-card-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.24),
@@ -3559,7 +3704,7 @@ html[data-theme="dark"] .scan-status-panel:not(.scan-hero) {
 }
 
 html[data-theme="dark"] .scan-hero.scan-status-panel {
-  background: var(--hc-scan-hero-fill);
+  background: var(--hc-scan-hero-fill-glass);
   border-color: var(--hc-scan-hero-border);
   box-shadow: var(--hc-scan-hero-shadow);
 }
@@ -3578,6 +3723,7 @@ html[data-theme="dark"] .scan-hero .scan-safety-resolver,
 html[data-theme="dark"] .scan-hero .scan-hero-limit,
 html[data-theme="dark"] .scan-hero .scan-hero-foot,
 html[data-theme="dark"] .scan-hero .scan-game-privacy-note,
+html[data-theme="dark"] .scan-hero .scan-game-privacy-tagline,
 html[data-theme="dark"] .scan-hero .scan-game-contribute-lead,
 html[data-theme="dark"] .scan-hero .scan-game-contribute-note,
 html[data-theme="dark"] .scan-hero .scan-game-contribute-progress-label,
@@ -3649,6 +3795,10 @@ html[data-theme="dark"] .hc-emphasis-card--urgent {
 }
 
 @media (prefers-reduced-transparency: reduce) {
+  html[data-theme="dark"] .scan-hero.scan-status-panel {
+    background: var(--hc-scan-hero-fill);
+  }
+
   html[data-theme="dark"] .hc-emphasis-card--active {
     background: var(--hc-emphasis-card-fill-active);
   }
@@ -3912,7 +4062,7 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
     </div>
     <p class="scan-offline-banner" id="scan-offline-banner" role="status" hidden>Offline - status may be stale; refresh when connected.</p>
     <p class="scan-truth-unverified-banner" id="scan-truth-unverified-banner" role="alert" hidden></p>
-    <p class="scan-freshness-banner" id="scan-freshness-banner" role="status" hidden data-fetched-at="2026-06-05T12:33:54.401Z" data-max-age-seconds="30" data-source="resolver">This response was built by the resolver at fetch time. Cached or offline copies may be older — open the URL again for current signed state.</p>
+    <p class="scan-freshness-banner" id="scan-freshness-banner" role="status" hidden data-fetched-at="2026-06-22T03:16:45.053Z" data-max-age-seconds="30" data-source="resolver">This response was built by the resolver at fetch time. Cached or offline copies may be older — open the URL again for current signed state.</p>
     <main class="screen scan-screen">
       <div class="scan-pass-layer">
 <article class="scan-hero scan-status-panel scan-safety-header scan-live-check--pending" id="scan-safety-header" aria-label="Live check" data-profile-id="7Xk9mP2nQ4rT6vW8yZ1aB3cD5" data-qr-id="qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5" data-ssr-scan-kind="active" data-scan-active="1">
@@ -3947,7 +4097,7 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
   
   <details class="scan-hero-qr-details">
   <summary class="scan-hero-qr-summary">This QR</summary>
-  <div class="scan-hero-qr pass-qr scan-status-qr" id="pass-qr-slot" data-scan-url="http://127.0.0.1:8788/c/7Xk9mP2nQ4rT6vW8yZ1aB3cD5?q=qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5"><div class="hc-qr-frame pass-qr-svg" role="img" aria-label="QR code for this Humanity live object scan link"><svg class="hc-qr-frame-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 91.5" role="presentation" aria-hidden="true"><rect width="60" height="91.5" rx="3" fill="#ffffff"/><rect x="1.275" y="1.275" width="57.45" height="88.95" rx="2.475" fill="none" stroke="#db1b43" stroke-width="1.5"/><g transform="translate(5.5 5.5)"><path fill="#ffffff" d="M0 0h49v49H0z"/><path stroke="#db1b43" d="M2 2.5h7m1 0h5m6 0h1m6 0h1m4 0h1m4 0h1m1 0h7M2 3.5h1m5 0h1m2 0h2m1 0h5m2 0h1m1 0h4m1 0h1m3 0h1m4 0h1m2 0h1m5 0h1M2 4.5h1m1 0h3m1 0h1m2 0h1m2 0h2m4 0h1m1 0h3m2 0h2m1 0h3m2 0h1m1 0h1m2 0h1m1 0h3m1 0h1M2 5.5h1m1 0h3m1 0h1m2 0h3m1 0h2m1 0h1m2 0h2m2 0h2m1 0h8m1 0h2m1 0h1m1 0h3m1 0h1M2 6.5h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h1m3 0h12m3 0h5m1 0h1m1 0h3m1 0h1M2 7.5h1m5 0h1m1 0h2m7 0h1m2 0h1m3 0h1m5 0h3m5 0h1m5 0h1M2 8.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M14 9.5h1m2 0h1m1 0h1m1 0h2m3 0h2m4 0h1m1 0h1m2 0h2M3 10.5h7m1 0h3m2 0h1m2 0h2m1 0h5m1 0h2m1 0h1m1 0h1m2 0h1m1 0h1m2 0h2m3 0h1M5 11.5h3m2 0h6m2 0h1m5 0h1m5 0h1m2 0h3m1 0h3m1 0h1m2 0h1m1 0h1M2 12.5h2m3 0h2m1 0h2m1 0h1m2 0h7m1 0h2m1 0h1m1 0h1m2 0h2m1 0h6m2 0h1M2 13.5h1m2 0h3m2 0h2m2 0h1m1 0h1m2 0h1m2 0h1m8 0h2m1 0h2m1 0h2m1 0h1m1 0h1m1 0h3M3 14.5h3m1 0h2m1 0h3m3 0h3m3 0h3m2 0h2m1 0h3m2 0h1m3 0h1m1 0h1m1 0h1M3 15.5h1m3 0h1m2 0h2m1 0h2m3 0h1m1 0h2m2 0h1m3 0h4m1 0h3m4 0h7M2 16.5h1m3 0h1m1 0h2m5 0h4m2 0h3m2 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h1m3 0h4M2 17.5h3m1 0h1m9 0h1m1 0h2m4 0h3m2 0h6m3 0h1m2 0h2m1 0h3M2 18.5h2m1 0h4m1 0h1m2 0h1m3 0h2m1 0h1m1 0h2m3 0h3m1 0h3m2 0h5m1 0h1m1 0h2M2 19.5h6m6 0h2m6 0h3m1 0h1m2 0h5m2 0h1m2 0h1m1 0h4m1 0h1M8 20.5h1m2 0h1m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h1m1 0h1m1 0h2m1 0h1m5 0h2M3 21.5h2m1 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h4m2 0h2m5 0h3m3 0h1m2 0h1m2 0h1M3 22.5h2m1 0h5m1 0h1m2 0h2m1 0h2m1 0h7m1 0h1m1 0h3m1 0h8m2 0h1M4 23.5h1m1 0h1m3 0h1m2 0h5m1 0h2m1 0h1m3 0h1m5 0h4m2 0h1m3 0h1m2 0h1M3 24.5h2m1 0h1m1 0h1m1 0h5m1 0h1m3 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m3 0h3m1 0h1m1 0h1m1 0h1M2 25.5h2m2 0h1m3 0h1m2 0h1m2 0h7m3 0h2m3 0h2m2 0h1m2 0h1m3 0h3m1 0h1M3 26.5h2m1 0h8m1 0h5m1 0h6m2 0h3m4 0h8m1 0h1M4 27.5h1m1 0h1m2 0h3m1 0h1m2 0h4m5 0h1m2 0h1m1 0h1m3 0h1m2 0h4m3 0h2M5 28.5h1m1 0h2m3 0h1m1 0h2m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h2m1 0h2m1 0h1m1 0h4M5 29.5h1m3 0h1m2 0h1m1 0h1m1 0h3m1 0h1m2 0h2m1 0h1m2 0h1m1 0h3m1 0h1m3 0h1m4 0h1m1 0h1M8 30.5h1m1 0h2m9 0h6m2 0h2m5 0h1m2 0h1m4 0h2M2 31.5h3m1 0h1m2 0h2m2 0h1m1 0h1m1 0h1m4 0h2m9 0h1m2 0h4m1 0h1m1 0h2m1 0h1M2 32.5h2m1 0h1m2 0h1m3 0h1m2 0h1m1 0h1m2 0h1m1 0h3m2 0h2m2 0h1M3 33.5h5m2 0h4m1 0h3m1 0h2m3 0h2m3 0h4m1 0h1m2 0h1m1 0h1m3 0h1M5 34.5h1m1 0h2m3 0h8m3 0h1m1 0h3m1 0h3m1 0h1m3 0h1m1 0h1m5 0h1M2 35.5h2m5 0h1m1 0h1m1 0h1m2 0h9m3 0h1m4 0h2m2 0h2m2 0h1m1 0h2M6 36.5h1m1 0h1m3 0h1m1 0h1m2 0h1m2 0h4m1 0h1m1 0h2m2 0h2m2 0h1m2 0h2m1 0h2M3 37.5h4m3 0h2m1 0h3m4 0h3m2 0h4m3 0h2m2 0h3m2 0h2m1 0h2M2 38.5h1m2 0h2m1 0h2m2 0h2m1 0h1m2 0h1m1 0h1m1 0h10m3 0h2m1 0h6m1 0h1M10 39.5h1m1 0h2m1 0h1m3 0h1m1 0h2m3 0h3m1 0h5m1 0h3m3 0h1m1 0h1M2 40.5h7m1 0h2m1 0h1m4 0h1m3 0h1m1 0h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m1 0h2M2 41.5h1m5 0h1m1 0h2m1 0h2m1 0h1m3 0h3m3 0h2m2 0h1m1 0h1m1 0h1m2 0h2m3 0h1m1 0h1m1 0h1M2 42.5h1m1 0h3m1 0h1m1 0h4m1 0h1m3 0h9m3 0h1m1 0h1m2 0h1m1 0h5m2 0h2M2 43.5h1m1 0h3m1 0h1m1 0h1m3 0h2m5 0h3m1 0h1m7 0h2m1 0h1m1 0h1m3 0h1m1 0h1M2 44.5h1m1 0h3m1 0h1m1 0h1m1 0h1m3 0h2m4 0h1m2 0h5m2 0h2m2 0h3m4 0h1M2 45.5h1m5 0h1m1 0h1m5 0h1m3 0h1m1 0h2m1 0h1m2 0h2m1 0h1m1 0h3m1 0h1m3 0h1m2 0h1M2 46.5h7m2 0h1m3 0h1m1 0h2m2 0h1m1 0h1m1 0h1m2 0h1m1 0h1m2 0h4m1 0h1m1 0h1m2 0h1m1 0h1"/><defs><mask id="hc-qr-finder-logo-mask-idynmq2765" maskUnits="userSpaceOnUse" mask-type="alpha"><path stroke="#db1b43" d="M2 2.5h7m1 0h5m6 0h1m6 0h1m4 0h1m4 0h1m1 0h7M2 3.5h1m5 0h1m2 0h2m1 0h5m2 0h1m1 0h4m1 0h1m3 0h1m4 0h1m2 0h1m5 0h1M2 4.5h1m1 0h3m1 0h1m2 0h1m2 0h2m4 0h1m1 0h3m2 0h2m1 0h3m2 0h1m1 0h1m2 0h1m1 0h3m1 0h1M2 5.5h1m1 0h3m1 0h1m2 0h3m1 0h2m1 0h1m2 0h2m2 0h2m1 0h8m1 0h2m1 0h1m1 0h3m1 0h1M2 6.5h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h1m3 0h12m3 0h5m1 0h1m1 0h3m1 0h1M2 7.5h1m5 0h1m1 0h2m7 0h1m2 0h1m3 0h1m5 0h3m5 0h1m5 0h1M2 8.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M14 9.5h1m2 0h1m1 0h1m1 0h2m3 0h2m4 0h1m1 0h1m2 0h2M3 10.5h7m1 0h3m2 0h1m2 0h2m1 0h5m1 0h2m1 0h1m1 0h1m2 0h1m1 0h1m2 0h2m3 0h1M5 11.5h3m2 0h6m2 0h1m5 0h1m5 0h1m2 0h3m1 0h3m1 0h1m2 0h1m1 0h1M2 12.5h2m3 0h2m1 0h2m1 0h1m2 0h7m1 0h2m1 0h1m1 0h1m2 0h2m1 0h6m2 0h1M2 13.5h1m2 0h3m2 0h2m2 0h1m1 0h1m2 0h1m2 0h1m8 0h2m1 0h2m1 0h2m1 0h1m1 0h1m1 0h3M3 14.5h3m1 0h2m1 0h3m3 0h3m3 0h3m2 0h2m1 0h3m2 0h1m3 0h1m1 0h1m1 0h1M3 15.5h1m3 0h1m2 0h2m1 0h2m3 0h1m1 0h2m2 0h1m3 0h4m1 0h3m4 0h7M2 16.5h1m3 0h1m1 0h2m5 0h4m2 0h3m2 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h1m3 0h4M2 17.5h3m1 0h1m9 0h1m1 0h2m4 0h3m2 0h6m3 0h1m2 0h2m1 0h3M2 18.5h2m1 0h4m1 0h1m2 0h1m3 0h2m1 0h1m1 0h2m3 0h3m1 0h3m2 0h5m1 0h1m1 0h2M2 19.5h6m6 0h2m6 0h3m1 0h1m2 0h5m2 0h1m2 0h1m1 0h4m1 0h1M8 20.5h1m2 0h1m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h1m1 0h1m1 0h2m1 0h1m5 0h2M3 21.5h2m1 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h4m2 0h2m5 0h3m3 0h1m2 0h1m2 0h1M3 22.5h2m1 0h5m1 0h1m2 0h2m1 0h2m1 0h7m1 0h1m1 0h3m1 0h8m2 0h1M4 23.5h1m1 0h1m3 0h1m2 0h5m1 0h2m1 0h1m3 0h1m5 0h4m2 0h1m3 0h1m2 0h1M3 24.5h2m1 0h1m1 0h1m1 0h5m1 0h1m3 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m3 0h3m1 0h1m1 0h1m1 0h1M2 25.5h2m2 0h1m3 0h1m2 0h1m2 0h7m3 0h2m3 0h2m2 0h1m2 0h1m3 0h3m1 0h1M3 26.5h2m1 0h8m1 0h5m1 0h6m2 0h3m4 0h8m1 0h1M4 27.5h1m1 0h1m2 0h3m1 0h1m2 0h4m5 0h1m2 0h1m1 0h1m3 0h1m2 0h4m3 0h2M5 28.5h1m1 0h2m3 0h1m1 0h2m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h2m1 0h2m1 0h1m1 0h4M5 29.5h1m3 0h1m2 0h1m1 0h1m1 0h3m1 0h1m2 0h2m1 0h1m2 0h1m1 0h3m1 0h1m3 0h1m4 0h1m1 0h1M8 30.5h1m1 0h2m9 0h6m2 0h2m5 0h1m2 0h1m4 0h2M2 31.5h3m1 0h1m2 0h2m2 0h1m1 0h1m1 0h1m4 0h2m9 0h1m2 0h4m1 0h1m1 0h2m1 0h1M2 32.5h2m1 0h1m2 0h1m3 0h1m2 0h1m1 0h1m2 0h1m1 0h3m2 0h2m2 0h1M3 33.5h5m2 0h4m1 0h3m1 0h2m3 0h2m3 0h4m1 0h1m2 0h1m1 0h1m3 0h1M5 34.5h1m1 0h2m3 0h8m3 0h1m1 0h3m1 0h3m1 0h1m3 0h1m1 0h1m5 0h1M2 35.5h2m5 0h1m1 0h1m1 0h1m2 0h9m3 0h1m4 0h2m2 0h2m2 0h1m1 0h2M6 36.5h1m1 0h1m3 0h1m1 0h1m2 0h1m2 0h4m1 0h1m1 0h2m2 0h2m2 0h1m2 0h2m1 0h2M3 37.5h4m3 0h2m1 0h3m4 0h3m2 0h4m3 0h2m2 0h3m2 0h2m1 0h2M2 38.5h1m2 0h2m1 0h2m2 0h2m1 0h1m2 0h1m1 0h1m1 0h10m3 0h2m1 0h6m1 0h1M10 39.5h1m1 0h2m1 0h1m3 0h1m1 0h2m3 0h3m1 0h5m1 0h3m3 0h1m1 0h1M2 40.5h7m1 0h2m1 0h1m4 0h1m3 0h1m1 0h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m1 0h2M2 41.5h1m5 0h1m1 0h2m1 0h2m1 0h1m3 0h3m3 0h2m2 0h1m1 0h1m1 0h1m2 0h2m3 0h1m1 0h1m1 0h1M2 42.5h1m1 0h3m1 0h1m1 0h4m1 0h1m3 0h9m3 0h1m1 0h1m2 0h1m1 0h5m2 0h2M2 43.5h1m1 0h3m1 0h1m1 0h1m3 0h2m5 0h3m1 0h1m7 0h2m1 0h1m1 0h1m3 0h1m1 0h1M2 44.5h1m1 0h3m1 0h1m1 0h1m1 0h1m3 0h2m4 0h1m2 0h5m2 0h2m2 0h3m4 0h1M2 45.5h1m5 0h1m1 0h1m5 0h1m3 0h1m1 0h2m1 0h1m2 0h2m1 0h1m1 0h3m1 0h1m3 0h1m2 0h1M2 46.5h7m2 0h1m3 0h1m1 0h2m2 0h1m1 0h1m1 0h1m2 0h1m1 0h1m2 0h4m1 0h1m1 0h1m2 0h1m1 0h1"/></mask></defs><g class="hc-qr-finder-logo" aria-hidden="true" mask="url(#hc-qr-finder-logo-mask-idynmq2765)"><circle class="hc-qr-finder-logo-outer" cx="5.5" cy="5.5" r="5.145" fill="#c9979f" opacity="0.52"/><circle class="hc-qr-finder-logo-inner" cx="5.5" cy="5.5" r="2.3667" fill="#141414" opacity="0.9"/></g></g><text class="hc-qr-frame-pill-text" x="30" y="62.98" text-anchor="middle" font-family="system-ui,sans-serif" font-size="5.5" font-weight="600" letter-spacing="0.14em" fill="#db1b43">LIVE OBJECT</text><text class="hc-qr-frame-footer-text" x="30" y="75" text-anchor="middle" font-family="system-ui,sans-serif" font-size="5" font-weight="500" fill="#8a8a8a">humanity.llc</text><text class="hc-qr-frame-code-text" x="30" y="85.26" text-anchor="middle" font-family="ui-monospace,monospace" font-size="5" font-weight="600" letter-spacing="0.08em" fill="#db1b43">HC-CWWX-HPK0</text></svg></div><p class="pass-credential-code mono" aria-label="Credential code for print verification">HC-CWWX-HPK0</p></div>
+  <div class="scan-hero-qr pass-qr scan-status-qr" id="pass-qr-slot" data-scan-url="http://127.0.0.1:8788/c/7Xk9mP2nQ4rT6vW8yZ1aB3cD5?q=qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5"><div class="hc-qr-frame pass-qr-svg" role="img" aria-label="QR code for this Humanity live object scan link"><svg class="hc-qr-frame-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 91.5" role="presentation" aria-hidden="true"><rect width="60" height="91.5" rx="3" fill="#ffffff"/><rect x="1.275" y="1.275" width="57.45" height="88.95" rx="2.475" fill="none" stroke="#db1b43" stroke-width="1.5"/><g transform="translate(5.5 5.5)"><path fill="#ffffff" d="M0 0h49v49H0z"/><path stroke="#db1b43" d="M2 2.5h7m1 0h5m6 0h1m6 0h1m4 0h1m4 0h1m1 0h7M2 3.5h1m5 0h1m2 0h2m1 0h5m2 0h1m1 0h4m1 0h1m3 0h1m4 0h1m2 0h1m5 0h1M2 4.5h1m1 0h3m1 0h1m2 0h1m2 0h2m4 0h1m1 0h3m2 0h2m1 0h3m2 0h1m1 0h1m2 0h1m1 0h3m1 0h1M2 5.5h1m1 0h3m1 0h1m2 0h3m1 0h2m1 0h1m2 0h2m2 0h2m1 0h8m1 0h2m1 0h1m1 0h3m1 0h1M2 6.5h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h1m3 0h12m3 0h5m1 0h1m1 0h3m1 0h1M2 7.5h1m5 0h1m1 0h2m7 0h1m2 0h1m3 0h1m5 0h3m5 0h1m5 0h1M2 8.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M14 9.5h1m2 0h1m1 0h1m1 0h2m3 0h2m4 0h1m1 0h1m2 0h2M3 10.5h7m1 0h3m2 0h1m2 0h2m1 0h5m1 0h2m1 0h1m1 0h1m2 0h1m1 0h1m2 0h2m3 0h1M5 11.5h3m2 0h6m2 0h1m5 0h1m5 0h1m2 0h3m1 0h3m1 0h1m2 0h1m1 0h1M2 12.5h2m3 0h2m1 0h2m1 0h1m2 0h7m1 0h2m1 0h1m1 0h1m2 0h2m1 0h6m2 0h1M2 13.5h1m2 0h3m2 0h2m2 0h1m1 0h1m2 0h1m2 0h1m8 0h2m1 0h2m1 0h2m1 0h1m1 0h1m1 0h3M3 14.5h3m1 0h2m1 0h3m3 0h3m3 0h3m2 0h2m1 0h3m2 0h1m3 0h1m1 0h1m1 0h1M3 15.5h1m3 0h1m2 0h2m1 0h2m3 0h1m1 0h2m2 0h1m3 0h4m1 0h3m4 0h7M2 16.5h1m3 0h1m1 0h2m5 0h4m2 0h3m2 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h1m3 0h4M2 17.5h3m1 0h1m9 0h1m1 0h2m4 0h3m2 0h6m3 0h1m2 0h2m1 0h3M2 18.5h2m1 0h4m1 0h1m2 0h1m3 0h2m1 0h1m1 0h2m3 0h3m1 0h3m2 0h5m1 0h1m1 0h2M2 19.5h6m6 0h2m6 0h3m1 0h1m2 0h5m2 0h1m2 0h1m1 0h4m1 0h1M8 20.5h1m2 0h1m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h1m1 0h1m1 0h2m1 0h1m5 0h2M3 21.5h2m1 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h4m2 0h2m5 0h3m3 0h1m2 0h1m2 0h1M3 22.5h2m1 0h5m1 0h1m2 0h2m1 0h2m1 0h7m1 0h1m1 0h3m1 0h8m2 0h1M4 23.5h1m1 0h1m3 0h1m2 0h5m1 0h2m1 0h1m3 0h1m5 0h4m2 0h1m3 0h1m2 0h1M3 24.5h2m1 0h1m1 0h1m1 0h5m1 0h1m3 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m3 0h3m1 0h1m1 0h1m1 0h1M2 25.5h2m2 0h1m3 0h1m2 0h1m2 0h7m3 0h2m3 0h2m2 0h1m2 0h1m3 0h3m1 0h1M3 26.5h2m1 0h8m1 0h5m1 0h6m2 0h3m4 0h8m1 0h1M4 27.5h1m1 0h1m2 0h3m1 0h1m2 0h4m5 0h1m2 0h1m1 0h1m3 0h1m2 0h4m3 0h2M5 28.5h1m1 0h2m3 0h1m1 0h2m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h2m1 0h2m1 0h1m1 0h4M5 29.5h1m3 0h1m2 0h1m1 0h1m1 0h3m1 0h1m2 0h2m1 0h1m2 0h1m1 0h3m1 0h1m3 0h1m4 0h1m1 0h1M8 30.5h1m1 0h2m9 0h6m2 0h2m5 0h1m2 0h1m4 0h2M2 31.5h3m1 0h1m2 0h2m2 0h1m1 0h1m1 0h1m4 0h2m9 0h1m2 0h4m1 0h1m1 0h2m1 0h1M2 32.5h2m1 0h1m2 0h1m3 0h1m2 0h1m1 0h1m2 0h1m1 0h3m2 0h2m2 0h1M3 33.5h5m2 0h4m1 0h3m1 0h2m3 0h2m3 0h4m1 0h1m2 0h1m1 0h1m3 0h1M5 34.5h1m1 0h2m3 0h8m3 0h1m1 0h3m1 0h3m1 0h1m3 0h1m1 0h1m5 0h1M2 35.5h2m5 0h1m1 0h1m1 0h1m2 0h9m3 0h1m4 0h2m2 0h2m2 0h1m1 0h2M6 36.5h1m1 0h1m3 0h1m1 0h1m2 0h1m2 0h4m1 0h1m1 0h2m2 0h2m2 0h1m2 0h2m1 0h2M3 37.5h4m3 0h2m1 0h3m4 0h3m2 0h4m3 0h2m2 0h3m2 0h2m1 0h2M2 38.5h1m2 0h2m1 0h2m2 0h2m1 0h1m2 0h1m1 0h1m1 0h10m3 0h2m1 0h6m1 0h1M10 39.5h1m1 0h2m1 0h1m3 0h1m1 0h2m3 0h3m1 0h5m1 0h3m3 0h1m1 0h1M2 40.5h7m1 0h2m1 0h1m4 0h1m3 0h1m1 0h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m1 0h2M2 41.5h1m5 0h1m1 0h2m1 0h2m1 0h1m3 0h3m3 0h2m2 0h1m1 0h1m1 0h1m2 0h2m3 0h1m1 0h1m1 0h1M2 42.5h1m1 0h3m1 0h1m1 0h4m1 0h1m3 0h9m3 0h1m1 0h1m2 0h1m1 0h5m2 0h2M2 43.5h1m1 0h3m1 0h1m1 0h1m3 0h2m5 0h3m1 0h1m7 0h2m1 0h1m1 0h1m3 0h1m1 0h1M2 44.5h1m1 0h3m1 0h1m1 0h1m1 0h1m3 0h2m4 0h1m2 0h5m2 0h2m2 0h3m4 0h1M2 45.5h1m5 0h1m1 0h1m5 0h1m3 0h1m1 0h2m1 0h1m2 0h2m1 0h1m1 0h3m1 0h1m3 0h1m2 0h1M2 46.5h7m2 0h1m3 0h1m1 0h2m2 0h1m1 0h1m1 0h1m2 0h1m1 0h1m2 0h4m1 0h1m1 0h1m2 0h1m1 0h1"/><defs><mask id="hc-qr-finder-logo-mask-bvuuwg5hozq" maskUnits="userSpaceOnUse" mask-type="alpha"><path stroke="#db1b43" d="M2 2.5h7m1 0h5m6 0h1m6 0h1m4 0h1m4 0h1m1 0h7M2 3.5h1m5 0h1m2 0h2m1 0h5m2 0h1m1 0h4m1 0h1m3 0h1m4 0h1m2 0h1m5 0h1M2 4.5h1m1 0h3m1 0h1m2 0h1m2 0h2m4 0h1m1 0h3m2 0h2m1 0h3m2 0h1m1 0h1m2 0h1m1 0h3m1 0h1M2 5.5h1m1 0h3m1 0h1m2 0h3m1 0h2m1 0h1m2 0h2m2 0h2m1 0h8m1 0h2m1 0h1m1 0h3m1 0h1M2 6.5h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h1m3 0h12m3 0h5m1 0h1m1 0h3m1 0h1M2 7.5h1m5 0h1m1 0h2m7 0h1m2 0h1m3 0h1m5 0h3m5 0h1m5 0h1M2 8.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M14 9.5h1m2 0h1m1 0h1m1 0h2m3 0h2m4 0h1m1 0h1m2 0h2M3 10.5h7m1 0h3m2 0h1m2 0h2m1 0h5m1 0h2m1 0h1m1 0h1m2 0h1m1 0h1m2 0h2m3 0h1M5 11.5h3m2 0h6m2 0h1m5 0h1m5 0h1m2 0h3m1 0h3m1 0h1m2 0h1m1 0h1M2 12.5h2m3 0h2m1 0h2m1 0h1m2 0h7m1 0h2m1 0h1m1 0h1m2 0h2m1 0h6m2 0h1M2 13.5h1m2 0h3m2 0h2m2 0h1m1 0h1m2 0h1m2 0h1m8 0h2m1 0h2m1 0h2m1 0h1m1 0h1m1 0h3M3 14.5h3m1 0h2m1 0h3m3 0h3m3 0h3m2 0h2m1 0h3m2 0h1m3 0h1m1 0h1m1 0h1M3 15.5h1m3 0h1m2 0h2m1 0h2m3 0h1m1 0h2m2 0h1m3 0h4m1 0h3m4 0h7M2 16.5h1m3 0h1m1 0h2m5 0h4m2 0h3m2 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h1m3 0h4M2 17.5h3m1 0h1m9 0h1m1 0h2m4 0h3m2 0h6m3 0h1m2 0h2m1 0h3M2 18.5h2m1 0h4m1 0h1m2 0h1m3 0h2m1 0h1m1 0h2m3 0h3m1 0h3m2 0h5m1 0h1m1 0h2M2 19.5h6m6 0h2m6 0h3m1 0h1m2 0h5m2 0h1m2 0h1m1 0h4m1 0h1M8 20.5h1m2 0h1m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h1m1 0h1m1 0h2m1 0h1m5 0h2M3 21.5h2m1 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h4m2 0h2m5 0h3m3 0h1m2 0h1m2 0h1M3 22.5h2m1 0h5m1 0h1m2 0h2m1 0h2m1 0h7m1 0h1m1 0h3m1 0h8m2 0h1M4 23.5h1m1 0h1m3 0h1m2 0h5m1 0h2m1 0h1m3 0h1m5 0h4m2 0h1m3 0h1m2 0h1M3 24.5h2m1 0h1m1 0h1m1 0h5m1 0h1m3 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m3 0h3m1 0h1m1 0h1m1 0h1M2 25.5h2m2 0h1m3 0h1m2 0h1m2 0h7m3 0h2m3 0h2m2 0h1m2 0h1m3 0h3m1 0h1M3 26.5h2m1 0h8m1 0h5m1 0h6m2 0h3m4 0h8m1 0h1M4 27.5h1m1 0h1m2 0h3m1 0h1m2 0h4m5 0h1m2 0h1m1 0h1m3 0h1m2 0h4m3 0h2M5 28.5h1m1 0h2m3 0h1m1 0h2m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h2m1 0h2m1 0h1m1 0h4M5 29.5h1m3 0h1m2 0h1m1 0h1m1 0h3m1 0h1m2 0h2m1 0h1m2 0h1m1 0h3m1 0h1m3 0h1m4 0h1m1 0h1M8 30.5h1m1 0h2m9 0h6m2 0h2m5 0h1m2 0h1m4 0h2M2 31.5h3m1 0h1m2 0h2m2 0h1m1 0h1m1 0h1m4 0h2m9 0h1m2 0h4m1 0h1m1 0h2m1 0h1M2 32.5h2m1 0h1m2 0h1m3 0h1m2 0h1m1 0h1m2 0h1m1 0h3m2 0h2m2 0h1M3 33.5h5m2 0h4m1 0h3m1 0h2m3 0h2m3 0h4m1 0h1m2 0h1m1 0h1m3 0h1M5 34.5h1m1 0h2m3 0h8m3 0h1m1 0h3m1 0h3m1 0h1m3 0h1m1 0h1m5 0h1M2 35.5h2m5 0h1m1 0h1m1 0h1m2 0h9m3 0h1m4 0h2m2 0h2m2 0h1m1 0h2M6 36.5h1m1 0h1m3 0h1m1 0h1m2 0h1m2 0h4m1 0h1m1 0h2m2 0h2m2 0h1m2 0h2m1 0h2M3 37.5h4m3 0h2m1 0h3m4 0h3m2 0h4m3 0h2m2 0h3m2 0h2m1 0h2M2 38.5h1m2 0h2m1 0h2m2 0h2m1 0h1m2 0h1m1 0h1m1 0h10m3 0h2m1 0h6m1 0h1M10 39.5h1m1 0h2m1 0h1m3 0h1m1 0h2m3 0h3m1 0h5m1 0h3m3 0h1m1 0h1M2 40.5h7m1 0h2m1 0h1m4 0h1m3 0h1m1 0h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m1 0h2M2 41.5h1m5 0h1m1 0h2m1 0h2m1 0h1m3 0h3m3 0h2m2 0h1m1 0h1m1 0h1m2 0h2m3 0h1m1 0h1m1 0h1M2 42.5h1m1 0h3m1 0h1m1 0h4m1 0h1m3 0h9m3 0h1m1 0h1m2 0h1m1 0h5m2 0h2M2 43.5h1m1 0h3m1 0h1m1 0h1m3 0h2m5 0h3m1 0h1m7 0h2m1 0h1m1 0h1m3 0h1m1 0h1M2 44.5h1m1 0h3m1 0h1m1 0h1m1 0h1m3 0h2m4 0h1m2 0h5m2 0h2m2 0h3m4 0h1M2 45.5h1m5 0h1m1 0h1m5 0h1m3 0h1m1 0h2m1 0h1m2 0h2m1 0h1m1 0h3m1 0h1m3 0h1m2 0h1M2 46.5h7m2 0h1m3 0h1m1 0h2m2 0h1m1 0h1m1 0h1m2 0h1m1 0h1m2 0h4m1 0h1m1 0h1m2 0h1m1 0h1"/></mask></defs><g class="hc-qr-finder-logo" aria-hidden="true" mask="url(#hc-qr-finder-logo-mask-bvuuwg5hozq)"><circle class="hc-qr-finder-logo-outer" cx="5.5" cy="5.5" r="5.145" fill="#c9979f" opacity="0.52"/><circle class="hc-qr-finder-logo-inner" cx="5.5" cy="5.5" r="2.3667" fill="#141414" opacity="0.9"/></g></g><text class="hc-qr-frame-pill-text" x="30" y="62.98" text-anchor="middle" font-family="system-ui,sans-serif" font-size="5.5" font-weight="600" letter-spacing="0.14em" fill="#db1b43">LIVE OBJECT</text><text class="hc-qr-frame-footer-text" x="30" y="75" text-anchor="middle" font-family="system-ui,sans-serif" font-size="5" font-weight="500" fill="#8a8a8a">humanity.llc</text><text class="hc-qr-frame-code-text" x="30" y="85.26" text-anchor="middle" font-family="ui-monospace,monospace" font-size="5" font-weight="600" letter-spacing="0.08em" fill="#db1b43">HC-CWWX-HPK0</text></svg></div><p class="pass-credential-code mono" aria-label="Credential code for print verification">HC-CWWX-HPK0</p></div>
 </details>
 </article>
 </div>
@@ -3964,7 +4114,7 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
   <h2 class="scan-module-label">What this scan shows</h2>
   <ul class="scan-proves-list"><li>Live status returned from humanity.llc at scan time</li><li>Revocable per card and per printed-item QR on the network</li></ul>
 </section></div>
-      <details class="scan-limits-settings scan-trust-layer scan-limits-layer" id="scan-limits-settings">
+<details class="scan-limits-settings scan-trust-layer scan-limits-layer" id="scan-limits-settings">
   <summary class="scan-limits-summary">
     <span class="list-icon list-icon-tone-orange" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
     <span class="scan-limits-summary-text">
@@ -3986,7 +4136,7 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
     <p class="scan-limits-meta">No scan analytics on this page. <a href="http://127.0.0.1:8788/data-policy.html">Operator data policy</a> · <a href="http://127.0.0.1:8788/architecture.html">Architecture</a></p>
   </div>
 </details>
-      <section class="scan-trust-tools" aria-labelledby="scan-trust-tools-heading">
+<section class="scan-trust-tools" aria-labelledby="scan-trust-tools-heading">
   <header class="scan-trust-tools-head">
     <h2 id="scan-trust-tools-heading" class="scan-trust-tools-title">Check at scan time</h2>
     <p class="scan-trust-tools-lead">Open a row for card, human trust, this QR, or live control.</p>
@@ -4242,7 +4392,7 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
 </section>
   </div>
 </section>
-      <details class="scan-show-link">
+<details class="scan-show-link">
   <summary class="scan-show-link-summary">Show link</summary>
   <p class="pass-scan-url mono">http://127.0.0.1:8788/c/7Xk9mP2nQ4rT6vW8yZ1aB3cD5?q=qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5</p>
   <p class="scan-credential-code">Credential code on print: <strong class="mono">HC-CWWX-HPK0</strong> — compare with the sticker or status JSON.</p>
@@ -4292,7 +4442,7 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
     var stripped = stripResolverUrlsFromMessage(raw);
     if (stripped) return stripped;
     if (typeof status === "number" && status >= 500) {
-      return "Could not reach the resolver. Try again in a moment.";
+      return "Could not reach humanity.llc.";
     }
     return fallback || "Something went wrong. Try again.";
   }
@@ -4323,7 +4473,7 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
       message: body.message,
     });
     if (body.error === "RESOLVER_SCHEMA") {
-      return "Live proof is temporarily unavailable. Try again shortly.";
+      return "Control check is temporarily unavailable. Try again shortly.";
     }
     if (body.error === "LIVE_CONTROL_UNAVAILABLE") {
       return (
@@ -4334,11 +4484,11 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
       );
     }
     if (result.status >= 500 || /error code:\s*1101/i.test(result.text || "")) {
-      return "Could not create live proof request. Try again in a moment.";
+      return "Could not start control check. Try again in a moment.";
     }
     return liveControlUserErrorMessage(body, {
       status: result.status,
-      fallback: "Could not create live proof request.",
+      fallback: "Could not start control check.",
     });
   }
 

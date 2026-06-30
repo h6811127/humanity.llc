@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>GT-8 field walk · network lens · Cedar Rapids</title>
+  <style>
+    :root { color-scheme: light dark; font-family: system-ui, sans-serif; }
+    body { margin: 0; padding: 16px; max-width: 44rem; line-height: 1.45; }
+    h1 { font-size: 1.2rem; margin: 0 0 8px; }
+    h2 { font-size: 1rem; margin: 24px 0 10px; }
+    .lead { margin: 0 0 12px; color: #666; font-size: 0.95rem; }
+    .cta {
+      display: block; padding: 14px 16px; border-radius: 12px; margin: 0 0 10px;
+      background: #db1b43; color: #fff; text-decoration: none; font-weight: 600; text-align: center;
+    }
+    .timer {
+      margin: 16px 0 20px; padding: 16px; border-radius: 12px;
+      background: rgba(60,60,67,.08); text-align: center;
+    }
+    .timer-display { font-size: 2.4rem; font-weight: 700; font-variant-numeric: tabular-nums; margin: 8px 0; }
+    .timer button {
+      font: inherit; padding: 10px 18px; border-radius: 10px; border: none;
+      background: #db1b43; color: #fff; font-weight: 600; margin: 0 6px;
+    }
+    .timer button.secondary { background: rgba(60,60,67,.18); color: inherit; }
+    .scenarios { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+    .scenarios li {
+      padding: 12px; border-radius: 10px; border: 1px solid rgba(60,60,67,.15);
+      font-size: 0.9rem;
+    }
+    .scenarios p { margin: 6px 0 8px; color: #666; }
+    .gate {
+      display: inline-block; margin-left: 6px; padding: 2px 6px; border-radius: 6px;
+      font-size: 0.7rem; font-weight: 700; background: rgba(0,122,255,.15); color: #007aff;
+    }
+    .check { font-size: 0.85rem; color: #666; }
+    .note {
+      margin: 16px 0; padding: 12px; border-radius: 10px;
+      background: rgba(255,149,0,.12); font-size: 0.85rem;
+    }
+    code { font-size: 0.85em; }
+  </style>
+</head>
+<body>
+  <h1>GT-8 field walk · network lens</h1>
+  <p class="lead">
+    Run on <strong>≥2 phones</strong> (Safari + Chrome) at an <strong>outdoor</strong> venue or in bright sun — not only at a desk.
+    Mode: local dev.
+  </p>
+  <p class="lead">Full GT-1–GT-8 cohort kit: <a href="http://127.0.0.1:8788/dev/city-game-comprehension.html">http://127.0.0.1:8788/dev/city-game-comprehension.html</a></p>
+  <a class="cta" href="http://127.0.0.1:8788/play/cedar-rapids/map/" id="board-link">Open network lens (tester device)</a>
+  <p class="lead">Expected first stop: <strong>Riverwalk River Lantern</strong> (<code>node_04</code>) — Next pin / express line.</p>
+
+  <div class="timer" aria-live="polite">
+    <h2>GT-8 · 10 second orientation</h2>
+    <p class="lead">Hand phone to tester. Say only: “Where would you go first?” Start timer when the map finishes loading.</p>
+    <div class="timer-display" id="timer-display">10.0</div>
+    <button type="button" id="timer-start">Start 10s</button>
+    <button type="button" class="secondary" id="timer-reset">Reset</button>
+  </div>
+
+  <div class="note">
+    <strong>Pass when:</strong> tester points to a plausible first stop on the map (Next pin, express callout, or spine row) before timer hits 0 — without reading paragraphs or coaching.
+    Record ☑ in <code>CITY_GAME_COMPREHENSION_RUNBOOK.md</code> § Per-tester log. Need <strong>≥4/5</strong> for SF-3 sign-off.
+  </div>
+
+  <h2>Board field scenarios (B1–B7)</h2>
+  <ul class="scenarios"><li>
+  <strong>B1 · Fresh open (GT-8)</strong>
+  <span class="gate">GT-8</span>
+  <p>Un coached — point to where you would go first within 10 seconds.</p>
+  <label class="check"><input type="checkbox" disabled /> Pass</label>
+</li>
+<li>
+  <strong>B2 · Outdoor / glare</strong>
+  
+  <p>Pin labels and express spine readable without zoom in bright sun.</p>
+  <label class="check"><input type="checkbox" disabled /> Pass</label>
+</li>
+<li>
+  <strong>B3 · Tap a spine pin</strong>
+  
+  <p>Selection shows world state (chips/effect), Scan + Maps — not a duplicate essay.</p>
+  <label class="check"><input type="checkbox" disabled /> Pass</label>
+</li>
+<li>
+  <strong>B4 · Tap a non-spine pin</strong>
+  
+  <p>Same panel shape; state differs from personal progress.</p>
+  <label class="check"><input type="checkbox" disabled /> Pass</label>
+</li>
+<li>
+  <strong>B5 · After one scan</strong>
+  
+  <p>Board refresh shows snapshot chips — not “you visited N times”.</p>
+  <label class="check"><input type="checkbox" disabled /> Pass</label>
+</li>
+<li>
+  <strong>B6 · All places list</strong>
+  
+  <p>Full node list stays state-first rows; map remains visible.</p>
+  <label class="check"><input type="checkbox" disabled /> Pass</label>
+</li>
+<li>
+  <strong>B7 · Privacy probe (GT-7)</strong>
+  <span class="gate">GT-7</span>
+  <p>Tester describes city knowledge — not GPS tracking or personal rank.</p>
+  <label class="check"><input type="checkbox" disabled /> Pass</label>
+</li></ul>
+
+  <p class="lead">After ≥4/5 GT-8 + 5/5 GT-7: <code>npm run city-game:network-lens-sign-off -- --pass --apply</code></p>
+
+  <script>
+    (function () {
+      var display = document.getElementById("timer-display");
+      var startBtn = document.getElementById("timer-start");
+      var resetBtn = document.getElementById("timer-reset");
+      var remaining = 10;
+      var handle = null;
+      function render() {
+        display.textContent = remaining.toFixed(1);
+        display.style.color = remaining <= 3 ? "#db1b43" : "";
+      }
+      function clearTimer() {
+        if (handle) { clearInterval(handle); handle = null; }
+      }
+      startBtn.addEventListener("click", function () {
+        clearTimer();
+        remaining = 10;
+        render();
+        handle = setInterval(function () {
+          remaining = Math.max(0, remaining - 0.1);
+          render();
+          if (remaining <= 0) clearTimer();
+        }, 100);
+      });
+      resetBtn.addEventListener("click", function () {
+        clearTimer();
+        remaining = 10;
+        render();
+      });
+      render();
+    })();
+  </script>
+</body>
+</html>

@@ -154,10 +154,11 @@ describe("city game scan view", () => {
     expect(html).toContain(GAME_NODE_SCAN_PRIVACY_NOTE);
     expect(html).toContain("scan-game-onboarding");
     expect(html).toContain("Wake the city · Signal War");
-    expect(html).toContain("Open city board");
+    expect(html).toContain("Open board");
     expect(html).toContain('href="/play/cedar-rapids/map/?node=node_01"');
-    expect(html).toContain('href="/play/cedar-rapids/"');
-    expect(html).toMatch(/>\s*Season rules\s*</);
+    expect(html).toContain("What a scan proves");
+    expect(html).toContain("#rules-prove-title");
+    expect(html).toContain('href="/play/cedar-rapids/#rules-prove-title"');
     expect(html).toContain("No account. No GPS. No visit log.");
     expect(html).toContain("scan-game-privacy-tagline");
     expect(html).toContain("scan-game-privacy-note");

@@ -16,7 +16,7 @@
 | E2 | `npm run city-game:verify-season -- --require-launch` (season root + dates set) | ☑ **2026-06-03** |
 | E3 | All 15 nodes minted + QRs issued on season root | ☐ local ☑ via `city-game:seed-local` |
 | E4 | `CITY_GAME_ENABLED=1` in `worker/wrangler.toml` · Worker deployed | ☑ **2026-06-03** · worker deploy `0b084cd9` |
-| E5 | Scan template live on staging/production for `node_01`, `node_04`, `node_07` | ☑ **2026-06-03** · node_01,node_04,node_07 |
+| E5 | Scan template live on staging/production for `node_01`, `node_04`, `node_07` | ☑ **2026-06-29** · 40/40 --all |
 
 **Phase D preflight (engineering only):**
 

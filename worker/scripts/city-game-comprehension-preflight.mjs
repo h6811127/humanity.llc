@@ -12,13 +12,19 @@ import { fileURLToPath } from "node:url";
 
 import {
   assessComprehensionEngineeringReady,
+  comprehensionGt8FieldWalkPageRel,
+  comprehensionDualGateWalkPageRel,
+  comprehensionPlayerFlowFieldWalkPageRel,
   comprehensionProductionPageRel,
   formatComprehensionPreflightReport,
   LOCAL_DEV_COMPREHENSION_REL,
   productionScanProfileId,
 } from "./city-game-comprehension-kit-core.mjs";
+import { LOCAL_DEV_GT8_FIELD_WALK_REL } from "./city-game-network-lens-gt8-field-kit-core.mjs";
+import { LOCAL_DEV_PLAYER_FLOW_FIELD_WALK_REL } from "../../site/js/public-network-player-flow-field-kit-core.mjs";
 import {
   comprehensionGt7GateMet,
+  comprehensionGt8GateMet,
   surfacesMarketLiveCityBoard,
 } from "./city-game-map-board-b13-core.mjs";
 import { RESEARCH_LAUNCH_PAGE_RELS } from "./city-game-launch-surfaces-core.mjs";
@@ -54,7 +60,12 @@ function main() {
     season,
     localSeed: existsSync(seedPath),
     localDevPageHtml: readOptional(LOCAL_DEV_COMPREHENSION_REL),
+    localFieldWalkHtml: readOptional(LOCAL_DEV_GT8_FIELD_WALK_REL),
+    localPlayerFlowWalkHtml: readOptional(LOCAL_DEV_PLAYER_FLOW_FIELD_WALK_REL),
     productionPageHtml: readOptional(productionRel),
+    productionFieldWalkHtml: readOptional(comprehensionGt8FieldWalkPageRel(season)),
+    productionPlayerFlowWalkHtml: readOptional(comprehensionPlayerFlowFieldWalkPageRel(season)),
+    productionDualGateWalkHtml: readOptional(comprehensionDualGateWalkPageRel(season)),
     productionScanProfileId: productionSeed ? productionScanProfileId(productionSeed) : null,
   });
   const runbook = existsSync(runbookPath) ? readFileSync(runbookPath, "utf8") : "";
@@ -67,6 +78,7 @@ function main() {
     researchHtmlByRel,
   });
   const gt7 = comprehensionGt7GateMet(runbook);
+  const gt8 = comprehensionGt8GateMet(runbook);
   const c2Report = { ...c2, humanSignedOff: humanSignedOff(runbook), warnings: [...c2.warnings] };
   if (marketsLiveCityBoard && !gt7.met) {
     c2Report.warnings.push(
@@ -81,6 +93,10 @@ function main() {
       `B13 GT-7: ${gt7.met ? "☑" : "☐"} ${gt7.passCount}/${gt7.required} · npm run city-game:map-board-b13-preflight`
     );
   }
+  console.log("");
+  console.log(
+    `SF-3 GT-8: ${gt8.met ? "☑" : "☐"} ${gt8.passCount}/${gt8.required} of ${gt8.cohort} · npm run city-game:network-lens-preflight`
+  );
 
   if (!c2.ready) {
     process.exit(1);

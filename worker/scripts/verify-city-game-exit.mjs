@@ -71,6 +71,15 @@ if (!skipTests) {
     "worker/tests/relay-decay-cron.test.ts",
     "worker/tests/unlock-evaluator.test.ts",
     "worker/tests/vouch-graph.test.ts",
+    "worker/tests/relationship-edge-spec.test.ts",
+    "worker/tests/relationship-edge-evaluator.test.ts",
+    "worker/tests/relationship-edge-store.test.ts",
+    "worker/tests/relationship-edge-scan-parity.test.ts",
+    "worker/tests/relationship-edge-routes.test.ts",
+    "worker/tests/scan-object-graph.test.ts",
+    "worker/tests/scan-object-graph-html.test.ts",
+    "worker/tests/ws-object-graph-v1-verify.test.ts",
+    "worker/tests/witness-gate-parity.test.ts",
     "worker/tests/city-game-launch-gates.test.ts",
     "worker/tests/city-game-smoke-local-core.test.ts",
     "worker/tests/game-operator-core.test.ts",
@@ -91,6 +100,9 @@ if (!skipTests) {
     "worker/tests/city-game-operator-ops-core.test.ts",
     "worker/tests/city-game-launch-checklist-core.test.ts",
     "worker/tests/city-game-map-board-b13-core.test.ts",
+    "worker/tests/city-game-map-board-privacy-core.test.ts",
+    "worker/tests/city-game-network-lens-sf3-core.test.ts",
+    "worker/tests/city-game-network-lens-gt8-field-kit-core.test.ts",
     "worker/tests/city-game-smoke-production-core.test.ts",
     "worker/tests/city-game-verify-production-root-core.test.ts",
     "worker/tests/city-game-bulletin-schedule.test.ts",
@@ -125,7 +137,9 @@ if (!skipTests) {
     "worker/tests/city-game-season-template-core.test.ts",
     "worker/tests/city-game-terminal-mint-deprecation-core.test.ts",
     "worker/tests/city-game-self-serve-staging-core.test.ts",
+    "worker/tests/created-season-when-panel-core.test.ts",
     "worker/tests/created-child-object-game-node-print-pack-core.test.ts",
+    "worker/tests/created-child-object-game-node-unlock-edges-core.test.ts",
   ]);
 }
 
@@ -141,6 +155,12 @@ if (requireLaunch) {
 
 console.log("\n=== city-game scaffold play pages ===\n");
 run("node", ["worker/scripts/city-game-scaffold-play.mjs", "--all", "--check"]);
+
+console.log("\n=== public network player flow (shell belt) ===\n");
+run("npm", ["run", "verify:public-network-player-flow:fast"]);
+
+console.log("\n=== player flow field walk kit ===\n");
+run("npm", ["run", "player-flow:field-kit:check"]);
 
 if (runE2e) {
   console.log("\n=== city-game self-serve setup e2e ===\n");

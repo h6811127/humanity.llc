@@ -4,6 +4,8 @@
 
 const PHASES = ["idle", "checking", "resolved", "after"];
 const DOT_MODES = ["static", "sync", "loop", "breathe"];
+const CANVAS_MODES = ["neutral", "red-frame", "red-vignette"];
+const GLASS_MODES = ["low", "mid", "high", "prod"];
 
 const els = {
   hero: () => document.getElementById("trust-demo-hero"),
@@ -18,6 +20,8 @@ const els = {
 
 let phase = "idle";
 let dotMode = "static";
+let canvasMode = "neutral";
+let glassMode = "mid";
 let operatorBand = false;
 let forceReducedMotion = false;
 let autoTimer = null;
@@ -28,6 +32,10 @@ function readQuery() {
   if (p && PHASES.includes(p)) phase = p;
   const d = q.get("dot");
   if (d && DOT_MODES.includes(d)) dotMode = d;
+  const canvas = q.get("canvas");
+  if (canvas && CANVAS_MODES.includes(canvas)) canvasMode = canvas;
+  const glass = q.get("glass");
+  if (glass && GLASS_MODES.includes(glass)) glassMode = glass;
   if (q.get("operator") === "1") operatorBand = true;
   if (q.get("auto") === "1") queueMicrotask(() => runAutoSequence());
 }
@@ -36,8 +44,24 @@ function syncUrl() {
   const q = new URLSearchParams();
   q.set("phase", phase);
   q.set("dot", dotMode);
+  q.set("canvas", canvasMode);
+  q.set("glass", glassMode);
   if (operatorBand) q.set("operator", "1");
   history.replaceState(null, "", `${location.pathname}?${q}`);
+}
+
+function applyGlassV4() {
+  document.body.dataset.trustCanvasV4 = canvasMode;
+  document.body.dataset.trustGlassV4 = glassMode;
+}
+
+function syncGlassV4Buttons() {
+  for (const btn of document.querySelectorAll("[data-trust-canvas]")) {
+    btn.setAttribute("aria-pressed", btn.dataset.trustCanvas === canvasMode ? "true" : "false");
+  }
+  for (const btn of document.querySelectorAll("[data-trust-glass]")) {
+    btn.setAttribute("aria-pressed", btn.dataset.trustGlass === glassMode ? "true" : "false");
+  }
 }
 
 function clearDotClasses() {
@@ -174,6 +198,7 @@ function syncPhaseButtons() {
   if (op) op.checked = operatorBand;
   const rm = document.getElementById("trust-demo-reduced-toggle");
   if (rm) rm.checked = forceReducedMotion;
+  syncGlassV4Buttons();
 }
 
 function runAutoSequence() {
@@ -233,10 +258,27 @@ function bindDevPanel() {
     operatorBand = false;
     runAutoSequence();
   });
+  for (const btn of document.querySelectorAll("[data-trust-canvas]")) {
+    btn.addEventListener("click", () => {
+      canvasMode = btn.dataset.trustCanvas;
+      applyGlassV4();
+      syncGlassV4Buttons();
+      syncUrl();
+    });
+  }
+  for (const btn of document.querySelectorAll("[data-trust-glass]")) {
+    btn.addEventListener("click", () => {
+      glassMode = btn.dataset.trustGlass;
+      applyGlassV4();
+      syncGlassV4Buttons();
+      syncUrl();
+    });
+  }
 }
 
 readQuery();
 bindDevPanel();
+applyGlassV4();
 applyDotMode();
 document.body.classList.toggle("trust-demo-force-reduced-motion", forceReducedMotion);
 setPhase(phase === "idle" ? "checking" : phase);

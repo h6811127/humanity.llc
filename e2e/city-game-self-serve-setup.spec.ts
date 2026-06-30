@@ -165,6 +165,10 @@ test.describe("city game self-serve setup on /created/", () => {
     await seedGameSeasonControlSession(page, GAME_SEASON_ROOT);
     await openGameSeasonLive(page);
 
+    await expect(page.locator("#child-object-season-when-rules-hint")).toContainText(
+      /Rules page|Terminal mint/i
+    );
+
     await page.locator("#child-object-season-when-id").fill("my_city_season_01");
     await page.locator("#child-object-season-when-id").blur();
 
@@ -264,6 +268,25 @@ test.describe("city game self-serve setup on /created/", () => {
     await expect(page.locator("#child-object-game-node-rules-preview-draft")).toBeEnabled({
       timeout: 10_000,
     });
+  });
+
+  test("shows unlock edges editor and print install pack sections", async ({ page }) => {
+    await seedGameSeasonControlSession(page, GAME_SEASON_ROOT);
+    await openGameSeasonLive(page);
+    await selectExampleSeason(page);
+
+    await expect(page.locator("#child-object-game-node-unlock-edges")).toBeVisible();
+    await expect(page.locator("#child-object-game-node-print-pack")).toBeVisible();
+
+    await page.locator("#child-object-game-node-unlock-edges summary").click();
+    await expect(page.locator("#child-object-game-node-unlock-edges-summary")).toContainText(
+      /registered node/i
+    );
+
+    await page.locator("#child-object-game-node-print-pack summary").click();
+    await expect(page.locator("#child-object-game-node-print-pack-summary")).toContainText(
+      /Register game nodes|scan QRs/i
+    );
   });
 });
 

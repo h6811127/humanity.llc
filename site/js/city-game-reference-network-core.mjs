@@ -4,6 +4,11 @@
  */
 import { resolveComprehensionProbeNodes } from "./city-game-player-guide-core.mjs";
 import { seasonBoardPath } from "./city-game-season-path-shared.mjs";
+import {
+  PUBLIC_NETWORK_RULES_PROVE_CTA,
+  publicNetworkRulesProveHref,
+} from "./public-networks-portal-core.mjs";
+import { productionPlayerFlowFieldWalkUrl } from "./public-network-player-flow-field-kit-core.mjs";
 
 /** Minimum un coached strangers for LO-4 integrated comprehension (human gate). */
 export const LO4_COMPREHENSION_MIN_STRANGERS = 3;
@@ -228,6 +233,40 @@ export function buildMapReferenceSpineHtml(season) {
 }
 
 /**
+ * Compact transit legend for network lens drawer (LO-4 spine — less essay).
+ * @param {Record<string, unknown>} season
+ * @param {{ legend_title?: string; legend_intro?: string }} [copy]
+ */
+export function buildMapNetworkLegendHtml(season, copy = {}) {
+  if (!isReferenceNetworkTeachingEnabled(season)) return "";
+  const rows = resolveReferenceSpineRows(season);
+  if (!rows.length) return "";
+
+  const title = copy.legend_title?.trim() || "Key route stops";
+  const intro =
+    copy.legend_intro?.trim() ||
+    "Main stops on the suggested route — scan any sticker for live status.";
+  const rulesPath = String(season.rules_path ?? "/play/cedar-rapids/").trim() || "/play/cedar-rapids/";
+  const rulesProveHref = publicNetworkRulesProveHref(rulesPath);
+
+  const items = rows
+    .map((row) => {
+      return `<li class="city-game-map-legend-row" data-node-id="${escapeReferenceNetworkHtml(row.node_id)}">
+  <span class="city-game-map-legend-label">${escapeReferenceNetworkHtml(row.label)}</span>
+  <span class="city-game-map-legend-note">${escapeReferenceNetworkHtml(row.lesson)}</span>
+</li>`;
+    })
+    .join("");
+
+  return `<section class="city-game-map-legend" id="city-game-map-legend" aria-labelledby="city-game-map-legend-title">
+  <h3 class="group-label" id="city-game-map-legend-title">${escapeReferenceNetworkHtml(title)}</h3>
+  <p class="group-intro short city-game-map-legend-intro">${escapeReferenceNetworkHtml(intro)}</p>
+  <ul class="city-game-map-legend-list">${items}</ul>
+  <p class="idea-footnote city-game-map-legend-foot"><a href="${escapeReferenceNetworkHtml(rulesProveHref)}">${escapeReferenceNetworkHtml(PUBLIC_NETWORK_RULES_PROVE_CTA)}</a> · <a href="${escapeReferenceNetworkHtml(rulesPath)}">Full rules</a></p>
+</section>`;
+}
+
+/**
  * @param {Record<string, unknown>} season
  */
 export function isReferenceNetworkTeachingEnabled(season) {
@@ -248,6 +287,11 @@ export function buildReferenceNetworkTeachingKitHtml(season, opts = {}) {
   const rulesUrl =
     opts.rulesUrl?.trim() ||
     `https://humanity.llc${String(season.rules_path ?? "/play/cedar-rapids/").trim()}`;
+  const rulesPath = String(season.rules_path ?? "/play/cedar-rapids/").trim() || "/play/cedar-rapids/";
+  const rulesProveUrl = production
+    ? `https://humanity.llc${publicNetworkRulesProveHref(rulesPath)}`
+    : publicNetworkRulesProveHref(rulesPath);
+  const proveCta = PUBLIC_NETWORK_RULES_PROVE_CTA;
   const boardUrl =
     opts.boardUrl?.trim() || `${rulesUrl.replace(/\/?$/, "/")}map/`;
   const statusPlateUrl =
@@ -255,6 +299,9 @@ export function buildReferenceNetworkTeachingKitHtml(season, opts = {}) {
     charter.status_plate_scan_url ||
     "https://humanity.llc/c/r4YyNEWJvVwWNMETzXfGjFyL?q=qr_8w7zHCPHisXvTnar";
   const gameNodeUrl = opts.gameNodeUrl?.trim() || charter.game_node_scan_url || "[node_04 scan URL]";
+  const fieldWalkUrl = production
+    ? productionPlayerFlowFieldWalkUrl(season)
+    : "http://127.0.0.1:8788/dev/public-network-player-flow-field-walk.html";
   const scorecard = LO4_SCORECARD_ROWS.map(
     (row) => `<li><strong>${escapeReferenceNetworkHtml(row.id)}:</strong> ${escapeReferenceNetworkHtml(row.prompt)}</li>`
   ).join("\n      ");
@@ -291,7 +338,9 @@ export function buildReferenceNetworkTeachingKitHtml(season, opts = {}) {
 <body>
   <h1>LO-4 · Reference network comprehension</h1>
   <p class="lead">Integrated stranger walk — <strong>${LO4_COMPREHENSION_MIN_STRANGERS}+ un coached strangers</strong>. Same resolver primitive: game node + status plate. C2 engineering: seven teaching surfaces on rules + board + portal.</p>
-  <p class="lead"><strong>Path:</strong> About this network → board spine → game scan → status plate scan.</p>
+  <p class="lead"><strong>Path:</strong> ${escapeReferenceNetworkHtml(proveCta)} → board spine → game scan → status plate scan.</p>
+
+  <p class="lead">Agent D shell field walk (PD-1–PD-5): <a href="${escapeReferenceNetworkHtml(fieldWalkUrl)}">player flow field walk</a>.</p>
 
   <h2>Seven surfaces (engineering shipped)</h2>
   <ol class="surfaces">
@@ -301,7 +350,7 @@ export function buildReferenceNetworkTeachingKitHtml(season, opts = {}) {
     <li>Prove / not prove + collapsed game mechanics</li>
     <li>Board intro + reference spine (${escapeReferenceNetworkHtml(boardUrl)})</li>
     <li>After-season debrief teaser on board</li>
-    <li>Portal “About this network” nudge</li>
+    <li>Portal “${escapeReferenceNetworkHtml(proveCta)}” nudge</li>
   </ol>
 
   <div class="scorecard">
@@ -320,14 +369,14 @@ export function buildReferenceNetworkTeachingKitHtml(season, opts = {}) {
   <h2>Reference spine probes</h2>
   <ul>${spine}</ul>
 
-  <a class="cta" href="${escapeReferenceNetworkHtml(rulesUrl)}">1 · About this network</a>
+  <a class="cta" href="${escapeReferenceNetworkHtml(rulesProveUrl)}">1 · ${escapeReferenceNetworkHtml(proveCta)}</a>
   <a class="cta cta-secondary" href="${escapeReferenceNetworkHtml(boardUrl)}">2 · Public state board</a>
   <a class="cta cta-secondary" href="${escapeReferenceNetworkHtml(gameNodeUrl)}">3 · Game node scan</a>
   <a class="cta cta-secondary" href="${escapeReferenceNetworkHtml(statusPlateUrl)}">4 · Status plate scan</a>
 
   <footer class="human-gate">
     <h2>Human gate (LO-4 / C2)</h2>
-    <p class="lead">Sign after <strong>${LO4_COMPREHENSION_MIN_STRANGERS}+ un coached strangers</strong> pass RN-1–RN-5 on the rules-first path above (About → board spine → game scan → status plate).</p>
+    <p class="lead">Sign after <strong>${LO4_COMPREHENSION_MIN_STRANGERS}+ un coached strangers</strong> pass RN-1–RN-5 on the rules-first path above (${escapeReferenceNetworkHtml(proveCta)} → board spine → game scan → status plate).</p>
     <ul>
       <li>☐ Each stranger reads rules page first — no coaching</li>
       <li>☐ RN-1–RN-5 pass per stranger (scorecard above)</li>

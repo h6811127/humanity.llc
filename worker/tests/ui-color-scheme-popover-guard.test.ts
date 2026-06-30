@@ -309,7 +309,11 @@ describe("UI color scheme popover guard", () => {
       "site/css/theme-dark.css",
       'html[data-theme="dark"] .scan-hero.scan-status-panel',
       {
-        require: ["--hc-scan-hero-fill", "--hc-scan-hero-shadow"],
+        require: [
+          "--hc-scan-hero-fill-glass",
+          "--hc-scan-hero-backdrop",
+          "--hc-scan-hero-shadow",
+        ],
       }
     );
     assertGuardedRule("site/css/theme-dark.css", "html[data-theme=\"dark\"] .hc-emphasis-card--urgent", {

@@ -66,8 +66,15 @@ async function openBoardFilters(board: ReturnType<Page["locator"]>) {
   });
 }
 
+async function expandAllPlacesList(board: ReturnType<Page["locator"]>) {
+  const allBtn = board.locator('[data-list-lens="all"]');
+  if (await allBtn.getAttribute("aria-pressed") !== "true") {
+    await allBtn.click();
+  }
+}
+
 async function openDistrictSketch(board: ReturnType<Page["locator"]>) {
-  await board.locator("#city-game-map-advanced").evaluate((el) => {
+  await board.locator("#city-game-map-drawer").evaluate((el) => {
     if (el instanceof HTMLDetailsElement) el.open = true;
   });
   await board.locator("#district-sketch").evaluate((el) => {
@@ -95,42 +102,50 @@ test.describe("city game map board", () => {
     await expect(board).toBeVisible({ timeout: 15_000 });
     await expect(page.locator(".city-game-map-loading")).toHaveCount(0);
     await expect(page.getByRole("heading", { level: 1 })).toContainText(/wake the city/i);
-    await expect(page.getByRole("link", { name: "About this network" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Full rules" })).toBeVisible();
+    const footnote = page.locator(".city-game-map-page-footnote");
+    await expect(footnote.getByRole("link", { name: "Browse places near me" })).toHaveAttribute(
+      "href",
+      "/discover/cedar-rapids-iowa/"
+    );
+    await expect(footnote.getByRole("link", { name: "How this network works" })).toHaveAttribute(
+      "href",
+      "/play/cedar-rapids/#rules-start-title"
+    );
+    await expect(footnote.getByRole("link", { name: "All public networks" })).toHaveAttribute(
+      "href",
+      "/play/season/"
+    );
 
-    await expect(board.getByText("Help wake the city.")).toBeVisible();
     await expect(board.locator("#city-game-map-progress")).toBeVisible();
-    await expect(board.getByText("Relays unclaimed · Finale dormant")).toBeVisible();
+    await expect(board.getByText("Open team spots · Finale waiting")).toBeVisible();
     await expect(board.locator("#city-game-map-mission .city-game-map-mission-privacy")).toContainText(
       "No account. No GPS. No visit log."
     );
-    await expect(board.locator(".city-game-map-wake-loop")).toBeVisible();
-    await expect(
-      board.getByText("Scans add signals toward shared fragments — the board updates for everyone.")
-    ).toBeVisible();
-    await expect(board.getByText("How scanning works")).toBeVisible();
-    await expect(board.getByRole("heading", { name: "Riverwalk River Lantern" })).toBeVisible();
-    await expect(board.getByText("Find the River Lantern and add one signal.")).toBeVisible();
-    await expect(board.locator("#city-game-map-spotlight .city-game-map-spotlight-effect")).toContainText(
-      "Unlocks Czech Village cabinet"
-    );
-    await expect(board.locator("#city-game-map-spotlight .city-game-map-spotlight-hint")).toContainText(
-      "Find the River Lantern"
-    );
+    await expect(board.locator("#city-game-map-drawer")).toBeVisible();
+    await expect(board.locator("#city-game-map-drawer")).toHaveJSProperty("open", false);
     await expect(board.getByText(/back of the sticker|enter code|Add to the city/i)).toHaveCount(0);
+    await expect(board.locator('.city-game-map-pin[data-node-id="node_04"] .city-game-map-pin-next')).toHaveText(
+      "Start"
+    );
+    await expect(board.locator(".city-game-map-pin--next")).toBeVisible();
     await expect(board.locator("#city-game-map-places")).toBeVisible();
+    await expect(board.locator(".city-game-map-list-lens")).toBeVisible();
+    await expect(board.locator('#city-game-map-places [data-list-lens="spine"]')).toHaveAttribute(
+      "aria-pressed",
+      "true"
+    );
     await expect(board.locator("#city-game-map-filters")).toBeVisible();
-    await expect(board.getByText("Start at Riverwalk River Lantern.")).toBeVisible();
+    await expect(board.getByText("Try here: Riverwalk River Lantern")).toBeVisible();
+    await expect(board.locator(".city-game-map-start-callout-kicker")).toHaveText("Suggested first stop");
 
     await expect(board).toHaveAttribute("data-snapshot-loaded", "1");
-    await expect(board.locator("#city-game-map-progress")).toHaveText("1 / 3 fragments recovered");
-    await expect(board.locator("#city-game-map-spotlight-count")).toHaveText("14 / 20");
+    await expect(board.locator("#city-game-map-progress")).toHaveText("1 / 3 shared clues found");
+    await expect(
+      board.locator('.city-game-map-pin[data-node-id="node_04"] .city-game-map-pin-state')
+    ).toHaveText("14 / 20");
     await expect(board.locator("#city-game-map-live-state")).toBeVisible();
-    await expect(board.getByText("What changes when the city wakes")).toBeVisible();
-    await expect(board.locator("#city-game-map-activity")).toBeVisible();
-    await expect(board.locator("#city-game-map-progress")).toHaveText("1 / 3 fragments recovered");
-    await expect(board.locator("#city-game-map-live-state")).toContainText("Something is stirring.");
-    await expect(board.getByText("Routes waking with the city")).toBeVisible();
+    await expect(board.locator("#city-game-map-activity")).toBeAttached();
+    await expect(board.getByText("Routes waking with the city")).toBeHidden();
     const riverRow = board.locator('.city-game-map-node-row[data-node-id="node_04"]');
     await expect(riverRow).toHaveCount(1);
     await expect(riverRow).toHaveClass(/city-game-map-node-row--spotlight/);
@@ -139,6 +154,127 @@ test.describe("city game map board", () => {
     await expect(riverRow.locator("[data-node-card-scan]")).toContainText(
       /add one signal.*whole city/i
     );
+  });
+
+  test("GT-8 orientation affordances visible on fresh load without interaction", async ({ page }) => {
+    await mockSeasonSnapshot(page, mockSnapshotBody());
+
+    await page.goto("/play/cedar-rapids/map/");
+
+    const board = page.locator(".city-game-map-board");
+    await expect(board).toBeVisible({ timeout: 15_000 });
+    await expect(board).toHaveAttribute("data-snapshot-loaded", "1");
+    await expect(board).toHaveClass(/city-game-map-board--network-lens/);
+
+    await expect(board.locator("#city-game-map-orient")).toBeVisible();
+    await expect(board.getByRole("button", { name: /Scan a sticker · Start here/i })).toBeVisible();
+
+    const nextPin = board.locator("#city-game-map-sketch-hero .city-game-map-pin--next");
+    await expect(nextPin).toHaveCount(1);
+    await expect(nextPin).toHaveAttribute("data-node-id", "node_04");
+    await expect(nextPin.locator(".city-game-map-pin-next")).toHaveText("Start");
+    await expect(board.getByText("Try here: Riverwalk River Lantern")).toBeVisible();
+    await expect(board.locator(".city-game-map-start-callout-kicker")).toHaveText("Suggested first stop");
+    await expect(board.locator('.city-game-map-edge--express.city-game-map-edge--next')).toBeVisible();
+    await expect(board.locator('[data-list-lens="spine"]')).toHaveAttribute("aria-pressed", "true");
+  });
+
+  test("SF-2b pin tap opens selection panel with snapshot chips", async ({ page }) => {
+    await mockSeasonSnapshot(page, mockSnapshotBody());
+
+    await page.goto("/play/cedar-rapids/map/");
+
+    const board = page.locator(".city-game-map-board");
+    await expect(board).toBeVisible({ timeout: 15_000 });
+    await expect(board).toHaveAttribute("data-snapshot-loaded", "1");
+    await expect(
+      board.locator('#city-game-map-sketch-hero .city-game-map-pin[data-node-id="node_04"] .city-game-map-pin-state')
+    ).toHaveText("14 / 20");
+
+    await board
+      .locator('#city-game-map-sketch-hero .city-game-map-pin[data-node-id="node_04"]')
+      .click();
+
+    const panel = board.locator("#city-game-map-selection-panel");
+    await expect(panel).toBeVisible();
+    await expect(panel.locator("[data-selection-effect]")).toContainText("14 / 20");
+    await expect(panel.locator("[data-selection-chips]")).toContainText("14 / 20");
+  });
+
+  test("start callout and primary CTA focus next pin and open selection panel", async ({ page }) => {
+    await mockSeasonSnapshot(page, mockSnapshotBody());
+
+    await page.goto("/play/cedar-rapids/map/");
+
+    const board = page.locator(".city-game-map-board");
+    await expect(board).toBeVisible({ timeout: 15_000 });
+    await expect(board).toHaveAttribute("data-snapshot-loaded", "1");
+
+    const selectionPanel = board.locator("#city-game-map-selection-panel");
+    await expect(selectionPanel).toBeHidden();
+
+    await board.locator("#city-game-map-start-callout").click();
+    await expect(selectionPanel).toBeVisible();
+    await expect(
+      board.locator('#city-game-map-sketch-hero .city-game-map-pin--highlight[data-node-id="node_04"]')
+    ).toHaveCount(1);
+    await expect(board.locator('.city-game-map-node-row--highlight[data-node-id="node_04"]')).toHaveCount(1);
+    await expect(board).toHaveClass(/city-game-map-board--sketch-expanded/);
+
+    await board.locator("#city-game-map-primary-action-btn").click();
+    await expect(selectionPanel).toBeVisible();
+    await expect(board.locator("#city-game-map-selection-title")).toContainText("Riverwalk River Lantern");
+  });
+
+  test("routes strip focuses pin and opens selection panel", async ({ page }) => {
+    await mockSeasonSnapshot(page, mockSnapshotBody());
+
+    await page.goto("/play/cedar-rapids/map/");
+
+    const board = page.locator(".city-game-map-board");
+    await expect(board).toBeVisible({ timeout: 15_000 });
+    await expect(board.locator("#city-game-map-routes-strip")).toBeVisible();
+
+    const stripRoute = board.locator(
+      '#city-game-map-routes-strip [data-focus-route-from="node_04"]'
+    );
+    await expect(stripRoute).toHaveCount(1);
+    await stripRoute.click();
+
+    await expect(board.locator("#city-game-map-selection-panel")).toBeVisible();
+    await expect(
+      board.locator('#city-game-map-sketch-hero .city-game-map-pin--highlight[data-node-id="node_04"]')
+    ).toHaveCount(1);
+    await expect(
+      board.locator('#city-game-map-sketch-hero line.city-game-map-edge--highlight')
+    ).toHaveCount(1);
+  });
+
+  test("routes strip more opens network drawer", async ({ page }) => {
+    await mockSeasonSnapshot(page, mockSnapshotBody());
+
+    await page.goto("/play/cedar-rapids/map/");
+
+    const board = page.locator(".city-game-map-board");
+    await expect(board).toBeVisible({ timeout: 15_000 });
+
+    await board.locator("#city-game-map-routes-strip [data-open-map-drawer]").click();
+    await expect(board.locator("#city-game-map-drawer")).toHaveJSProperty("open", true);
+  });
+
+  test("place row keeps one primary scan CTA with secondary links in details", async ({ page }) => {
+    await mockSeasonSnapshot(page, mockSnapshotBody());
+
+    await page.goto("/play/cedar-rapids/map/");
+
+    const board = page.locator(".city-game-map-board");
+    await expect(board).toBeVisible({ timeout: 15_000 });
+
+    const row = board.locator('.city-game-map-node-row[data-node-id="node_04"]');
+    const actions = row.locator('[data-state-first="actions"]');
+    await expect(actions.locator(".city-game-map-row-cta")).toHaveText("Scan sticker");
+    await expect(actions.getByRole("link", { name: "Open in Maps" })).toHaveCount(0);
+    await expect(row.locator(".city-game-map-node-secondary-actions")).toContainText("Open in Maps");
   });
 
   test("public node card explains what scanning does", async ({ page }) => {
@@ -167,6 +303,7 @@ test.describe("city game map board", () => {
     await expect(board).toBeVisible({ timeout: 15_000 });
     await expect(board).toHaveAttribute("data-snapshot-loaded", "1");
 
+    await expandAllPlacesList(board);
     await openBoardFilters(board);
 
     const typeFilter = board.locator(".city-game-map-type-filter");
@@ -199,6 +336,7 @@ test.describe("city game map board", () => {
 
     await typeFilter.getByRole("button", { name: "All", exact: true }).click();
     await stateFilter.getByRole("button", { name: "All states" }).click();
+    await expandAllPlacesList(board);
     await expect(board).toHaveAttribute("data-active-type", "all");
     await expect(board).toHaveAttribute("data-active-state", "all");
     await expect(board.locator(".city-game-map-node-row:visible")).toHaveCount(40);
@@ -214,6 +352,7 @@ test.describe("city game map board", () => {
     await expect(board).toBeVisible({ timeout: 15_000 });
     await expect(board).toHaveAttribute("data-snapshot-loaded", "1");
 
+    await expandAllPlacesList(board);
     await openBoardFilters(board);
 
     const typeFilter = board.locator(".city-game-map-type-filter");
@@ -230,7 +369,7 @@ test.describe("city game map board", () => {
 
     await expect(relayBtn).toHaveAttribute("aria-pressed", "true");
     await expect(relayBtn).toHaveClass(/city-game-map-filter-btn--active/);
-    await expect(relayBtn).toHaveCSS("background-color", "rgb(219, 27, 67)");
+    await expect(relayBtn).toHaveCSS("background-color", "rgb(0, 122, 255)");
     await expect(allTypes).toHaveAttribute("aria-pressed", "false");
     await expect(allTypes).not.toHaveClass(/city-game-map-filter-btn--active/);
 
@@ -561,6 +700,7 @@ test.describe("city game map board", () => {
     const board = page.locator(".city-game-map-board");
     await expect(board).toBeVisible({ timeout: 15_000 });
 
+    await expandAllPlacesList(board);
     await openBoardFilters(board);
     await board
       .locator(".city-game-map-type-filter")
@@ -589,7 +729,7 @@ test.describe("city game map board", () => {
       .toBe(true);
   });
 
-  test("mobile layout keeps sketch above selection bar and list", async ({ page }) => {
+  test("mobile layout keeps sketch hero above selection bar and list", async ({ page }) => {
     await mockSeasonSnapshot(page, mockSnapshotBody());
     await page.setViewportSize({ width: 390, height: 844 });
 
@@ -601,21 +741,22 @@ test.describe("city game map board", () => {
     const row = board.locator('.city-game-map-node-row[data-node-id="node_04"]');
     await row.locator(".city-game-map-node-title").click();
 
-    const order = await board.locator(".city-game-map-list-panel").evaluate((panel) => {
-      const sketch = panel.querySelector(".city-game-map-mobile-sketch");
-      const list = panel.querySelector(".city-game-map-list-scroll");
+    const order = await board.evaluate((root) => {
+      const sketch = root.querySelector("#city-game-map-sketch-hero .city-game-map-mobile-sketch");
+      const panel = root.querySelector(".city-game-map-list-panel");
+      const list = panel?.querySelector(".city-game-map-list-scroll");
       const bar = list?.querySelector("[data-selection-bar]");
       const firstRow = list?.querySelector(".city-game-map-node-row");
-      if (!sketch || !bar || !list || !firstRow) return null;
+      if (!sketch || !panel || !bar || !list || !firstRow) return null;
       const following = Node.DOCUMENT_POSITION_FOLLOWING;
       return {
-        sketchBeforeList: Boolean(sketch.compareDocumentPosition(list) & following),
+        sketchBeforePanel: Boolean(sketch.compareDocumentPosition(panel) & following),
         barInsideList: list.contains(bar),
         barBeforeRow: Boolean(bar.compareDocumentPosition(firstRow) & following),
       };
     });
 
-    expect(order?.sketchBeforeList).toBe(true);
+    expect(order?.sketchBeforePanel).toBe(true);
     expect(order?.barInsideList).toBe(true);
     expect(order?.barBeforeRow).toBe(true);
   });
@@ -628,10 +769,16 @@ test.describe("city game map board", () => {
     await expect(page).toHaveURL(/\/play\/cedar-rapids\/map\/?/, { timeout: 15_000 });
     const board = page.locator(".city-game-map-board");
     await expect(board).toBeVisible({ timeout: 15_000 });
-    await expect(page.locator(".idea-footnote").getByRole("link", { name: "Data policy" })).toBeVisible();
+    const footnote = page.locator(".city-game-map-page-footnote");
+    await expect(footnote).toBeVisible();
+    await expect(footnote.getByRole("link", { name: "How this network works" })).toBeVisible();
+    await expect(footnote.getByRole("link", { name: "All public networks" })).toHaveAttribute(
+      "href",
+      "/play/season/"
+    );
   });
 
-  test("mobile viewport keeps launch spotlight above places list and mechanics", async ({
+  test("mobile viewport keeps orient strip then compact sketch then places list", async ({
     page,
   }) => {
     await mockSeasonSnapshot(page, mockSnapshotBody());
@@ -641,47 +788,51 @@ test.describe("city game map board", () => {
 
     const board = page.locator(".city-game-map-board");
     await expect(board).toBeVisible({ timeout: 15_000 });
-    await expect(board.getByRole("heading", { name: "Riverwalk River Lantern" })).toBeVisible();
+    await expect(board).toHaveClass(/city-game-map-board--network-lens/);
+    await expect(board).toHaveClass(/city-game-map-board--cold-sketch/);
+    await expect(board.locator("#city-game-map-orient")).toBeVisible();
+    await expect(board.getByRole("button", { name: /Scan a sticker · Start here/i })).toBeVisible();
+    await expect(board.locator("#city-game-map-sketch-hero")).toBeVisible();
+    await expect(board.locator(".city-game-map-pin--next")).toBeVisible();
     await expect(board.getByRole("heading", { name: "Places" })).toBeVisible();
-    await expect(board.locator(".city-game-map-mobile-sketch")).toBeVisible();
+    await expect(board.locator(".city-game-map-mobile-sketch")).toHaveCount(1);
 
-    const advanced = board.locator("#city-game-map-advanced");
+    const drawer = board.locator("#city-game-map-drawer");
     const sketch = board.locator("#district-sketch");
-    await expect(advanced.getByText(/routes & unlocks/i)).toBeVisible();
-    await expect(advanced).toHaveJSProperty("open", false);
+    await expect(drawer.getByText(/Routes and connections/i)).toBeVisible();
+    await expect(drawer).toHaveJSProperty("open", false);
     await expect(sketch).toHaveJSProperty("open", false);
 
-    const spotlight = board.locator("#city-game-map-spotlight");
+    const orient = board.locator("#city-game-map-orient");
+    const sketchHero = board.locator("#city-game-map-sketch-hero");
+    const selectionPanel = board.locator("#city-game-map-selection-panel");
+    const primaryAction = board.locator("#city-game-map-primary-action");
     const placesList = board.locator("#city-game-map-places");
-    const activity = board.locator("#city-game-map-activity");
 
-    await expect(board.getByRole("heading", { name: "Live city state" })).toBeVisible();
-    await expect(board.getByRole("heading", { name: "City activity" })).toBeVisible();
-    await expect(activity).toBeVisible();
+    await expect(board.getByRole("heading", { name: "City status" })).toBeVisible();
+    await expect(selectionPanel).toBeHidden();
 
-    const spotlightBox = await spotlight.boundingBox();
+    const orientBox = await orient.boundingBox();
+    const primaryBox = await primaryAction.boundingBox();
+    const sketchBox = await sketchHero.boundingBox();
+    const statusBox = await board.locator("#city-game-map-live-state").boundingBox();
+    const routesStripBox = await board.locator("#city-game-map-routes-strip").boundingBox();
     const placesBox = await placesList.boundingBox();
-    const activityBox = await activity.boundingBox();
-    const advancedBox = await advanced.boundingBox();
+    const drawerBox = await drawer.boundingBox();
 
-    expect(spotlightBox?.width ?? 0).toBeGreaterThan(280);
-    expect(placesBox?.width ?? 0).toBeGreaterThan(280);
-    expect(activityBox?.width ?? 0).toBeGreaterThan(280);
-    expect(advancedBox?.width ?? 0).toBeGreaterThan(280);
-
-    expect((spotlightBox?.y ?? 0) + (spotlightBox?.height ?? 0)).toBeLessThanOrEqual(
-      (activityBox?.y ?? 0) + 24
-    );
-    expect((placesBox?.y ?? 0)).toBeGreaterThan((activityBox?.y ?? 0) - 24);
-    expect((activityBox?.y ?? 0) + (activityBox?.height ?? 0)).toBeLessThanOrEqual(
-      (advancedBox?.y ?? 0) + 24
-    );
+    expect((orientBox?.y ?? 0)).toBeLessThan((sketchBox?.y ?? 9999));
+    expect((primaryBox?.y ?? 0)).toBeLessThan((sketchBox?.y ?? 9999));
+    expect(sketchBox?.width ?? 0).toBeGreaterThan(280);
+    expect((sketchBox?.y ?? 0)).toBeLessThan((statusBox?.y ?? 9999));
+    expect((statusBox?.y ?? 0)).toBeLessThan((routesStripBox?.y ?? 9999) + 24);
+    expect((routesStripBox?.y ?? 0)).toBeLessThan((placesBox?.y ?? 0) + 24);
+    expect((placesBox?.y ?? 0)).toBeLessThan((drawerBox?.y ?? 0) + 24);
 
     const list = board.locator(".city-game-map-list-scroll");
     const listBox = await list.boundingBox();
     expect(listBox?.height ?? 0).toBeGreaterThan(360);
-    await advanced.scrollIntoViewIfNeeded();
-    await expect(advanced).toBeInViewport({ ratio: 0.2 });
+    await drawer.scrollIntoViewIfNeeded();
+    await expect(drawer).toBeInViewport({ ratio: 0.2 });
   });
 
   test("district sketch stays collapsed on desktop until expanded", async ({ page }) => {
@@ -712,5 +863,31 @@ test.describe("city game map board", () => {
 
     await expect(page.locator("#city-game-map-sync")).toHaveClass(/city-game-map-sync--stale/);
     await expect(page.locator("#city-game-map-sync")).toContainText("Couldn’t refresh");
+  });
+
+  test("first visit banner introduces scan charter and dismisses for session", async ({ page }) => {
+    await mockSeasonSnapshot(page, mockSnapshotBody());
+
+    await page.addInitScript(() => {
+      if (sessionStorage.getItem("__e2e_map_intro_seed") === "1") return;
+      sessionStorage.removeItem("hc_city_game_map_intro_dismissed:cr_season_01_wake");
+      sessionStorage.setItem("__e2e_map_intro_seed", "1");
+    });
+    await page.goto("/play/cedar-rapids/map/");
+
+    const banner = page.locator("#city-game-map-first-visit-banner");
+    await expect(banner).toBeVisible({ timeout: 15_000 });
+    await expect(banner).toContainText("Shared signed state on real stickers");
+    await expect(banner.getByRole("link", { name: "What a scan proves" })).toHaveAttribute(
+      "href",
+      "/play/cedar-rapids/#rules-prove-title"
+    );
+
+    await banner.getByRole("button", { name: "Got it" }).click();
+    await expect(banner).toHaveCount(0);
+
+    await page.reload();
+    await expect(page.locator(".city-game-map-board")).toBeVisible({ timeout: 15_000 });
+    await expect(banner).toHaveCount(0);
   });
 });

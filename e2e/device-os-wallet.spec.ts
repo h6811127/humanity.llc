@@ -1,6 +1,10 @@
 import { test, expect, type Page } from "@playwright/test";
 
 import { expandHubNetworkToolsAdvanced } from "./helpers/hub-network-tools";
+import {
+  gotoWalletWithBoot,
+  stubShellHealthOk,
+} from "./helpers/wallet-shell";
 
 const SAMPLE_WALLET_ENTRY = {
   id: "e2e_test_1",
@@ -112,6 +116,7 @@ async function waitForCreatedSigningKeys(page: Page) {
 
 test.describe("device OS wallet flow", () => {
   test.beforeEach(async ({ page }) => {
+    await stubShellHealthOk(page);
     await page.addInitScript((entry) => {
       localStorage.setItem("hc_wallet", JSON.stringify([entry]));
     }, SAMPLE_WALLET_ENTRY);
@@ -120,9 +125,11 @@ test.describe("device OS wallet flow", () => {
   test("shows My objects home and Open controls opens /created/ with session keys", async ({
     page,
   }) => {
-    await page.goto("/wallet/");
+    await gotoWalletWithBoot(page);
     await expect(page.getByRole("heading", { name: "My objects on this device" })).toBeVisible();
-    await expect(page.getByText("E2E Test Card")).toBeVisible();
+    await expect(
+      page.locator(".hub-card-item").filter({ hasText: SAMPLE_WALLET_ENTRY.label })
+    ).toBeVisible();
     await clickOpenControlsOnSavedCard(page);
     await expect(page).toHaveURL(/\/created\/\?.*profile_id=7Xk9mP2nQ4rT6vW8yZ1aB3cD5/);
     const sessionRaw = await page.evaluate(() => sessionStorage.getItem("hc_created"));
@@ -188,7 +195,7 @@ test.describe("device OS wallet flow", () => {
         })
     );
 
-    await page.goto("/wallet/");
+    await gotoWalletWithBoot(page);
     await expect(page.locator(".hub-card-status-label")).toContainText("Reachable", {
       timeout: 15_000,
     });
@@ -216,7 +223,7 @@ test.describe("device OS wallet flow", () => {
     }, SAMPLE_WALLET_ENTRY.profile_id);
     await stubCreatedResolver(page);
 
-    await page.goto("/wallet/");
+    await gotoWalletWithBoot(page);
     await clickOpenControlsOnSavedCard(page);
 
     await expect(page).toHaveURL(/\/created\/\?.*profile_id=7Xk9mP2nQ4rT6vW8yZ1aB3cD5/);
@@ -238,7 +245,7 @@ test.describe("device OS wallet flow", () => {
     }, SAMPLE_WALLET_ENTRY.profile_id);
     await stubCreatedResolver(page);
 
-    await page.goto("/wallet/");
+    await gotoWalletWithBoot(page);
     await expect(page.locator("#wallet-active-banner")).toBeVisible();
     await page.locator("#wallet-active-link").click();
 
@@ -262,7 +269,7 @@ test.describe("device OS wallet flow", () => {
     }, SAMPLE_WALLET_ENTRY.profile_id);
     await stubCreatedResolver(page);
 
-    await page.goto("/wallet/");
+    await gotoWalletWithBoot(page);
     await clickOpenControlsOnSavedCard(page);
     await expect(page).toHaveURL(/\/created\/\?.*profile_id=7Xk9mP2nQ4rT6vW8yZ1aB3cD5/);
     await waitForCreatedSigningKeys(page);
@@ -303,7 +310,7 @@ test.describe("device OS wallet flow", () => {
     await expect(page.locator("#created-setup-root")).toBeVisible();
     await expect(page.locator("#created-control-root")).toBeHidden();
     await expect(page.locator("#created-setup-root .created-setup-kicker")).toHaveText(
-      /steps · ownership stays on this device/
+      "Save on this device"
     );
   });
 
@@ -336,7 +343,7 @@ test.describe("device OS wallet flow", () => {
 
     const card = page.locator("#device-keys-custody-created-setup .device-keys-custody--created");
     await expect(card).toBeVisible();
-    await expect(card.locator(".hc-emphasis-card__eyebrow")).toHaveText(/keys on this device/i);
+    await expect(card.locator(".hc-emphasis-card__eyebrow")).toHaveText("Control on this device");
     await expect(card.getByRole("button", { name: "Acknowledge" })).toBeVisible();
     await expect(page.locator("#created-setup-keys-mount #created-keys-strip")).toBeVisible();
   });
@@ -350,7 +357,7 @@ test.describe("device OS wallet flow", () => {
       );
     }, SAMPLE_WALLET_ENTRY.profile_id);
     await stubCreatedResolver(page);
-    await page.goto("/wallet/");
+    await gotoWalletWithBoot(page);
     await expect(page.locator(".hub-card-status-label")).toContainText("Reachable", {
       timeout: 15_000,
     });
@@ -395,7 +402,7 @@ test.describe("device OS wallet flow", () => {
       });
     });
 
-    await page.goto("/wallet/");
+    await gotoWalletWithBoot(page);
     await expect(page.getByText("Reachable")).toBeVisible();
     await expect(page.locator(".hub-card-item .hub-card-identity").first()).toBeHidden();
     await expect(
@@ -431,7 +438,7 @@ test.describe("device OS wallet flow", () => {
       });
     });
 
-    await page.goto("/wallet/");
+    await gotoWalletWithBoot(page);
     await expect(page.getByText("Reachable")).toBeVisible({ timeout: 15_000 });
     await expect(
       page.getByText("Card disabled on the network since your last visit.")
@@ -516,7 +523,7 @@ test.describe("device OS wallet flow", () => {
     const statusResponse = (resp) =>
       resp.url().includes("/status") && resp.request().method() === "GET" && resp.ok();
 
-    await page.goto("/wallet/");
+    await gotoWalletWithBoot(page);
     await page.waitForResponse(statusResponse, { timeout: 15_000 });
     await expandHubNetworkToolsAdvanced(page);
     await page.evaluate(() => {
@@ -594,7 +601,7 @@ test.describe("device OS wallet flow", () => {
       });
     });
 
-    await page.goto("/wallet/");
+    await gotoWalletWithBoot(page);
     await expect(page.getByText("Reachable")).toBeVisible();
     await expect(page.locator(".hub-card-item .hub-card-identity").first()).toBeHidden();
     await expect(
@@ -667,7 +674,7 @@ test.describe("device OS wallet flow", () => {
       localStorage.setItem("hc_wallet", JSON.stringify(entries));
     }, [SAMPLE_WALLET_ENTRY, entryB]);
 
-    await page.goto("/wallet/");
+    await gotoWalletWithBoot(page);
     await expect(page.getByText("Reachable").first()).toBeVisible();
     await expect(page.locator(".hub-card-status-alert:not([hidden])")).toHaveCount(0);
 
@@ -750,7 +757,7 @@ test.describe("device OS wallet flow", () => {
       localStorage.setItem("hc_wallet", JSON.stringify(entries));
     }, [SAMPLE_WALLET_ENTRY, entryB]);
 
-    await page.goto("/wallet/");
+    await gotoWalletWithBoot(page);
     await expect(page.getByText("Reachable").first()).toBeVisible();
     await expect(page.locator(".hub-card-status-alert:not([hidden])")).toHaveCount(0);
 
@@ -760,7 +767,7 @@ test.describe("device OS wallet flow", () => {
       .getByRole("button", { name: "Open controls" })
       .click();
     await expect(page).toHaveURL(/\/created\/\?.*profile_id=/);
-    await page.goto("/wallet/");
+    await gotoWalletWithBoot(page);
     await expect(page.getByText("Reachable").first()).toBeVisible();
     await expect(page.locator(".hub-card-status-alert:not([hidden])")).toHaveCount(0);
   });
@@ -775,7 +782,7 @@ test.describe("device OS wallet flow", () => {
     await page.addInitScript(() => {
       localStorage.removeItem("hc_keys_custody_notice_dismissed");
     });
-    await page.goto("/wallet/");
+    await gotoWalletWithBoot(page);
     const card = page.locator(".device-keys-custody--wallet");
     await expect(card).toBeVisible();
     await expect(card.getByRole("button", { name: "Acknowledge" })).toBeVisible();
@@ -799,7 +806,7 @@ test.describe("device OS wallet flow", () => {
   });
 
   test("keys custody acknowledge dismiss persists on wallet", async ({ page }) => {
-    await page.goto("/wallet/");
+    await gotoWalletWithBoot(page);
     await page.evaluate(() => localStorage.removeItem("hc_keys_custody_notice_dismissed"));
     await page.reload();
     const card = page.locator(".device-keys-custody--wallet");
@@ -818,7 +825,7 @@ test.describe("device OS wallet flow", () => {
       localStorage.setItem("hc_theme", "dark");
       localStorage.removeItem("hc_keys_custody_notice_dismissed");
     });
-    await page.goto("/wallet/");
+    await gotoWalletWithBoot(page);
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
     const card = page.locator(".device-keys-custody--wallet");
     await expect(card).toBeVisible();
@@ -992,7 +999,7 @@ test.describe("hub My objects presentation (step 13)", () => {
       })
     );
 
-    await page.goto("/wallet/");
+    await gotoWalletWithBoot(page);
     await expect(page.locator("#device-hub-saved-items-title")).toHaveText("My objects");
 
     const list = page.locator("#device-hub-wallet-list .hub-card-item");

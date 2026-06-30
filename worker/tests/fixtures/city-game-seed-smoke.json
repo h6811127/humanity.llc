@@ -1,0 +1,26 @@
+{
+  "note": "TEST ONLY — committed fixture for CI; not a production seed",
+  "profile_id": "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+  "game_operator_private_key_b58": "6PWuUC5V5KZCG2ENAZBQRQvMAb7tcFkLd3z4FYeyFq5z",
+  "public_key_base58": "GnYQwx66GYxqb2jfjAQRRSJZogt3FEtD9x7bGLVnh5Rx",
+  "api_origin": "http://127.0.0.1:8787",
+  "nodes": [
+    {
+      "node_id": "node_07",
+      "qr_id": "qr_Ag51j5E7WAAk5E5t",
+      "public_label": "Czech Village cabinet"
+    },
+    {
+      "node_id": "node_10",
+      "qr_id": "qr_hfiQzG53d6oj25aq",
+      "site_code": "CR-WITNS-4P",
+      "public_label": "Library witness seal"
+    },
+    {
+      "node_id": "node_04",
+      "qr_id": "qr_aV3BcFtid5NBfCuM",
+      "site_code": "CR-LANTERN-7K",
+      "public_label": "Riverwalk River Lantern"
+    }
+  ]
+}

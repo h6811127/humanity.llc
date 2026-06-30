@@ -3,6 +3,11 @@
  * @see docs/CITY_GAME_MAP_DASHBOARD.md
  */
 
+import {
+  buildMapPagePlayerFootnoteHtml,
+  buildPlayerFlowMapBreadcrumbHtml,
+  resolveSeasonDiscoveryBrowseHref,
+} from "./public-network-player-nav-core.mjs";
 import { buildSeasonBannerBlock, formatSeasonWindowLabel } from "./city-game-season-banner-core.mjs";
 import {
   seasonBoardPath,
@@ -10,7 +15,7 @@ import {
   seasonLaunchContext,
 } from "./city-game-season-path-shared.mjs";
 
-export const MAP_PAGE_SCRIPT = "/js/city-game-map-page.mjs?v=4";
+export const MAP_PAGE_SCRIPT = "/js/city-game-map-page.mjs?v=5";
 export const STYLES_HREF = "/styles.css?v=157";
 
 /**
@@ -47,6 +52,9 @@ export function buildMapPageHtml(season, jsonBasename) {
     ? '    <meta name="robots" content="noindex, nofollow" />\n'
     : "";
   const metaDescription = `${heroObjective} Weekend city board for ${city}. No app. No account.`;
+  const canonicalMeta = boardPath
+    ? `    <link rel="canonical" href="${escapeHtml(boardPath)}" />\n`
+    : "";
 
   const bannerOrHint = isPlanned
     ? `<div class="research-dev-hint" role="note">
@@ -70,7 +78,7 @@ export function buildMapPageHtml(season, jsonBasename) {
       name="description"
       content="${escapeHtml(metaDescription)}"
     />
-${robotsMeta}    <meta name="theme-color" content="#ffffff" />
+${robotsMeta}${canonicalMeta}    <meta name="theme-color" content="#ffffff" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
     <link rel="stylesheet" href="${STYLES_HREF}" />
   </head>
@@ -85,11 +93,13 @@ ${robotsMeta}    <meta name="theme-color" content="#ffffff" />
       </header>
 
       <main class="screen screen-landing">
-        <section class="hero hero-compact">
+        ${buildPlayerFlowMapBreadcrumbHtml(boardTitle, escapeHtml)}
+        <section class="hero hero-compact city-game-map-page-hero">
           <p class="hero-eyebrow">${escapeHtml(city)}</p>
           <h1 id="city-state-title">${escapeHtml(boardTitle)}</h1>
+          <p class="hero-lead city-game-map-page-lead">A read-only weekend board — see which places are active, then scan stickers for live details.</p>
           <p class="hero-line hero-line-sub">
-            <a href="${escapeHtml(ctx.rulesPath)}">Rules</a>
+            <a href="${escapeHtml(ctx.rulesPath)}#rules-start-title">How this network works</a>
           </p>
         </section>
 
@@ -100,6 +110,7 @@ ${robotsMeta}    <meta name="theme-color" content="#ffffff" />
           id="city-state"
           aria-labelledby="city-state-title"
         >
+          <div id="city-game-map-first-visit-mount" class="city-game-map-first-visit-mount" hidden></div>
           <div id="city-game-map-root" class="city-game-map-root" data-season-id="${escapeHtml(seasonId)}">
             <noscript>
               <p class="city-game-map-error">
@@ -112,15 +123,7 @@ ${robotsMeta}    <meta name="theme-color" content="#ffffff" />
           </div>
         </section>
 
-        <p class="idea-footnote">
-          <a href="${escapeHtml(ctx.rulesPath)}">Full rules</a>
-          ·
-          <a href="${escapeHtml(boardPath)}">Share this board</a>
-          ·
-          <a href="/play/season/">All city games</a>
-          ·
-          <a href="/data-policy.html">Data policy</a>
-        </p>
+        ${buildMapPagePlayerFootnoteHtml(season, ctx.rulesPath, escapeHtml)}
       </main>
     </div>
     <script type="module" src="${MAP_PAGE_SCRIPT}"></script>
@@ -148,6 +151,16 @@ export function verifyMapPageHtml(html, season) {
   }
   if (!html.includes('id="city-state"')) {
     issues.push("missing #city-state section");
+  }
+  if (!html.includes('id="city-game-map-first-visit-mount"')) {
+    issues.push("missing city-game-map-first-visit-mount");
+  }
+  if (!html.includes("player-flow-breadcrumb")) {
+    issues.push("missing player-flow-breadcrumb");
+  }
+  const discoverHref = resolveSeasonDiscoveryBrowseHref(season);
+  if (discoverHref && !html.includes(discoverHref)) {
+    issues.push(`missing discover browse link ${discoverHref}`);
   }
   const boardPath = seasonBoardPath(String(season.rules_path ?? ""));
   if (boardPath && !html.includes(boardPath)) {

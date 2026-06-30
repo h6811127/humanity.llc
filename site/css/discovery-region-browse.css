@@ -1,0 +1,287 @@
+.discovery-region-screen .hero-line {
+  max-width: 36em;
+}
+
+.discovery-region-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  margin-top: 8px;
+}
+
+.discovery-network-filter-mount {
+  margin-top: 12px;
+}
+
+.discovery-network-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.discovery-network-filter-btn {
+  appearance: none;
+  -webkit-appearance: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.25;
+  padding: 7px 12px;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.92);
+  color: rgba(0, 0, 0, 0.82);
+  cursor: pointer;
+}
+
+.discovery-network-filter-btn[aria-pressed="true"] {
+  border-color: var(--red);
+  background: var(--red);
+  color: var(--white);
+}
+
+.discovery-network-board-link {
+  margin: 8px 0 0;
+}
+
+.discovery-regions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.discovery-region-card {
+  margin: 0;
+  padding: 16px;
+}
+
+.discovery-region-card__title {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.3;
+}
+
+.discovery-region-card__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.discovery-region-card__link:hover {
+  text-decoration: underline;
+}
+
+.discovery-region-card__meta,
+.discovery-region-card__summary {
+  margin: 6px 0 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text-muted, rgba(0, 0, 0, 0.62));
+}
+
+.discovery-pin-object-chooser {
+  margin-top: 14px;
+}
+
+.discovery-pin-object-chooser__title {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.discovery-pin-object-chooser__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.discovery-pin-object-chooser__item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.discovery-pin-object-chooser__item--primary {
+  border-color: rgba(219, 27, 67, 0.35);
+}
+
+.discovery-pin-object-chooser__link {
+  font-weight: 650;
+  color: var(--red);
+  text-decoration: none;
+}
+
+.discovery-pin-object-chooser__type {
+  font-size: 12px;
+  color: var(--text-muted, rgba(0, 0, 0, 0.62));
+}
+
+html[data-theme="dark"] .discovery-network-filter-btn {
+  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.88);
+}
+
+html[data-theme="dark"] .discovery-pin-object-chooser__item {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.discovery-near-me-btn {
+  appearance: none;
+  -webkit-appearance: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.25;
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.92);
+  color: rgba(0, 0, 0, 0.82);
+  cursor: pointer;
+}
+
+.discovery-near-me-btn--active {
+  border-color: var(--red);
+  background: var(--red);
+  color: var(--white);
+}
+
+.discovery-near-me-status,
+.discovery-region-privacy,
+.discovery-region-loading,
+.discovery-region-empty,
+.discovery-region-error {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text-muted, rgba(0, 0, 0, 0.62));
+}
+
+.discovery-region-privacy {
+  margin-top: 10px;
+}
+
+.discovery-region-search {
+  width: 100%;
+  margin-top: 14px;
+}
+
+.discovery-pin-count {
+  margin: 12px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted, rgba(0, 0, 0, 0.62));
+}
+
+.discovery-pin-results {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.discovery-pin-row {
+  margin: 0;
+  padding: 14px 16px;
+}
+
+.discovery-pin-row__heading {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.3;
+}
+
+.discovery-pin-row__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.discovery-pin-row__link:hover {
+  text-decoration: underline;
+}
+
+.discovery-pin-row__state {
+  margin: 6px 0 0;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: rgba(0, 0, 0, 0.82);
+}
+
+.discovery-pin-row__meta {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--text-muted, rgba(0, 0, 0, 0.62));
+}
+
+html[data-theme="dark"] .discovery-pin-row__state {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.discovery-pin-detail-mount:not([hidden]) + .discovery-pin-results {
+  margin-top: 16px;
+}
+
+.discovery-pin-detail-mount[hidden] {
+  display: none;
+}
+
+.discovery-pin-detail {
+  margin-top: 8px;
+  padding: 16px;
+}
+
+.discovery-pin-detail__summary {
+  margin: 10px 0 0;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.discovery-pin-detail__state {
+  margin-top: 14px;
+}
+
+.discovery-pin-detail__state-headline {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.discovery-pin-detail__actions {
+  margin-top: 14px;
+}
+
+.discovery-pin-detail__links {
+  margin: 14px 0 0;
+  font-size: 14px;
+}
+
+.discovery-pin-detail__scan-missing {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text-muted, rgba(0, 0, 0, 0.62));
+}
+
+html[data-theme="dark"] .discovery-near-me-btn {
+  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.88);
+}
+
+html[data-theme="dark"] .discovery-near-me-btn--active {
+  border-color: var(--red);
+  background: var(--red);
+  color: var(--white);
+}

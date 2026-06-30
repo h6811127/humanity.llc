@@ -2,17 +2,24 @@
  * Apply season snapshot JSON to the city board DOM (M2 live chips).
  * @see docs/CITY_GAME_MAP_DASHBOARD.md
  */
+import {
+  buildDualVictoryPanelHtml,
+  parseDualVictoryFromSnapshot,
+  shouldShowDualVictoryPanel,
+} from "./city-game-dual-victory-board-core.mjs";
 import { applyBoardFilterVisibility } from "./city-game-map-filter-core.mjs";
 import {
   COOPERATIVE_BOARD_ROLES,
   escapeMapHtml,
   formatHookLine,
+  formatCityStatusLeadLine,
   formatMysteryNodeCopy,
   formatNodeConsequenceLine,
   formatProgressLine,
   formatStaticWorldStatusLine,
   MAP_ROW_SCAN_HINT,
   resolveRowScanCta,
+  ROW_ROLE_STATUS_HINT,
   seasonRumoredNodeIds,
 } from "./city-game-map-board-core.mjs";
 import { deriveNodeBoardStates } from "./city-game-map-state-filter-core.mjs";
@@ -227,15 +234,19 @@ export function applyLobbyProgressFromSnapshot(boardRoot, snapshot) {
   const lobby = boardRoot.querySelector(".city-game-map-lobby");
   const progressEl = boardRoot.querySelector("#city-game-map-progress");
   const hookEl = boardRoot.querySelector("#city-game-map-hook");
+  const questHookEl = boardRoot.querySelector("#city-game-map-quest-hook");
   if (!lobby || typeof lobby !== "object" || !("dataset" in lobby)) return;
 
-  const dataset = /** @type {{ hook?: string; hookStirring?: string; hookAwake?: string; progressSuffix?: string }} */ (
+  const dataset = /** @type {{ hook?: string; hookStirring?: string; hookAwake?: string; cityStatusLead?: string; cityStatusLeadActive?: string; cityStatusLeadComplete?: string; progressSuffix?: string }} */ (
     lobby.dataset
   );
   const copy = {
     hook: dataset.hook,
     hook_stirring: dataset.hookStirring,
     hook_awake: dataset.hookAwake,
+    city_status_lead: dataset.cityStatusLead,
+    city_status_lead_active: dataset.cityStatusLeadActive,
+    city_status_lead_complete: dataset.cityStatusLeadComplete,
     progress_suffix: dataset.progressSuffix,
   };
   const finale = /** @type {Record<string, unknown>} */ (snapshot.finale);
@@ -244,7 +255,12 @@ export function applyLobbyProgressFromSnapshot(boardRoot, snapshot) {
     progressEl.textContent = formatProgressLine(finale, copy);
   }
   if (hookEl && typeof hookEl === "object" && "textContent" in hookEl) {
-    hookEl.textContent = formatHookLine(finale, copy);
+    hookEl.textContent = dataset.cityStatusLead
+      ? formatCityStatusLeadLine(finale, copy)
+      : formatHookLine(finale, copy);
+  }
+  if (questHookEl && typeof questHookEl === "object" && "textContent" in questHookEl) {
+    questHookEl.textContent = formatHookLine(finale, copy);
   }
 }
 
@@ -297,6 +313,113 @@ export function formatSpotlightCountLine(value, countLabel = "") {
   if (!trimmed) return null;
   const label = countLabel?.trim();
   return label ? `${label} · ${trimmed}` : trimmed;
+}
+
+/**
+ * @param {Record<string, unknown> | null | undefined} snap
+ * @param {string | null | undefined} role
+ * @param {string} staticHint
+ */
+export function formatPinStateFromSnapshot(snap, role, staticHint) {
+  if (snap?.map_mode === "care_pause") return "Care pause";
+  if (snap?.lifecycle === "revoked") return "Revoked";
+  if (!snap || !Array.isArray(snap.chips) || !snap.chips.length) {
+    return staticHint || ROW_ROLE_STATUS_HINT[role ?? ""] || "Unknown";
+  }
+  const primary =
+    snap.chips.find((chip) => chip?.kind === "state") ??
+    snap.chips.find((chip) => chip?.kind === "collective") ??
+    snap.chips[0];
+  const value = typeof primary?.value === "string" ? primary.value.trim() : "";
+  if (!value) return staticHint || "Live";
+  if (value.length <= 22) return value;
+  return `${value.slice(0, 20)}…`;
+}
+
+/**
+ * @param {HTMLElement} boardRoot
+ */
+export function refreshSelectionPanelFromHighlight(boardRoot) {
+  const panel = boardRoot.querySelector("#city-game-map-selection-panel");
+  if (!(panel instanceof HTMLElement) || panel.hidden) return;
+  const nodeId = boardRoot.dataset.highlightNodeId;
+  if (!nodeId) return;
+  const row = boardRoot.querySelector(
+    `.city-game-map-node-row[data-node-id="${CSS.escape(nodeId)}"]`
+  );
+  if (!(row instanceof HTMLElement)) return;
+
+  const effectEl = panel.querySelector("[data-selection-effect]");
+  const chipsEl = panel.querySelector("[data-selection-chips]");
+  const scanEl = panel.querySelector("[data-selection-scan]");
+  const rowEffect = row.querySelector("[data-node-effect]");
+  const rowChips = row.querySelector("[data-node-chips]");
+  const scanLink = row.querySelector(".city-game-map-scan-link");
+
+  if (effectEl instanceof HTMLElement && rowEffect instanceof HTMLElement) {
+    effectEl.textContent = rowEffect.textContent ?? "";
+  }
+  if (chipsEl instanceof HTMLElement) {
+    if (rowChips instanceof HTMLElement && !rowChips.hidden && rowChips.innerHTML.trim()) {
+      chipsEl.innerHTML = rowChips.innerHTML;
+      chipsEl.hidden = false;
+    } else {
+      chipsEl.innerHTML = "";
+      chipsEl.hidden = true;
+    }
+  }
+  if (scanEl instanceof HTMLElement) {
+    if (scanLink instanceof HTMLAnchorElement) {
+      scanEl.innerHTML = scanLink.outerHTML;
+    }
+  }
+}
+
+/**
+ * @param {HTMLElement} boardRoot
+ * @param {Record<string, unknown>} snapshot
+ */
+export function applyContestOverlayFromSnapshot(boardRoot, snapshot) {
+  const mapVisibility =
+    typeof snapshot.map_visibility === "string" ? snapshot.map_visibility.trim() : "public";
+  const contestOn = mapVisibility !== "public";
+  if (boardRoot.classList && typeof boardRoot.classList.toggle === "function") {
+    boardRoot.classList.toggle("city-game-map-board--contest", contestOn);
+  }
+  const hero = boardRoot.querySelector("#city-game-map-sketch-hero");
+  if (hero instanceof HTMLElement) {
+    hero.classList.toggle("city-game-map-sketch-hero--contest", contestOn);
+  } else if (hero && typeof hero === "object" && hero.classList?.toggle) {
+    hero.classList.toggle("city-game-map-sketch-hero--contest", contestOn);
+  }
+  const overlay = boardRoot.querySelector("#city-game-map-contest-overlay");
+  if (overlay && typeof overlay === "object" && "hidden" in overlay) {
+    overlay.hidden = !contestOn;
+  }
+}
+
+/**
+ * @param {HTMLElement} boardRoot
+ * @param {Record<string, unknown>} snapshot
+ */
+export function applyDualVictoryFromSnapshot(boardRoot, snapshot) {
+  const mount = boardRoot.querySelector("#city-game-map-dual-victory-mount");
+  if (!mount || typeof mount !== "object") return;
+  if (!shouldShowDualVictoryPanel(snapshot)) {
+    mount.hidden = true;
+    mount.innerHTML = "";
+    mount.setAttribute("aria-hidden", "true");
+    return;
+  }
+  const dual = parseDualVictoryFromSnapshot(snapshot.signal_war);
+  if (!dual) {
+    mount.hidden = true;
+    mount.innerHTML = "";
+    return;
+  }
+  mount.innerHTML = buildDualVictoryPanelHtml(dual);
+  mount.hidden = false;
+  mount.removeAttribute("aria-hidden");
 }
 
 /**
@@ -381,7 +504,7 @@ export function applySnapshotToMapBoard(boardRoot, snapshot) {
     if (!(live instanceof HTMLElement)) continue;
     const snap = nodeSnapshot(nodeById, nodeId);
     const role = row.getAttribute("data-role");
-    const ctaLabel = resolveRowScanCta(role);
+    const ctaLabel = resolveRowScanCta(role, undefined, { hasScanUrl: Boolean(snap?.scan_url) });
     const effectEl = row.querySelector("[data-node-effect]");
 
     if (mapVisibility === "public" || snap) {
@@ -487,6 +610,9 @@ export function applySnapshotToMapBoard(boardRoot, snapshot) {
 
   const edges = Array.isArray(snapshot.unlock_edges) ? snapshot.unlock_edges : [];
   const primaryNode = boardRoot.dataset.primaryNode?.trim() ?? "";
+  const startLabel = boardRoot.dataset.routeStartLabel?.trim() || "Start";
+  const openLabel = boardRoot.dataset.routeOpenLabel?.trim() || "Open";
+  const lockedLabel = boardRoot.dataset.routeLockedLabel?.trim() || "Locked";
   for (const edge of edges) {
     if (!edge?.from || !edge?.to) continue;
     const selector = `[data-edge-from="${edge.from}"][data-edge-to="${edge.to}"]`;
@@ -494,13 +620,14 @@ export function applySnapshotToMapBoard(boardRoot, snapshot) {
     const isNext = !satisfied && primaryNode && edge.from === primaryNode;
     for (const el of boardRoot.querySelectorAll(selector)) {
       el.classList.toggle("city-game-map-edge--satisfied", satisfied);
+      el.classList.toggle("city-game-map-edge--next", isNext);
       if (el instanceof HTMLElement) {
         el.classList.toggle("city-game-map-route-row--unlocked", satisfied);
         el.classList.toggle("city-game-map-route-row--next", isNext);
         el.dataset.routeLocked = satisfied || isNext ? "false" : "true";
         const stateEl = el.querySelector(".city-game-map-route-state");
         if (stateEl instanceof HTMLElement) {
-          stateEl.textContent = satisfied ? "Open" : isNext ? "Next" : "Locked";
+          stateEl.textContent = satisfied ? openLabel : isNext ? startLabel : lockedLabel;
         }
       }
     }
@@ -515,6 +642,13 @@ export function applySnapshotToMapBoard(boardRoot, snapshot) {
     pin.classList.toggle("city-game-map-pin--fog-hidden", fogHidden);
     pin.classList.toggle("city-game-map-pin--live", Boolean(snap?.chips?.length));
     pin.classList.toggle("city-game-map-pin--maintenance", snap?.map_mode === "care_pause");
+    pin.classList.toggle(
+      "city-game-map-pin--relay-held",
+      role === "relay_gate" &&
+        Boolean(
+          snap?.chips?.some((chip) => /held|claimed|network/i.test(String(chip?.value ?? "")))
+        )
+    );
     if (fogHidden || (!snap && mapVisibility !== "public")) {
       pin.setAttribute("data-board-visibility", "hidden");
       pin.setAttribute("data-board-states", "locked");
@@ -522,8 +656,14 @@ export function applySnapshotToMapBoard(boardRoot, snapshot) {
       pin.setAttribute("data-board-visibility", "public");
       pin.setAttribute("data-board-states", deriveNodeBoardStates(snap, role).join(" "));
     }
+    const networkLens = boardRoot.classList.contains("city-game-map-board--network-lens");
+    const staticHint = ROW_ROLE_STATUS_HINT[role ?? ""] ?? "Unknown";
+    const stateEl = pin.querySelector(".city-game-map-pin-state");
+    if (stateEl instanceof SVGTextElement) {
+      stateEl.textContent = formatPinStateFromSnapshot(snap, role, staticHint);
+    }
     const labelEl = pin.querySelector(".city-game-map-pin-label");
-    if (labelEl instanceof SVGTextElement) {
+    if (labelEl instanceof SVGTextElement && !networkLens) {
       labelEl.setAttribute("visibility", "hidden");
     }
   }
@@ -546,7 +686,9 @@ export function applySnapshotToMapBoard(boardRoot, snapshot) {
   applyLobbyProgressFromSnapshot(boardRoot, snapshot);
   applyFinaleFromSnapshot(boardRoot, snapshot);
   applySignalWarFromSnapshot(boardRoot, snapshot);
-  applySpotlightFromSnapshot(boardRoot, snapshot);
+  applyContestOverlayFromSnapshot(boardRoot, snapshot);
+  applyDualVictoryFromSnapshot(boardRoot, snapshot);
+  refreshSelectionPanelFromHighlight(boardRoot);
 
   return { ok: true, nodeCount: nodes.length };
 }

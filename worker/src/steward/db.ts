@@ -11,6 +11,7 @@ import {
   stewardUpdateForExpiredAccount,
 } from "./billing-lifecycle";
 import { closeStewardPushConnectionsForAccount } from "./push";
+import { deleteStewardWebPushSubscriptionsForAccount } from "./web-push-db";
 
 const STEWARD_TABLE = "steward_accounts";
 
@@ -196,6 +197,7 @@ export async function applyStewardLifecycleTransitions(
       .run();
     await revokeAllSessionsForAccount(db, accountId);
     closeStewardPushConnectionsForAccount(accountId);
+    await deleteStewardWebPushSubscriptionsForAccount(db, accountId);
     return getAccount(db, accountId);
   }
 

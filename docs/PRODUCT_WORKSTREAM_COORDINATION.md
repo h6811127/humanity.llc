@@ -3,7 +3,13 @@
 **Purpose:** Single reference for parallel agents and humans — active work, regression gates, file ownership.  
 **Also read:** [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) (rules that must stay true) · [`DOC_MAINTENANCE.md`](DOC_MAINTENANCE.md) (doc policy)
 
-**Last updated:** 2026-06-04
+**Last updated:** 2026-06-21
+
+**Changelog (2026-06-21):** **Landing live object carriers shipped** — `#landing-live-object-carriers` on `/` after public boards · hydrates from `shop-config.json` + print catalog / store rows · [`landing-live-object-carriers-core.mjs`](../site/js/landing-live-object-carriers-core.mjs) · contract v7+ · `npm run verify:landing` · e2e `landing-copy.spec.ts`.
+
+**Changelog (2026-06-21):** **Landing commerce spec (docs)** — discovery-first `/` + carriers row design ([`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) § Landing carriers row).
+
+**Changelog (2026-06-21):** **WS-CR network lens v2 — Phase 0 docs** — canonical presentation in [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) § Network lens; **SF-3** in [`STATE_FIRST_UI_MODEL.md`](STATE_FIRST_UI_MODEL.md); **GT-8** orientation gate in [`CITY_GAME_COMPREHENSION_RUNBOOK.md`](CITY_GAME_COMPREHENSION_RUNBOOK.md); board field scenarios in [`CITY_GAME_INSTALL_QA.md`](CITY_GAME_INSTALL_QA.md). **Hold B13 centerpiece** until SF-3 Phase 1–2 + human GT-8 pass. Interim map-first code on production is not signed spec.
 
 **Changelog (2026-06-04):** **Steward UX presentation target (step 20)** — canonical spec [`STEWARD_UX_PRESENTATION_TARGET.md`](STEWARD_UX_PRESENTATION_TARGET.md): **Q1 decided** (one root + dual skins + season-only fork), room switcher, client steward state model, presentation policy (add vs list), implementation slices, risks. Slice 1 shipped (add-hub filter). Next: room switcher (slice 2). Cross-links: [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) · [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) · [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) Phase E.
 
@@ -253,10 +259,10 @@ WS-E (Phase E /created/ setup — needs WS-REV entitlements UI)
 | **Canonical docs** | [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) § Phase E · [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) · [`CITY_GAME_OPERATOR_CUSTODY.md`](CITY_GAME_OPERATOR_CUSTODY.md) § Self-serve setup |
 | **In scope** | `/created/` **Add game node** (parity with status plate) · hub rows for `game_node` · season metadata editor · rules draft + publish · bulk template import · **`e2e/city-game-self-serve-setup.spec.ts` shipped** · deprecate terminal mint for **new** self-serve seasons (keep scripts for CI/fixtures) |
 | **Out of scope** | Stripe checkout flow (WS-REV); Cedar Rapids launch apply (WS-CR); scan analytics; delegated child keys |
-| **Gates (do not market “create your own game” until)** | **E1** Phase D signed · **E2** loader ≥2 seasons (**met**) · **E3** full 15-node season in browser on staging · **E4** comprehension on self-serve rules · **E5** INVARIANTS updated (**R-16**) |
+| **Gates (do not market “create your own game” until)** | **E1** Phase D signed · **E2** loader ≥2 seasons (**met**) · **E3** full season template in browser on staging (**40** CR summer · **15** example demo) · **E4** comprehension on self-serve rules · **E5** INVARIANTS updated (**R-16**) |
 | **Regression** | `npm run verify:city-game` · `npm run verify:city-game -- --e2e` · `npm run e2e:city-game-self-serve-setup` · `npm run worker:test -- worker/tests/city-game-season-loader.test.ts` |
 | **File ownership** | `site/js/created-*game*` (new modules TBD) · `site/created/index.html` · `worker/src/city-game/season-loader.ts` (registerSeasonConfig only if needed) · **Do not** fork parallel mint API — use `POST …/objects` + `issue-qr` |
-| **Status** | **E2E ☑** · **E5 INVARIANTS ☑** · **E3 tooling ☑** (`city-game:self-serve-staging-preflight`) · **Next:** human E3 walkthrough on staging (15 nodes, no terminal) |
+| **Status** | **E2E ☑** · **E5 INVARIANTS ☑** · **E3 preflight ☑** (default CR summer 40-node · `--browser-staging` · `--metadata-draft` · unlock graph gate) · **unlock_edges + print pack ☑** · **When panel draft hint ☑** · **Next:** human E3 walkthrough on staging (**40/40** CR summer, no terminal) |
 | **Blocked by** | WS-CR **E1** (Phase D launch sign-off) before marketing self-serve |
 
 ---
@@ -294,7 +300,7 @@ WS-E (Phase E /created/ setup — needs WS-REV entitlements UI)
 | **Milestones** | **Q0** belt ☑ · **Q1** loop table complete · **Q2** P0 green local · **Q3** comprehension (5 steward / 3 stranger) · **Q4** rearchitecture decision (default **no**) |
 | **Regression** | `npm run verify:desk:fast` (CI) · `npm run verify:desk` (pre-merge) · per-row gates in [`CORE_PRODUCT_LOOP.md`](CORE_PRODUCT_LOOP.md) § Core loop inventory |
 | **File ownership** | `site/create/**` · `site/created/**` · `site/js/device-{hub,status,wallet,ownership}*` · `site/js/create-*` · targeted `e2e/*` · resolver sad-path fixes |
-| **Status** | **Q0 shipped** · **Q1–Q3 open** — rearchitecture **deferred** until measured friction |
+| **Status** | **Q0 shipped** · **Q1 engineering shipped** (`ws-quality:q1-preflight`) · **Q1 human + Q2–Q3 open** — rearchitecture **deferred** until measured friction |
 | **Hub/inbox mutex** | **WS-NOTIF closed** — WS-QUALITY owns **P1-MOTO-06/10/21** and mutex hub/inbox/network files (see WS-NOTIF § Mutex) |
 | **Blocks** | **Steward-path marketing** and **LO-1** until L1–L4, L6–L7 green — **not** WS-LIVE game field work when § [Gating (revised)](#gating-revised) rules hold |
 
@@ -332,7 +338,7 @@ WS-E (Phase E /created/ setup — needs WS-REV entitlements UI)
 | **B7 at ~40** | WS-SCALE + WS-CR | Install QA + comprehension at **opening footprint**, not 15-node scaffold count |
 | **G-C0** (parallel) | WS-CUSTODY | `custody:phase0-sign-off -- --pass` — **not** a city-game blocker; **is** a broad consumer-launch blocker |
 
-Phase 1 human gates still open: **WS-CR C2** comprehension ≥5 · **WS-E E3** staging walkthrough (15-node scaffold OK for E3; summer open needs **SC-2**).
+Phase 1 human gates still open: **WS-CR C2** comprehension ≥5 · **WS-E E3** staging walkthrough (**40/40** CR summer browser path; **15** example remains generic self-serve demo).
 
 ### Phase 2 critical path
 
@@ -543,6 +549,7 @@ npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts
 
 | Date | Event |
 |------|--------|
+| 2026-06-21 | **WS-CR network lens v2 Phase 0** — docs: [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) § Network lens · SF-3 · GT-8 · install QA board scenarios · B13 hold until SF-3 ships |
 | 2026-06-04 | **WS-LIVE tooling** — `verify:live` / `verify:live:fast` belt · `ws-live:preflight` · `ws-live:lo1-kit` (LO-1 field walk) |
 | 2026-06-04 | **WS-NOTIF N3 + P1-MOTO cluster** — foreground U0 strip · Check network refreshes resolver health first · Chrome-aware companion copy on Android PWA |
 | 2026-06-04 | **WS-NOTIF** — notification v2 workstream (TIF) — [`NOTIFICATION_SYSTEM_V2.md`](NOTIFICATION_SYSTEM_V2.md) |

@@ -132,7 +132,7 @@ Run on **production** (or staging with full Pages deploy) after `site/` ships. M
 
 ### P0-N · Notifications v2 — Android Chrome PWA (WS-NOTIF N4)
 
-**Spec:** [`NOTIFICATION_SYSTEM_V2.md`](NOTIFICATION_SYSTEM_V2.md) · Automated guards: `npm run notify:field-signoff` · Vitest/e2e belt: `npm run notify:verify` · `npm run notify:foreground:e2e`
+**Spec:** [`NOTIFICATION_SYSTEM_V2.md`](NOTIFICATION_SYSTEM_V2.md) · Automated guards: `npm run notify:field-signoff` · `npm run notify:transport:tier1` · Vitest/e2e belt: `npm run notify:verify` · `npm run notify:foreground:e2e`
 
 **Device:** Physical **Android phone** with **Chrome** (not Samsung Internet / Firefox). Install Humanity from Chrome (**Add to Home screen** / installed PWA). Do **not** use iOS Safari for this matrix — use **P0-W** for WebKit.
 
@@ -157,20 +157,54 @@ Run on **production** (or staging with full Pages deploy) after `site/` ships. M
 
 **Fail signals:** Legacy `#device-live-proof-banner` shows alongside strip; strip missing while badge counts proof; strip CTA dead.
 
-#### P0-N2 · Background OS alert (tab/app away, live proof U0) — **NON-FUNCTIONAL (deferred)**
+#### P0-N2 · Background OS alert (tab/app away, live proof U0) — **field re-test (Tier 1 transport)**
 
-**Status (2026-06-04):** **Do not run for sign-off.** Repeated Android Chrome PWA field attempts failed (no reliable tray alert; tap-through regressed). Documented in [`NOTIFICATION_SYSTEM_V2.md`](NOTIFICATION_SYSTEM_V2.md) § Known limitations. **WS-NOTIF N4** does **not** require P0-N2 pass.
+**Status (2026-06-23):** Tier 1 transport shipped in repo — **SW-only OS when hidden**, full-wallet SW probe on hide, push-hint cache, relay OS in SW. **Run this matrix on physical Android Chrome PWA** to sign off P0-N2. Automated guards: `npm run notify:transport:tier1`.
 
-**When reopened:** Use the matrix below.
+**Transport path (must match field behavior):**
+
+| Layer | Expected |
+|-------|----------|
+| Page (hidden) | Does **not** call `new Notification()` |
+| SW | `sw-live-proof.mjs` shows tray alert via `registration.showNotification` |
+| Tap | Opens `/created/` sign URL (`live_proof`) via SW postMessage navigate |
 
 | Step | Action | Expected |
 |------|--------|----------|
 | 1 | Pending live proof; **Background alerts** on | Opt-in copy on Android PWA mentions **Chrome** (not Safari) when offered |
-| 2 | Send PWA to background (Home) or switch to another app ~30s | **One** Chrome system notification (live proof); title ≈ card label |
-| 3 | Tap notification | Humanity foregrounds; opens `/created/` sign flow |
-| 4 | Foreground again with proof still pending | Strip visible; **no** spam of duplicate OS notifications for unchanged challenge |
+| 2 | Enable diagnostics (optional): `localStorage.hc_inbox_diagnostics = "1"` | `window.__hcNotifyTransportSnapshot()` available in console after reload |
+| 3 | Send PWA to background (Home) or switch to another app ~30s | **One** Chrome system notification (live proof); title ≈ card label; delivered via **SW** (not page) |
+| 4 | Tap notification | Humanity foregrounds; opens `/created/` sign flow with `live_challenge` |
+| 5 | Foreground again with proof still pending | Strip visible; **no** spam of duplicate OS notifications for unchanged challenge |
 
-**Fail signals:** Copy says Safari on Android; no OS alert when hidden; duplicate notifications every poll tick.
+**Fail signals:** Copy says Safari on Android; no OS alert when hidden; page `Notification` path used; duplicate notifications every poll tick; tap opens wrong URL.
+
+**Field debug:** With `hc_inbox_diagnostics=1`, inspect `sessionStorage.hc_inbox_diag_log` for `os_delivery_sw` entries and run `__hcNotifyTransportSnapshot()`.
+
+#### P0-N2-T2 · Force-quit / no page (Tier 2 Web Push)
+
+**Status (2026-06-23):** Tier 2 store + worker fan-out in repo. Requires operator **VAPID keys** + migration **0037** on target env. Engineering: `npm run notify:web-push:tier2` · `npm run notify:web-push:preflight`.
+
+**Transport path (must match field behavior):**
+
+| Layer | Expected |
+|-------|----------|
+| Page (swiped away / force-stopped) | No Humanity tab process |
+| Operator | `notifyLiveProofPending` → Web Push POST to browser push service |
+| SW | `push` event → `notifyFromPushHint` → `registration.showNotification` |
+| Tap | Opens `/created/` sign URL (`live_proof`) |
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Hosted steward + **Background alerts** on; entitled account linked | `syncStewardWebPushSubscription` POSTs subscribe (200) when VAPID configured |
+| 2 | Diagnostics: `localStorage.hc_inbox_diagnostics = "1"` | `__hcNotifyTransportSnapshot().web_push.should_maintain === true`; `await __hcWebPushSubscriptionEndpoint()` returns FCM/Mozilla URL |
+| 3 | Force-stop PWA (Android app info → Force stop) or swipe away all tasks | No page process |
+| 4 | Trigger live proof from second device | **One** system notification within ~30s (hosted Web Push path) |
+| 5 | Tap notification | PWA opens `/created/` sign flow |
+
+**Fail signals:** Subscribe 501 (VAPID/migration missing); `web_push.should_maintain` false while entitled; no OS alert after force-stop; only works when tab hidden but not force-stopped (Tier 1 only).
+
+**Ops before field:** `npm run notify:web-push:vapid-keys` → set public in wrangler `[vars]`, private via secret → `npm run worker:migrate:remote` → `npm run notify:web-push:preflight -- --api https://humanity.llc`.
 
 #### P0-N3 · Finder relay message (relay_offer U0, when testable)
 
@@ -193,7 +227,7 @@ Run on **production** (or staging with full Pages deploy) after `site/` ships. M
 
 **Fail signals:** Safari named on Android standalone; user told to use Safari for notifications.
 
-**Sign-off:** Log pass/fail per row in § Bug triage log (`P0-N1` … `P0-N4`). **WS-NOTIF N4** exits when **P0-N1, P0-N3 (if testable), P0-N4** pass on one Android Chrome PWA session — **P0-N2 excluded** (non-functional).
+**Sign-off:** Log pass/fail per row in § Bug triage log (`P0-N1` … `P0-N4`). **WS-NOTIF N4** exits when **P0-N1, P0-N2, P0-N3 (if testable), P0-N4** pass on one Android Chrome PWA session after **`npm run notify:transport:tier1`** is green in CI.
 
 ### P0-SMOOTH · Smooth mode Phase 0 lab matrix (standard tier baseline)
 

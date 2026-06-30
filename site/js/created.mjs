@@ -45,6 +45,7 @@ import { markSetupDone, modeFromPage, isSetupDone } from "./created-mode.mjs";
 import { ownershipBackupSeatbeltSatisfied } from "./created-first-session-gate-core.mjs";
 import { findWalletEntryByProfileId } from "./device-wallet.mjs";
 import { initCreatedMerchFunnel } from "./created-merch-funnel.mjs";
+import { initCreatedShopAccess } from "./created-shop-access.mjs";
 import { initCreatedLiveObjectCard } from "./created-live-object-card.mjs";
 import { initCreatedChildObject } from "./created-child-object.mjs";
 import { initCreatedLostItemRelay } from "./created-child-object-lost-item.mjs";
@@ -519,6 +520,8 @@ let downloadQrClick = null;
 let liveObjectCardCtl = null;
 /** @type {ReturnType<typeof initCreatedTagsCollection> | null} */
 let tagsCollectionCtl = null;
+/** @type {ReturnType<typeof initCreatedShopAccess> | null} */
+let createdShopAccessCtl = null;
 
 function prepareGameSeasonSetupLandingFromUrl() {
   if (isGameSeasonSetupFocus(params)) {
@@ -618,7 +621,16 @@ function wireCreatedPresentation() {
   wireCreatedCollection();
   wireCreatedTagsCollection();
   wireCreatedFocusedObject();
+  wireCreatedShopAccess();
   syncCreatedRoomSwitcher(profileId, loadSession());
+}
+
+function wireCreatedShopAccess() {
+  if (!profileId || createdShopAccessCtl) return;
+  createdShopAccessCtl = initCreatedShopAccess({
+    profileId,
+    getWorkspaceMode: () => workspaceMode,
+  });
 }
 
 function wireCreatedTagsCollection() {
@@ -767,6 +779,7 @@ function enterControlWorkspace() {
     dashboardWired = true;
   }
   finalizeControlWorkspacePresentation();
+  createdShopAccessCtl?.sync?.();
   void bootstrapOwnerTools();
   void liveObjectCardCtl?.maybeRunArrive();
 }

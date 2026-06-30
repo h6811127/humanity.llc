@@ -3,6 +3,7 @@
  */
 
 import { validateMapLayout } from "../../site/js/city-game-map-board-core.mjs";
+import { validateNetworkLens } from "../../site/js/city-game-network-lens-core.mjs";
 import {
   contributableNodeIds,
   validateNetworkGraph,
@@ -165,6 +166,10 @@ export function cityGameSeasonReadiness(season, opts = {}) {
   validateAutonomousSpine(s, nodeIds, issues, warnings);
 
   issues.push(...validateMapLayout(s));
+
+  if (s.season_id === "cr_season_01_wake") {
+    validateNetworkLens(s, issues);
+  }
 
   if (s.bulletin_schedule?.entries?.length && (!s.window?.starts_at || !s.window?.ends_at)) {
     warnings.push(

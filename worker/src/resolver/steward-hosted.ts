@@ -32,6 +32,12 @@ import { verifyStewardAccountLink } from "../steward/link-proof";
 import { parseEntitlementsJson, utcDayKey } from "../steward/plans";
 import { generateSessionToken, hashSessionToken } from "../steward/session-token";
 import { authenticateStewardSession } from "./steward-session-auth";
+import {
+  handlePostStewardWebPushSubscribe,
+  handleDeleteStewardWebPushSubscribe,
+  parseStewardWebPushSubscribeBody,
+  parseStewardWebPushUnsubscribeBody,
+} from "../steward/web-push-subscribe";
 import { PROTOCOL_VERSION } from "../crypto";
 import {
   accountMayAccessGameSeason,
@@ -99,8 +105,17 @@ export async function handleGetOperatorCapabilities(
           entitlements: "/.well-known/hc/v1/steward/entitlements",
           session: "/.well-known/hc/v1/steward/session",
           push: "/.well-known/hc/v1/steward/push",
+          push_subscribe: "/.well-known/hc/v1/steward/push/subscribe",
           billing_checkout: "/.well-known/hc/v1/steward/billing/checkout",
         },
+        ...(typeof env.STEWARD_VAPID_PUBLIC_KEY === "string" &&
+        env.STEWARD_VAPID_PUBLIC_KEY.trim()
+          ? {
+              web_push: {
+                vapid_public_key: env.STEWARD_VAPID_PUBLIC_KEY.trim(),
+              },
+            }
+          : {}),
       },
     };
   }
@@ -431,5 +446,111 @@ export async function handleGetStewardPush(
     accountId: auth.account_id,
     deviceId: auth.device_id,
     clientIp: ip,
+  });
+}
+
+/**
+ * POST /.well-known/hc/v1/steward/push/subscribe (Tier 2 Web Push — P2)
+ */
+export async function handlePostStewardWebPushSubscribe(
+  request: Request,
+  env: Env,
+  db: D1Database
+): Promise<Response> {
+  const gate = await requireStewardReady(env, db);
+  if (gate) return gate;
+
+  const auth = await authenticateStewardSession(db, request);
+  if (!auth.ok) return auth.response;
+
+  const resolved = await resolveEffectiveEntitlements(db, auth.account_id);
+  if (!resolved) {
+    return errorResponse("NOT_FOUND", "Account not found.", 404);
+  }
+
+  const { account, entitlements } = resolved;
+  if (account.status !== "active" && account.status !== "trialing") {
+    return errorResponse(
+      "FORBIDDEN",
+      "Push not available for this account status.",
+      403
+    );
+  }
+  if (entitlements["steward.hosted"] !== true) {
+    return errorResponse(
+      "FORBIDDEN",
+      "Hosted steward plan required for push.",
+      403
+    );
+  }
+  if (entitlements["notify.push.live_proof"] !== true) {
+    return errorResponse(
+      "FORBIDDEN",
+      "Push not entitled for this account.",
+      403
+    );
+  }
+  if (!(await accountHasLinkedProfile(db, auth.account_id))) {
+    return errorResponse(
+      "FORBIDDEN",
+      "Link at least one card profile before subscribing to push.",
+      403
+    );
+  }
+
+  let raw: unknown;
+  try {
+    raw = await request.json();
+  } catch {
+    return errorResponse("BAD_REQUEST", "Invalid JSON body.", 400);
+  }
+  const subscribeBody = parseStewardWebPushSubscribeBody(raw);
+  if (!subscribeBody) {
+    return errorResponse(
+      "BAD_REQUEST",
+      "Web Push subscription body must include endpoint and keys.",
+      400
+    );
+  }
+
+  return handlePostStewardWebPushSubscribe(env, db, {
+    accountId: auth.account_id,
+    deviceId: auth.device_id,
+    body: subscribeBody,
+  });
+}
+
+/**
+ * DELETE /.well-known/hc/v1/steward/push/subscribe (Tier 2 Web Push — unsubscribe)
+ */
+export async function handleDeleteStewardWebPushSubscribeRoute(
+  request: Request,
+  env: Env,
+  db: D1Database
+): Promise<Response> {
+  const gate = await requireStewardReady(env, db);
+  if (gate) return gate;
+
+  const auth = await authenticateStewardSession(db, request);
+  if (!auth.ok) return auth.response;
+
+  let raw: unknown;
+  try {
+    raw = await request.json();
+  } catch {
+    return errorResponse("BAD_REQUEST", "Invalid JSON body.", 400);
+  }
+  const unsubscribeBody = parseStewardWebPushUnsubscribeBody(raw);
+  if (!unsubscribeBody) {
+    return errorResponse(
+      "BAD_REQUEST",
+      "Web Push unsubscribe body must include endpoint.",
+      400
+    );
+  }
+
+  return handleDeleteStewardWebPushSubscribe(env, db, {
+    accountId: auth.account_id,
+    endpoint: unsubscribeBody.endpoint,
   });
 }

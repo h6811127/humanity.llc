@@ -78,12 +78,74 @@ export function liveControlBackgroundAlertPollShouldRun(input) {
 }
 
 /**
+ * Browser alerts on + lost-item relays in wallet: poll for finder messages (visible or hidden tab).
+ *
+ * @param {{
+ *   alertsEnabled: boolean,
+ *   permissionGranted: boolean,
+ *   relayEligible: boolean,
+ *   resolverHealth: 'ok' | 'degraded' | 'offline',
+ *   backoffUntil?: number,
+ *   now?: number,
+ * }} input
+ */
+export function relayOfferAlertPollShouldRun(input) {
+  if (!input.alertsEnabled) return false;
+  if (!input.relayEligible) return false;
+  const now = input.now ?? Date.now();
+  if (now < (input.backoffUntil ?? 0)) return false;
+  return liveControlManualPollAllowedByResolverHealth(input.resolverHealth);
+}
+
+/**
+ * @param {number} relayPendingCount
+ */
+export function relayOfferAlertPollIntervalMs(relayPendingCount) {
+  return relayPendingCount > 0 ? LIVE_CONTROL_POLL_MS_ACTIVE : LIVE_CONTROL_BACKGROUND_ALERT_POLL_MS;
+}
+
+/**
+ * Browser alerts on, tab visible, Watch off: poll live proof for foreground strip (P1-MOTO-21).
+ *
+ * @param {{
+ *   alertsEnabled: boolean,
+ *   permissionGranted: boolean,
+ *   tabVisible: boolean,
+ *   watchEnabled: boolean,
+ *   hasPollableCards: boolean,
+ *   resolverHealth: 'ok' | 'degraded' | 'offline',
+ *   stewardPushHealthy?: boolean,
+ *   backoffUntil?: number,
+ *   now?: number,
+ * }} input
+ */
+export function liveProofForegroundAlertPollShouldRun(input) {
+  if (!input.alertsEnabled) return false;
+  if (!input.tabVisible) return false;
+  if (input.watchEnabled) return false;
+  if (!input.hasPollableCards) return false;
+  if (input.stewardPushHealthy === true) return false;
+  const now = input.now ?? Date.now();
+  if (now < (input.backoffUntil ?? 0)) return false;
+  return liveControlManualPollAllowedByResolverHealth(input.resolverHealth);
+}
+
+/**
  * Phase 3: do not poll live-control while resolver health is degraded/offline.
  *
- * @param {'ok' | 'degraded' | 'offline'} resolverHealth
+ * @param {'ok' | 'degraded' | 'offline' | 'unset'} resolverHealth
  */
 export function liveControlPollAllowedByResolverHealth(resolverHealth) {
   return resolverHealth === "ok";
+}
+
+/**
+ * Manual / browser-alert polls may run before resolver health settles (P1-MOTO-06 / MOTO-21).
+ *
+ * @param {'ok' | 'degraded' | 'offline' | 'unset'} resolverHealth
+ */
+export function liveControlManualPollAllowedByResolverHealth(resolverHealth) {
+  return resolverHealth === "ok" || resolverHealth === "unset";
 }
 
 /**

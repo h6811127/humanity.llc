@@ -64,15 +64,18 @@ Commerce and BYOP create are **carrier split**, not competing products ([`PRODUC
 
 | Surface | Path | Revenue | Same primitive |
 |---------|------|---------|----------------|
-| Launch door 2 **Live status on you** | `/shop/customize/` → checkout → `print_artifact` mint | Yes | Live signed state on fabric |
-| Launch door 1 **Live status on something** | `/create/` deploy (BYOP) | No (today) | Sign · print own sticker/sign |
+| **Scan → want** (primary merch) | Scan live wear → curiosity CTA → `/shop/customize/` → checkout → `print_artifact` mint | Yes | Live signed state on fabric |
+| **`#landing-live-object-carriers`** (shipped on `/`) | Featured row → `/shop/` → customize | Yes | Teaser only — full story on `/shop/` |
+| **Start with one live object** (shipped on `/`) | `/create/` deploy (BYOP) | No (today) | Sign · print own sticker/sign |
 | Merch funnel step 4 | Create card before customize | Keys for buyer | Required for owned QR on purchased garment |
 
 **Rules (do not break):**
 
 - Never paywall sign · publish · revoke ([`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) § Create entry).
 - Create in the funnel is **ownership**, not a substitute for buying the hoodie.
-- Shipped (step 15): under door 2, **“Or print your own wear”** on `/shop/customize/` → `/create/?intent=wear` (BYOP).
+- Landing **`/`** teases carriers — does **not** embed checkout or duplicate `/shop/` story rows.
+- **No** product carousel on `/` until catalog ≥5 distinct carriers ([`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) § Landing carriers row).
+- Shipped: **“Or print your own wear”** on `/shop/customize/` → `/create/?intent=wear` (BYOP).
 - UX target (step 20): wear **two tracks** in one room — fulfilled `print_artifact` (no calendar expiry) vs BYOP `card` QR (expiry honest) — [`STEWARD_UX_PRESENTATION_TARGET.md`](STEWARD_UX_PRESENTATION_TARGET.md) § Room 2.
 - Commerce never grants vouch; webhook mint uses existing `print_artifact` scope — no parallel scan product.
 

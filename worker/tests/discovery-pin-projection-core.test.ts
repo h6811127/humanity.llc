@@ -47,8 +47,35 @@ describe("discovery-pin-projection-core", () => {
       expect(pin.network_ids).toContain("cr_season_01_wake");
       expect(pin.region).toBe("cedar-rapids-iowa");
       assertDiscoveryPinPrivacyShape(pin);
-      expect(pin).not.toHaveProperty("geo");
+      expect(pin.geo?.precision).toBe("block");
+      expect(Number.isFinite(pin.geo?.latitude)).toBe(true);
+      expect(Number.isFinite(pin.geo?.longitude)).toBe(true);
     }
+  });
+
+  it("prefers steward public_listing.geo over schematic projection", () => {
+    const custom = {
+      ...season,
+      nodes: season.nodes.map((node) =>
+        node.node_id === "node_04"
+          ? {
+              ...node,
+              public_listing: {
+                listed: true,
+                geo: { latitude: 41.981, longitude: -91.671, precision: "entrance" },
+              },
+            }
+          : node
+      ),
+    };
+    const pin = projectDiscoveryPinIndexFromSeason(custom).pins.find((row) =>
+      row.pin_id.includes("node_04")
+    );
+    expect(pin?.geo).toEqual({
+      latitude: 41.981,
+      longitude: -91.671,
+      precision: "entrance",
+    });
   });
 
   it("skips excluded object types and roles", () => {
@@ -85,19 +112,48 @@ describe("discovery-pin-projection-core", () => {
     ).toBeNull();
   });
 
-  it("delisted season omits network_ids on pins", () => {
+  it("delisted season drops season-inherited pins from index", () => {
     const delisted = {
       ...season,
       public_listing: { ...season.public_listing, listed: false },
     };
     const index = projectDiscoveryPinIndexFromSeason(delisted);
-    expect(index.pins.length).toBe(40);
-    for (const pin of index.pins) {
-      expect(pin.network_ids ?? []).toHaveLength(0);
-    }
+    expect(index.pins.length).toBe(0);
     expect(
       filterDiscoveryPinsByNetworkLens(index.pins, "cr_season_01_wake")
     ).toHaveLength(0);
+  });
+
+  it("delisted season keeps explicitly listed object pins without network_ids", () => {
+    const delisted = {
+      ...season,
+      public_listing: { ...season.public_listing, listed: false },
+      nodes: season.nodes.map((node, i) =>
+        i === 0
+          ? { ...node, public_listing: { listed: true, title: node.label } }
+          : node
+      ),
+    };
+    const index = projectDiscoveryPinIndexFromSeason(delisted);
+    expect(index.pins.length).toBe(1);
+    expect(index.pins[0].network_ids ?? []).toHaveLength(0);
+  });
+
+  it("object-level delist drops pin from index while season stays listed", () => {
+    const nodeDelisted = {
+      ...season,
+      nodes: season.nodes.map((node) =>
+        node.node_id === "node_04"
+          ? {
+              ...node,
+              public_listing: { listed: false },
+            }
+          : node
+      ),
+    };
+    const index = projectDiscoveryPinIndexFromSeason(nodeDelisted);
+    expect(index.pins.length).toBe(39);
+    expect(index.pins.some((pin) => pin.pin_id.includes("node_04"))).toBe(false);
   });
 
   it("network lens filter returns only matching pins", () => {
@@ -140,16 +196,19 @@ describe("board context pin lens", () => {
     expect(lantern?.object_id).toBe("obj_cr_node_04_river");
   });
 
-  it("board HTML stays equivalent with pin-powered context view", () => {
+  it("board HTML adds discovery crosslinks when pin-powered context view is used", () => {
     const pinIndex = projectDiscoveryPinIndexFromSeason(season);
     const withoutPins = buildMapBoardInnerHtml(season);
     const withPins = buildMapBoardInnerHtml(
       season,
       resolveBoardContextView(season, { pinIndex })
     );
-    expect(withPins).toContain("How this network works");
+    expect(withPins).toContain("Key route stops");
     expect(withPins).toContain('data-pin-lens="1"');
     expect(withPins).toContain("Riverwalk River Lantern");
-    expect(withPins.replace(/\s+/g, " ")).toEqual(withoutPins.replace(/\s+/g, " "));
+    expect(withPins).toContain("Browse places near me");
+    expect(withPins).toContain("/discover/cedar-rapids-iowa/pin/");
+    expect(withoutPins).toContain("Browse places near me");
+    expect(withoutPins).not.toContain("/discover/cedar-rapids-iowa/pin/");
   });
 });

@@ -13,7 +13,7 @@
     />
 <meta name="theme-color" content="#ffffff" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=146" />
+    <link rel="stylesheet" href="/styles.css?v=165" />
   </head>
   <body>
     <div class="page">
@@ -26,6 +26,11 @@
       </header>
 
       <main class="screen screen-landing">
+        <nav class="player-flow-breadcrumb" aria-label="You are here">
+          <a href="/">Home</a><span class="player-flow-breadcrumb-sep" aria-hidden="true"> · </span>
+          <a href="/play/season/">Public networks</a><span class="player-flow-breadcrumb-sep" aria-hidden="true"> · </span>
+          <span aria-current="page">Wake the city</span>
+        </nav>
         <section class="hero hero-compact">
           <p class="hero-eyebrow">Public network · Cedar Rapids</p>
           <h1>Wake the city</h1>
@@ -44,61 +49,81 @@
 
         <section class="idea-section" aria-labelledby="rules-prove-title">
           <h2 class="group-label" id="rules-prove-title">What a scan proves</h2>
-          <ul class="list list-compact">
-            <li class="list-row">
-              <span class="list-content">
-                <span class="list-title">Public object truth</span>
-                <span class="list-sub">Which faction holds a relay, whether a sanctuary is live, whether a temp drop expired, whether a marker is compromised or paused.</span>
-              </span>
-            </li>
-            <li class="list-row">
-              <span class="list-content">
-                <span class="list-title">Signed updates</span>
-                <span class="list-sub">Bulletins, lore lines, and care/maintenance notices published by the season operator or place stewards.</span>
-              </span>
-            </li>
-            <li class="list-row">
-              <span class="list-content">
-                <span class="list-title">Cooperation beats hoarding</span>
-                <span class="list-sub">Some objects evolve only after the group shares clues outward. Hiding information delays everyone’s next chapter.</span>
-              </span>
-            </li>
-          </ul>
+          <div class="city-game-rules-prove-grid">
+            <article class="city-game-rules-plate hc-emphasis-card hc-emphasis-card--info">
+              <div class="hc-emphasis-card__main">
+                <div class="hc-emphasis-card__copy">
+                  <p class="hc-emphasis-card__eyebrow">Ground truth</p>
+                  <h3 class="hc-emphasis-card__title">Public object truth</h3>
+                  <p class="hc-emphasis-card__detail">Which faction holds a relay, whether a sanctuary is live, whether a temp drop expired, whether a marker is compromised or paused.</p>
+                </div>
+              </div>
+            </article>
+            <article class="city-game-rules-plate hc-emphasis-card hc-emphasis-card--info">
+              <div class="hc-emphasis-card__main">
+                <div class="hc-emphasis-card__copy">
+                  <p class="hc-emphasis-card__eyebrow">Signed updates</p>
+                  <h3 class="hc-emphasis-card__title">Operator and steward bulletins</h3>
+                  <p class="hc-emphasis-card__detail">Lore lines and care/maintenance notices published by the season operator or place stewards.</p>
+                </div>
+              </div>
+            </article>
+            <article class="city-game-rules-plate hc-emphasis-card hc-emphasis-card--info">
+              <div class="hc-emphasis-card__main">
+                <div class="hc-emphasis-card__copy">
+                  <p class="hc-emphasis-card__eyebrow">Cooperation</p>
+                  <h3 class="hc-emphasis-card__title">Shared progress beats hoarding</h3>
+                  <p class="hc-emphasis-card__detail">Some objects evolve only after the group shares clues outward. Hiding information delays everyone’s next chapter.</p>
+                </div>
+              </div>
+            </article>
+          </div>
         </section>
 
         <section class="idea-section" aria-labelledby="rules-not-title">
           <h2 class="group-label" id="rules-not-title">What a scan does not prove</h2>
-          <ul class="list list-compact">
-            <li class="list-row">
-              <span class="list-content">
-                <span class="list-title">Who scanned</span>
-                <span class="list-sub">No leaderboard, streak, XP, heatmap, or per-player scan history.</span>
-              </span>
-            </li>
-            <li class="list-row">
-              <span class="list-content">
-                <span class="list-title">Legal identity or ownership</span>
-                <span class="list-sub">Holding a sticker does not prove you are the card owner or a faction member.</span>
-              </span>
-            </li>
-            <li class="list-row">
-              <span class="list-content">
-                <span class="list-title">Safety certification</span>
-                <span class="list-sub">Game copy never overrides care streams. Players do not mark emergency equipment safe.</span>
-              </span>
-            </li>
-          </ul>
+          <div class="city-game-rules-prove-grid">
+            <article class="city-game-rules-plate hc-emphasis-card hc-emphasis-card--warn">
+              <div class="hc-emphasis-card__main">
+                <div class="hc-emphasis-card__copy">
+                  <p class="hc-emphasis-card__eyebrow">Not tracked</p>
+                  <h3 class="hc-emphasis-card__title">Who scanned</h3>
+                  <p class="hc-emphasis-card__detail">No leaderboard, streak, XP, heatmap, or per-player scan history.</p>
+                </div>
+              </div>
+            </article>
+            <article class="city-game-rules-plate hc-emphasis-card hc-emphasis-card--warn">
+              <div class="hc-emphasis-card__main">
+                <div class="hc-emphasis-card__copy">
+                  <p class="hc-emphasis-card__eyebrow">Not identity</p>
+                  <h3 class="hc-emphasis-card__title">Legal ownership</h3>
+                  <p class="hc-emphasis-card__detail">Holding a sticker does not prove you are the card owner or a faction member.</p>
+                </div>
+              </div>
+            </article>
+            <article class="city-game-rules-plate hc-emphasis-card hc-emphasis-card--warn">
+              <div class="hc-emphasis-card__main">
+                <div class="hc-emphasis-card__copy">
+                  <p class="hc-emphasis-card__eyebrow">Not safety</p>
+                  <h3 class="hc-emphasis-card__title">Certification</h3>
+                  <p class="hc-emphasis-card__detail">Game copy never overrides care streams. Players do not mark emergency equipment safe.</p>
+                </div>
+              </div>
+            </article>
+          </div>
         </section>
 
         <section class="idea-section" aria-labelledby="rules-start-title">
           <h2 class="group-label" id="rules-start-title">How to start</h2>
-          <ul class="list list-compact" id="city-game-player-guide-list">
-            <li class="list-row">
-              <span class="list-content">
-                <span class="list-sub">Loading start guide…</span>
-              </span>
-            </li>
-          </ul>
+          <div class="city-game-rules-guide-grid" id="city-game-player-guide-list">
+            <article class="city-game-rules-plate hc-emphasis-card hc-emphasis-card--info">
+              <div class="hc-emphasis-card__main">
+                <div class="hc-emphasis-card__copy">
+                  <p class="hc-emphasis-card__detail">Loading start guide…</p>
+                </div>
+              </div>
+            </article>
+          </div>
         </section>
 
         <div class="research-live-banner hc-notice hc-notice--info" role="note" data-city-game-season-banner data-season-json="/data/city-game-cr-season-01.json" data-banner-variant="rules">
@@ -114,12 +139,16 @@
           aria-labelledby="city-board-cta-title"
         >
           <h2 class="group-label" id="city-board-cta-title">Public state board</h2>
-          <p class="group-intro short">
-            Every game spot, live progress, and Open in Maps links live on their own page. Easier on your phone and simple to share.
-          </p>
-          <p class="group-intro short">
-            <a href="/play/cedar-rapids/map/"><strong>Open public state board</strong></a>
-          </p>
+          <article class="city-game-rules-plate city-game-rules-board-cta hc-emphasis-card hc-emphasis-card--active">
+            <div class="hc-emphasis-card__main">
+              <div class="hc-emphasis-card__copy">
+                <p class="hc-emphasis-card__eyebrow">Weekend board</p>
+                <h3 class="hc-emphasis-card__title">Every spot, live progress, Open in Maps</h3>
+                <p class="hc-emphasis-card__detail">Easier on your phone and simple to share — the network lens over Cedar Rapids game stickers.</p>
+              </div>
+            </div>
+            <a class="hc-emphasis-card__cta" href="/play/cedar-rapids/map/">Open public state board</a>
+          </article>
         </section>
 
         <details class="idea-section city-game-mechanics-deep">
@@ -181,27 +210,37 @@
 
         </details>
 
-        <section class="qr-compare idea-compare" aria-labelledby="rules-privacy-title">
+        <section class="idea-section landing-privacy-split" aria-labelledby="rules-privacy-title">
           <h2 class="group-label" id="rules-privacy-title">Privacy</h2>
           <p class="group-intro short">
             Read the <a href="/data-policy.html">operator data policy</a>. Two ideas. Both true:
           </p>
-          <div class="qr-compare-grid">
-            <article class="qr-compare-col qr-compare-col-muted">
-              <h3 class="qr-compare-heading">No scan tracking</h3>
-              <ul class="qr-compare-list">
-                <li>Opening a game QR is not logged by default</li>
-                <li>No trail of who scanned, when, or where</li>
-                <li>No leaderboard, streak, or player dossier built from scans</li>
-              </ul>
+          <div class="landing-privacy-grid">
+            <article class="landing-privacy-card city-game-rules-plate hc-emphasis-card hc-emphasis-card--active">
+              <div class="hc-emphasis-card__main">
+                <div class="hc-emphasis-card__copy">
+                  <p class="hc-emphasis-card__eyebrow">Privacy</p>
+                  <h3 class="hc-emphasis-card__title">No scan tracking</h3>
+                  <ul class="landing-privacy-list">
+                    <li>Opening a game QR is not logged by default</li>
+                    <li>No trail of who scanned, when, or where</li>
+                    <li>No leaderboard, streak, or player dossier built from scans</li>
+                  </ul>
+                </div>
+              </div>
             </article>
-            <article class="qr-compare-col qr-compare-col-live">
-              <h3 class="qr-compare-heading">Public object state</h3>
-              <ul class="qr-compare-list">
-                <li>Collective progress (e.g. 14/20) lives on the object. World truth, not a private score</li>
-                <li>When you <strong>choose</strong> to contribute, a site code updates that public count</li>
-                <li>We do not store who contributed. Only the aggregate on the object</li>
-              </ul>
+            <article class="landing-privacy-card city-game-rules-plate hc-emphasis-card hc-emphasis-card--info">
+              <div class="hc-emphasis-card__main">
+                <div class="hc-emphasis-card__copy">
+                  <p class="hc-emphasis-card__eyebrow">Public truth</p>
+                  <h3 class="hc-emphasis-card__title">Public object state</h3>
+                  <ul class="landing-privacy-list">
+                    <li>Collective progress (e.g. 14/20) lives on the object. World truth, not a private score</li>
+                    <li>When you <strong>choose</strong> to contribute, a site code updates that public count</li>
+                    <li>We do not store who contributed. Only the aggregate on the object</li>
+                  </ul>
+                </div>
+              </div>
             </article>
           </div>
           <p class="idea-footnote">
@@ -210,9 +249,23 @@
           </p>
         </section>
 
+        <p class="idea-footnote city-game-rules-player-footnote">
+          <a href="/play/cedar-rapids/map/">Open board</a>
+          ·
+          <a href="/play/cedar-rapids/#rules-prove-title">What a scan proves</a>
+          ·
+          <a href="/discover/cedar-rapids-iowa/">Browse places near me</a>
+          ·
+          <a href="/play/season/">All public networks</a>
+          ·
+          <a href="/">Home dashboard</a>
+          ·
+          <a href="/play/cedar-rapids/teaching/">LO-4 teaching kit</a> (operators)
+          ·
+          <a href="/play/cedar-rapids/comprehension/player-flow-field-walk.html">Player flow field walk</a> (operators) ·
+          <a href="/play/cedar-rapids/debrief/">Season debrief</a> (after close)
+        </p>
         <p class="idea-footnote">
-          <a href="/play/cedar-rapids/teaching/">LO-4 teaching kit</a> (operators) ·
-          <a href="/play/cedar-rapids/debrief/">Season debrief</a> (after close) ·
           Research:
           <a href="/what-can-a-qr-do/physical-world-multiplayer/">physical-world multiplayer</a>
           ·

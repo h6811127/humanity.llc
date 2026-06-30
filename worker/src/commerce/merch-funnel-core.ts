@@ -7,6 +7,7 @@ export const ALLOWED_MERCH_FUNNEL_REFS = new Set([
   "customize_hoodie",
   "customize_glitch",
   "scan_customize",
+  "created_control",
 ]);
 
 export const MERCH_FUNNEL_EVENTS = new Set(["scan_landing", "create_attributed"]);

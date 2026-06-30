@@ -1,14 +1,14 @@
 {
   "schema": "device_shell_baseline_v1",
-  "generated_at": "2026-06-16",
+  "generated_at": "2026-06-30",
   "phase": "smooth_mode_phase_0",
   "asset_version": 94,
   "module_count": 86,
-  "js_bytes_total": 563167,
+  "js_bytes_total": 571836,
   "shell_css_bytes_total": 78910,
-  "landing_css_bytes_total": 371894,
-  "transfer_bytes_shell_graph": 642077,
-  "transfer_bytes_landing_first_paint": 935061,
+  "landing_css_bytes_total": 392819,
+  "transfer_bytes_shell_graph": 650746,
+  "transfer_bytes_landing_first_paint": 964655,
   "js_modules": [
     {
       "file": "js/device-status-bootstrap.mjs",
@@ -20,7 +20,7 @@
     },
     {
       "file": "js/device-status-load-error.mjs",
-      "bytes": 7860
+      "bytes": 8576
     },
     {
       "file": "js/device-status-dot-boot-core.mjs",
@@ -44,7 +44,7 @@
     },
     {
       "file": "js/device-status-core.mjs",
-      "bytes": 7466
+      "bytes": 7723
     },
     {
       "file": "js/device-status.mjs",
@@ -132,7 +132,7 @@
     },
     {
       "file": "js/device-relay-offer-inbox-loader.mjs",
-      "bytes": 1924
+      "bytes": 2337
     },
     {
       "file": "js/device-relay-offer-inbox-core.mjs",
@@ -140,7 +140,7 @@
     },
     {
       "file": "js/device-notification-delivery.mjs",
-      "bytes": 3961
+      "bytes": 2866
     },
     {
       "file": "js/device-browser-notifications-loader.mjs",
@@ -148,11 +148,11 @@
     },
     {
       "file": "js/device-live-proof-notification-nav.mjs",
-      "bytes": 1826
+      "bytes": 2037
     },
     {
       "file": "js/device-live-proof-notification-nav-core.mjs",
-      "bytes": 1092
+      "bytes": 1144
     },
     {
       "file": "js/device-inbox-sheet.mjs",
@@ -176,7 +176,7 @@
     },
     {
       "file": "js/device-notification-delivery-core.mjs",
-      "bytes": 7262
+      "bytes": 8169
     },
     {
       "file": "js/device-inbox-core.mjs",
@@ -312,7 +312,7 @@
     },
     {
       "file": "js/device-steward-entitlements.mjs",
-      "bytes": 10375
+      "bytes": 10569
     },
     {
       "file": "js/device-steward-entitlements-core.mjs",
@@ -328,11 +328,11 @@
     },
     {
       "file": "js/device-steward-push.mjs",
-      "bytes": 6796
+      "bytes": 6930
     },
     {
       "file": "js/device-steward-push-core.mjs",
-      "bytes": 4017
+      "bytes": 6708
     },
     {
       "file": "js/device-hub-sheet.mjs",
@@ -348,7 +348,7 @@
     },
     {
       "file": "js/device-browser-notifications.mjs",
-      "bytes": 14792
+      "bytes": 18981
     },
     {
       "file": "js/device-browser-notifications-core.mjs",

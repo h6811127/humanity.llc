@@ -1,4 +1,162 @@
 /* Path 2 trust UI prototype — demo-only (not production scan HTML) */
+/* Glass v4 Phase 0 — canvas + hero tokens; not bundled into worker scan-pass.css */
+
+:root {
+  --trust-demo-canvas-neutral: linear-gradient(
+    165deg,
+    #b8bfcc 0%,
+    #dce1eb 32%,
+    #f0f2f7 52%,
+    #c5ccd9 100%
+  );
+  --trust-demo-canvas-red-frame: linear-gradient(
+    165deg,
+    #8f1230 0%,
+    #db1b43 42%,
+    #c41235 68%,
+    #7a0f28 100%
+  );
+  --trust-demo-canvas-red-vignette: radial-gradient(
+      ellipse 130% 90% at 50% -8%,
+      rgba(219, 27, 67, 0.42) 0%,
+      rgba(219, 27, 67, 0.12) 38%,
+      transparent 62%
+    ),
+    linear-gradient(165deg, #c8cdd8 0%, #eceef4 48%, #dfe3ec 100%);
+  --trust-demo-hero-backdrop-v4: blur(24px) saturate(1.28);
+  --trust-demo-hero-shadow-glass: inset 0 1px 0 rgba(255, 255, 255, 0.62),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.4), 0 2px 6px rgba(0, 0, 0, 0.06),
+    0 10px 28px rgba(0, 0, 0, 0.1);
+  --trust-demo-hero-border-glass: rgba(255, 255, 255, 0.48);
+}
+
+body:has(.trust-demo-page) {
+  background: var(--trust-demo-canvas-active, var(--hc-scan-page-canvas));
+  min-height: 100dvh;
+}
+
+body[data-trust-canvas-v4="neutral"] {
+  --trust-demo-canvas-active: var(--trust-demo-canvas-neutral);
+}
+
+body[data-trust-canvas-v4="red-frame"] {
+  --trust-demo-canvas-active: var(--trust-demo-canvas-red-frame);
+}
+
+body[data-trust-canvas-v4="red-vignette"] {
+  --trust-demo-canvas-active: var(--trust-demo-canvas-red-vignette);
+}
+
+.trust-demo-page.scan-page {
+  background: transparent;
+}
+
+.trust-demo-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.045;
+  background-image: radial-gradient(circle at 1px 1px, rgba(0, 0, 0, 0.55) 1px, transparent 0);
+  background-size: 5px 5px;
+}
+
+body[data-trust-canvas-v4="red-frame"] .trust-demo-page::before,
+body[data-trust-canvas-v4="red-vignette"] .trust-demo-page::before {
+  opacity: 0.06;
+  background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.35) 1px, transparent 0);
+}
+
+.trust-demo-hero-v4.scan-hero.scan-status-panel {
+  border-color: var(--trust-demo-hero-border-glass);
+  -webkit-backdrop-filter: var(--trust-demo-hero-backdrop-v4);
+  backdrop-filter: var(--trust-demo-hero-backdrop-v4);
+}
+
+body[data-trust-glass-v4="low"] .trust-demo-hero-v4.scan-hero.scan-status-panel {
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.52) 0%,
+    rgba(248, 248, 250, 0.42) 50%,
+    rgba(242, 242, 245, 0.48) 100%
+  );
+  box-shadow: var(--trust-demo-hero-shadow-glass);
+}
+
+body[data-trust-glass-v4="mid"] .trust-demo-hero-v4.scan-hero.scan-status-panel {
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.58) 0%,
+    rgba(248, 248, 250, 0.48) 50%,
+    rgba(242, 242, 245, 0.54) 100%
+  );
+  box-shadow: var(--trust-demo-hero-shadow-glass);
+}
+
+body[data-trust-glass-v4="high"] .trust-demo-hero-v4.scan-hero.scan-status-panel {
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.72) 0%,
+    rgba(248, 248, 250, 0.62) 50%,
+    rgba(242, 242, 245, 0.68) 100%
+  );
+  box-shadow: var(--hc-scan-hero-shadow);
+}
+
+body[data-trust-glass-v4="prod"] .trust-demo-hero-v4.scan-hero.scan-status-panel {
+  background: var(--hc-scan-hero-fill-glass);
+  border-color: var(--hc-scan-hero-border);
+  box-shadow: var(--hc-scan-hero-shadow);
+  -webkit-backdrop-filter: var(--hc-scan-hero-backdrop);
+  backdrop-filter: var(--hc-scan-hero-backdrop);
+}
+
+@supports not (
+  (-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))
+) {
+  body[data-trust-glass-v4="low"] .trust-demo-hero-v4.scan-hero.scan-status-panel,
+  body[data-trust-glass-v4="mid"] .trust-demo-hero-v4.scan-hero.scan-status-panel,
+  body[data-trust-glass-v4="high"] .trust-demo-hero-v4.scan-hero.scan-status-panel {
+    background: var(--hc-scan-hero-fill);
+    box-shadow: var(--hc-scan-hero-shadow);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  body[data-trust-glass-v4="low"] .trust-demo-hero-v4.scan-hero.scan-status-panel,
+  body[data-trust-glass-v4="mid"] .trust-demo-hero-v4.scan-hero.scan-status-panel,
+  body[data-trust-glass-v4="high"] .trust-demo-hero-v4.scan-hero.scan-status-panel {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: var(--hc-scan-hero-fill);
+    box-shadow: var(--hc-scan-hero-shadow);
+  }
+}
+
+body[data-trust-canvas-v4="red-frame"] .trust-demo-chrome .scan-page-dot .pass-dot,
+body[data-trust-canvas-v4="red-vignette"] .trust-demo-chrome .scan-page-dot .pass-dot {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.85);
+}
+
+body[data-trust-canvas-v4="red-frame"] .trust-demo-status-line.is-checking,
+body[data-trust-canvas-v4="red-vignette"] .trust-demo-status-line.is-checking {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+body[data-trust-canvas-v4="red-frame"] .trust-demo-status-line.is-resolved,
+body[data-trust-canvas-v4="red-vignette"] .trust-demo-status-line.is-resolved {
+  color: var(--hc-emphasis-card-title-fg, #1c1c1e);
+}
+
+.trust-demo-dev-section-label {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(235, 235, 245, 0.55);
+}
 
 .trust-demo-dev {
   position: fixed;
@@ -6,7 +164,7 @@
   right: 0;
   bottom: 0;
   z-index: 100;
-  max-height: 42vh;
+  max-height: 52vh;
   overflow: auto;
   padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
   font-size: 13px;
@@ -82,7 +240,7 @@
 }
 
 .trust-demo-page {
-  padding-bottom: 220px;
+  padding-bottom: 260px;
 }
 
 .trust-demo-chrome {

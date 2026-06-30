@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Discovery pin · humanity.llc</title>
+    <meta
+      name="description"
+      content="Discovery pin detail — open the live scan for a listed place. Scans are not tracked."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=165" />
+    <link rel="stylesheet" href="/css/discovery-region-browse.css?v=3" />
+  </head>
+  <body class="discovery-region-page discovery-pin-page">
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+
+      <main class="screen screen-landing discovery-region-screen">
+        <p class="discovery-region-loading" id="discovery-region-loading" aria-live="polite">
+          Loading place…
+        </p>
+        <p class="discovery-region-error" id="discovery-region-error" hidden></p>
+        <div id="discovery-pin-detail"></div>
+        <p class="discovery-region-privacy" id="discovery-near-me-privacy">
+          Location is used on your device to sort results; scans are not tracked.
+          <a href="/data-policy.html">Data policy</a>.
+        </p>
+      </main>
+    </div>
+
+    <script type="module" src="/js/discovery-region-page.mjs?v=4"></script>
+  </body>
+</html>

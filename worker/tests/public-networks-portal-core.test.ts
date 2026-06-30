@@ -8,12 +8,15 @@ import {
   formatPublicNetworkStateHero,
   formatPublicNetworkStatsLine,
   listedPublicNetworkRows,
+  publicNetworkCardEmphasisStyle,
   publicNetworkPreviewArtForSeason,
   publicNetworkVisionCardModels,
   publicNetworkWindowStatusLabel,
   publicNetworksEmptyMessage,
   PUBLIC_NETWORK_ABOUT_NETWORK_CTA,
   PUBLIC_NETWORK_OPEN_BOARD_CTA,
+  PUBLIC_NETWORK_RULES_PROVE_CTA,
+  publicNetworkRulesProveHref,
   renderPublicNetworkCard,
   renderPublicNetworkResults,
 } from "../../site/js/public-networks-portal-core.mjs";
@@ -41,6 +44,16 @@ const templateRow = {
 };
 
 describe("public-networks-portal-core", () => {
+  it("builds rules prove href with charter anchor", () => {
+    expect(publicNetworkRulesProveHref("/play/cedar-rapids/")).toBe(
+      "/play/cedar-rapids/#rules-prove-title"
+    );
+    expect(publicNetworkRulesProveHref("/play/cedar-rapids")).toBe(
+      "/play/cedar-rapids/#rules-prove-title"
+    );
+    expect(publicNetworkRulesProveHref("")).toBeNull();
+  });
+
   it("lists only public_listing.listed rows", () => {
     const listed = listedPublicNetworkRows([cedarIndexRow, templateRow]);
     expect(listed).toHaveLength(1);
@@ -59,7 +72,7 @@ describe("public-networks-portal-core", () => {
     expect(card.name).toBe("Wake the city");
     expect(card.place).toBe("Cedar Rapids, Iowa");
     expect(card.openHref).toBe("/play/cedar-rapids/map/");
-    expect(card.rulesHref).toBe("/play/cedar-rapids/");
+    expect(card.rulesHref).toBe("/play/cedar-rapids/#rules-prove-title");
     expect(card.statusLabel).toBe("Live now");
     expect(card.category).toBe("city_games");
     expect(card.placeCount).toBe(40);
@@ -97,8 +110,8 @@ describe("public-networks-portal-core", () => {
     });
     const html = renderPublicNetworkCard(card);
     expect(html).toContain(PUBLIC_NETWORK_OPEN_BOARD_CTA);
-    expect(html).toContain(PUBLIC_NETWORK_ABOUT_NETWORK_CTA);
-    expect(html).toContain('href="/play/cedar-rapids/"');
+    expect(html).toContain(PUBLIC_NETWORK_RULES_PROVE_CTA);
+    expect(html).toContain('href="/play/cedar-rapids/#rules-prove-title"');
     expect(html).toContain('href="/play/cedar-rapids/map/"');
     expect(html).toContain("public-networks-card__board-links");
     expect(html).toContain("Faction relays");
@@ -109,6 +122,26 @@ describe("public-networks-portal-core", () => {
     expect(html).toContain("Weekend live-object game across Cedar Rapids.");
     expect(html).toContain("public-networks-card--rich");
     expect(html).toContain("public-networks-card--state-first");
+    expect(html).toContain("hc-emphasis-card");
+    expect(html).toContain("public-networks-plate");
+    expect(html).toContain("hc-emphasis-card__dot");
+  });
+
+  it("maps window phase to emphasis-card modifiers", () => {
+    const live = buildPublicNetworkCardModel(cedarIndexRow, {
+      window: {
+        starts_at: "2020-01-01T00:00:00-05:00",
+        ends_at: "2099-01-01T00:00:00-05:00",
+      },
+    });
+    expect(publicNetworkCardEmphasisStyle(live)).toEqual({ modifier: "active", dot: "success" });
+    const before = buildPublicNetworkCardModel(cedarIndexRow, {
+      window: {
+        starts_at: "2099-06-06T18:00:00-05:00",
+        ends_at: "2099-09-01T22:00:00-05:00",
+      },
+    });
+    expect(publicNetworkCardEmphasisStyle(before)).toEqual({ modifier: "warn", dot: "warn" });
   });
 
   it("formats state hero from status and stats", () => {
@@ -165,6 +198,7 @@ describe("public-networks-portal-core", () => {
     const html = renderPublicNetworkCard(card);
     expect(html).toContain("Live now · 3 places · 3 live objects");
     expect(html).toContain('data-state-first="current-state"');
+    expect(html).toContain("hc-emphasis-card--active");
     expect(html).toContain("public-networks-card__preview");
     expect(html).toContain("cedar-rapids-board-open.png");
   });

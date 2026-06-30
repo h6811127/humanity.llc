@@ -138,6 +138,7 @@ describe("notifyLiveProofPending", () => {
 
     expect(result.account_id).toBe(ACCOUNT);
     expect(result.delivered).toBe(1);
+    expect(result.web_push_delivered).toBe(0);
     expect(writes).toHaveLength(1);
     expect(writes[0]).toContain(CHALLENGE);
     expect(incrementCalls.length).toBe(1);

@@ -227,7 +227,7 @@ test.describe("topology convergence — field-kit deep links", () => {
     await page.goto("/create/?template=lost_item");
 
     await expect(page.locator("#create-deploy-wizard")).toBeVisible();
-    await expect(page.locator("#deploy-object-label-title")).toHaveText("What is this tag on?");
+    await expect(page.locator("#deploy-object-label-title")).toHaveText("Name this return tag");
   });
 
   test("template deep link with saved root shows entry gate", async ({ page }) => {

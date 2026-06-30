@@ -21,15 +21,19 @@ describe("WS-NOTIF N4 field sign-off guards", () => {
     expect(doc).toMatch(/Chrome.*not Safari|not Safari/i);
   });
 
-  it("documents P0-N2 background OS as non-functional (deferred)", () => {
+  it("documents P0-N2 background OS field re-test after Tier 1 transport", () => {
     const qa = readFileSync(DEVICE_OS_QA, "utf8");
     const v2 = readFileSync(
       join(REPO_ROOT, "docs/NOTIFICATION_SYSTEM_V2.md"),
       "utf8"
     );
-    expect(qa).toMatch(/P0-N2.*NON-FUNCTIONAL|NON-FUNCTIONAL.*P0-N2/is);
-    expect(v2).toMatch(/Background OS alert.*Non-functional/is);
-    expect(qa).toMatch(/P0-N2 excluded/i);
+    expect(qa).toMatch(/P0-N2.*field re-test|field re-test.*P0-N2/is);
+    expect(qa).toMatch(/notify:transport:tier1/);
+    expect(qa).toMatch(/P0-N2-T2/);
+    expect(qa).toMatch(/notify:web-push:preflight/);
+    expect(v2).toMatch(/Tier 1 transport|P0-N2.*field re-test/is);
+    expect(v2).toMatch(/P0-N2-T2|notify:web-push:tier2/);
+    expect(v2).not.toMatch(/do not invest until a new workstream reopens transport/i);
   });
 
   it("background alert copy on Android PWA names Chrome, not Safari", () => {

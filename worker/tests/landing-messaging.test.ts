@@ -37,6 +37,10 @@ describe("landing messaging (Step 3)", () => {
     expect(html).toContain("Public live boards");
     expect(html).toContain('id="public-networks-search"');
     expect(html).toContain('id="public-networks-results"');
+    expect(html).toContain('id="landing-live-object-carriers"');
+    expect(html).toContain("Live object carriers");
+    expect(html).toContain('href="/shop/"');
+    expect(html).toContain("See all carriers");
     expect(html).toContain('id="landing-start-object-cta"');
     expect(html).toContain("Start with one live object");
     expect(html).toContain('href="/create/"');
@@ -53,8 +57,8 @@ describe("landing messaging (Step 3)", () => {
 
   it("landing loads public networks portal script and styles", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
-    expect(html).toContain("public-networks-portal.css?v=6");
-    expect(html).toContain("public-networks-portal.mjs?v=6");
+    expect(html).toContain("public-networks-portal.css?v=9");
+    expect(html).toContain("public-networks-portal.mjs?v=10");
     expect(html).not.toContain("landing-showcase.mjs");
   });
 

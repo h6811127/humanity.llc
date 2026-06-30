@@ -101,7 +101,7 @@ function formatSeasonWindowDatesMarkup(season, variant) {
   const ends = formatSeasonWindowEndsLine(season);
   if (!opens || !ends) return "";
   if (variant === "map") {
-    return ` ${escapeHtml(opens)}<br />${escapeHtml(ends)}`;
+    return ` ${escapeHtml(`${opens} · ${ends}`)}`;
   }
   return ` ${escapeHtml(`${opens} · ${ends}`)}`;
 }
@@ -217,12 +217,12 @@ export function seasonBannerBodyHtml(phase, variant, season = {}) {
 
   if (variant === "map") {
     if (phase === "before") {
-      return "Help wake the city. Find a relay or the River Lantern below — play opens on the date above.";
+      return "Play opens on the date above — express line marks a recommended first stop.";
     }
     if (phase === "after") {
       return "Season ended. Board is reference only.";
     }
-    return "Season live — shared city state below.";
+    return "";
   }
 
   if (variant === "rules") {
@@ -232,7 +232,7 @@ export function seasonBannerBodyHtml(phase, variant, season = {}) {
     if (phase === "after") {
       return `${seasonTitle} has ended. Public object state remains readable on scans; game progression is paused. The <a href="${boardHref}">city board</a> and rules stay available for reference.`;
     }
-    return `Scan game stickers around ${city} to read public object state. No account required. Open the <a href="${boardHref}">weekend city board</a> for every spot, live progress, and directions.`;
+    return `Scan game stickers around ${city} to read public object state. No account required. Open the <a href="${boardHref}">public state board</a> for every spot, live progress, and directions.`;
   }
 
   if (variant === "hub") {
@@ -275,15 +275,15 @@ export function applySeasonBannerMount(mount, season, phase, variant) {
   if (labelEl) labelEl.textContent = headline;
   if (datesEl) {
     const datesMarkup = formatSeasonWindowDatesMarkup(season, variant);
-    if (variant === "map" && datesMarkup.includes("<br />")) {
-      datesEl.innerHTML = datesMarkup;
-    } else {
-      datesEl.textContent = datesMarkup || "";
-    }
+    datesEl.textContent = datesMarkup.trim() || "";
   }
   if (bodyEl) {
-    if (variant === "hub") bodyEl.textContent = ` ${seasonBannerBodyHtml(phase, variant, season)}`;
-    else bodyEl.innerHTML = seasonBannerBodyHtml(phase, variant, season);
+    const bodyHtml = seasonBannerBodyHtml(phase, variant, season);
+    if (variant === "hub") bodyEl.textContent = ` ${bodyHtml}`;
+    else bodyEl.innerHTML = bodyHtml;
+    if (variant === "map") {
+      bodyEl.hidden = !bodyHtml.trim();
+    }
   }
 }
 

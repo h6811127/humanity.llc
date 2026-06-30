@@ -21,13 +21,13 @@ Every item below must still pass the [Use-Case Rule](V1_USE_CASES.md#use-case-ru
 
 ## Catalog roles (portfolio + way-finder)
 
-The public hub (`site/what-can-a-qr-do.html` and walkthroughs) is **not** the onboarding path. Landing uses **Three ways in** ([`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md)). This catalog is for **team prioritization**, **portfolio narrative**, and **design-space exploration**.
+The public hub (`site/what-can-a-qr-do.html` and walkthroughs) is **not** the onboarding path. Landing is a **discovery dashboard** (boards + shipped carriers row) — [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md). This catalog is for **team prioritization**, **portfolio narrative**, and **design-space exploration**.
 
 When adding or editing walkthrough pages, tag each item:
 
 | Tag | Meaning | Front door? | Summer 2026 examples |
 |-----|---------|-------------|----------------------|
-| **wedge** | Revenue, field proof, or category story | Yes — via launch doors | Physical software objects, Glitch hoodie, Cedar Rapids game, combining ideas |
+| **wedge** | Revenue, field proof, or category story | Yes — via boards/shelves · carriers row (shipped) · `/shop/` | Physical software objects, Glitch hoodie, Cedar Rapids game, combining ideas |
 | **pilot** | Field QA + LO gates; engineering validation | No — link from “More use cases” | Status plate, lost-item relay |
 | **research** | Honest limits; not shipped resolver behavior | No | Crisis cards, mesh/NFC, healthcare-adjacent |
 

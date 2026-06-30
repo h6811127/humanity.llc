@@ -25,7 +25,7 @@ This doc is that map.
 
 | Register | Audience | Surfaces | Job | Tone |
 |----------|----------|----------|-----|------|
-| **A — Belonging / imagination** | Card owner, buyer | `/shop/customize/`, `/created/`, `/shop/thanks/`, shop PDP, landing merch rows | “This will be *mine*; I control what strangers read.” | Meaningful artifact — can be warmer and more expressive ([`VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md) § Tone by surface · Storefront) |
+| **A — Belonging / imagination** | Card owner, buyer | `/shop/customize/`, `/created/`, `/shop/thanks/`, shop PDP, **`#landing-live-object-carriers`** (shipped) | “This will be *mine*; I control what strangers read.” | Meaningful artifact — can be warmer and more expressive ([`VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md) § Tone by surface · Storefront) |
 | **B — Notary / verification** | Stranger after scan | `GET /c/{profile_id}?q={qr_id}` (Worker scan HTML) | “Is this a real Humanity check, what does it claim, what doesn’t it prove?” | Calm, precise, fast ([`SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md)) |
 
 **Register C — Physical** (garment or sticker in the world) is the **persistent bridge** between A and B: recognition at arm’s length, then resolver truth on scan. See § Beat 1.
@@ -223,10 +223,59 @@ Reuses motion dictionary from [`VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_
 | `/shop/customize/` preview | ✅ (QR lands on mock) | Optional low-amplitude on mock | ❌ | ❌ in v1 |
 | `/created/` live object card | ✅ (publish, card reveal) | Optional | Shell dot only | ❌ |
 | `/shop/thanks/` | ✅ (mint complete) | ❌ | ❌ | ❌ |
-| Shop PDP / landing | Demo OK | ✅ (marketing) | ❌ | Avoid on trust copy |
+| Shop PDP / landing carriers row | Demo OK | ✅ (marketing) | ❌ | Avoid on trust copy · **no carousel on `/`** |
 | Device shell hub/dot | ✅ (network settle — not scan semantics) | ❌ | ✅ (custody) | Urgent only |
 
 **`prefers-reduced-motion`:** Instant text + visibility on all surfaces; no pulse ([`SCAN_PAGE_TRUST_UI.md`](SCAN_PAGE_TRUST_UI.md) § Reduced motion).
+
+---
+
+## Landing carriers row (Register A teaser)
+
+**Status:** **Shipped** on `/` (2026-06-21) — `site/index.html` `#landing-live-object-carriers` · [`landing-copy-contract.mjs`](../site/js/landing-copy-contract.mjs) v7 · hydrate via [`landing-live-object-carriers-core.mjs`](../site/js/landing-live-object-carriers-core.mjs) + `shop-config.json` `personalize.checkout_product_id`. Parent: [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) § Landing section order · [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) § Landing.
+
+**Purpose:** Give cold `/` visitors a **visual commerce hook** without turning the discovery dashboard into a shop grid or marketing landing. Discovery stays primary; carriers are **secondary** after public boards.
+
+### Placement and id
+
+- **After** `#public-networks-results` (Public live boards)
+- **Before** `#landing-start-object-cta` (Start with one live object)
+- Section id: **`#landing-live-object-carriers`**
+
+### Content (one static row — not a carousel)
+
+| Element | Spec |
+|---------|------|
+| Section title | **Live object carriers** — not “custom products” |
+| Lead line | Names founding SKU(s) — e.g. *Glitch hoodie · unique QR on fabric — preview before checkout* |
+| Optional image | **One** featured product photo (hoodie mock or physical) — not a swipe gallery |
+| Primary CTA | Row tap or **Customize** → `/shop/customize/?product=glitch_hoodie_v1` |
+| Secondary link | **See all carriers →** `/shop/` |
+| Honesty | Buying merch does not verify you — limit line or link to policy if space allows |
+
+### Rejected for v1
+
+| Pattern | Why |
+|---------|-----|
+| Horizontal carousel / swiper | Hides SKUs at catalog size ~2–3; new interaction pattern; feels like ad insert in utility UI |
+| Full `/shop/` embed on `/` | Duplicates story rows; competes with discovery |
+| Hero-only **Shop** button | Too minimal — no product context for founding launch |
+| Checkout on `/` | Commerce handoff stays on `/shop/` + Shopify |
+
+**Revisit carousel** when ≥5 distinct carriers with photography and/or data-driven rows from `shop-config.json`.
+
+### Visual register
+
+- **Register A** (belonging) — warmer than board cards, calmer than customize preview Settle
+- Reuse list/card vocabulary from landing (`group-label`, `list-row list-action`, or compact `shop-hub-card` variant) — do not fork a Shopify-style product grid
+- Motion: static or single image only; no infinite loops ([§ Motion budget](#motion-budget-by-surface))
+
+### Engineering follow-up
+
+- **✅ Shipped:** [`landing-copy-contract.mjs`](../site/js/landing-copy-contract.mjs) v7 + `npm run verify:landing`
+- **✅ Shipped:** featured SKU from `site/data/shop-config.json` (`personalize.checkout_product_id`) — static HTML fallback when config fetch fails · [`landing-live-object-carriers-core.mjs`](../site/js/landing-live-object-carriers-core.mjs)
+- **✅ Shipped:** availability label from print catalog + `GET /v1/store/rows` when Worker is reachable (`Checkout live` / `Preview live…`) · [`landing-live-object-carriers.mjs`](../site/js/landing-live-object-carriers.mjs)
+- **Defer:** carousel until catalog ≥5 distinct carriers with photography
 
 ---
 

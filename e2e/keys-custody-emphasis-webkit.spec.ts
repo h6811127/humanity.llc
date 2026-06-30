@@ -1,5 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 
+import { gotoLandingWithBoot, waitForDeviceBootReady } from "./helpers/wallet-shell";
+
 /**
  * WebKit layout regression for keys custody emphasis cards.
  * @see docs/KEYS_CUSTODY_EMPHASIS_CARD_SPACING_INVESTIGATION.md § step 13c
@@ -70,6 +72,19 @@ test.describe("keys custody emphasis WebKit layout", () => {
     await page.addInitScript(() => {
       localStorage.removeItem("hc_keys_custody_notice_dismissed");
       localStorage.setItem("hc_device_hub_intro_dismissed", "1");
+      localStorage.setItem(
+        "hc_device_pins",
+        JSON.stringify([
+          {
+            id: "pin_e2e_hub_custody",
+            label: "Pinned scan",
+            profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+            qr_id: null,
+            scan_url: "https://humanity.llc/c/7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+            pinned_at: "2026-05-25T12:00:00.000Z",
+          },
+        ])
+      );
     });
   });
 
@@ -88,11 +103,12 @@ test.describe("keys custody emphasis WebKit layout", () => {
   test("hub custody card is compact with native-styled Acknowledge on WebKit", async ({
     page,
   }) => {
-    await page.goto("/");
+    await gotoLandingWithBoot(page);
     await page.locator("#brand-status-dot-btn").click({ timeout: 15_000 });
     await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/, {
       timeout: 15_000,
     });
+    await waitForDeviceBootReady(page);
 
     const card = page.locator(".device-keys-custody--hub");
     await expect(card).toBeVisible();

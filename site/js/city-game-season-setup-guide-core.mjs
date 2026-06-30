@@ -128,6 +128,7 @@ export function gameOperatorCustodyComplete(ack) {
  *   custodyAck: Record<string, boolean>;
  *   registeredGameNodeCount?: number;
  *   rulesPublishReady?: boolean;
+ *   scanGraphPublishReady?: boolean;
  *   season?: Record<string, unknown> | null;
  *   jsonBasename?: string;
  * }} input
@@ -180,6 +181,12 @@ export function buildSelfServeSetupChecklist(input) {
       id: "rules_published",
       label: "Rules page prepared for launch (download + deploy)",
       done: input.rulesPublishReady === true,
+      required: false,
+    },
+    {
+      id: "scan_graph_published",
+      label: "Scan graph edges published on Live (Route unlock edges → Publish)",
+      done: input.scanGraphPublishReady === true,
       required: false,
     },
     {

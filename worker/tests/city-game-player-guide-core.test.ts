@@ -31,10 +31,12 @@ describe("city-game-player-guide-core", () => {
     expect(guide.heroSubline).toContain("/play/cedar-rapids/map/");
   });
 
-  it("builds HTML list with quorum spot", () => {
+  it("builds emphasis-card guide with quorum spot", () => {
     const html = buildPlayerGuideListHtml(crSeason);
-    expect(html).toContain("No required first stop");
+    expect(html).toContain("hc-emphasis-card");
+    expect(html).toContain("Suggested route, any sticker");
     expect(html).toContain("Riverwalk River Lantern");
+    expect(html).toContain("hc-emphasis-card--active");
   });
 
   it("derives comprehension paths and probe nodes per city", () => {

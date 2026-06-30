@@ -90,10 +90,18 @@ Map pin state MUST be derived from the same functions and precedence as scan SSR
 | Dormant / `visible_until` | `resolveSeasonWindowPhase` + `game_meta.visible_until` |
 | Collective quorum display | `isCollectiveQuorumComplete`, `collective_progress` / `target` |
 | Fragment lattice | `fragmentLatticeProgress` on finale `game_meta` |
-| Vouch gate (read-only) | `resolveGameVouchGate` — show “path sealed / open” chip, not who vouched |
+| Vouch gate (read-only) | `witness-gate.ts` → `resolveWitnessGate` — witness child `vouch_active_for`; board chip + fog use same helper as scan (**not** RelationshipEdge v1 yet) |
 | Contribute mode | `gameNodeContributeMode` — show “quorum open” vs “fragment” vs “scarcity” labels only |
 
 Extract a small **`city-game/map-node-snapshot.ts`** (name TBD) that both `scan-view` and the snapshot handler call — avoid duplicating precedence rules in Pages JS.
+
+#### Witness gate evaluation (safety extraction)
+
+**Status:** Single-source-of-truth in `worker/src/city-game/witness-gate.ts` — **not** RelationshipEdge v1 protocol storage yet.
+
+Scan SSR, map snapshot chips, and signal-war fog all call `resolveWitnessGate`, which reads witness child documents (`vouch_active_for` on the witness node, not the target). Snapshot rows include precomputed `vouch_gate` when the handler batches `buildWitnessMetaByNodeId` across season child objects.
+
+Removes the incorrect target-self check that caused board “Sealed” while scan showed “Witness vouch live.”
 
 ### API sketch (Worker)
 
@@ -257,14 +265,189 @@ Align with rollout **S1 → S2 → S3** in the parent spec. Map work is **not** 
 
 ## UI / UX standards
 
+### Network lens (presentation — canonical)
+
+**Status:** Spec signed for implementation · replaces interim “map-first” layout notes  
+**Handoff spec:** [`SF-3_LIVING_NETWORK_LENS.md`](SF-3_LIVING_NETWORK_LENS.md) — living network, wireframes, repeat-scan loops, success metrics  
+**Architecture:** [`DISCOVERY_PROJECTION.md`](DISCOVERY_PROJECTION.md) § Board maps reading pins through a network lens · [`STATE_FIRST_UI_MODEL.md`](STATE_FIRST_UI_MODEL.md) § SF-3  
+**Presentation only** — snapshot API, fog rules, contribute POST, and DOM ids snapshot JS depends on change only via explicit migration + tests.
+
+#### Product noun
+
+| Audience | Term |
+|----------|------|
+| **Spec / engineering** | **Network lens** — read-only view over DiscoveryPins filtered by `season_id` (`data-pin-lens="1"`) |
+| **Players (Cedar Rapids)** | **Weekend board** or season title (`Wake the city`) — avoid “Your map”, “dashboard”, L1–L5 labels |
+| **Rules / charter** | **Public network** — definition and signers live on [`/play/cedar-rapids/`](../site/play/cedar-rapids/), not repeated as essays on the lens |
+
+**North star:** *A live public network that plays like a game board and reads like ground truth.*
+
+**Visual metaphor:** **Transit map** — full schematic network visible; **express spine** emphasized; **unlock edges** as lines that light when satisfied; **ticker / care** as service alerts; pin stops show **readable state** (not anonymous dots).
+
+#### Two surfaces (do not merge)
+
+| Surface | URL | Job |
+|---------|-----|-----|
+| **Rules + charter** | `/play/cedar-rapids/` | What scanning proves, privacy, LO-4 teaching, link to lens |
+| **Network lens** | `/play/cedar-rapids/map/` | **Instrument** — where things are, what changed, where to go next, then **scan** for ground truth |
+
+The lens is a **between-scans scoreboard**, not the game client. Stickers resolve to `/c/…`; the lens plans walks and shows **city** progress.
+
+#### Two-map contract
+
+1. **Network map (lens)** — schematic 0–1 layout in season JSON; shows signed **world** state; not turn-by-turn.  
+2. **Walking** — **Open in Maps** on the selected pin panel; never imply pin distance matches real-world meters.
+
+Copy: [`player_guide`](../../site/data/city-game-cr-season-01.json) already states the sketch is not directions — keep that honest.
+
+#### Discovery cross-links (shipped · WS-DISCOVER-P1-4)
+
+The network lens and discovery browse are **complementary surfaces** ([`DISCOVERY_PROJECTION.md`](DISCOVERY_PROJECTION.md)):
+
+| Surface | URL | Job |
+|---------|-----|-----|
+| **Network lens** | `/play/cedar-rapids/map/` | Schematic **world state** — snapshot chips, express spine, scan CTAs |
+| **Discovery browse** | `/discover/cedar-rapids-iowa/` | **Near-me planning** — alphabetical or client-sorted pin list; bookmark URLs |
+
+**Cross-links on the lens (shipped):**
+
+- Place list header: **Browse places near me** → discovery region browse (client-side near-me sort; privacy copy on discover page).
+- Each place row (when pin lens + `pin_id`): **Discovery pin** → `/discover/{region}/pin/{pin_id}/` (human bookmark, not a scan URL).
+- Selection panel mirrors row links (Scan · Open in Maps · Discovery pin).
+- Map page footnote links to discovery browse.
+
+**Do not** add geolocation to the lens sketch — near-me stays on `/discover/*` only.
+
+#### Default view: full map + express spine
+
+| Layer | Default |
+|-------|---------|
+| **Sketch** | **All** listed pins visible (fog hides per Signal War rules — ghost/rumor styling, not broken UI) |
+| **Express emphasis** | Spine stops larger / labeled; spine `unlock_edges` drawn as the **active line**; one stop marked **Next** (`comprehension_kit.primary_scan_node`, today `node_04`) |
+| **Place list** | Default filter **Play spine** (~5–8 cooperative stops); one tap to **All places (N)** for faction / full registry |
+| **Selection** | Tap any pin → **one** tier-4 panel (scan-hero shape): entity → state → Scan CTA → Open in Maps — **no** parallel spotlight card + row + mission duplicate |
+
+**Spine sources (until `network_lens` ships in JSON):** derive express stops from `comprehension_kit.primary_scan_node`, autonomous unlock chain (`node_04` → `node_07` → fragment nodes → finale), and optional sanctuary regroup (`node_02` / `node_12` per GT-3). Consolidate into **`network_lens.play_spine[]`** in season JSON before next presentation PR.
+
+#### Two game layers on one lens
+
+Cedar Rapids runs **cooperative awakening** + **Signal War** contest on the same resolver ([`CITY_GAME_SUMMER_MOMENTUM.md`](CITY_GAME_SUMMER_MOMENTUM.md)):
+
+| Layer | Lens treatment |
+|-------|----------------|
+| **Co-op express** | Spine line + fragment/finale progress strip |
+| **Contest overlay** | Relay hold / fog on full map (district tint or pin state — no heatmap); **dual victory** panel from snapshot when `dualVictory` present |
+
+**Instrument audit (wire before polish):** `#city-game-map-dual-victory-mount`, snapshot apply for dual victory, SF-2b state on **pins** (not only list rows). See § Launch sign-off.
+
+#### LO-4 reference spine
+
+LO-4 comprehension path includes **board reference spine** ([`city-game-reference-network-core.mjs`](../site/js/city-game-reference-network-core.mjs)). Do **not** delete — **refactor** into transit **legend + express station list** on the lens (same probes, less essay). Full charter remains on rules page.
+
+#### Copy reconcile
+
+Season `player_guide` currently says **“No required first stop”** while `comprehension_kit` and launch copy emphasize River Lantern. Align to transit framing: *any listed stop is valid; the express line recommends where to start* — update `player_guide` / `launch` in the same PR as spine config when presentation ships.
+
+#### Above-the-fold budget (mobile)
+
+| Slot | Max | Content |
+|------|-----|---------|
+| Page chrome | 2 lines | City + season title |
+| Season chip | 1 line | Window dates |
+| **Network map** | ≥50% viewport | Schematic SVG — primary surface |
+| **City strip** | 2 lines | Hook · progress · `generated_at` / sync |
+| Selection panel | 0–1 node | Only when pin selected |
+| List | below fold | Default spine lens |
+
+#### Target DOM order (inside `#city-game-map-root`)
+
+1. **Network map** (schematic SVG; pins carry snapshot state labels)  
+2. **City strip** (world progress; quest lore in `<details>`)  
+3. **Selection panel** (replaces always-visible spotlight)  
+4. **Place list** (default spine; expand to all)  
+5. **Drawer** — events · paths · dual victory · advanced (single collapsible band, not six open sections)
+
+Rules copy, wake-loop essays, and full charter → rules page anchors only.
+
+#### Label dictionary (game ↔ reusable network)
+
+| Game (Cedar Rapids) | Generic network season |
+|---------------------|-------------------------|
+| Playable node / place | Member object |
+| Path / route | Unlock edge |
+| Quest / city goal | Collective goal |
+| Game event / activity | Network headline |
+
+All player-facing strings from season `map_copy` / `launch` / `network_lens` — never hardcode CR in layout code.
+
+#### Proposed season config (`network_lens`)
+
+Document before implementation; validate in `verify:city-game`:
+
+```json
+"network_lens": {
+  "play_spine": ["node_04", "node_07", "node_09", "node_11", "node_13"],
+  "default_list": "spine",
+  "contest_layer": true,
+  "next_node_id": "node_04"
+}
+```
+
+`default_list`: `"spine"` | `"all"`. Optional `express_edges`: subset of `unlock_edges` ids for line drawing.
+
+#### Anti-patterns (do not ship)
+
+- Status essay before the map  
+- Duplicate sketch in list + hero  
+- Spotlight card **and** selection panel **and** highlighted row for the same node  
+- New CSS frameworks (`pnl-*`, etc.) — extend `city-game-map-*` only  
+- “State first” as prose first — **state first = pins and selection panel show truth** ([`STATE_FIRST_UI_MODEL.md`](STATE_FIRST_UI_MODEL.md))  
+- Personal progress, GPS, visit counts, heatmaps (policy § above)  
+- Treating lens layout experiments as canonical before this section is updated  
+
+#### Comprehension gates
+
+| ID | Question | When |
+|----|----------|------|
+| **GT-7** | Does the lens show what the **city** knows, not what **I** did? | B13 / live board marketing |
+| **GT-8** | Can you point to where you would go first **within 10s** of opening the lens (un coached)? | Network lens v2 sign-off |
+| **RN-1–RN-3** | Public network definition + signers + season end (rules-first path) | LO-4 · [`city-game-reference-network-core.mjs`](../site/js/city-game-reference-network-core.mjs) |
+
+E2E green ≠ GT-8 pass. Record human probes in [`CITY_GAME_COMPREHENSION_RUNBOOK.md`](CITY_GAME_COMPREHENSION_RUNBOOK.md).
+
+#### Implementation phases (doc → code)
+
+| Phase | Scope | Exit |
+|-------|--------|------|
+| **0** | This section + SF-3 in state-first doc + GT-8 / install QA rows | Doc merged |
+| **1** | Pin state labels, selection panel, spine list default, dual-victory mount | GT-8 ≥4/5 on staging |
+| **2** | Express edge styling, contest overlay, drawer collapse | Photo-ready screenshot (Lane C) |
+| **3** | Page shell trim, `network_lens` in season JSON, copy reconcile | B13 human sign-off |
+
+Do **not** deploy presentation changes to production as “done” until Phase 1 exit unless hotfix.
+
+#### Visual dialect (emphasis plates — 2026-06)
+
+Presentation-only refresh aligned with [`hc-emphasis-card.css`](../site/css/hc-emphasis-card.css) (legacy landing privacy/framing cards). Red reserved for **Next pin**, **express edges**, and **scan CTAs** — not selection chrome.
+
+| Phase | Surface | Status |
+|-------|---------|--------|
+| **C1** | Lens panels (live state, express callout, selection, sketch hero) | ☑ Shipped |
+| **B** | Public network cards on `/` and `/play/season/` | ☑ Shipped |
+| **C2** | Map list/selection/filter chrome → info tint | ☑ Shipped |
+| **D** | Rules page player guide + privacy + board CTA plates | ☑ Shipped |
+
+**Engineering preflight:** `npm run city-game:network-lens-preflight` (board + rules surfaces + `network_lens` JSON). **Human:** GT-8 orientation (≥4/5 testers) — [`CITY_GAME_COMPREHENSION_RUNBOOK.md`](CITY_GAME_COMPREHENSION_RUNBOOK.md) · field walk [`gt8-field-walk.html`](../site/play/cedar-rapids/comprehension/gt8-field-walk.html) (`npm run city-game:network-lens-gt8-kit -- --production`).
+
 | Standard | Application |
 |----------|-------------|
-| **Device shell** | Dashboard is a **Pages** surface, not status-module graph — no `DEVICE_SHELL_ASSET_VERSION` bump unless importing shell modules |
+| **Device shell** | Lens is a **Pages** surface — no `DEVICE_SHELL_ASSET_VERSION` bump unless importing shell modules |
 | **Naming** | Page title **“City state”** or **“Weekend board”** — avoid “Your map” |
-| **Accessibility** | SVG `role="img"` + tabular fallback list of nodes with same chips |
-| **Offline** | Show last snapshot timestamp; stale banner after 2× poll interval |
-| **Launch surfaces** | `city-game:launch-surfaces` adds link from rules hero when **M2** ships — not before snapshot API is live |
-| **Comprehension GT** | Add GT-7: “Does the board show what the **city** knows, not what **I** did?” |
+| **Accessibility** | SVG `role="img"` + list fallback; pin targets sized for outdoor tap; `prefers-reduced-motion` for edge pulse |
+| **Offline** | Last snapshot timestamp; stale banner after 2× poll interval |
+| **Poll budget** | 60–120s poll; passive `GET` snapshot — not a realtime app ([`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md)) |
+| **Launch surfaces** | Site links to lens are OK; **B13** before treating lens as field-launch **centerpiece** ([`CITY_GAME_LAUNCH_CHECKLIST.md`](CITY_GAME_LAUNCH_CHECKLIST.md) P6) |
+| **Reuse** | Same presentation module for [`example-city`](../site/play/example-city/map/) — CR is instance, not fork |
 
 ---
 
@@ -348,10 +531,15 @@ When launch surfaces market a **live** city board (`#city-state` + live chips co
 | Gate | Status | Date |
 |------|--------|------|
 | SF-2 state-first node rows (engineering + visual QA) | ☑ Complete | 2026-06-10 |
-| B13 privacy review (snapshot JSON shape + no visit/player fields) | ☐ Pending | |
+| SF-3 network lens — spec | ☑ Doc | 2026-06-21 |
+| SF-3 network lens — implementation (phases 1–3 + visual C1–D) | ☑ Engineering | 2026-06-21 |
+| SF-3 GT-8 human orientation (≥4/5 testers, &lt;10s) | ☐ Pending | |
+| B13 privacy engineering (snapshot JSON + public surface copy) | ☑ Complete | 2026-06-21 |
+| B13 privacy review (human sign-off) | ☐ Pending | |
 
-**Engineering:** `npm run city-game:map-board-b13-preflight` (B14 + GT-7 log + row above)  
-**Record:** `npm run city-game:map-board-b13-sign-off -- --pass --apply --reviewer "Name"`
+**Engineering:** `npm run city-game:network-lens-preflight` (SF-3) · `npm run city-game:map-board-privacy-preflight` (B13 engineering) · `npm run city-game:map-board-b13-preflight` (B14 + GT-7 + privacy sign-off)  
+**Record GT-8:** `npm run city-game:network-lens-sign-off -- --pass --apply --reviewer "Name"` (after ≥4/5 testers in runbook)  
+**Record B13:** `npm run city-game:map-board-b13-sign-off -- --pass --apply --reviewer "Name"`
 
 ---
 
@@ -361,5 +549,9 @@ When launch surfaces market a **live** city board (`#city-state` + live chips co
 |------|-------|
 | 2026-06-02 | **M2–M3 shipped** — snapshot API, live chips, headline ticker, launch-surfaces board links, GT-7 comprehension kit |
 | 2026-06-02 | **M1 shipped** — `map_layout` + `map_copy` in season JSON; `/play/cedar-rapids/#city-state`; `site/js/city-game-map-board*.mjs`; `verify:city-game` layout tests |
+| 2026-06-21 | **Network lens v2 spec** — transit map metaphor, express spine, two-map contract, `network_lens` JSON sketch, phases 0–3; replaces interim map-first notes |
+| 2026-06-21 | **SF-3 engineering + visual C1–D** — network lens phases 1–3, emphasis plates on lens/rules/portal; GT-8 human gate tooling (`city-game:network-lens-preflight`) |
+| 2026-06-21 | **B13 privacy engineering** — snapshot JSON key audit + negation-aware public surface copy (`city-game:map-board-privacy-preflight`) |
+| 2026-06-21 | **GT-8 field walk kit** — outdoor B1–B7 scenarios + 10s timer at `/play/cedar-rapids/comprehension/gt8-field-walk.html` |
 | 2026-06-10 | **SF-2 visually complete** — state-first node rows + dark-theme contrast; ready for B13 human sign-off (`city-game:map-board-b13-preflight`) |
 | 2026-06-02 | Initial canonical plan — M1 static / M2 snapshot / M3 headlines; policy boundaries; API sketch; risks R-19–R-20, gates B13–B15 |

@@ -13,6 +13,7 @@ import {
   stewardPushSchemaReady,
 } from "./db";
 import { utcDayKey } from "./plans";
+import { fanOutWebPushLiveProofPending } from "./web-push-send";
 
 export const LIVE_PROOF_PENDING_TYPE = "live_proof.pending";
 export const STEWARD_PUSH_DELIVERED_EVENT = "notify.push.delivered";
@@ -339,31 +340,35 @@ export async function notifyLiveProofPending(
   env: Env,
   db: D1Database,
   input: LiveProofPendingNotifyInput
-): Promise<{ delivered: number; account_id: string | null }> {
+): Promise<{
+  delivered: number;
+  web_push_delivered: number;
+  account_id: string | null;
+}> {
   try {
     if (!hostedStewardEnabled(env) || !(await stewardPushSchemaReady(db))) {
-      return { delivered: 0, account_id: null };
+      return { delivered: 0, web_push_delivered: 0, account_id: null };
     }
 
     const accountId = await profileLinkedAccount(db, input.profile_id);
     if (!accountId) {
-      return { delivered: 0, account_id: null };
+      return { delivered: 0, web_push_delivered: 0, account_id: null };
     }
 
     const resolved = await resolveEffectiveEntitlements(db, accountId);
     if (!resolved) {
-      return { delivered: 0, account_id: accountId };
+      return { delivered: 0, web_push_delivered: 0, account_id: accountId };
     }
 
     const { account, entitlements } = resolved;
     if (account.status !== "active" && account.status !== "trialing") {
-      return { delivered: 0, account_id: accountId };
+      return { delivered: 0, web_push_delivered: 0, account_id: accountId };
     }
     if (entitlements["steward.hosted"] !== true) {
-      return { delivered: 0, account_id: accountId };
+      return { delivered: 0, web_push_delivered: 0, account_id: accountId };
     }
     if (entitlements["notify.push.live_proof"] !== true) {
-      return { delivered: 0, account_id: accountId };
+      return { delivered: 0, web_push_delivered: 0, account_id: accountId };
     }
 
     const event: LiveProofPendingPushEvent = {
@@ -380,40 +385,45 @@ export async function notifyLiveProofPending(
 
     const chunk = formatLiveProofPendingSse(event);
     const sinks = connectionsByAccount.get(accountId);
-    if (!sinks || sinks.size === 0) {
-      return { delivered: 0, account_id: accountId };
-    }
-
     const dayKey = utcDayKey();
     let delivered = 0;
-    for (const sink of sinks) {
-      try {
-        sink.write(chunk);
-        delivered += 1;
+    if (sinks && sinks.size > 0) {
+      for (const sink of sinks) {
         try {
-          await incrementUsage(
-            db,
-            accountId,
-            sink.deviceId || "",
-            STEWARD_PUSH_DELIVERED_EVENT,
-            dayKey
-          );
-        } catch {
-          /* metering must not break fan-out */
+          sink.write(chunk);
+          delivered += 1;
+          try {
+            await incrementUsage(
+              db,
+              accountId,
+              sink.deviceId || "",
+              STEWARD_PUSH_DELIVERED_EVENT,
+              dayKey
+            );
+          } catch {
+            /* metering must not break fan-out */
+          }
+        } catch (err) {
+          console.error("steward_push_sink_write_failed", {
+            account_id: accountId,
+            connection_id: sink.connectionId,
+            err,
+          });
         }
-      } catch (err) {
-        console.error("steward_push_sink_write_failed", {
-          account_id: accountId,
-          connection_id: sink.connectionId,
-          err,
-        });
       }
     }
 
-    return { delivered, account_id: accountId };
+    const web_push_delivered = await fanOutWebPushLiveProofPending(
+      env,
+      db,
+      accountId,
+      event
+    );
+
+    return { delivered, web_push_delivered, account_id: accountId };
   } catch (err) {
     recordStewardPushNotifyFailure();
     console.error("steward_push_notify_failed", err);
-    return { delivered: 0, account_id: null };
+    return { delivered: 0, web_push_delivered: 0, account_id: null };
   }
 }

@@ -1,6 +1,5 @@
 /**
- * Intent-based relay-offer inbox refresh for tab session owners.
- * No continuous polling — refreshes on hub open, manual check, and offer dismiss.
+ * Relay-offer inbox refresh — hub open, manual check, dismiss, and browser-alert poll.
  * @see docs/DEVICE_INBOX.md
  */
 import { readChildObjectRows } from "./child-object-store-core.mjs";
@@ -66,8 +65,21 @@ function hasLocalActiveLostItemRelays(profileId) {
 
 export function relayOfferInboxEligible() {
   const keys = signingKeysFromTabSession();
-  if (!keys) return false;
-  return hasLocalActiveLostItemRelays(keys.profileId);
+  if (keys && hasLocalActiveLostItemRelays(keys.profileId)) return true;
+  return walletHasActiveLostItemRelays();
+}
+
+/** True when any saved wallet row has active lost-item relay child objects. */
+export function walletHasActiveLostItemRelays() {
+  try {
+    for (const entry of loadWallet()) {
+      const pid = typeof entry.profile_id === "string" ? entry.profile_id : "";
+      if (pid && hasLocalActiveLostItemRelays(pid)) return true;
+    }
+  } catch {
+    /* ignore */
+  }
+  return false;
 }
 
 export function getRelayOfferPending() {
@@ -79,10 +91,11 @@ export function getRelayOfferPendingCount() {
 }
 
 /**
- * @param {{ manual?: boolean }} [opts]
+ * @param {{ manual?: boolean, promptUnlock?: boolean }} [opts]
  */
 export async function refreshRelayOfferInbox(opts = {}) {
   const manual = opts.manual === true;
+  const promptUnlock = opts.promptUnlock ?? manual;
   const now = Date.now();
 
   if (!manual) {
@@ -102,7 +115,7 @@ export async function refreshRelayOfferInbox(opts = {}) {
     for (const entry of loadWallet()) {
       const pid = typeof entry.profile_id === "string" ? entry.profile_id : "";
       if (!pid || !hasLocalActiveLostItemRelays(pid)) continue;
-      keys = await signingKeysForProfile(pid, { promptUnlock: manual });
+      keys = await signingKeysForProfile(pid, { promptUnlock });
       if (keys) break;
     }
   }
@@ -146,6 +159,13 @@ export async function refreshRelayOfferInbox(opts = {}) {
 /** Manual hub / shortcuts refresh. */
 export function checkRelayOffersNow() {
   return refreshRelayOfferInbox({ manual: true });
+}
+
+/**
+ * Browser-alert probe: bypass coalesce, no unlock prompt (device_unlock cards skip until unlocked).
+ */
+export async function probeRelayOfferInboxForBackgroundAlerts() {
+  return refreshRelayOfferInbox({ manual: true, promptUnlock: false });
 }
 
 /** Invalidate coalesce window (tests). */

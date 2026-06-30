@@ -19,6 +19,7 @@ import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs"
 import { logDotDiagnostic } from "./device-dot-diagnostics.mjs";
 import { shouldDeferCoreDotPaint } from "./device-status-dot-boot-core.mjs";
 import { markDotBootPending } from "./device-status-dot-boot.mjs";
+import { STATUS_PARTIAL_LOAD_ARIA_LABEL } from "./device-status-load-error.mjs";
 import { closeInboxSheet } from "./device-inbox-sheet-loader.mjs?v=94";
 import { syncInboxBackdropForOpenHub } from "./device-sheet-backdrop-sync.mjs?v=94";
 
@@ -145,12 +146,15 @@ export function applyCoreDot() {
   dot.dataset.dotOverlay = overlay;
   dotBtn?.setAttribute("data-dot-state", dotState);
   dotBtn?.setAttribute("data-dot-overlay", overlay);
+  const partialLoad = document.getElementById("top-chrome")?.hasAttribute("data-device-status-partial");
   dotBtn?.setAttribute(
     "aria-label",
-    statusAriaLabel(networkStatus, device, overlay, {
-      pageKind: dotPageKindFromPathname(location.pathname, { isWalletPage: isWalletPage() }),
-      surface: shellSurfaceFromStandalone(readStandaloneModeFromWindow(window)),
-    })
+    partialLoad
+      ? STATUS_PARTIAL_LOAD_ARIA_LABEL
+      : statusAriaLabel(networkStatus, device, overlay, {
+          pageKind: dotPageKindFromPathname(location.pathname, { isWalletPage: isWalletPage() }),
+          surface: shellSurfaceFromStandalone(readStandaloneModeFromWindow(window)),
+        })
   );
 }
 
