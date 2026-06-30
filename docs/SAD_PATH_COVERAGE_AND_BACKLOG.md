@@ -3,7 +3,7 @@
 **Status:** Active — living inventory of unhappy paths, coverage gaps, and validation split  
 **Date:** 2026-05-29  
 **Audience:** Product, engineering, QA, agents planning tests or hardening  
-**Related:** [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH_QA_2026-05-26.md) (production pass) · [`LIVE_CONTROL_USABILITY_HARDENING.md`](LIVE_CONTROL_USABILITY_HARDENING.md) (live proof slices) · [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) (stranger gate) · [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) § Errors and sad paths
+**Related:** [`CORE_PRODUCT_LOOP.md`](CORE_PRODUCT_LOOP.md) § Q1 loop inventory (L1–L8 · `npm run ws-quality:q1-preflight`) · [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH_QA_2026-05-26.md) (production pass) · [`LIVE_CONTROL_USABILITY_HARDENING.md`](LIVE_CONTROL_USABILITY_HARDENING.md) (live proof slices) · [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) (stranger gate) · [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) § Errors and sad paths
 
 ---
 

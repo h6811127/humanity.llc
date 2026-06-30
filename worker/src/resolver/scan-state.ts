@@ -19,6 +19,11 @@ import { buildScanCapabilities } from "../live-object/scan-capabilities";
 import type { ObjectPublicStream } from "../validation/object-streams";
 import type { GameNodeScanContext } from "../city-game/scan-view";
 import { composeChildObjectScanState } from "../live-object/compose-child-object-scan";
+import {
+  buildScanWitnessRelationships,
+  scanRelationshipRulesFromEdges,
+} from "../live-object/scan-object-graph";
+import { isWitnessRelationshipEdge } from "../live-object/relationship-edge-spec";
 import { composeScanTrustContext, type ScanTrustContext } from "./scan-trust-compose";
 import { composeCardScanState } from "../live-object/compose-card-scan-state";
 import type { ObjectCustodyScanContext } from "../live-object/custody";
@@ -120,6 +125,10 @@ export interface ScanViewModel {
   gameNode: GameNodeScanContext | null;
   /** WS-REALITY — proves / limits / signers / charter for network-enrolled scans. */
   scanTrust: ScanTrustContext | null;
+  /** Signed witness relationship edges — scan HTML + status JSON (WS-OBJECT-GRAPH-V1). */
+  relationships: ScanRelationshipStatus[];
+  /** Signed edge authority summary when relationships present. */
+  relationshipRules: ScanRelationshipRules | null;
 }
 
 /** Canonical HTTPS scan target for this request. */
@@ -303,13 +312,38 @@ export function buildScanViewModel(
       card_document_json: child.child_object_document_json,
     };
     const season = options.season ?? defaultSeason();
+    const witnessEdgesIncoming =
+      ctx.witnessRelationshipEdgesIncoming?.filter(isWitnessRelationshipEdge) ??
+      [];
     const composed = composeChildObjectScanState({
       child,
       season,
       env: options.env ?? {},
       now,
       vouchWitnesses: ctx.gameVouchWitnesses ?? undefined,
+      witnessRelationshipEdges: witnessEdgesIncoming.length
+        ? witnessEdgesIncoming
+        : undefined,
     });
+    const allSignedEdges = [
+      ...(ctx.witnessRelationshipEdgesIncoming ?? []),
+      ...(ctx.witnessRelationshipEdgesOutgoing ?? []),
+    ];
+    const relationships = allSignedEdges.length
+      ? buildScanWitnessRelationships({
+          scannedObjectId: child.object_id,
+          incomingEdges: ctx.witnessRelationshipEdgesIncoming ?? [],
+          outgoingEdges: ctx.witnessRelationshipEdgesOutgoing ?? [],
+          incomingGate: composed.gameNode?.vouchGate ?? null,
+          scannerGameMeta: composed.gameNode?.gameMeta ?? null,
+          peerLabels: ctx.witnessPeerLabels ?? {},
+          peerGameMetaByObjectId: ctx.relationshipPeerGameMeta ?? {},
+        })
+      : [];
+    const relationshipRules = scanRelationshipRulesFromEdges(
+      allSignedEdges,
+      relationships.length
+    );
     const scanChild = {
       ...child,
       public_state: composed.publicState,
@@ -347,6 +381,8 @@ export function buildScanViewModel(
         childCustody: composed.childCustody,
         gameNode: composed.gameNode,
         scanTrust,
+        relationships,
+        relationshipRules,
       },
       origin,
       now
@@ -636,6 +672,8 @@ interface BaseViewInput {
   childCustody?: ObjectCustodyScanContext | null;
   gameNode?: GameNodeScanContext | null;
   scanTrust?: ScanTrustContext | null;
+  relationships?: ScanRelationshipStatus[];
+  relationshipRules?: ScanRelationshipRules | null;
 }
 
 function baseView(input: BaseViewInput, origin: string, now: Date = new Date()): ScanViewModel {
@@ -700,6 +738,8 @@ function baseView(input: BaseViewInput, origin: string, now: Date = new Date()):
     capabilities: [],
     gameNode: input.gameNode ?? null,
     scanTrust: input.scanTrust ?? null,
+    relationships: input.relationships ?? [],
+    relationshipRules: input.relationshipRules ?? null,
   };
   return { ...vm, capabilities: buildScanCapabilities(vm, now) };
 }

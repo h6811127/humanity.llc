@@ -66,11 +66,55 @@ Safety flips only via [`/game-operator/`](../site/game-operator/index.html) on s
 
 ---
 
-## Game-theory comprehension (GT-1–GT-7)
+## Network board field scenarios (B13 / SF-3)
 
-Human gate — run with **5 un coached testers** before launch ([`FOUNDING_COPY_COMPREHENSION_RUNBOOK.md`](FOUNDING_COPY_COMPREHENSION_RUNBOOK.md) pattern). Full runbook: [`CITY_GAME_COMPREHENSION_RUNBOOK.md`](CITY_GAME_COMPREHENSION_RUNBOOK.md). **GT-7** covers the live city state board when marketing the map dashboard.
+Run on **≥2 phones** (Safari + Chrome if possible) at an **outdoor** venue or in **bright sun** — not only at a desk. Canonical spec: [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) § Network lens · human gate **GT-8** in [`CITY_GAME_COMPREHENSION_RUNBOOK.md`](CITY_GAME_COMPREHENSION_RUNBOOK.md).
 
-Engineering preflight only: `city-game-game-theory.test.ts` asserts scan templates never render forbidden score/analytics copy — **not** a substitute for GT-1–GT-7 human pass.
+URL: `/play/cedar-rapids/map/` (production or LAN dev). **Operator kit:** [`gt8-field-walk.html`](../site/play/cedar-rapids/comprehension/gt8-field-walk.html) — 10s timer + scenario checklist (`npm run city-game:network-lens-gt8-kit -- --production`).
+
+| # | Scenario | Pass when |
+|---|----------|-----------|
+| B1 | Fresh open, no coaching | Tester points to a **first stop on the map within 10s** (GT-8) |
+| B2 | Outdoor / glare | Pin labels and express spine readable without zoom |
+| B3 | Tap a spine pin | Selection shows **world state** (chips/effect), Scan + Maps — not duplicate essay block |
+| B4 | Tap a non-spine pin | Same panel shape; state differs from personal progress |
+| B5 | After scanning one node | Board refresh shows **snapshot chips** on pin or panel — not “you visited N times” |
+| B6 | Expand “all places” | Full node list still state-first rows (SF-2); map remains visible |
+| B7 | Privacy probe (GT-7) | Tester describes **city knowledge**, not GPS tracking or personal rank |
+
+Record photos optional (internal). Failures block **B13** centerpiece sign-off until SF-3 Phase 1–2 fixes land.
+
+---
+
+## Public network player flow shell (PD-1–PD-5)
+
+**Human execution pending** — run PD-1–PD-5 with un coached strangers.
+
+Human gate — run with **3 un coached strangers** on production or LAN dev before treating discover → board → scan as stranger-ready. Engineering belt: `npm run verify:public-network-player-flow`.
+
+**Operator kit:** [`player-flow-field-walk.html`](../site/play/cedar-rapids/comprehension/player-flow-field-walk.html) — linked from C2 comprehension hub and rules operator footnote (`npm run player-flow:field-kit:production`).
+
+| # | Scenario | Pass when |
+|---|----------|-----------|
+| PD-1 | Discover network | From `/` or `/play/season/`, finds Wake the city and opens board — no coaching |
+| PD-2 | What a scan proves | From catalog or home, reaches rules `#rules-prove-title` without search |
+| PD-3 | Board shell intro | Dismisses first-visit banner, taps start callout, opens selection panel |
+| PD-4 | First stop (world state) | Names suggested first place — collective state, not GPS rank |
+| PD-5 | Scan handoff | Finds scan link on place row or scan onboarding **Open board** + **What a scan proves** CTAs |
+
+When passed:
+
+```bash
+npm run player-flow:sign-off -- --pass --apply --strangers 3 --pass-count 3
+```
+
+---
+
+## Game-theory comprehension (GT-1–GT-8)
+
+Human gate — run with **5 un coached testers** before launch ([`FOUNDING_COPY_COMPREHENSION_RUNBOOK.md`](FOUNDING_COPY_COMPREHENSION_RUNBOOK.md) pattern). Full runbook: [`CITY_GAME_COMPREHENSION_RUNBOOK.md`](CITY_GAME_COMPREHENSION_RUNBOOK.md). **GT-7** covers the live city state board when marketing the map dashboard; **GT-8** covers orientation speed on the **network lens** (SF-3 sign-off).
+
+Engineering preflight only: `city-game-game-theory.test.ts` asserts scan templates never render forbidden score/analytics copy — **not** a substitute for GT-1–GT-8 human pass.
 
 ---
 
@@ -82,6 +126,7 @@ Engineering preflight only: `city-game-game-theory.test.ts` asserts scan templat
 | Local proof gate (`city-game:proof-local`) | ☑ Pass | 2026-06-02 |
 | Physical install (≥3 phones × 15 nodes) | ☐ Pending | |
 | GT comprehension (≥5 testers) | ☑ Pass | 2026-06-03 |
+| Player flow shell (≥3 strangers, PD-1–PD-5) | ☐ Pending | |
 
 | Role | Name | Date |
 |------|------|------|

@@ -138,6 +138,9 @@ describe("device-keys-custody-html", () => {
     expect(html).toContain("created-manage-group-label");
     expect(html).toContain("Access &amp; recovery");
     expect(html).toContain("Share &amp; preview");
+    expect(html).toContain('id="created-shop-order-panel"');
+    expect(html).toContain("Order on wear");
+    expect(html).toContain('id="created-live-shop-link"');
     expect(html).toContain("Issue new code");
     expect(html).toContain("Preview item");
     expect(html).not.toContain("Issue new QR");

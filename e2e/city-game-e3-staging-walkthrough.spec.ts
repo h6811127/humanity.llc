@@ -9,6 +9,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 const EXAMPLE_SEASON = "example_city_season_01";
+const CR_SUMMER_SEASON = "cr_season_01_wake";
 const SPOT_NODES = ["node_01", "node_04", "node_07"];
 
 async function dismissSetupOverlays(page: import("@playwright/test").Page) {
@@ -175,6 +176,117 @@ test.describe("E3 self-serve staging walkthrough (local)", () => {
           profile_id: profileId,
           handle,
           season_id: EXAMPLE_SEASON,
+          game_node_count: gameNodes.length,
+          spot_nodes: SPOT_NODES,
+          completed_at: new Date().toISOString(),
+        },
+        null,
+        2
+      ) + "\n"
+    );
+  });
+
+  test("browser-only 40-node Cedar Rapids summer season on local stack", async ({ page, request }) => {
+    test.setTimeout(900_000);
+
+    await page.addInitScript(() => {
+      if (sessionStorage.getItem("__e2e_e3_cr_storage_boot")) return;
+      localStorage.clear();
+      sessionStorage.clear();
+      sessionStorage.setItem("__e2e_e3_cr_storage_boot", "1");
+    });
+
+    const handle = `e3cr_${Date.now().toString(36).slice(-8)}`;
+
+    await page.goto("/create/");
+    await page.locator("#handle").fill(handle);
+    await page.locator("#manifesto").fill("E3 Cedar Rapids summer staging walkthrough");
+    await page.locator("#create-organizer-details summary").click();
+    await page.locator("#enable-organizer-revoke").check();
+    await page.locator("#submit").click();
+
+    await page.waitForURL(/\/created\/\?.*profile_id=.*qr_id=.*fresh=1/, {
+      timeout: 60_000,
+    });
+
+    const session = await page.evaluate(() => {
+      const raw = sessionStorage.getItem("hc_created");
+      return raw ? JSON.parse(raw) : null;
+    });
+    expect(session?.profile_id).toBeTruthy();
+    const profileId = String(session.profile_id);
+
+    await completeSetupWizard(page);
+    await dismissSetupOverlays(page);
+
+    await expect(page.locator("#child-object-add-game-node")).toBeVisible({
+      timeout: 15_000,
+    });
+
+    const seasonSelect = page.locator("#child-object-game-node-season");
+    await expect(seasonSelect.locator(`option[value="${CR_SUMMER_SEASON}"]`)).toHaveCount(1, {
+      timeout: 15_000,
+    });
+    await seasonSelect.selectOption(CR_SUMMER_SEASON);
+
+    await page.locator("#child-object-game-node-bulk summary").click();
+    const bulkSubmit = page.locator("#child-object-game-node-bulk-submit");
+    await expect(bulkSubmit).toBeEnabled({ timeout: 15_000 });
+    await expect(bulkSubmit).toContainText("Register selected nodes (40)");
+
+    await bulkSubmit.click();
+    await expect(page.locator("#child-object-game-node-bulk-status")).toContainText("40 / 40", {
+      timeout: 600_000,
+    });
+
+    const objectsRes = await request.get(
+      `http://127.0.0.1:8787/.well-known/hc/v1/cards/${profileId}/objects`
+    );
+    expect(objectsRes.ok()).toBeTruthy();
+    const objectsBody = await objectsRes.json();
+    const gameNodes = (objectsBody.objects ?? []).filter(
+      (row: { object_type?: string; status?: string; qr_id?: string | null }) =>
+        row.object_type === "game_node" &&
+        row.status !== "revoked" &&
+        typeof row.qr_id === "string" &&
+        row.qr_id.trim().length > 0
+    );
+    expect(gameNodes.length).toBeGreaterThanOrEqual(40);
+
+    const seasonJson = await (
+      await request.get("http://127.0.0.1:8788/data/city-game-cr-season-01.json")
+    ).json();
+    const nodeById = new Map(
+      (seasonJson.nodes ?? []).map((n: { node_id: string; object_id: string }) => [
+        n.node_id,
+        n.object_id,
+      ])
+    );
+
+    for (const nodeId of SPOT_NODES) {
+      const objectId = nodeById.get(nodeId);
+      expect(objectId, `missing template object for ${nodeId}`).toBeTruthy();
+      const row = gameNodes.find(
+        (n: { object_id?: string }) => n.object_id === objectId
+      );
+      expect(row?.qr_id, `${nodeId} missing QR`).toBeTruthy();
+      const scanRes = await request.get(
+        `http://127.0.0.1:8787/c/${profileId}?q=${row.qr_id}`
+      );
+      expect(scanRes.ok()).toBeTruthy();
+      const html = await scanRes.text();
+      expect(html.toLowerCase()).toContain("game");
+    }
+
+    const outDir = join(process.cwd(), "worker/.local");
+    mkdirSync(outDir, { recursive: true });
+    writeFileSync(
+      join(outDir, "e3-cr-staging-walkthrough.json"),
+      JSON.stringify(
+        {
+          profile_id: profileId,
+          handle,
+          season_id: CR_SUMMER_SEASON,
           game_node_count: gameNodes.length,
           spot_nodes: SPOT_NODES,
           completed_at: new Date().toISOString(),

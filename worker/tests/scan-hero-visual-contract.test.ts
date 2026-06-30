@@ -73,13 +73,25 @@ describe("scan hero visual contract (v2 depth)", () => {
     expect(SCAN_PASS_CSS).toContain("--scan-hero-qr-expanded-max");
     expect(SCAN_PASS_CSS).toMatch(/\.scan-hero-qr-details\[open\][\s\S]*--scan-hero-qr-expanded-max/);
     expect(SCAN_PASS_CSS).toContain("--hc-scan-hero-fill");
+    expect(SCAN_PASS_CSS).toContain("--hc-scan-hero-fill-glass");
+    expect(SCAN_PASS_CSS).toContain("--hc-scan-hero-backdrop");
+    expect(SCAN_PASS_CSS).toContain("--hc-scan-page-canvas");
     expect(SCAN_PASS_CSS).toContain("--hc-scan-hero-border");
     expect(SCAN_PASS_CSS).toContain("scan-hero-settle-pulse");
     expect(SCAN_PASS_CSS).toMatch(
-      /\.scan-hero\.scan-status-panel[\s\S]*background:\s*var\(--hc-scan-hero-fill\)/
+      /\.scan-hero\.scan-status-panel[\s\S]*background:\s*var\(--hc-scan-hero-fill-glass\)/
     );
     expect(SCAN_PASS_CSS).toMatch(
-      /html\[data-theme="dark"\][\s\S]*--hc-scan-hero-fill/
+      /\.scan-hero\.scan-status-panel[\s\S]*backdrop-filter:\s*var\(--hc-scan-hero-backdrop\)/
+    );
+    expect(SCAN_PASS_CSS).toMatch(
+      /\.page\.scan-page[\s\S]*background:\s*var\(--hc-scan-page-canvas\)/
+    );
+    expect(SCAN_PASS_CSS).toMatch(
+      /@supports not[\s\S]*\.scan-hero\.scan-status-panel[\s\S]*--hc-scan-hero-fill/
+    );
+    expect(SCAN_PASS_CSS).toMatch(
+      /html\[data-theme="dark"\][\s\S]*--hc-scan-hero-fill-glass/
     );
     expect(SCAN_PASS_CSS).toContain("--hc-scan-surface-bg");
     expect(SCAN_PASS_CSS).toMatch(

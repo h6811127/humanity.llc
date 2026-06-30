@@ -72,6 +72,7 @@ import {
 import {
   liveControlPollIntervalMs,
   liveControlPollAllowedByResolverHealth,
+  liveControlManualPollAllowedByResolverHealth,
   liveControlAutoPollShouldRun,
   liveControlPollLoopShouldRun,
   liveControlPollTickShouldFetch,
@@ -542,7 +543,10 @@ export async function refreshLiveControlInbox(opts = {}) {
   if (!manual && !isWatchLiveProofEnabled()) {
     return pending;
   }
-  if (!liveControlPollAllowedByResolverHealth(getResolverHealthStatus())) {
+  const resolverHealth = getResolverHealthStatus();
+  if (manual) {
+    if (!liveControlManualPollAllowedByResolverHealth(resolverHealth)) return pending;
+  } else if (!liveControlPollAllowedByResolverHealth(resolverHealth)) {
     return pending;
   }
   if (Date.now() < pollBackoffUntil) return pending;
@@ -656,7 +660,7 @@ export async function checkLiveProofNow() {
  * Does not require Watch; bounded by wallet size + resolver health.
  */
 export async function probeLiveControlInboxForBackgroundAlerts() {
-  if (!liveControlPollAllowedByResolverHealth(getResolverHealthStatus())) {
+  if (!liveControlManualPollAllowedByResolverHealth(getResolverHealthStatus())) {
     return getLiveControlPendingForDisplay();
   }
   if (Date.now() < pollBackoffUntil) {
@@ -717,7 +721,7 @@ export async function verifyLiveControlInboxOnHubExpand() {
   if (!readPollScope()) {
     return getLiveControlPendingForDisplay();
   }
-  if (!liveControlPollAllowedByResolverHealth(getResolverHealthStatus())) {
+  if (!liveControlManualPollAllowedByResolverHealth(getResolverHealthStatus())) {
     return getLiveControlPendingForDisplay();
   }
   if (Date.now() < pollBackoffUntil) {

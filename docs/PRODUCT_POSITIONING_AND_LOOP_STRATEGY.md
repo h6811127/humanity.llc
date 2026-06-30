@@ -5,7 +5,7 @@
 **Parent:** `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` · `docs/STATUS_PLATE_PILOT.md`  
 **Language policy:** [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md)  
 **Object model (protocol):** [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md)  
-**Last updated:** 2026-06-04 — Step 20 steward UX presentation target ([`STEWARD_UX_PRESENTATION_TARGET.md`](STEWARD_UX_PRESENTATION_TARGET.md))
+**Last updated:** 2026-06-21 — Discovery-first landing + shipped **`#landing-live-object-carriers`** ([`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) § Landing carriers row)
 
 ---
 
@@ -13,41 +13,50 @@
 
 | Layer | Message | Where |
 |-------|---------|--------|
-| Hook | **The sticker stays. The status changes.** | Landing hero H1 ([`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) § Landing) |
-| Mechanism | Print once · scanners read today’s signed state · update or revoke without reprint | Landing hero tagline · how-it-works |
-| Category | Public programmable objects / **physical software objects** | Landing kicker · framing card · [`site/what-can-a-qr-do/physical-software-objects/`](../site/what-can-a-qr-do/physical-software-objects/) |
-| Summer wedge | Hoodie (wear) · deploy on surfaces · Cedar Rapids (place) | `#launch-doors` · [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) · [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) |
+| Hook | **The sticker stays. The status changes.** | Landing create footnote · `/shop/` · scan curiosity CTAs — **not** hero H1 ([`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) § Landing) |
+| Mechanism | Print once · scanners read today’s signed state · update or revoke without reprint | Create CTA note · `/shop/` · scan page |
+| Category | Public programmable objects / **physical software objects** | Hero subline · trust disclosures · [`site/what-can-a-qr-do/physical-software-objects/`](../site/what-can-a-qr-do/physical-software-objects/) |
+| Summer wedge | Hoodie (wear) · deploy on surfaces · Cedar Rapids (place) | **`#landing-live-object-carriers`** (shipped) · shelves/boards · [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) · [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.md) |
 | Catalog | Research, portfolio depth, internal way-finder — **not** the front door | `site/what-can-a-qr-do.html` · [`QR_DESIGN_SPACE.md`](QR_DESIGN_SPACE.md) § Catalog roles |
 
-**Forbidden on `/`:** “Live state on real objects” as hero H1, single hero Create CTA, leading with lost-item relay as company identity ([`landing-copy-contract.mjs`](../site/js/landing-copy-contract.mjs)).
+**Forbidden on `/`:** “Live state on real objects” as hero H1; hero-only Create CTA; leading with lost-item relay as company identity; product carousel; full shop embed ([`landing-copy-contract.mjs`](../site/js/landing-copy-contract.mjs) · [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) § Landing).
 
 ---
 
 ## Front door strategy (June 2026)
 
-**Decision:** **Option A** — keep landing **Three ways in** as the primary public entry. **Option B** — top-nav **Create** opens the same three-door chooser (not a protocol form). Engineering targets: Steps 10–15 below.
+**Decision (shipped):** **Discovery-first landing** — `/` is a **live boards dashboard** (no marketing landing). Strangers browse public truth; stewards use create/shop from secondary rows. **Option B (shipped):** top-nav **Create** → steward chooser (deploy + wear), not a protocol form.
+
+**Decision (shipped):** **`#landing-live-object-carriers`** — one static **Live object carriers** row after public boards, hydrating from `shop-config.json` + store catalog when Worker is reachable. Links to `/shop/`; replaces retired **`#launch-doors`**. **Not** a carousel — revisit swipe UI only when ≥5 distinct carriers with photography.
 
 ### Three user jobs (not twelve catalog pages)
 
-| Job | User question | Primary door | Protocol (unchanged) |
-|-----|---------------|--------------|----------------------|
-| **Wear live state** | “What I wear should mean something *today*.” | Door 2 → `/shop/customize/` | `scope: print_artifact` on garment; steward updates from `/created/` |
-| **Deploy on something** | “Something in the world should stay *true*.” | Door 1 → create (BYOP) | Account → endpoint → scan link via deploy wizard; legacy flat scan compat per [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) |
-| **Activate a place** | “Many scan points should share one world.” | Door 3 → play; organizers → season setup | `game_node` children + Layer 5 season overlay · [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) |
+| Job | User question | Primary entry on `/` | Protocol (unchanged) |
+|-----|---------------|----------------------|----------------------|
+| **Activate a place** | “What's happening / what's true near me?” | Shelves + **Public live boards** + [**Browse places**](/discover/cedar-rapids-iowa/) near-me pins ([`DISCOVERY_PROJECTION.md`](DISCOVERY_PROJECTION.md)) | `game_node` + Layer 5 · boards link to `/play/` |
+| **Deploy on something** | “Something in the world should stay *true*.” | **Start with one live object** → `/create/` | Deploy wizard · legacy flat compat per [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) |
+| **Wear live state** | “What I wear should mean something *today*.” | **`#landing-live-object-carriers`** → `/shop/` (shipped) · scan curiosity CTA (primary merch funnel) | `scope: print_artifact`; steward updates from `/created/` |
 
 Lost-item relay, status plate, menus, crisis cards, etc. are **catalog instances** of job #2 — field pilots and portfolio depth, **not** homepage nouns.
 
-### Launch doors (Option A — shipped copy)
+### Landing section order (discovery + revenue hooks)
 
-| Door | Title (user-facing) | Route | Role |
-|------|---------------------|-------|------|
-| 1 | Live status on something | `/create/?intent=deploy` (shipped) · legacy `?template=status_plate` field-kit regression only | Free deploy tool (BYOP) |
-| 2 | Live status on you | `/shop/customize/?product=glitch_hoodie_v1` | Commerce + distribution |
-| 3 | Play the city game | `/play/cedar-rapids/` | Player entry; network proof |
+| Order | Section | Role |
+|-------|---------|------|
+| 1 | Discovery hero + trust chips | Utility headline — check before you go |
+| 2 | **Browse by need** shelves | Filter boards by job (live now · open/paused · return/hours) |
+| 3 | Search + **Public live boards** | Primary `/` job — discovery plane ([`DISCOVERY_PROJECTION.md`](DISCOVERY_PROJECTION.md)) |
+| 4 | **`#landing-live-object-carriers`** (shipped) | Secondary commerce — one featured carrier row → `/shop/` |
+| 5 | **`#landing-start-object-cta`** | Secondary steward entry — BYOP deploy |
+| 6 | Trust disclosures · device settings | Progressive depth — not first scroll |
 
-**Secondary (shipped):** “Organize a live season” → `/create/?intent=game` or `/created/?focus=game-season-setup` for stewards who run games (not players). Footer / studio — not a fourth hero row.
+**Retired:** **`#launch-doors`** (Three ways in hero block). Job routes unchanged; presentation distributed across rows above.
 
-**Architecture alignment:** Doors are **routing and copy only**. Resolver composition (`buildScanViewModel`), custody, and child-object APIs do not fork per door. `verify:landing` + [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) § Landing lock hero + `#launch-doors` structure.
+**Secondary (unchanged):** “Organize a live season” → `/create/?intent=game` or `/created/?focus=game-season-setup` — footer / studio, not a landing hero row.
+
+**Revenue rule:** `/` **teases** carriers and links to `/shop/`; **hosted tier** upsell stays on **`/created/`** and entitlements UI — not the discovery homepage.
+
+**Architecture alignment:** Presentation is routing and copy only. Resolver composition (`buildScanViewModel`), custody, and child-object APIs do not fork per row. `verify:landing` + [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) § Landing lock discovery hero + section order (+ carriers row when implemented).
 
 ### Create vs buy hoodie (carrier split, not capability split)
 
@@ -115,14 +124,17 @@ See [`QR_DESIGN_SPACE.md`](QR_DESIGN_SPACE.md) § Catalog roles.
 
 | Surface | Lead copy |
 |---------|-----------|
-| Landing hero H1 | **The sticker stays. The status changes.** |
-| Landing hero kicker | Public programmable objects |
-| Landing meta / OG | Public programmable objects. Live, revocable status on physical tags — browser-native. No scan tracking. |
-| Launch door 1 | Live status on something — deploy on a plate, sticker, or sign |
-| Launch door 2 | Live status on you — Glitch hoodie; your line, change from Live without reprinting |
-| Launch door 3 | Play the city game — Cedar Rapids; scan stickers, shared world state |
-| Top-nav Create (target) | Same three rows as launch doors — pick how you want to start |
-| Create (deploy intent, target) | Deploy on something — what should scanners see right now? |
+| Landing hero H1 (shipped) | **Check what's true right now before you knock, pick up, or show up.** |
+| Landing hero subline | Current public truth on real doors, tags, and places |
+| Landing meta / OG (shipped) | Check what's true right now on real doors, tags, and places. Browse live public boards — no account. No scan trails. |
+| Landing hook (secondary) | **The sticker stays — the status changes.** — `#landing-start-object-cta` footnote |
+| Landing carriers row (shipped) | **Live object carriers** — e.g. *Glitch hoodie · unique QR on fabric — preview before checkout* · **See all carriers →** `/shop/` |
+| Browse shelves | Live now · Open or paused · Return, relay, hours |
+| Public boards | Public live boards — open a board to browse places |
+| Create row (shipped) | **Start with one live object** → `/create/` |
+| Top-nav Create (shipped) | Steward chooser: deploy on something + wear carrier (shop) — not three launch doors |
+| `/shop/` hero | Wear the signal. Keep the story honest. |
+| Create (deploy intent) | Deploy on something — what should scanners see right now? |
 | Create chooser / deploy | Keys stay in this tab until you save on this device or add recovery |
 | Scan (any object) | Object name + live state + honest limit |
 | `/created/` (steward) | Publish updates on Live · same QR, no reprint |

@@ -82,6 +82,7 @@ async function main() {
   await publish("obj_cr_node_04_river", {
     public_state: "Seed clue live — share outward to evolve",
     game_meta: {
+      visible_until: "2026-09-01T22:00:00-05:00",
       collective_progress: process.argv.includes("--from-zero") ? 0 : 4,
       collective_target: 20,
       unlocked_by: [],

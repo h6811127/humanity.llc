@@ -46,11 +46,23 @@ export function relayOfferInboxEligible() {
   return false;
 }
 
+export function walletHasActiveLostItemRelays() {
+  if (relayOfferModule) return relayOfferModule.walletHasActiveLostItemRelays();
+  return false;
+}
+
 export function refreshRelayOfferInbox() {
   if (relayOfferModule) {
     return relayOfferModule.refreshRelayOfferInbox();
   }
   return void loadRelayOfferInboxModule().then((mod) => mod.refreshRelayOfferInbox());
+}
+
+export function probeRelayOfferInboxForBackgroundAlerts() {
+  if (relayOfferModule) {
+    return relayOfferModule.probeRelayOfferInboxForBackgroundAlerts();
+  }
+  return loadRelayOfferInboxModule().then((mod) => mod.probeRelayOfferInboxForBackgroundAlerts());
 }
 
 export function checkRelayOffersNow() {

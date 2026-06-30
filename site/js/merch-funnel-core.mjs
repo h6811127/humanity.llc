@@ -21,6 +21,7 @@ export const ALLOWED_MERCH_REFS = new Set([
   "customize_glitch",
   "customize_purse",
   "scan_customize",
+  "created_control",
 ]);
 
 /** Refs that should continue to `/shop/customize/` after card create. */
@@ -30,6 +31,7 @@ export const CUSTOMIZE_HANDOFF_REFS = new Set([
   "customize_hoodie",
   "customize_glitch",
   "customize_purse",
+  "created_control",
 ]);
 
 /** localStorage map profile_id → true for Tier 1 ephemeral-state owners. */

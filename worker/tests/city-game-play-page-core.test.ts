@@ -46,6 +46,8 @@ describe("city game play page integration", () => {
     expect(rulesHtml).toContain('id="city-game-network-charter-mount"');
     expect(rulesHtml).toContain("Public network · Cedar Rapids");
     expect(rulesHtml).toContain("city-game-mechanics-deep");
+    expect(rulesHtml).toContain("city-game-rules-guide-grid");
+    expect(rulesHtml).toContain("hc-emphasis-card");
     expect(rulesHtml.indexOf("rules-prove-title")).toBeLessThan(
       rulesHtml.indexOf("rules-start-title")
     );

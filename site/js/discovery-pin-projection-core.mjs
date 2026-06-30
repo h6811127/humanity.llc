@@ -1,7 +1,13 @@
 /**
  * DiscoveryPin projection — derived browse index, not resolver truth.
- * @see docs/DISCOVERY_PROJECTION.md · WS-DISCOVER-P0
+ * @see docs/DISCOVERY_PROJECTION.md · WS-DISCOVER-P0 · P1 listing schema
  */
+import {
+  discoveryListingDisplayTitle,
+  isObjectListedForDiscovery,
+  parseDiscoveryPublicListingFromRow,
+} from "./discovery-public-listing-core.mjs";
+import { resolveDiscoveryGeoForSeasonNode } from "./discovery-geo-projection-core.mjs";
 
 /** @typedef {{ listed?: boolean; title?: string | null; summary?: string | null; category?: string | null }} DiscoveryListingFacet */
 
@@ -14,6 +20,8 @@
  * @property {string} [entry_id]
  */
 
+/** @typedef {import("./discovery-public-listing-core.mjs").DiscoveryPublicListingGeo} DiscoveryPinGeo */
+
 /**
  * @typedef {Object} DiscoveryPin
  * @property {string} pin_id
@@ -24,6 +32,8 @@
  * @property {string} [primary_object_id]
  * @property {DiscoveryPinFacets} facets
  * @property {DiscoveryListingFacet} listing
+ * @property {DiscoveryPinGeo} [geo]
+ * @property {string} [scan_url]
  * @property {string} index_version
  */
 
@@ -35,7 +45,7 @@
  * @property {DiscoveryPin[]} pins
  */
 
-export const DISCOVERY_PIN_INDEX_VERSION = "discovery-pin-v1";
+export const DISCOVERY_PIN_INDEX_VERSION = "discovery-pin-v3";
 
 export const DISCOVERY_INDEXABLE_OBJECT_TYPES = new Set([
   "game_node",
@@ -116,7 +126,7 @@ export function resolveNodeObjectType(node) {
 
 /**
  * @param {Record<string, unknown>} node
- * @param {{ seasonListed?: boolean; objectListed?: boolean; status?: string }} [opts]
+ * @param {{ seasonListed?: boolean; objectListed?: boolean; onSeasonRegistry?: boolean; status?: string }} [opts]
  */
 export function isNodeDiscoveryIndexable(node, opts = {}) {
   const objectType = resolveNodeObjectType(node);
@@ -126,7 +136,12 @@ export function isNodeDiscoveryIndexable(node, opts = {}) {
   if (role && DISCOVERY_EXCLUDED_ROLES.has(role)) return false;
   const status = String(opts.status ?? node.status ?? "active").trim().toLowerCase();
   if (status === "revoked" || status === "disabled") return false;
-  const objectListed = opts.objectListed ?? node.public_listing?.listed !== false;
+  const objectListed =
+    opts.objectListed ??
+    isObjectListedForDiscovery(node, {
+      seasonListed: opts.seasonListed === true,
+      onSeasonRegistry: opts.onSeasonRegistry === true,
+    });
   if (!objectListed) return false;
   const label = String(node.label ?? "").trim();
   const objectId = String(node.object_id ?? "").trim();
@@ -159,40 +174,56 @@ export function selectPrimaryObjectId(pin, opts = {}) {
  * @param {Record<string, unknown>} node
  * @param {string} region
  * @param {string} indexVersion
- * @param {{ networkIds?: string[]; seasonListed?: boolean }} [opts]
+ * @param {{ networkIds?: string[]; seasonListed?: boolean; season?: Record<string, unknown> }} [opts]
  * @returns {DiscoveryPin | null}
  */
 export function projectDiscoveryPinFromSeasonNode(node, region, indexVersion, opts = {}) {
-  if (!isNodeDiscoveryIndexable(node, { objectListed: true })) return null;
+  const seasonListed = opts.seasonListed === true;
+  if (
+    !isNodeDiscoveryIndexable(node, {
+      seasonListed,
+      onSeasonRegistry: true,
+    })
+  ) {
+    return null;
+  }
 
   const entryId = String(node.node_id ?? "").trim();
   const objectId = String(node.object_id ?? "").trim();
   const objectIds = objectId ? [objectId] : [];
   if (!entryId || !objectIds.length) return null;
 
-  const seasonListed = opts.seasonListed === true;
+  const objectListing = parseDiscoveryPublicListingFromRow(node);
+  const fallbackLabel = String(node.label ?? entryId).trim();
   const networkIds =
     seasonListed && Array.isArray(opts.networkIds) ? opts.networkIds.filter(Boolean) : [];
+  const geo = opts.season ? resolveDiscoveryGeoForSeasonNode(node, opts.season) : null;
   /** @type {DiscoveryPin} */
   const pin = {
     pin_id: stablePinIdFromNode(node, region),
     region,
-    display_label: String(node.label ?? entryId).trim(),
+    display_label: discoveryListingDisplayTitle(objectListing, fallbackLabel) ?? fallbackLabel,
     object_ids: objectIds,
     facets: {
       object_type: resolveNodeObjectType(node),
       role: String(node.role ?? "").trim() || undefined,
       district: String(node.district ?? "").trim() || undefined,
-      category: String(node.role ?? "").trim() || undefined,
+      category:
+        objectListing.category ?? (String(node.role ?? "").trim() || undefined),
       entry_id: entryId,
     },
     listing: {
-      listed: opts.seasonListed !== false,
-      title: String(node.label ?? entryId).trim(),
-      category: "game_node",
+      listed: isObjectListedForDiscovery(node, {
+        seasonListed,
+        onSeasonRegistry: true,
+      }),
+      title: discoveryListingDisplayTitle(objectListing, fallbackLabel) ?? fallbackLabel,
+      summary: objectListing.summary ?? undefined,
+      category: objectListing.category ?? "game_node",
     },
     index_version: indexVersion,
   };
+  if (geo) pin.geo = geo;
   if (networkIds.length) pin.network_ids = [...networkIds];
   pin.primary_object_id = selectPrimaryObjectId(pin, {
     networkId: networkIds[0] ?? null,
@@ -227,8 +258,28 @@ export function fingerprintDiscoveryPinIndex(pins, region) {
       primary_object_id: pin.primary_object_id ?? null,
       facets: pin.facets,
       listing: pin.listing,
+      geo: pin.geo ?? null,
+      scan_url: pin.scan_url ?? null,
     }));
   return `${DISCOVERY_PIN_INDEX_VERSION}:${region}:${JSON.stringify(rows)}`;
+}
+
+/**
+ * @param {DiscoveryPin[]} pins
+ * @param {string} region
+ * @param {{ generatedAt?: string }} [opts]
+ */
+export function finalizeDiscoveryPinIndex(pins, region, opts = {}) {
+  const indexVersion = fingerprintDiscoveryPinIndex(pins, region);
+  for (const pin of pins) {
+    pin.index_version = indexVersion;
+  }
+  return {
+    region,
+    index_version: indexVersion,
+    generated_at: opts.generatedAt ?? new Date().toISOString(),
+    pins,
+  };
 }
 
 /**
@@ -253,26 +304,12 @@ export function projectDiscoveryPinIndexFromSeason(season, opts = {}) {
         /** @type {Record<string, unknown>} */ (node),
         region,
         DISCOVERY_PIN_INDEX_VERSION,
-        { networkIds, seasonListed }
+        { networkIds, seasonListed, season }
       )
     )
     .filter(Boolean);
 
-  const indexVersion = fingerprintDiscoveryPinIndex(
-    /** @type {DiscoveryPin[]} */ (pins),
-    region
-  );
-
-  for (const pin of pins) {
-    pin.index_version = indexVersion;
-  }
-
-  return {
-    region,
-    index_version: indexVersion,
-    generated_at: opts.generatedAt ?? new Date().toISOString(),
-    pins: /** @type {DiscoveryPin[]} */ (pins),
-  };
+  return finalizeDiscoveryPinIndex(/** @type {DiscoveryPin[]} */ (pins), region, opts);
 }
 
 /**
@@ -285,12 +322,21 @@ export function discoveryPinsForNetworkLens(index, networkId) {
 }
 
 /**
- * Guard — pins must never carry geo or player/visit fields in P0.
+ * Guard — pins must not carry player/visit tracking fields.
+ * Steward-published `geo` is allowed (WS-DISCOVER-P1-2).
  * @param {DiscoveryPin} pin
  */
 export function assertDiscoveryPinPrivacyShape(pin) {
-  const forbidden = ["geo", "latitude", "longitude", "visit", "player_id", "scan_count"];
+  const forbidden = ["latitude", "longitude", "visit", "player_id", "scan_count"];
   for (const key of forbidden) {
     if (key in pin) throw new Error(`DiscoveryPin must not include ${key}`);
+  }
+  if (pin.geo) {
+    if (!Number.isFinite(pin.geo.latitude) || !Number.isFinite(pin.geo.longitude)) {
+      throw new Error("DiscoveryPin.geo must include finite latitude and longitude");
+    }
+    if ("accuracy" in pin.geo || "client" in pin.geo || "user" in pin.geo) {
+      throw new Error("DiscoveryPin.geo must not include client tracking fields");
+    }
   }
 }

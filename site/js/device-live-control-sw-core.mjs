@@ -4,6 +4,7 @@
  * @see docs/DEVICE_OS_REQUEST_BUDGET.md - Phase 4
  */
 import { osNotificationContentForLiveProof } from "./device-browser-notifications-core.mjs";
+import { isStaleLiveProofPushEvent } from "./device-steward-push-core.mjs";
 import {
   buildLiveControlProofHref,
   classifyChallengeHttpStatus,
@@ -30,6 +31,69 @@ export const SW_NOTIFICATION_TAG = "hc-live-proof";
 
 /** Page → SW: steward SSE `live_proof.pending` hint (hosted tier E4d). */
 export const SW_MESSAGE_LIVE_PROOF_PUSH = "HC_SW_LIVE_PROOF_PUSH";
+export const SW_MESSAGE_DELIVER_OS_PLANS = "HC_SW_DELIVER_OS_PLANS";
+
+/**
+ * @typedef {{
+ *   profile_id?: string,
+ *   qr_id?: string,
+ *   challenge_id?: string,
+ *   expires_at?: string,
+ *   issued_at?: string,
+ *   cachedAt?: number,
+ * }} SwCachedPushHint
+ */
+
+/**
+ * @param {SwCachedPushHint | null | undefined} hint
+ */
+export function pushHintChallengeId(hint) {
+  return typeof hint?.challenge_id === "string" ? hint.challenge_id.trim() : "";
+}
+
+/**
+ * @param {SwCachedPushHint[]} cache
+ * @param {SwCachedPushHint} hint
+ * @param {number} [now]
+ */
+export function upsertSwPushHintCache(cache, hint, now = Date.now()) {
+  const challengeId = pushHintChallengeId(hint);
+  if (!challengeId) return cache ?? [];
+  if (isStaleLiveProofPushEvent(hint, now)) return cache ?? [];
+  const next = (cache ?? []).filter((row) => pushHintChallengeId(row) !== challengeId);
+  next.push({ ...hint, cachedAt: now });
+  return next;
+}
+
+/**
+ * @param {SwCachedPushHint[]} cache
+ * @param {number} [now]
+ */
+export function pruneSwPushHintCache(cache, now = Date.now()) {
+  return (cache ?? []).filter((row) => !isStaleLiveProofPushEvent(row, now));
+}
+
+/**
+ * @param {import("./device-notification-delivery-core.mjs").OsNotificationPlan} plan
+ */
+export function osPlanCacheKey(plan) {
+  if (!plan?.kind || !plan.dedupeKey) return "";
+  return `${plan.kind}:${plan.dedupeKey}`;
+}
+
+/**
+ * @param {import("./device-notification-delivery-core.mjs").OsNotificationPlan[]} cache
+ * @param {import("./device-notification-delivery-core.mjs").OsNotificationPlan[]} plans
+ */
+export function upsertCachedOsPlans(cache, plans) {
+  /** @type {Map<string, import("./device-notification-delivery-core.mjs").OsNotificationPlan>} */
+  const map = new Map((cache ?? []).map((plan) => [osPlanCacheKey(plan), plan]));
+  for (const plan of plans ?? []) {
+    const key = osPlanCacheKey(plan);
+    if (key) map.set(key, plan);
+  }
+  return [...map.values()];
+}
 
 /** Minimum periodicSync interval (request budget Phase 4: 5–15 min; use 15). */
 export const SW_PERIODIC_MIN_INTERVAL_MS = 15 * 60 * 1000;
@@ -83,11 +147,15 @@ export function liveProofPollTargetsFromWallet(wallet) {
  *   resolverHealth?: 'ok' | 'degraded' | 'offline',
  *   stewardPushEntitled?: boolean,
  *   stewardPushHealthy?: boolean,
+ *   forcePoll?: boolean,
  * }} input
  */
 export function swLiveProofPollingShouldRun(input) {
   /** `enabled` = background alerts on (synced from page), not Watch. */
   if (!input.enabled) return false;
+  if (input.forcePoll === true) {
+    return liveControlPollAllowedByResolverHealth(input.resolverHealth ?? "offline");
+  }
   if (input.stewardPushEntitled === true && input.stewardPushHealthy === true) {
     return false;
   }
@@ -165,6 +233,58 @@ export async function pollWalletEntriesForLiveProof(
     nextCursor: nextRoundRobinIndex(roundRobinCursor, pollable.length),
     pollSlots: Object.fromEntries(slots),
     rateLimited: result.kind === "rate_limited",
+  };
+}
+
+/**
+ * Probe every pollable wallet row in one wake (tab-hidden pollNow / background alerts).
+ * Stops on first 429 and backs off like the page hidden probe.
+ *
+ * @param {Array<Record<string, unknown>>} entries
+ * @param {string} apiOrigin
+ * @param {(url: string) => Promise<{ ok: boolean, status: number, body: unknown }>} [fetchFn]
+ * @param {Record<string, import("./device-live-control-inbox-core.mjs").LiveControlPendingItem>} [pollSlotsRecord]
+ * @param {number} [roundRobinCursor] preserved when full probe completes
+ */
+export async function pollAllWalletEntriesForLiveProof(
+  entries,
+  apiOrigin,
+  fetchFn = defaultFetch,
+  pollSlotsRecord = {},
+  roundRobinCursor = 0
+) {
+  const pollable = entries.filter((e) => isPollableWalletEntry(e));
+  /** @type {Map<string, import("./device-live-control-inbox-core.mjs").LiveControlPendingItem>} */
+  const slots = new Map(Object.entries(pollSlotsRecord));
+  pruneLiveControlPollSlots(slots, pollable);
+
+  if (pollable.length === 0) {
+    return {
+      pending: [],
+      signature: "",
+      nextCursor: 0,
+      pollSlots: {},
+      rateLimited: false,
+    };
+  }
+
+  let rateLimited = false;
+  for (const entry of pollable) {
+    const result = await fetchLiveProofChallengeForEntry(entry, apiOrigin, fetchFn);
+    if (result.kind === "rate_limited") {
+      rateLimited = true;
+      break;
+    }
+    updateLiveControlPollSlot(slots, entry, result);
+  }
+
+  const pending = pendingItemsFromPollSlots(pollable, slots);
+  return {
+    pending,
+    signature: liveControlPendingSignature(pending),
+    nextCursor: roundRobinCursor,
+    pollSlots: Object.fromEntries(slots),
+    rateLimited,
   };
 }
 

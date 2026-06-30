@@ -7,11 +7,17 @@ import {
   buildLiveProofSwNotificationFromPushHint,
   liveProofPollTargetsFromWallet,
   pendingLiveControlChallengeUrl,
+  pollAllWalletEntriesForLiveProof,
   pollWalletEntriesForLiveProof,
   shouldShowSwLiveProofNotification,
   swLiveProofPollingShouldRun,
   resolveSwPeriodicMinIntervalMs,
   SW_PERIODIC_MIN_INTERVAL_MS,
+  pruneSwPushHintCache,
+  pushHintChallengeId,
+  upsertSwPushHintCache,
+  upsertCachedOsPlans,
+  osPlanCacheKey,
 } from "../../site/js/device-live-control-sw-core.mjs";
 import { REFERENCE_FREE_POLICY } from "../../site/js/device-steward-entitlements-core.mjs";
 
@@ -66,6 +72,19 @@ describe("swLiveProofPollingShouldRun", () => {
         stewardPushHealthy: true,
       })
     ).toBe(false);
+  });
+
+  it("allows explicit pollNow when push is healthy (forcePoll)", () => {
+    expect(
+      swLiveProofPollingShouldRun({
+        enabled: true,
+        watchLiveProofEnabled: true,
+        resolverHealth: "ok",
+        stewardPushEntitled: true,
+        stewardPushHealthy: true,
+        forcePoll: true,
+      })
+    ).toBe(true);
   });
 });
 
@@ -152,6 +171,116 @@ describe("pollWalletEntriesForLiveProof", () => {
     }
     expect(fetched).toHaveLength(2);
     expect(fetched[0]).not.toBe(fetched[1]);
+  });
+});
+
+describe("pollAllWalletEntriesForLiveProof", () => {
+  it("probes every pollable card in one wake", async () => {
+    const entries = [
+      { profile_id: PROFILE, qr_id: QR_ID, label: "A" },
+      { profile_id: `${PROFILE}2`, qr_id: QR_ID_B, label: "B" },
+    ];
+    const fetched = [];
+    const { pending, signature } = await pollAllWalletEntriesForLiveProof(
+      entries,
+      "http://127.0.0.1:8787",
+      async (url) => {
+        fetched.push(url);
+        const isFirst = fetched.length === 1;
+        return {
+          ok: true,
+          status: 200,
+          body: isFirst
+            ? {
+                status: "pending",
+                challenge_id: "ch_full_1",
+                expires_at: new Date(Date.now() + 120_000).toISOString(),
+              }
+            : { status: "none" },
+        };
+      }
+    );
+    expect(fetched).toHaveLength(2);
+    expect(pending).toHaveLength(1);
+    expect(pending[0]?.challenge_id).toBe("ch_full_1");
+    expect(signature).toContain("ch_full_1");
+  });
+
+  it("stops on rate limit without probing remaining cards", async () => {
+    const entries = [
+      { profile_id: PROFILE, qr_id: QR_ID, label: "A" },
+      { profile_id: `${PROFILE}2`, qr_id: QR_ID_B, label: "B" },
+    ];
+    let calls = 0;
+    const { rateLimited } = await pollAllWalletEntriesForLiveProof(
+      entries,
+      "http://127.0.0.1:8787",
+      async () => {
+        calls += 1;
+        return { ok: false, status: 429, body: null };
+      }
+    );
+    expect(rateLimited).toBe(true);
+    expect(calls).toBe(1);
+  });
+});
+
+describe("sw push hint cache (Tier 1 hosted push → SW OS)", () => {
+  const hint = {
+    profile_id: PROFILE,
+    qr_id: QR_ID,
+    challenge_id: "ch_push_1",
+    expires_at: new Date(Date.now() + 120_000).toISOString(),
+  };
+
+  it("upserts by challenge_id and prunes stale rows", () => {
+    const now = Date.now();
+    let cache = upsertSwPushHintCache([], hint, now);
+    expect(cache).toHaveLength(1);
+    expect(pushHintChallengeId(cache[0])).toBe("ch_push_1");
+
+    cache = upsertSwPushHintCache(cache, { ...hint, challenge_id: "ch_push_2" }, now);
+    expect(cache).toHaveLength(2);
+
+    cache = upsertSwPushHintCache(cache, { ...hint, challenge_id: "ch_push_1" }, now + 1);
+    expect(cache).toHaveLength(2);
+    expect(cache.find((row) => pushHintChallengeId(row) === "ch_push_1")?.cachedAt).toBe(now + 1);
+
+    cache = pruneSwPushHintCache(
+      [
+        hint,
+        {
+          profile_id: PROFILE,
+          challenge_id: "ch_old",
+          expires_at: "2020-01-01T00:00:00.000Z",
+        },
+      ],
+      now
+    );
+    expect(cache).toHaveLength(1);
+    expect(pushHintChallengeId(cache[0])).toBe("ch_push_1");
+  });
+});
+
+describe("upsertCachedOsPlans", () => {
+  it("dedupes plans by kind + dedupeKey", () => {
+    const relay = {
+      kind: "relay_offer",
+      tag: "hc-relay-offer",
+      dedupeKey: "1",
+      title: "Finder message",
+      body: "Open Humanity",
+      openInboxOnClick: true,
+      requireInteraction: true,
+    };
+    let cache = upsertCachedOsPlans([], [relay]);
+    expect(cache).toHaveLength(1);
+    cache = upsertCachedOsPlans(cache, [{ ...relay, title: "Updated title" }]);
+    expect(cache).toHaveLength(1);
+    expect(cache[0]?.title).toBe("Updated title");
+    cache = upsertCachedOsPlans(cache, [{ ...relay, dedupeKey: "2", title: "2 messages" }]);
+    expect(cache).toHaveLength(2);
+    expect(osPlanCacheKey(relay)).toBe("relay_offer:1");
   });
 });
 

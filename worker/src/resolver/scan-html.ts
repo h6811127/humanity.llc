@@ -80,6 +80,10 @@ import {
   deriveCredentialCodeSync,
 } from "../../../site/js/qr-credential-code.mjs";
 import {
+  PUBLIC_NETWORK_RULES_PROVE_CTA,
+  publicNetworkRulesProveHref,
+} from "../../../site/js/public-networks-portal-core.mjs";
+import {
   isChildObjectScope,
   qrNoCalendarExpirySubtitle,
   qrScopeRelationshipCopy,
@@ -131,6 +135,12 @@ import {
   scanMalformedLead,
   scanMalformedPageTitle,
 } from "./scan-malformed-hint";
+import { renderScanObjectGraphBlock } from "./scan-object-graph-html";
+import {
+  firstPendingIncomingPeer,
+  hasSignedUnlockIncomingRelationships,
+  hasSignedWitnessIncomingRelationships,
+} from "../live-object/scan-object-graph";
 
 function scanHeroDisplay(vm: ScanViewModel) {
   return resolveScanHeroDisplay({
@@ -159,6 +169,10 @@ function gameNodeMutedCopy(
   }
   if (archive?.state === "dormant") {
     return `<p class="scan-game-dormant-note" role="note">This temporary object is dormant. The QR still resolves — public state only.</p>`;
+  }
+  const pendingPeer = firstPendingIncomingPeer(vm.relationships);
+  if (pendingPeer) {
+    return `<p class="scan-game-vouch-note" role="note">Not yet open — visit ${escapeHtml(pendingPeer)} first, then return here.</p>`;
   }
   if (gameNode.vouchGate && !gameNode.vouchGate.met) {
     return `<p class="scan-game-vouch-note" role="note">Trust path still waiting on ${escapeHtml(gameNode.vouchGate.pending.join(", "))} — cooperation with nearby places opens the deeper route.</p>`;
@@ -320,6 +334,7 @@ function renderGameNodeOnboardingBand(
 ): string {
   const season = resolveSeasonById(gameNode.seasonId);
   const rulesPath = season?.rules_path?.trim() || "/play/season/";
+  const rulesProvePath = publicNetworkRulesProveHref(rulesPath);
   const boardPath =
     seasonBoardPathWithNode(rulesPath, gameNode.nodeId) ??
     `${rulesPath.replace(/\/?$/, "/")}map/`;
@@ -356,8 +371,8 @@ function renderGameNodeOnboardingBand(
   ${consequence ? `<p class="scan-game-onboarding-consequence" role="note">${escapeHtml(consequence)}</p>` : ""}
   <p class="scan-game-onboarding-next">${escapeHtml(nextAction)}</p>
   <div class="scan-game-onboarding-actions" role="navigation" aria-label="City game next steps">
-    <a class="scan-game-onboarding-cta scan-game-onboarding-cta--primary" href="${escapeHtml(boardPath)}">Open city board</a>
-    <a class="scan-game-onboarding-cta scan-game-onboarding-cta--secondary" href="${escapeHtml(rulesPath)}">Season rules</a>
+    <a class="scan-game-onboarding-cta scan-game-onboarding-cta--primary" href="${escapeHtml(boardPath)}">Open board</a>
+    <a class="scan-game-onboarding-cta scan-game-onboarding-cta--secondary" href="${escapeHtml(rulesProvePath)}">${escapeHtml(PUBLIC_NETWORK_RULES_PROVE_CTA)}</a>
   </div>
   <p class="scan-game-privacy-tagline" role="note">${escapeHtml(tagline)}</p>
 </section>`;
@@ -370,9 +385,13 @@ function renderGameNodeCollapsedState(
   const season = resolveSeasonById(gameNode.seasonId);
   const streams = renderObjectStreamsBlock(vm.objectStreams);
   const steward = renderStewardStrip(vm);
-  const metaChips = renderGameNodeMetaChips(gameNode, season ?? undefined);
+  const metaChips = renderGameNodeMetaChips(gameNode, season ?? undefined, {
+    omitVouch: hasSignedWitnessIncomingRelationships(vm.relationships),
+    omitUnlockBy: hasSignedUnlockIncomingRelationships(vm.relationships),
+  });
+  const graph = renderScanObjectGraphBlock(vm);
   const muted = gameNodeMutedCopy(vm, gameNode);
-  const parts = [muted, streams, metaChips, steward].filter(Boolean);
+  const parts = [muted, graph, streams, metaChips, steward].filter(Boolean);
   if (!parts.length) return "";
   return `<details class="scan-game-state-details">
   <summary class="scan-game-state-summary">Live object details</summary>
@@ -670,7 +689,7 @@ function renderLostItemOfferBlock(vm: ScanViewModel): string {
 function renderGameNodeMetaChips(
   gameNode: GameNodeScanContext,
   season?: ReturnType<typeof resolveSeasonById>,
-  opts: { omitVouch?: boolean } = {}
+  opts: { omitVouch?: boolean; omitUnlockBy?: boolean } = {}
 ): string {
   const chips: string[] = [];
   const meta = gameNode.gameMeta;
@@ -704,7 +723,7 @@ function renderGameNodeMetaChips(
   if (meta.fragment_id) {
     chips.push(`Fragment ${meta.fragment_id}`);
   }
-  if (meta.unlocked_by.length) {
+  if (meta.unlocked_by.length && !opts.omitUnlockBy) {
     chips.push(`Unlocked by ${meta.unlocked_by.join(", ")}`);
   }
   if (!opts.omitVouch) {

@@ -6,12 +6,13 @@
       name="viewport"
       content="width=device-width, initial-scale=1, viewport-fit=cover"
     />
-    <title>Wake the city · Cedar Rapids, Iowa · humanity.llc</title>
+    <title>Weekend board · Cedar Rapids, Iowa · humanity.llc</title>
     <meta
       name="description"
-      content="Wake the city — shared weekend mission board for Cedar Rapids live objects. No app, no account."
+      content="Weekend city board for Cedar Rapids — shared signed state on live objects. No app, no account."
     />
     <meta name="theme-color" content="#ffffff" />
+    <link rel="canonical" href="/play/cedar-rapids/map/" />
     <script>
       (function () {
         try {
@@ -25,10 +26,10 @@
       })();
     </script>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=157" />
-    <link rel="stylesheet" href="/css/theme-dark.css?v=37" />
+    <link rel="stylesheet" href="/styles.css?v=164" />
+    <link rel="stylesheet" href="/css/theme-dark.css?v=38" />
   </head>
-  <body>
+  <body class="city-game-map-page">
     <div class="page">
       <header class="top">
         <a class="top-brand" href="/">
@@ -39,21 +40,25 @@
       </header>
 
       <main class="screen screen-landing">
-        <section class="hero hero-compact">
+        <nav class="player-flow-breadcrumb" aria-label="You are here">
+          <a href="/">Home</a><span class="player-flow-breadcrumb-sep" aria-hidden="true"> · </span>
+          <a href="/play/season/">Public networks</a><span class="player-flow-breadcrumb-sep" aria-hidden="true"> · </span>
+          <span aria-current="page">Wake the city board</span>
+        </nav>
+        <section class="hero hero-compact city-game-map-page-hero">
           <p class="hero-eyebrow">Cedar Rapids, Iowa</p>
           <h1 id="city-state-title">Wake the city</h1>
+          <p class="hero-lead city-game-map-page-lead">A read-only weekend board — see which places are active, then scan stickers for live details.</p>
           <p class="hero-line hero-line-sub">
-            <a href="/play/cedar-rapids/">About this network</a>
-            ·
-            <a href="/play/cedar-rapids/map/">Share this board</a>
+            <a href="/play/cedar-rapids/#rules-start-title">How this network works</a>
           </p>
         </section>
 
-        <div class="research-live-banner hc-notice hc-notice--info" role="note" data-city-game-season-banner data-season-json="/data/city-game-cr-season-01.json" data-banner-variant="map">
+        <div class="research-live-banner hc-notice hc-notice--info city-game-map-season-chip" role="note" data-city-game-season-banner data-season-json="/data/city-game-cr-season-01.json" data-banner-variant="map">
   <p>
-    <strong data-city-game-season-banner-label>Season window</strong><span data-city-game-season-banner-dates> Opens June 6 at 6 PM<br />Ends Sept 1 at 10 PM</span>
+    <strong data-city-game-season-banner-label>Season window</strong><span data-city-game-season-banner-dates> Opens June 6 at 6 PM · Ends Sept 1 at 10 PM</span>
   </p>
-  <p data-city-game-season-banner-body>Season live.</p>
+  <p data-city-game-season-banner-body hidden></p>
 </div>
 
         <section
@@ -61,6 +66,7 @@
           id="city-state"
           aria-labelledby="city-state-title"
         >
+          <div id="city-game-map-first-visit-mount" class="city-game-map-first-visit-mount" hidden></div>
           <div id="city-game-map-root" class="city-game-map-root" data-season-id="cr_season_01_wake">
             <noscript>
               <p class="city-game-map-error">
@@ -73,17 +79,19 @@
           </div>
         </section>
 
-        <p class="idea-footnote">
-          <a href="/play/cedar-rapids/">Full rules</a>
+        <p class="idea-footnote city-game-map-page-footnote">
+          <a href="/discover/cedar-rapids-iowa/">Browse places near me</a>
           ·
-          <a href="/play/cedar-rapids/map/">Share this board</a>
+          <a href="/play/cedar-rapids/#rules-start-title">How this network works</a>
           ·
-          <a href="/play/season/">All city games</a>
+          <a href="/play/cedar-rapids/#rules-privacy-title">Privacy &amp; mechanics</a>
+          ·
+          <a href="/play/season/">All public networks</a>
           ·
           <a href="/data-policy.html">Data policy</a>
         </p>
       </main>
     </div>
-    <script type="module" src="/js/city-game-map-page.mjs?v=4"></script>
+    <script type="module" src="/js/city-game-map-page.mjs?v=5"></script>
   </body>
 </html>

@@ -31,7 +31,7 @@
       })();
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=5" />
-    <link rel="stylesheet" href="/styles.css?v=151" />
+    <link rel="stylesheet" href="/styles.css?v=154" />
     <link rel="stylesheet" href="/css/device-shell.css?v=94" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=30" />
   </head>
@@ -777,6 +777,13 @@
                 <button type="button" class="btn-secondary" id="created-live-copy-scan" disabled>
                   Copy scan link
                 </button>
+                <a
+                  class="btn-secondary created-live-shop-link"
+                  id="created-live-shop-link"
+                  href="/shop/customize/?product=glitch_hoodie_v1"
+                  hidden
+                  >Get it on wear</a
+                >
               </div>
             </article>
 
@@ -1360,6 +1367,7 @@
                   inputmode="text"
                 />
                 <p class="form-hint" id="child-object-season-when-status" hidden role="status"></p>
+                <p class="form-hint" id="child-object-season-when-rules-hint" role="status"></p>
               </div>
               <label class="form-label" for="child-object-game-node-season">Season</label>
               <select class="form-input" id="child-object-game-node-season" required></select>
@@ -1520,6 +1528,107 @@
                   >Open deployed rules page</a
                 >
               </p>
+            </details>
+
+            <details class="created-game-node-unlock-edges" id="child-object-game-node-unlock-edges">
+              <summary>Route unlock edges</summary>
+              <p class="form-hint created-game-node-unlock-edges-lead">
+                Wire which checkpoint unlocks the next on the network graph. Edges save in your
+                season publish draft on this device. Use <strong>Publish scan graph edges</strong>
+                to sign and push the live scan “How this place connects” block — no CLI seed file.
+              </p>
+              <p class="form-hint" id="child-object-game-node-unlock-edges-summary" role="status"></p>
+              <ul
+                class="created-game-node-unlock-edges-issues"
+                id="child-object-game-node-unlock-edges-issues"
+                aria-label="Unlock edge validation"
+              ></ul>
+              <div
+                id="child-object-game-node-unlock-edges-table-wrap"
+                class="created-game-node-unlock-edges-table-wrap"
+              ></div>
+              <div class="created-game-node-unlock-edges-actions">
+                <button
+                  type="button"
+                  class="btn-secondary"
+                  id="child-object-game-node-unlock-edges-add"
+                  disabled
+                >
+                  Add unlock edge
+                </button>
+                <button
+                  type="button"
+                  class="btn-secondary"
+                  id="child-object-game-node-unlock-edges-download"
+                  disabled
+                >
+                  Download season metadata JSON
+                </button>
+                <button
+                  type="button"
+                  class="btn-primary"
+                  id="child-object-game-node-unlock-edges-publish"
+                  disabled
+                >
+                  Publish scan graph edges
+                </button>
+              </div>
+              <div
+                id="child-object-game-node-unlock-edges-live"
+                class="created-game-node-unlock-edges-live"
+                hidden
+              ></div>
+              <p
+                class="form-hint"
+                id="child-object-game-node-unlock-edges-status"
+                hidden
+                role="status"
+              ></p>
+            </details>
+
+            <details class="created-game-node-print-pack" id="child-object-game-node-print-pack">
+              <summary>Print / install pack</summary>
+              <p class="form-hint created-game-node-print-pack-lead">
+                Export node list, scan links, QR PNGs, and install checklist markdown for field
+                QA — replaces the internal spreadsheet for self-serve organizers.
+              </p>
+              <p class="form-hint" id="child-object-game-node-print-pack-summary" role="status"></p>
+              <div
+                id="child-object-game-node-print-pack-table-wrap"
+                class="created-game-node-print-pack-table-wrap"
+              ></div>
+              <div class="created-game-node-print-pack-actions">
+                <button
+                  type="button"
+                  class="btn-secondary"
+                  id="child-object-game-node-print-pack-download-csv"
+                  disabled
+                >
+                  Download install pack CSV
+                </button>
+                <button
+                  type="button"
+                  class="btn-secondary"
+                  id="child-object-game-node-print-pack-copy-checklist"
+                  disabled
+                >
+                  Copy install checklist
+                </button>
+                <button
+                  type="button"
+                  class="btn-secondary"
+                  id="child-object-game-node-print-pack-download-all-qr"
+                  disabled
+                >
+                  Download all QR PNGs
+                </button>
+              </div>
+              <p
+                class="form-hint"
+                id="child-object-game-node-print-pack-status"
+                hidden
+                role="status"
+              ></p>
             </details>
 
             <ul
@@ -2041,6 +2150,41 @@
                     </div>
           <div class="created-manage-group">
             <h2 class="created-manage-group-label">Share &amp; preview</h2>
+
+            <details
+              class="settings-disclosure settings-disclosure-action"
+              id="created-shop-order-panel"
+              hidden
+            >
+              <summary class="settings-summary">
+                <span class="list-icon list-icon-tone-purple" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                </span>
+                <span class="settings-summary-text">
+                  <span class="settings-summary-title" id="created-shop-order-summary-title"
+                    >Order on wear</span
+                  >
+                  <span class="settings-summary-sub" id="created-shop-order-summary-sub"
+                    >Hoodie or sticker with your live QR printed</span
+                  >
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </summary>
+              <div class="settings-panel settings-panel-action">
+                <p class="form-hint" id="created-shop-order-hint"></p>
+                <div class="created-shop-order-actions">
+                  <a
+                    class="btn-primary"
+                    id="created-shop-order-link"
+                    href="/shop/customize/?product=glitch_hoodie_v1"
+                    >Customize on wear</a
+                  >
+                  <a class="btn-secondary" id="created-shop-browse-link" href="/shop/"
+                    >See all carriers</a
+                  >
+                </div>
+              </div>
+            </details>
 
             <details class="settings-disclosure settings-disclosure-action" id="created-deploy-preview">
               <summary class="settings-summary">
@@ -2566,6 +2710,6 @@
 
     <script src="/js/device-status-bootstrap.mjs?v=94" type="module"></script>
     <script src="/js/created-hub.mjs?v=5" type="module"></script>
-    <script type="module" src="/js/created.mjs?v=91"></script>
+    <script type="module" src="/js/created.mjs?v=93"></script>
   </body>
 </html>

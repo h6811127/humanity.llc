@@ -154,3 +154,18 @@ export interface VouchRow {
   revoke_nonce: string | null;
   revoke_signed_document_json: string | null;
 }
+
+export type RelationshipEdgeStatus = "active" | "revoked";
+
+export interface RelationshipEdgeRow {
+  edge_id: string;
+  network_id: string;
+  kind: "witnesses";
+  from_object_id: string;
+  to_object_id: string;
+  steward_profile_id: string;
+  status: RelationshipEdgeStatus;
+  edge_document_json: string;
+  created_at: string;
+  updated_at: string;
+}

@@ -4,10 +4,11 @@
  * `npm run verify:landing`.
  *
  * @see docs/DEVICE_HUB_AND_LOCAL_SEARCH.md § Landing story
+ * @see docs/MERCH_VISUAL_CHOREOGRAPHY.md § Landing carriers row
  */
 
 /** Bump when hero / discovery dashboard copy or structure changes intentionally. */
-export const LANDING_COPY_CONTRACT_VERSION = 6;
+export const LANDING_COPY_CONTRACT_VERSION = 8;
 
 export const LANDING_STYLES_CACHE_BUST = "157";
 
@@ -25,8 +26,18 @@ export const LANDING_REQUIRED_SNIPPETS = [
   'id="public-networks-search"',
   "Public live boards",
   'id="public-networks-results"',
-  "About Wake the City",
+  'href="/play/season/"',
+  "See all listed public networks",
+  "What a scan proves",
   "reference public network",
+  'id="landing-live-object-carriers"',
+  "Live object carriers",
+  "Unique QR on fabric — preview before checkout",
+  'href="/shop/customize/?product=glitch_hoodie_v1"',
+  "Customize Glitch hoodie",
+  'href="/shop/"',
+  "See all carriers",
+  "Buying merch does not verify you",
   'id="landing-start-object-cta"',
   "Start with one live object",
   'href="/create/"',
@@ -38,7 +49,7 @@ export const LANDING_REQUIRED_SNIPPETS = [
   "No behavioral dossiers",
   "The sticker stays — the status changes.",
   'id="landing-learn-trust"',
-  "public-networks-portal.css?v=6",
+  "public-networks-portal.css?v=9",
   `styles.css?v=${LANDING_STYLES_CACHE_BUST}`,
 ];
 
@@ -71,6 +82,10 @@ export const LANDING_FORBIDDEN_SNIPPETS = [
   "Search public networks",
   "Community-run networks",
   "Open public networks that expose live places",
+  "custom products",
+  'class="landing-carriers-carousel"',
+  "swiper",
+  "carousel",
 ];
 
 /** Narrative sections must appear in document order. */
@@ -79,5 +94,6 @@ export const LANDING_SECTION_ORDER_MARKERS = [
   'id="landing-entry-shelves"',
   'id="public-networks-search"',
   'id="public-networks-results"',
+  'id="landing-live-object-carriers"',
   'id="landing-start-object-cta"',
 ];

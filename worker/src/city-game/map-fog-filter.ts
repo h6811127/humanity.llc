@@ -4,6 +4,7 @@ import { isGameFaction } from "./factions";
 import { applyRelayDecayIfExpired } from "./relay-contribute";
 import type { MapNodeSnapshotRow } from "./map-node-snapshot";
 import type { CrSeasonConfig } from "./season-config";
+import { lorePathUnlocked } from "./witness-gate";
 
 export type MapVisibilityMode = "public" | "signal_war" | "rumor_only";
 
@@ -70,14 +71,6 @@ function relayHoldFaction(meta: GameMeta, now: Date): string | null {
   return faction;
 }
 
-function loreUnlockSatisfied(meta: GameMeta): boolean {
-  if (!meta.unlocked_by.length) return true;
-  if (meta.vouch_requires.length) {
-    return meta.vouch_requires.every((id) => meta.vouch_active_for.includes(id));
-  }
-  return false;
-}
-
 function hiddenRelayRevealed(row: MapNodeSnapshotRow, now: Date): boolean {
   if (row.game_meta.artifact_id !== "hidden_relay") return true;
   return relayHoldFaction(row.game_meta, now) != null;
@@ -120,7 +113,7 @@ export function nodeVisibleOnMapBoard(input: {
   }
 
   if (cooperativeNodeVisible(input.row)) return true;
-  return loreUnlockSatisfied(input.row.game_meta);
+  return lorePathUnlocked(input.row.game_meta, input.row.vouch_gate);
 }
 
 export function filterNodesForMapBoard(input: {

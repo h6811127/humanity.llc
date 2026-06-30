@@ -133,6 +133,14 @@ describe("city-game-map-interaction-core", () => {
     );
   });
 
+  it("network lens spine labels restore pointer events for tap targets", () => {
+    const styles = readFileSync(join(root, "site/styles.css"), "utf8");
+    expect(styles).toMatch(
+      /\.city-game-map-board--network-lens[^}]*\.city-game-map-pin--spine[^}]*pointer-events:\s*auto/s
+    );
+    expect(styles).toContain(".city-game-map-pin-hit");
+  });
+
   it("shouldScrollSketchForRowFocus matches mobile stack media", () => {
     expect(shouldScrollSketchForRowFocus(() => true)).toBe(true);
     expect(shouldScrollSketchForRowFocus(() => false)).toBe(false);

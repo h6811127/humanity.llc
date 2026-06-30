@@ -48,7 +48,12 @@ describe("city-game-season-banner-core", () => {
     expect(seasonBannerBodyHtml("before", "rules", season)).toContain("plan your weekend");
     expect(seasonBannerBodyHtml("open", "rules", season)).toContain("/play/cedar-rapids/map/");
     expect(seasonBannerBodyHtml("open", "rules", season)).toContain("Cedar Rapids");
+    expect(seasonBannerBodyHtml("open", "rules", season)).toContain("public state board");
+    expect(seasonBannerBodyHtml("open", "rules", season)).not.toContain("weekend city board");
     expect(seasonBannerBodyHtml("open", "research", season)).toContain("/play/cedar-rapids/");
+    expect(seasonBannerBodyHtml("open", "map", season)).toBe("");
+    expect(seasonBannerBodyHtml("before", "map", season)).toContain("express line");
+    expect(seasonBannerBodyHtml("after", "map", season)).toContain("reference only");
     expect(seasonBannerNoticeClass("after")).toBe("hc-notice--warning");
   });
 });

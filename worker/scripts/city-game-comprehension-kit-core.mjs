@@ -4,11 +4,37 @@
 
 import { buildLanScanUrl, rewriteScanUrlForLan } from "./city-game-lan-hub-core.mjs";
 import {
+  buildGt8FieldWalkKitHtml,
+  LOCAL_DEV_GT8_FIELD_WALK_REL,
+  productionGt8FieldWalkUrl,
+  resolveNetworkLensNextStop,
+  validateGt8FieldWalkKitHtml,
+} from "./city-game-network-lens-gt8-field-kit-core.mjs";
+import {
   buildJamieWayfindingChecks,
   comprehensionPrimaryNodeId,
   resolveComprehensionProbeNodes,
+  seasonComprehensionPath,
 } from "../../site/js/city-game-player-guide-core.mjs";
 import { seasonSlugFromRulesPath } from "../../site/js/city-game-season-path-shared.mjs";
+import {
+  buildDualGateWalkKitHtml,
+  comprehensionDualGateWalkPageRel,
+  comprehensionDualGateWalkProductionUrl,
+  LOCAL_DUAL_GATE_WALK_REL,
+  seasonHasDualGateScanGraph,
+  validateDualGateWalkKitHtml,
+} from "./ws-object-graph-dual-gate-walk-core.mjs";
+import { resolveProdCabinetSmokeUrls } from "./ws-object-graph-prod-smoke-core.mjs";
+import { isReferenceNetworkTeachingEnabled } from "../../site/js/city-game-reference-network-core.mjs";
+import {
+  buildPlayerFlowFieldWalkKitHtml,
+  LOCAL_DEV_PLAYER_FLOW_FIELD_WALK_REL,
+  PLAYER_FLOW_FIELD_WALK_COMPREHENSION_BASENAME,
+  playerFlowRelativeUrlsForSeason,
+  productionPlayerFlowFieldWalkUrl,
+  validatePlayerFlowFieldWalkKitHtml,
+} from "../../site/js/public-network-player-flow-field-kit-core.mjs";
 
 export const COMPREHENSION_RUNBOOK_REL = "docs/CITY_GAME_COMPREHENSION_RUNBOOK.md";
 export const LOCAL_DEV_COMPREHENSION_REL = "site/dev/city-game-comprehension.html";
@@ -28,7 +54,55 @@ const DEFAULT_NODES = [
   { node_id: "node_14", blurb: "GT-5 — care stream vs game bulletins" },
 ];
 
-/** Jamie-style wayfinding checks (Phase D human gate supplement). */
+/** @param {Record<string, unknown>} season */
+export function seasonHasNetworkLens(season) {
+  const lens = season?.network_lens;
+  return Boolean(lens && typeof lens === "object" && !Array.isArray(lens));
+}
+
+/** @param {Record<string, unknown>} season */
+export function comprehensionGt8FieldWalkPageRel(season) {
+  const slug = seasonSlugFromRulesPath(String(season.rules_path ?? "")) ?? "cedar-rapids";
+  return `site/play/${slug}/comprehension/gt8-field-walk.html`;
+}
+
+/**
+ * @param {Record<string, unknown>} season
+ * @param {string} [origin]
+ */
+export function comprehensionGt8FieldWalkProductionUrl(season, origin = "https://humanity.llc") {
+  return productionGt8FieldWalkUrl(season, origin);
+}
+
+/** @param {Record<string, unknown>} season */
+export function seasonHasPlayerFlowFieldWalk(season) {
+  return isReferenceNetworkTeachingEnabled(season);
+}
+
+/** @param {Record<string, unknown>} season */
+export function comprehensionPlayerFlowFieldWalkPageRel(season) {
+  const slug = seasonSlugFromRulesPath(String(season.rules_path ?? "")) ?? "cedar-rapids";
+  return `site/play/${slug}/comprehension/${PLAYER_FLOW_FIELD_WALK_COMPREHENSION_BASENAME}`;
+}
+
+export function buildProductionDualGateWalkHtml() {
+  const urls = resolveProdCabinetSmokeUrls("https://humanity.llc");
+  return buildDualGateWalkKitHtml({
+    cabinetScan: urls.cabinetScan,
+    libraryScan: urls.libraryScan,
+    riverScan: urls.riverScan,
+    siteCodes: { witness: "CR-WITNS-4P", quorum: "CR-LANTERN-7K" },
+    labels: {
+      cabinet: "Czech Village cabinet",
+      library: "Library witness seal",
+      river: "Riverwalk River Lantern",
+    },
+    production: true,
+  });
+}
+
+export { comprehensionDualGateWalkPageRel, comprehensionDualGateWalkProductionUrl };
+
 export const JAMIE_WAYFINDING_CHECKS = [
   {
     id: "GT-W1",
@@ -117,6 +191,9 @@ export function resolveKitScanUrls(nodes, profileId, host, kitNodes = DEFAULT_NO
  *   hubUrl?: string | null;
  *   rulesUrl?: string | null;
  *   boardUrl?: string | null;
+ *   fieldWalkUrl?: string | null;
+ *   dualGateWalkUrl?: string | null;
+ *   playerFlowWalkUrl?: string | null;
  *   kitNodes: Array<KitNode & { href: string | null; label: string }>;
  *   production?: boolean;
  *   season?: Record<string, unknown>;
@@ -161,7 +238,16 @@ export function buildComprehensionKitHtml(opts) {
     ? `<p class="lead">Full season hub: <a href="${escapeHtml(opts.hubUrl)}">${escapeHtml(opts.hubUrl)}</a></p>`
     : "";
   const rulesLine = `<p class="lead"><strong>Start here:</strong> <a href="${escapeHtml(rulesUrl)}">${escapeHtml(rulesUrl)}</a> — read How to start + place list before scanning.</p>`;
-  const boardLine = `<p class="lead">GT-7 city board: <a href="${escapeHtml(boardUrl)}">${escapeHtml(boardUrl)}</a></p>`;
+  const boardLine = `<p class="lead">Weekend board (GT-7 + GT-8): <a href="${escapeHtml(boardUrl)}">${escapeHtml(boardUrl)}</a> — GT-8: point to first stop within <strong>10 seconds</strong> (look for Next / express line).</p>`;
+  const fieldWalkLine = opts.fieldWalkUrl
+    ? `<p class="lead"><strong>GT-8 field walk (operator, outdoor):</strong> <a href="${escapeHtml(opts.fieldWalkUrl)}">${escapeHtml(opts.fieldWalkUrl)}</a> — 10s timer + B1–B7 checklist.</p>`
+    : "";
+  const dualGateWalkLine = opts.dualGateWalkUrl
+    ? `<p class="lead"><strong>Dual-gate scan graph walk (GT-4 / OG-2, operator):</strong> <a href="${escapeHtml(opts.dualGateWalkUrl)}">${escapeHtml(opts.dualGateWalkUrl)}</a> — D0–D3 witness + quorum on cabinet.</p>`
+    : "";
+  const playerFlowWalkLine = opts.playerFlowWalkUrl
+    ? `<p class="lead"><strong>Player flow field walk (Agent D, operator):</strong> <a href="${escapeHtml(opts.playerFlowWalkUrl)}">${escapeHtml(opts.playerFlowWalkUrl)}</a> — PD-1–PD-5 shell path (≥3 strangers).</p>`
+    : "";
   const wayfindingItems = buildJamieWayfindingChecks(season).map(
     (row) => `<li>${escapeHtml(row.id)}: ${escapeHtml(row.prompt)}</li>`
   ).join("\n      ");
@@ -199,6 +285,9 @@ export function buildComprehensionKitHtml(opts) {
   ${rulesLine}
   ${hubLine}
   ${boardLine}
+  ${fieldWalkLine}
+  ${dualGateWalkLine}
+  ${playerFlowWalkLine}
   <div class="scorecard">
     <strong>Wayfinding (Jamie checks)</strong>
     <ol>
@@ -215,6 +304,7 @@ export function buildComprehensionKitHtml(opts) {
       <li>GT-5: Care pause beats game bulletins for safety</li>
       <li>GT-6: No rank, streak, or scan count visible</li>
       <li>GT-7: City board shows shared world chips — not “my visits” or GPS</li>
+      <li>GT-8: Points to a first stop on the map within 10s (Next / express line — SF-3)</li>
     </ol>
   </div>
   <div class="message">Quick playtest (~10 min)
@@ -235,7 +325,8 @@ W3) Can you find ${escapeHtml(primaryLabel)} before you scan?
 4) Do you need an ACCOUNT to go deeper, or trust from another place?
 5) If it says MAINTENANCE PAUSE, would you trust game bulletins for safety?
 6) Do you see a RANK, STREAK, or SCAN COUNT anywhere?
-7) On the city board (${boardUrl}) — does it show what the CITY knows, or what YOU did?</div>
+7) On the city board (${boardUrl}) — does it show what the CITY knows, or what YOU did?
+8) Same board — within 10 SECONDS, point to where you would GO FIRST (Next pin / express line — no coaching)</div>
   <h2>Prototype nodes for spot checks</h2>
   <ul class="links">${links}</ul>
 </body>
@@ -378,6 +469,9 @@ export function productionScanProfileId(productionSeed) {
  */
 export function buildComprehensionRunbookProductionUrlsBlock(input) {
   const dateIso = input.dateIso ?? new Date().toISOString().slice(0, 10);
+  const fieldWalkRow = input.fieldWalkUrl
+    ? `\n| GT-8 field walk (operator) | ${input.fieldWalkUrl} |`
+    : "";
   return `**Production URLs (${dateIso}):**
 
 | Step | URL |
@@ -385,7 +479,7 @@ export function buildComprehensionRunbookProductionUrlsBlock(input) {
 | Rules | ${input.rulesUrl} |
 | Operator kit (you) | ${input.kitUrl} |
 | Primary scan (node_04) | ${input.primaryScanUrl} |
-| City board (GT-7) | ${input.boardUrl} |`;
+| City board (GT-7, GT-8) | ${input.boardUrl} |${fieldWalkRow}`;
 }
 
 /**
@@ -435,6 +529,24 @@ export function auditComprehensionKitHtml(html, opts = {}) {
   if (!html.includes("GT-7:")) {
     issues.push(`${rel}: missing GT-7 scorecard row`);
   }
+  if (!html.includes("GT-8:")) {
+    issues.push(`${rel}: missing GT-8 scorecard row`);
+  }
+  if (seasonHasNetworkLens(season)) {
+    if (!html.includes("gt8-field-walk.html")) {
+      issues.push(`${rel}: missing GT-8 field walk link (network lens season)`);
+    }
+  }
+  if (seasonHasDualGateScanGraph(season)) {
+    if (!html.includes("dual-gate-walk.html")) {
+      issues.push(`${rel}: missing dual-gate scan graph walk link (OG-2 season)`);
+    }
+  }
+  if (seasonHasPlayerFlowFieldWalk(season)) {
+    if (!html.includes(PLAYER_FLOW_FIELD_WALK_COMPREHENSION_BASENAME)) {
+      issues.push(`${rel}: missing player flow field walk link (reference network season)`);
+    }
+  }
   if (/class="missing"/.test(html)) {
     issues.push(`${rel}: probe node missing scan URL`);
   }
@@ -470,12 +582,136 @@ export function auditComprehensionKitHtml(html, opts = {}) {
 }
 
 /**
+ * Build production comprehension kit + GT-8 field walk HTML (network lens seasons).
+ * @param {{
+ *   season: Record<string, unknown>;
+ *   rulesUrl: string;
+ *   boardUrl: string;
+ *   kitNodes: Array<KitNode & { href: string | null; label: string }>;
+ *   origin?: string;
+ * }} input
+ */
+export function buildProductionComprehensionSurfaces(input) {
+  const origin = input.origin ?? "https://humanity.llc";
+  const kitUrl = `${origin.replace(/\/$/, "")}${seasonComprehensionPath(input.season)}`;
+  const fieldWalkUrl = seasonHasNetworkLens(input.season)
+    ? comprehensionGt8FieldWalkProductionUrl(input.season, origin)
+    : null;
+  const dualGateWalkUrl = seasonHasDualGateScanGraph(input.season)
+    ? comprehensionDualGateWalkProductionUrl(input.season, origin)
+    : null;
+  const playerFlowWalkUrl = seasonHasPlayerFlowFieldWalk(input.season)
+    ? productionPlayerFlowFieldWalkUrl(input.season, origin)
+    : null;
+  const kitHtml = buildComprehensionKitHtml({
+    host: "humanity.llc",
+    rulesUrl: input.rulesUrl,
+    boardUrl: input.boardUrl,
+    fieldWalkUrl,
+    dualGateWalkUrl,
+    playerFlowWalkUrl,
+    kitNodes: input.kitNodes,
+    production: true,
+    season: input.season,
+  });
+  /** @type {{ kitHtml: string; fieldWalkHtml?: string; fieldWalkUrl?: string; dualGateWalkHtml?: string; dualGateWalkUrl?: string; playerFlowWalkHtml?: string; playerFlowWalkUrl?: string; kitUrl: string }} */
+  const out = { kitHtml, kitUrl };
+  if (fieldWalkUrl) {
+    out.fieldWalkUrl = fieldWalkUrl;
+    out.fieldWalkHtml = buildGt8FieldWalkKitHtml({
+      boardUrl: input.boardUrl,
+      comprehensionUrl: kitUrl,
+      nextStop: resolveNetworkLensNextStop(input.season),
+      production: true,
+    });
+  }
+  if (dualGateWalkUrl) {
+    out.dualGateWalkUrl = dualGateWalkUrl;
+    out.dualGateWalkHtml = buildProductionDualGateWalkHtml();
+  }
+  if (playerFlowWalkUrl) {
+    out.playerFlowWalkUrl = playerFlowWalkUrl;
+    out.playerFlowWalkHtml = buildPlayerFlowFieldWalkKitHtml({
+      urls: playerFlowRelativeUrlsForSeason(input.season),
+      production: true,
+    });
+  }
+  return out;
+}
+
+/**
+ * Build LAN/local comprehension kit + GT-8 field walk (network lens seasons).
+ * @param {{
+ *   season: Record<string, unknown>;
+ *   host: string;
+ *   rulesUrl: string;
+ *   boardUrl: string;
+ *   kitNodes: Array<KitNode & { href: string | null; label: string }>;
+ *   hubUrl?: string | null;
+ * }} input
+ */
+export function buildLocalComprehensionSurfaces(input) {
+  const host = input.host.replace(/\/$/, "");
+  const pagesHost = host.includes(":") ? host : `${host}:8788`;
+  const kitUrl = `http://${pagesHost}/dev/city-game-comprehension.html`;
+  const fieldWalkUrl = seasonHasNetworkLens(input.season)
+    ? `http://${pagesHost}/dev/city-game-gt8-field-walk.html`
+    : null;
+  const dualGateWalkUrl = seasonHasDualGateScanGraph(input.season)
+    ? `http://${pagesHost}/dev/ws-object-graph-v1/dual-gate-walk.html`
+    : null;
+  const pagesOrigin = `http://${pagesHost}`;
+  const playerFlowWalkUrl = seasonHasPlayerFlowFieldWalk(input.season)
+    ? `${pagesOrigin}/dev/public-network-player-flow-field-walk.html`
+    : null;
+  const kitHtml = buildComprehensionKitHtml({
+    host,
+    hubUrl: input.hubUrl ?? null,
+    rulesUrl: input.rulesUrl,
+    boardUrl: input.boardUrl,
+    fieldWalkUrl,
+    dualGateWalkUrl,
+    playerFlowWalkUrl,
+    kitNodes: input.kitNodes,
+    production: false,
+    season: input.season,
+  });
+  /** @type {{ kitHtml: string; fieldWalkHtml?: string; fieldWalkUrl?: string; dualGateWalkUrl?: string; playerFlowWalkHtml?: string; playerFlowWalkUrl?: string; kitUrl: string }} */
+  const out = { kitHtml, kitUrl };
+  if (fieldWalkUrl) {
+    out.fieldWalkUrl = fieldWalkUrl;
+    out.fieldWalkHtml = buildGt8FieldWalkKitHtml({
+      boardUrl: input.boardUrl,
+      comprehensionUrl: kitUrl,
+      nextStop: resolveNetworkLensNextStop(input.season),
+      production: false,
+    });
+  }
+  if (dualGateWalkUrl) {
+    out.dualGateWalkUrl = dualGateWalkUrl;
+  }
+  if (playerFlowWalkUrl) {
+    out.playerFlowWalkUrl = playerFlowWalkUrl;
+    out.playerFlowWalkHtml = buildPlayerFlowFieldWalkKitHtml({
+      urls: playerFlowRelativeUrlsForSeason(input.season),
+      production: false,
+    });
+  }
+  return out;
+}
+
+/**
  * C2 engineering readiness — kit page + seed URLs (human ≥5 testers still required).
  * @param {{
  *   season: Record<string, unknown>;
  *   localSeed?: boolean;
  *   localDevPageHtml?: string | null;
+ *   localFieldWalkHtml?: string | null;
+ *   localPlayerFlowWalkHtml?: string | null;
  *   productionPageHtml?: string | null;
+ *   productionFieldWalkHtml?: string | null;
+ *   productionPlayerFlowWalkHtml?: string | null;
+ *   productionDualGateWalkHtml?: string | null;
  *   productionScanProfileId?: string | null;
  * }} input
  */
@@ -495,7 +731,25 @@ export function assessComprehensionEngineeringReady(input) {
         rel: LOCAL_DEV_COMPREHENSION_REL,
       });
       if (audit.ok) {
-        localOk = true;
+        if (seasonHasNetworkLens(season)) {
+          if (!input.localFieldWalkHtml) {
+            issues.push(
+              `Local GT-8 field walk missing — npm run city-game:comprehension-kit (${LOCAL_DEV_GT8_FIELD_WALK_REL})`
+            );
+          } else {
+            const fieldWalkAudit = validateGt8FieldWalkKitHtml(
+              input.localFieldWalkHtml,
+              LOCAL_DEV_GT8_FIELD_WALK_REL
+            );
+            if (fieldWalkAudit.ok) {
+              localOk = true;
+            } else {
+              issues.push(...fieldWalkAudit.issues);
+            }
+          }
+        } else {
+          localOk = true;
+        }
       } else {
         issues.push(...audit.issues);
       }
@@ -505,6 +759,9 @@ export function assessComprehensionEngineeringReady(input) {
   }
 
   let productionOk = false;
+  let fieldWalkOk = false;
+  let playerFlowWalkOk = false;
+  let dualGateWalkOk = false;
   if (input.productionPageHtml) {
     const seasonRoot = String(season.season_root_profile_id ?? "").trim();
     const audit = auditComprehensionKitHtml(input.productionPageHtml, {
@@ -533,8 +790,74 @@ export function assessComprehensionEngineeringReady(input) {
     warnings.push("Production kit page missing — npm run city-game:comprehension-kit -- --production (after seed-production)");
   }
 
+  if (seasonHasNetworkLens(season)) {
+    const fieldWalkRel = comprehensionGt8FieldWalkPageRel(season);
+    if (!input.productionFieldWalkHtml) {
+      warnings.push(`GT-8 field walk missing — npm run city-game:comprehension-kit -- --production (${fieldWalkRel})`);
+    } else {
+      const fieldWalkAudit = validateGt8FieldWalkKitHtml(input.productionFieldWalkHtml, fieldWalkRel);
+      if (fieldWalkAudit.ok) {
+        fieldWalkOk = true;
+      } else {
+        warnings.push(...fieldWalkAudit.issues);
+      }
+    }
+  } else {
+    fieldWalkOk = true;
+  }
+
+  if (seasonHasPlayerFlowFieldWalk(season)) {
+    const playerFlowRel = comprehensionPlayerFlowFieldWalkPageRel(season);
+    if (!input.productionPlayerFlowWalkHtml) {
+      warnings.push(
+        `Player flow field walk missing — npm run city-game:comprehension-kit -- --production (${playerFlowRel})`
+      );
+    } else {
+      const playerFlowAudit = validatePlayerFlowFieldWalkKitHtml(input.productionPlayerFlowWalkHtml);
+      if (playerFlowAudit.ok) {
+        playerFlowWalkOk = true;
+      } else {
+        warnings.push(...playerFlowAudit.issues.map((i) => `${playerFlowRel}: ${i}`));
+      }
+    }
+    if (input.localSeed && !input.localPlayerFlowWalkHtml) {
+      warnings.push(
+        `Local player flow field walk missing — npm run city-game:comprehension-kit (${LOCAL_DEV_PLAYER_FLOW_FIELD_WALK_REL})`
+      );
+    }
+  } else {
+    playerFlowWalkOk = true;
+  }
+
+  if (seasonHasDualGateScanGraph(season)) {
+    const dualGateRel = comprehensionDualGateWalkPageRel(season);
+    if (!input.productionDualGateWalkHtml) {
+      warnings.push(
+        `Dual-gate walk missing — npm run city-game:comprehension-kit -- --production (${dualGateRel})`
+      );
+    } else {
+      const dualGateAudit = validateDualGateWalkKitHtml(input.productionDualGateWalkHtml, dualGateRel);
+      if (dualGateAudit.ok) {
+        dualGateWalkOk = true;
+      } else {
+        warnings.push(...dualGateAudit.issues);
+      }
+    }
+  } else {
+    dualGateWalkOk = true;
+  }
+
   const ready = localOk || productionOk;
-  return { ready, localOk, productionOk, issues, warnings };
+  return {
+    ready,
+    localOk,
+    productionOk,
+    fieldWalkOk,
+    playerFlowWalkOk,
+    dualGateWalkOk,
+    issues,
+    warnings,
+  };
 }
 
 /**
@@ -542,6 +865,9 @@ export function assessComprehensionEngineeringReady(input) {
  *   ready: boolean;
  *   localOk: boolean;
  *   productionOk: boolean;
+ *   fieldWalkOk?: boolean;
+ *   playerFlowWalkOk?: boolean;
+ *   dualGateWalkOk?: boolean;
  *   issues: string[];
  *   warnings: string[];
  *   humanSignedOff?: boolean;
@@ -557,6 +883,23 @@ export function formatComprehensionPreflightReport(c2) {
   lines.push(
     `  Production kit: ${c2.productionOk ? "☑" : "☐"} (${comprehensionProductionPageRel({ rules_path: "/play/cedar-rapids/" })})`
   );
+  lines.push(
+    `  GT-8 field walk: ${c2.fieldWalkOk ? "☑" : "☐"} (${comprehensionGt8FieldWalkPageRel({ rules_path: "/play/cedar-rapids/" })})`
+  );
+  lines.push(
+    `  Player flow walk: ${c2.playerFlowWalkOk ? "☑" : "☐"} (${comprehensionPlayerFlowFieldWalkPageRel({ rules_path: "/play/cedar-rapids/" })})`
+  );
+  lines.push(
+    `  Dual-gate walk: ${c2.dualGateWalkOk ? "☑" : "☐"} (${comprehensionDualGateWalkPageRel({ season_id: "cr_season_01_wake", rules_path: "/play/cedar-rapids/" })})`
+  );
+  lines.push("");
+  lines.push("Human probes (field):");
+  lines.push("  /play/cedar-rapids/comprehension/ — full GT-1–GT-8 cohort");
+  lines.push("  /play/cedar-rapids/comprehension/gt8-field-walk.html — outdoor timer + B1–B7");
+  lines.push(
+    "  /play/cedar-rapids/comprehension/player-flow-field-walk.html — PD-1–PD-5 shell path (≥3 strangers)"
+  );
+  lines.push("  /play/cedar-rapids/comprehension/dual-gate-walk.html — OG-2 D0–D3 cabinet path");
   if (c2.warnings.length) {
     lines.push("");
     lines.push("Warnings:");

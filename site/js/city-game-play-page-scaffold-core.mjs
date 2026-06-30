@@ -4,6 +4,13 @@
  */
 
 import { buildSeasonBannerBlock, formatSeasonWindowLabel } from "./city-game-season-banner-core.mjs";
+import { isReferenceNetworkTeachingEnabled } from "./city-game-reference-network-core.mjs";
+import { PLAYER_FLOW_FIELD_WALK_COMPREHENSION_BASENAME } from "./public-network-player-flow-field-kit-core.mjs";
+import {
+  buildPlayerFlowRulesBreadcrumbHtml,
+  buildRulesPagePlayerFootnoteHtml,
+  resolveSeasonDiscoveryBrowseHref,
+} from "./public-network-player-nav-core.mjs";
 import {
   seasonBoardPath,
   seasonJsonPublicUrl,
@@ -88,6 +95,7 @@ ${robotsMeta}    <meta name="theme-color" content="#ffffff" />
       </header>
 
       <main class="screen screen-landing">
+        ${buildPlayerFlowRulesBreadcrumbHtml(title, escapeHtml)}
         <section class="hero hero-compact">
           <p class="hero-eyebrow">${escapeHtml(heroEyebrow)}</p>
           <h1>${escapeHtml(title)}</h1>
@@ -95,19 +103,21 @@ ${robotsMeta}    <meta name="theme-color" content="#ffffff" />
             ${heroLine}
           </p>
           <p class="hero-line hero-line-sub" id="city-game-hero-subline">
-            <a href="${escapeHtml(ctx.boardPath)}">Open the weekend city board</a> — every game spot, districts, and Open in Maps links (scan stickers for live chips).
+            <a href="${escapeHtml(ctx.boardPath)}">Open board</a> — every game spot, districts, and Open in Maps links (scan stickers for live chips).
           </p>
         </section>
 
         <section class="idea-section" aria-labelledby="rules-start-title">
           <h2 class="group-label" id="rules-start-title">How to start</h2>
-          <ul class="list list-compact" id="city-game-player-guide-list">
-            <li class="list-row">
-              <span class="list-content">
-                <span class="list-sub">Loading start guide…</span>
-              </span>
-            </li>
-          </ul>
+          <div class="city-game-rules-guide-grid" id="city-game-player-guide-list">
+            <article class="city-game-rules-plate hc-emphasis-card hc-emphasis-card--info">
+              <div class="hc-emphasis-card__main">
+                <div class="hc-emphasis-card__copy">
+                  <p class="hc-emphasis-card__detail">Loading start guide…</p>
+                </div>
+              </div>
+            </article>
+          </div>
         </section>
 
         ${bannerOrHint}
@@ -147,27 +157,39 @@ ${robotsMeta}    <meta name="theme-color" content="#ffffff" />
           id="city-state"
           aria-labelledby="city-board-cta-title"
         >
-          <h2 class="group-label" id="city-board-cta-title">Weekend city board</h2>
+          <h2 class="group-label" id="city-board-cta-title">Public state board</h2>
           <p class="group-intro short">
             Every game spot, live progress, and Open in Maps links live on their own page — easier on your phone and simple to share.
           </p>
           <p class="group-intro short">
-            <a href="${escapeHtml(ctx.boardPath)}"><strong>Open weekend city board</strong></a>
+            <a href="${escapeHtml(ctx.boardPath)}"><strong>Open board</strong></a>
           </p>
         </section>
 
-        <section class="qr-compare idea-compare" aria-labelledby="rules-privacy-title">
+        <section class="idea-section landing-privacy-split" aria-labelledby="rules-privacy-title">
           <h2 class="group-label" id="rules-privacy-title">Privacy</h2>
           <p class="group-intro short">
             Read the <a href="/data-policy.html">operator data policy</a>. Same city truth for everyone — no account, no visit log.
           </p>
         </section>
 
-        <p class="idea-footnote">
-          <a href="/play/season/">All city games</a>
-          ·
-          <a href="/what-can-a-qr-do/physical-world-multiplayer/">Physical-world multiplayer research</a>
-        </p>
+        ${buildRulesPagePlayerFootnoteHtml(
+          season,
+          {
+            boardPath: ctx.boardPath,
+            rulesPath: ctx.rulesPath,
+            teachingPath:
+              !isPlanned && isReferenceNetworkTeachingEnabled(season)
+                ? `${ctx.rulesPath.replace(/\/?$/, "/")}teaching/`
+                : null,
+            debriefPath: !isPlanned ? `${ctx.rulesPath.replace(/\/?$/, "/")}debrief/` : null,
+            fieldWalkPath:
+              !isPlanned && isReferenceNetworkTeachingEnabled(season)
+                ? `${ctx.rulesPath.replace(/\/?$/, "/")}comprehension/${PLAYER_FLOW_FIELD_WALK_COMPREHENSION_BASENAME}`
+                : null,
+          },
+          escapeHtml
+        )}
       </main>
     </div>
     <script type="module" src="${PLAY_PAGE_SCRIPT}"></script>
@@ -192,6 +214,16 @@ export function verifyPlayPageHtml(html, season) {
   }
   if (!html.includes('id="city-state"')) {
     issues.push("missing #city-state section");
+  }
+  if (!html.includes("player-flow-breadcrumb")) {
+    issues.push("missing player-flow-breadcrumb");
+  }
+  if (!html.includes("city-game-rules-player-footnote")) {
+    issues.push("missing city-game-rules-player-footnote");
+  }
+  const discoverHref = resolveSeasonDiscoveryBrowseHref(season);
+  if (discoverHref && !html.includes(discoverHref)) {
+    issues.push(`missing discover browse link ${discoverHref}`);
   }
   const boardPath = seasonBoardPath(String(season.rules_path ?? ""));
   if (boardPath && !html.includes(boardPath)) {

@@ -13,7 +13,7 @@ import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const argv = process.argv.slice(2);
-const fast = argv.includes("--fast") || !argv.includes("--full");
+const fast = argv.includes("--fast");
 
 /** @param {string} label @param {string[]} npmArgs */
 function step(label, npmArgs) {

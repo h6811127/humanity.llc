@@ -1,6 +1,6 @@
 # Discovery projection
 
-**Status:** Strategic spec — discovery plane · **P0 shipped** (WS-DISCOVER-P0, 2026-06-09) · P1+ not started  
+**Status:** Strategic spec — discovery plane · **P0 shipped** (WS-DISCOVER-P0) · **P1 shipped** · **P2 shipped** (browse row state + pin detail snapshot) · **P3 shipped** (region hub + network filter + multi-object primary) · belt: `npm run verify:discover`  
 **Audience:** Product, frontend, operators, agents  
 **Scope:** Public browse, near-me planning, board map lenses — **no resolver, scan, or network-graph changes**
 
@@ -12,6 +12,8 @@
 ## Purpose
 
 At low object density, a listed **network board** can imply its place catalog. At city scale (many **Objects**, many overlapping **Networks**), strangers need a **human-facing browse index** that does not fork resolver truth.
+
+**Landing (`/`) today:** Shipped as a **discovery dashboard** — shelves, search, and **Public live boards** (`public-networks-portal.mjs`). This is the no-landing entry: utility for players/checkers, not a marketing homepage. **Shipped:** **`#landing-live-object-carriers`** row after boards (commerce teaser → `/shop/`) — does not change discovery plane semantics ([`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) § Landing carriers row). **Hosted tier** upsell stays on `/created/`, not `/`.
 
 This doc defines the **discovery plane**: how public listings, geo browse, and board maps **project** resolver state into browse rows — without new signed documents, without changing `/c/…` scan URLs, and without scan surveillance.
 
@@ -276,6 +278,8 @@ Game bulletin state **must not** override care/maintenance primary when care str
 
 ## Board maps reading pins through a network lens
 
+**Presentation spec (transit map, express spine, selection panel):** [`SF-3_LIVING_NETWORK_LENS.md`](SF-3_LIVING_NETWORK_LENS.md) · [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) § Network lens · [`STATE_FIRST_UI_MODEL.md`](STATE_FIRST_UI_MODEL.md) § SF-3.
+
 Today: season board reads season JSON nodes + resolver snapshot per node.
 
 **Future (doc target):** board map is a **view** over DiscoveryPins, not a second place registry.
@@ -306,7 +310,8 @@ Season board (network lens = cr_season_01_wake)
 | URL kind | Example | Resolves to |
 |----------|---------|-------------|
 | **Scan (resolver)** | `/c/{profile_id}?q={qr_id}` | Signed scan view model |
-| **Pin (discovery)** | `/discover/{region}/pin/{pin_id}` | Browse/detail; CTAs → scan URLs |
+| **Pin (discovery, share/bookmark)** | `/discover/{region}/pin/{pin_id}` | Browse/detail via pin shell + `_redirects` splat; CTAs → scan URLs |
+| **Pin (discovery, in-app browse tap)** | `/discover/{region}/?pin={pin_id}` | Same region shell — no rewrite; detail panel above list |
 | **Region browse** | `/discover/{region}/` | Pin list; client-side near-me sort |
 | **Network lens** | `/play/cedar-rapids/map/` (unchanged path) | Board view; filtered pins + snapshots |
 
@@ -350,16 +355,46 @@ Discovery plane targets the second without changing resolver cardinality.
 
 **WS-DISCOVER-P0 (☑ shipped):** DiscoveryPin projection + Cedar Rapids board reads pins through the `cr_season_01_wake` network lens (`data-pin-lens="1"` on board context). Committed pin index at `site/data/discovery-cedar-rapids-iowa.json` — **40 pins / 40 season nodes** after GcP3 wave-open JSON. Regenerate: `npm run discover:rebuild-pins`. **CI:** `npm run verify:city-game` runs `discover:rebuild-pins -- --check` via [`verify-city-game-exit.mjs`](../worker/scripts/verify-city-game-exit.mjs) — fails on pin drift. No geo, no `/discover/` routes, no resolver scan changes in P0.
 
-**P1+ (not started):** object-level `public_listing`, geo near-me, `/discover/` routes — escalate only after INTEGRATOR confirms LO-4 human gate plan.
+**P1+ (☑ shipped):** object-level `public_listing` schema (**P1-1**), geo near-me (**P1-2**), `/discover/` routes (**P1-3**).
 
-Before P1 engineering:
+**WS-DISCOVER-P1-3 (☑ shipped):** Region browse at [`/discover/cedar-rapids-iowa/`](../site/discover/cedar-rapids-iowa/index.html) — pin list, search, client-side **Sort near me** (geolocation permitted on `/discover/*` via [`site/_headers`](../site/_headers)), required privacy copy. **In-app row taps** use `?pin=` on the region shell (rewrite-free). **Share/bookmark URLs** use `/discover/{region}/pin/{pin_id}` via [`site/discover/pin/`](../site/discover/pin/index.html) + per-region splat in [`site/_redirects`](../site/_redirects) (synced by `npm run discover:rebuild-pins`). Modules: [`discovery-region-path-core.mjs`](../site/js/discovery-region-path-core.mjs) · [`discovery-region-browse-core.mjs`](../site/js/discovery-region-browse-core.mjs) · [`discovery-region-page.mjs`](../site/js/discovery-region-page.mjs) · [`discovery-redirects-sync-core.mjs`](../site/js/discovery-redirects-sync-core.mjs). Landing network cards link **Browse places** when a discovery region slug resolves. Tests: [`discovery-region-path-core.test.ts`](../worker/tests/discovery-region-path-core.test.ts) · [`discovery-region-browse-core.test.ts`](../worker/tests/discovery-region-browse-core.test.ts) · [`discovery-redirects-sync-core.test.ts`](../worker/tests/discovery-redirects-sync-core.test.ts) · [`e2e/discovery-region-browse.spec.ts`](../e2e/discovery-region-browse.spec.ts).
 
-1. Object-level `public_listing` schema aligned with season listing ([`public-networks-portal-core.mjs`](../site/js/public-networks-portal-core.mjs) pattern).
-2. Privacy review against [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md).
-3. Map dashboard spec updated to reference pin lens ([`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md)) — when implementation starts, not before.
-4. Tests: index rebuild idempotency, excluded types, delisting, no scan logging hooks.
+**WS-DISCOVER-P1-1 (☑ shipped):** Shared object/network `public_listing` parser in [`discovery-public-listing-core.mjs`](../site/js/discovery-public-listing-core.mjs) — explicit opt-in (`listed === true`), geo precision tiers, season-registry inherit for listed Cedar Rapids nodes. Pin projection uses [`isObjectListedForDiscovery()`](../site/js/discovery-public-listing-core.mjs) — object-level `listed: false` drops pin on rebuild. Tests: [`discovery-public-listing-core.test.ts`](../worker/tests/discovery-public-listing-core.test.ts).
 
-**Until P1+ ships:** pin projection is index-only; resolver and scan behavior remain as shipped.
+**WS-DISCOVER-P1-2 (☑ shipped):** Steward-published **`geo`** on DiscoveryPins — projection via [`discovery-geo-projection-core.mjs`](../site/js/discovery-geo-projection-core.mjs) (object `public_listing.geo` → `node.geo` → Cedar Rapids pilot schematic layout with block precision). Client-side near-me sort in [`discovery-near-me-core.mjs`](../site/js/discovery-near-me-core.mjs) — haversine distance, nearest-first ordering, required privacy copy constant; **no** server-side location storage. Pin index version **`discovery-pin-v2`** — regenerate: `npm run discover:rebuild-pins`. Tests: [`discovery-geo-projection-core.test.ts`](../worker/tests/discovery-geo-projection-core.test.ts) · [`discovery-near-me-core.test.ts`](../worker/tests/discovery-near-me-core.test.ts).
+
+**P1 follow-ups:** ~~map dashboard pin-lens cross-links~~ ☑ P1-4 · ~~privacy review checklist~~ ☑ P1-5 · ~~standalone object pins beyond season registry~~ ☑ P1-6.
+
+**WS-DISCOVER-P1-6 (☑ shipped):** Standalone listed objects outside season node registry merge into the regional pin index via [`discovery-standalone-{region}.json`](../site/data/discovery-standalone-cedar-rapids-iowa.json). Explicit `public_listing.listed === true` + `scan_url` required; season registry wins on `object_id` collision. Pins carry optional `scan_url` for browse/detail CTAs. Module: [`discovery-standalone-object-core.mjs`](../site/js/discovery-standalone-object-core.mjs). Rebuild: `npm run discover:rebuild-pins`. Tests: [`discovery-standalone-object-core.test.ts`](../worker/tests/discovery-standalone-object-core.test.ts). Index version **`discovery-pin-v3`**.
+
+**WS-DISCOVER-P1-5 (☑ shipped):** Privacy review checklist — engineering gates below; human spot-check before marketing near-me browse.
+
+| Gate | Owner | Check |
+|------|-------|-------|
+| Pin index shape | CI | `assertDiscoveryPinPrivacyShape()` on every pin — no visit/player/scan fields; `geo` steward-published only ([`discovery-pin-projection-core.test.ts`](../worker/tests/discovery-pin-projection-core.test.ts)) |
+| Geolocation scope | `_headers` | `geolocation=(self)` only on `/discover/*` — not on `/play/*` map lens |
+| Near-me copy | Browse UI | `DISCOVERY_NEAR_ME_PRIVACY_COPY` visible on `/discover/{region}/` |
+| Client-only sort | Browse JS | Near-me uses `navigator.geolocation` in client only — no coords sent for ranking |
+| Map lens honesty | Map board | Network lens sketch does **not** request geolocation ([`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) § Discovery cross-links) |
+| Share URL splats | Rebuild | `npm run discover:rebuild-pins -- --check` verifies `_redirects` per-region pin splats |
+
+**Human sign-off (before external near-me marketing):** confirm browse + map cross-links on production; deny location on map page; allow on discover browse only.
+
+**WS-DISCOVER-P1-4 (☑ shipped):** Network lens ↔ discovery cross-links — [`discovery-map-crosslink-core.mjs`](../site/js/discovery-map-crosslink-core.mjs). City board place list shows **Browse places near me** → `/discover/{region}/`; pin rows + selection panel link **Discovery pin** → `/discover/{region}/pin/{pin_id}/` when pin lens members carry `pin_id`. Map page footnote + [`city-game-map-board-core.mjs`](../site/js/city-game-map-board-core.mjs) · [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) § Discovery cross-links. Tests: [`discovery-map-crosslink-core.test.ts`](../worker/tests/discovery-map-crosslink-core.test.ts).
+
+**WS-DISCOVER-P2-1 (☑ shipped):** Pin detail **live state** from passive season snapshot GET — headline + chip list on browse `?pin=` detail and share-path pin shell ([`discovery-pin-snapshot-core.mjs`](../site/js/discovery-pin-snapshot-core.mjs)). Reuses map board chip renderer; no scan logging; standalone pins without snapshot rows show scan hint. Tests: [`discovery-pin-snapshot-core.test.ts`](../worker/tests/discovery-pin-snapshot-core.test.ts).
+
+**WS-DISCOVER-P2-2 (☑ shipped):** Browse list **row state hints** — compact snapshot headline under each place title ([`resolveDiscoveryPinRowStateHeadline()`](../site/js/discovery-pin-snapshot-core.mjs) · state-first row markup in [`discovery-region-browse-core.mjs`](../site/js/discovery-region-browse-core.mjs)). Reuses single snapshot fetch at page boot; season pins show live or role fallback; standalone pins omit row state until snapshot support. Tests: [`discovery-pin-snapshot-core.test.ts`](../worker/tests/discovery-pin-snapshot-core.test.ts) · [`discovery-region-browse-core.test.ts`](../worker/tests/discovery-region-browse-core.test.ts).
+
+**WS-DISCOVER-P2 belt (☑ shipped):** Regression gate — `npm run verify:discover` (Vitest + pin index + `_headers` discover scope) · `npm run verify:discover -- --e2e` (+ [`e2e/discovery-region-browse.spec.ts`](../e2e/discovery-region-browse.spec.ts)) · script: [`verify-discover-exit.mjs`](../worker/scripts/verify-discover-exit.mjs).
+
+**WS-DISCOVER-P3-1 (☑ shipped):** Region hub at [`/discover/`](../site/discover/index.html) — lists listed discovery regions from [`city-game-seasons-index.json`](../site/data/city-game-seasons-index.json). Module: [`discovery-regions-index-core.mjs`](../site/js/discovery-regions-index-core.mjs) · boot: [`discovery-regions-hub.mjs`](../site/js/discovery-regions-hub.mjs). Landing public board cards still link **Browse places** per region when slug resolves ([`public-networks-portal-core.mjs`](../site/js/public-networks-portal-core.mjs)). Tests: [`discovery-regions-index-core.test.ts`](../worker/tests/discovery-regions-index-core.test.ts).
+
+**WS-DISCOVER-P3-2 (☑ shipped):** Network lens filter on region browse — client-side `?network=` filter on `pin.network_ids[]`; chip UI **All places** / season display name (e.g. **Wake the city**); near-me sort + privacy copy preserved; board cross-link → `/play/{slug}/map/`. Module: [`discovery-network-filter-core.mjs`](../site/js/discovery-network-filter-core.mjs). Tests: [`discovery-network-filter-core.test.ts`](../worker/tests/discovery-network-filter-core.test.ts) · e2e network filter row in [`discovery-region-browse.spec.ts`](../e2e/discovery-region-browse.spec.ts).
+
+**WS-DISCOVER-P3-3 (☑ shipped):** Multi-object pin detail — primary-object selection policy ([§ Primary-object selection policy](#primary-object-selection-policy)) in [`discovery-primary-object-core.mjs`](../site/js/discovery-primary-object-core.mjs); object chooser on ambiguous pins; standalone `scan_url` unchanged. Tests: [`discovery-primary-object-core.test.ts`](../worker/tests/discovery-primary-object-core.test.ts).
+
+**WS-DISCOVER-P3 belt (☑ shipped):** `npm run verify:discover` scope extended to P3 modules above · `npm run verify:discover -- --e2e` includes hub + network filter smoke.
 
 ---
 

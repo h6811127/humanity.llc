@@ -9,6 +9,7 @@ import {
   applyBoardFilterVisibility,
   isBoardFilterChipEmphasized,
   matchesDistrictFilter,
+  matchesListLensFilter,
   setDistrictFilter,
   setStateFilter,
   setTypeFilter,
@@ -242,6 +243,19 @@ function mockFilterButton(filterKey, filterValue) {
 }
 
 describe("city-game-map-filter-core", () => {
+  it("matchesListLensFilter keeps highlighted row visible under spine lens", () => {
+    expect(
+      matchesListLensFilter({ spineNode: null, nodeId: "node_01" }, "spine", "node_01")
+    ).toBe(true);
+    expect(
+      matchesListLensFilter({ spineNode: null, nodeId: "node_01" }, "spine", null)
+    ).toBe(false);
+    expect(
+      matchesListLensFilter({ spineNode: "1", nodeId: "node_04" }, "spine", null)
+    ).toBe(true);
+    expect(matchesListLensFilter({ nodeId: "node_01" }, "all", null)).toBe(true);
+  });
+
   it("only emphasizes narrowed chips, not All reset chips", () => {
     expect(isBoardFilterChipEmphasized("relay_gate")).toBe(true);
     expect(isBoardFilterChipEmphasized("needs_action")).toBe(true);

@@ -14,6 +14,7 @@ import {
 } from "./time-policy";
 import type { ObjectPublicStream } from "../validation/object-streams";
 import { objectStreamsFromChildDocumentJson } from "../validation/object-streams";
+import type { RelationshipEdgeDocument } from "./relationship-edge-spec";
 
 export type ComposeChildObjectScanInput = {
   child: ChildObjectRow;
@@ -21,6 +22,7 @@ export type ComposeChildObjectScanInput = {
   env: { CITY_GAME_ENABLED?: string; CITY_GAME_LOCAL_PLAY_OPEN?: string };
   now: Date;
   vouchWitnesses?: Record<string, import("../city-game/game-meta").GameMeta>;
+  witnessRelationshipEdges?: RelationshipEdgeDocument[] | null;
 };
 
 export type ComposeChildObjectScanResult = {
@@ -53,6 +55,7 @@ export function composeChildObjectScanState(
     objectStreams,
     env,
     vouchWitnesses: input.vouchWitnesses,
+    witnessRelationshipEdges: input.witnessRelationshipEdges,
     season,
     now,
   });

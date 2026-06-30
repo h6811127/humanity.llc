@@ -46,10 +46,11 @@ describe("landing copy contract (regression lock)", () => {
     }
   });
 
-  it("discovery dashboard styles include hero, shelves, and create CTA layout", () => {
+  it("discovery dashboard styles include hero, shelves, carriers, and create CTA layout", () => {
     const portalStyles = readFileSync(portalStylesPath, "utf8");
     expect(portalStyles).toContain(".landing-discovery-hero");
     expect(portalStyles).toContain(".landing-entry-shelves");
+    expect(portalStyles).toContain(".landing-live-object-carriers");
     expect(portalStyles).toContain(".landing-start-object-cta");
   });
 

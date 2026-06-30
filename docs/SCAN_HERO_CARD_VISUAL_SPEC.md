@@ -1,6 +1,6 @@
 # Scan hero card — visual spec (live check)
 
-**Status:** Active — **v2 depth complete** (`pass-v33`): tier-4 hero plate, dark mode, Vitest + Playwright (Chromium + WebKit). Optional: spot-check on physical iPhone if WebKit CI green — [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) P1-SD steps 8–9.  
+**Status:** Active — **v3 glass step 1 shipped**: tier-4 frosted plate tokens + fallbacks; settle pulse unchanged. Prior **v2 depth complete** (`pass-v33`). Optional: spot-check on physical iPhone if WebKit CI green — [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) P1-SD steps 8–9.  
 **Audience:** Product, design, frontend  
 **Component name:** **Live check hero** (resolver plate)  
 **Related:** [`SCAN_PAGE_TRUST_UI.md`](SCAN_PAGE_TRUST_UI.md) (motion) · [`M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) (layout) · [`SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) (copy IA) · [`VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md) · [`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) (Beat 2 notary — no hoodie fork, no loop bubble) · [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § Emphasis notice cards · [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md)
@@ -87,6 +87,18 @@ Below the hero (not part of this component): L3 `.scan-actor-band`, then “What
 
 ## Surface & depth
 
+### Shipped (v3 step 1 — tier-4 glass plate)
+
+| Property | Value | Notes |
+|----------|-------|-------|
+| Background (default) | `var(--hc-scan-hero-fill-glass)` | More opaque than tier-3 emphasis glass — trust surface |
+| Backdrop | `var(--hc-scan-hero-backdrop)` | `blur(18px) saturate(1.12)` on hero only |
+| Fallback | `var(--hc-scan-hero-fill)` | `@supports not (backdrop-filter)` + `prefers-reduced-transparency: reduce` |
+| Border | `0.5px solid var(--hc-scan-hero-border)` | Unchanged hairline |
+| Radius | **18px** | Unchanged |
+| Shadow | `var(--hc-scan-hero-shadow)` | Tier 4 — deeper than emphasis card |
+| Settle motion | `scan-hero-settle-pulse` | Unchanged — red ring layered on hero shadow |
+
 ### Shipped (v2 — resolver plate depth)
 
 | Property | Value | Notes |
@@ -117,6 +129,7 @@ Non-hero `.scan-status-panel` (e.g. scan-out) keeps the lighter v1 shadow stack.
 | | Emphasis card (tier 3) | Scan hero (tier 4) |
 |--|------------------------|---------------------|
 | Size | Compact notice | Full-width plate |
+| Fill | Modifier glass (~0.68–0.78 α) | Neutral glass (~0.84–0.9 α) + stronger shadow |
 | Semantic frame | Eyebrow + dot modifier | Neutral surface; **strip** carries state |
 | Motion | Static | Path 2 arrive + one-shot settle pulse |
 | CTA | In-card pill common | CTAs in L3 actor band or page footer |
@@ -250,6 +263,21 @@ Prototype (timing tune): `npm run pages:dev` → `/prototypes/scan-trust-ui-demo
 
 ---
 
+## Implementation checklist (v3 glass)
+
+When raising the hero to tier-4 glass:
+
+1. ~~Add `--hc-scan-hero-fill-glass` + `--hc-scan-hero-backdrop` on `:root` (light + dark).~~ **Done**
+2. ~~Apply glass + backdrop on `.scan-hero.scan-status-panel`; opaque fallback paths.~~ **Done**
+3. ~~Keep `scan-hero-settle-pulse` unchanged.~~ **Done**
+4. ~~Update `scan-hero-visual-contract.test.ts` + `ui-color-scheme-popover-guard.test.ts`.~~ **Done**
+5. After `scan-pass.css` changes: `npm run worker:bundle-scan` · regenerate e2e fixtures if needed.
+6. Manual / E2E: light + dark, active + revoked, reduced motion + reduced transparency.
+
+**v3 step 2 (☑ shipped):** Lower glass opacity (~0.68–0.78 α) + `--hc-scan-page-canvas` gradient so `backdrop-filter` has contrast — without this, step 1 reads identical to opaque v2 on flat `#f2f2f7`.
+
+**v4 Phase 0 (prototype):** Canvas + glass lab at [`/prototypes/scan-trust-ui-demo.html`](../site/prototypes/scan-trust-ui-demo.html) — query `?canvas=neutral|red-frame|red-vignette` · `?glass=low|mid|high|prod`. Demo CSS only (`scan-trust-ui-demo.css`); production `scan-pass.css` unchanged until Phase 1 sign-off.
+
 ## Implementation checklist (v2 depth)
 
 When raising the hero to tier 4:
@@ -266,6 +294,8 @@ When raising the hero to tier 4:
 
 | Date | Change |
 |------|--------|
+| 2026-06-22 | v4 Phase 0: glass canvas prototype — `scan-trust-ui-demo` canvas/glass toggles (demo CSS only) |
+| 2026-06-21 | v3 step 1: tier-4 glass plate — `--hc-scan-hero-fill-glass`, backdrop, opaque fallbacks; settle pulse unchanged |
 | 2026-05-26 | Initial spec: anatomy, tier system, shipped v1 + target v2 depth, motion cross-ref |
 | 2026-05-26 | v2 step 1: `--hc-scan-hero-shadow` on `:root` (`styles.css`, `scan-pass.css`) + dark in `theme-dark.css` |
 | 2026-05-26 | v2 step 2: `.scan-hero.scan-status-panel` uses token at rest; `scan-hero-settle-pulse` for Path 2 settle |

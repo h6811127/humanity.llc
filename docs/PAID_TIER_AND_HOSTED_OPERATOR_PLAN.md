@@ -40,6 +40,8 @@ Two **`plan_id`** values on the same **`account_id`** / steward-session model. A
 
 **WS-REV shipped (repo):** Stripe Checkout (`POST …/steward/billing/checkout`), webhook `plan_id`, `/created/` Operator plan & limits panel. **Still open:** exact USD in Stripe Dashboard, public marketing launch date, Legal G7 refund copy.
 
+**Landing (`/`) vs hosted upsell:** Discovery homepage is **not** a hosted-tier marketing surface. Strangers browse boards free; stewards hit caps and billing on **`/created/`** and hub entitlements UI. Merch revenue on `/` is a **shipped** static **`#landing-live-object-carriers`** teaser → `/shop/` only ([`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) · [`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) § Landing carriers row).
+
 ---
 
 ## Problem statement

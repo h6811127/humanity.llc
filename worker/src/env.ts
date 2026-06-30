@@ -7,6 +7,12 @@ export interface Env {
   SCAN_OUT_HMAC_SECRET?: string;
   /** E1 hosted steward API (`1` / `true` to enable). */
   HOSTED_STEWARD_ENABLED?: string;
+  /** Tier 2 Web Push VAPID public key (URL-safe base64) for operator capabilities. */
+  STEWARD_VAPID_PUBLIC_KEY?: string;
+  /** Tier 2 Web Push VAPID private key (URL-safe base64) — wrangler secret. */
+  STEWARD_VAPID_PRIVATE_KEY?: string;
+  /** VAPID `sub` claim (default mailto:push@humanity.llc). */
+  STEWARD_VAPID_CONTACT?: string;
   /** E5 Stripe webhook signing secret (`whsec_…`). */
   STRIPE_WEBHOOK_SECRET?: string;
   /** E5 Stripe secret key (`sk_test_…` / `sk_live_…`) for Checkout session create. */

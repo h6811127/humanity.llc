@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 import {
+  buildMapNetworkLegendHtml,
   buildMapReferenceSpineHtml,
   buildNetworkCharterSectionHtml,
   LO4_COMPREHENSION_MIN_STRANGERS,
@@ -39,14 +40,16 @@ describe("city-game-reference-network-core", () => {
     expect(html).toContain("<table");
   });
 
-  it("builds reference spine on map board", () => {
-    const spine = buildMapReferenceSpineHtml(season);
-    expect(spine).toContain("How this network works");
-    expect(spine).toContain("node_04");
-    expect(spine).toContain("Collective unlock");
+  it("builds compact network legend for map drawer", () => {
+    const legend = buildMapNetworkLegendHtml(season);
+    expect(legend).toContain("Key route stops");
+    expect(legend).toContain("node_04");
+    expect(legend).toContain("What a scan proves");
+    expect(legend).toContain("#rules-prove-title");
 
     const board = buildMapBoardInnerHtml(season);
-    expect(board).toContain("city-game-map-spine");
+    expect(board).toContain("city-game-map-legend");
+    expect(board).toContain("city-game-map-drawer");
     expect(board).toContain("city-game-map-debrief-mount");
   });
 
@@ -69,6 +72,9 @@ describe("city-game-reference-network-kit-core", () => {
   it("builds operator teaching kit HTML", () => {
     const html = buildLo4KitHtml(root, { production: true });
     expect(html).toContain("LO-4");
+    expect(html).toContain("What a scan proves");
+    expect(html).toContain("#rules-prove-title");
+    expect(html).toContain("player flow field walk");
     expect(html).toContain("Seven surfaces");
     expect(html).toContain("RN-1");
     expect(html).toContain("/play/cedar-rapids/map/");

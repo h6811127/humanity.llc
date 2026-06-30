@@ -108,6 +108,7 @@ function requireFields(unsigned) {
     !unsigned.profile_id &&
     !unsigned.vouchee_profile_id &&
     !unsigned.parent_profile_id &&
+    !unsigned.steward_profile_id &&
     !unsigned.issued_to
   ) {
     throw new Error("Missing subject profile id.");

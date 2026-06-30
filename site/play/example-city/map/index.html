@@ -9,25 +9,13 @@
     <title>City state · Example City (template) · humanity.llc</title>
     <meta
       name="description"
-      content="Weekend city board for Example City (template). Every game spot, live public progress, and Open in Maps links. No app. No account."
+      content="The city is asleep. Find fragments around Example City (template). Weekend city board for Example City (template). No app. No account."
     />
     <meta name="robots" content="noindex, nofollow" />
+    <link rel="canonical" href="/play/example-city/map/" />
     <meta name="theme-color" content="#ffffff" />
-    <script>
-      (function () {
-        try {
-          if (localStorage.getItem("hc_theme") === "dark") {
-            document.documentElement.dataset.theme = "dark";
-            document.documentElement.style.colorScheme = "dark";
-          }
-        } catch (e) {
-          /* ignore */
-        }
-      })();
-    </script>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=155" />
-    <link rel="stylesheet" href="/css/theme-dark.css?v=37" />
+    <link rel="stylesheet" href="/styles.css?v=157" />
   </head>
   <body>
     <div class="page">
@@ -40,16 +28,13 @@
       </header>
 
       <main class="screen screen-landing">
-        <section class="hero hero-compact">
+        <nav class="player-flow-breadcrumb" aria-label="You are here"><a href="/">Home</a><span class="player-flow-breadcrumb-sep" aria-hidden="true"> · </span><a href="/play/season/">Public networks</a><span class="player-flow-breadcrumb-sep" aria-hidden="true"> · </span><span aria-current="page">City state board</span></nav>
+        <section class="hero hero-compact city-game-map-page-hero">
           <p class="hero-eyebrow">Example City (template)</p>
-          <h1>City state</h1>
-          <p class="hero-line">
-            See every game spot around town. <strong>live progress</strong>, districts, and
-            directions. The same view for everyone. No app. No account.
-          </p>
+          <h1 id="city-state-title">City state</h1>
+          <p class="hero-lead city-game-map-page-lead">A read-only weekend board — see which places are active, then scan stickers for live details.</p>
           <p class="hero-line hero-line-sub">
-            <a href="/play/example-city/">How to play (rules)</a>
-            · scan any sticker when you arrive for the latest state
+            <a href="/play/example-city/#rules-start-title">How this network works</a>
           </p>
         </section>
 
@@ -65,6 +50,7 @@
           id="city-state"
           aria-labelledby="city-state-title"
         >
+          <div id="city-game-map-first-visit-mount" class="city-game-map-first-visit-mount" hidden></div>
           <div id="city-game-map-root" class="city-game-map-root" data-season-id="example_city_season_01">
             <noscript>
               <p class="city-game-map-error">
@@ -77,17 +63,17 @@
           </div>
         </section>
 
-        <p class="idea-footnote">
-          <a href="/play/example-city/">Full rules</a>
+        <p class="idea-footnote city-game-map-page-footnote"><a href="/discover/example-city-template/">Browse places near me</a>
           ·
-          <a href="/play/example-city/map/">Share this board</a>
+          <a href="/play/example-city/#rules-start-title">How this network works</a>
           ·
-          <a href="/play/season/">All city games</a>
+          <a href="/play/example-city/#rules-privacy-title">Privacy &amp; mechanics</a>
           ·
-          <a href="/data-policy.html">Data policy</a>
-        </p>
+          <a href="/play/season/">All public networks</a>
+          ·
+          <a href="/data-policy.html">Data policy</a></p>
       </main>
     </div>
-    <script type="module" src="/js/city-game-map-page.mjs?v=1"></script>
+    <script type="module" src="/js/city-game-map-page.mjs?v=5"></script>
   </body>
 </html>

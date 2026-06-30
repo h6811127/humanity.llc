@@ -118,13 +118,27 @@ Do **not** invert with “physical internet” essay, L1–L5 labels, or protoco
 
 **Future polish only:** ensure interpretation trace (charter, signers) lives in #5, not competing with #2.
 
-### City board node cards (`/play/cedar-rapids/map/`)
+### Network lens (`/play/{city}/map/`)
 
-**Shipped (SF-2):** identity → **Current state** (`[data-node-effect]`) → scan CTA → What / Scan details. Snapshot still updates the same selectors; chip list band deferred to SF-2b. **Visually complete** (light + dark QA; dark contrast patch in `theme-dark.css`; label `nowrap` cache-bust `styles.css?v=156` on map page). Engineering ready for **B13 human sign-off** path — privacy/GT-7 remain human gates per [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md).
+**Target (SF-3 — spec ☑ 2026-06-21, GT-8 human ☐):** Canonical handoff [`SF-3_LIVING_NETWORK_LENS.md`](SF-3_LIVING_NETWORK_LENS.md) · architecture summary [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) § Network lens
 
-**SF-2b (deferred):** optional `buildNodeChipsHtml` band above effect text when snapshot carries `chips[]`.
+**Metaphor:** transit map — full schematic visible; **express spine** stops show state as hero; tap opens a **tier-4 selection panel** (same hierarchy as [`SCAN_HERO_CARD_VISUAL_SPEC.md`](SCAN_HERO_CARD_VISUAL_SPEC.md): entity → state → Scan → Maps → governance collapsed).
 
-See [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) policy — world state, not personal progress.
+| # | Question | Lens UI |
+|---|----------|---------|
+| 1 | What is this thing? | Season + city (quiet); selected pin name when focused |
+| 2 | Current state? | **Hero on pin label / panel** — chips, quorum, maintenance, locked |
+| 3 | What can I do? | Scan sticker · Open in Maps |
+| 4 | What governs it? | Link to rules/charter — not inline essay |
+| 5 | Details? | Drawer: paths, events, dual victory, advanced |
+
+**Shipped (SF-2):** list rows — identity → **Current state** (`[data-node-effect]`) → scan CTA → details. Still required for a11y + “all places” view.
+
+**SF-2b (Phase 1):** snapshot `chips[]` on **map pins** and selection panel, not only `[data-node-effect]` on rows.
+
+**SF-3 (Phase 1–2):** replace always-visible spotlight with selection panel; default list = play spine; express edges on sketch.
+
+See [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) — world state, not personal progress.
 
 ### Public network discovery cards (landing portal)
 
@@ -146,7 +160,11 @@ Module: `site/js/public-networks-portal-core.mjs` · styles: `site/css/public-ne
 
 ### Landing network cards
 
-Same as public network discovery — listed seasons and vision cards on `/` discovery dashboard. Must stay within [`landing-copy-contract.mjs`](../site/js/landing-copy-contract.mjs) hero constraints.
+Same as public network discovery — listed seasons and vision cards on `/` discovery dashboard. Must stay within [`landing-copy-contract.mjs`](../site/js/landing-copy-contract.mjs) hero constraints. State-first card layout: identity → **state hero** → Open board CTA ([§ Public network discovery cards](#public-network-discovery-cards-landing-portal)).
+
+### Landing live object carriers row (shipped)
+
+**One static featured row** after public boards — **`#landing-live-object-carriers`**. Register A commerce teaser (optional product photo + **Live object carriers** title + link to `/shop/`). **Not** a carousel. Full spec: [`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) § Landing carriers row. Sits **below** discovery (boards) and **above** create CTA so utility leads, revenue follows.
 
 ---
 
@@ -159,7 +177,8 @@ Same as public network discovery — listed seasons and vision cards on `/` disc
 | **Social feed framing** | No infinite scroll of activity |
 | **Ontology-first screens** | No L1–L5, Identity/Address/Interpretation labels for strangers |
 | **Physical internet before state** | No manifesto essay before useful status |
-| **Redesign whole app** | Slice surfaces incrementally |
+| **Product carousel on `/`** | Hides SKUs; wrong pattern for discovery dashboard — static carriers row only ([`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md)) |
+| **Hosted tier billboard on `/`** | Upsell at caps on `/created/` — not discovery homepage |
 | **Backend / protocol changes** | UI reorders existing fields only |
 
 ---
@@ -168,7 +187,7 @@ Same as public network discovery — listed seasons and vision cards on `/` disc
 
 | Contract | Interaction |
 |----------|-------------|
-| [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) § Landing | Hero copy unchanged — state-first applies **below** hero on cards |
+| [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) § Landing | Discovery hero unchanged — state-first applies on board cards; **`#landing-live-object-carriers`** (shipped) is Register A teaser below boards |
 | [`SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) | Reinforces calm utility scan — state-first extends to browse/board |
 | [`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md) | Limits copy stays honest — position as #4 governance, not hidden |
 | [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) | Board stays read-only world truth — state-first ≠ personal progress |
@@ -191,14 +210,40 @@ Same as public network discovery — listed seasons and vision cards on `/` disc
 | Slice | Surface | Status |
 |-------|---------|--------|
 | **SF-1** | Public network discovery cards | **☑ Shipped** — state hero + reordered card body |
-| **SF-2** | City board node rows | **☑ Shipped + visually complete** — B13 human sign-off path |
-| **SF-2b** | Per-row chip list band | Deferred — wire `buildNodeChipsHtml` on snapshot apply |
-| **SF-3** | Scan trust details ordering | Coordinate with WS-REALITY — details band only |
-| **SF-4** | `/created/` object headers | After steward comprehension |
+| **SF-2** | City board node rows | **☑ Shipped** — list row state-first |
+| **SF-2b** | Pin + panel chip band from snapshot | **☑ Shipped** — pin sublabel + row/panel chips from snapshot apply |
+| **SF-3** | Network lens (living network, express spine, selection panel) | **☑ Spec** · **☑ Engineering** · **☐ GT-8 human** — [`SF-3_LIVING_NETWORK_LENS.md`](SF-3_LIVING_NETWORK_LENS.md) |
+| **SF-4** | Scan trust details ordering | Coordinate with WS-REALITY — details band only |
+| **SF-5** | `/created/` object headers | After steward comprehension |
 
 ---
 
-## SF-1 — First slice spec (recommended)
+## SF-3 — Network lens slice (canonical)
+
+**Handoff spec:** [`SF-3_LIVING_NETWORK_LENS.md`](SF-3_LIVING_NETWORK_LENS.md) — living network, repeat-scan loops, wireframes, metrics.
+
+**Surface:** `/play/{city}/map/` · module graph `city-game-map-board-core.mjs` + snapshot apply.
+
+**Architecture summary:** [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) § Network lens.
+
+**Changes (presentation; reuse snapshot + season JSON):**
+
+- Map pins display **readable state** from snapshot (SF-2b on sketch).
+- **Express spine** visually emphasized; full pin set remains visible.
+- **Selection panel** replaces permanent spotlight duplicate.
+- Default list lens = **play spine**; expand to all places.
+- LO-4 reference spine → **transit legend**, not essay block.
+- Wire **dual victory** mount when snapshot includes `dualVictory`.
+
+**Files (Phase 1):** `city-game-map-board-core.mjs`, `city-game-map-snapshot-core.mjs`, `city-game-map-board-core.test.ts`, `e2e/city-game-map-board.spec.ts`, season JSON `network_lens` (when added).
+
+**Regression:** `npm run verify:city-game` · `npm run e2e:city-game-map-board`
+
+**Human gate:** GT-8 in [`CITY_GAME_COMPREHENSION_RUNBOOK.md`](CITY_GAME_COMPREHENSION_RUNBOOK.md) before B13 centerpiece sign-off.
+
+---
+
+## SF-1 — First slice spec (shipped)
 
 **Surface:** Landing public network cards (`renderPublicNetworkCard`).
 

@@ -1,0 +1,23 @@
+{
+  "region": "cedar-rapids-iowa",
+  "objects": [
+    {
+      "object_id": "obj_cr_pilot_cooling_center_plate",
+      "object_type": "status_plate",
+      "label": "Linn County cooling center — door plate",
+      "scan_url": "https://humanity.llc/c/r4YyNEWJvVwWNMETzXfGjFyL?q=qr_8w7zHCPHisXvTnar",
+      "district": "downtown",
+      "public_listing": {
+        "listed": true,
+        "title": "Linn County cooling center",
+        "summary": "Signed open or paused status before you go — standalone resource plate, not a game node.",
+        "category": "status_plate",
+        "geo": {
+          "latitude": 41.993,
+          "longitude": -91.662,
+          "precision": "block"
+        }
+      }
+    }
+  ]
+}

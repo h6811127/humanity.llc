@@ -197,6 +197,7 @@ export function resolveBoardContextMembers(season, opts = {}) {
 export function boardContextPlaceRows(context) {
   return context.members.map((member) => ({
     node_id: member.entry_id,
+    pin_id: member.pin_id ?? undefined,
     object_id: member.object_id,
     role: member.category,
     district: member.group ?? undefined,

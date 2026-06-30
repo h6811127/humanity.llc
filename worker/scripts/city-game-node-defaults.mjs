@@ -131,7 +131,7 @@ const NODE_OVERRIDES = {
       { id: "care", class: "care", label: "Trail", value: "Open" },
     ],
     game_meta: {
-      visible_until: "2026-06-14T22:00:00-05:00",
+      visible_until: "2026-09-01T22:00:00-05:00",
       collective_progress: 4,
       collective_target: 20,
     },

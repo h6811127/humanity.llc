@@ -2,11 +2,16 @@
  * Public network discovery — filter + card render (Pages-only, no resolver).
  */
 import { resolveSeasonWindowPhase } from "./city-game-season-banner-core.mjs";
+import {
+  discoveryRegionBrowsePath,
+  resolveDiscoveryRegionSlugFromSeasonRow,
+} from "./discovery-region-path-core.mjs";
 import { seasonBoardPath } from "./city-game-season-path-shared.mjs";
 import {
   buildPublicNetworkBoardQuickLinks,
   renderPublicNetworkBoardQuickLinks,
 } from "./public-network-board-links-core.mjs";
+import { DISCOVERY_BROWSE_PLACES_CTA } from "./discovery-region-browse-core.mjs";
 
 /** @typedef {"all" | "city_games" | "markets" | "events" | "resources"} PublicNetworkCategoryFilter */
 
@@ -99,8 +104,30 @@ export function publicNetworkWindowStatusLabel(phase) {
   return "Listed";
 }
 
-/** Secondary CTA on live network cards — charter before board for strangers. */
-export const PUBLIC_NETWORK_ABOUT_NETWORK_CTA = "About this network";
+/** Catalog of intentionally listed public networks (Player discovery). */
+export const PUBLIC_NETWORKS_CATALOG_PATH = "/play/season/";
+
+/** Footnote / nav label for the public networks catalog. */
+export const PUBLIC_NETWORKS_CATALOG_LABEL = "All public networks";
+
+/** Rules page anchor for the scan-proves charter (secondary card CTA). */
+export const PUBLIC_NETWORK_RULES_PROVE_ANCHOR = "#rules-prove-title";
+
+/** Secondary CTA on live network cards — deep-link to scan-proves charter. */
+export const PUBLIC_NETWORK_RULES_PROVE_CTA = "What a scan proves";
+
+/** @deprecated Use {@link PUBLIC_NETWORK_RULES_PROVE_CTA}. */
+export const PUBLIC_NETWORK_ABOUT_NETWORK_CTA = PUBLIC_NETWORK_RULES_PROVE_CTA;
+
+/**
+ * @param {string | null | undefined} rulesPath e.g. /play/cedar-rapids/
+ * @returns {string | null}
+ */
+export function publicNetworkRulesProveHref(rulesPath) {
+  const base = String(rulesPath ?? "").trim();
+  if (!base) return null;
+  return `${base.replace(/\/?$/, "/")}${PUBLIC_NETWORK_RULES_PROVE_ANCHOR}`;
+}
 
 /** Primary CTA label for listed networks with an open board href. */
 export const PUBLIC_NETWORK_OPEN_BOARD_CTA = "Open board";
@@ -230,6 +257,9 @@ export function buildPublicNetworkCardModel(row, seasonConfig = null, now = new 
   const stateHeroLine = formatPublicNetworkStateHero({ statusLabel, statsLine });
 
   const boardQuickLinks = buildPublicNetworkBoardQuickLinks(boardPath, seasonId);
+  const discoverBrowseHref = discoveryRegionBrowsePath(
+    resolveDiscoveryRegionSlugFromSeasonRow(row, seasonConfig)
+  );
 
   return {
     season_id: seasonId,
@@ -244,7 +274,8 @@ export function buildPublicNetworkCardModel(row, seasonConfig = null, now = new 
     statusClass,
     stateHeroLine,
     openHref: boardPath,
-    rulesHref: rulesPath || null,
+    rulesHref: publicNetworkRulesProveHref(rulesPath),
+    discoverBrowseHref,
     boardQuickLinks,
     placeCount,
     objectCount,
@@ -289,6 +320,7 @@ export function buildPublicNetworkVisionCardModel(row) {
     stateHeroLine,
     openHref: null,
     rulesHref: null,
+    discoverBrowseHref: null,
     boardQuickLinks: [],
     placeCount: null,
     objectCount: null,
@@ -354,14 +386,33 @@ export function renderPublicNetworkCardPreview(card) {
   return renderPublicNetworkSchematicPreview(card.category);
 }
 
+/**
+ * Emphasis-card modifier + status dot for listed / vision network cards.
+ * @param {{ statusClass?: string }} card
+ */
+export function publicNetworkCardEmphasisStyle(card) {
+  const statusClass = String(card.statusClass ?? "");
+  if (statusClass.includes("--live")) return { modifier: "active", dot: "success" };
+  if (statusClass.includes("--soon")) return { modifier: "warn", dot: "warn" };
+  return { modifier: "info", dot: "info" };
+}
+
+/**
+ * @param {ReturnType<typeof buildPublicNetworkCardModel>} card
+ */
 export function renderPublicNetworkCard(card) {
+  const { modifier, dot } = publicNetworkCardEmphasisStyle(card);
   const rulesLink = card.rulesHref
-    ? `<a class="public-networks-card__secondary" href="${escapePublicNetworksHtml(card.rulesHref)}">${escapePublicNetworksHtml(PUBLIC_NETWORK_ABOUT_NETWORK_CTA)}</a>`
+    ? `<a class="public-networks-card__secondary" href="${escapePublicNetworksHtml(card.rulesHref)}">${escapePublicNetworksHtml(PUBLIC_NETWORK_RULES_PROVE_CTA)}</a>`
     : "";
+  const discoverLink =
+    card.isLive && card.discoverBrowseHref
+      ? `<a class="public-networks-card__secondary" href="${escapePublicNetworksHtml(card.discoverBrowseHref)}">${escapePublicNetworksHtml(DISCOVERY_BROWSE_PLACES_CTA)}</a>`
+      : "";
   const liveAttr = card.isLive ? ' data-network-live="true"' : ' data-network-live="false"';
   const cta = card.isLive && card.openHref
-    ? `<a class="landing-hero-btn landing-hero-btn-primary public-networks-card__cta" href="${escapePublicNetworksHtml(card.openHref)}">${escapePublicNetworksHtml(PUBLIC_NETWORK_OPEN_BOARD_CTA)}</a>`
-    : `<span class="landing-hero-btn landing-hero-btn-primary public-networks-card__cta public-networks-card__cta--disabled" aria-disabled="true">${escapePublicNetworksHtml(card.statusLabel)}</span>`;
+    ? `<a class="hc-emphasis-card__cta public-networks-card__cta" href="${escapePublicNetworksHtml(card.openHref)}">${escapePublicNetworksHtml(PUBLIC_NETWORK_OPEN_BOARD_CTA)}</a>`
+    : `<span class="hc-emphasis-card__cta public-networks-card__cta public-networks-card__cta--disabled" aria-disabled="true">${escapePublicNetworksHtml(card.statusLabel)}</span>`;
   const stateHeroLine =
     String(card.stateHeroLine ?? "").trim() ||
     formatPublicNetworkStateHero({
@@ -369,26 +420,33 @@ export function renderPublicNetworkCard(card) {
       statsLine: card.statsLine,
     });
   const stateHero = stateHeroLine
-    ? `<p class="public-networks-card__state-hero ${card.statusClass}" data-state-first="current-state">${escapePublicNetworksHtml(stateHeroLine)}</p>`
+    ? `<p class="hc-emphasis-card__detail public-networks-card__state-hero ${card.statusClass}" data-state-first="current-state">${escapePublicNetworksHtml(stateHeroLine)}</p>`
     : "";
   const boardLinks =
     card.isLive && Array.isArray(card.boardQuickLinks) && card.boardQuickLinks.length
       ? renderPublicNetworkBoardQuickLinks(card.boardQuickLinks, escapePublicNetworksHtml)
       : "";
-  return `<article class="public-networks-card public-networks-card--rich public-networks-card--state-first${card.isLive ? "" : " public-networks-card--vision"}" data-season-id="${escapePublicNetworksHtml(card.season_id)}" data-category="${escapePublicNetworksHtml(card.category)}"${liveAttr}>
+  const metaEyebrow = `${card.categoryLabel} · ${card.place}`;
+  return `<article class="hc-emphasis-card hc-emphasis-card--${modifier} public-networks-card public-networks-plate public-networks-card--rich public-networks-card--state-first${card.isLive ? "" : " public-networks-card--vision"}" data-season-id="${escapePublicNetworksHtml(card.season_id)}" data-category="${escapePublicNetworksHtml(card.category)}"${liveAttr}>
   ${renderPublicNetworkCardPreview(card)}
   <div class="public-networks-card__body">
-  <div class="public-networks-card__identity" data-state-first="entity">
-    <h3 class="public-networks-card__title">${escapePublicNetworksHtml(card.name)}</h3>
-    <p class="public-networks-card__meta"><span class="public-networks-card__kind">${escapePublicNetworksHtml(card.categoryLabel)}</span><span class="public-networks-card__scope">${escapePublicNetworksHtml(card.place)}</span></p>
-  </div>
-  ${stateHero}
-  <div class="public-networks-card__actions" data-state-first="actions">
-    ${cta}
-    ${rulesLink}
-  </div>
-  ${boardLinks}
-  <p class="public-networks-card__summary" data-state-first="details">${escapePublicNetworksHtml(card.summary)}</p>
+    <div class="hc-emphasis-card__main">
+      <span class="hc-emphasis-card__dot hc-emphasis-card__dot--${dot}" aria-hidden="true"></span>
+      <div class="hc-emphasis-card__copy">
+        <div class="public-networks-card__identity" data-state-first="entity">
+          <p class="hc-emphasis-card__eyebrow public-networks-card__meta-line">${escapePublicNetworksHtml(metaEyebrow)}</p>
+          <h3 class="hc-emphasis-card__title public-networks-card__title">${escapePublicNetworksHtml(card.name)}</h3>
+        </div>
+        ${stateHero}
+      </div>
+    </div>
+    <div class="hc-emphasis-card__actions public-networks-card__actions" data-state-first="actions">
+      ${cta}
+      ${discoverLink}
+      ${rulesLink}
+    </div>
+    ${boardLinks}
+    <p class="public-networks-card__summary" data-state-first="details">${escapePublicNetworksHtml(card.summary)}</p>
   </div>
 </article>`;
 }

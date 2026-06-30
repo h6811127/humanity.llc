@@ -67,9 +67,24 @@ export function initCreatedGameNodeRulesPublish(ctx) {
     return { window, status, districts };
   }
 
+  function readMergedPublishDraft(seasonId) {
+    const formDraft = readDraftFromForm();
+    const stored = seasonId
+      ? readSeasonPublishDraft(localStorage, ctx.profileId, seasonId)
+      : null;
+    if (stored && "unlock_edges" in stored) {
+      return { ...formDraft, unlock_edges: stored.unlock_edges };
+    }
+    return formDraft;
+  }
+
   function persistDraft(seasonId) {
     if (!seasonId) return;
-    writeSeasonPublishDraft(localStorage, ctx.profileId, seasonId, readDraftFromForm());
+    const existing = readSeasonPublishDraft(localStorage, ctx.profileId, seasonId);
+    writeSeasonPublishDraft(localStorage, ctx.profileId, seasonId, {
+      ...readDraftFromForm(),
+      ...(existing && "unlock_edges" in existing ? { unlock_edges: existing.unlock_edges } : {}),
+    });
   }
 
   function renderReadiness(assessment) {
@@ -197,7 +212,7 @@ export function initCreatedGameNodeRulesPublish(ctx) {
       return;
     }
 
-    const draft = readDraftFromForm();
+    const draft = readMergedPublishDraft(seasonId);
     lastAssessment = assessOrganizerRulesPublish(
       seasonBody,
       jsonBasename,
@@ -262,7 +277,9 @@ export function initCreatedGameNodeRulesPublish(ctx) {
         seasonBody,
         jsonBasename,
         ctx.profileId,
-        readDraftFromForm()
+        readMergedPublishDraft(
+          ctx.seasonSelect instanceof HTMLSelectElement ? ctx.seasonSelect.value.trim() : ""
+        )
       );
       const filename = suggestedRulesDownloadFilename(lastAssessment.launchCtx);
       const blob = new Blob([html], { type: "text/html;charset=utf-8" });

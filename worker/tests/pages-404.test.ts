@@ -28,4 +28,14 @@ describe("Pages 404 shell", () => {
     const shell = join(process.cwd(), "site/shop/product-detail/index.html");
     expect(readFileSync(shell, "utf8")).toMatch(/shop-product-detail\.mjs/);
   });
+
+  it("rewrites /discover/{region}/pin/* to pin shell (one splat per region)", () => {
+    const redirects = readFileSync(join(process.cwd(), "site/_redirects"), "utf8");
+    expect(redirects).toMatch(/# DISCOVER_PIN_SPLAT_BEGIN/);
+    expect(redirects).toMatch(
+      /\/discover\/cedar-rapids-iowa\/pin\/\*\s+\/discover\/pin\/\s+200/
+    );
+    const shell = join(process.cwd(), "site/discover/pin/index.html");
+    expect(readFileSync(shell, "utf8")).toMatch(/discovery-region-page\.mjs/);
+  });
 });

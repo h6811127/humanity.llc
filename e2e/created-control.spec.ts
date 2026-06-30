@@ -375,13 +375,28 @@ test.describe("/created/ live proof panel", () => {
     });
 
     await page.goto(`/created/?profile_id=${SAMPLE.profile_id}&qr_id=${SAMPLE.qr_id}`);
-    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.evaluate(() => {
+      const spacer = document.createElement("div");
+      spacer.id = "e2e-live-proof-scroll-spacer";
+      spacer.style.height = "200vh";
+      document.body.appendChild(spacer);
+      window.scrollTo(0, document.documentElement.scrollHeight);
+    });
+    const layout = await page.evaluate(() => ({
+      scrollY: window.scrollY,
+      vh: window.innerHeight,
+    }));
+    expect(layout.scrollY).toBeGreaterThan(layout.vh * 0.25);
 
     const panel = page.locator("#live-control-proof");
     await expect(panel).toBeVisible({ timeout: 15_000 });
     await expect(panel).toHaveClass(/live-control-proof-requested/);
     await expect(page.locator("#live-control-proof-lead")).toBeHidden();
 
-    expect(await liveProofScrollIntoViewCalls(page)).toBeGreaterThanOrEqual(1);
+    await expect
+      .poll(async () =>
+        page.evaluate(() => document.getElementById("live-control-proof")?.getBoundingClientRect().top ?? 9999)
+      )
+      .toBeLessThan(200);
   });
 });

@@ -64,6 +64,16 @@ ${LAUNCH_CHECKLIST_E5_PENDING}`;
     expect(out).toContain("☑ **2026-06-03**");
   });
 
+  it("refreshes signed E5 row when nodes detail is provided", () => {
+    const signed = `| E5 | Scan template live | ☑ **2026-06-03** · node_01,node_04,node_07 |`;
+    const out = applyLaunchChecklistE5Pass(signed, {
+      dateIso: "2026-06-23",
+      nodes: "40/40 --all",
+    });
+    expect(out).toContain("☑ **2026-06-23** · 40/40 --all");
+    expect(out).not.toContain("2026-06-03");
+  });
+
   it("launchChecklistE5Signed reads E5 row only", () => {
     const unsigned = `| E4 | deploy | ☑ |
 ${LAUNCH_CHECKLIST_E5_PENDING}`;

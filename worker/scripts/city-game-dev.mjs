@@ -16,9 +16,10 @@ import { fileURLToPath } from "node:url";
 
 import { buildLanHubHtml, detectLanHostFromInterfaces } from "./city-game-lan-hub-core.mjs";
 import {
-  buildComprehensionKitHtml,
+  buildLocalComprehensionSurfaces,
   resolveKitScanUrls,
 } from "./city-game-comprehension-kit-core.mjs";
+import { LOCAL_DEV_GT8_FIELD_WALK_REL } from "./city-game-network-lens-gt8-field-kit-core.mjs";
 import {
   buildInstallQaWalkKitHtml,
   installQaRegistryNodeIds,
@@ -32,6 +33,7 @@ const seedPath = join(root, "worker/.local/city-game-seed.json");
 const seasonPath = join(root, "site/data/city-game-cr-season-01.json");
 const hubPath = join(root, "site/dev/city-game-lan-hub.html");
 const comprehensionPath = join(root, "site/dev/city-game-comprehension.html");
+const fieldWalkPath = join(root, LOCAL_DEV_GT8_FIELD_WALK_REL);
 const installQaWalkPath = join(root, "site/dev/city-game-install-qa-walk.html");
 
 const bootstrap = process.argv.includes("--bootstrap");
@@ -110,17 +112,37 @@ function writeHub(host) {
   return `http://${host}:8788/dev/city-game-lan-hub`;
 }
 
-/** @returns {string | null} */
+/** @returns {{ comprehensionUrl: string; fieldWalkUrl?: string; boardUrl: string } | null} */
 function writeComprehensionKit(host, hubUrl) {
-  if (!existsSync(seedPath)) return null;
+  if (!existsSync(seedPath) || !existsSync(seasonPath)) return null;
   const seed = JSON.parse(readFileSync(seedPath, "utf8"));
+  const season = JSON.parse(readFileSync(seasonPath, "utf8"));
   if (!seed.profile_id || !Array.isArray(seed.nodes)) return null;
 
   const kitNodes = resolveKitScanUrls(seed.nodes, seed.profile_id, host);
-  const html = buildComprehensionKitHtml({ host, hubUrl, kitNodes });
+  const pagesHost = host.includes(":") ? host.split(":")[0] : host;
+  const rulesPath = String(season.rules_path ?? "/play/cedar-rapids/").trim() || "/play/cedar-rapids/";
+  const rulesUrl = `http://${pagesHost}:8788${rulesPath.startsWith("/") ? rulesPath : `/${rulesPath}`}`;
+  const boardUrl = `${rulesUrl.replace(/\/?$/, "/")}map/`;
+  const surfaces = buildLocalComprehensionSurfaces({
+    season,
+    host,
+    rulesUrl,
+    boardUrl,
+    kitNodes,
+    hubUrl,
+  });
   mkdirSync(dirname(comprehensionPath), { recursive: true });
-  writeFileSync(comprehensionPath, html, "utf8");
-  return `http://${host}:8788/dev/city-game-comprehension`;
+  writeFileSync(comprehensionPath, surfaces.kitHtml, "utf8");
+  if (surfaces.fieldWalkHtml) {
+    mkdirSync(dirname(fieldWalkPath), { recursive: true });
+    writeFileSync(fieldWalkPath, surfaces.fieldWalkHtml, "utf8");
+  }
+  return {
+    comprehensionUrl: `http://${pagesHost}:8788/dev/city-game-comprehension.html`,
+    fieldWalkUrl: surfaces.fieldWalkUrl,
+    boardUrl,
+  };
 }
 
 /** @returns {string | null} */
@@ -218,10 +240,16 @@ async function main() {
   if (hubUrl) {
     console.log("\n📋 Scan hub (tap links — no copy/paste):");
     console.log("  ", hubUrl);
-    const comprehensionUrl = writeComprehensionKit(envPatch.host, hubUrl);
-    if (comprehensionUrl) {
+    const kit = writeComprehensionKit(envPatch.host, hubUrl);
+    if (kit) {
       console.log("\n📝 GT comprehension kit (Phase D human gate):");
-      console.log("  ", comprehensionUrl);
+      console.log("  ", kit.comprehensionUrl);
+      if (kit.fieldWalkUrl) {
+        console.log("\n⏱ GT-8 field walk (outdoor timer + B1–B7):");
+        console.log("  ", kit.fieldWalkUrl);
+      }
+      console.log("\n🗺 Network lens (tester map):");
+      console.log("  ", kit.boardUrl);
     }
     const walkUrl = writeInstallQaWalkKit(envPatch.host);
     if (walkUrl) {

@@ -25,6 +25,7 @@ import {
   shouldMaintainStewardPushConnection,
   stewardPushInFallbackCooldown,
 } from "./device-steward-push-core.mjs";
+import { syncStewardWebPushSubscription } from "./device-steward-web-push.mjs";
 
 export {
   STEWARD_PUSH_DOWN_FALLBACK_MS,
@@ -233,7 +234,10 @@ function bindStewardPushListeners() {
   if (pushListenersBound || typeof window === "undefined") return;
   pushListenersBound = true;
 
-  const refresh = () => syncStewardPushConnection();
+  const refresh = () => {
+    syncStewardPushConnection();
+    void syncStewardWebPushSubscription();
+  };
 
   window.addEventListener("hc-live-control-poll-scope-changed", refresh);
   window.addEventListener(STEWARD_PUSH_STATE_CHANGED, refresh);

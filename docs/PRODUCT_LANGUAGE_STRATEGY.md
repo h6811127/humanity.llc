@@ -79,10 +79,11 @@ The **terminology map** in [`OWNERSHIP_AND_CONTROL_MODEL.md`](OWNERSHIP_AND_CONT
 
 ### Landing and movement copy
 
-- Hero H1: **“The sticker stays. The status changes.”** — kicker **Public programmable objects** ([`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) § Landing). Do not revert to “Live state on real objects” as H1.
-- Launch doors: **Live status on something / on you / Play the city game** — abstract deployment surfaces, not pilot template names ([`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) § Front door strategy).
+- Hero H1 (shipped): **“Check what's true right now before you knock, pick up, or show up.”** — discovery utility, not category manifesto ([`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) § Landing).
+- Hook (secondary): **“The sticker stays — the status changes.”** — create footnote and `/shop/`, not hero H1.
+- **Live object carriers** row (shipped): section title for `#landing-live-object-carriers` — not “custom products” ([`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) § Landing carriers row).
 - Avoid leading with “OS”, wallet jargon, lost-item relay, or status-plate pilot vocabulary as **company identity**.
-- Movement energy may be louder; **scan page stays calm** ([`VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md)).
+- Movement energy may be louder on `/shop/` and carriers row; **scan page stays calm** ([`VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md)).
 
 ### Object model vocabulary (steward UI — steps 19–20)
 

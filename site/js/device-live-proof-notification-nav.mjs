@@ -3,8 +3,10 @@
  */
 import {
   HC_NOTIFICATION_NAVIGATE,
+  HC_SW_OPEN_INBOX,
   PENDING_NOTIFICATION_NAV_STORAGE_KEY,
 } from "./device-live-proof-notification-nav-core.mjs";
+import { openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=94";
 
 let notificationNavListenerBound = false;
 
@@ -40,7 +42,12 @@ export function applyNotificationNavigate(href) {
 /** @param {MessageEvent} event */
 function onServiceWorkerMessage(event) {
   const data = event.data;
-  if (!data || data.type !== HC_NOTIFICATION_NAVIGATE) return;
+  if (!data?.type) return;
+  if (data.type === HC_SW_OPEN_INBOX) {
+    openInboxFromChrome("notification");
+    return;
+  }
+  if (data.type !== HC_NOTIFICATION_NAVIGATE) return;
   if (typeof data.href !== "string" || !data.href) return;
   applyNotificationNavigate(data.href);
 }

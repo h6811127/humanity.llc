@@ -47,6 +47,8 @@ import {
   summarizeBulkTemplateRows,
 } from "./created-child-object-game-node-bulk-core.mjs";
 import { initCreatedGameNodeRulesPublish } from "./created-child-object-game-node-rules.mjs";
+import { initCreatedGameNodePrintPack } from "./created-child-object-game-node-print-pack.mjs";
+import { initCreatedGameNodeUnlockEdges } from "./created-child-object-game-node-unlock-edges.mjs";
 import {
   initCreatedGameNodeSetupGuide,
 } from "./created-child-object-game-node-setup.mjs";
@@ -249,6 +251,8 @@ export function initCreatedGameNode(ctx) {
     await refreshDistrictsForSeason(seasonId);
     await refreshBulkPanel(readChildObjectRows(localStorage, ctx.profileId));
     rulesPublishCtl?.refresh?.();
+    unlockEdgesCtl?.refresh?.();
+    printPackCtl?.refresh?.();
     setupGuideCtl?.refresh?.();
   }
 
@@ -390,6 +394,8 @@ export function initCreatedGameNode(ctx) {
     const rows = readChildObjectRows(localStorage, ctx.profileId);
     renderGameNodeList(ctx.profileId, rows);
     await refreshBulkPanel(rows);
+    unlockEdgesCtl?.refresh?.();
+    printPackCtl?.refresh?.();
     syncChildObjectBackupGateUi({
       profileId: ctx.profileId,
       getSession: ctx.getSession,
@@ -434,6 +440,25 @@ export function initCreatedGameNode(ctx) {
   const rulesPublishCtl = initCreatedGameNodeRulesPublish({
     profileId: ctx.profileId,
     getSession: ctx.getSession,
+    showError: ctx.showError,
+    seasonSelect: seasonSelect instanceof HTMLSelectElement ? seasonSelect : null,
+    getSeasonIndexRow: (seasonId) => seasonById.get(seasonId),
+  });
+
+  const unlockEdgesCtl = initCreatedGameNodeUnlockEdges({
+    profileId: ctx.profileId,
+    showError: ctx.showError,
+    getSigningKeys: ctx.getSigningKeys,
+    seasonSelect: seasonSelect instanceof HTMLSelectElement ? seasonSelect : null,
+    getSeasonIndexRow: (seasonId) => seasonById.get(seasonId),
+    onDraftChange: () => {
+      rulesPublishCtl?.refresh?.();
+      setupGuideCtl?.refresh?.();
+    },
+  });
+
+  const printPackCtl = initCreatedGameNodePrintPack({
+    profileId: ctx.profileId,
     showError: ctx.showError,
     seasonSelect: seasonSelect instanceof HTMLSelectElement ? seasonSelect : null,
     getSeasonIndexRow: (seasonId) => seasonById.get(seasonId),
@@ -734,6 +759,8 @@ export function initCreatedGameNode(ctx) {
     refresh: () => {
       refreshVisibility();
       rulesPublishCtl?.refresh?.();
+      unlockEdgesCtl?.refresh?.();
+      printPackCtl?.refresh?.();
       setupGuideCtl?.refresh?.();
     },
     selectSeasonId,

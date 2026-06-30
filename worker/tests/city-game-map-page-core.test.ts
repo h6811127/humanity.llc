@@ -34,4 +34,13 @@ describe("city game map page boot", () => {
     expect(mapPageHtml.match(/city-game-map-page\.mjs/g)?.length).toBe(1);
     expect(mapPageHtml).not.toContain("city-game-map-board.mjs");
   });
+
+  it("boots first-visit banner before board render", () => {
+    expect(mapPageCoreSrc).toContain(
+      'import { bootMapFirstVisitBanner } from "./city-game-map-first-visit-banner-core.mjs"'
+    );
+    expect(mapPageCoreSrc.indexOf("bootMapFirstVisitBanner(root, season)")).toBeLessThan(
+      mapPageCoreSrc.indexOf("resolveBoardContextView(season, { pinIndex })")
+    );
+  });
 });

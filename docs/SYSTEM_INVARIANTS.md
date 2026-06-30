@@ -89,12 +89,16 @@ Canonical inbox taxonomy: [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
 
 | Invariant | Detail |
 |-----------|--------|
-| Hero H1 | **“The sticker stays. The status changes.”** (kicker: Public programmable objects). |
-| Entry | **`#launch-doors`** — three list rows (**Live status on something** · **Live status on you** · **Play the city game**), not a single hero Create CTA. |
-| Door routes | Something → create/BYOP deploy; You → `/shop/customize/` (commerce); Game → `/play/cedar-rapids/` (player). Spec: [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) § Front door strategy. |
-| Forbidden | “Live state on real objects” as hero H1, hero `landing-hero-btn-primary`, “One use · status plate”, **leading with lost-item relay as company identity**. |
+| Model | **Discovery-first** (no-landing): utility dashboard for players/checkers — browse live boards before scan. Not a marketing homepage or shop grid. Spec: [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) § Front door strategy · [`DISCOVERY_PROJECTION.md`](DISCOVERY_PROJECTION.md). |
+| Hero H1 (shipped) | **“Check what's true right now before you knock, pick up, or show up.”** — trust chips below (No account · Community-run boards · No scan surveillance). |
+| Hook (secondary) | **“The sticker stays — the status changes.”** on the create footnote (`#landing-start-object-cta`), not the hero H1. |
+| Section order (shipped) | Hero → **Browse by need** shelves → search → **Public live boards** → **Start with one live object** → trust disclosures → device settings. |
+| Commerce row (shipped) | **`#landing-live-object-carriers`** — static featured row after **`#public-networks-results`**. Hydrates from `shop-config.json` **`personalize.checkout_product_id`** via [`landing-live-object-carriers-core.mjs`](../site/js/landing-live-object-carriers-core.mjs); static HTML fallback if config fetch fails. **No** carousel. Spec: [`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) § Landing carriers row. |
+| Job routes (via discovery UI) | **Play / place** → shelves + public boards (e.g. Cedar Rapids); **Deploy** → `#landing-start-object-cta` → `/create/`; **Wear / buy** → `#landing-live-object-carriers` → `/shop/` (shipped row) · primary merch conversion remains **scan → customize**. |
+| Retired | **`#launch-doors`** three-row chooser — removed from `/` (discovery pivot). Routes unchanged; presentation moved to shelves + boards + create/shop rows. Do not restore as hero block. |
+| Forbidden | “Live state on real objects” as hero H1; hero-only **`landing-hero-btn-primary`** Create CTA; “One use · status plate”; **leading with lost-item relay as company identity**; product carousel on `/`; full shop embed or checkout on `/`. |
 | Catalog | `site/what-can-a-qr-do.html` is portfolio/way-finder — not the onboarding path. |
-| Contract | `site/js/landing-copy-contract.mjs` — bump version + tests when copy changes intentionally. |
+| Contract | `site/js/landing-copy-contract.mjs` — bump version + tests when copy changes intentionally (including `#landing-live-object-carriers` when copy changes). |
 
 **Regression:** `npm run verify:landing` · `npm run e2e:landing-copy` · CI: `.github/workflows/deploy-pages.yml` post-deploy `verify:landing:production`.
 
@@ -151,6 +155,29 @@ Read [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) before adding 
 Resolver tab sync: `hc-resolver-sync` BroadcastChannel (network 60s, health 30s); opt out via homepage **Share network checks** or `hc_resolver_sync_tabs=0`.
 
 Passive scans must not create steward notifications, OS alerts, emails, webhooks, scan histories, or engagement dashboards. `live_proof` is the narrow alert exception because the scanner explicitly requests a short-lived signature. Future awareness features must be coarse object state only, with no timestamps, locations, IPs, scanner identity, or per-scan rows.
+
+---
+
+## OS background alerts (WS-NOTIF transport)
+
+Read [`NOTIFICATION_SYSTEM_V2.md`](NOTIFICATION_SYSTEM_V2.md) and [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) **P0-N2** before changing browser-alert or `sw-live-proof.mjs` code.
+
+| Invariant | Detail |
+|-----------|--------|
+| Hidden tab OS | When `document.visibilityState === "hidden"`, **`applyOsNotificationsFromInbox` must not call `new Notification()`** — OS delivery goes through `sw-live-proof.mjs` only. |
+| SW plan bridge | Inbox OS plans (live proof + relay) post to SW via `HC_SW_DELIVER_OS_PLANS`; SW caches and shows when no visible Humanity client. |
+| Push transport | Hosted SSE `live_proof.pending` is **transport only** — cache hint in SW; flush on tab hide / periodic sync; do not bypass inbox gather on the page. |
+| SW poll modes | `pollNow` on hide uses **full-wallet** live-proof probe; `periodicSync` / background sync stay **round-robin** (request budget). |
+| Relay in SW | Relay OS uses cached inbox plans + synced `relayOfferCount`; SW cannot sign relay API polls — page probe remains source of truth. |
+| Tap-through | Live proof: `HC_NOTIFICATION_NAVIGATE` deep link. Relay: `HC_SW_OPEN_INBOX` → inbox sheet. |
+
+**Regression:**
+
+```bash
+npm run notify:transport:tier1
+npm run notify:verify
+npm run notify:field-signoff
+```
 
 ---
 
@@ -253,6 +280,7 @@ Canonical spec: [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.m
 | Lifecycle first | Revoked or paused child object or QR shows lifecycle truth; game hero does not override. |
 | Game-operator scope | `issuer_public_key` may `game-update` **game_node** only — not owner manifesto, human vouch issuance, or non-game child types. |
 | Human vs game vouch | Game `vouch_requires` / `vouch_active_for` on `game_meta` is separate from root-card Steward vouch graph; do not conflate in copy or tests. |
+| Scan object graph | When verified signed witness edges exist, scan HTML + status JSON expose `scan.relationships[]` and name the season steward; legacy `vouch_requires` chips remain when no signed edges. Board/map snapshot unchanged — [`WS_OBJECT_GRAPH_V1.md`](WS_OBJECT_GRAPH_V1.md) · product copy [`WS_OBJECT_GRAPH_PRODUCT_V1.md`](WS_OBJECT_GRAPH_PRODUCT_V1.md) · launch [`WS_OBJECT_GRAPH_LAUNCH_V1.md`](WS_OBJECT_GRAPH_LAUNCH_V1.md). |
 | Launch deploy | Public “live season” HTML (`city-game:launch-surfaces --apply`) and Worker `CITY_GAME_ENABLED=1` ship in the **same** release train. |
 | Map dashboard | Read-only **city state board** — same public truth as scan; **no** GPS, visit log, player ID, or device-local scarcity on server snapshot. Passive `GET` snapshot does not increment quorum/fragments. Plan: [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md). Play pages boot via **`city-game-play-page.mjs` only** (one season fetch → board + guide + banners + snapshot). Snapshot chips apply to **`.city-game-map-node-live`** inside each list row — do not remove when editing Maps links. |
 | Season fair use | Organizer caps via `game.*` entitlements on linked steward account (`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md` § City game season). Stranger play stays free; IP rate limits remain. |

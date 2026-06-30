@@ -206,7 +206,7 @@ describe("buildScanCapabilities (Order 2 — Cedar Rapids verbs)", () => {
     expect(html).toContain('data-scan-room="season"');
     expect(html).toContain("Riverwalk River Lantern");
     expect(html).toContain("scan-game-onboarding");
-    expect(html).toContain("Open city board");
+    expect(html).toContain("Open board");
   });
 
   it("advertises offer verb on lost-item relay child scans", () => {

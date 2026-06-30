@@ -45,11 +45,18 @@ describe("WS-NOTIF N0 notification inventory", () => {
   it("N2: OS delivery routes through device-notification-delivery", () => {
     const browserNotif = readRepoFile("site/js/device-browser-notifications.mjs");
     expect(browserNotif).toMatch(/applyOsNotificationsFromInbox/);
+    expect(browserNotif).toMatch(/deliverOsNotificationPlansToServiceWorker/);
+    expect(browserNotif).toMatch(/flushPushCache/);
     expect(browserNotif).toMatch(/runOsDeliveryFromInbox/);
     expect(browserNotif).toMatch(/probeAndDeliverBackgroundAlerts/);
     expect(browserNotif).toMatch(/probeLiveControlInboxForBackgroundAlerts/);
     expect(browserNotif).toMatch(/syncBackgroundAlertPollTimer/);
     expect(browserNotif).toMatch(/bindLiveProofNotificationNavListener/);
+    expect(readRepoFile("site/sw-live-proof.mjs")).toMatch(/pollAllWalletEntriesForLiveProof/);
+    expect(readRepoFile("site/sw-live-proof.mjs")).toMatch(/flushCachedPushHints/);
+    expect(readRepoFile("site/sw-live-proof.mjs")).toMatch(/flushCachedOsPlans/);
+    expect(readRepoFile("site/sw-live-proof.mjs")).toMatch(/relayOfferCount/);
+    expect(readRepoFile("site/sw-live-proof.mjs")).toMatch(/cachedPushHints/);
     expect(readRepoFile("site/sw-live-proof.mjs")).toMatch(/postMessage/);
     expect(readRepoFile("site/sw-live-proof.mjs")).not.toMatch(/client\.navigate/);
     expect(existsSync(join(repoRoot, "site/js/device-notification-delivery-core.mjs"))).toBe(

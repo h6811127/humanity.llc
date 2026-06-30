@@ -123,6 +123,11 @@ export function writeStewardSession(session) {
 }
 
 export function clearStewardSession() {
+  void import("./device-steward-web-push.mjs").then((mod) => {
+    if (typeof mod.clearStewardWebPushSubscription === "function") {
+      void mod.clearStewardWebPushSubscription();
+    }
+  });
   try {
     sessionStorage.removeItem(STEWARD_SESSION_STORAGE_KEY);
   } catch {

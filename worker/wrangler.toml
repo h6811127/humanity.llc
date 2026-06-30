@@ -30,6 +30,10 @@ HOSTED_STEWARD_ENABLED = "1"
 # STRIPE_WEBHOOK_SECRET = "whsec_…"
 # STRIPE_PRICE_HOSTED_STEWARD_V1 = "price_…"
 # STRIPE_PRICE_HOSTED_GAME_SEASON_V1 = "price_…"
+# Tier 2 Web Push (RFC P2): public key in vars; private key + contact via wrangler secret.
+# STEWARD_VAPID_PUBLIC_KEY = ""
+# wrangler secret put STEWARD_VAPID_PRIVATE_KEY
+# wrangler secret put STEWARD_VAPID_CONTACT  # optional; default mailto:push@humanity.llc
 # Cedar Rapids city game (Phase A): resolver routes off until season launch.
 CITY_GAME_ENABLED = "1"
 # Tier 0 batch fulfillment (O-002): set when Shopify founding sticker SKU is live.

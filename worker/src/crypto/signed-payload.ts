@@ -82,6 +82,11 @@ export const PAYLOAD_FIELD_RULES: Record<PayloadType, PayloadFieldRules> = {
     timestampFields: ["created_at", "expires_at"],
     uniqueIdFields: ["capability_id"],
   },
+  [PAYLOAD_TYPES.RELATIONSHIP_EDGE]: {
+    subjectProfileField: "steward_profile_id",
+    timestampFields: ["created_at"],
+    uniqueIdFields: ["edge_id"],
+  },
 };
 
 export function isPayloadType(value: string): value is PayloadType {

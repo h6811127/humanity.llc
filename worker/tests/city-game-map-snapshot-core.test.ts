@@ -13,12 +13,15 @@ import {
   formatSyncLabel,
   isSchematicPinFogged,
   signalWarSummaryLines,
+  applyDualVictoryFromSnapshot,
   applyLobbyProgressFromSnapshot,
   applySnapshotToMapBoard,
   applySpotlightFromSnapshot,
+  formatPinStateFromSnapshot,
 } from "../../site/js/city-game-map-snapshot-core.mjs";
 import {
   buildMapBoardInnerHtml,
+  formatCityStatusLeadLine,
   formatHookLine,
   formatProgressLine,
 } from "../../site/js/city-game-map-board-core.mjs";
@@ -73,12 +76,13 @@ describe("city-game map snapshot core", () => {
     expect(html).toContain('id="city-game-map-sync"');
     expect(html).toContain('id="city-game-map-signal-war"');
     expect(html).toContain('id="city-game-map-progress"');
-    expect(html).toContain('id="city-game-map-spotlight"');
+    expect(html).toContain('id="city-game-map-selection-panel"');
+    expect(html).toContain('id="city-game-map-dual-victory-mount"');
     expect(html).toContain('data-edge-from="node_04"');
     expect(html).toContain('data-node-id="node_04"');
     expect(html).toContain("city-game-map-node-live");
     expect(html).toContain("Open in Maps");
-    expect(html).toContain("Live count opens when play starts.");
+    expect(html).toContain("city-game-map-pin--next");
   });
 
   it("formats launch collective line from chip value", () => {
@@ -99,6 +103,34 @@ describe("city-game map snapshot core", () => {
     expect(formatSpotlightCountLine("14 / 20", "River Lantern")).toBe("14 of 20 together");
     expect(formatSpotlightCountLine("14 / 20", "")).toBe("14 of 20 together");
     expect(formatSpotlightCountLine(null, "River Lantern")).toBeNull();
+  });
+
+  it("formatPinStateFromSnapshot prefers live chip value", () => {
+    expect(
+      formatPinStateFromSnapshot(
+        { chips: [{ kind: "collective", value: "14 / 20" }] },
+        "temp_drop",
+        "Awaiting signal"
+      )
+    ).toBe("14 / 20");
+    expect(formatPinStateFromSnapshot(null, "temp_drop", "Awaiting signal")).toBe("Awaiting signal");
+  });
+
+  it("applyDualVictoryFromSnapshot fills mount when snapshot carries paths", () => {
+    const mount = { hidden: true, innerHTML: "", setAttribute: () => {}, removeAttribute: () => {} };
+    const boardRoot = {
+      querySelector: (sel) => (sel === "#city-game-map-dual-victory-mount" ? mount : null),
+      classList: { contains: () => false },
+    };
+    applyDualVictoryFromSnapshot(/** @type {HTMLElement} */ (boardRoot), {
+      signal_war: {
+        dual_victory: {
+          paths: [{ id: "awakening", title: "Wake", detail: "Fragments", status: "pending" }],
+        },
+      },
+    });
+    expect(mount.hidden).toBe(false);
+    expect(mount.innerHTML).toContain("city-game-dual-victory-path");
   });
 
   it("applySpotlightFromSnapshot updates spotlight count element", () => {
@@ -138,10 +170,16 @@ describe("city-game map snapshot core", () => {
 
   it("formats lobby hook and progress from snapshot finale", () => {
     expect(formatProgressLine({ fragments: { claimed: 1, required: 3 } })).toBe(
-      "1 / 3 fragments recovered"
+      "1 / 3 shared clues found"
     );
     expect(formatHookLine({ fragments: { claimed: 1 } })).toBe("Something is stirring.");
     expect(formatHookLine({ fragments: { claimed: 3, complete: true } })).toBe("The city woke.");
+    expect(formatCityStatusLeadLine({ fragments: { claimed: 1 } })).toContain(
+      "Shared progress is moving"
+    );
+    expect(formatCityStatusLeadLine({ fragments: { claimed: 3, complete: true } })).toContain(
+      "Weekend network is live"
+    );
 
     /** @type {Record<string, HTMLElement>} */
     const nodes = {};
@@ -150,16 +188,21 @@ describe("city-game map snapshot core", () => {
         hook: "The city is asleep.",
         hookStirring: "Something is stirring.",
         hookAwake: "The city woke.",
-        progressSuffix: "fragments recovered",
+        cityStatusLead: "Updates when anyone scans — same view for every visitor.",
+        cityStatusLeadActive: "Shared progress is moving — scan a sticker for ground truth.",
+        cityStatusLeadComplete: "Weekend network is live — scan any sticker to confirm.",
+        progressSuffix: "shared clues found",
       },
     };
     const progressEl = { textContent: "" };
     const hookEl = { textContent: "" };
+    const questHookEl = { textContent: "" };
     const boardRoot = {
       querySelector: (sel) => {
         if (sel === ".city-game-map-lobby") return lobby;
         if (sel === "#city-game-map-progress") return progressEl;
         if (sel === "#city-game-map-hook") return hookEl;
+        if (sel === "#city-game-map-quest-hook") return questHookEl;
         return nodes[sel] ?? null;
       },
     };
@@ -167,8 +210,11 @@ describe("city-game map snapshot core", () => {
     applyLobbyProgressFromSnapshot(/** @type {HTMLElement} */ (boardRoot), {
       finale: { fragments: { claimed: 2, required: 3, complete: false } },
     });
-    expect(progressEl.textContent).toBe("2 / 3 fragments recovered");
-    expect(hookEl.textContent).toBe("Something is stirring.");
+    expect(progressEl.textContent).toBe("2 / 3 shared clues found");
+    expect(hookEl.textContent).toBe(
+      "Shared progress is moving — scan a sticker for ground truth."
+    );
+    expect(questHookEl.textContent).toBe("Something is stirring.");
   });
 
   it("extracts signal war summary lines from snapshot (SW-07)", () => {
@@ -224,7 +270,7 @@ describe("city-game map snapshot core", () => {
     const lockedRow = mockRouteRow();
 
     const boardRoot = {
-      dataset: { primaryNode: "node_04" },
+      dataset: { primaryNode: "node_04", routeStartLabel: "Start" },
       querySelectorAll(selector: string) {
         if (selector === ".city-game-map-node-row[data-node-id]") return [];
         if (selector === ".city-game-map-pin[data-node-id]") return [];
@@ -246,7 +292,7 @@ describe("city-game map snapshot core", () => {
       ],
     });
 
-    expect(nextRow.stateEl.textContent).toBe("Next");
+    expect(nextRow.stateEl.textContent).toBe("Start");
     expect(nextRow.classes.has("city-game-map-route-row--next")).toBe(true);
     expect(nextRow.el.dataset.routeLocked).toBe("false");
 
@@ -342,6 +388,63 @@ describe("city-game map snapshot core", () => {
     expect(liveEl.innerHTML).toContain("https://humanity.llc/c/test?q=qr_04");
     expect(rowClasses.has("city-game-map-node-row--live")).toBe(true);
     expect(rowAttrs.get("data-board-visibility")).toBe("public");
+  });
+
+  it("applySnapshotToMapBoard updates sketch pin state sublabel from snapshot chips (SF-2b)", () => {
+    if (typeof globalThis.HTMLElement === "undefined") {
+      globalThis.HTMLElement = class HTMLElement {} as typeof HTMLElement;
+    }
+    class MockSvgText extends globalThis.HTMLElement {}
+    globalThis.SVGTextElement = MockSvgText as typeof SVGTextElement;
+
+    const pinStateEl = new MockSvgText();
+    pinStateEl.textContent = "Awaiting signal";
+    const pinClasses = new Set<string>();
+    const pin = {
+      getAttribute(name: string) {
+        if (name === "data-node-id") return "node_04";
+        if (name === "data-role") return "temp_drop";
+        return null;
+      },
+      setAttribute() {},
+      classList: {
+        toggle(cls: string, on?: boolean) {
+          if (on) pinClasses.add(cls);
+          else pinClasses.delete(cls);
+        },
+      },
+      querySelector(sel: string) {
+        if (sel === ".city-game-map-pin-state") return pinStateEl;
+        if (sel === ".city-game-map-pin-label") return null;
+        return null;
+      },
+    };
+
+    const boardRoot = {
+      classList: { contains: () => true },
+      dataset: { rumoredNodes: "", primaryNode: "node_04" },
+      querySelectorAll(selector: string) {
+        if (selector === ".city-game-map-node-row[data-node-id]") return [];
+        if (selector === ".city-game-map-pin[data-node-id]") return [pin];
+        return [];
+      },
+      querySelector() {
+        return null;
+      },
+    };
+
+    applySnapshotToMapBoard(/** @type {HTMLElement} */ (boardRoot), {
+      map_visibility: "public",
+      nodes: [
+        {
+          node_id: "node_04",
+          chips: [{ kind: "collective", value: "14 / 20" }],
+        },
+      ],
+    });
+
+    expect(pinStateEl.textContent).toBe("14 / 20");
+    expect(pinClasses.has("city-game-map-pin--live")).toBe(true);
   });
 
   it("empty snapshot fog keeps schematic pins visible and hittable (RC1)", () => {

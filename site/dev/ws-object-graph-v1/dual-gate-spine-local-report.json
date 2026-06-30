@@ -1,0 +1,105 @@
+{
+  "at": "2026-06-29T19:13:19.172Z",
+  "apiOrigin": "http://127.0.0.1:8787",
+  "urls": {
+    "apiOrigin": "http://127.0.0.1:8787",
+    "profileId": "CEenC57QN9qqnr2x5L89cbWt",
+    "cabinetQr": "qr_Ag51j5E7WAAk5E5t",
+    "cabinetScan": "http://127.0.0.1:8787/c/CEenC57QN9qqnr2x5L89cbWt?q=qr_Ag51j5E7WAAk5E5t",
+    "cabinetStatus": "http://127.0.0.1:8787/.well-known/hc/v1/cards/CEenC57QN9qqnr2x5L89cbWt/status?q=qr_Ag51j5E7WAAk5E5t",
+    "libraryScan": "http://127.0.0.1:8787/c/CEenC57QN9qqnr2x5L89cbWt?q=qr_hfiQzG53d6oj25aq",
+    "riverScan": "http://127.0.0.1:8787/c/CEenC57QN9qqnr2x5L89cbWt?q=qr_aV3BcFtid5NBfCuM",
+    "siteCodes": {
+      "witness": "CR-WITNS-4P",
+      "quorum": "CR-LANTERN-7K"
+    },
+    "labels": {
+      "cabinet": "Czech Village cabinet",
+      "library": "Library witness seal",
+      "river": "Riverwalk River Lantern"
+    }
+  },
+  "results": [
+    {
+      "step": "migrate local",
+      "ok": true,
+      "detail": "relationship_edges migrations applied"
+    },
+    {
+      "step": "seed both edges",
+      "ok": true,
+      "detail": "witness + unlock edges on local D1"
+    },
+    {
+      "step": "worker health",
+      "ok": true,
+      "detail": "worker reachable"
+    },
+    {
+      "step": "reset dual-gate spine",
+      "ok": true,
+      "detail": "node_04 / node_07 / node_10 D0 cold state"
+    },
+    {
+      "step": "worker health",
+      "ok": true,
+      "detail": "worker reachable"
+    },
+    {
+      "step": "witness edge pending",
+      "ok": true,
+      "detail": "pass"
+    },
+    {
+      "step": "unlock edge pending",
+      "ok": true,
+      "detail": "pass"
+    },
+    {
+      "step": "dual-gate status JSON",
+      "ok": true,
+      "detail": "pass"
+    },
+    {
+      "step": "witness graph HTML",
+      "ok": true,
+      "detail": "pass"
+    },
+    {
+      "step": "dual-gate cabinet HTML",
+      "ok": true,
+      "detail": "pass"
+    },
+    {
+      "step": "season profile align",
+      "ok": true,
+      "detail": "using wrangler satisfy (season root GcP3Ee17yGqMHdidhEVMYBzq ≠ local seed CEenC57QN9qqnr2x5L89cbWt)"
+    },
+    {
+      "step": "D1 witness edge satisfied",
+      "ok": true,
+      "detail": "pass"
+    },
+    {
+      "step": "D3 witness edge satisfied",
+      "ok": true,
+      "detail": "pass"
+    },
+    {
+      "step": "D3 unlock edge satisfied",
+      "ok": true,
+      "detail": "pass"
+    },
+    {
+      "step": "D3 dual-gate status JSON",
+      "ok": true,
+      "detail": "pass"
+    },
+    {
+      "step": "D3 dual-gate cabinet HTML",
+      "ok": true,
+      "detail": "pass"
+    }
+  ],
+  "go": true
+}

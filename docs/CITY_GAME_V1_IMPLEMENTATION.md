@@ -706,7 +706,8 @@ Build on shipped child-object primitives — do not fork a parallel mint path.
 
 - [x] `/created/` **Add game node** — register + first QR in one action (parity with status plate)
 - [x] Hub nested rows for `game_node` under season root
-- [x] Season metadata editor — window/status + **districts** in rules panel (`/created/`); `unlock_edges` still edited in committed season JSON
+- [x] Season metadata editor — window/status + **districts** in rules panel (`/created/`); **unlock_edges** browser editor + metadata JSON export
+- [x] Print / install pack export on `/created/` — CSV, QR PNGs, install checklist
 - [x] Browser rules page draft + publish
 - [x] Deprecate terminal mint for **new** self-serve seasons (keep scripts for CI/fixtures) — marketing only after **E3**
 - [x] Document organizer path in [`CITY_GAME_OPERATOR_CUSTODY.md`](CITY_GAME_OPERATOR_CUSTODY.md) § Self-serve setup

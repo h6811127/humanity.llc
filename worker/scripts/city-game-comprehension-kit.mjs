@@ -18,15 +18,21 @@ import { detectLanHostFromInterfaces } from "./city-game-lan-hub-core.mjs";
 import {
   applyComprehensionRunbookPrimaryScanUrl,
   applyComprehensionRunbookProductionUrls,
-  buildComprehensionKitHtml,
   buildComprehensionRunbookProductionUrlsBlock,
+  buildLocalComprehensionSurfaces,
+  buildProductionComprehensionSurfaces,
+  comprehensionDualGateWalkPageRel,
   COMPREHENSION_RUNBOOK_REL,
+  comprehensionGt8FieldWalkPageRel,
+  comprehensionPlayerFlowFieldWalkPageRel,
   parseQrPackScanUrls,
   productionRulesUrl,
   resolveKitScanUrls,
   resolveProductionKitScanUrls,
   resolveProductionScanUrlByNode,
 } from "./city-game-comprehension-kit-core.mjs";
+import { LOCAL_DEV_GT8_FIELD_WALK_REL } from "./city-game-network-lens-gt8-field-kit-core.mjs";
+import { LOCAL_DEV_PLAYER_FLOW_FIELD_WALK_REL } from "../../site/js/public-network-player-flow-field-kit-core.mjs";
 import { resolveSeasonPathFromCli } from "../../site/js/city-game-season-path-core.mjs";
 import {
   comprehensionPrimaryNodeId,
@@ -40,6 +46,9 @@ const prodSeedPath = join(root, "worker/.local/city-game-production-seed.json");
 const qrPackPath = join(root, "worker/.local/city-game-qr-pack/SCAN_URLS.md");
 const localOutDir = join(root, "site/dev");
 const localOutPath = join(localOutDir, "city-game-comprehension.html");
+const localFieldWalkOutPath = join(root, LOCAL_DEV_GT8_FIELD_WALK_REL);
+const localPlayerFlowWalkOutPath = join(root, LOCAL_DEV_PLAYER_FLOW_FIELD_WALK_REL);
+const defaultSeasonPath = join(root, "site/data/city-game-cr-season-01.json");
 const lanMode = process.argv.includes("--lan");
 const productionMode = process.argv.includes("--production");
 const applyRunbook = process.argv.includes("--apply-runbook");
@@ -94,21 +103,52 @@ function main() {
     const productionOutPath = seasonComprehensionOutputPath(season);
     const productionKitUrl = seasonComprehensionProductionUrl(season);
     const boardUrl = `${rulesUrl.replace(/\/?$/, "/")}map/`;
-    const html = buildComprehensionKitHtml({
-      host: "humanity.llc",
+    const surfaces = buildProductionComprehensionSurfaces({
+      season,
       rulesUrl,
       boardUrl,
       kitNodes,
-      production: true,
-      season,
     });
     mkdirSync(dirname(productionOutPath), { recursive: true });
-    writeFileSync(productionOutPath, html, "utf8");
+    writeFileSync(productionOutPath, surfaces.kitHtml, "utf8");
+    if (surfaces.fieldWalkHtml) {
+      const fieldWalkOutPath = join(root, comprehensionGt8FieldWalkPageRel(season));
+      mkdirSync(dirname(fieldWalkOutPath), { recursive: true });
+      writeFileSync(fieldWalkOutPath, surfaces.fieldWalkHtml, "utf8");
+    }
+    if (surfaces.dualGateWalkHtml) {
+      const dualGateOutPath = join(root, comprehensionDualGateWalkPageRel(season));
+      mkdirSync(dirname(dualGateOutPath), { recursive: true });
+      writeFileSync(dualGateOutPath, surfaces.dualGateWalkHtml, "utf8");
+    }
+    if (surfaces.playerFlowWalkHtml) {
+      const playerFlowOutPath = join(root, comprehensionPlayerFlowFieldWalkPageRel(season));
+      mkdirSync(dirname(playerFlowOutPath), { recursive: true });
+      writeFileSync(playerFlowOutPath, surfaces.playerFlowWalkHtml, "utf8");
+    }
     console.log("GT comprehension kit (production)\n");
     console.log(`Scan URL source: ${resolved.source}`);
     console.log("Wrote:", productionOutPath);
+    if (surfaces.fieldWalkHtml) {
+      console.log("Wrote:", join(root, comprehensionGt8FieldWalkPageRel(season)));
+    }
+    if (surfaces.dualGateWalkHtml) {
+      console.log("Wrote:", join(root, comprehensionDualGateWalkPageRel(season)));
+    }
+    if (surfaces.playerFlowWalkHtml) {
+      console.log("Wrote:", join(root, comprehensionPlayerFlowFieldWalkPageRel(season)));
+    }
     console.log("\nOpen on production:");
     console.log(" ", productionKitUrl);
+    if (surfaces.fieldWalkUrl) {
+      console.log("  GT-8 field walk:", surfaces.fieldWalkUrl);
+    }
+    if (surfaces.dualGateWalkUrl) {
+      console.log("  Dual-gate walk:", surfaces.dualGateWalkUrl);
+    }
+    if (surfaces.playerFlowWalkUrl) {
+      console.log("  Player flow walk:", surfaces.playerFlowWalkUrl);
+    }
     console.log("\nSend testers:");
     console.log("  Kit page:", productionKitUrl);
     console.log("  Rules:", rulesUrl);
@@ -124,6 +164,7 @@ function main() {
         kitUrl: productionKitUrl,
         primaryScanUrl,
         boardUrl,
+        fieldWalkUrl: surfaces.fieldWalkUrl ?? null,
       });
       runbook = applyComprehensionRunbookProductionUrls(runbook, block);
       if (primaryScanUrl) {
@@ -149,21 +190,57 @@ function main() {
     : "127.0.0.1";
 
   const seed = JSON.parse(readFileSync(seedPath, "utf8"));
+  const season = existsSync(defaultSeasonPath)
+    ? JSON.parse(readFileSync(defaultSeasonPath, "utf8"))
+    : {};
   const kitNodes = resolveKitScanUrls(seed.nodes, seed.profile_id, host);
   const hubUrl = `http://${host}:8788/dev/city-game-lan-hub`;
-  const html = buildComprehensionKitHtml({ host, hubUrl, kitNodes });
+  const rulesPath = String(season.rules_path ?? "/play/cedar-rapids/").trim() || "/play/cedar-rapids/";
+  const rulesUrl = `http://${host.includes(":") ? host.split(":")[0] : host}:8788${rulesPath.startsWith("/") ? rulesPath : `/${rulesPath}`}`;
+  const boardUrl = `${rulesUrl.replace(/\/?$/, "/")}map/`;
+  const surfaces = buildLocalComprehensionSurfaces({
+    season,
+    host,
+    rulesUrl,
+    boardUrl,
+    kitNodes,
+    hubUrl,
+  });
 
   mkdirSync(localOutDir, { recursive: true });
-  writeFileSync(localOutPath, html, "utf8");
+  writeFileSync(localOutPath, surfaces.kitHtml, "utf8");
+  if (surfaces.fieldWalkHtml) {
+    mkdirSync(dirname(localFieldWalkOutPath), { recursive: true });
+    writeFileSync(localFieldWalkOutPath, surfaces.fieldWalkHtml, "utf8");
+  }
+  if (surfaces.playerFlowWalkHtml) {
+    mkdirSync(dirname(localPlayerFlowWalkOutPath), { recursive: true });
+    writeFileSync(localPlayerFlowWalkOutPath, surfaces.playerFlowWalkHtml, "utf8");
+  }
 
-  const pageUrl = `http://${host}:8788/dev/city-game-comprehension.html`;
+  const pageUrl = `http://${host.includes(":") ? host.split(":")[0] : host}:8788/dev/city-game-comprehension.html`;
+  const fieldWalkUrl = surfaces.fieldWalkUrl ?? null;
+  const playerFlowWalkUrl = surfaces.playerFlowWalkUrl ?? null;
   console.log("GT comprehension kit\n");
   console.log("Wrote:", localOutPath);
+  if (surfaces.fieldWalkHtml) {
+    console.log("Wrote:", localFieldWalkOutPath);
+  }
+  if (surfaces.playerFlowWalkHtml) {
+    console.log("Wrote:", localPlayerFlowWalkOutPath);
+  }
   console.log("\nStart a local server first:");
   console.log("  npm run city-game:dev");
   console.log("  (or npm run pages:dev in another terminal)");
   console.log("\nThen open:");
   console.log(" ", pageUrl);
+  if (fieldWalkUrl) {
+    console.log("  GT-8 field walk:", fieldWalkUrl);
+  }
+  if (playerFlowWalkUrl) {
+    console.log("  Player flow walk:", playerFlowWalkUrl);
+  }
+  console.log("  Map board:", boardUrl);
   console.log("\nProduction kit (no local server needed):");
   console.log("  npm run city-game:comprehension-kit -- --production");
   console.log("  → /play/{slug}/comprehension/ (from season rules_path)");

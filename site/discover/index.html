@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Browse places · humanity.llc</title>
+    <meta
+      name="description"
+      content="Discovery regions with listed live-object pins — near-me sort on your device. Scans are not tracked."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="canonical" href="/discover/" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=165" />
+    <link rel="stylesheet" href="/css/discovery-region-browse.css?v=4" />
+  </head>
+  <body class="discovery-region-page discovery-regions-hub-page">
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+
+      <main class="screen screen-landing discovery-region-screen">
+        <section class="hero hero-compact">
+          <p class="hero-eyebrow">Discovery</p>
+          <h1>Browse live places</h1>
+          <p class="hero-line">
+            Listed regions with opt-in public pins — plan a walk before you scan.
+            Network boards show world state; discovery browse sorts near you on this device only.
+          </p>
+        </section>
+
+        <section class="idea-section" aria-labelledby="discovery-regions-title">
+          <h2 class="group-label" id="discovery-regions-title">Listed regions</h2>
+          <p class="discovery-region-loading" id="discovery-regions-loading" aria-live="polite">
+            Loading regions…
+          </p>
+          <p class="discovery-region-error" id="discovery-regions-error" hidden></p>
+          <div class="discovery-regions-list" id="discovery-regions-list"></div>
+        </section>
+
+        <p class="idea-footnote">
+          <a href="/play/season/">All public networks</a>
+          ·
+          <a href="/">Home dashboard</a>
+          ·
+          <a href="/data-policy.html">Data policy</a>
+        </p>
+      </main>
+    </div>
+
+    <script type="module" src="/js/discovery-regions-hub.mjs?v=1"></script>
+  </body>
+</html>

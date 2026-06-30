@@ -15,6 +15,11 @@ import {
   MAP_DASHBOARD_REL,
   surfacesMarketLiveCityBoard,
 } from "./city-game-map-board-b13-core.mjs";
+import { buildMapBoardInnerHtml } from "../../site/js/city-game-map-board-core.mjs";
+import {
+  auditMapBoardPrivacyEngineering,
+} from "./city-game-map-board-privacy-core.mjs";
+import { comprehensionProductionPageRel } from "./city-game-comprehension-kit-core.mjs";
 import { LAUNCH_CHECKLIST_REL } from "./city-game-launch-checklist-core.mjs";
 import {
   auditGameScanAnalyticsGate,
@@ -55,9 +60,35 @@ function main() {
     researchHtmlByRel,
   });
 
+  const season = JSON.parse(
+    readFileSync(join(root, "site/data/city-game-cr-season-01.json"), "utf8")
+  );
+  const snapshotFixture = JSON.parse(
+    readFileSync(
+      join(root, "worker/tests/fixtures/city-game-snapshot-empty-board.json"),
+      "utf8"
+    )
+  );
+  let comprehensionHtml = null;
+  try {
+    comprehensionHtml = readFileSync(
+      join(root, comprehensionProductionPageRel(season)),
+      "utf8"
+    );
+  } catch {
+    comprehensionHtml = null;
+  }
+  const privacyAudit = auditMapBoardPrivacyEngineering({
+    snapshot: snapshotFixture,
+    rulesHtml,
+    boardHtml: buildMapBoardInnerHtml(season),
+    comprehensionHtml,
+  });
+
   const b13 = assessMapBoardB13Ready({
     marketsLiveCityBoard,
     b14Ok: b14.ok,
+    privacyAuditOk: privacyAudit.ok,
     comprehensionRunbook: readFileSync(join(root, COMPREHENSION_RUNBOOK_REL), "utf8"),
     mapDashboardDoc: readFileSync(join(root, MAP_DASHBOARD_REL), "utf8"),
     launchChecklistDoc: readFileSync(join(root, LAUNCH_CHECKLIST_REL), "utf8"),

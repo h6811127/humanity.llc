@@ -11,6 +11,7 @@ import { getResolverHealthStatus } from "./device-wallet-since-visit-gate.mjs";
 import {
   liveProofPollTargetsFromWallet,
   resolveSwPeriodicMinIntervalMs,
+  SW_MESSAGE_DELIVER_OS_PLANS,
   SW_MESSAGE_LIVE_PROOF_PUSH,
   SW_PERIODIC_TAG,
   SW_SYNC_TAG,
@@ -21,6 +22,7 @@ import {
   stewardPushSubscribeAllowed,
 } from "./device-steward-entitlements.mjs";
 import { isStewardPushHealthy } from "./device-steward-push.mjs";
+import { getRelayOfferPendingCount } from "./device-relay-offer-inbox-loader.mjs";
 
 export const SW_SCRIPT_URL = "/sw-live-proof.mjs";
 
@@ -72,7 +74,7 @@ export async function unregisterLiveProofServiceWorker() {
 }
 
 /**
- * @param {{ pollNow?: boolean }} [opts]
+ * @param {{ pollNow?: boolean, flushPushCache?: boolean }} [opts]
  * @returns {Promise<void>}
  */
 export async function syncLiveProofServiceWorkerState(opts = {}) {
@@ -111,6 +113,8 @@ export async function syncLiveProofServiceWorkerState(opts = {}) {
     interactShown,
     resolverHealth: getResolverHealthStatus(),
     pollNow: !!opts.pollNow && alertsOn,
+    flushPushCache: !!opts.flushPushCache && alertsOn,
+    relayOfferCount: getRelayOfferPendingCount(),
     stewardPushEntitled: stewardPushSubscribeAllowed(getStewardEntitlementsPolicy()),
     stewardPushHealthy: isStewardPushHealthy(),
   };
@@ -143,6 +147,7 @@ export async function syncLiveProofServiceWorkerState(opts = {}) {
 
 /**
  * E4d: forward hosted SSE push hints to the live-proof SW when alerts are on.
+ * SW caches hints and shows OS when no Humanity tab is visible (Tier 1 push → SW cache).
  *
  * @param {{
  *   profile_id?: string,
@@ -181,6 +186,33 @@ export async function forwardLiveProofPushToServiceWorker(hint, opts = {}) {
       challenge_id: challengeId,
       expires_at: typeof hint.expires_at === "string" ? hint.expires_at : "",
     },
+  });
+}
+
+/**
+ * Deliver inbox OS plans via the live-proof service worker (hidden tab / PWA background).
+ *
+ * @param {import("./device-notification-delivery-core.mjs").OsNotificationPlan[]} plans
+ * @returns {Promise<void>}
+ */
+export async function deliverOsNotificationPlansToServiceWorker(plans) {
+  if (!Array.isArray(plans) || plans.length === 0) return;
+  if (typeof window !== "undefined" && Array.isArray(window.__hcE2eSwOsPlans)) {
+    window.__hcE2eSwOsPlans.push(...plans);
+  }
+  if (!liveProofServiceWorkerSupported()) return;
+  if (!isBrowserNotifEnabled() || !notificationGranted()) return;
+
+  const reg = await registerLiveProofServiceWorker();
+  if (!reg) return;
+  await navigator.serviceWorker.ready.catch(() => null);
+  const active = reg.active || (await reg.installing) || (await reg.waiting);
+  if (!active) return;
+
+  active.postMessage({
+    type: SW_MESSAGE_DELIVER_OS_PLANS,
+    plans,
+    pageOrigin: location.origin,
   });
 }
 

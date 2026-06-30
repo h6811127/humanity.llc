@@ -18,14 +18,17 @@ describe("play/season public networks page", () => {
     expect(html).toContain('id="public-networks-search"');
     expect(html).toContain('id="public-networks-categories"');
     expect(html).toContain('id="public-networks-results"');
-    expect(html).toContain("/js/public-networks-portal.mjs?v=6");
-    expect(html).toContain("/css/public-networks-portal.css?v=6");
+    expect(html).toContain("/js/public-networks-portal.mjs?v=10");
+    expect(html).toContain("/css/public-networks-portal.css?v=9");
     expect(html).toContain('id="landing-entry-shelves"');
+    expect(html).toContain("player-flow-breadcrumb");
     expect(html).toContain("data-landing-shelf");
     expect(html).not.toContain("city-game-season-portal.mjs");
     expect(html).toContain("This is not a map");
     expect(html).toContain("One live network today: Cedar Rapids");
+    expect(html).toContain("not live networks");
     expect(html).toContain("A network is a shared board of places");
+    expect(html).toContain("Home dashboard");
     expect(html).not.toContain('content="noindex, nofollow"');
   });
 

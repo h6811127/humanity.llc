@@ -66,7 +66,8 @@ export const NOTIFICATION_INVENTORY = [
   {
     id: "relay-offer-poll",
     file: "site/js/device-relay-offer-inbox.mjs",
-    trigger: "hub open, manual check, dismiss; hc-relay-offer-inbox-changed",
+    trigger:
+      "hub open, manual check, dismiss; browser-alert poll when relays in wallet; hc-relay-offer-inbox-changed",
     surface: "pending store → gather relayOfferCount",
     currentBehavior: "Intent-based refresh for lost-item relay owner summaries",
     inboxKind: "relay_offer",

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Browse places · Cedar Rapids, Iowa · humanity.llc</title>
+    <meta
+      name="description"
+      content="Discovery browse for Cedar Rapids — listed live-object pins with optional near-me sort on your device. Scans are not tracked."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="canonical" href="/discover/cedar-rapids-iowa/" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=165" />
+    <link rel="stylesheet" href="/css/discovery-region-browse.css?v=4" />
+  </head>
+  <body
+    class="discovery-region-page"
+    data-discovery-region="cedar-rapids-iowa"
+    data-discovery-season-json="/data/city-game-cr-season-01.json"
+  >
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+
+      <main class="screen screen-landing discovery-region-screen">
+        <nav class="player-flow-breadcrumb" aria-label="You are here">
+          <a href="/">Home</a><span class="player-flow-breadcrumb-sep" aria-hidden="true"> · </span>
+          <a href="/play/season/">Public networks</a><span class="player-flow-breadcrumb-sep" aria-hidden="true"> · </span>
+          <a href="/discover/">Browse places</a><span class="player-flow-breadcrumb-sep" aria-hidden="true"> · </span>
+          <span aria-current="page">Cedar Rapids, Iowa</span>
+        </nav>
+        <section class="hero hero-compact">
+          <p class="hero-eyebrow">Discovery · Cedar Rapids, Iowa</p>
+          <h1>Browse live places</h1>
+          <p class="hero-line">
+            Listed pins for this region — bookmark rows for planning before you scan.
+            Open a place for the live scan link; board view stays on the city network map.
+          </p>
+        </section>
+
+        <section class="idea-section" aria-labelledby="discovery-browse-title">
+          <h2 class="group-label" id="discovery-browse-title">Places in this region</h2>
+
+          <div class="discovery-region-toolbar">
+            <button
+              type="button"
+              class="discovery-near-me-btn"
+              id="discovery-near-me-btn"
+              aria-pressed="false"
+            >
+              Sort near me
+            </button>
+            <p class="discovery-near-me-status" id="discovery-near-me-status" aria-live="polite"></p>
+          </div>
+
+          <div id="discovery-network-filter" class="discovery-network-filter-mount" hidden></div>
+          <p class="discovery-network-board-link idea-footnote" id="discovery-network-board-link" hidden></p>
+
+          <p class="discovery-region-privacy" id="discovery-near-me-privacy">
+            Location is used on your device to sort results; scans are not tracked.
+            <a href="/data-policy.html">Data policy</a>.
+          </p>
+
+          <label class="visually-hidden" for="discovery-pin-search">Search places</label>
+          <input
+            type="search"
+            class="public-networks-search discovery-region-search"
+            id="discovery-pin-search"
+            placeholder="Search by place name or district"
+            autocomplete="off"
+            enterkeyhint="search"
+          />
+
+          <p class="discovery-pin-count" id="discovery-pin-count" aria-live="polite"></p>
+          <p class="discovery-region-loading" id="discovery-region-loading" aria-live="polite">
+            Loading places…
+          </p>
+          <p class="discovery-region-error" id="discovery-region-error" hidden></p>
+          <div class="discovery-pin-detail-mount" id="discovery-pin-detail" hidden></div>
+          <div class="discovery-pin-results" id="discovery-pin-results"></div>
+        </section>
+
+        <p class="idea-footnote discovery-region-player-footnote">
+          <a href="/play/cedar-rapids/map/">Open board</a>
+          ·
+          <a href="/play/cedar-rapids/#rules-prove-title">What a scan proves</a>
+          ·
+          <a href="/play/season/">All public networks</a>
+          ·
+          <a href="/discover/">All regions</a>
+          ·
+          <a href="/">Home dashboard</a>
+        </p>
+      </main>
+    </div>
+
+    <script type="module" src="/js/discovery-region-page.mjs?v=5"></script>
+  </body>
+</html>

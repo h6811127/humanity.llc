@@ -19,7 +19,9 @@ import {
   resolveSeasonWindowPhase,
   type SeasonWindowPhase,
 } from "./season-window";
-import { resolveGameVouchGate, type GameVouchGate } from "./vouch-graph";
+import type { GameVouchGate } from "./vouch-graph";
+import { resolveWitnessGate } from "./witness-gate";
+import type { RelationshipEdgeDocument } from "../live-object/relationship-edge-spec";
 import type { ObjectPublicStream } from "../validation/object-streams";
 import { parseObjectStreamsFromDocument } from "../validation/object-streams";
 
@@ -244,7 +246,7 @@ export function gameScanNextActionLine(
   } = {}
 ): string {
   if (gameNode.seasonWindowPhase === "before") {
-    return "Open the city board to plan your route before the season opens.";
+    return "Open the board to plan your route before the season opens.";
   }
   if (gameNode.seasonWindowPhase === "after") {
     return "Browse the board for final public state — progression is paused.";
@@ -264,7 +266,7 @@ export function gameScanNextActionLine(
     }
     return "Add your visit to unlock the clue for everyone, or scout ahead on the board.";
   }
-  return "Open the city board to see how this spot connects to the weekend route.";
+  return "Open the board to see how this spot connects to the weekend route.";
 }
 
 export function parseGameNodeFields(documentJson: string | null | undefined): {
@@ -314,6 +316,7 @@ export function resolveGameNodeScanContext(input: {
     CITY_GAME_RELAY_CAPTURE_PLAYER?: string;
   };
   vouchWitnesses?: Record<string, GameMeta>;
+  witnessRelationshipEdges?: RelationshipEdgeDocument[] | null;
   season?: CrSeasonConfig;
   now?: Date;
 }): GameNodeScanContext | null {
@@ -353,11 +356,12 @@ export function resolveGameNodeScanContext(input: {
   const showsContribute = contributeMode != null;
   const showsPledge =
     gameNodeShowsPledge(fields.nodeRole) && isSeasonContributeOpen(seasonWindowPhase, input.env);
-  const vouchGate = resolveGameVouchGate(
-    nodeId,
-    fields.gameMeta,
-    input.vouchWitnesses ?? {}
-  );
+  const vouchGate = resolveWitnessGate({
+    targetNodeId: nodeId,
+    gameMeta: fields.gameMeta,
+    witnessMetaByNodeId: input.vouchWitnesses ?? {},
+    witnessRelationshipEdges: input.witnessRelationshipEdges,
+  });
   const roleEyebrow = gameNodeRoleEyebrow(fields.nodeRole, fields.district);
 
   const withVouchGate = {

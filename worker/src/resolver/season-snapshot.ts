@@ -27,6 +27,7 @@ import {
   recordGameSnapshotSeasonUsage,
 } from "../city-game/season-quota";
 import { resolveSeasonWindowPhase } from "../city-game/season-window";
+import { buildWitnessMetaByNodeId } from "../city-game/witness-gate";
 import { buildSignalWarSnapshotSummary } from "../city-game/faction-network-score";
 import { buildDualVictorySnapshot } from "../city-game/dual-victory";
 import {
@@ -236,6 +237,7 @@ export async function handleGetSeasonSnapshot(
         buildScanUrl(origin, rootProfile, qr.qr_id)
       );
     }
+    const witnessMetaByNodeId = buildWitnessMetaByNodeId(rows, season);
     for (const row of rows) {
       if (row.status !== "active") continue;
       const snap = deriveMapNodeSnapshot({
@@ -243,6 +245,7 @@ export async function handleGetSeasonSnapshot(
         season,
         env,
         now,
+        witnessMetaByNodeId,
       });
       if (snap) nodes.push(snap);
     }

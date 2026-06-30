@@ -18,6 +18,7 @@ function row(
     route_open: null,
     active_bulletin: null,
     active_route: null,
+    vouch_gate: null,
     ...partial,
   };
 }

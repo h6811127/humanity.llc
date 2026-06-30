@@ -25,41 +25,6 @@ export {
 let lastOsDedupeByKind = {};
 
 /**
- * @param {import("./device-notification-delivery-core.mjs").OsNotificationPlan} plan
- * @param {{
- *   onLiveProofClick?: () => void,
- *   onRelayClick?: () => void,
- * }} handlers
- * @returns {Promise<boolean>}
- */
-async function showOsNotificationPlan(plan, handlers) {
-  if (typeof Notification === "undefined") return false;
-  try {
-    const ntf = new Notification(plan.title, {
-      body: plan.body,
-      tag: plan.tag,
-      requireInteraction: plan.requireInteraction,
-    });
-    ntf.onclick = () => {
-      window.focus();
-      ntf.close();
-      if (plan.kind === "live_proof" && plan.href) {
-        handlers.onLiveProofClick?.();
-        location.href = plan.href;
-        return;
-      }
-      if (plan.openInboxOnClick) {
-        handlers.onRelayClick?.();
-        document.getElementById("brand-status-dot-btn")?.click();
-      }
-    };
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-/**
  * @param {import("./device-inbox-core.mjs").InboxItem[]} [items]
  * @param {ReturnType<typeof gatherInboxInput>} [gatherCtx]
  */
@@ -83,8 +48,6 @@ export function hubGroupVisibilityFromInbox(items = getInboxItems(), opts = {}) 
  *   tabVisible?: boolean,
  *   interactShown?: boolean,
  *   pageOrigin?: string,
- *   onLiveProofClick?: () => void,
- *   onRelayClick?: () => void,
  * }} ctx
  * @returns {Promise<{ shown: number, plans: import("./device-notification-delivery-core.mjs").OsNotificationPlan[] }>}
  */
@@ -96,8 +59,6 @@ export async function applyOsNotificationsFromInbox(ctx) {
     tabVisible = typeof document !== "undefined" && document.visibilityState === "visible",
     interactShown = false,
     pageOrigin = typeof location !== "undefined" ? location.origin : "",
-    onLiveProofClick,
-    onRelayClick,
   } = ctx;
 
   if (!supported || !permissionGranted || !browserAlertsEnabled) {
@@ -120,13 +81,8 @@ export async function applyOsNotificationsFromInbox(ctx) {
     return { shown: 0, plans };
   }
 
-  let shown = 0;
-  for (const plan of plans) {
-    const ok = await showOsNotificationPlan(plan, { onLiveProofClick, onRelayClick });
-    if (ok) shown += 1;
-  }
-
-  return { shown, plans };
+  // Hidden tab: SW-only OS (PWA background). Page Notification API is unreliable here.
+  return { shown: 0, plans };
 }
 
 /** Reset OS dedupe state (tests). */

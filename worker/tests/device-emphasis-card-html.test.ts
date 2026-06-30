@@ -217,7 +217,7 @@ describe("device-emphasis-card-html", () => {
     const stylesBust = {
       "site/wallet/index.html": "148",
       "site/create/index.html": "151",
-      "site/created/index.html": "151",
+      "site/created/index.html": "154",
     };
     for (const [page, v] of Object.entries(stylesBust)) {
       const html = readFileSync(join(root, page), "utf8");

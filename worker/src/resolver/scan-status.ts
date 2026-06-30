@@ -44,6 +44,7 @@ import { buildAgentContextPacket } from "./ai-explain-core";
 import type { ScanCapability } from "../live-object/scan-capabilities";
 import { objectCustodyStatusPayload } from "../live-object/custody";
 import { buildScanFreshnessPayload, type ScanFreshnessPayload } from "../live-object/staleness-contract";
+import type { ScanRelationshipStatus, ScanRelationshipRules } from "../live-object/relationship-edge-spec";
 import {
   resolveSuccessionScanContext,
   type SuccessionScanContext,
@@ -97,6 +98,10 @@ export interface ScanStatusBody {
     capabilities?: ScanCapability[];
     /** Possession assignment on Phase A child objects (Layer 1). */
     custody?: Record<string, unknown>;
+    /** Signed witness relationship satisfaction (RelationshipEdge v1). */
+    relationships?: ScanRelationshipStatus[];
+    /** Signed witness edge authority when relationships are protocol-backed. */
+    relationship_rules?: ScanRelationshipRules;
     /** Resolver freshness contract — honest staleness for cache/mesh clients (Order 6). */
     freshness: ScanFreshnessPayload;
     /** Archive / sunset hints when object or season is winding down (Order 6). */
@@ -194,6 +199,8 @@ export function scanStatusBodyFromViewModel(
       ...(objectCustodyStatusPayload(vm.childCustody)
         ? { custody: objectCustodyStatusPayload(vm.childCustody)! }
         : {}),
+      ...(vm.relationships.length ? { relationships: vm.relationships } : {}),
+      ...(vm.relationshipRules ? { relationship_rules: vm.relationshipRules } : {}),
       freshness: buildScanFreshnessPayload({
         now,
         cacheControl: vm.cacheControl,

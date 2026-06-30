@@ -60,7 +60,21 @@
     0 8px 24px rgba(0, 0, 0, 0.08),
     0 18px 44px rgba(0, 0, 0, 0.1);
   --hc-scan-hero-fill: linear-gradient(160deg, #ffffff 0%, #fafafa 50%, #f5f5f7 100%);
+  --hc-scan-hero-fill-glass: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.78) 0%,
+    rgba(248, 248, 250, 0.68) 50%,
+    rgba(242, 242, 245, 0.74) 100%
+  );
+  --hc-scan-hero-backdrop: blur(18px) saturate(1.12);
   --hc-scan-hero-border: rgba(60, 60, 67, 0.14);
+  --hc-scan-page-canvas: linear-gradient(
+    165deg,
+    #dfe2ea 0%,
+    #f2f2f7 42%,
+    #f2f2f7 58%,
+    #e8ecf4 100%
+  );
   --hc-emphasis-card-fill-active: linear-gradient(
     160deg,
     #f6f8f7 0%,
@@ -1716,6 +1730,8 @@ a.hub-card-menu-item {
 .landing-framing.hc-emphasis-card,
 .landing-privacy-card.hc-emphasis-card,
 .landing-final-cta.hc-emphasis-card,
+.city-game-map-plate.hc-emphasis-card,
+.public-networks-plate.hc-emphasis-card,
 .device-cross-tab-banner.hc-emphasis-card,
 .device-live-proof-banner.hc-emphasis-card,
 .device-pwa-install-card.hc-emphasis-card,
@@ -1731,6 +1747,8 @@ a.hub-card-menu-item {
 .landing-framing.hc-emphasis-card .hc-emphasis-card__main,
 .landing-privacy-card.hc-emphasis-card .hc-emphasis-card__main,
 .landing-final-cta.hc-emphasis-card .hc-emphasis-card__main,
+.city-game-map-plate.hc-emphasis-card .hc-emphasis-card__main,
+.public-networks-plate.hc-emphasis-card .hc-emphasis-card__main,
 .device-cross-tab-banner.hc-emphasis-card .hc-emphasis-card__main,
 .device-live-proof-banner.hc-emphasis-card .hc-emphasis-card__main,
 .device-pwa-install-card.hc-emphasis-card .hc-emphasis-card__main,
@@ -1743,6 +1761,8 @@ a.hub-card-menu-item {
 
 .landing-framing.hc-emphasis-card .hc-emphasis-card__actions,
 .landing-final-cta.hc-emphasis-card .hc-emphasis-card__actions,
+.city-game-map-plate.hc-emphasis-card .hc-emphasis-card__actions,
+.public-networks-plate.hc-emphasis-card .hc-emphasis-card__actions,
 .device-cross-tab-banner.hc-emphasis-card .hc-emphasis-card__actions,
 .device-live-proof-banner.hc-emphasis-card .hc-emphasis-card__actions,
 .device-pwa-install-card.hc-emphasis-card .hc-emphasis-card__actions,
@@ -7405,6 +7425,40 @@ body.created-tags-manage-open {
   min-height: 44px;
 }
 
+.created-live-shop-link--subtle {
+  display: block;
+  width: 100%;
+  min-height: 0;
+  padding: 2px 0 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.35;
+  text-align: center;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  color: var(--grey);
+}
+
+.created-live-shop-link--subtle:hover,
+.created-live-shop-link--subtle:focus-visible {
+  color: var(--black);
+}
+
+.created-shop-order-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.created-shop-order-actions .btn-primary,
+.created-shop-order-actions .btn-secondary {
+  width: 100%;
+  justify-content: center;
+}
+
 body[data-created-mode="control"] .created-dashboard .created-qr-preview-wrap {
   display: none !important;
 }
@@ -10348,6 +10402,72 @@ body[data-created-mode="setup"] #created-setup-keys-mount .flow-keys-panel {
   margin-top: 10px;
 }
 
+.created-game-node-unlock-edges,
+.created-game-node-print-pack {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.08));
+}
+
+.created-game-node-unlock-edges-lead,
+.created-game-node-print-pack-lead {
+  margin-bottom: 10px;
+}
+
+.created-game-node-unlock-edges-issues {
+  margin: 8px 0 10px;
+  padding-left: 1.1rem;
+  font-size: 0.92rem;
+}
+
+.created-game-node-unlock-edges-issues li.is-ready {
+  color: var(--hc-success-text, #166534);
+}
+
+.created-game-node-unlock-edges-table-wrap,
+.created-game-node-print-pack-table-wrap {
+  overflow-x: auto;
+  margin: 8px 0 10px;
+}
+
+.created-game-node-unlock-edges-table,
+.created-game-node-print-pack-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.created-game-node-unlock-edges-table th,
+.created-game-node-unlock-edges-table td,
+.created-game-node-print-pack-table th,
+.created-game-node-print-pack-table td {
+  border-bottom: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.08));
+  padding: 6px 8px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.created-game-node-unlock-edges-table .form-input,
+.created-game-node-print-pack-table .form-input {
+  min-width: 8rem;
+}
+
+.created-game-node-print-pack-table tr.is-missing-qr td {
+  opacity: 0.72;
+}
+
+.created-game-node-unlock-edges-actions,
+.created-game-node-print-pack-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.created-game-node-print-pack-actions .btn-text {
+  margin-right: 6px;
+}
+
 .created-game-node-setup {
   margin-top: 12px;
   padding-top: 12px;
@@ -10541,6 +10661,9 @@ body[data-created-mode="setup"] #created-setup-keys-mount .flow-keys-panel {
 }
 
 .created-manage-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   margin-bottom: 20px;
 }
 
@@ -10549,7 +10672,7 @@ body[data-created-mode="setup"] #created-setup-keys-mount .flow-keys-panel {
 }
 
 .created-manage-group-label {
-  margin: 0 0 8px 2px;
+  margin: 0 0 0 2px;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -10626,7 +10749,11 @@ body[data-created-mode="setup"] #created-setup-keys-mount .flow-keys-panel {
 .created-manage-tools {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
+}
+
+#created-tab-advanced .created-manage-group + .settings-disclosure {
+  margin-top: 8px;
 }
 
 .created-manage-tools .settings-disclosure:first-child {
@@ -11311,6 +11438,12 @@ body.device-shell-created .flow-keys-group .list-row {
   --map-surface: var(--white);
   --map-red-soft: rgba(219, 27, 67, 0.08);
   --map-red-line: rgba(219, 27, 67, 0.22);
+  /* Selection / list chrome — info tint; red reserved for Next, express, scan CTAs */
+  --map-select-border: var(--hc-emphasis-card-border-info);
+  --map-select-fill: var(--hc-emphasis-card-fill-info-glass);
+  --map-select-ink: var(--hc-emphasis-card-eyebrow-info);
+  --map-select-ring: rgba(0, 122, 255, 0.22);
+  --map-select-soft: rgba(0, 122, 255, 0.08);
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -11319,32 +11452,616 @@ body.device-shell-created .flow-keys-group .list-row {
   overflow-x: clip;
 }
 
+/* Map-first board — sketch hero, compact status strip, list below */
+.city-game-map-board--map-first {
+  gap: 10px;
+}
+
+/* Network lens — transit map presentation (SF-3 Phase 1) */
+/* Default: dots only on the full sketch; label state on express spine + Next + selection. */
+.city-game-map-board--network-lens .city-game-map-pin-label,
+.city-game-map-board--network-lens .city-game-map-pin-state,
+.city-game-map-board--network-lens .city-game-map-pin-next {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.city-game-map-board--network-lens .city-game-map-pin--spine .city-game-map-pin-label,
+.city-game-map-board--network-lens .city-game-map-pin--spine .city-game-map-pin-state,
+.city-game-map-board--network-lens .city-game-map-pin--next .city-game-map-pin-label,
+.city-game-map-board--network-lens .city-game-map-pin--next .city-game-map-pin-state,
+.city-game-map-board--network-lens .city-game-map-pin--next .city-game-map-pin-next,
+.city-game-map-board--network-lens .city-game-map-pin--highlight .city-game-map-pin-label,
+.city-game-map-board--network-lens .city-game-map-pin--highlight .city-game-map-pin-state {
+  visibility: visible;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.city-game-map-pin-hit {
+  fill: transparent;
+  stroke: none;
+  pointer-events: all;
+}
+
+.city-game-map-board--network-lens .city-game-map-pin--spine .city-game-map-pin-label,
+.city-game-map-board--network-lens .city-game-map-pin--next .city-game-map-pin-label,
+.city-game-map-board--network-lens .city-game-map-pin--highlight .city-game-map-pin-label {
+  font-size: 3.1px;
+  font-weight: 700;
+  fill: var(--map-ink, #1a1a1a);
+}
+
+.city-game-map-board--network-lens .city-game-map-pin--spine .city-game-map-pin-state,
+.city-game-map-board--network-lens .city-game-map-pin--next .city-game-map-pin-state,
+.city-game-map-board--network-lens .city-game-map-pin--highlight .city-game-map-pin-state {
+  font-size: 2.6px;
+  fill: var(--map-ink-soft, #5c5c5c);
+}
+
+.city-game-map-board--network-lens .city-game-map-pin-next {
+  font-size: 2.8px;
+  font-weight: 800;
+  fill: var(--red, #db1b43);
+  letter-spacing: 0.04em;
+}
+
+.city-game-map-pin--spine .city-game-map-pin-dot {
+  stroke-width: 0.55;
+  stroke: rgba(219, 27, 67, 0.55);
+}
+
+.city-game-map-pin--next .city-game-map-pin-dot {
+  fill: var(--red, #db1b43);
+}
+
+.city-game-map-edge--express {
+  stroke: rgba(219, 27, 67, 0.55);
+  stroke-width: 0.65;
+}
+
+.city-game-map-edge--express.city-game-map-edge--next {
+  stroke: rgba(219, 27, 67, 0.95);
+  stroke-width: 0.75;
+  animation: city-game-map-edge-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes city-game-map-edge-pulse {
+  0%,
+  100% {
+    stroke-opacity: 0.55;
+  }
+  50% {
+    stroke-opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .city-game-map-edge--express.city-game-map-edge--next {
+    animation: none;
+    stroke-opacity: 1;
+  }
+}
+
+.city-game-map-contest-overlay {
+  margin: 0 0 8px;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--map-ink-soft, #444);
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.city-game-map-sketch-hero--contest .city-game-map-sketch-hero-figure {
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+.city-game-map-pin--relay-held .city-game-map-pin-dot {
+  stroke: rgba(90, 70, 180, 0.75);
+  stroke-width: 0.65;
+}
+
+.city-game-map-drawer {
+  margin-top: 4px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: var(--white);
+}
+
+.city-game-map-drawer-summary {
+  cursor: pointer;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-weight: 700;
+  list-style: none;
+}
+
+.city-game-map-drawer-summary::-webkit-details-marker {
+  display: none;
+}
+
+.city-game-map-drawer-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 0 14px 14px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.city-game-map-drawer-body .city-game-map-activity,
+.city-game-map-drawer-body .city-game-map-routes-preview {
+  margin: 0;
+}
+
+.city-game-map-legend-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.city-game-map-legend-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.city-game-map-legend-label {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.city-game-map-legend-note {
+  font-size: 13px;
+  color: var(--map-ink-soft, #555);
+  line-height: 1.35;
+}
+
+.city-game-map-selection-panel[hidden] {
+  display: none !important;
+}
+
+.city-game-map-plate.hc-emphasis-card {
+  margin: 0 0 10px;
+  padding: var(--hc-emphasis-card-padding-block-compact)
+    var(--hc-emphasis-card-padding-inline-compact);
+  gap: var(--hc-emphasis-card-gap-section-compact);
+}
+
+.city-game-map-plate.hc-emphasis-card .hc-emphasis-card__eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.city-game-map-plate.hc-emphasis-card .hc-emphasis-card__title {
+  font-size: 17px;
+  letter-spacing: -0.02em;
+}
+
+/* Rules page — emphasis plates (network lens visual Phase D) */
+.city-game-rules-guide-grid,
+.city-game-rules-prove-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.city-game-rules-plate.hc-emphasis-card {
+  margin: 0;
+  padding: var(--hc-emphasis-card-padding-block-compact)
+    var(--hc-emphasis-card-padding-inline-compact);
+  gap: var(--hc-emphasis-card-gap-section-compact);
+  align-items: flex-start;
+}
+
+.city-game-rules-plate.hc-emphasis-card .hc-emphasis-card__title {
+  font-size: 16px;
+  letter-spacing: -0.02em;
+}
+
+.city-game-rules-plate.hc-emphasis-card .hc-emphasis-card__detail {
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.city-game-rules-board-cta.hc-emphasis-card {
+  align-items: center;
+}
+
+.city-game-rules-board-cta .hc-emphasis-card__cta {
+  margin-top: 4px;
+}
+
 .city-game-map-live-state {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 14px 16px 12px;
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(219, 27, 67, 0.18);
-  background: linear-gradient(
-    180deg,
-    rgba(219, 27, 67, 0.07) 0%,
-    rgba(255, 255, 255, 0.98) 100%
-  );
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
 }
 
-.city-game-map-live-state .city-game-map-lobby {
+.city-game-map-board-intro {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--muted, #5c5c60);
+}
+
+.city-game-map-orient {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+}
+
+.city-game-map-orient .city-game-map-board-intro {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.city-game-map-start-callout {
+  width: 100%;
+  margin: 0;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.city-game-map-start-callout .hc-emphasis-card__main {
+  width: 100%;
+}
+
+.city-game-map-start-callout .hc-emphasis-card__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.city-game-map-start-callout:active {
+  opacity: 0.92;
+  transform: scale(0.995);
+}
+
+.city-game-map-primary-action {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+}
+
+.city-game-map-primary-action-btn {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.city-game-map-how-details {
+  margin: 0;
+  border: 1px solid var(--hc-emphasis-card-border, rgba(0, 0, 0, 0.08));
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: var(--hc-emphasis-card-bg, rgba(255, 255, 255, 0.72));
+}
+
+.city-game-map-how-summary {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--hc-emphasis-card-title-fg, inherit);
+}
+
+.city-game-map-how-body {
+  margin-top: 8px;
+}
+
+.city-game-map-page-lead {
+  max-width: 36rem;
+  margin: 8px 0 0;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.city-game-map-live-state .city-game-map-start-callout {
+  margin: 0;
+}
+
+.city-game-map-orient .city-game-map-start-callout {
+  margin: 0;
+}
+
+.city-game-map-live-state-plate {
+  width: 100%;
+}
+
+.city-game-map-live-state .city-game-map-lobby,
+.city-game-map-mission--in-plate {
   padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .city-game-map-live-state .city-game-map-mission {
-  padding: 14px 16px;
-  border: 1px solid rgba(219, 27, 67, 0.18);
-  background: linear-gradient(
-    180deg,
-    rgba(219, 27, 67, 0.07) 0%,
-    rgba(255, 255, 255, 0.98) 100%
-  );
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.city-game-map-live-state-title {
+  margin: 0;
+}
+
+.city-game-map-hook {
+  margin: var(--hc-emphasis-card-gap-copy) 0 0;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--hc-emphasis-card-title-fg);
+}
+
+.city-game-map-progress {
+  margin: 6px 0 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--hc-emphasis-card-detail-fg);
+}
+
+.city-game-map-mission-world {
+  margin: 6px 0 0;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--hc-emphasis-card-detail-fg);
+}
+
+.city-game-map-selection-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.city-game-map-selection-kicker {
+  margin: 0;
+}
+
+.city-game-map-selection-title {
+  margin: 0;
+  line-height: 1.25;
+}
+
+.city-game-map-selection-state {
+  margin: 0;
+  font-weight: 600;
+  color: var(--hc-emphasis-card-detail-fg);
+}
+
+.city-game-map-selection-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+  width: 100%;
+}
+
+.city-game-map-list-lens {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0 8px;
+}
+
+.city-game-map-list-lens-btn {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: var(--white);
+  cursor: pointer;
+}
+
+.city-game-map-list-lens-btn[aria-pressed="true"],
+.city-game-map-list-lens-btn--active {
+  border-color: var(--map-select-border);
+  background: var(--map-select-fill);
+  color: var(--map-select-ink);
+  box-shadow: var(--hc-emphasis-card-shadow);
+}
+
+.city-game-map-sketch-hero {
+  margin: 0;
+}
+
+.city-game-map-sketch-hero-figure.city-game-map-mobile-sketch {
+  margin: 0;
+  padding: 10px 10px 8px;
+  border-radius: 14px;
+  border: 0.5px solid var(--hc-emphasis-card-border-neutral);
+  background: var(--hc-emphasis-card-fill-info-glass);
+  box-shadow: var(--hc-emphasis-card-shadow);
+  -webkit-backdrop-filter: var(--hc-emphasis-card-backdrop);
+  backdrop-filter: var(--hc-emphasis-card-backdrop);
+}
+
+.city-game-map-sketch-hero-figure .city-game-map-svg {
+  min-height: 14rem;
+}
+
+/* Cold-load compact sketch — mobile first viewport fits orient + action */
+@media (max-width: 640px) {
+  .city-game-map-board--cold-sketch:not(.city-game-map-board--sketch-expanded)
+    .city-game-map-sketch-hero-figure.city-game-map-mobile-sketch {
+    padding: 6px 8px 4px;
+  }
+
+  .city-game-map-board--cold-sketch:not(.city-game-map-board--sketch-expanded)
+    .city-game-map-sketch-hero-figure
+    .city-game-map-svg {
+    min-height: 7.25rem;
+    max-height: 8rem;
+  }
+
+  .city-game-map-board--cold-sketch:not(.city-game-map-board--sketch-expanded)
+    .city-game-map-figcaption {
+    margin-top: 2px;
+    font-size: 11px;
+    line-height: 1.3;
+  }
+
+  .city-game-map-board--map-first {
+    gap: 8px;
+  }
+}
+
+.city-game-map-live-state--compact {
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.city-game-map-live-state--compact .city-game-map-live-state-title {
+  margin: 0;
+}
+
+.city-game-map-mission--compact {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.city-game-map-mission--compact .city-game-map-status-lead,
+.city-game-map-mission--compact .city-game-map-hook {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--hc-emphasis-card-detail-fg);
+}
+
+.city-game-map-quest-hook {
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--map-ink, #1a1a1a);
+}
+
+.city-game-map-mission--compact .city-game-map-progress {
+  margin: 2px 0 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--hc-emphasis-card-detail-fg);
+}
+
+.city-game-map-mission--compact .city-game-map-mission-world {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--map-ink-soft);
+}
+
+.city-game-map-mission-details {
+  margin-top: 6px;
+}
+
+.city-game-map-mission-details-summary {
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--map-ink-soft);
+}
+
+.city-game-map-mission--compact .city-game-map-mission-privacy {
+  margin: 6px 0 0;
+  font-size: 12px;
+}
+
+.city-game-map-page-hero {
+  margin-bottom: 4px;
+}
+
+.city-game-map-page .city-game-map-section {
+  margin-top: 4px;
+}
+
+.city-game-map-page .city-game-map-season-chip {
+  margin: 6px 0 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+.city-game-map-page .city-game-map-season-chip p {
+  margin: 0;
+}
+
+.city-game-map-page .city-game-map-season-chip p[data-city-game-season-banner-body]:empty,
+.city-game-map-page .city-game-map-season-chip p[data-city-game-season-banner-body][hidden] {
+  display: none;
+}
+
+.city-game-map-page-footnote {
+  margin-top: 12px;
+}
+
+.player-flow-breadcrumb {
+  margin: 0 0 12px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: rgba(60, 60, 67, 0.72);
+}
+
+.player-flow-breadcrumb a {
+  color: var(--hc-notice-link, #007aff);
+  text-decoration: none;
+}
+
+.player-flow-breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.player-flow-breadcrumb-sep {
+  opacity: 0.55;
+}
+
+.city-game-map-first-visit-mount:not([hidden]) {
+  margin-bottom: 12px;
+}
+
+.city-game-map-first-visit-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 12px;
+  margin: 0;
+}
+
+.city-game-map-first-visit-banner-copy {
+  margin: 0;
+  flex: 1 1 12rem;
+}
+
+.city-game-map-first-visit-dismiss {
+  flex-shrink: 0;
 }
 
 .city-game-map-mission-objective {
@@ -11360,7 +12077,7 @@ body.device-shell-created .flow-keys-group .list-row {
   font-size: 14px;
   line-height: 1.4;
   font-weight: 700;
-  color: var(--red);
+  color: var(--hc-emphasis-card-eyebrow-active);
 }
 
 .city-game-map-spotlight-chain {
@@ -11438,6 +12155,86 @@ body.device-shell-created .flow-keys-group .list-row {
   border-radius: var(--radius-lg);
   border: 1px solid var(--map-line, rgba(0, 0, 0, 0.1));
   background: var(--map-surface, var(--white));
+}
+
+.city-game-map-routes-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--hc-emphasis-card-border, rgba(0, 0, 0, 0.08));
+  background: var(--hc-emphasis-card-bg, rgba(255, 255, 255, 0.72));
+}
+
+.city-game-map-routes-strip-title {
+  margin: 0;
+  font-size: 13px;
+}
+
+.city-game-map-routes-strip-intro {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--map-ink-soft);
+}
+
+.city-game-map-routes-strip-more {
+  align-self: flex-start;
+  margin: 2px 0 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--red, #db1b43);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.city-game-map-routes-strip-more:active {
+  opacity: 0.85;
+}
+
+.city-game-map-route-list--interactive {
+  gap: 6px;
+}
+
+.city-game-map-route-item {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+button.city-game-map-route-row {
+  width: 100%;
+  margin: 0;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button.city-game-map-route-row:active {
+  opacity: 0.92;
+}
+
+.city-game-map-route-row--highlight {
+  border-color: rgba(219, 27, 67, 0.42) !important;
+  background: rgba(219, 27, 67, 0.1) !important;
+}
+
+.city-game-map-edge.city-game-map-edge--highlight {
+  stroke: var(--red, #db1b43);
+  stroke-width: 2.6;
+  opacity: 1;
 }
 
 .city-game-map-routes-intro {
@@ -11536,15 +12333,15 @@ body.device-shell-created .flow-keys-group .list-row {
   display: none !important;
 }
 
-.city-game-map-mission {
-  padding: 14px 16px;
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(219, 27, 67, 0.18);
-  background: linear-gradient(
-    180deg,
-    rgba(219, 27, 67, 0.07) 0%,
-    rgba(255, 255, 255, 0.98) 100%
-  );
+.city-game-map-mission:not(.city-game-map-mission--in-plate) {
+  padding: var(--hc-emphasis-card-padding-block-compact)
+    var(--hc-emphasis-card-padding-inline-compact);
+  border-radius: 14px;
+  border: 0.5px solid var(--hc-emphasis-card-border-neutral);
+  background: var(--hc-emphasis-card-fill-info-glass);
+  box-shadow: var(--hc-emphasis-card-shadow);
+  -webkit-backdrop-filter: var(--hc-emphasis-card-backdrop);
+  backdrop-filter: var(--hc-emphasis-card-backdrop);
 }
 
 .city-game-map-mission-lines {
@@ -11735,8 +12532,8 @@ body.device-shell-created .flow-keys-group .list-row {
 }
 
 .city-game-map-node-row--spotlight {
-  border-color: rgba(219, 27, 67, 0.28);
-  background: rgba(219, 27, 67, 0.03);
+  border-color: var(--map-select-border);
+  background: var(--map-select-soft);
 }
 
 .city-game-map-browse {
@@ -12087,16 +12884,23 @@ body.device-shell-created .flow-keys-group .list-row {
   stroke: rgba(120, 120, 120, 0.75);
 }
 
-.city-game-map-pin--highlight .city-game-map-pin-dot {
-  fill: rgba(219, 27, 67, 0.16);
-  stroke: rgba(219, 27, 67, 1);
+.city-game-map-pin--highlight:not(.city-game-map-pin--next) .city-game-map-pin-dot {
+  fill: var(--map-select-soft);
+  stroke: var(--map-select-ink);
   stroke-width: 1.05;
-  filter: drop-shadow(0 0 1px rgba(219, 27, 67, 0.55));
+  filter: drop-shadow(0 0 1px var(--map-select-ring));
 }
 
-.city-game-map-pin--highlight .city-game-map-pin-label {
-  fill: var(--red);
+.city-game-map-pin--highlight:not(.city-game-map-pin--next) .city-game-map-pin-label {
+  fill: var(--map-ink);
   font-weight: 800;
+}
+
+.city-game-map-pin--next.city-game-map-pin--highlight .city-game-map-pin-dot {
+  fill: var(--red, #db1b43);
+  stroke: var(--red, #db1b43);
+  stroke-width: 1.05;
+  filter: drop-shadow(0 0 1px rgba(219, 27, 67, 0.55));
 }
 
 .city-game-map-pin-label {
@@ -12168,36 +12972,10 @@ body.device-shell-created .flow-keys-group .list-row {
   gap: 12px;
 }
 
-.city-game-map-start-callout {
-  padding: 14px 16px;
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(219, 27, 67, 0.24);
-  background: rgba(219, 27, 67, 0.05);
-}
-
-.city-game-map-start-callout-kicker {
-  margin: 0 0 4px;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--red);
-}
-
-.city-game-map-start-callout-title {
-  margin: 0 0 4px;
-  font-size: 17px;
-  font-weight: 800;
-  line-height: 1.3;
-  color: var(--black);
-}
-
+.city-game-map-start-callout-kicker,
+.city-game-map-start-callout-title,
 .city-game-map-start-callout-why {
   margin: 0;
-  font-size: 14px;
-  line-height: 1.4;
-  font-weight: 600;
-  color: rgba(0, 0, 0, 0.72);
 }
 
 .city-game-map-mobile-sketch {
@@ -12220,13 +12998,13 @@ body.device-shell-created .flow-keys-group .list-row {
   flex-direction: column;
   gap: 10px;
   margin: 0 0 10px;
-  padding: 12px 0 14px;
-  border: 0;
-  border-top: 1px solid var(--map-line);
-  border-bottom: 1px solid var(--map-line);
-  border-radius: 0;
-  background: var(--map-surface);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  padding: 12px 14px;
+  border: 0.5px solid var(--map-select-border);
+  border-radius: var(--radius-lg);
+  background: var(--map-select-fill);
+  box-shadow: var(--hc-emphasis-card-shadow);
+  -webkit-backdrop-filter: var(--hc-emphasis-card-backdrop);
+  backdrop-filter: var(--hc-emphasis-card-backdrop);
   position: sticky;
   top: 0;
   z-index: 4;
@@ -12267,7 +13045,7 @@ body.device-shell-created .flow-keys-group .list-row {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--red);
+  color: var(--map-select-ink);
 }
 
 .city-game-map-selection-bar-title {
@@ -12298,10 +13076,10 @@ body.device-shell-created .flow-keys-group .list-row {
   font-weight: 700;
   line-height: 1.2;
   padding: 8px 14px;
-  border: 1px solid rgba(219, 27, 67, 0.28);
+  border: 1px solid var(--map-select-border);
   border-radius: var(--radius-pill);
   background: var(--white);
-  color: var(--red);
+  color: var(--map-select-ink);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
@@ -12311,7 +13089,7 @@ body.device-shell-created .flow-keys-group .list-row {
 }
 
 .city-game-map-selection-bar-action:focus-visible {
-  outline: 2px solid rgba(219, 27, 67, 0.55);
+  outline: 2px solid var(--map-select-ring);
   outline-offset: 2px;
 }
 
@@ -12325,7 +13103,7 @@ body.device-shell-created .flow-keys-group .list-row {
 
 .city-game-map-pin--highlight .city-game-map-pin-label {
   visibility: visible !important;
-  fill: var(--red);
+  fill: var(--map-ink);
   font-weight: 800;
 }
 
@@ -12345,6 +13123,35 @@ body.device-shell-created .flow-keys-group .list-row {
   font-weight: 600;
   border-width: 1px;
   opacity: 0.88;
+}
+
+.city-game-map-discovery-crosslinks {
+  margin: 6px 0 0;
+}
+
+.city-game-map-discovery-link {
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.city-game-map-discovery-link:hover {
+  text-decoration: underline;
+}
+
+.city-game-map-discovery-link--secondary {
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.88;
+}
+
+.city-game-map-node-actions .city-game-map-discovery-link--secondary {
+  order: 2;
+}
+
+.city-game-map-selection-actions .city-game-map-discovery-link--secondary {
+  min-height: 34px;
+  padding: 6px 12px;
+  font-size: 12px;
 }
 
 .city-game-map-node-actions {
@@ -12480,14 +13287,14 @@ body.device-shell-created .flow-keys-group .list-row {
 }
 
 .city-game-map-filter-btn--active {
-  border-color: var(--red);
-  background: var(--red);
+  border-color: var(--map-select-ink);
+  background: var(--map-select-ink);
   color: var(--white);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.22),
     0 0 0 2px rgba(255, 255, 255, 0.96),
-    0 0 0 4px rgba(219, 27, 67, 0.52),
-    0 4px 14px rgba(219, 27, 67, 0.34);
+    0 0 0 4px var(--map-select-ring),
+    0 4px 14px rgba(0, 122, 255, 0.28);
   transform: translateY(-1px);
 }
 
@@ -12513,7 +13320,7 @@ body.device-shell-created .flow-keys-group .list-row {
 }
 
 .city-game-map-filter-btn:focus-visible {
-  outline: 2px solid rgba(219, 27, 67, 0.55);
+  outline: 2px solid var(--map-select-ring);
   outline-offset: 2px;
 }
 
@@ -12530,16 +13337,12 @@ body.device-shell-created .flow-keys-group .list-row {
   margin: 0;
   padding: 12px 14px 12px 12px;
   border-radius: var(--radius-md, 12px);
-  border: 1px solid rgba(219, 27, 67, 0.34);
-  border-left: 4px solid var(--red);
-  background: linear-gradient(
-    90deg,
-    rgba(219, 27, 67, 0.12) 0%,
-    rgba(219, 27, 67, 0.06) 100%
-  );
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.72) inset,
-    0 2px 10px rgba(219, 27, 67, 0.1);
+  border: 0.5px solid var(--map-select-border);
+  border-left: 4px solid var(--map-select-ink);
+  background: var(--map-select-fill);
+  box-shadow: var(--hc-emphasis-card-shadow);
+  -webkit-backdrop-filter: var(--hc-emphasis-card-backdrop);
+  backdrop-filter: var(--hc-emphasis-card-backdrop);
 }
 
 .city-game-map-filter-summary--live {
@@ -12644,7 +13447,7 @@ body.device-shell-created .flow-keys-group .list-row {
 }
 
 .city-game-map-board--filtered .city-game-map-district:not([hidden]) .city-game-map-district-label {
-  color: var(--red);
+  color: var(--map-select-ink);
   letter-spacing: 0.1em;
 }
 
@@ -12686,17 +13489,19 @@ body.device-shell-created .flow-keys-group .list-row {
 
 .city-game-map-node-row--highlight,
 .city-game-map-node-row:focus-visible {
-  border-color: rgba(219, 27, 67, 0.42);
-  background: rgba(219, 27, 67, 0.06);
-  box-shadow: 0 0 0 2px rgba(219, 27, 67, 0.12);
+  border-color: var(--map-select-border);
+  background: var(--map-select-fill);
+  box-shadow:
+    var(--hc-emphasis-card-shadow),
+    0 0 0 1px var(--map-select-ring);
 }
 
 .city-game-map-board--place-selected .city-game-map-node-row--highlight {
   position: relative;
-  border-color: var(--map-line);
-  background: rgba(0, 0, 0, 0.02);
-  box-shadow: none;
-  border-left: 3px solid var(--red);
+  border-color: var(--map-select-border);
+  background: var(--map-select-fill);
+  box-shadow: var(--hc-emphasis-card-shadow);
+  border-left: 3px solid var(--map-select-ink);
   padding-left: 9px;
 }
 
@@ -12714,9 +13519,11 @@ body.device-shell-created .flow-keys-group .list-row {
 }
 
 .city-game-map-board--place-selected .city-game-map-node-row--highlight:focus-visible {
-  border-color: var(--map-line);
-  background: rgba(0, 0, 0, 0.03);
-  box-shadow: 0 0 0 2px rgba(219, 27, 67, 0.2);
+  border-color: var(--map-select-border);
+  background: var(--map-select-fill);
+  box-shadow:
+    var(--hc-emphasis-card-shadow),
+    0 0 0 2px var(--map-select-ring);
 }
 
 .city-game-map-node-row--live {
@@ -12809,6 +13616,48 @@ body.device-shell-created .flow-keys-group .list-row {
 
 .city-game-map-node-row--state-first .city-game-map-node-actions {
   margin-top: 8px;
+  display: flex;
+}
+
+.city-game-map-node-row--state-first .city-game-map-node-live {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.city-game-map-node-row--state-first .city-game-map-node-live .city-game-map-scan-link,
+.city-game-map-node-row--state-first .city-game-map-node-live .city-game-map-live-hint.city-game-map-row-cta {
+  width: 100%;
+}
+
+.city-game-map-node-secondary-actions {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--map-ink-soft);
+}
+
+.city-game-map-secondary-sep {
+  color: var(--map-ink-soft);
+}
+
+.city-game-map-maps-link--text,
+.city-game-map-discovery-link--text {
+  display: inline;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--map-ink-soft);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.city-game-map-maps-link--text:active,
+.city-game-map-discovery-link--text:active {
+  opacity: 0.85;
 }
 
 .city-game-map-node-details {

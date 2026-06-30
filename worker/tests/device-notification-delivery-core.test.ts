@@ -6,10 +6,12 @@ import {
 import {
   buildForegroundAttentionPlan,
   buildOsNotificationPlans,
+  buildRelayOfferOsPlan,
   buildShellBadgeDeliveryPlan,
   filterOsPlansByDedupe,
   hubInboxGroupVisibilityFromItems,
   liveProofPendingFromInbox,
+  osPlanToSwNotificationPayload,
   relayOfferPendingFromInbox,
 } from "../../site/js/device-notification-delivery-core.mjs";
 
@@ -131,5 +133,52 @@ describe("buildForegroundAttentionPlan", () => {
     const plan = buildForegroundAttentionPlan(items, { tabVisible: false });
     expect(plan.show).toBe(false);
     expect(plan.topU0Kind).toBeNull();
+  });
+});
+
+describe("osPlanToSwNotificationPayload", () => {
+  it("maps live proof plan to SW showNotification shape", () => {
+    const payload = osPlanToSwNotificationPayload(
+      {
+        kind: "live_proof",
+        tag: "hc-live-proof",
+        dedupeKey: "c1",
+        title: "Door",
+        body: "Tap to sign",
+        href: "https://humanity.llc/wallet/?live_challenge=c1",
+        openInboxOnClick: false,
+        requireInteraction: true,
+      },
+      "https://humanity.llc"
+    );
+    expect(payload.data.href).toContain("live_challenge=c1");
+    expect(payload.data.openInboxOnClick).toBe(false);
+    expect(payload.requireInteraction).toBe(true);
+  });
+
+  it("maps relay plan to wallet inbox open on click", () => {
+    const payload = osPlanToSwNotificationPayload(
+      {
+        kind: "relay_offer",
+        tag: "hc-relay-offer",
+        dedupeKey: "1",
+        title: "Finder message",
+        body: "Open Humanity",
+        openInboxOnClick: true,
+        requireInteraction: true,
+      },
+      "https://humanity.llc"
+    );
+    expect(payload.data.openInboxOnClick).toBe(true);
+    expect(payload.data.walletHref).toBe("https://humanity.llc/wallet/");
+  });
+});
+
+describe("buildRelayOfferOsPlan", () => {
+  it("builds relay OS plan for SW when page mirrors pending count", () => {
+    const plan = buildRelayOfferOsPlan(2);
+    expect(plan?.kind).toBe("relay_offer");
+    expect(plan?.openInboxOnClick).toBe(true);
+    expect(plan?.title).toContain("2");
   });
 });

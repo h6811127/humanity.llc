@@ -55,6 +55,9 @@ test.describe("status dot module graph", () => {
       /basic hub available/i
     );
     await expect(page.locator("#device-status-load-error-popover")).toBeHidden();
+    await expect(page.locator("#brand-status-dot-btn")).toHaveAttribute("data-dot-boot", "ready", {
+      timeout: 15_000,
+    });
 
     await page.locator("#brand-status-dot-btn").click();
     await expect(page.locator("body")).toHaveClass(/device-hub-sheet-open/, { timeout: 8000 });

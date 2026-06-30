@@ -4,6 +4,9 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(self), microphone=(), geolocation=()
 
+/discover/*
+  Permissions-Policy: camera=(), microphone=(), geolocation=(self)
+
 /styles.css
   Cache-Control: public, max-age=3600
 

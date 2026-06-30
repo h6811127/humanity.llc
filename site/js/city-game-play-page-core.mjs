@@ -13,8 +13,14 @@ import { seasonBoardPath } from "./city-game-season-path-shared.mjs";
  */
 function showPlayerGuideFallback(list) {
   if (list.children.length) return;
-  list.innerHTML =
-    '<li class="list-row"><span class="list-content"><span class="list-sub">Could not load start guide. Open the place list below or scan any sticker you find.</span></span></li>';
+  list.innerHTML = `<article class="city-game-rules-plate hc-emphasis-card hc-emphasis-card--warn">
+  <div class="hc-emphasis-card__main">
+    <div class="hc-emphasis-card__copy">
+      <p class="hc-emphasis-card__eyebrow">Start guide</p>
+      <p class="hc-emphasis-card__detail">Could not load start guide. Open the place list below or scan any sticker you find.</p>
+    </div>
+  </div>
+</article>`;
 }
 
 /**

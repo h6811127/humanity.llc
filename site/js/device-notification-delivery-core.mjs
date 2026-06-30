@@ -177,19 +177,51 @@ export function buildOsNotificationPlans(items, ctx = {}) {
   const relayItem = items.find((i) => i.kind === "relay_offer");
   const relayCount = relayItem?.count ?? 0;
   if (relayItem && inboxKindAllowsOsNotification("relay_offer") && relayCount > 0) {
-    plans.push({
-      kind: "relay_offer",
-      tag: OS_NOTIFICATION_TAG_RELAY_OFFER,
-      dedupeKey: String(relayCount),
-      title:
-        relayCount === 1 ? "Finder message on your relay" : `${relayCount} finder messages`,
-      body: "Someone replied on your lost-item relay. Open Humanity to read and respond.",
-      openInboxOnClick: true,
-      requireInteraction: true,
-    });
+    const relayPlan = buildRelayOfferOsPlan(relayCount);
+    if (relayPlan) plans.push(relayPlan);
   }
 
   return plans;
+}
+
+/**
+ * Build relay_offer OS plan from pending count (SW mirror when page is dead).
+ *
+ * @param {number} relayCount
+ */
+export function buildRelayOfferOsPlan(relayCount) {
+  if (!Number.isFinite(relayCount) || relayCount <= 0) return null;
+  return {
+    kind: "relay_offer",
+    tag: OS_NOTIFICATION_TAG_RELAY_OFFER,
+    dedupeKey: String(relayCount),
+    title:
+      relayCount === 1 ? "Finder message on your relay" : `${relayCount} finder messages`,
+    body: "Someone replied on your lost-item relay. Open Humanity to read and respond.",
+    openInboxOnClick: true,
+    requireInteraction: true,
+  };
+}
+
+/**
+ * Map inbox OS plan to service worker `showNotification` options.
+ *
+ * @param {OsNotificationPlan} plan
+ * @param {string} pageOrigin
+ */
+export function osPlanToSwNotificationPayload(plan, pageOrigin) {
+  const origin = String(pageOrigin || "https://humanity.llc").replace(/\/$/, "");
+  return {
+    title: plan.title,
+    body: plan.body,
+    tag: plan.tag,
+    requireInteraction: !!plan.requireInteraction,
+    data: {
+      href: plan.href ?? "",
+      openInboxOnClick: !!plan.openInboxOnClick,
+      walletHref: plan.openInboxOnClick ? `${origin}/wallet/` : "",
+    },
+  };
 }
 
 /**
