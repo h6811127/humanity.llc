@@ -1725,7 +1725,7 @@ function renderScanTabKeysScript(
 ): string {
   if (vm.kind !== "active" || !vm.profileId) return "";
   const assetOrigin = pagesJsOrigin(origin, request, originEnv);
-  const mod = JSON.stringify(`${assetOrigin}/js/scan-tab-keys.mjs?v=9`);
+  const mod = JSON.stringify(`${assetOrigin}/js/scan-tab-keys.mjs?v=10`);
   return `<script type="module" src=${mod}></script>`;
 }
 

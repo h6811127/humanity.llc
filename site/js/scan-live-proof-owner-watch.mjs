@@ -8,7 +8,7 @@ import {
   parsePendingChallengeBody,
 } from "./device-live-control-inbox-core.mjs";
 import { setScanPageLiveProofPending } from "./device-live-control-inbox.mjs";
-import { getResolverHealthStatus } from "./device-wallet-since-visit-gate.mjs";
+import { getResolverHealthStatus } from "./device-wallet-since-visit-gate.mjs?v=94";
 import {
   findWalletEntryByProfileId,
   walletEntryQrId,

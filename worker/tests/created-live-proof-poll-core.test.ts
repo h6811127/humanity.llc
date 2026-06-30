@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 
 import {
   createdLiveProofPollShouldRun,
@@ -15,6 +17,17 @@ describe("createdLiveProofPendingPollShouldRun", () => {
     expect(
       createdLiveProofPendingPollShouldRun({ documentVisible: false })
     ).toBe(false);
+  });
+});
+
+describe("created view-mode pending live-proof wiring", () => {
+  it("wires the pending watcher into created.mjs view mode", () => {
+    const src = readFileSync(join(process.cwd(), "site/js/created.mjs"), "utf8");
+    expect(src).toContain(
+      'import { initCreatedLiveProofPendingWatch } from "./created-live-proof-pending-watch.mjs";'
+    );
+    expect(src).toContain("initCreatedLiveProofPendingWatch({");
+    expect(src).toContain("onRestoreKeys: () => focusCreatedViewRestore");
   });
 });
 

@@ -7,7 +7,7 @@ import { listPollableWalletEntries } from "./device-wallet.mjs";
 import { getLiveControlPendingForDisplay } from "./device-live-control-inbox.mjs";
 import { liveControlPendingSignature } from "./device-live-control-inbox-core.mjs";
 import { isBrowserNotifEnabled } from "./device-browser-notifications-core.mjs";
-import { getResolverHealthStatus } from "./device-wallet-since-visit-gate.mjs";
+import { getResolverHealthStatus } from "./device-wallet-since-visit-gate.mjs?v=94";
 import {
   liveProofPollTargetsFromWallet,
   resolveSwPeriodicMinIntervalMs,

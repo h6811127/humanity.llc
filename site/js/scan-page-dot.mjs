@@ -13,6 +13,7 @@ import {
   hasStewardVerification,
 } from "./device-dot-state-core.mjs?v=56";
 import { fetchResolverHealth } from "./device-network-health.mjs";
+import { setResolverHealthStatusForSinceVisit } from "./device-wallet-since-visit-gate.mjs?v=94";
 import { savedControlNeedsDeviceUnlockCopy, savedControlNeedsDeviceUnlockReenrollCopy } from "./device-custody-mode-core.mjs";
 import { getTabSession } from "./device-keys.mjs";
 import { activateRestoreControlInThisTab } from "./device-ownership-restore-in-tab.mjs";
@@ -60,6 +61,7 @@ const OVERLAY_CLASSES = [
 const SCAN_DOT_MODIFIER = "scan-page-dot-device-none-eligible";
 const SCAN_NONE_ATTENTION_CLASS = "scan-page-dot-none-attention";
 const STEWARD_CELEBRATE_CLASS = "pass-dot-steward-celebrate";
+const RESOLVER_HEALTH_CHANGED = "hc-resolver-health-changed";
 
 /** @type {"ok" | "degraded" | "offline"} */
 let networkStatus = "ok";
@@ -469,6 +471,13 @@ export function refreshScanPageDot() {
   renderScanGlanceContent(network, device, overlay, ctx);
 }
 
+function setScanResolverHealth(status) {
+  setResolverHealthStatusForSinceVisit(status);
+  window.dispatchEvent(
+    new CustomEvent(RESOLVER_HEALTH_CHANGED, { detail: { networkStatus: status } })
+  );
+}
+
 async function refreshResolverHealth() {
   if (healthFetchInFlight) return;
   healthFetchInFlight = true;
@@ -478,6 +487,7 @@ async function refreshResolverHealth() {
     } else {
       networkStatus = await fetchResolverHealth(resolverApiOrigin());
     }
+    setScanResolverHealth(networkStatus);
   } finally {
     healthFetchInFlight = false;
     networkResolved = true;
@@ -489,6 +499,7 @@ function onConnectivityChange() {
   if (navigator.onLine === false) {
     networkStatus = "offline";
     networkResolved = true;
+    setScanResolverHealth(networkStatus);
     refreshScanPageDot();
     return;
   }
