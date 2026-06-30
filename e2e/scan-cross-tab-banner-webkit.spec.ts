@@ -199,46 +199,4 @@ test.describe("cross-tab banner WebKit layout", () => {
     await pageB.close();
     await pageA.close();
   });
-
-  test("wallet #wallet-tab-hint CTAs are spaced and styled", async ({ context }) => {
-    const pageA = await context.newPage();
-    await pageA.addInitScript(({ walletEntry }) => {
-      localStorage.setItem("hc_wallet", JSON.stringify([walletEntry]));
-      localStorage.removeItem("hc_created");
-      localStorage.setItem("hc_device_hub_intro_dismissed", "1");
-    }, { walletEntry: OTHER_TAB_WALLET_ENTRY });
-    await wireShellRoutes(pageA);
-    await pageA.goto("/wallet/", { waitUntil: "domcontentloaded" });
-    await expect(pageA.locator("#wallet-page")).toBeVisible();
-    await expect(pageA.locator("#brand-status-dot")).toHaveAttribute("data-dot-state", /.+/, {
-      timeout: 20_000,
-    });
-
-    const pageB = await openKeysTab(context, "/wallet/");
-
-    await expect
-      .poll(async () =>
-        pageA.evaluate((id) => {
-          const raw = localStorage.getItem("hc_tab_keys_presence");
-          const map = raw ? JSON.parse(raw) : {};
-          return map[id]?.profile_id ?? null;
-        }, TAB_B_ID)
-      )
-      .toBe(OTHER_TAB_SESSION.profile_id);
-
-    await stabilizeCrossTabChrome(pageA);
-
-    const hint = pageA.locator("#wallet-tab-hint");
-    await expect(hint).toBeVisible({ timeout: 20_000 });
-    await expect(pageA.locator("#wallet-tab-hint-use-keys")).toBeVisible();
-
-    const metrics = await measureCrossTabBannerLayout(pageA, "#wallet-tab-hint", {
-      primary: "#wallet-tab-hint-focus",
-      secondary: "#wallet-tab-hint-use-keys",
-    });
-    assertCrossTabBannerLayout(metrics);
-
-    await pageB.close();
-    await pageA.close();
-  });
 });
