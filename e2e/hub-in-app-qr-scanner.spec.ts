@@ -257,7 +257,7 @@ test.describe("hub in-app QR scanner (S3)", () => {
       /opens in this app/i
     );
 
-    await page.locator("[data-hub-qr-scanner-close]").click();
+    await page.locator("button.device-hub-qr-scanner-close[data-hub-qr-scanner-close]").click();
     await expect(dialog).not.toHaveAttribute("open", "");
   });
 
