@@ -12,12 +12,11 @@ import {
   resolveProdCabinetSmokeUrls,
 } from "../scripts/ws-object-graph-prod-smoke-core.mjs";
 
-const root = join(import.meta.dirname, "../..");
-const seedPath = join(root, "worker/.local/city-game-seed.json");
+const seedFixturePath = join(import.meta.dirname, "fixtures/city-game-seed-smoke.json");
 
 describe("ws-object-graph-local-smoke-core", () => {
   it("resolves local cabinet URLs from city-game-seed.json", () => {
-    const seed = JSON.parse(readFileSync(seedPath, "utf8"));
+    const seed = JSON.parse(readFileSync(seedFixturePath, "utf8"));
     const urls = resolveLocalCabinetSmokeUrls(seed, "http://127.0.0.1:8787");
     expect(urls.profileId).toBe(seed.profile_id);
     expect(urls.cabinetScan).toContain("qr_Ag51j5E7WAAk5E5t");
