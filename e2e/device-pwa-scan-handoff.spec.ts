@@ -1,3 +1,6 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+
 import { test, expect, type Page } from "@playwright/test";
 
 /**
@@ -8,6 +11,11 @@ import { test, expect, type Page } from "@playwright/test";
 
 const SCAN_FIXTURE = "/e2e-fixtures/scan-active.html";
 const PAGES_ORIGIN = "http://127.0.0.1:8788";
+const SCAN_HANDOFF_URL = /\/c\/7Xk9mP2nQ4rT6vW8yZ1aB3cD5\?q=qr_E2ePwaScanHandoff/;
+const SCAN_FIXTURE_HTML = readFileSync(
+  join(process.cwd(), "site/e2e-fixtures/scan-active.html"),
+  "utf8"
+);
 
 const HANDOFF_ENTRY = {
   id: "e2e_pwa_scan_handoff",
@@ -17,7 +25,7 @@ const HANDOFF_ENTRY = {
   qr_id: "qr_E2ePwaScanHandoff",
   handle: "pwascanhandoff",
   manifesto_line: "Scan handoff test line",
-  scan_url: `${PAGES_ORIGIN}${SCAN_FIXTURE}`,
+  scan_url: `${PAGES_ORIGIN}/c/7Xk9mP2nQ4rT6vW8yZ1aB3cD5?q=qr_E2ePwaScanHandoff`,
   owner_public_key_b58: "pubkeyfortestonlyxxxxxxxxxxxx",
   owner_private_key_b58: "privkeyfortestonlyxxxxxxxxx",
   status: "active",
@@ -85,6 +93,13 @@ async function stubCreatedResolver(page: Page) {
   );
   await page.route("**/.well-known/hc/v1/cards/**/live-control/challenges**", (route) =>
     route.fulfill({ status: 404, contentType: "application/json", body: "{}" })
+  );
+  await page.route(`**/c/${HANDOFF_ENTRY.profile_id}*`, (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "text/html; charset=utf-8",
+      body: SCAN_FIXTURE_HTML,
+    })
   );
 }
 
@@ -184,7 +199,7 @@ test.describe("device PWA scan handoff (P1-PWA-N)", () => {
     await expect(page.locator("#created-setup-panel-test")).toBeVisible({ timeout: 20_000 });
     await page.locator('[data-setup-action="test-scan"]').click();
 
-    await expect(page).toHaveURL(/scan-active/, { timeout: 10_000 });
+    await expect(page).toHaveURL(SCAN_HANDOFF_URL, { timeout: 10_000 });
     await expect(page).toHaveURL(/hc_return=/);
     await expect(page.locator("#scan-steward-preview-return")).toBeVisible();
     await expect(page.locator("#scan-steward-preview-return-link")).toContainText(
@@ -204,7 +219,7 @@ test.describe("device PWA scan handoff (P1-PWA-N)", () => {
     await expect(page.locator("#created-setup-panel-test")).toBeVisible({ timeout: 20_000 });
     await page.locator('[data-setup-action="test-scan"]').click();
 
-    await expect(page).toHaveURL(/scan-active/, { timeout: 10_000 });
+    await expect(page).toHaveURL(SCAN_HANDOFF_URL, { timeout: 10_000 });
     await page.goBack();
     await expect(page).toHaveURL(/\/created\//);
     await expect(page).toHaveURL(/#setup-test/);
@@ -223,7 +238,7 @@ test.describe("device PWA scan handoff (P1-PWA-N)", () => {
     await page.locator('[data-setup-action="test-scan"]').click();
     const popup = await popupPromise;
 
-    await expect(popup).toHaveURL(/scan-active/, { timeout: 10_000 });
+    await expect(popup).toHaveURL(SCAN_HANDOFF_URL, { timeout: 10_000 });
     await expect(page).toHaveURL(/\/created\//);
     await expect(page).toHaveURL(/#setup-test/);
     await popup.close();
@@ -239,7 +254,7 @@ test.describe("device PWA scan handoff (P1-PWA-N)", () => {
 
     await expect(page).toHaveURL(/#setup-protect/);
     await expect(page.locator("#created-setup-panel-protect")).toBeVisible({ timeout: 10_000 });
-    await expect(page).not.toHaveURL(/scan-active/);
+    await expect(page).not.toHaveURL(SCAN_HANDOFF_URL);
   });
 
   test("standalone Continue on test scan advances without opening scan (P1b)", async ({ page }) => {
@@ -253,7 +268,7 @@ test.describe("device PWA scan handoff (P1-PWA-N)", () => {
 
     await expect(page).toHaveURL(/#setup-protect/);
     await expect(page.locator("#created-setup-panel-protect")).toBeVisible({ timeout: 10_000 });
-    await expect(page).not.toHaveURL(/scan-active/);
+    await expect(page).not.toHaveURL(SCAN_HANDOFF_URL);
   });
 
   test("standalone hub Open scan stays in same tab (P1-PWA-N step 4)", async ({ page }) => {
@@ -264,7 +279,7 @@ test.describe("device PWA scan handoff (P1-PWA-N)", () => {
     await openHubSheet(page);
 
     await page.locator(".hub-open-scan").first().click();
-    await expect(page).toHaveURL(/scan-active/, { timeout: 10_000 });
+    await expect(page).toHaveURL(SCAN_HANDOFF_URL, { timeout: 10_000 });
     await expect(page).toHaveURL(/hc_return=/);
   });
 
@@ -281,7 +296,7 @@ test.describe("device PWA scan handoff (P1-PWA-N)", () => {
     const pinLink = page.getByRole("link", { name: /E2E PWA pin/i }).first();
     await expect(pinLink).not.toContainText(/new tab/i);
     await pinLink.click();
-    await expect(page).toHaveURL(/scan-active/, { timeout: 10_000 });
+    await expect(page).toHaveURL(SCAN_HANDOFF_URL, { timeout: 10_000 });
     await expect(page).toHaveURL(/hc_return=/);
   });
 
@@ -296,8 +311,8 @@ test.describe("device PWA scan handoff (P1-PWA-N)", () => {
     await page.locator(".hub-open-scan").first().click();
     const popup = await popupPromise;
 
-    await expect(popup).toHaveURL(/scan-active/, { timeout: 10_000 });
-    await expect(page).not.toHaveURL(/scan-active/);
+    await expect(popup).toHaveURL(SCAN_HANDOFF_URL, { timeout: 10_000 });
+    await expect(page).not.toHaveURL(SCAN_HANDOFF_URL);
     await popup.close();
   });
 

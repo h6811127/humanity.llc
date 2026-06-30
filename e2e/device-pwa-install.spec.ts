@@ -449,7 +449,12 @@ test.describe("device PWA install (phase 4 rollout gate)", () => {
   }) => {
     await page.addInitScript(withStandaloneDisplayMode().content);
     await seedPwaLandingStorage(page);
-    await page.route("**/js/build-meta.mjs**", async (route) => {
+    await page.route(/\/js\/build-meta\.mjs/, async (route) => {
+      const url = new URL(route.request().url());
+      if (!url.searchParams.has("_")) {
+        await route.continue();
+        return;
+      }
       await route.fulfill({
         status: 200,
         contentType: "application/javascript",
@@ -465,14 +470,16 @@ test.describe("device PWA install (phase 4 rollout gate)", () => {
         )};`,
       });
     });
-    await page.route("**/.well-known/hc/v1/cards/**/live-control/challenges**", mockNoLiveProof);
+    await wireShellRoutes(page);
     await page.goto("/", { waitUntil: "domcontentloaded" });
     await waitForShellReady(page);
 
     await page.waitForFunction(() => typeof window.__hcStaleShellSyncForTests === "function", {
       timeout: 20_000,
     });
-    await page.evaluate(() => window.__hcStaleShellSyncForTests?.());
+    await page.evaluate(async () => {
+      await window.__hcStaleShellSyncForTests?.();
+    });
 
     await expect(page.locator("#device-pwa-stale-shell-banner")).toBeVisible();
     await expect(page.locator("#device-pwa-stale-shell-banner")).toContainText(
