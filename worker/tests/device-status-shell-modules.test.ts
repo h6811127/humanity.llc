@@ -84,6 +84,18 @@ describe("device status shell module manifest", () => {
     expect(read("device-relay-offer-inbox.mjs")).toContain(
       `device-wallet-since-visit-gate.mjs?v=${v}`
     );
+    expect(read("device-browser-notifications.mjs")).toContain(
+      `device-wallet-since-visit-gate.mjs?v=${v}`
+    );
+    expect(read("device-browser-notifications-sw.mjs")).toContain(
+      `device-wallet-since-visit-gate.mjs?v=${v}`
+    );
+    expect(read("scan-live-proof-owner-watch.mjs")).toContain(
+      `device-wallet-since-visit-gate.mjs?v=${v}`
+    );
+    expect(read("scan-page-dot.mjs")).toContain(
+      `device-wallet-since-visit-gate.mjs?v=${v}`
+    );
   });
 
   it("custody status graph cache-busts copy chain (partial-load regression)", () => {

@@ -29,7 +29,7 @@ import {
   liveControlBackgroundAlertPollShouldRun,
 } from "./device-live-control-poll-scheduler.mjs";
 import { bindLiveProofNotificationNavListener } from "./device-live-proof-notification-nav.mjs";
-import { getResolverHealthStatus } from "./device-wallet-since-visit-gate.mjs";
+import { getResolverHealthStatus } from "./device-wallet-since-visit-gate.mjs?v=94";
 import { isStewardPushHealthy } from "./device-steward-push.mjs";
 import {
   registerLiveProofServiceWorker,

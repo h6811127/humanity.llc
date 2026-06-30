@@ -21,6 +21,7 @@ import {
   liveProofPanelMostlyVisible,
   shouldScrollLiveProofPanelIntoView,
 } from "./created-live-proof-poll-core.mjs";
+import { initCreatedLiveProofPendingWatch } from "./created-live-proof-pending-watch.mjs";
 import { initCreatedTabs } from "./created-tabs.mjs";
 import { initCreatedDashboard } from "./created-dashboard.mjs?v=7";
 import {
@@ -1445,6 +1446,11 @@ if (workspaceMode === "view" && profileId && activeQrId) {
         const href = openScanBtn?.getAttribute("href");
         return href && href.startsWith("http") ? href : null;
       },
+    });
+    initCreatedLiveProofPendingWatch({
+      profileId,
+      qrId: activeQrId,
+      onRestoreKeys: () => focusCreatedViewRestore((id) => createdTabs?.select(id)),
     });
   }
 } else if (workspaceMode === "view" && noSessionEl) {

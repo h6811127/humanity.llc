@@ -56,7 +56,7 @@ describe("scan page device dot contract", () => {
 
   it("loads versioned scan-tab-keys bundle", () => {
     const src = readFileSync(join(root, "worker/src/resolver/scan-html.ts"), "utf8");
-    expect(src).toContain("scan-tab-keys.mjs?v=9");
+    expect(src).toContain("scan-tab-keys.mjs?v=10");
     expect(src).toContain("scan-page-dot-glance");
   });
 
@@ -72,8 +72,8 @@ describe("scan page device dot contract", () => {
 
   it("scan-tab-keys imports scan-page-dot module", () => {
     const src = readFileSync(join(root, "site/js/scan-tab-keys.mjs"), "utf8");
-    expect(src).toContain("./scan-page-dot.mjs?v=8");
-    expect(src).toContain("./scan-live-proof-owner-watch.mjs?v=1");
+    expect(src).toContain("./scan-page-dot.mjs?v=9");
+    expect(src).toContain("./scan-live-proof-owner-watch.mjs?v=2");
   });
 
   it("ships Playwright scan fixture with progressive dot markup", () => {
@@ -84,7 +84,7 @@ describe("scan page device dot contract", () => {
     expect(html).toContain('id="scan-page-dot"');
     expect(html).toContain('id="scan-page-dot-glance"');
     expect(html).toContain('class="scan-hero-host scan-hero-wordmark"');
-    expect(html).toContain("scan-tab-keys.mjs?v=9");
+    expect(html).toContain("scan-tab-keys.mjs?v=10");
     expect(html).toContain(`data-profile-id="${SHOWCASE_PROFILE}"`);
   });
 });
