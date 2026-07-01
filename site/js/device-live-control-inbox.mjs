@@ -63,6 +63,7 @@ import {
   setLiveControlPollHealth,
   applySingleCardPollHealth,
   applyLiveControlPollConfirmation,
+  applyLiveControlSnapshotConfirmation,
   entriesForHubExpandLiveProofVerification,
   filterConfirmedLiveControlPending,
   pendingItemsFromPollSlots,
@@ -408,6 +409,7 @@ export function applyLiveControlInboxSnapshot(snapshot) {
   const changed =
     liveControlInboxChanged(pending, next) || prevHealth !== getLiveControlPollHealth();
   pending = next;
+  applyLiveControlSnapshotConfirmation(confirmedChallengeIds, next);
   persistLiveProofCheckedAt(snapshot.at || Date.now());
   if (changed) {
     window.dispatchEvent(new Event("hc-live-control-inbox-changed"));
