@@ -1,10 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import {
-  applyLiveControlInboxSnapshot,
-  getLiveControlPendingForDisplay,
-  resetLiveControlInboxOnShellResume,
-} from "../../site/js/device-live-control-inbox.mjs";
+type LiveControlInboxModule = typeof import("../../site/js/device-live-control-inbox.mjs");
 
 function storageStub() {
   const store = new Map<string, string>();
@@ -28,7 +24,10 @@ const pendingItem = {
 };
 
 describe("applyLiveControlInboxSnapshot", () => {
-  beforeEach(() => {
+  let inbox: LiveControlInboxModule;
+
+  beforeEach(async () => {
+    vi.resetModules();
     vi.stubGlobal("sessionStorage", storageStub());
     vi.stubGlobal("localStorage", storageStub());
     vi.stubGlobal("window", {
@@ -36,32 +35,38 @@ describe("applyLiveControlInboxSnapshot", () => {
       addEventListener: vi.fn(),
       clearTimeout: vi.fn(),
       setTimeout: vi.fn(),
+      matchMedia: vi.fn(() => ({
+        matches: false,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      })),
     });
-    resetLiveControlInboxOnShellResume();
+    inbox = await import("../../site/js/device-live-control-inbox.mjs");
+    inbox.resetLiveControlInboxOnShellResume();
   });
 
   afterEach(() => {
-    resetLiveControlInboxOnShellResume();
+    inbox?.resetLiveControlInboxOnShellResume();
     vi.unstubAllGlobals();
   });
 
   it("surfaces leader-confirmed pending rows on follower tabs", () => {
-    applyLiveControlInboxSnapshot({
+    inbox.applyLiveControlInboxSnapshot({
       pending: [pendingItem],
       health: "ok",
       at: 123,
       tabId: "leader-tab",
     });
 
-    expect(getLiveControlPendingForDisplay()).toEqual([pendingItem]);
+    expect(inbox.getLiveControlPendingForDisplay()).toEqual([pendingItem]);
 
-    applyLiveControlInboxSnapshot({
+    inbox.applyLiveControlInboxSnapshot({
       pending: [],
       health: "ok",
       at: 124,
       tabId: "leader-tab",
     });
 
-    expect(getLiveControlPendingForDisplay()).toEqual([]);
+    expect(inbox.getLiveControlPendingForDisplay()).toEqual([]);
   });
 });
