@@ -41,6 +41,12 @@ describe("applyLiveControlInboxSnapshot", () => {
         removeEventListener: vi.fn(),
       })),
     });
+    vi.stubGlobal("document", {
+      getElementById: vi.fn(() => null),
+      addEventListener: vi.fn(),
+      visibilityState: "visible",
+      body: { classList: { contains: vi.fn(() => false) } },
+    });
     inbox = await import("../../site/js/device-live-control-inbox.mjs");
     inbox.resetLiveControlInboxOnShellResume();
   });
