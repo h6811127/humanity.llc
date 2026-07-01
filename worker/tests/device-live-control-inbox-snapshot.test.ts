@@ -1,19 +1,9 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
-type LiveControlInboxModule = typeof import("../../site/js/device-live-control-inbox.mjs");
-
-function storageStub() {
-  const store = new Map<string, string>();
-  return {
-    getItem: vi.fn((key: string) => store.get(key) ?? null),
-    setItem: vi.fn((key: string, value: string) => {
-      store.set(key, value);
-    }),
-    removeItem: vi.fn((key: string) => {
-      store.delete(key);
-    }),
-  };
-}
+import {
+  applyLiveControlSnapshotConfirmation,
+  filterConfirmedLiveControlPending,
+} from "../../site/js/device-live-control-inbox-core.mjs";
 
 const pendingItem = {
   entry: { profile_id: "prof_live_proof", qr_id: "qr_live_proof" },
@@ -24,56 +14,15 @@ const pendingItem = {
 };
 
 describe("applyLiveControlInboxSnapshot", () => {
-  let inbox: LiveControlInboxModule;
-
-  beforeEach(async () => {
-    vi.resetModules();
-    vi.stubGlobal("sessionStorage", storageStub());
-    vi.stubGlobal("localStorage", storageStub());
-    vi.stubGlobal("window", {
-      dispatchEvent: vi.fn(),
-      addEventListener: vi.fn(),
-      clearTimeout: vi.fn(),
-      setTimeout: vi.fn(),
-      matchMedia: vi.fn(() => ({
-        matches: false,
-        addEventListener: vi.fn(),
-        removeEventListener: vi.fn(),
-      })),
-    });
-    vi.stubGlobal("document", {
-      getElementById: vi.fn(() => null),
-      querySelectorAll: vi.fn(() => []),
-      addEventListener: vi.fn(),
-      visibilityState: "visible",
-      body: { classList: { contains: vi.fn(() => false) } },
-    });
-    inbox = await import("../../site/js/device-live-control-inbox.mjs");
-    inbox.resetLiveControlInboxOnShellResume();
-  });
-
-  afterEach(() => {
-    inbox?.resetLiveControlInboxOnShellResume();
-    vi.unstubAllGlobals();
-  });
-
   it("surfaces leader-confirmed pending rows on follower tabs", () => {
-    inbox.applyLiveControlInboxSnapshot({
-      pending: [pendingItem],
-      health: "ok",
-      at: 123,
-      tabId: "leader-tab",
-    });
+    const confirmed = new Set<string>();
 
-    expect(inbox.getLiveControlPendingForDisplay()).toEqual([pendingItem]);
+    applyLiveControlSnapshotConfirmation(confirmed, [pendingItem]);
+    expect(filterConfirmedLiveControlPending([pendingItem], confirmed)).toEqual([
+      pendingItem,
+    ]);
 
-    inbox.applyLiveControlInboxSnapshot({
-      pending: [],
-      health: "ok",
-      at: 124,
-      tabId: "leader-tab",
-    });
-
-    expect(inbox.getLiveControlPendingForDisplay()).toEqual([]);
+    applyLiveControlSnapshotConfirmation(confirmed, []);
+    expect(filterConfirmedLiveControlPending([pendingItem], confirmed)).toEqual([]);
   });
 });
