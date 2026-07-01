@@ -43,6 +43,7 @@ describe("applyLiveControlInboxSnapshot", () => {
     });
     vi.stubGlobal("document", {
       getElementById: vi.fn(() => null),
+      querySelectorAll: vi.fn(() => []),
       addEventListener: vi.fn(),
       visibilityState: "visible",
       body: { classList: { contains: vi.fn(() => false) } },
