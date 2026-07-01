@@ -212,6 +212,24 @@ export function getLiveControlPendingForDisplay() {
 }
 
 /**
+ * Leader snapshots only contain rows the leader already confirmed with the
+ * resolver; mirror that confirmation set in follower tabs without a duplicate GET.
+ * @param {import("./device-live-control-inbox-core.mjs").LiveControlPendingItem[]} items
+ */
+function confirmLiveControlSnapshotItems(items) {
+  const nextIds = new Set();
+  for (const item of items) {
+    if (typeof item?.challenge_id === "string" && item.challenge_id) {
+      nextIds.add(item.challenge_id);
+    }
+  }
+  for (const id of [...confirmedChallengeIds]) {
+    if (!nextIds.has(id)) confirmedChallengeIds.delete(id);
+  }
+  for (const id of nextIds) confirmedChallengeIds.add(id);
+}
+
+/**
  * Scan-page owner watch (one profile, one GET per tick) — Phase 9.
  * @param {import("./device-live-control-inbox-core.mjs").LiveControlPendingItem | null} item
  */
@@ -408,6 +426,7 @@ export function applyLiveControlInboxSnapshot(snapshot) {
   const changed =
     liveControlInboxChanged(pending, next) || prevHealth !== getLiveControlPollHealth();
   pending = next;
+  confirmLiveControlSnapshotItems(next);
   persistLiveProofCheckedAt(snapshot.at || Date.now());
   if (changed) {
     window.dispatchEvent(new Event("hc-live-control-inbox-changed"));

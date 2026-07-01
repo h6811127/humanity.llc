@@ -23,6 +23,7 @@ import { factionControllerLabel, isGameFactionHold } from "./factions";
 import { fragmentLatticeProgress } from "./unlock-engine";
 import type { GameVouchGate } from "./vouch-graph";
 import { mapVouchChipValue, resolveWitnessGate } from "./witness-gate";
+import { applyRelayDecayIfExpired } from "./relay-contribute";
 
 export type MapNodeChip = {
   kind: string;
@@ -115,7 +116,23 @@ export function deriveMapNodeSnapshot(input: {
   const registry = input.season.nodes.find((row) => row.node_id === nodeId);
   if (!registry) return null;
 
-  const fields = parseGameNodeFields(input.child.child_object_document_json);
+  let documentJson = input.child.child_object_document_json;
+  let publicStateForCompose = input.child.public_state;
+  try {
+    const doc = JSON.parse(documentJson) as Record<string, unknown>;
+    const decayed = applyRelayDecayIfExpired(doc, input.now);
+    if (decayed.decayed) {
+      documentJson = JSON.stringify(decayed.doc);
+      publicStateForCompose =
+        typeof decayed.doc.public_state === "string"
+          ? decayed.doc.public_state
+          : publicStateForCompose;
+    }
+  } catch {
+    /* parseGameNodeFields below keeps malformed documents out of the board. */
+  }
+
+  const fields = parseGameNodeFields(documentJson);
   if (!fields || fields.seasonId !== input.season.season_id) return null;
 
   const lifecycle: MapNodeSnapshotRow["lifecycle"] =
@@ -131,7 +148,14 @@ export function deriveMapNodeSnapshot(input: {
 
   if (lifecycle === "active") {
     const composed = composeChildObjectScanState({
-      child: childRowForCompose(input.child, registry.label),
+      child: childRowForCompose(
+        {
+          ...input.child,
+          public_state: publicStateForCompose,
+          child_object_document_json: documentJson,
+        },
+        registry.label
+      ),
       season: input.season,
       env: input.env,
       now: input.now,

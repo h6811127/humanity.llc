@@ -13,8 +13,10 @@ const VAPID_PUBLIC =
 const VAPID_PRIVATE =
   "UUxI4O8-FbRPOA3_Z-vy_xYs9DIFYP5dYKI13sOJEvI";
 
-function mockFanoutDb() {
+function mockFanoutDb(endpoint = "https://fcm.googleapis.com/fcm/send/sub-1") {
+  const deletes: unknown[][] = [];
   return {
+    deletes,
     prepare: (sql: string) => ({
       bind: (...params: unknown[]) => ({
         first: async () => {
@@ -27,7 +29,7 @@ function mockFanoutDb() {
         all: async () => ({
           results: [
             {
-              endpoint: "https://push.example.test/sub/1",
+              endpoint,
               account_id: ACCOUNT,
               device_id: "dev_1",
               p256dh:
@@ -39,10 +41,15 @@ function mockFanoutDb() {
             },
           ],
         }),
-        run: async () => ({ success: true }),
+        run: async () => {
+          if (sql.includes("DELETE FROM steward_web_push_subscriptions")) {
+            deletes.push(params);
+          }
+          return { success: true, meta: { changes: 1 } };
+        },
       }),
     }),
-  } as unknown as D1Database;
+  } as unknown as D1Database & { deletes: unknown[][] };
 }
 
 afterEach(() => {
@@ -95,7 +102,7 @@ describe("fanOutWebPushLiveProofPending", () => {
     expect(delivered).toBe(1);
     expect(fetchMock).toHaveBeenCalledTimes(1);
     const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
-    expect(url).toContain("push.example.test");
+    expect(url).toContain("fcm.googleapis.com");
     expect(init.method).toBe("POST");
     expect(String(init.headers && (init.headers as Record<string, string>)["Content-Encoding"])).toBe(
       "aes128gcm"
@@ -103,5 +110,33 @@ describe("fanOutWebPushLiveProofPending", () => {
     expect(String(init.headers && (init.headers as Record<string, string>).Authorization)).toMatch(
       /^vapid t=/
     );
+  });
+
+  it("does not fetch stored endpoints outside known Web Push services", async () => {
+    const fetchMock = vi.fn(async () => new Response("", { status: 201 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const db = mockFanoutDb("https://example.com/sub/1");
+    const env: Env = {
+      DB: db,
+      STEWARD_VAPID_PUBLIC_KEY: VAPID_PUBLIC,
+      STEWARD_VAPID_PRIVATE_KEY: VAPID_PRIVATE,
+    };
+    const delivered = await fanOutWebPushLiveProofPending(env, db, ACCOUNT, {
+      type: LIVE_PROOF_PENDING_TYPE,
+      version: 1,
+      operator_id: "humanity.llc",
+      account_id: ACCOUNT,
+      profile_id: "prof_1",
+      qr_id: "qr_1",
+      challenge_id: "lc_1",
+      issued_at: "2026-05-26T12:00:00.000Z",
+      expires_at: "2026-05-26T12:02:00.000Z",
+    });
+    expect(delivered).toBe(0);
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect((db as D1Database & { deletes: unknown[][] }).deletes).toEqual([
+      ["https://example.com/sub/1"],
+    ]);
   });
 });

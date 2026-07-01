@@ -21,7 +21,6 @@ import {
 } from "../city-game/season-config";
 import { publicUnlockEdges } from "../live-object/network-graph";
 import { resolveSeasonById } from "../city-game/season-loader";
-import { runRelayTerritoryDecayCron } from "../city-game/relay-decay-cron";
 import {
   enforceGameSnapshotSeasonQuota,
   recordGameSnapshotSeasonUsage,
@@ -208,16 +207,15 @@ export async function handleGetSeasonSnapshot(
     );
   }
 
+  const seasonQuota = await enforceGameSnapshotSeasonQuota(env.DB, season);
+  if (seasonQuota) return seasonQuota;
+
   const cached = getCachedSnapshot(seasonId);
   if (cached) {
     return cachedSnapshotResponse(request, cached);
   }
 
-  const seasonQuota = await enforceGameSnapshotSeasonQuota(env.DB, season);
-  if (seasonQuota) return seasonQuota;
-
   const now = new Date();
-  await runRelayTerritoryDecayCron(env.DB, env, now, season);
 
   const origin = new URL(request.url).origin;
   const windowPhase = resolveSeasonWindowPhase(now, season);
