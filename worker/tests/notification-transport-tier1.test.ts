@@ -28,6 +28,12 @@ describe("WS-NOTIF Tier 1 background OS transport contract", () => {
     expect(browser).toMatch(/__hcNotifyTransportSnapshot/);
   });
 
+  it("T1-2b: background probe has a module-scope single-flight guard", () => {
+    const browser = readRepoFile("site/js/device-browser-notifications.mjs");
+    expect(browser).toMatch(/let\s+backgroundProbeInFlight\s*=\s*false/);
+    expect(browser).toMatch(/if\s*\(\s*backgroundProbeInFlight\s*\)\s*return/);
+  });
+
   it("T1-3: SW full-wallet probe on pollNow only", () => {
     const sw = readRepoFile("site/sw-live-proof.mjs");
     expect(sw).toMatch(/pollAllWalletEntriesForLiveProof/);
