@@ -290,6 +290,7 @@ function readOsInteractShown() {
 }
 
 let alertProbeSettleTimer = null;
+let backgroundProbeInFlight = false;
 
 function scheduleAlertProbeWhenReady() {
   syncBackgroundAlertPollTimer();

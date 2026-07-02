@@ -1,14 +1,14 @@
 {
   "schema": "device_shell_baseline_v1",
-  "generated_at": "2026-06-30",
+  "generated_at": "2026-07-02",
   "phase": "smooth_mode_phase_0",
   "asset_version": 94,
   "module_count": 86,
-  "js_bytes_total": 571836,
+  "js_bytes_total": 571873,
   "shell_css_bytes_total": 78910,
   "landing_css_bytes_total": 392819,
-  "transfer_bytes_shell_graph": 650746,
-  "transfer_bytes_landing_first_paint": 964655,
+  "transfer_bytes_shell_graph": 650783,
+  "transfer_bytes_landing_first_paint": 964692,
   "js_modules": [
     {
       "file": "js/device-status-bootstrap.mjs",
@@ -348,7 +348,7 @@
     },
     {
       "file": "js/device-browser-notifications.mjs",
-      "bytes": 18981
+      "bytes": 19018
     },
     {
       "file": "js/device-browser-notifications-core.mjs",

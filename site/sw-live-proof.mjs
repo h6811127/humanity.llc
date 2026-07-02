@@ -10,7 +10,9 @@ import {
   pollWalletEntriesForLiveProof,
   pruneSwPushHintCache,
   pushHintChallengeId,
+  markSwPushHintShown,
   shouldShowSwLiveProofNotification,
+  swPushHintAlreadyShown,
   swLiveProofPollingShouldRun,
   upsertSwPushHintCache,
   upsertCachedOsPlans,
@@ -50,6 +52,7 @@ import {
  *   stewardPushEntitled?: boolean,
  *   stewardPushHealthy?: boolean,
  *   lastPushChallengeId?: string,
+ *   shownPushChallengeIds?: string[],
  *   cachedPushHints?: import("./js/device-live-control-sw-core.mjs").SwCachedPushHint[],
  *   cachedOsPlans?: import("./js/device-notification-delivery-core.mjs").OsNotificationPlan[],
  *   lastOsDedupeByKind?: Record<string, string>,
@@ -179,7 +182,7 @@ async function showLiveProofNotificationForPushHint(hint, state) {
   if (!payload) return state;
 
   const challengeId = pushHintChallengeId(hint);
-  if (challengeId && state.lastPushChallengeId === challengeId) return state;
+  if (challengeId && swPushHintAlreadyShown(state, hint)) return state;
 
   const requireInteraction = !state.interactShown;
   await self.registration.showNotification(payload.title, {
@@ -189,11 +192,10 @@ async function showLiveProofNotificationForPushHint(hint, state) {
     requireInteraction,
   });
 
-  return {
+  return markSwPushHintShown({
     ...state,
-    lastPushChallengeId: challengeId || state.lastPushChallengeId,
     interactShown: state.interactShown || requireInteraction,
-  };
+  }, hint);
 }
 
 /**
@@ -430,6 +432,7 @@ self.addEventListener("message", (event) => {
         stewardPushEntitled: msg.stewardPushEntitled === true,
         stewardPushHealthy: msg.stewardPushHealthy === true,
         lastPushChallengeId: enabled ? (prev?.lastPushChallengeId ?? "") : "",
+        shownPushChallengeIds: enabled ? (prev?.shownPushChallengeIds ?? []) : [],
         cachedPushHints: enabled
           ? pruneSwPushHintCache(prev?.cachedPushHints ?? [])
           : [],
