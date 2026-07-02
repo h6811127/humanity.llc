@@ -144,9 +144,7 @@ describe("device-status-core", () => {
 
   it("keeps partial-load dot aria focused on basic hub availability", async () => {
     const { dotBtn } = installStatusCoreDom({ partial: true });
-    const core = await import(
-      `../../site/js/device-status-core.mjs?partial-aria=${Date.now()}`
-    );
+    const core = await import("../../site/js/device-status-core.mjs");
 
     core.setNetworkStatus("ok");
     core.applyCoreDot();
