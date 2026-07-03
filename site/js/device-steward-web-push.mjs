@@ -26,6 +26,7 @@ export {
 
 const CAPABILITIES_CACHE_MS = 60 * 60 * 1000;
 const SUBSCRIBE_PATH = "/.well-known/hc/v1/steward/push/subscribe";
+const STORAGE_WEB_PUSH_SUBSCRIBED_ENDPOINT = "hc_steward_web_push_subscribed_endpoint";
 
 /** @type {string | null} */
 let cachedVapidPublicKey = null;
@@ -101,7 +102,7 @@ export async function syncStewardWebPushSubscription() {
     if (!subscription) return;
 
     const body = serializePushSubscriptionForSubscribe(subscription);
-    await fetch(`${resolverApiOrigin()}${SUBSCRIBE_PATH}`, {
+    const res = await fetch(`${resolverApiOrigin()}${SUBSCRIBE_PATH}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -110,8 +111,18 @@ export async function syncStewardWebPushSubscription() {
       credentials: "omit",
       body: JSON.stringify(body),
     }).catch(() => {
-      /* 501 / offline — local SW push handler still works once server sends */
+      /* 501 / offline — keep SW polling fallback active until storage confirms. */
+      return null;
     });
+    try {
+      if (res?.ok) {
+        localStorage.setItem(STORAGE_WEB_PUSH_SUBSCRIBED_ENDPOINT, body.endpoint);
+      } else {
+        localStorage.removeItem(STORAGE_WEB_PUSH_SUBSCRIBED_ENDPOINT);
+      }
+    } catch {
+      /* ignore */
+    }
   })();
 
   try {
@@ -134,6 +145,11 @@ export async function clearStewardWebPushSubscription() {
   const endpoint = subscription?.endpoint ?? "";
   if (subscription) {
     await subscription.unsubscribe().catch(() => null);
+  }
+  try {
+    localStorage.removeItem(STORAGE_WEB_PUSH_SUBSCRIBED_ENDPOINT);
+  } catch {
+    /* ignore */
   }
   if (!endpoint || !readStewardSessionToken()) return;
 

@@ -122,6 +122,23 @@ export async function listActiveRelationshipEdgesForSource(
   return result.results ?? [];
 }
 
+export async function listActiveRelationshipEdgesForNetwork(
+  db: D1Database,
+  networkId: string
+): Promise<RelationshipEdgeRow[]> {
+  const result = await db
+    .prepare(
+      `SELECT edge_id, network_id, kind, from_object_id, to_object_id,
+              steward_profile_id, status, edge_document_json, created_at, updated_at
+       FROM relationship_edges
+       WHERE network_id = ? AND status = 'active'
+       ORDER BY created_at ASC, edge_id ASC`
+    )
+    .bind(networkId)
+    .all<RelationshipEdgeRow>();
+  return result.results ?? [];
+}
+
 /** @deprecated Use listActiveRelationshipEdgesForTarget */
 export async function listActiveWitnessEdgesForTarget(
   db: D1Database,

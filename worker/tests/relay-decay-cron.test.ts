@@ -129,6 +129,34 @@ describe("relay-decay-cron (SW-05)", () => {
     expect(decayed).toBe(false);
   });
 
+  it("persistRelayDecayIfExpired fails open on repeated write conflicts", async () => {
+    const db = new RelayDecayDb();
+    db.objects.set(BRIDGE_OBJECT, bridgeRow({ updated_at: "stale-version" }));
+    const originalPrepare = db.prepare.bind(db);
+    db.prepare = ((sql: string) => {
+      const prepared = originalPrepare(sql);
+      if (!sql.includes("UPDATE child_objects")) return prepared;
+      return {
+        bind() {
+          return {
+            async run() {
+              return { success: true, meta: { changes: 0 } };
+            },
+          };
+        },
+      };
+    }) as typeof db.prepare;
+
+    const decayed = await persistRelayDecayIfExpired(db as unknown as D1Database, {
+      objectId: BRIDGE_OBJECT,
+      parentProfileId: PROFILE,
+      now: new Date("2026-06-08T13:00:00.000Z"),
+      maxRetries: 2,
+    });
+
+    expect(decayed).toBe(false);
+  });
+
   it("runRelayTerritoryDecayCron decays expired relay_gate nodes on season root", async () => {
     const db = new RelayDecayDb();
     db.objects.set(BRIDGE_OBJECT, bridgeRow());

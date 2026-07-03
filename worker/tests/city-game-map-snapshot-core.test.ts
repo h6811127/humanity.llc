@@ -390,6 +390,70 @@ describe("city-game map snapshot core", () => {
     expect(rowAttrs.get("data-board-visibility")).toBe("public");
   });
 
+  it("applySnapshotToMapBoard uses snapshot-rumored relay ids when static board data is stale", () => {
+    if (typeof globalThis.HTMLElement === "undefined") {
+      globalThis.HTMLElement = class HTMLElement {} as typeof HTMLElement;
+    }
+
+    const titleEl = new HTMLElement();
+    const effectEl = new HTMLElement();
+    const liveEl = new HTMLElement();
+    const rowClasses = new Set<string>();
+    const rowAttrs = new Map([
+      ["data-node-id", "node_01"],
+      ["data-role", "relay_gate"],
+    ]);
+    const row = new HTMLElement();
+    row.hidden = false;
+    row.getAttribute = ((name: string) => rowAttrs.get(name) ?? null) as typeof row.getAttribute;
+    row.setAttribute = ((name: string, value: string) => {
+      rowAttrs.set(name, value);
+    }) as typeof row.setAttribute;
+    row.classList = {
+      add(cls: string) {
+        rowClasses.add(cls);
+      },
+      remove(cls: string) {
+        rowClasses.delete(cls);
+      },
+      toggle(cls: string, on?: boolean) {
+        if (on) rowClasses.add(cls);
+        else rowClasses.delete(cls);
+      },
+    } as DOMTokenList;
+    row.querySelector = ((sel: string) => {
+      if (sel === ".city-game-map-node-live") return liveEl;
+      if (sel === ".city-game-map-node-title") return titleEl;
+      if (sel === "[data-node-effect]") return effectEl;
+      if (sel === "[data-node-chips]") return null;
+      return null;
+    }) as typeof row.querySelector;
+
+    const boardRoot = {
+      dataset: { rumoredNodes: "" },
+      querySelectorAll(selector: string) {
+        if (selector === ".city-game-map-node-row[data-node-id]") return [row];
+        if (selector === ".city-game-map-pin[data-node-id]") return [];
+        return [];
+      },
+      querySelector() {
+        return null;
+      },
+    };
+
+    applySnapshotToMapBoard(/** @type {HTMLElement} */ (boardRoot), {
+      map_visibility: "signal_war",
+      rumored_node_ids: ["node_01"],
+      nodes: [],
+    });
+
+    expect(row.hidden).toBe(false);
+    expect(rowClasses.has("city-game-map-node-row--fog-omitted")).toBe(false);
+    expect(rowClasses.has("city-game-map-node-row--clue")).toBe(true);
+    expect(rowAttrs.get("data-board-visibility")).toBe("hidden");
+    expect(liveEl.innerHTML).toContain("city-game-map-live-hint");
+  });
+
   it("applySnapshotToMapBoard updates sketch pin state sublabel from snapshot chips (SF-2b)", () => {
     if (typeof globalThis.HTMLElement === "undefined") {
       globalThis.HTMLElement = class HTMLElement {} as typeof HTMLElement;

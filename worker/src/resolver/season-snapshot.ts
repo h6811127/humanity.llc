@@ -1,6 +1,11 @@
 import { listChildObjectsForParent } from "../db/child-objects";
 import { listActiveChildObjectQrsForParent } from "../db/child-object-qr";
 import {
+  listActiveRelationshipEdgesForNetwork,
+  relationshipEdgesSchemaReady,
+  verifyStoredRelationshipEdge,
+} from "../db/relationship-edges";
+import {
   checkSeasonSnapshotRateLimit,
   hashIp,
 } from "../db/rate-limit";
@@ -20,6 +25,10 @@ import {
   type CrSeasonConfig,
 } from "../city-game/season-config";
 import { publicUnlockEdges } from "../live-object/network-graph";
+import {
+  isWitnessRelationshipEdge,
+  type RelationshipEdgeDocument,
+} from "../live-object/relationship-edge-spec";
 import { resolveSeasonById } from "../city-game/season-loader";
 import { runRelayTerritoryDecayCron } from "../city-game/relay-decay-cron";
 import {
@@ -95,6 +104,23 @@ function cachedSnapshotResponse(
     return new Response(null, { status: 304, headers });
   }
   return new Response(entry.serialized, { status: 200, headers });
+}
+
+async function verifiedWitnessEdgesByTargetObject(
+  db: D1Database,
+  networkId: string
+): Promise<Map<string, RelationshipEdgeDocument[]>> {
+  const out = new Map<string, RelationshipEdgeDocument[]>();
+  if (!(await relationshipEdgesSchemaReady(db))) return out;
+  const rows = await listActiveRelationshipEdgesForNetwork(db, networkId);
+  for (const row of rows) {
+    const doc = await verifyStoredRelationshipEdge(db, row);
+    if (!doc || !isWitnessRelationshipEdge(doc)) continue;
+    const list = out.get(doc.to.id) ?? [];
+    list.push(doc);
+    out.set(doc.to.id, list);
+  }
+  return out;
 }
 
 export type SeasonSnapshotPublicNode = {
@@ -238,6 +264,10 @@ export async function handleGetSeasonSnapshot(
       );
     }
     const witnessMetaByNodeId = buildWitnessMetaByNodeId(rows, season);
+    const witnessEdgesByTarget = await verifiedWitnessEdgesByTargetObject(
+      env.DB,
+      season.season_id
+    );
     for (const row of rows) {
       if (row.status !== "active") continue;
       const snap = deriveMapNodeSnapshot({
@@ -246,6 +276,7 @@ export async function handleGetSeasonSnapshot(
         env,
         now,
         witnessMetaByNodeId,
+        witnessRelationshipEdges: witnessEdgesByTarget.get(row.object_id) ?? null,
       });
       if (snap) nodes.push(snap);
     }

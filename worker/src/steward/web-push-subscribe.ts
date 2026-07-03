@@ -91,6 +91,13 @@ export async function handlePostStewardWebPushSubscribe(
     body: input.body,
   });
   if (!result.ok) {
+    if (result.reason === "endpoint_account_conflict") {
+      return errorResponse(
+        "steward_web_push_endpoint_conflict",
+        "Web Push subscription endpoint already belongs to another steward account.",
+        409
+      );
+    }
     return errorResponse(
       "steward_web_push_subscription_limit",
       `Too many Web Push subscriptions for this account (max ${STEWARD_WEB_PUSH_MAX_SUBSCRIPTIONS_PER_ACCOUNT}).`,

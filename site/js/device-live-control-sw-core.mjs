@@ -318,11 +318,15 @@ export function buildLiveProofSwNotificationFromPushHint(hint, entries, pageOrig
   const profileId =
     typeof hint.profile_id === "string" ? hint.profile_id.trim() : "";
   if (!profileId) return null;
-  const entry = entries.find((row) => row.profile_id === profileId);
-  if (!entry) return null;
   const challengeId =
     typeof hint.challenge_id === "string" ? hint.challenge_id.trim() : "";
   if (!challengeId) return null;
+  const entry =
+    entries.find((row) => row.profile_id === profileId) ?? {
+      profile_id: profileId,
+      qr_id: typeof hint.qr_id === "string" ? hint.qr_id.trim() : "",
+      label: "Saved card",
+    };
   return buildLiveProofSwNotification(
     {
       entry,

@@ -25,6 +25,7 @@ import { isStewardPushHealthy } from "./device-steward-push.mjs";
 import { getRelayOfferPendingCount } from "./device-relay-offer-inbox-loader.mjs";
 
 export const SW_SCRIPT_URL = "/sw-live-proof.mjs";
+const STORAGE_WEB_PUSH_SUBSCRIBED_ENDPOINT = "hc_steward_web_push_subscribed_endpoint";
 
 /** @returns {boolean} */
 export function liveProofServiceWorkerSupported() {
@@ -33,6 +34,14 @@ export function liveProofServiceWorkerSupported() {
 
 function notificationGranted() {
   return typeof Notification !== "undefined" && Notification.permission === "granted";
+}
+
+function readStoredWebPushSubscribedEndpoint() {
+  try {
+    return localStorage.getItem(STORAGE_WEB_PUSH_SUBSCRIBED_ENDPOINT) ?? "";
+  } catch {
+    return "";
+  }
 }
 
 /** @returns {Promise<ServiceWorkerRegistration | null>} */
@@ -102,6 +111,12 @@ export async function syncLiveProofServiceWorkerState(opts = {}) {
   const watchOn = isWatchLiveProofEnabled();
   const alertsOn = isBrowserNotifEnabled() && notificationGranted();
   const pending = getLiveControlPendingForDisplay();
+  const webPushSubscription = await reg.pushManager?.getSubscription().catch(() => null);
+  const webPushEndpoint = webPushSubscription?.endpoint ?? "";
+  const stewardPushDeliveryReady =
+    !!webPushEndpoint &&
+    webPushEndpoint === readStoredWebPushSubscribedEndpoint() &&
+    isStewardPushHealthy();
   const message = {
     type: "HC_SW_SYNC_STATE",
     enabled: alertsOn,
@@ -116,7 +131,7 @@ export async function syncLiveProofServiceWorkerState(opts = {}) {
     flushPushCache: !!opts.flushPushCache && alertsOn,
     relayOfferCount: getRelayOfferPendingCount(),
     stewardPushEntitled: stewardPushSubscribeAllowed(getStewardEntitlementsPolicy()),
-    stewardPushHealthy: isStewardPushHealthy(),
+    stewardPushHealthy: stewardPushDeliveryReady,
   };
 
   active.postMessage(message);

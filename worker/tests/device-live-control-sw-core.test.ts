@@ -364,13 +364,15 @@ describe("buildLiveProofSwNotificationFromPushHint", () => {
     expect(payload?.href).toContain("live_challenge=lc_push_1");
   });
 
-  it("returns null when wallet row is missing", () => {
-    expect(
-      buildLiveProofSwNotificationFromPushHint(
-        { profile_id: PROFILE, challenge_id: "lc_push_1" },
-        [],
-        "http://localhost:8788"
-      )
-    ).toBeNull();
+  it("uses a generic payload when the SW wallet mirror is missing the row", () => {
+    const payload = buildLiveProofSwNotificationFromPushHint(
+      { profile_id: PROFILE, qr_id: QR_ID, challenge_id: "lc_push_1" },
+      [],
+      "http://localhost:8788"
+    );
+    expect(payload?.title).toBe("Saved card");
+    expect(payload?.href).toContain(`profile_id=${PROFILE}`);
+    expect(payload?.href).toContain(`qr_id=${QR_ID}`);
+    expect(payload?.href).toContain("live_challenge=lc_push_1");
   });
 });

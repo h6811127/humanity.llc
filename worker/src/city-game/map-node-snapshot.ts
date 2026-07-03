@@ -1,4 +1,5 @@
 import type { ChildObjectRow } from "../db/types";
+import type { RelationshipEdgeDocument } from "../live-object/relationship-edge-spec";
 import { composeChildObjectScanState } from "../live-object/compose-child-object-scan";
 import type { GameMeta } from "./game-meta";
 import {
@@ -108,6 +109,8 @@ export function deriveMapNodeSnapshot(input: {
   now: Date;
   /** All active witness node metas for the season — enables vouch gate on board rows. */
   witnessMetaByNodeId?: Record<string, GameMeta>;
+  /** Verified active witness edges targeting this node — same source as scan SSR. */
+  witnessRelationshipEdges?: RelationshipEdgeDocument[] | null;
 }): MapNodeSnapshotRow | null {
   if (input.child.object_type !== "game_node") return null;
   const nodeId = seasonNodeIdForObject(input.child.object_id, input.season);
@@ -136,6 +139,7 @@ export function deriveMapNodeSnapshot(input: {
       env: input.env,
       now: input.now,
       vouchWitnesses: input.witnessMetaByNodeId,
+      witnessRelationshipEdges: input.witnessRelationshipEdges,
     });
     streamPolicy = composed.streamPolicy;
     publicState = composed.publicState;
@@ -159,6 +163,7 @@ export function deriveMapNodeSnapshot(input: {
     targetNodeId: nodeId,
     gameMeta: fields.gameMeta,
     witnessMetaByNodeId: input.witnessMetaByNodeId ?? {},
+    witnessRelationshipEdges: input.witnessRelationshipEdges,
   });
 
   return {
