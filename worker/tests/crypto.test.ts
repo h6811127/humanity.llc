@@ -14,6 +14,7 @@ import {
   verifySignedDocument,
   withProtocolFields,
 } from "../src/crypto/index.ts";
+import { crWitnessEdgeDocumentUnsigned } from "../src/live-object/relationship-edge-spec";
 
 const fixturesDir = join(dirname(fileURLToPath(import.meta.url)), "fixtures");
 
@@ -110,6 +111,36 @@ describe("verifySignedDocument failures", () => {
     await expect(
       signDocument(unsigned, { privateKey, publicKeyBase58 })
     ).rejects.toThrow(/version/i);
+  });
+
+  it("rejects relationship_edge signatures without steward subject", async () => {
+    const { privateKey, publicKeyBase58 } = await getTestKeypair();
+    const unsigned = withProtocolFields(
+      crWitnessEdgeDocumentUnsigned("7Xk9mP2nQ4rT6vW8yZ1aB3cD5"),
+      PAYLOAD_TYPES.RELATIONSHIP_EDGE
+    );
+    delete (unsigned as { steward_profile_id?: string }).steward_profile_id;
+
+    await expect(
+      signDocument(unsigned, { privateKey, publicKeyBase58 })
+    ).rejects.toMatchObject({
+      code: CRYPTO_ERROR.MISSING_REQUIRED_FIELD,
+    });
+  });
+
+  it("rejects relationship_edge signatures without stable edge id", async () => {
+    const { privateKey, publicKeyBase58 } = await getTestKeypair();
+    const unsigned = withProtocolFields(
+      crWitnessEdgeDocumentUnsigned("7Xk9mP2nQ4rT6vW8yZ1aB3cD5"),
+      PAYLOAD_TYPES.RELATIONSHIP_EDGE
+    );
+    delete (unsigned as { edge_id?: string }).edge_id;
+
+    await expect(
+      signDocument(unsigned, { privateKey, publicKeyBase58 })
+    ).rejects.toMatchObject({
+      code: CRYPTO_ERROR.MISSING_REQUIRED_FIELD,
+    });
   });
 });
 
