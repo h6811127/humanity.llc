@@ -70,4 +70,29 @@ describe("discovery-network-filter-core", () => {
       "/play/cedar-rapids/map/"
     );
   });
+
+  it("falls back to a usable board href when the first listed network has no board", () => {
+    const options = [
+      {
+        network_id: "listed_without_rules",
+        label: "A listed network without rules",
+        board_href: null,
+      },
+      {
+        network_id: "listed_with_rules",
+        label: "B listed network with rules",
+        board_href: "/play/example-city/map/",
+      },
+    ];
+
+    expect(resolveDiscoveryNetworkBoardHref(options, DISCOVERY_NETWORK_FILTER_ALL)).toBe(
+      "/play/example-city/map/"
+    );
+    expect(resolveDiscoveryNetworkBoardHref(options, "missing_network")).toBe(
+      "/play/example-city/map/"
+    );
+    expect(resolveDiscoveryNetworkBoardHref(options, "listed_with_rules")).toBe(
+      "/play/example-city/map/"
+    );
+  });
 });
