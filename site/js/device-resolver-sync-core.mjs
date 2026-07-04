@@ -3,7 +3,7 @@
  * @see docs/DEVICE_TAB_RESOLVER_SYNC.md
  */
 
-import { pruneWalletNetworkCache } from "./device-wallet-network-core.mjs?v=94";
+import { pruneWalletNetworkCache } from "./device-wallet-network-core.mjs?v=95";
 
 export const RESOLVER_SYNC_PREF_KEY = "hc_resolver_sync_tabs";
 
@@ -43,6 +43,7 @@ export function isResolverSyncTabsEnabled(raw) {
  *   at: number;
  *   origin: string;
  *   entries: NetworkSnapshotRow[];
+ *   complete: boolean;
  * }} NetworkSnapshotMessage
  */
 
@@ -57,6 +58,7 @@ export function parseNetworkSnapshotMessage(data) {
   const tabId = typeof msg.tabId === "string" ? msg.tabId : "";
   const at = typeof msg.at === "number" && Number.isFinite(msg.at) ? msg.at : 0;
   const origin = typeof msg.origin === "string" ? msg.origin : "";
+  const complete = msg.complete === true;
   if (!tabId || !at || !origin) return null;
   const entries = Array.isArray(msg.entries) ? msg.entries : [];
   /** @type {NetworkSnapshotRow[]} */
@@ -96,7 +98,7 @@ export function parseNetworkSnapshotMessage(data) {
     });
   }
   if (rows.length === 0) return null;
-  return { type: "network-snapshot", tabId, at, origin, entries: rows };
+  return { type: "network-snapshot", tabId, at, origin, entries: rows, complete };
 }
 
 /**

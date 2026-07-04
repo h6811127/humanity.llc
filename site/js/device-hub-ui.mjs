@@ -77,7 +77,7 @@ import {
 import {
   getResolverHealthStatus,
   shouldSuppressCardDisabledSinceVisitAlerts,
-} from "./device-wallet-since-visit-gate.mjs?v=94";
+} from "./device-wallet-since-visit-gate.mjs?v=95";
 import {
   getCachedNetworkSeenAt,
   getCachedNetworkScanKind,
@@ -98,12 +98,12 @@ import {
   snapshotNetworkSeenOnExit,
   syncLastSeenFromNetworkMap,
   NETWORK_REFRESHED,
-} from "./device-wallet-network.mjs?v=94";
-import { clearWalletNetworkTruthForProfile } from "./device-wallet-network-truth.mjs?v=94";
+} from "./device-wallet-network.mjs?v=95";
+import { clearWalletNetworkTruthForProfile } from "./device-wallet-network-truth.mjs?v=95";
 import {
   hubNetworkChipStatusForProfile,
   shouldShowHubNetworkCheckingChip,
-} from "./device-wallet-network-core.mjs?v=94";
+} from "./device-wallet-network-core.mjs?v=95";
 import {
   broadcastNetworkSnapshotIfEligible,
   shouldFollowerSkipAutoNetworkFetch,
@@ -117,7 +117,7 @@ import {
   hubCardIdentityLine,
   hubCardStatusLine,
   hubCardTitle,
-} from "./device-hub-card-row-core.mjs?v=94";
+} from "./device-hub-card-row-core.mjs?v=95";
 import {
   hubChildObjectIconHtml,
   hubChildObjectIdentityLine,
@@ -172,7 +172,7 @@ import {
 import { tabNoticeCount } from "./device-counts.mjs";
 import { mountHubBuildStamp } from "./device-hub-build-stamp.mjs";
 import { mountHubNetworkTools } from "./device-hub-network-tools.mjs";
-import { syncInboxBackdropForOpenHub } from "./device-sheet-backdrop-sync.mjs?v=94";
+import { syncInboxBackdropForOpenHub } from "./device-sheet-backdrop-sync.mjs?v=95";
 import {
   HUB_STRANGER_EMPTY_CLASS,
   isHubStrangerEmptyState,
@@ -1296,9 +1296,13 @@ async function fetchAndApplyNetworkChips(opts = {}) {
   const visibleProfileIds = visibleHubCardProfileIds();
   const policy = getStewardEntitlementsPolicy();
   let entriesToFetch = entries;
+  let snapshotEntries = entries;
+  let snapshotComplete = false;
   if (manual) {
     const manualPool = staleEntries.length > 0 ? staleEntries : entries;
     entriesToFetch = orderEntriesVisibleFirst(manualPool, visibleProfileIds);
+    snapshotEntries = entries;
+    snapshotComplete = true;
   } else if (isLargeWallet(entries.length, policy)) {
     if (staleEntries.length === 0) {
       window.dispatchEvent(
@@ -1323,8 +1327,12 @@ async function fetchAndApplyNetworkChips(opts = {}) {
     );
     walletNetworkRefreshCursor = picked.nextCursor;
     entriesToFetch = picked.entries;
+    snapshotComplete = picked.entries.length >= staleEntries.length;
+    snapshotEntries = snapshotComplete ? entries : entriesToFetch;
   } else if (staleEntries.length > 0) {
     entriesToFetch = orderEntriesVisibleFirst(staleEntries, visibleProfileIds);
+    snapshotEntries = entries;
+    snapshotComplete = true;
   } else {
     return;
   }
@@ -1366,11 +1374,12 @@ async function fetchAndApplyNetworkChips(opts = {}) {
       );
       broadcastNetworkSnapshotIfEligible({
         manual,
-        entries: entriesToFetch,
+        entries: snapshotEntries,
         statusMap,
         scanKindMap,
         resolverConfirmedMap,
         alertStateMap,
+        complete: snapshotComplete,
       });
     },
     {

@@ -13,6 +13,7 @@ vi.mock("../../site/js/hc-sign.mjs", () => ({
 }));
 
 import {
+  applyResolverNetworkSnapshot,
   buildResolverConfirmedWalletPollMaps,
   getCachedNetworkQrScope,
   getCachedNetworkScanKind,
@@ -114,6 +115,35 @@ describe("isResolverConfirmedProfile", () => {
     expect(getCachedNetworkQrScope(PROFILE_A)).toBe("print_artifact");
     const wallet = JSON.parse(localStore.get("hc_wallet") || "[]");
     expect(wallet[0].qr_scope).toBe("print_artifact");
+  });
+
+  it("applies follower resolver snapshots without throwing", () => {
+    expect(() =>
+      applyResolverNetworkSnapshot(
+        [
+          {
+            profile_id: PROFILE_A,
+            status: "active",
+            scanKind: "active",
+            qrScope: "print_artifact",
+            resolverConfirmed: true,
+            alertState: "active",
+          },
+        ],
+        Date.now()
+      )
+    ).not.toThrow();
+
+    expect(isResolverConfirmedProfile(PROFILE_A)).toBe(true);
+    const wallet = JSON.parse(localStore.get("hc_wallet") || "[]");
+    expect(wallet[0]).toMatchObject({
+      status: "active",
+      scan_kind: "active",
+      qr_scope: "print_artifact",
+    });
+    expect(window.dispatchEvent).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "hc-wallet-network-refreshed" })
+    );
   });
 
   it("buildResolverConfirmedWalletPollMaps includes only resolver-confirmed profiles after poll", async () => {

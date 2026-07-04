@@ -1,14 +1,14 @@
 {
   "schema": "device_shell_baseline_v1",
-  "generated_at": "2026-06-30",
+  "generated_at": "2026-07-04",
   "phase": "smooth_mode_phase_0",
-  "asset_version": 94,
+  "asset_version": 95,
   "module_count": 86,
-  "js_bytes_total": 571836,
+  "js_bytes_total": 572605,
   "shell_css_bytes_total": 78910,
   "landing_css_bytes_total": 392819,
-  "transfer_bytes_shell_graph": 650746,
-  "transfer_bytes_landing_first_paint": 964655,
+  "transfer_bytes_shell_graph": 651515,
+  "transfer_bytes_landing_first_paint": 965424,
   "js_modules": [
     {
       "file": "js/device-status-bootstrap.mjs",
@@ -268,11 +268,11 @@
     },
     {
       "file": "js/device-resolver-sync-core.mjs",
-      "bytes": 7791
+      "bytes": 7867
     },
     {
       "file": "js/device-resolver-sync.mjs",
-      "bytes": 9791
+      "bytes": 10079
     },
     {
       "file": "js/device-live-control-poll-leader-core.mjs",
@@ -284,7 +284,7 @@
     },
     {
       "file": "js/device-hub-ui.mjs",
-      "bytes": 96443
+      "bytes": 96801
     },
     {
       "file": "js/device-hub-card-row-core.mjs",
@@ -300,7 +300,7 @@
     },
     {
       "file": "js/device-wallet-network.mjs",
-      "bytes": 26564
+      "bytes": 26611
     },
     {
       "file": "js/device-hub-build-stamp.mjs",

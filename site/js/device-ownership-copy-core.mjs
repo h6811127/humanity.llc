@@ -3,11 +3,11 @@
  * @see docs/PRODUCT_LANGUAGE_STRATEGY.md
  * @see docs/OWNERSHIP_AND_CONTROL_MODEL.md § Terminology map · D7 · D9g
  */
-import { walletEntryNeedsDeviceUnlock } from "./device-custody-mode-core.mjs?v=94";
+import { walletEntryNeedsDeviceUnlock } from "./device-custody-mode-core.mjs?v=95";
 import {
   inboxAriaManagingInOtherContext,
   inboxAriaOrphanManagingElsewhere,
-} from "./device-shell-copy-core.mjs?v=94";
+} from "./device-shell-copy-core.mjs?v=95";
 
 export const OWNERSHIP_NOT_LOADED_TAB = "Ownership not loaded in this tab.";
 

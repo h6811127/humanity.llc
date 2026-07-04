@@ -12,11 +12,11 @@ import {
   inboxCountFromItems,
   inboxItemsIncludeKind,
   inboxTier,
-} from "./device-inbox-core.mjs?v=94";
+} from "./device-inbox-core.mjs?v=95";
 import {
   inboxKindAllowsOsNotification,
   osNotificationContentForLiveProof,
-} from "./device-browser-notifications-core.mjs?v=94";
+} from "./device-browser-notifications-core.mjs?v=95";
 import { buildLiveControlProofHref } from "./device-live-control-inbox-core.mjs";
 
 export const OS_NOTIFICATION_TAG_LIVE_PROOF = "hc-live-proof";

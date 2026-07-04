@@ -40,10 +40,31 @@ describe("device-resolver-sync-core", () => {
           alertState: "active",
         },
       ],
+      complete: true,
     });
     expect(parsed?.entries).toHaveLength(1);
     expect(parsed?.entries[0].profile_id).toBe("p1");
     expect(parsed?.entries[0].qrScope).toBe("print_artifact");
+    expect(parsed?.complete).toBe(true);
+  });
+
+  it("treats missing network-snapshot completeness as partial", () => {
+    const parsed = parseNetworkSnapshotMessage({
+      type: "network-snapshot",
+      tabId: "tab-a",
+      at: 1000,
+      origin: "https://api.example",
+      entries: [
+        {
+          profile_id: "p1",
+          status: "active",
+          scanKind: "active",
+          cachedAt: 999,
+          resolverConfirmed: true,
+        },
+      ],
+    });
+    expect(parsed?.complete).toBe(false);
   });
 
   it("rejects invalid snapshot payloads", () => {

@@ -12,7 +12,7 @@ import {
   relayOfferInboxChanged,
 } from "./device-relay-offer-inbox-core.mjs";
 import { fetchRelayOfferProfileSummary } from "./lost-item-offer-owner.mjs";
-import { getResolverHealthStatus } from "./device-wallet-since-visit-gate.mjs?v=94";
+import { getResolverHealthStatus } from "./device-wallet-since-visit-gate.mjs?v=95";
 
 export {
   relayOfferInboxAggregateTitle,
