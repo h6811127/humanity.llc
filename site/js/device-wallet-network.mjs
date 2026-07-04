@@ -23,11 +23,11 @@ import {
   shouldUseCachedNetworkStatus,
   verificationRecordFromLabelState,
   WALLET_NETWORK_CACHE_TTL_MS,
-} from "./device-wallet-network-core.mjs?v=94";
+} from "./device-wallet-network-core.mjs?v=95";
 import {
   getWalletStatusPollHealth,
   setWalletStatusPollHealthForSinceVisit,
-} from "./device-wallet-since-visit-gate.mjs?v=94";
+} from "./device-wallet-since-visit-gate.mjs?v=95";
 import {
   buildSinceVisitPollMapsFromTruth,
   clearWalletNetworkTruthForProfile,
@@ -41,7 +41,7 @@ import {
   setWalletNetworkTruthFromCacheOnly,
   setWalletNetworkTruthFromPoll,
   shouldSuppressCardDisabledSinceVisitFromTruth,
-} from "./device-wallet-network-truth.mjs?v=94";
+} from "./device-wallet-network-truth.mjs?v=95";
 
 export { readCachedVerification };
 export {
@@ -49,7 +49,7 @@ export {
   isSinceVisitBlockedChipStatus,
   listWalletNetworkTruthPollProfileIds,
   shouldSuppressCardDisabledSinceVisitFromTruth,
-} from "./device-wallet-network-truth.mjs?v=94";
+} from "./device-wallet-network-truth.mjs?v=95";
 
 const CACHE_KEY = "hc_wallet_network_cache";
 const LAST_SEEN_KEY = "hc_wallet_last_seen_network";
@@ -209,6 +209,8 @@ export function applyResolverNetworkSnapshot(snapshotEntries, snapshotAt = Date.
   const scanKindMap = {};
   const qrScopeMap = {};
   const resolverConfirmedMap = {};
+  const qrIdMap = {};
+  const scanUrlMap = {};
 
   for (const row of snapshotEntries) {
     const pid = row.profile_id;

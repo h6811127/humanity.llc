@@ -2,11 +2,11 @@
  * WS-NOTIF N3 — foreground U0 attention strip (pure).
  * @see docs/NOTIFICATION_SYSTEM_V2.md
  */
-import { inboxWalletEntryLabel } from "./device-inbox-core.mjs?v=94";
+import { inboxWalletEntryLabel } from "./device-inbox-core.mjs?v=95";
 import {
   buildForegroundAttentionPlan,
   liveProofPendingFromInbox,
-} from "./device-notification-delivery-core.mjs?v=94";
+} from "./device-notification-delivery-core.mjs?v=95";
 
 /**
  * @typedef {object} ForegroundAttentionStripModel

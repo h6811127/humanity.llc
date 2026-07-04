@@ -9,8 +9,8 @@ import {
   getNetworkLastSeenBaseline,
   listWalletNetworkTruthPollProfileIds,
   shouldSuppressCardDisabledSinceVisitForProfile,
-} from "./device-wallet-network.mjs?v=94";
-import { shouldSuppressCardDisabledSinceVisitAlerts } from "./device-wallet-since-visit-gate.mjs?v=94";
+} from "./device-wallet-network.mjs?v=95";
+import { shouldSuppressCardDisabledSinceVisitAlerts } from "./device-wallet-since-visit-gate.mjs?v=95";
 
 /** @returns {ReturnType<typeof getWalletEntrySummariesByProfileIds>} */
 export function gatherCardDisabledSinceVisitForInbox() {

@@ -19,9 +19,9 @@ import {
   inboxAriaManagingInOtherTab,
   inboxAriaOrphanManagingOtherTab,
   inboxAriaOwnershipNotSaved,
-} from "./device-ownership-copy-core.mjs?v=94";
-import { shellSurfaceFromStandalone } from "./device-shell-copy-core.mjs?v=94";
-import { dotOverlayFromCounts } from "./device-dot-state-core.mjs?v=94";
+} from "./device-ownership-copy-core.mjs?v=95";
+import { shellSurfaceFromStandalone } from "./device-shell-copy-core.mjs?v=95";
+import { dotOverlayFromCounts } from "./device-dot-state-core.mjs?v=95";
 import { liveProofInboxAggregateTitle, liveProofInboxRowSubtitle } from "./device-live-control-inbox-core.mjs";
 import {
   relayOfferInboxAggregateTitle,

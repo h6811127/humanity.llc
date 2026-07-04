@@ -6,7 +6,7 @@ import {
   HC_SW_OPEN_INBOX,
   PENDING_NOTIFICATION_NAV_STORAGE_KEY,
 } from "./device-live-proof-notification-nav-core.mjs";
-import { openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=94";
+import { openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=95";
 
 let notificationNavListenerBound = false;
 

@@ -2,14 +2,14 @@
  * WS-NOTIF N2 — browser delivery router (badge + OS from inbox).
  * @see docs/NOTIFICATION_SYSTEM_V2.md
  */
-import { gatherInboxInput, getInboxItems } from "./device-inbox.mjs?v=94";
+import { gatherInboxInput, getInboxItems } from "./device-inbox.mjs?v=95";
 import {
   buildForegroundAttentionPlan,
   buildOsNotificationPlans,
   buildShellBadgeDeliveryPlan,
   filterOsPlansByDedupe,
   hubInboxGroupVisibilityFromItems,
-} from "./device-notification-delivery-core.mjs?v=94";
+} from "./device-notification-delivery-core.mjs?v=95";
 
 export {
   buildForegroundAttentionPlan,
@@ -19,7 +19,7 @@ export {
   hubInboxGroupVisibilityFromItems,
   liveProofPendingFromInbox,
   relayOfferPendingFromInbox,
-} from "./device-notification-delivery-core.mjs?v=94";
+} from "./device-notification-delivery-core.mjs?v=95";
 
 /** @type {Record<string, string>} */
 let lastOsDedupeByKind = {};

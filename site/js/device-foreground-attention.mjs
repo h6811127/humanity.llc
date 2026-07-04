@@ -7,11 +7,11 @@ import {
   emphasisCardBodyHtml,
   emphasisCardCtaButton,
   escapeEmphasisHtml,
-} from "./device-emphasis-card-html.mjs?v=94";
-import { getInboxItems } from "./device-inbox.mjs?v=94";
-import { buildForegroundAttentionStripModel } from "./device-foreground-attention-core.mjs?v=94";
-import { openLiveControlProof } from "./device-live-control-inbox.mjs?v=94";
-import { openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=94";
+} from "./device-emphasis-card-html.mjs?v=95";
+import { getInboxItems } from "./device-inbox.mjs?v=95";
+import { buildForegroundAttentionStripModel } from "./device-foreground-attention-core.mjs?v=95";
+import { openLiveControlProof } from "./device-live-control-inbox.mjs?v=95";
+import { openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=95";
 
 const strip = document.getElementById("device-foreground-attention");
 

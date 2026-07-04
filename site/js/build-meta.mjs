@@ -5,6 +5,6 @@
 export const SITE_BUILD_META = {
   "gitSha": "90360b20",
   "builtAt": "2026-06-29T23:29:33.143Z",
-  "shellAssetVersion": 94,
+  "shellAssetVersion": 95,
   "source": "deploy"
 };

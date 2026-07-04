@@ -18,13 +18,13 @@ import {
   shouldShowBrowserNotifPrompt,
   STORAGE_BROWSER_NOTIF,
   STORAGE_PROMPT_DISMISS,
-} from "./device-browser-notifications-core.mjs?v=94";
+} from "./device-browser-notifications-core.mjs?v=95";
 import { getLiveControlPendingCount } from "./device-live-control-inbox.mjs";
 import { isWatchLiveProofEnabled } from "./device-hub-network-tools-core.mjs";
 import { listPollableWalletEntries } from "./device-wallet.mjs";
-import { logInboxDiagnostic, isInboxDiagnosticsEnabled } from "./device-inbox-diagnostics.mjs?v=94";
-import { applyOsNotificationsFromInbox } from "./device-notification-delivery.mjs?v=94";
-import { probeLiveControlInboxForBackgroundAlerts } from "./device-live-control-inbox.mjs?v=94";
+import { logInboxDiagnostic, isInboxDiagnosticsEnabled } from "./device-inbox-diagnostics.mjs?v=95";
+import { applyOsNotificationsFromInbox } from "./device-notification-delivery.mjs?v=95";
+import { probeLiveControlInboxForBackgroundAlerts } from "./device-live-control-inbox.mjs?v=95";
 import {
   getRelayOfferPendingCount,
   loadRelayOfferInboxModule,

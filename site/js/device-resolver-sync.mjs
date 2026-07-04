@@ -31,8 +31,8 @@ import {
   applyResolverNetworkSnapshot,
   loadWalletNetworkCacheForSync,
   saveWalletNetworkCacheForSync,
-} from "./device-wallet-network.mjs?v=94";
-import { verificationRecordFromLabelState } from "./device-wallet-network-core.mjs?v=94";
+} from "./device-wallet-network.mjs?v=95";
+import { verificationRecordFromLabelState } from "./device-wallet-network-core.mjs?v=95";
 
 const CHANNEL_NAME = RESOLVER_SYNC_CHANNEL;
 
@@ -104,7 +104,7 @@ function applySnapshotMessage(message) {
   if (!networkSnapshotOriginMatches(message.origin, resolverApiOrigin())) return;
   if (lastAppliedSnapshotAt === message.at) return;
   lastAppliedSnapshotAt = message.at;
-  lastReceivedSnapshotAt = message.at;
+  if (message.complete) lastReceivedSnapshotAt = message.at;
 
   const cache = loadWalletNetworkCacheForSync();
   const merged = mergeNetworkSnapshotIntoCache(cache, message.entries, message.at);
@@ -263,6 +263,7 @@ export function broadcastHealthSnapshotIfEligible(status, opts = {}) {
  *   resolverConfirmedMap: Record<string, boolean>,
  *   alertStateMap?: Record<string, string>,
  *   networkFetchedProfileIds?: Iterable<string>,
+ *   complete?: boolean,
  * }} detail
  */
 export function broadcastNetworkSnapshotIfEligible(detail) {
@@ -273,10 +274,14 @@ export function broadcastNetworkSnapshotIfEligible(detail) {
 
   const cache = loadWalletNetworkCacheForSync();
   const alertStateMap = detail.alertStateMap ?? {};
+  let missingSnapshotRow = false;
   /** @type {NetworkSnapshotRow[]} */
   const rows = detail.entries.map((entry) => {
     const pid = entry.profile_id;
     const cached = cache[pid];
+    if (!Object.prototype.hasOwnProperty.call(detail.statusMap, pid) && !cached) {
+      missingSnapshotRow = true;
+    }
     const status = detail.statusMap[pid] ?? cached?.status ?? "checking";
     const scanKind = detail.scanKindMap[pid] ?? cached?.scanKind ?? null;
     const resolverConfirmed = detail.resolverConfirmedMap[pid] === true;
@@ -310,8 +315,9 @@ export function broadcastNetworkSnapshotIfEligible(detail) {
     at: now,
     origin,
     entries: rows,
+    complete: detail.complete === true && !missingSnapshotRow,
   };
-  lastReceivedSnapshotAt = now;
+  if (message.complete) lastReceivedSnapshotAt = now;
   lastAppliedSnapshotAt = now;
 
   const ch = ensureChannel();
