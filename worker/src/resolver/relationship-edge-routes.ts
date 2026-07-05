@@ -17,6 +17,8 @@ import {
   isRelationshipEdgeSigner,
 } from "../db/relationship-edges";
 import { GAME_NODE_OBJECT_TYPE } from "../city-game/constants";
+import { seasonObjectIdForNode } from "../city-game/season-config";
+import { resolveSeasonById } from "../city-game/season-loader";
 import type { RelationshipEdgeDocument } from "../live-object/relationship-edge-spec";
 import {
   RELATIONSHIP_EDGE_ID_REGEX,
@@ -26,6 +28,7 @@ import {
   relationshipEdgePath,
   validateRelationshipEdgeShape,
 } from "../live-object/relationship-edge-spec";
+import type { RelationshipEdgeRow } from "../db/types";
 import { errorResponse, jsonResponse } from "../http/resolver";
 
 function parseRelationshipEdgeBody(body: unknown): Record<string, unknown> | null {
@@ -80,6 +83,107 @@ async function schemaUnavailable(db: D1Database): Promise<Response | null> {
     "SCHEMA_NOT_READY",
     "relationship_edges migration is not applied.",
     503
+  );
+}
+
+async function validateRelationshipEdgeTopology(
+  db: D1Database,
+  doc: RelationshipEdgeDocument,
+  pathProfileId: string
+): Promise<Response | null> {
+  const season = resolveSeasonById(doc.network_id);
+  if (!season) {
+    return errorResponse(
+      "NETWORK_NOT_FOUND",
+      "Relationship edge network_id is not registered in this worker build.",
+      422
+    );
+  }
+
+  const path = relationshipEdgePath(doc);
+  const expectedFromObject = seasonObjectIdForNode(path.from_node_id, season);
+  const expectedToObject = seasonObjectIdForNode(path.to_node_id, season);
+  if (!expectedFromObject || !expectedToObject) {
+    return errorResponse(
+      "NODE_NOT_FOUND",
+      "Relationship edge path nodes must exist in the target network.",
+      422
+    );
+  }
+  if (expectedFromObject !== doc.from.id || expectedToObject !== doc.to.id) {
+    return errorResponse(
+      "EDGE_TOPOLOGY_MISMATCH",
+      "Relationship edge path nodes must match the referenced child objects.",
+      422
+    );
+  }
+
+  for (const objectId of [doc.from.id, doc.to.id]) {
+    const child = await getChildObject(db, objectId);
+    if (!child || child.parent_profile_id !== pathProfileId) {
+      return errorResponse(
+        "OBJECT_NOT_FOUND",
+        `Child object ${objectId} not found under this steward.`,
+        404
+      );
+    }
+    if (child.object_type !== GAME_NODE_OBJECT_TYPE) {
+      return errorResponse(
+        "NOT_GAME_NODE",
+        "Witness relationship edges require game_node child objects.",
+        422
+      );
+    }
+    if (child.status !== "active") {
+      return errorResponse(
+        "OBJECT_NOT_ACTIVE",
+        `Child object ${objectId} is not active.`,
+        409
+      );
+    }
+  }
+
+  return null;
+}
+
+function parsedStoredRelationshipEdge(row: RelationshipEdgeRow): RelationshipEdgeDocument | null {
+  try {
+    const parsed = JSON.parse(row.edge_document_json);
+    const shape = validateRelationshipEdgeShape(parsed);
+    return shape.ok ? (parsed as RelationshipEdgeDocument) : null;
+  } catch {
+    return null;
+  }
+}
+
+function immutableRelationshipEdgeFieldsMatch(
+  existing: RelationshipEdgeRow,
+  existingDoc: RelationshipEdgeDocument | null,
+  revokeDoc: RelationshipEdgeDocument
+): boolean {
+  if (
+    existing.edge_id !== revokeDoc.edge_id ||
+    existing.network_id !== revokeDoc.network_id ||
+    existing.kind !== revokeDoc.kind ||
+    existing.from_object_id !== revokeDoc.from.id ||
+    existing.to_object_id !== revokeDoc.to.id ||
+    existing.steward_profile_id !== revokeDoc.steward_profile_id
+  ) {
+    return false;
+  }
+  if (!existingDoc) return true;
+  const existingPath = relationshipEdgePath(existingDoc);
+  const revokePath = relationshipEdgePath(revokeDoc);
+  return (
+    existingDoc.network_id === revokeDoc.network_id &&
+    existingDoc.kind === revokeDoc.kind &&
+    existingDoc.from.id === revokeDoc.from.id &&
+    existingDoc.to.id === revokeDoc.to.id &&
+    existingDoc.steward_profile_id === revokeDoc.steward_profile_id &&
+    existingDoc.label === revokeDoc.label &&
+    existingDoc.created_at === revokeDoc.created_at &&
+    existingPath.from_node_id === revokePath.from_node_id &&
+    existingPath.to_node_id === revokePath.to_node_id
   );
 }
 
@@ -203,38 +307,9 @@ async function verifiedWitnessEdgeIssuance(
     };
   }
 
-  for (const objectId of [doc.from.id, doc.to.id]) {
-    const child = await getChildObject(db, objectId);
-    if (!child || child.parent_profile_id !== pathProfileId) {
-      return {
-        ok: false,
-        response: errorResponse(
-          "OBJECT_NOT_FOUND",
-          `Child object ${objectId} not found under this steward.`,
-          404
-        ),
-      };
-    }
-    if (child.object_type !== GAME_NODE_OBJECT_TYPE) {
-      return {
-        ok: false,
-        response: errorResponse(
-          "NOT_GAME_NODE",
-          "Witness relationship edges require game_node child objects.",
-          422
-        ),
-      };
-    }
-    if (child.status !== "active") {
-      return {
-        ok: false,
-        response: errorResponse(
-          "OBJECT_NOT_ACTIVE",
-          `Child object ${objectId} is not active.`,
-          409
-        ),
-      };
-    }
+  const topologyError = await validateRelationshipEdgeTopology(db, doc, pathProfileId);
+  if (topologyError) {
+    return { ok: false, response: topologyError };
   }
 
   return { ok: true, doc, documentJson: JSON.stringify(raw) };
@@ -342,6 +417,19 @@ export async function handlePostRelationshipEdgeRevoke(
   }
   if (existing.status === "revoked") {
     return errorResponse("EDGE_REVOKED", "Relationship edge is already revoked.", 409);
+  }
+  if (
+    !immutableRelationshipEdgeFieldsMatch(
+      existing,
+      parsedStoredRelationshipEdge(existing),
+      parsed.doc
+    )
+  ) {
+    return errorResponse(
+      "EDGE_MISMATCH",
+      "Revoke document must match the stored relationship edge coordinates.",
+      422
+    );
   }
 
   const revoke = await revokeRelationshipEdge(db, {
