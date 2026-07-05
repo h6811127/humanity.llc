@@ -356,8 +356,8 @@ describe("relationship-edge-routes", () => {
     );
 
     expect(res.status).toBe(422);
-    const body = (await res.json()) as { code: string };
-    expect(body.code).toBe("EDGE_TOPOLOGY_MISMATCH");
+    const body = (await res.json()) as { error: string };
+    expect(body.error).toBe("EDGE_TOPOLOGY_MISMATCH");
     expect(db.edges.has(EDGE_ID)).toBe(false);
   });
 
@@ -386,8 +386,8 @@ describe("relationship-edge-routes", () => {
     );
 
     expect(res.status).toBe(422);
-    const body = (await res.json()) as { code: string };
-    expect(body.code).toBe("NETWORK_NOT_FOUND");
+    const body = (await res.json()) as { error: string };
+    expect(body.error).toBe("NETWORK_NOT_FOUND");
     expect(db.edges.has(EDGE_ID)).toBe(false);
   });
 
@@ -432,8 +432,8 @@ describe("relationship-edge-routes", () => {
     );
 
     expect(res.status).toBe(422);
-    const body = (await res.json()) as { code: string };
-    expect(body.code).toBe("EDGE_MISMATCH");
+    const body = (await res.json()) as { error: string };
+    expect(body.error).toBe("EDGE_MISMATCH");
     const stored = db.edges.get(EDGE_ID);
     expect(stored?.status).toBe("active");
     expect(stored?.from_object_id).toBe(FROM_OBJECT);
