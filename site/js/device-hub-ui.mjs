@@ -219,7 +219,7 @@ import {
   isDeviceHubExpanded,
   walletNetworkVisibilityRefreshAllowed,
 } from "./device-live-control-poll-scheduler.mjs";
-import { walletNetworkFetchAllowedByResolverHealth } from "./device-wallet-since-visit-gate.mjs";
+import { walletNetworkFetchAllowedByResolverHealth } from "./device-wallet-since-visit-gate.mjs?v=94";
 import {
   expandSummaryRowLimitForVisible,
   isScrollNearBottom,

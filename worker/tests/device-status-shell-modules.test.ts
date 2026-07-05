@@ -86,6 +86,38 @@ describe("device status shell module manifest", () => {
     );
   });
 
+  it("shell health gate importers share the versioned since-visit singleton", () => {
+    const v = DEVICE_SHELL_ASSET_VERSION;
+    const read = (name) =>
+      fs.readFileSync(path.join(siteJsDir, name), "utf8");
+    const importPattern =
+      /from\s+["']\.\/device-wallet-since-visit-gate\.mjs(?:\?v=(\d+))?["']/g;
+    const singletonImporters = [
+      "device-status.mjs",
+      "device-shell-resume.mjs",
+      "device-os-coordinator.mjs",
+      "device-wallet-network.mjs",
+      "device-inbox-card-disabled.mjs",
+      "device-hub-glance.mjs",
+      "device-hub-ui.mjs",
+      "device-live-control-inbox.mjs",
+      "device-relay-offer-inbox.mjs",
+      "device-browser-notifications.mjs",
+      "device-browser-notifications-sw.mjs",
+    ];
+
+    for (const file of singletonImporters) {
+      const matches = [...read(file).matchAll(importPattern)];
+      expect(matches.length, `${file} should import the since-visit gate`).toBeGreaterThan(0);
+      for (const match of matches) {
+        expect(
+          match[1],
+          `${file} imports device-wallet-since-visit-gate without ?v=${v}`
+        ).toBe(String(v));
+      }
+    }
+  });
+
   it("custody status graph cache-busts copy chain (partial-load regression)", () => {
     const v = DEVICE_SHELL_ASSET_VERSION;
     const read = (name) =>
