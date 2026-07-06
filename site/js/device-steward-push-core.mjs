@@ -8,6 +8,8 @@ export const STEWARD_PUSH_EVENT_CONNECTION_ACK = "connection.ack";
 
 /** Resume round-robin polling after push channel down (M3). */
 export const STEWARD_PUSH_DOWN_FALLBACK_MS = 60_000;
+export const STEWARD_WEB_PUSH_REGISTRATION_CONFIRMED_KEY =
+  "hc_steward_web_push_registered_v1";
 
 /**
  * @typedef {{
@@ -143,6 +145,41 @@ export function shouldMaintainStewardPushConnection(input) {
 export function stewardPushInFallbackCooldown(lastDownAt, now = Date.now()) {
   if (!lastDownAt) return false;
   return now - lastDownAt < STEWARD_PUSH_DOWN_FALLBACK_MS;
+}
+
+/**
+ * Server-side Web Push registration is the only signal that can safely replace
+ * service-worker polling after the page process is gone. A local PushManager
+ * subscription or healthy SSE stream alone is not enough.
+ *
+ * @param {Storage | null | undefined} [storage]
+ */
+export function stewardWebPushRegistrationConfirmed(storage) {
+  try {
+    const target =
+      storage ?? (typeof localStorage !== "undefined" ? localStorage : null);
+    return target?.getItem(STEWARD_WEB_PUSH_REGISTRATION_CONFIRMED_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * @param {boolean} confirmed
+ * @param {Storage | null | undefined} [storage]
+ */
+export function setStewardWebPushRegistrationConfirmed(confirmed, storage) {
+  try {
+    const target =
+      storage ?? (typeof localStorage !== "undefined" ? localStorage : null);
+    if (confirmed) {
+      target?.setItem(STEWARD_WEB_PUSH_REGISTRATION_CONFIRMED_KEY, "1");
+    } else {
+      target?.removeItem(STEWARD_WEB_PUSH_REGISTRATION_CONFIRMED_KEY);
+    }
+  } catch {
+    /* Best-effort diagnostic flag; polling remains enabled when unreadable. */
+  }
 }
 
 /**

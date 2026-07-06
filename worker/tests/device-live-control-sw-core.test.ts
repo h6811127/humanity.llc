@@ -62,7 +62,7 @@ describe("swLiveProofPollingShouldRun", () => {
     ).toBe(false);
   });
 
-  it("skips SW polling when hosted push is healthy (E4d)", () => {
+  it("keeps SW polling when hosted push is not server-registered", () => {
     expect(
       swLiveProofPollingShouldRun({
         enabled: true,
@@ -70,6 +70,20 @@ describe("swLiveProofPollingShouldRun", () => {
         resolverHealth: "ok",
         stewardPushEntitled: true,
         stewardPushHealthy: true,
+        stewardWebPushRegistered: false,
+      })
+    ).toBe(true);
+  });
+
+  it("skips SW polling only when hosted push is healthy and server-registered", () => {
+    expect(
+      swLiveProofPollingShouldRun({
+        enabled: true,
+        watchLiveProofEnabled: true,
+        resolverHealth: "ok",
+        stewardPushEntitled: true,
+        stewardPushHealthy: true,
+        stewardWebPushRegistered: true,
       })
     ).toBe(false);
   });
@@ -364,13 +378,16 @@ describe("buildLiveProofSwNotificationFromPushHint", () => {
     expect(payload?.href).toContain("live_challenge=lc_push_1");
   });
 
-  it("returns null when wallet row is missing", () => {
-    expect(
-      buildLiveProofSwNotificationFromPushHint(
-        { profile_id: PROFILE, challenge_id: "lc_push_1" },
-        [],
-        "http://localhost:8788"
-      )
-    ).toBeNull();
+  it("uses generic notification copy when the SW wallet mirror is stale", () => {
+    const payload = buildLiveProofSwNotificationFromPushHint(
+      { profile_id: PROFILE, qr_id: QR_ID, challenge_id: "lc_push_1" },
+      [],
+      "http://localhost:8788"
+    );
+    expect(payload?.title).toBe("Live proof request");
+    expect(payload?.body).toContain("Live proof");
+    expect(payload?.href).toContain(`profile_id=${encodeURIComponent(PROFILE)}`);
+    expect(payload?.href).toContain(`qr_id=${encodeURIComponent(QR_ID)}`);
+    expect(payload?.href).toContain("live_challenge=lc_push_1");
   });
 });

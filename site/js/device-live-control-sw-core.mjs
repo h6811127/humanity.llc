@@ -147,6 +147,7 @@ export function liveProofPollTargetsFromWallet(wallet) {
  *   resolverHealth?: 'ok' | 'degraded' | 'offline',
  *   stewardPushEntitled?: boolean,
  *   stewardPushHealthy?: boolean,
+ *   stewardWebPushRegistered?: boolean,
  *   forcePoll?: boolean,
  * }} input
  */
@@ -156,7 +157,11 @@ export function swLiveProofPollingShouldRun(input) {
   if (input.forcePoll === true) {
     return liveControlPollAllowedByResolverHealth(input.resolverHealth ?? "offline");
   }
-  if (input.stewardPushEntitled === true && input.stewardPushHealthy === true) {
+  if (
+    input.stewardPushEntitled === true &&
+    input.stewardPushHealthy === true &&
+    input.stewardWebPushRegistered === true
+  ) {
     return false;
   }
   return liveControlPollAllowedByResolverHealth(input.resolverHealth ?? "offline");
@@ -318,11 +323,15 @@ export function buildLiveProofSwNotificationFromPushHint(hint, entries, pageOrig
   const profileId =
     typeof hint.profile_id === "string" ? hint.profile_id.trim() : "";
   if (!profileId) return null;
-  const entry = entries.find((row) => row.profile_id === profileId);
-  if (!entry) return null;
   const challengeId =
     typeof hint.challenge_id === "string" ? hint.challenge_id.trim() : "";
   if (!challengeId) return null;
+  const entry =
+    entries.find((row) => row.profile_id === profileId) ?? {
+      profile_id: profileId,
+      qr_id: typeof hint.qr_id === "string" ? hint.qr_id.trim() : "",
+      label: "Live proof request",
+    };
   return buildLiveProofSwNotification(
     {
       entry,

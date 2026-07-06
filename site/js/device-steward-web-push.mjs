@@ -13,6 +13,7 @@ import {
   getStewardEntitlementsPolicy,
 } from "./device-steward-entitlements.mjs";
 import {
+  setStewardWebPushRegistrationConfirmed,
   serializePushSubscriptionForSubscribe,
   shouldMaintainStewardWebPushSubscription,
   stewardWebPushVapidPublicKeyFromCapabilities,
@@ -87,6 +88,7 @@ export async function syncStewardWebPushSubscription() {
 
     const token = readStewardSessionToken();
     if (!token) return;
+    setStewardWebPushRegistrationConfirmed(false);
 
     const reg = await registerLiveProofServiceWorker();
     if (!reg?.pushManager) return;
@@ -101,17 +103,20 @@ export async function syncStewardWebPushSubscription() {
     if (!subscription) return;
 
     const body = serializePushSubscriptionForSubscribe(subscription);
-    await fetch(`${resolverApiOrigin()}${SUBSCRIBE_PATH}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...stewardResolverRequestHeaders(),
-      },
-      credentials: "omit",
-      body: JSON.stringify(body),
-    }).catch(() => {
-      /* 501 / offline — local SW push handler still works once server sends */
-    });
+    try {
+      const res = await fetch(`${resolverApiOrigin()}${SUBSCRIBE_PATH}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...stewardResolverRequestHeaders(),
+        },
+        credentials: "omit",
+        body: JSON.stringify(body),
+      });
+      setStewardWebPushRegistrationConfirmed(res.ok);
+    } catch {
+      setStewardWebPushRegistrationConfirmed(false);
+    }
   })();
 
   try {
@@ -135,6 +140,7 @@ export async function clearStewardWebPushSubscription() {
   if (subscription) {
     await subscription.unsubscribe().catch(() => null);
   }
+  setStewardWebPushRegistrationConfirmed(false);
   if (!endpoint || !readStewardSessionToken()) return;
 
   await fetch(`${resolverApiOrigin()}${SUBSCRIBE_PATH}`, {

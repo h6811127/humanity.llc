@@ -22,6 +22,7 @@ import {
   stewardPushSubscribeAllowed,
 } from "./device-steward-entitlements.mjs";
 import { isStewardPushHealthy } from "./device-steward-push.mjs";
+import { stewardWebPushRegistrationConfirmed } from "./device-steward-push-core.mjs";
 import { getRelayOfferPendingCount } from "./device-relay-offer-inbox-loader.mjs";
 
 export const SW_SCRIPT_URL = "/sw-live-proof.mjs";
@@ -117,6 +118,7 @@ export async function syncLiveProofServiceWorkerState(opts = {}) {
     relayOfferCount: getRelayOfferPendingCount(),
     stewardPushEntitled: stewardPushSubscribeAllowed(getStewardEntitlementsPolicy()),
     stewardPushHealthy: isStewardPushHealthy(),
+    stewardWebPushRegistered: stewardWebPushRegistrationConfirmed(),
   };
 
   active.postMessage(message);
