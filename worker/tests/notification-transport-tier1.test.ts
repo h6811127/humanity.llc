@@ -23,6 +23,8 @@ describe("WS-NOTIF Tier 1 background OS transport contract", () => {
     const browser = readRepoFile("site/js/device-browser-notifications.mjs");
     expect(browser).toMatch(/deliverOsNotificationPlansToServiceWorker/);
     expect(browser).toMatch(/probeRelayOfferInboxForBackgroundAlerts/);
+    expect(browser).toMatch(/let\s+backgroundProbeInFlight\s*=\s*false/);
+    expect(browser).toMatch(/if\s*\(\s*backgroundProbeInFlight\s*\)\s*return/);
     expect(browser).toMatch(/flushPushCache:\s*true/);
     expect(browser).toMatch(/notifyTransportFieldSnapshot/);
     expect(browser).toMatch(/__hcNotifyTransportSnapshot/);

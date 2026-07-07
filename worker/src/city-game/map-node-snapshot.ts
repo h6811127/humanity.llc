@@ -23,6 +23,7 @@ import { factionControllerLabel, isGameFactionHold } from "./factions";
 import { fragmentLatticeProgress } from "./unlock-engine";
 import type { GameVouchGate } from "./vouch-graph";
 import { mapVouchChipValue, resolveWitnessGate } from "./witness-gate";
+import type { RelationshipEdgeDocument } from "../live-object/relationship-edge-spec";
 
 export type MapNodeChip = {
   kind: string;
@@ -108,6 +109,8 @@ export function deriveMapNodeSnapshot(input: {
   now: Date;
   /** All active witness node metas for the season — enables vouch gate on board rows. */
   witnessMetaByNodeId?: Record<string, GameMeta>;
+  /** Verified signed witness edges targeting this node — same authority as scan SSR. */
+  witnessRelationshipEdges?: RelationshipEdgeDocument[] | null;
 }): MapNodeSnapshotRow | null {
   if (input.child.object_type !== "game_node") return null;
   const nodeId = seasonNodeIdForObject(input.child.object_id, input.season);
@@ -136,6 +139,7 @@ export function deriveMapNodeSnapshot(input: {
       env: input.env,
       now: input.now,
       vouchWitnesses: input.witnessMetaByNodeId,
+      witnessRelationshipEdges: input.witnessRelationshipEdges,
     });
     streamPolicy = composed.streamPolicy;
     publicState = composed.publicState;
@@ -159,6 +163,7 @@ export function deriveMapNodeSnapshot(input: {
     targetNodeId: nodeId,
     gameMeta: fields.gameMeta,
     witnessMetaByNodeId: input.witnessMetaByNodeId ?? {},
+    witnessRelationshipEdges: input.witnessRelationshipEdges,
   });
 
   return {
