@@ -5,6 +5,7 @@ import {
   buildRelationshipEdgesFromUnlockDraft,
   assessScanGraphPublish,
   filterUnlockEdgesForScanGraphPublish,
+  liveRelationshipEdgeStatus,
   relationshipEdgeIdFromDraft,
   resolveRelationshipEdgeKind,
   RELATIONSHIP_EDGE_KIND_UNLOCKS,
@@ -106,6 +107,29 @@ describe("created-relationship-edge-publish-core", () => {
     });
     expect(assess.ready).toBe(false);
     expect(assess.missingEdgeIds.length).toBe(1);
+  });
+
+  it("assessScanGraphPublish treats revoked live edges as missing", () => {
+    const live = [
+      { edge_id: "edge_cr_witness_10_07", status: "revoked" },
+      { edge_id: "edge_cr_unlock_04_07", status: "active" },
+    ];
+    const assess = assessScanGraphPublish({
+      profileId: "prof_test",
+      seasonId: crSeason.season_id,
+      templateRows,
+      unlockEdges: crSeason.unlock_edges,
+      liveEdges: live,
+      season: crSeason,
+    });
+
+    expect(liveRelationshipEdgeStatus(live, "edge_cr_witness_10_07")).toBe("revoked");
+    expect(assess.ready).toBe(false);
+    expect(assess.missingEdgeIds).toEqual(["edge_cr_witness_10_07"]);
+    expect(assess.publishedEdgeIds).toEqual(["edge_cr_unlock_04_07"]);
+    expect(assess.issues).toContain(
+      "Scan graph edge not published on Live: edge_cr_witness_10_07"
+    );
   });
 
   it("assessScanGraphPublish passes when cabinet dual-gate edges are live", () => {
