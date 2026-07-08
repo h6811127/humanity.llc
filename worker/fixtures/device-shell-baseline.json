@@ -1,14 +1,14 @@
 {
   "schema": "device_shell_baseline_v1",
-  "generated_at": "2026-06-30",
+  "generated_at": "2026-07-08",
   "phase": "smooth_mode_phase_0",
   "asset_version": 94,
   "module_count": 86,
-  "js_bytes_total": 571836,
+  "js_bytes_total": 573833,
   "shell_css_bytes_total": 78910,
   "landing_css_bytes_total": 392819,
-  "transfer_bytes_shell_graph": 650746,
-  "transfer_bytes_landing_first_paint": 964655,
+  "transfer_bytes_shell_graph": 652743,
+  "transfer_bytes_landing_first_paint": 966652,
   "js_modules": [
     {
       "file": "js/device-status-bootstrap.mjs",
@@ -132,7 +132,7 @@
     },
     {
       "file": "js/device-relay-offer-inbox-loader.mjs",
-      "bytes": 2337
+      "bytes": 3903
     },
     {
       "file": "js/device-relay-offer-inbox-core.mjs",
@@ -348,7 +348,7 @@
     },
     {
       "file": "js/device-browser-notifications.mjs",
-      "bytes": 18981
+      "bytes": 19412
     },
     {
       "file": "js/device-browser-notifications-core.mjs",
