@@ -12,6 +12,11 @@ export {
   relayOfferInboxRowSubtitle,
 } from "./device-relay-offer-inbox-core.mjs";
 
+const WALLET_STORAGE_KEY = "hc_wallet";
+const CHILD_OBJECTS_STORAGE_KEY = "hc_child_objects_v1";
+const CHILD_OBJECT_TYPE_LOST_ITEM_RELAY = "lost_item_relay";
+const CHILD_OBJECT_STATUS_DISABLED = "disabled";
+
 /** @type {Promise<typeof import("./device-relay-offer-inbox.mjs")> | null} */
 let relayOfferModulePromise = null;
 
@@ -43,11 +48,50 @@ export function getRelayOfferPendingCount() {
 
 export function relayOfferInboxEligible() {
   if (relayOfferModule) return relayOfferModule.relayOfferInboxEligible();
-  return false;
+  return walletHasActiveLostItemRelays();
+}
+
+/**
+ * This loader sits on the shell graph, so keep the pre-load eligibility check
+ * dependency-free and mirror only the storage fields needed to decide whether
+ * the heavier relay inbox module should be loaded.
+ * @param {string} profileId
+ */
+function hasLocalActiveLostItemRelays(profileId) {
+  if (!profileId) return false;
+  try {
+    const raw = localStorage.getItem(`${CHILD_OBJECTS_STORAGE_KEY}:${profileId}`);
+    if (!raw) return false;
+    const rows = JSON.parse(raw);
+    if (!Array.isArray(rows)) return false;
+    return rows.some((row) => {
+      if (!row || typeof row !== "object") return false;
+      const r = /** @type {Record<string, unknown>} */ (row);
+      return (
+        r.object_type === CHILD_OBJECT_TYPE_LOST_ITEM_RELAY &&
+        r.status !== CHILD_OBJECT_STATUS_DISABLED
+      );
+    });
+  } catch {
+    return false;
+  }
 }
 
 export function walletHasActiveLostItemRelays() {
   if (relayOfferModule) return relayOfferModule.walletHasActiveLostItemRelays();
+  try {
+    const raw = localStorage.getItem(WALLET_STORAGE_KEY);
+    if (!raw) return false;
+    const entries = JSON.parse(raw);
+    if (!Array.isArray(entries)) return false;
+    for (const entry of entries) {
+      if (!entry || typeof entry !== "object") continue;
+      const pid = /** @type {Record<string, unknown>} */ (entry).profile_id;
+      if (typeof pid === "string" && hasLocalActiveLostItemRelays(pid)) return true;
+    }
+  } catch {
+    return false;
+  }
   return false;
 }
 

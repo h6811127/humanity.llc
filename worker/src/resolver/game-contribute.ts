@@ -33,7 +33,7 @@ import {
   patchesForQuorumUnlock,
 } from "../city-game/unlock-engine";
 import type { CrSeasonConfig } from "../city-game/season-config";
-import { getChildObject, updateChildObject } from "../db/child-objects";
+import { getChildObject, updateChildObjectIfUnchanged } from "../db/child-objects";
 import {
   gameContributeObjectDailyCapReached,
   incrementGameContributeBucket,
@@ -54,6 +54,8 @@ type ContributeBody = {
   action?: string;
   faction?: string;
 };
+
+const GAME_CONTRIBUTE_WRITE_MAX_RETRIES = 24;
 
 function parseRelayAction(raw: string | undefined): RelayContributeAction {
   const action = typeof raw === "string" ? raw.trim().toLowerCase() : "";
@@ -108,7 +110,7 @@ async function fragmentAlreadyClaimedPayload(
   };
 }
 
-async function persistGameNodeDocument(
+async function persistGameNodeDocumentIfUnchanged(
   db: D1Database,
   row: {
     object_id: string;
@@ -116,22 +118,106 @@ async function persistGameNodeDocument(
     object_type: string;
     public_label: string;
     created_at: string;
+    updated_at: string;
   },
   doc: Record<string, unknown>,
   publicState: string,
   updatedAt: string
+): Promise<boolean> {
+  return updateChildObjectIfUnchanged(
+    db,
+    {
+      objectId: row.object_id,
+      parentProfileId: row.parent_profile_id,
+      objectType: row.object_type,
+      publicLabel: row.public_label,
+      publicState,
+      status: "active",
+      documentJson: JSON.stringify(doc),
+      createdAt: row.created_at,
+      updatedAt,
+    },
+    row.updated_at
+  );
+}
+
+async function recordSuccessfulContribute(
+  db: D1Database,
+  objectId: string,
+  seasonId: string,
+  bucketDate: string
 ): Promise<void> {
-  await updateChildObject(db, {
-    objectId: row.object_id,
-    parentProfileId: row.parent_profile_id,
-    objectType: row.object_type,
-    publicLabel: row.public_label,
-    publicState,
-    status: "active",
-    documentJson: JSON.stringify(doc),
-    createdAt: row.created_at,
-    updatedAt,
-  });
+  await incrementGameContributeBucket(db, objectId, seasonId, bucketDate);
+  await recordGameContributeSeasonUsage(db, seasonId);
+}
+
+async function issueWitnessSunsetPassWithRetry(
+  db: D1Database,
+  input: {
+    objectId: string;
+    parentProfileId: string;
+    nodeId: string;
+    season: CrSeasonConfig;
+    maxRetries?: number;
+  }
+): Promise<{ scarcityRemaining: number; depleted: boolean; vouchTargets: string[] } | null> {
+  const maxRetries = input.maxRetries ?? GAME_CONTRIBUTE_WRITE_MAX_RETRIES;
+  for (let attempt = 0; attempt < maxRetries; attempt += 1) {
+    const row = await getChildObject(db, input.objectId);
+    if (!row || row.parent_profile_id !== input.parentProfileId) return null;
+    const doc = parseDocument(row.child_object_document_json);
+    const meta = normalizeGameMeta(doc.game_meta);
+    if (meta.scarcity_remaining == null || meta.scarcity_remaining <= 0) {
+      throw new Error("WITNESS_DEPLETED");
+    }
+    const issued = issueWitnessSunsetPass(doc, input.nodeId, input.season);
+    const saved = await persistGameNodeDocumentIfUnchanged(
+      db,
+      row,
+      issued.doc,
+      typeof issued.doc.public_state === "string" ? issued.doc.public_state : row.public_state,
+      new Date().toISOString()
+    );
+    if (!saved) continue;
+    return {
+      scarcityRemaining: issued.meta.scarcity_remaining ?? 0,
+      depleted: issued.depleted,
+      vouchTargets: seasonVouchTargetsFrom(input.nodeId, input.season),
+    };
+  }
+  throw new Error("SCARCITY_WRITE_CONFLICT");
+}
+
+async function markFragmentNodeClaimedWithRetry(
+  db: D1Database,
+  input: {
+    objectId: string;
+    parentProfileId: string;
+    nodeId: string;
+    maxRetries?: number;
+  }
+): Promise<{ doc: Record<string, unknown>; alreadyClaimed: boolean } | null> {
+  const maxRetries = input.maxRetries ?? GAME_CONTRIBUTE_WRITE_MAX_RETRIES;
+  for (let attempt = 0; attempt < maxRetries; attempt += 1) {
+    const row = await getChildObject(db, input.objectId);
+    if (!row || row.parent_profile_id !== input.parentProfileId) return null;
+    const doc = parseDocument(row.child_object_document_json);
+    const meta = normalizeGameMeta(doc.game_meta);
+    if (meta.unlocked_by.includes(input.nodeId)) {
+      return { doc, alreadyClaimed: true };
+    }
+    const marked = markFragmentNodeClaimed(doc, input.nodeId);
+    const saved = await persistGameNodeDocumentIfUnchanged(
+      db,
+      row,
+      marked,
+      typeof marked.public_state === "string" ? marked.public_state : row.public_state,
+      new Date().toISOString()
+    );
+    if (!saved) continue;
+    return { doc: marked, alreadyClaimed: false };
+  }
+  throw new Error("FRAGMENT_WRITE_CONFLICT");
 }
 
 export async function handlePostGameContribute(
@@ -312,9 +398,6 @@ export async function handlePostGameContribute(
     );
   }
 
-  await incrementGameContributeBucket(db, pathObjectId, fields.seasonId, bucketDate);
-  await recordGameContributeSeasonUsage(db, season.season_id);
-
   if (contributeMode === "quorum") {
     const target = meta.collective_target!;
     try {
@@ -327,6 +410,9 @@ export async function handlePostGameContribute(
       });
       if (!bumped) {
         return errorResponse("NOT_FOUND", "Child object not found.", 404);
+      }
+      if (!bumped.alreadyComplete) {
+        await recordSuccessfulContribute(db, pathObjectId, fields.seasonId, bucketDate);
       }
 
       return jsonResponse(
@@ -356,31 +442,50 @@ export async function handlePostGameContribute(
   }
 
   if (contributeMode === "scarcity") {
-    const issued = issueWitnessSunsetPass(doc, nodeId, season);
-    doc = issued.doc;
-    const updatedAt = now.toISOString();
+    try {
+      const issued = await issueWitnessSunsetPassWithRetry(db, {
+        objectId: pathObjectId,
+        parentProfileId: pathProfileId,
+        nodeId,
+        season,
+      });
+      if (!issued) {
+        return errorResponse("NOT_FOUND", "Child object not found.", 404);
+      }
+      await recordSuccessfulContribute(db, pathObjectId, fields.seasonId, bucketDate);
 
-    await persistGameNodeDocument(
-      db,
-      existing,
-      doc,
-      typeof doc.public_state === "string" ? doc.public_state : existing.public_state,
-      updatedAt
-    );
-
-    return jsonResponse(
-      {
-        object_id: pathObjectId,
-        node_id: nodeId,
-        contribute_mode: "scarcity",
-        pass_issued: true,
-        scarcity_remaining: issued.meta.scarcity_remaining,
-        witness_depleted: issued.depleted,
-        vouch_targets: seasonVouchTargetsFrom(nodeId, season),
-      },
-      200,
-      { "Cache-Control": "no-store" }
-    );
+      return jsonResponse(
+        {
+          object_id: pathObjectId,
+          node_id: nodeId,
+          contribute_mode: "scarcity",
+          pass_issued: true,
+          scarcity_remaining: issued.scarcityRemaining,
+          witness_depleted: issued.depleted,
+          vouch_targets: issued.vouchTargets,
+        },
+        200,
+        { "Cache-Control": "no-store" }
+      );
+    } catch (e) {
+      if (e instanceof Error) {
+        if (e.message === "WITNESS_DEPLETED") {
+          return errorResponse(
+            "WITNESS_DEPLETED",
+            "Witness sunset passes were exhausted by another contribution. Try another node.",
+            409
+          );
+        }
+        if (e.message === "SCARCITY_WRITE_CONFLICT") {
+          return errorResponse(
+            "SCARCITY_WRITE_CONFLICT",
+            "Witness pass update conflict under load. Try again.",
+            409
+          );
+        }
+      }
+      throw e;
+    }
   }
 
   if (contributeMode === "capture") {
@@ -406,6 +511,7 @@ export async function handlePostGameContribute(
       if (!relayResult) {
         return errorResponse("NOT_FOUND", "Child object not found.", 404);
       }
+      await recordSuccessfulContribute(db, pathObjectId, fields.seasonId, bucketDate);
 
       return jsonResponse(
         {
@@ -458,17 +564,36 @@ export async function handlePostGameContribute(
     return errorResponse("NOT_CONTRIBUTABLE", "This object is not accepting contributions.", 422);
   }
 
-  doc = markFragmentNodeClaimed(doc, nodeId);
-  const updatedAt = now.toISOString();
-  await persistGameNodeDocument(
-    db,
-    existing,
-    doc,
-    typeof doc.public_state === "string" ? doc.public_state : existing.public_state,
-    updatedAt
-  );
+  let marked;
+  try {
+    marked = await markFragmentNodeClaimedWithRetry(db, {
+      objectId: pathObjectId,
+      parentProfileId: pathProfileId,
+      nodeId,
+    });
+  } catch (e) {
+    if (e instanceof Error && e.message === "FRAGMENT_WRITE_CONFLICT") {
+      return errorResponse(
+        "FRAGMENT_WRITE_CONFLICT",
+        "Fragment update conflict under load. Try again.",
+        409
+      );
+    }
+    throw e;
+  }
+  if (!marked) {
+    return errorResponse("NOT_FOUND", "Child object not found.", 404);
+  }
+  if (marked.alreadyClaimed) {
+    return jsonResponse(
+      await fragmentAlreadyClaimedPayload(db, pathObjectId, nodeId, season),
+      200,
+      { "Cache-Control": "no-store" }
+    );
+  }
 
-  const unlockEffects = await applyUnlockSideEffects(db, nodeId, doc, now, season);
+  const unlockEffects = await applyUnlockSideEffects(db, nodeId, marked.doc, now, season);
+  await recordSuccessfulContribute(db, pathObjectId, fields.seasonId, bucketDate);
 
   return jsonResponse(
     {

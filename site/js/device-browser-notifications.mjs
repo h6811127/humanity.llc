@@ -307,6 +307,17 @@ function scheduleAlertProbeSettle() {
     scheduleAlertProbeWhenReady();
   }, SW_POLL_NOW_DEFER_MS);
 }
+
+function warmRelayOfferInboxForEnabledAlerts() {
+  if (!isBrowserNotifEnabled() || notificationPermission() !== "granted") return;
+  void loadRelayOfferInboxModule().finally(() => {
+    syncBackgroundAlertPollTimer();
+    if (document.visibilityState === "hidden") {
+      void syncLiveProofServiceWorkerState({ pollNow: false });
+    }
+  });
+}
+
 /** @type {ReturnType<typeof setInterval> | null} */
 let backgroundAlertPollTimer = null;
 
@@ -486,6 +497,7 @@ export function initBrowserNotifications() {
   if (browserNotifListenersBound) {
     mountBrowserNotifToggles();
     syncBrowserNotifPrompts();
+    warmRelayOfferInboxForEnabledAlerts();
     syncBackgroundAlertPollTimer();
     scheduleAlertProbeSettle();
     return;
@@ -563,6 +575,7 @@ export function initBrowserNotifications() {
     scheduleAlertProbeSettle();
   });
   syncBackgroundAlertPollTimer();
+  warmRelayOfferInboxForEnabledAlerts();
   queueMicrotask(() => {
     if (isDeviceBootReadyState(document.body?.dataset?.boot)) {
       scheduleAlertProbeSettle();

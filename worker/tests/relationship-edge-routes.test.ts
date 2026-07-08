@@ -49,9 +49,22 @@ class RelationshipEdgeRouteDb {
       parent_profile_id: string;
       object_type: string;
       status: string;
+      child_object_document_json: string;
     }
   >();
   edges = new Map<string, RelationshipEdgeRow>();
+
+  gameNodeDocument(objectId: string, vouchRequires: string[] = []) {
+    return JSON.stringify({
+      object_id: objectId,
+      parent_profile_id: STEWARD,
+      object_type: "game_node",
+      season_id: "cr_season_01_wake",
+      game_meta: {
+        vouch_requires: vouchRequires,
+      },
+    });
+  }
 
   seedGameNodes() {
     for (const objectId of [FROM_OBJECT, TO_OBJECT, RIVER_OBJECT]) {
@@ -60,6 +73,10 @@ class RelationshipEdgeRouteDb {
         parent_profile_id: STEWARD,
         object_type: "game_node",
         status: "active",
+        child_object_document_json: this.gameNodeDocument(
+          objectId,
+          objectId === TO_OBJECT ? ["node_10"] : []
+        ),
       });
     }
   }
@@ -266,6 +283,51 @@ describe("relationship-edge-routes", () => {
     );
     expect(res.status).toBe(200);
     expect(db.edges.get(EDGE_ID)?.status).toBe("revoked");
+  });
+
+  it("rejects revoking the last edge-only witness gate without legacy fallback", async () => {
+    const db = new RelationshipEdgeRouteDb();
+    const owner = await getTestKeypair();
+    const operator = await getTestKeypair();
+    db.steward = {
+      public_key: owner.publicKeyBase58,
+      recovery_public_key: null,
+      issuer_public_key: operator.publicKeyBase58,
+      status: "active",
+    };
+    db.seedGameNodes();
+    const target = db.children.get(TO_OBJECT)!;
+    target.child_object_document_json = db.gameNodeDocument(TO_OBJECT, []);
+    const { json } = await signedEdge("operator");
+    await handlePostRelationshipEdgeIssue(
+      new Request("https://humanity.llc/v1/cards/x/relationship-edges", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ relationship_edge: JSON.parse(json) }),
+      }),
+      db as unknown as D1Database,
+      STEWARD
+    );
+
+    const revoked = await signedEdge("operator", { status: "revoked" });
+    const res = await handlePostRelationshipEdgeRevoke(
+      new Request(
+        `https://humanity.llc/v1/cards/x/relationship-edges/${EDGE_ID}/revoke`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ relationship_edge: JSON.parse(revoked.json) }),
+        }
+      ),
+      db as unknown as D1Database,
+      STEWARD,
+      EDGE_ID
+    );
+
+    expect(res.status).toBe(409);
+    const body = (await res.json()) as { error?: string };
+    expect(body.error).toBe("EDGE_ONLY_WITNESS_REVOKE_UNSAFE");
+    expect(db.edges.get(EDGE_ID)?.status).toBe("active");
   });
 
   it("accepts unlock kind edge", async () => {

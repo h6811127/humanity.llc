@@ -9,6 +9,7 @@ import {
   getRelationshipEdgeById,
   getRelationshipEdgeStewardRow,
   insertRelationshipEdge,
+  listActiveRelationshipEdgesForTarget,
   listRelationshipEdgesForSteward,
   relationshipEdgeWriteFromDocument,
   relationshipEdgesSchemaReady,
@@ -17,6 +18,7 @@ import {
   isRelationshipEdgeSigner,
 } from "../db/relationship-edges";
 import { GAME_NODE_OBJECT_TYPE } from "../city-game/constants";
+import { normalizeGameMeta } from "../city-game/game-meta";
 import type { RelationshipEdgeDocument } from "../live-object/relationship-edge-spec";
 import {
   RELATIONSHIP_EDGE_ID_REGEX,
@@ -80,6 +82,36 @@ async function schemaUnavailable(db: D1Database): Promise<Response | null> {
     "SCHEMA_NOT_READY",
     "relationship_edges migration is not applied.",
     503
+  );
+}
+
+function childLegacyVouchRequires(child: { child_object_document_json?: string }): string[] {
+  try {
+    const doc = JSON.parse(child.child_object_document_json ?? "{}") as Record<string, unknown>;
+    return normalizeGameMeta(doc.game_meta).vouch_requires;
+  } catch {
+    return [];
+  }
+}
+
+async function revokingLastEdgeOnlyWitnessGate(
+  db: D1Database,
+  doc: RelationshipEdgeDocument,
+  edgeId: string
+): Promise<boolean> {
+  if (doc.kind !== RELATIONSHIP_EDGE_KIND_WITNESSES) return false;
+  const target = await getChildObject(db, doc.to.id);
+  if (!target || childLegacyVouchRequires(target).length > 0) return false;
+
+  const activeRows = await listActiveRelationshipEdgesForTarget(db, {
+    toObjectId: doc.to.id,
+    networkId: doc.network_id,
+  });
+  return !activeRows.some(
+    (row) =>
+      row.edge_id !== edgeId &&
+      row.kind === RELATIONSHIP_EDGE_KIND_WITNESSES &&
+      row.status === "active"
   );
 }
 
@@ -342,6 +374,13 @@ export async function handlePostRelationshipEdgeRevoke(
   }
   if (existing.status === "revoked") {
     return errorResponse("EDGE_REVOKED", "Relationship edge is already revoked.", 409);
+  }
+  if (await revokingLastEdgeOnlyWitnessGate(db, parsed.doc, pathEdgeId)) {
+    return errorResponse(
+      "EDGE_ONLY_WITNESS_REVOKE_UNSAFE",
+      "Cannot revoke the last signed witness edge while the target has no legacy witness fallback.",
+      409
+    );
   }
 
   const revoke = await revokeRelationshipEdge(db, {
