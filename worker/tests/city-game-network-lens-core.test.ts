@@ -58,6 +58,42 @@ describe("city-game-network-lens-core", () => {
     expect(validateNetworkLens(season)).toEqual([]);
   });
 
+  it("validateNetworkLens rejects unknown spine and next-node references", () => {
+    const invalid = {
+      ...season,
+      network_lens: {
+        ...season.network_lens,
+        play_spine: ["node_04", "node_missing"],
+        next_node_id: "node_missing_next",
+      },
+    };
+
+    expect(validateNetworkLens(invalid)).toEqual([
+      "network_lens.play_spine references unknown node_id node_missing.",
+      "network_lens.next_node_id references unknown node_id node_missing_next.",
+      "network_lens.next_node_id (node_missing_next) should appear in play_spine for GT-8 orientation.",
+    ]);
+  });
+
+  it("validateNetworkLens requires the next node to stay on the play spine", () => {
+    const offSpineNode = season.nodes.find(
+      (row: { node_id: string }) => row.node_id && !season.network_lens.play_spine.includes(row.node_id)
+    )?.node_id;
+    expect(offSpineNode).toBeTruthy();
+
+    const invalid = {
+      ...season,
+      network_lens: {
+        ...season.network_lens,
+        next_node_id: offSpineNode,
+      },
+    };
+
+    expect(validateNetworkLens(invalid)).toContain(
+      `network_lens.next_node_id (${offSpineNode}) should appear in play_spine for GT-8 orientation.`
+    );
+  });
+
   it("derivePlaySpineNodeIds respects registry node set", () => {
     const mini = {
       ...season,

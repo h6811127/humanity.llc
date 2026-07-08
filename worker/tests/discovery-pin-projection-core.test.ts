@@ -25,6 +25,31 @@ const season = JSON.parse(
   readFileSync(join(root, "site/data/city-game-cr-season-01.json"), "utf8")
 );
 
+function minimalDiscoveryPin() {
+  return {
+    pin_id: "pin_cedar_rapids_iowa_node_04",
+    region: "cedar-rapids-iowa",
+    display_label: "River Lantern",
+    object_ids: ["obj_cr_node_04_river"],
+    facets: {
+      object_type: "game_node",
+      role: "temp_drop",
+      entry_id: "node_04",
+    },
+    listing: {
+      listed: true,
+      title: "River Lantern",
+      category: "game_node",
+    },
+    geo: {
+      latitude: 41.981,
+      longitude: -91.671,
+      precision: "block",
+    },
+    index_version: "test",
+  };
+}
+
 describe("discovery-pin-projection-core", () => {
   it("projects Cedar Rapids region slug from public_listing", () => {
     expect(resolveDiscoveryRegionFromSeason(season)).toBe("cedar-rapids-iowa");
@@ -182,6 +207,42 @@ describe("discovery-pin-projection-core", () => {
       index.region
     );
     expect(mutated).not.toBe(base);
+  });
+});
+
+describe("assertDiscoveryPinPrivacyShape", () => {
+  it("rejects root-level scanner or exact-location tracking fields", () => {
+    for (const key of ["latitude", "longitude", "visit", "player_id", "scan_count"]) {
+      expect(() =>
+        assertDiscoveryPinPrivacyShape({
+          ...minimalDiscoveryPin(),
+          [key]: key === "scan_count" ? 1 : "tracking-value",
+        })
+      ).toThrow(`DiscoveryPin must not include ${key}`);
+    }
+  });
+
+  it("rejects invalid geo and client-collected geo metadata", () => {
+    expect(() =>
+      assertDiscoveryPinPrivacyShape({
+        ...minimalDiscoveryPin(),
+        geo: { latitude: Number.NaN, longitude: -91.671, precision: "block" },
+      })
+    ).toThrow("DiscoveryPin.geo must include finite latitude and longitude");
+
+    for (const key of ["accuracy", "client", "user"]) {
+      expect(() =>
+        assertDiscoveryPinPrivacyShape({
+          ...minimalDiscoveryPin(),
+          geo: {
+            latitude: 41.981,
+            longitude: -91.671,
+            precision: "block",
+            [key]: key === "accuracy" ? 5 : "browser",
+          },
+        })
+      ).toThrow("DiscoveryPin.geo must not include client tracking fields");
+    }
   });
 });
 
