@@ -1,5 +1,6 @@
 import { loadScanContext, type ScanContext } from "../db/scan";
 import { checkCardResolutionRateLimit, hashIp } from "../db/rate-limit";
+import { resolveSeasonForProfile } from "../city-game/season-loader";
 import { PROFILE_ID_REGEX } from "../crypto";
 import { jsonResponseWithWeakEtag } from "../http/conditional-json";
 import {
@@ -28,6 +29,7 @@ import { deriveCredentialCodeSync } from "../../../site/js/qr-credential-code.mj
 import { scanContractErrorForKind } from "./scan-contract-error";
 import { scanMalformedStatusHint } from "./scan-malformed-hint";
 import { guardScanResponse, scanRedirectQueryBlocked } from "./scan-redirect-guard";
+import { loadScanContextWithGameRepairs, type ScanGameRepairEnv } from "./scan-game-repairs";
 import {
   BEARER_WARNING,
   OBJECT_PUBLIC_SNAPSHOT_LIMIT,
@@ -265,7 +267,8 @@ export { httpStatusForScanKind };
 export async function handleGetScanStatus(
   request: Request,
   db: D1Database,
-  profileId: string
+  profileId: string,
+  env: ScanGameRepairEnv & { CITY_GAME_LOCAL_PLAY_OPEN?: string } = {}
 ): Promise<Response> {
   const ipHash = await hashIp(clientIp(request));
   const rate = await checkCardResolutionRateLimit(db, ipHash);
@@ -312,8 +315,23 @@ export async function handleGetScanStatus(
         await statusResponse(request, malformedScanView(profileId, qrId, origin))
       );
     }
-    const ctx = await loadScanContext(db, profileId, qrId);
-    const vm = buildScanViewModel(profileId, qrId, ctx, origin);
+    const now = new Date();
+    const season = resolveSeasonForProfile(profileId);
+    const ctx = await loadScanContextWithGameRepairs(
+      db,
+      profileId,
+      qrId,
+      now,
+      env,
+      season
+    );
+    const vm = buildScanViewModel(profileId, qrId, ctx, origin, now, {
+      env: {
+        CITY_GAME_ENABLED: env.CITY_GAME_ENABLED,
+        CITY_GAME_LOCAL_PLAY_OPEN: env.CITY_GAME_LOCAL_PLAY_OPEN,
+      },
+      season: season ?? undefined,
+    });
     return guardScanResponse(request, await statusResponse(request, vm));
   }
 

@@ -59,6 +59,8 @@ import { isDeviceBootReadyState } from "./device-shell-boot-core.mjs";
 const SESSION_OS_INTERACT = "hc_browser_notif_os_interact";
 const SW_POLL_NOW_DEFER_MS = 400;
 
+let backgroundProbeInFlight = false;
+
 /** @returns {boolean} */
 export function isBrowserNotifEnabled() {
   return readBrowserNotifEnabled();
@@ -504,6 +506,7 @@ export function initBrowserNotifications() {
   syncBrowserNotifPrompts();
   window.addEventListener("hc-device-hub-changed", () => {
     void runOsDeliveryFromInbox();
+    void syncLiveProofServiceWorkerState();
     syncBrowserNotifPrompts();
     scheduleAlertProbeSettle();
   });

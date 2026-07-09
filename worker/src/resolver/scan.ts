@@ -1,12 +1,4 @@
-import { GAME_NODE_OBJECT_TYPE, isCityGameEnabled } from "../city-game/constants";
-import {
-  isSeasonRootProfile,
-  resolveSeasonForProfile,
-} from "../city-game/season-loader";
-import { seasonNodeIdForObject } from "../city-game/season-config";
-import { reconcileSeasonUnlockDrift } from "../city-game/unlock-evaluator";
-import { persistRelayDecayIfExpired } from "../city-game/relay-decay-cron";
-import { loadScanContext, type ScanContext } from "../db/scan";
+import { resolveSeasonForProfile } from "../city-game/season-loader";
 import { getLiveControlChallenge, getRecentLiveControlProof } from "../db/live-control";
 import { PROFILE_ID_REGEX } from "../crypto";
 import { htmlResponse, requestOrigin, type ScanPageOriginEnv } from "../http/resolver";
@@ -21,6 +13,7 @@ import {
   type ScanViewModel,
 } from "./scan-state";
 import { guardScanResponse, scanRedirectQueryBlocked } from "./scan-redirect-guard";
+import { loadScanContextWithGameRepairs } from "./scan-game-repairs";
 
 const CHALLENGE_ID_REGEX =
   /^lc_[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{12,40}$/;
@@ -142,58 +135,6 @@ export async function handleGetScan(
       }
     )
   );
-}
-
-async function loadScanContextWithGameRepairs(
-  db: D1Database,
-  profileId: string,
-  qrId: string,
-  now: Date,
-  env: { CITY_GAME_ENABLED?: string },
-  season: ReturnType<typeof resolveSeasonForProfile>
-): Promise<ScanContext> {
-  let ctx = await loadScanContext(db, profileId, qrId);
-  if (!isCityGameEnabled(env) || !season) return ctx;
-
-  let reloaded = false;
-
-  if (shouldRepairGameUnlockDriftOnScan(env, profileId, ctx, season)) {
-    const { repaired } = await reconcileSeasonUnlockDrift(db, now, season);
-    if (repaired.length > 0) reloaded = true;
-  }
-
-  if (
-    ctx.childObject?.object_type === GAME_NODE_OBJECT_TYPE &&
-    isSeasonRootProfile(profileId, season)
-  ) {
-    const nodeId = seasonNodeIdForObject(ctx.childObject.object_id, season);
-    const role = season.nodes.find((row) => row.node_id === nodeId)?.role;
-    if (role === "relay_gate") {
-      const decayed = await persistRelayDecayIfExpired(db, {
-        objectId: ctx.childObject.object_id,
-        parentProfileId: profileId,
-        now,
-      });
-      if (decayed) reloaded = true;
-    }
-  }
-
-  if (reloaded) {
-    ctx = await loadScanContext(db, profileId, qrId);
-  }
-  return ctx;
-}
-
-function shouldRepairGameUnlockDriftOnScan(
-  env: { CITY_GAME_ENABLED?: string },
-  profileId: string,
-  ctx: ScanContext,
-  season: ReturnType<typeof resolveSeasonForProfile>
-): boolean {
-  if (!isCityGameEnabled(env)) return false;
-  if (!season) return false;
-  if (ctx.childObject?.object_type !== GAME_NODE_OBJECT_TYPE) return false;
-  return isSeasonRootProfile(profileId, season);
 }
 
 async function applyLiveControlProofIfPresent(

@@ -134,6 +134,7 @@ class ContributeDb {
 
   rateBuckets = new Map<string, { count: number; window_start: string }>();
   contributeBuckets = new Map<string, number>();
+  forceWriteConflict = false;
 
   prepare(sql: string) {
     const db = this;
@@ -171,7 +172,7 @@ class ContributeDb {
               }
               if (sql.includes("AND updated_at = ?")) {
                 const expectedUpdatedAt = String(args[8]);
-                if (row.updated_at !== expectedUpdatedAt) {
+                if (db.forceWriteConflict || row.updated_at !== expectedUpdatedAt) {
                   return { success: true, meta: { changes: 0 } };
                 }
               }
@@ -289,6 +290,27 @@ describe("game-contribute", () => {
     const cabinetDoc = JSON.parse(cabinet.child_object_document_json);
     expect(cabinetDoc.game_meta.unlocked_by).toContain("node_04");
     expect(cabinet.public_state).toContain("Unlocked together");
+  });
+
+  it("does not charge contribution buckets when quorum write conflicts", async () => {
+    const db = new ContributeDb();
+    db.forceWriteConflict = true;
+    const res = await handlePostGameContribute(
+      new Request("https://humanity.llc/.well-known/hc/v1/cards/x/objects/y/game-contribute", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "CF-Connecting-IP": "203.0.113.3" },
+        body: JSON.stringify({ qr_id: QR, site_code: "cr-lantern-7k" }),
+      }),
+      db as unknown as D1Database,
+      { CITY_GAME_ENABLED: "1" },
+      PROFILE,
+      RIVER_OBJECT
+    );
+
+    expect(res.status).toBe(409);
+    const body = (await res.json()) as { error: string };
+    expect(body.error).toBe("QUORUM_WRITE_CONFLICT");
+    expect([...db.contributeBuckets.values()]).toEqual([]);
   });
 
   it("registers fragment on finale and opens when lattice completes", async () => {

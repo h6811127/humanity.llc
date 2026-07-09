@@ -5,6 +5,8 @@ import {
   resetSeasonSnapshotCacheForTests,
 } from "../src/resolver/season-snapshot";
 import * as seasonWindow from "../src/city-game/season-window";
+import { normalizeGameMeta } from "../src/city-game/game-meta";
+import { CR_SEASON_01 } from "../src/city-game/season-config";
 
 const SEASON_ID = "cr_season_01_wake";
 
@@ -43,6 +45,66 @@ class SnapshotDb {
           },
           async all<T>() {
             return { results: [] as T[] };
+          },
+        };
+      },
+    };
+  }
+}
+
+class SnapshotRelayConflictDb extends SnapshotDb {
+  objectId = "obj_cr_node_05_bridge";
+  rootProfile = CR_SEASON_01.season_root_profile_id!;
+
+  relayRow() {
+    return {
+      object_id: this.objectId,
+      parent_profile_id: this.rootProfile,
+      object_type: "game_node",
+      public_label: "16th Avenue bridge",
+      public_state: "Red team holds the relay",
+      status: "active",
+      child_object_document_json: JSON.stringify({
+        object_id: this.objectId,
+        parent_profile_id: this.rootProfile,
+        object_type: "game_node",
+        season_id: SEASON_ID,
+        node_role: "relay_gate",
+        district: "czech_village",
+        game_meta: normalizeGameMeta({
+          held_by_faction: "red",
+          held_until: "2026-06-07T12:00:00.000Z",
+        }),
+      }),
+      created_at: "2026-06-01T12:00:00.000Z",
+      updated_at: "2026-06-01T12:00:00.000Z",
+    };
+  }
+
+  prepare(sql: string) {
+    const base = super.prepare(sql);
+    const db = this;
+    return {
+      bind(...args: unknown[]) {
+        const bound = base.bind(...args);
+        return {
+          async first<T>() {
+            if (sql.includes("FROM child_objects WHERE object_id = ?")) {
+              return db.relayRow() as T;
+            }
+            return bound.first<T>();
+          },
+          async all<T>() {
+            if (sql.includes("FROM child_objects") && sql.includes("WHERE parent_profile_id")) {
+              return { results: [db.relayRow()] as T[] };
+            }
+            return bound.all<T>();
+          },
+          async run() {
+            if (sql.includes("UPDATE child_objects") && sql.includes("updated_at = ?")) {
+              return { success: true, meta: { changes: 0 } };
+            }
+            return bound.run();
           },
         };
       },
@@ -139,6 +201,23 @@ describe("season snapshot API", () => {
     const serialized = JSON.stringify(body);
     expect(serialized).not.toMatch(/profile_id|scan count|leaderboard|heatmap/i);
     expect(Array.isArray(body.headlines)).toBe(true);
+
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  it("returns a snapshot when best-effort relay decay hits write conflicts", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-06-07T18:00:00-05:00"));
+    vi.spyOn(seasonWindow, "resolveSeasonWindowPhase").mockReturnValue("open");
+
+    const res = await handleGetSeasonSnapshot(
+      new Request(`http://127.0.0.1:8787/.well-known/hc/v1/seasons/${SEASON_ID}/snapshot`),
+      { CITY_GAME_ENABLED: "1", DB: new SnapshotRelayConflictDb() as never },
+      SEASON_ID
+    );
+
+    expect(res.status).toBe(200);
 
     vi.useRealTimers();
     vi.restoreAllMocks();
