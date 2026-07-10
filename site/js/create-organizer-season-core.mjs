@@ -100,7 +100,7 @@ export function walletEntryHasOrganizerIssuerKey(entry) {
 export function pickPreferredGameSeasonRoot(walletEntries) {
   return (
     listGeneralRootsWithKeys(walletEntries).find((entry) =>
-      walletEntryHasOrganizerIssuerKey(entry)
+      walletEntryHasOrganizerIssuerKey(entry) && isGameSeasonCustodySession(entry)
     ) ?? null
   );
 }

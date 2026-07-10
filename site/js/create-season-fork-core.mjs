@@ -35,6 +35,7 @@ export function readGameSeasonForkChoice(searchParams) {
  * @param {{
  *   searchParams: URLSearchParams;
  *   walletEntries: unknown[];
+ *   gateBypass?: boolean;
  * }} ctx
  * @returns {GameSeasonSubmitStrategy}
  */

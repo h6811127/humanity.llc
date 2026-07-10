@@ -24,6 +24,7 @@ const seasonRoot = {
   profile_id: "p_season",
   owner_private_key_b58: "priv",
   issuer_public_key: "org_pub",
+  manifesto_line: "City game season · cr_season_01 · @demo",
 };
 
 describe("resolveGameSeasonSubmitStrategy", () => {
@@ -68,6 +69,23 @@ describe("resolveGameSeasonSubmitStrategy", () => {
       resolveGameSeasonSubmitStrategy({
         searchParams: new URLSearchParams(`intent=game&season_account=${GAME_SEASON_FORK_DEDICATED}`),
         walletEntries: [deployRoot],
+      })
+    ).toBe("create_season_only_root");
+  });
+
+  it("honors gate bypass by creating from the selected fork instead of redirecting", () => {
+    expect(
+      resolveGameSeasonSubmitStrategy({
+        searchParams: new URLSearchParams(`intent=game&season_account=${GAME_SEASON_FORK_EXISTING}`),
+        walletEntries: [seasonRoot],
+        gateBypass: true,
+      })
+    ).toBe("create_dual_skin_root");
+    expect(
+      resolveGameSeasonSubmitStrategy({
+        searchParams: new URLSearchParams(`intent=game&season_account=${GAME_SEASON_FORK_DEDICATED}`),
+        walletEntries: [seasonRoot],
+        gateBypass: true,
       })
     ).toBe("create_season_only_root");
   });
