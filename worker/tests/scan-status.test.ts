@@ -1,8 +1,13 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import worker from "../src";
 import type { ScanContext } from "../src/db/scan";
-import type { CardRow, QrCredentialRow, VerificationSummaryRow } from "../src/db/types";
+import type {
+  CardRow,
+  ChildObjectRow,
+  QrCredentialRow,
+  VerificationSummaryRow,
+} from "../src/db/types";
 import {
   BEARER_WARNING,
   httpStatusForScanKind,
@@ -16,9 +21,15 @@ import {
   malformedScanView,
 } from "../src/resolver/scan-state";
 import { d1WithRateLimitBuckets } from "./rate-limit-db-mock";
+import { CITY_GAME_SEASON_OPEN_NOW } from "./city-game-fixture-profile";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const QR = "qr_7Xk9mP2nQ4rT6vW8";
+const GAME_OBJECT_ID = "obj_cr_node_01_newbo";
+
+afterEach(() => {
+  vi.useRealTimers();
+});
 
 function card(overrides: Partial<CardRow> = {}): CardRow {
   return {
@@ -66,6 +77,44 @@ function summary(): VerificationSummaryRow {
     credential_ids_json: "[]",
     summary_document_json: null,
     updated_at: "2026-05-16T17:00:00Z",
+  };
+}
+
+function gameChildRow(): ChildObjectRow {
+  return {
+    object_id: GAME_OBJECT_ID,
+    parent_profile_id: PROFILE,
+    object_type: "game_node",
+    public_label: "NewBo relay arch",
+    public_state: "Fragment waiting",
+    status: "active",
+    child_object_document_json: JSON.stringify({
+      object_id: GAME_OBJECT_ID,
+      parent_profile_id: PROFILE,
+      object_type: "game_node",
+      public_label: "NewBo relay arch",
+      public_state: "Fragment waiting",
+      status: "active",
+      season_id: "cr_season_01_wake",
+      node_role: "relay_gate",
+      district: "newbo",
+      object_streams: [
+        { id: "care", class: "care", label: "Site", value: "Clear" },
+      ],
+      game_meta: {
+        visible_until: null,
+        compromised: false,
+        collective_progress: null,
+        collective_target: null,
+        unlocked_by: [],
+        vouch_requires: [],
+        vouch_active_for: [],
+        scarcity_remaining: null,
+        fragment_id: "newbo_fragment",
+      },
+    }),
+    created_at: "2026-06-01T12:00:00.000Z",
+    updated_at: "2026-06-01T12:05:00.000Z",
   };
 }
 
@@ -357,6 +406,52 @@ describe("scan status JSON (M3.4)", () => {
     );
     expect(second.status).toBe(304);
     expect(second.headers.get("Cache-Control")).toContain("max-age=30");
+  });
+
+  it("GET status honors city game env for live game-node capabilities", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(CITY_GAME_SEASON_OPEN_NOW);
+    const ctx: ScanContext = {
+      card: card(),
+      qr: qr({
+        scope: "child_object",
+        object_id: GAME_OBJECT_ID,
+        expires_at: null,
+      }),
+      childObject: gameChildRow(),
+      verification: summary(),
+      revocationDisplay: null,
+    };
+    const db = d1WithRateLimitBuckets((sql: string) => ({
+      bind: () => ({
+        first: async () => {
+          if (sql.includes("FROM cards")) return ctx.card;
+          if (sql.includes("FROM qr_credentials")) return ctx.qr;
+          if (sql.includes("FROM child_objects")) return ctx.childObject;
+          if (sql.includes("verification_summaries")) return ctx.verification;
+          if (sql.includes("sqlite_master")) return null;
+          return null;
+        },
+        run: async () => ({ meta: { changes: 0 } }),
+      }),
+    }));
+
+    const { handleGetScanStatus } = await import("../src/resolver/scan-status");
+    const url = `https://humanity.llc/.well-known/hc/v1/cards/${PROFILE}/status?q=${QR}`;
+    const res = await handleGetScanStatus(new Request(url), db, PROFILE, {
+      CITY_GAME_ENABLED: "1",
+    });
+
+    expect(res.status).toBe(200);
+    const json = (await res.json()) as ReturnType<typeof scanStatusBodyFromViewModel>;
+    expect(json.scan.capabilities?.find((cap) => cap.verb === "read")).toMatchObject({
+      kind: "game_node",
+      room: "season",
+    });
+    expect(json.scan.capabilities?.find((cap) => cap.verb === "contribute")).toMatchObject({
+      available: true,
+      kind: "game_fragment",
+    });
   });
 
   it("GET status through worker.fetch includes CORS for Pages dev origin", async () => {
