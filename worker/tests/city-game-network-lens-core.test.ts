@@ -58,6 +58,36 @@ describe("city-game-network-lens-core", () => {
     expect(validateNetworkLens(season)).toEqual([]);
   });
 
+  it("validateNetworkLens flags broken GT-8 route references", () => {
+    const broken = {
+      nodes: [{ node_id: "node_04" }, { node_id: "node_07" }, { node_id: "node_09" }],
+      network_lens: {
+        play_spine: ["node_04", "node_missing"],
+        next_node_id: "node_09",
+      },
+    };
+
+    expect(validateNetworkLens(broken)).toEqual([
+      "network_lens.play_spine references unknown node_id node_missing.",
+      "network_lens.next_node_id (node_09) should appear in play_spine for GT-8 orientation.",
+    ]);
+  });
+
+  it("validateNetworkLens flags unknown next node before it can become the board start", () => {
+    const broken = {
+      nodes: [{ node_id: "node_04" }, { node_id: "node_07" }],
+      network_lens: {
+        play_spine: ["node_04", "node_07"],
+        next_node_id: "node_missing",
+      },
+    };
+
+    expect(validateNetworkLens(broken)).toEqual([
+      "network_lens.next_node_id references unknown node_id node_missing.",
+      "network_lens.next_node_id (node_missing) should appear in play_spine for GT-8 orientation.",
+    ]);
+  });
+
   it("derivePlaySpineNodeIds respects registry node set", () => {
     const mini = {
       ...season,
