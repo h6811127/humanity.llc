@@ -33,6 +33,43 @@ export function readSeasonWhenId(profileId) {
 }
 
 /**
+ * The visible When panel is the canonical season id home on /created/.
+ * Resolve it again at submit time so an unblurred input cannot sign a stale
+ * dropdown / sessionStorage season id into new game nodes.
+ *
+ * @param {{
+ *   profileId: string;
+ *   whenPanelValue?: unknown;
+ *   selectedSeasonId?: unknown;
+ *   rememberedSeasonId?: unknown;
+ * }} input
+ */
+export function resolveGameNodeSeasonIdForSubmit(input) {
+  const whenPanelValue =
+    typeof input.whenPanelValue === "string" ? input.whenPanelValue.trim() : "";
+  if (whenPanelValue) {
+    return {
+      seasonId: persistSeasonWhenId(input.profileId, whenPanelValue),
+      source: "when",
+    };
+  }
+
+  const selectedSeasonId =
+    typeof input.selectedSeasonId === "string" ? input.selectedSeasonId.trim() : "";
+  if (selectedSeasonId) {
+    return {
+      seasonId: parseGameNodeSeasonId(selectedSeasonId),
+      source: "select",
+    };
+  }
+
+  return {
+    seasonId: parseGameNodeSeasonId(input.rememberedSeasonId),
+    source: "remembered",
+  };
+}
+
+/**
  * @param {Storage} storage
  * @param {string} profileId
  * @param {string} seasonId

@@ -34,6 +34,10 @@ import {
   assertChildObjectBackupGateAllowsCreate,
   syncChildObjectBackupGateUi,
 } from "./child-object-backup-gate.mjs";
+import {
+  resolveGameNodeSeasonIdForSubmit,
+  SEASON_WHEN_ID_INPUT_ID,
+} from "./created-season-when-panel-core.mjs";
 import { applyStewardScanLinkElement } from "./pwa-scan-handoff-core.mjs";
 import { buildStewardScanPreviewHrefFromWindow } from "./pwa-scan-handoff.mjs";
 import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
@@ -254,6 +258,27 @@ export function initCreatedGameNode(ctx) {
     unlockEdgesCtl?.refresh?.();
     printPackCtl?.refresh?.();
     setupGuideCtl?.refresh?.();
+  }
+
+  function readWhenPanelSeasonIdInput() {
+    const input = document.getElementById(SEASON_WHEN_ID_INPUT_ID);
+    return input instanceof HTMLInputElement ? input.value : "";
+  }
+
+  async function resolveSubmitSeasonId() {
+    const resolved = resolveGameNodeSeasonIdForSubmit({
+      profileId: ctx.profileId,
+      whenPanelValue: readWhenPanelSeasonIdInput(),
+      selectedSeasonId: seasonSelect instanceof HTMLSelectElement ? seasonSelect.value : "",
+      rememberedSeasonId: readRememberedGameSeasonId(ctx.profileId),
+    });
+    if (
+      seasonSelect instanceof HTMLSelectElement &&
+      (resolved.source === "when" || seasonSelect.value.trim() !== resolved.seasonId)
+    ) {
+      await selectSeasonId(resolved.seasonId);
+    }
+    return resolved.seasonId;
   }
 
   seasonSelect?.addEventListener("change", () => {
@@ -598,13 +623,12 @@ export function initCreatedGameNode(ctx) {
         profileId: ctx.profileId,
         getSession: ctx.getSession,
       });
-      const { publicLabel, nodeRole, district, seasonId } = parseGameNodeChildFields(
+      const seasonId = await resolveSubmitSeasonId();
+      const { publicLabel, nodeRole, district } = parseGameNodeChildFields(
         labelInput instanceof HTMLInputElement ? labelInput.value : "",
         roleSelect.value,
         districtSelect instanceof HTMLSelectElement ? districtSelect.value : "",
-        seasonSelect instanceof HTMLSelectElement && seasonSelect.value
-          ? seasonSelect.value
-          : readRememberedGameSeasonId(ctx.profileId)
+        seasonId
       );
       const signedCreate = await signGameNodeChildObjectCreate({
         profileId: ctx.profileId,
@@ -667,9 +691,11 @@ export function initCreatedGameNode(ctx) {
       return;
     }
 
-    const seasonId = seasonSelect.value.trim();
-    if (!seasonId) {
-      ctx.showError("Choose a season first.");
+    let seasonId = "";
+    try {
+      seasonId = await resolveSubmitSeasonId();
+    } catch (err) {
+      ctx.showError(err instanceof Error ? err.message : String(err));
       return;
     }
 

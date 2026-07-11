@@ -33,6 +33,7 @@ import {
   parseGameNodeChildFields,
   shouldOfferAddGameNode,
 } from "../../site/js/created-child-object-game-node-core.mjs";
+import { resolveGameNodeSeasonIdForSubmit } from "../../site/js/created-season-when-panel-core.mjs";
 
 const PROFILE = "cuAPt5nFYr8VCCWgPbAAupBS";
 
@@ -410,5 +411,35 @@ describe("created-child-object-game-node-core", () => {
     expect(gameNodeSrc).toContain("async function selectSeasonId");
     expect(gameNodeSrc).toContain("readRememberedGameSeasonId(ctx.profileId)");
     expect(createdSrc).toContain("gameNodeCtl.selectSeasonId(seasonId)");
+  });
+
+  it("prefers the unblurred When panel season id over stale submit state", () => {
+    const store = new Map<string, string>();
+    Object.defineProperty(globalThis, "sessionStorage", {
+      configurable: true,
+      value: {
+        getItem: (key: string) => store.get(key) ?? null,
+        setItem: (key: string, value: string) => store.set(key, String(value)),
+        removeItem: (key: string) => store.delete(key),
+      },
+    });
+
+    try {
+      const resolved = resolveGameNodeSeasonIdForSubmit({
+        profileId: PROFILE,
+        whenPanelValue: "fresh_city_season_01",
+        selectedSeasonId: "stale_city_season_01",
+        rememberedSeasonId: "older_city_season_01",
+      });
+
+      expect(resolved).toEqual({
+        seasonId: "fresh_city_season_01",
+        source: "when",
+      });
+      expect(store.get(`hc_game_season_id:${PROFILE}`)).toBe("fresh_city_season_01");
+    } finally {
+      // @ts-expect-error restore
+      delete globalThis.sessionStorage;
+    }
   });
 });

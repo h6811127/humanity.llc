@@ -170,6 +170,10 @@ function wirePartialLoadHubOpen(dotBtn) {
   dotBtn.addEventListener(
     "click",
     (event) => {
+      const hub = document.getElementById("device-hub");
+      if (!hub?.classList.contains("device-hub--sheet")) {
+        return;
+      }
       event.preventDefault();
       event.stopPropagation();
       void import(
