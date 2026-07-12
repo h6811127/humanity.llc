@@ -108,6 +108,39 @@ describe("created-relationship-edge-publish-core", () => {
     expect(assess.missingEdgeIds.length).toBe(1);
   });
 
+  it("assessScanGraphPublish stays blocked when one draft edge cannot build", () => {
+    const edges = [
+      { from: "node_04", to: "node_07", label: "River Lantern unlocks Czech Village cabinet" },
+      { from: "node_10", to: "node_missing_object", label: "Library witness vouch opens missing node" },
+    ];
+    const assess = assessScanGraphPublish({
+      profileId: "prof_test",
+      seasonId: crSeason.season_id,
+      templateRows: [
+        ...templateRows,
+        { node_id: "node_missing_object", label: "Missing object id" },
+      ],
+      unlockEdges: edges,
+      liveEdges: [
+        { edge_id: "edge_cr_unlock_04_07", status: "active" },
+        { edge_id: "edge_cr_witness_10_missingobject", status: "active" },
+      ],
+      season: {
+        ...crSeason,
+        automation: {
+          ...crSeason.automation,
+          quorum_nodes: ["node_04"],
+        },
+      },
+    });
+
+    expect(assess.ready).toBe(false);
+    expect(assess.missingEdgeIds).toEqual([]);
+    expect(assess.issues).toContain(
+      "Missing object_id for node_10 → node_missing_object. Register template nodes on Live first."
+    );
+  });
+
   it("assessScanGraphPublish passes when cabinet dual-gate edges are live", () => {
     const live = [
       { edge_id: "edge_cr_witness_10_07", status: "active" },
