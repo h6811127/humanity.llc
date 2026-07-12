@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
 
 import {
   buildSeasonMetadataDraftExport,
@@ -87,5 +88,17 @@ describe("created-child-object-game-node-unlock-edges-core", () => {
     expect(suggestedSeasonMetadataDraftFilename("example_city_season_01")).toBe(
       "city-game-example_city_season_01-metadata-draft.json"
     );
+  });
+
+  it("valid unlock edge drafts refresh publish button state", () => {
+    const source = readFileSync(
+      join(root, "site/js/created-child-object-game-node-unlock-edges.mjs"),
+      "utf8"
+    );
+    const validBranch = source.slice(
+      source.indexOf("if (validation.ok)"),
+      source.indexOf("for (const issue of validation.issues)")
+    );
+    expect(validBranch).toContain("updatePublishState(edges)");
   });
 });

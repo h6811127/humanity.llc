@@ -28,6 +28,7 @@ type ObjectRow = {
 
 class UnlockDb {
   objects = new Map<string, ObjectRow>();
+  concurrentCasWrites = new Map<string, (row: ObjectRow) => void>();
 
   prepare(sql: string) {
     const db = this;
@@ -46,6 +47,18 @@ class UnlockDb {
               const objectId = String(args[6]);
               const row = db.objects.get(objectId);
               if (row) {
+                if (sql.includes("AND updated_at = ?")) {
+                  const concurrent = db.concurrentCasWrites.get(objectId);
+                  if (concurrent) {
+                    db.concurrentCasWrites.delete(objectId);
+                    concurrent(row);
+                    return { success: true, meta: { changes: 0 } };
+                  }
+                  const expectedUpdatedAt = String(args[8]);
+                  if (row.updated_at !== expectedUpdatedAt) {
+                    return { success: true, meta: { changes: 0 } };
+                  }
+                }
                 row.object_type = String(args[0]);
                 row.public_label = String(args[1]);
                 row.public_state = String(args[2]);
@@ -164,6 +177,49 @@ describe("unlock-evaluator", () => {
     const finale = db.objects.get(FINALE_OBJECT)!;
     const finaleDoc = JSON.parse(finale.child_object_document_json);
     expect(finaleDoc.game_meta.unlocked_by).toContain("node_09");
+  });
+
+  it("merges finale fragment side effects after a concurrent write conflict", async () => {
+    const db = new UnlockDb();
+    db.objects.set(FINALE_OBJECT, {
+      object_id: FINALE_OBJECT,
+      parent_profile_id: PROFILE,
+      object_type: "game_node",
+      public_label: "Downtown alley arch",
+      public_state: "Finale switch dormant",
+      status: "active",
+      child_object_document_json: JSON.stringify({
+        game_meta: { unlocked_by: [] },
+        object_streams: [{ id: "bulletin", label: "Need", value: "0 / 3 fragments" }],
+      }),
+      created_at: CREATED,
+      updated_at: CREATED,
+    });
+    db.concurrentCasWrites.set(FINALE_OBJECT, (row) => {
+      row.child_object_document_json = JSON.stringify({
+        game_meta: { unlocked_by: ["node_11"] },
+        object_streams: [{ id: "bulletin", label: "Need", value: "1 / 3 fragments" }],
+      });
+      row.updated_at = "2026-06-01T12:00:01.000Z";
+    });
+
+    const result = await applyUnlockSideEffects(
+      db as unknown as D1Database,
+      "node_09",
+      {
+        public_state: "Fragment registered — city-scale coordination continues",
+        game_meta: { unlocked_by: ["node_09"] },
+        object_streams: [{ id: "relay", label: "Fragment", value: "Claimed" }],
+      },
+      new Date(CREATED)
+    );
+
+    expect(result.fragmentsRegistered).toBe(2);
+    const finale = db.objects.get(FINALE_OBJECT)!;
+    const finaleDoc = JSON.parse(finale.child_object_document_json);
+    expect(finaleDoc.game_meta.unlocked_by).toEqual(
+      expect.arrayContaining(["node_09", "node_11"])
+    );
   });
 
   it("reconcileSeasonUnlockDrift repairs cabinet when River quorum met but unlock missed", async () => {

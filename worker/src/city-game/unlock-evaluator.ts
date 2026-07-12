@@ -1,4 +1,4 @@
-import { getChildObject, updateChildObject } from "../db/child-objects";
+import { getChildObject, updateChildObjectIfUnchanged } from "../db/child-objects";
 import { normalizeGameMeta } from "./game-meta";
 import {
   seasonFragmentNodeIds,
@@ -26,11 +26,13 @@ export type UnlockSideEffectResult = {
   finaleOpen?: boolean;
 };
 
+const UNLOCK_SIDE_EFFECT_MAX_RETRIES = 24;
+
 function parseDocument(json: string): Record<string, unknown> {
   return JSON.parse(json) as Record<string, unknown>;
 }
 
-async function persistGameNodeDocument(
+async function persistGameNodeDocumentIfUnchanged(
   db: D1Database,
   row: {
     object_id: string;
@@ -38,22 +40,54 @@ async function persistGameNodeDocument(
     object_type: string;
     public_label: string;
     created_at: string;
+    updated_at: string;
   },
   doc: Record<string, unknown>,
   publicState: string,
   updatedAt: string
-): Promise<void> {
-  await updateChildObject(db, {
-    objectId: row.object_id,
-    parentProfileId: row.parent_profile_id,
-    objectType: row.object_type,
-    publicLabel: row.public_label,
-    publicState,
-    status: "active",
-    documentJson: JSON.stringify(doc),
-    createdAt: row.created_at,
-    updatedAt,
-  });
+): Promise<boolean> {
+  return updateChildObjectIfUnchanged(
+    db,
+    {
+      objectId: row.object_id,
+      parentProfileId: row.parent_profile_id,
+      objectType: row.object_type,
+      publicLabel: row.public_label,
+      publicState,
+      status: "active",
+      documentJson: JSON.stringify(doc),
+      createdAt: row.created_at,
+      updatedAt,
+    },
+    row.updated_at
+  );
+}
+
+async function patchGameNodeDocumentWithRetry(
+  db: D1Database,
+  objectId: string,
+  nextUpdatedAt: () => string,
+  transform: (
+    doc: Record<string, unknown>,
+    row: NonNullable<Awaited<ReturnType<typeof getChildObject>>>
+  ) => Record<string, unknown> | null
+): Promise<Record<string, unknown> | null> {
+  for (let attempt = 0; attempt < UNLOCK_SIDE_EFFECT_MAX_RETRIES; attempt += 1) {
+    const row = await getChildObject(db, objectId);
+    if (!row || row.status !== "active") return null;
+    const doc = parseDocument(row.child_object_document_json);
+    const nextDoc = transform(doc, row);
+    if (!nextDoc) return null;
+    const saved = await persistGameNodeDocumentIfUnchanged(
+      db,
+      row,
+      nextDoc,
+      typeof nextDoc.public_state === "string" ? nextDoc.public_state : row.public_state,
+      nextUpdatedAt()
+    );
+    if (saved) return nextDoc;
+  }
+  throw new Error("UNLOCK_WRITE_CONFLICT");
 }
 
 /** Run season unlock edges after a game_node document is persisted (contribute or game-update). */
@@ -79,75 +113,61 @@ export async function applyUnlockSideEffects(
     if (riverLanternNeedsAntiHoardingEvolve(sourceDoc)) {
       const sourceObjectId = seasonObjectIdForNode(nodeId, season);
       if (sourceObjectId) {
-        const sourceRow = await getChildObject(db, sourceObjectId);
-        if (sourceRow && sourceRow.status === "active") {
-          const evolved = evolveRiverLanternAntiHoarding(sourceDoc);
-          await persistGameNodeDocument(
-            db,
-            sourceRow,
-            evolved,
-            typeof evolved.public_state === "string"
-              ? evolved.public_state
-              : sourceRow.public_state,
-            nextUpdatedAt()
-          );
-        }
+        await patchGameNodeDocumentWithRetry(db, sourceObjectId, nextUpdatedAt, (currentDoc) =>
+          riverLanternNeedsAntiHoardingEvolve(currentDoc)
+            ? evolveRiverLanternAntiHoarding(currentDoc)
+            : null
+        );
       }
     }
 
     for (const patch of patchesForQuorumUnlock(nodeId, season)) {
-      const targetRow = await getChildObject(db, patch.objectId);
-      if (!targetRow || targetRow.status !== "active") continue;
-      const targetDoc = patch.transform(parseDocument(targetRow.child_object_document_json));
-      await persistGameNodeDocument(
+      const saved = await patchGameNodeDocumentWithRetry(
         db,
-        targetRow,
-        targetDoc,
-        typeof targetDoc.public_state === "string"
-          ? targetDoc.public_state
-          : targetRow.public_state,
-        nextUpdatedAt()
+        patch.objectId,
+        nextUpdatedAt,
+        (currentDoc) => {
+          const targetMeta = normalizeGameMeta(currentDoc.game_meta);
+          if (targetMeta.unlocked_by.includes(nodeId)) return null;
+          return patch.transform(currentDoc);
+        }
       );
-      unlockedNodes.push(patch.toNodeId);
+      if (saved) unlockedNodes.push(patch.toNodeId);
     }
   }
 
   if (isFragmentNodeClaimed(meta, nodeId)) {
     const fragmentPatch = patchesForFragmentContribute(nodeId, season);
     if (fragmentPatch) {
-      const finaleRow = await getChildObject(db, fragmentPatch.finaleObjectId);
-      if (finaleRow && finaleRow.status === "active") {
-        let finaleDoc = parseDocument(finaleRow.child_object_document_json);
-        const recorded = recordFragmentOnFinale(
-          finaleDoc,
-          nodeId,
-          seasonFragmentNodeIds(season)
-        );
-        finaleDoc = recorded.doc;
-        const lattice = fragmentLatticeProgress(
-          normalizeGameMeta(finaleDoc.game_meta),
-          seasonFragmentNodeIds(season)
-        );
-        fragmentsRegistered = lattice.claimed;
-        fragmentsRequired = lattice.required;
-        finaleOpen = recorded.latticeComplete;
+      const finaleSaved = await patchGameNodeDocumentWithRetry(
+        db,
+        fragmentPatch.finaleObjectId,
+        nextUpdatedAt,
+        (currentDoc) => {
+          let finaleDoc = currentDoc;
+          const recorded = recordFragmentOnFinale(
+            finaleDoc,
+            nodeId,
+            seasonFragmentNodeIds(season)
+          );
+          finaleDoc = recorded.doc;
+          const lattice = fragmentLatticeProgress(
+            normalizeGameMeta(finaleDoc.game_meta),
+            seasonFragmentNodeIds(season)
+          );
+          fragmentsRegistered = lattice.claimed;
+          fragmentsRequired = lattice.required;
+          finaleOpen = recorded.latticeComplete;
 
-        if (recorded.latticeComplete) {
-          finaleDoc = openFinaleSwitch(finaleDoc);
-          if (!unlockedNodes.includes(fragmentPatch.finaleNodeId)) {
-            unlockedNodes.push(fragmentPatch.finaleNodeId);
+          if (recorded.latticeComplete) {
+            finaleDoc = openFinaleSwitch(finaleDoc);
           }
-        }
 
-        await persistGameNodeDocument(
-          db,
-          finaleRow,
-          finaleDoc,
-          typeof finaleDoc.public_state === "string"
-            ? finaleDoc.public_state
-            : finaleRow.public_state,
-          nextUpdatedAt()
-        );
+          return finaleDoc;
+        }
+      );
+      if (finaleSaved && finaleOpen && !unlockedNodes.includes(fragmentPatch.finaleNodeId)) {
+        unlockedNodes.push(fragmentPatch.finaleNodeId);
       }
     }
   }
