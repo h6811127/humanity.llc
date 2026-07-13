@@ -147,6 +147,7 @@ export function liveProofPollTargetsFromWallet(wallet) {
  *   resolverHealth?: 'ok' | 'degraded' | 'offline',
  *   stewardPushEntitled?: boolean,
  *   stewardPushHealthy?: boolean,
+ *   hasWindowClients?: boolean,
  *   forcePoll?: boolean,
  * }} input
  */
@@ -156,7 +157,11 @@ export function swLiveProofPollingShouldRun(input) {
   if (input.forcePoll === true) {
     return liveControlPollAllowedByResolverHealth(input.resolverHealth ?? "offline");
   }
-  if (input.stewardPushEntitled === true && input.stewardPushHealthy === true) {
+  if (
+    input.stewardPushEntitled === true &&
+    input.stewardPushHealthy === true &&
+    input.hasWindowClients !== false
+  ) {
     return false;
   }
   return liveControlPollAllowedByResolverHealth(input.resolverHealth ?? "offline");
