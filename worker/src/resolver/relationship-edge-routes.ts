@@ -289,7 +289,10 @@ export async function handlePostRelationshipEdgeIssue(
     return errorResponse("MALFORMED_REQUEST", validation.issues.join(" "), 422);
   }
 
-  const existing = await getRelationshipEdgeById(db, parsed.doc.edge_id);
+  const existing = await getRelationshipEdgeById(db, {
+    edgeId: parsed.doc.edge_id,
+    stewardProfileId: pathProfileId,
+  });
   if (existing) {
     return errorResponse("EDGE_EXISTS", "Relationship edge already exists.", 409);
   }
@@ -336,8 +339,11 @@ export async function handlePostRelationshipEdgeRevoke(
     );
   }
 
-  const existing = await getRelationshipEdgeById(db, pathEdgeId);
-  if (!existing || existing.steward_profile_id !== pathProfileId) {
+  const existing = await getRelationshipEdgeById(db, {
+    edgeId: pathEdgeId,
+    stewardProfileId: pathProfileId,
+  });
+  if (!existing) {
     return errorResponse("NOT_FOUND", "Relationship edge not found.", 404);
   }
   if (existing.status === "revoked") {

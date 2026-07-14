@@ -28,6 +28,10 @@ const RIVER_OBJECT = "obj_cr_node_04_river";
 const EDGE_ID = "edge_cr_witness_10_07";
 const UNLOCK_EDGE_ID = "edge_cr_unlock_04_07";
 
+function edgeKey(stewardProfileId: string, edgeId: string) {
+  return `${stewardProfileId}:${edgeId}`;
+}
+
 async function randomKeypair() {
   const privateKey = ed.utils.randomPrivateKey();
   const publicKey = await ed.getPublicKeyAsync(privateKey);
@@ -89,8 +93,13 @@ class RelationshipEdgeRouteDb {
         if (sql.includes("FROM child_objects WHERE object_id = ?")) {
           return (db.children.get(String(args[0])) ?? null) as T | null;
         }
-        if (sql.includes("FROM relationship_edges WHERE edge_id = ?")) {
-          return (db.edges.get(String(args[0])) ?? null) as T | null;
+        if (
+          sql.includes("FROM relationship_edges") &&
+          sql.includes("WHERE edge_id = ? AND steward_profile_id = ?")
+        ) {
+          return (
+            db.edges.get(edgeKey(String(args[1]), String(args[0]))) ?? null
+          ) as T | null;
         }
         return null as T | null;
       },
@@ -129,17 +138,19 @@ class RelationshipEdgeRouteDb {
             created_at: String(args[8]),
             updated_at: String(args[9]),
           };
-          db.edges.set(row.edge_id, row);
+          db.edges.set(edgeKey(row.steward_profile_id, row.edge_id), row);
           return { success: true, meta: { changes: 1 } };
         }
         if (sql.startsWith("UPDATE relationship_edges")) {
           const edgeId = String(args[2]);
-          const row = db.edges.get(edgeId);
+          const stewardProfileId = String(args[3]);
+          const key = edgeKey(stewardProfileId, edgeId);
+          const row = db.edges.get(key);
           if (!row) return { success: true, meta: { changes: 0 } };
           row.status = "revoked";
           row.edge_document_json = String(args[0]);
           row.updated_at = String(args[1]);
-          db.edges.set(edgeId, row);
+          db.edges.set(key, row);
           return { success: true, meta: { changes: 1 } };
         }
         return { success: true, meta: { changes: 0 } };
@@ -265,7 +276,7 @@ describe("relationship-edge-routes", () => {
       EDGE_ID
     );
     expect(res.status).toBe(200);
-    expect(db.edges.get(EDGE_ID)?.status).toBe("revoked");
+    expect(db.edges.get(edgeKey(STEWARD, EDGE_ID))?.status).toBe("revoked");
   });
 
   it("accepts unlock kind edge", async () => {
@@ -295,7 +306,61 @@ describe("relationship-edge-routes", () => {
       STEWARD
     );
     expect(res.status).toBe(201);
-    expect(db.edges.get(UNLOCK_EDGE_ID)?.kind).toBe("unlocks");
+    expect(db.edges.get(edgeKey(STEWARD, UNLOCK_EDGE_ID))?.kind).toBe("unlocks");
+  });
+
+  it("scopes deterministic edge IDs to the steward graph", async () => {
+    const db = new RelationshipEdgeRouteDb();
+    const owner = await getTestKeypair();
+    db.steward = {
+      public_key: owner.publicKeyBase58,
+      recovery_public_key: null,
+      issuer_public_key: null,
+      status: "active",
+    };
+    db.seedGameNodes();
+
+    const otherSteward = "prof_other_steward";
+    db.edges.set(edgeKey(otherSteward, EDGE_ID), {
+      edge_id: EDGE_ID,
+      network_id: "other_season",
+      kind: "witnesses",
+      from_object_id: "obj_other_node_10",
+      to_object_id: "obj_other_node_07",
+      steward_profile_id: otherSteward,
+      status: "active",
+      edge_document_json: "{}",
+      created_at: "2026-07-14T00:00:00.000Z",
+      updated_at: "2026-07-14T00:00:00.000Z",
+    });
+
+    const unsigned = crWitnessEdgeDocumentUnsigned(STEWARD);
+    const signed = (await signDocument(
+      withProtocolFields(unsigned, PAYLOAD_TYPES.RELATIONSHIP_EDGE),
+      owner
+    )) as RelationshipEdgeDocument;
+    const request = () =>
+      new Request("https://humanity.llc/v1/cards/x/relationship-edges", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ relationship_edge: signed }),
+      });
+
+    const issued = await handlePostRelationshipEdgeIssue(
+      request(),
+      db as unknown as D1Database,
+      STEWARD
+    );
+    expect(issued.status).toBe(201);
+    expect(db.edges.has(edgeKey(otherSteward, EDGE_ID))).toBe(true);
+    expect(db.edges.has(edgeKey(STEWARD, EDGE_ID))).toBe(true);
+
+    const duplicate = await handlePostRelationshipEdgeIssue(
+      request(),
+      db as unknown as D1Database,
+      STEWARD
+    );
+    expect(duplicate.status).toBe(409);
   });
 
   it("rejects malformed unlock edge missing unlock block", async () => {

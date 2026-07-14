@@ -142,15 +142,16 @@ export async function listActiveWitnessEdgesForSource(
 
 export async function getRelationshipEdgeById(
   db: D1Database,
-  edgeId: string
+  input: { edgeId: string; stewardProfileId: string }
 ): Promise<RelationshipEdgeRow | null> {
   return db
     .prepare(
       `SELECT edge_id, network_id, kind, from_object_id, to_object_id,
               steward_profile_id, status, edge_document_json, created_at, updated_at
-       FROM relationship_edges WHERE edge_id = ?`
+       FROM relationship_edges
+       WHERE edge_id = ? AND steward_profile_id = ?`
     )
-    .bind(edgeId)
+    .bind(input.edgeId, input.stewardProfileId)
     .first<RelationshipEdgeRow>();
 }
 
