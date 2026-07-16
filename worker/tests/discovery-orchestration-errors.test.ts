@@ -1,5 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+vi.mock("../../site/js/hc-sign.mjs", () => ({
+  resolverApiOrigin: () => "https://resolver.test",
+}));
+
 import { bootDiscoveryRegionPage } from "../../site/js/discovery-region-page.mjs";
 import { bootDiscoveryRegionsHub } from "../../site/js/discovery-regions-hub.mjs";
 
