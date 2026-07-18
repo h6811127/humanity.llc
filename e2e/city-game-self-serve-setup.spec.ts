@@ -321,8 +321,10 @@ test.describe("city game self-serve setup on /created/", () => {
   test("enables scan graph publish when the unlock graph and signing keys are valid", async ({
     page,
   }) => {
+    const nodes = registeredExampleNodes();
+    await stubResolver(page, GAME_SEASON_ROOT, nodes);
     await seedGameSeasonControlSession(page, GAME_SEASON_ROOT, {
-      childObjectRows: registeredExampleNodes(),
+      childObjectRows: nodes,
     });
     await page.goto(
       `/created/?profile_id=${GAME_SEASON_ROOT.profile_id}&qr_id=${GAME_SEASON_ROOT.qr_id}`
