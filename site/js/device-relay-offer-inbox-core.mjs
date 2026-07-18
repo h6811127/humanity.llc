@@ -90,3 +90,14 @@ export function relayOfferInboxChanged(prev, next) {
   }
   return false;
 }
+
+/**
+ * A locked device cannot prove that server-side finder messages disappeared.
+ * Keep the last known snapshot while an active local relay still needs keys.
+ *
+ * @param {RelayOfferPendingItem[]} current
+ * @param {boolean} hasActiveLocalRelay
+ */
+export function resolveRelayOfferPendingWithoutKeys(current, hasActiveLocalRelay) {
+  return hasActiveLocalRelay ? current : [];
+}

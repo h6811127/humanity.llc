@@ -10,6 +10,7 @@ import { loadWallet } from "./device-wallet.mjs";
 import {
   parseRelayOfferProfileSummaryBody,
   relayOfferInboxChanged,
+  resolveRelayOfferPendingWithoutKeys,
 } from "./device-relay-offer-inbox-core.mjs";
 import { fetchRelayOfferProfileSummary } from "./lost-item-offer-owner.mjs";
 import { getResolverHealthStatus } from "./device-wallet-since-visit-gate.mjs?v=94";
@@ -111,6 +112,9 @@ export async function refreshRelayOfferInbox(opts = {}) {
   }
 
   let keys = signingKeysFromTabSession();
+  if (keys && !hasLocalActiveLostItemRelays(keys.profileId)) {
+    keys = null;
+  }
   if (!keys) {
     for (const entry of loadWallet()) {
       const pid = typeof entry.profile_id === "string" ? entry.profile_id : "";
@@ -119,9 +123,14 @@ export async function refreshRelayOfferInbox(opts = {}) {
       if (keys) break;
     }
   }
-  if (!keys || !hasLocalActiveLostItemRelays(keys.profileId)) {
-    const changed = relayOfferInboxChanged(pending, []);
-    pending = [];
+  if (!keys) {
+    const next = resolveRelayOfferPendingWithoutKeys(
+      pending,
+      walletHasActiveLostItemRelays()
+    );
+    if (next === pending) return pending;
+    const changed = relayOfferInboxChanged(pending, next);
+    pending = next;
     lastRefreshAt = now;
     if (changed) window.dispatchEvent(new Event(RELAY_OFFER_INBOX_CHANGED));
     return pending;
