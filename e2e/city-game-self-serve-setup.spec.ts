@@ -324,7 +324,11 @@ test.describe("city game self-serve setup on /created/", () => {
     await seedGameSeasonControlSession(page, GAME_SEASON_ROOT, {
       childObjectRows: registeredExampleNodes(),
     });
-    await openGameSeasonLive(page);
+    await page.goto(
+      `/created/?profile_id=${GAME_SEASON_ROOT.profile_id}&qr_id=${GAME_SEASON_ROOT.qr_id}`
+    );
+    await expect(page.locator("#created-control-root")).toBeVisible();
+    await page.locator("#child-object-add-hub > summary").click();
     await selectExampleSeason(page);
 
     await page.locator("#child-object-game-node-unlock-edges summary").click();
