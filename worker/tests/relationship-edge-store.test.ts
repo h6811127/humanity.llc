@@ -119,6 +119,50 @@ async function signedCrEdge(
 }
 
 describe("relationship-edges store", () => {
+  it("rejects malformed edge JSON before writing to D1", async () => {
+    const db = new RelationshipEdgeDb();
+    const { doc, json } = await signedCrEdge("operator");
+    const write = relationshipEdgeWriteFromDocument(doc, json);
+    write.edgeDocumentJson = "{";
+
+    const insert = await insertRelationshipEdge(db as unknown as D1Database, write);
+
+    expect(insert).toEqual({
+      ok: false,
+      issues: ["edge_document_json must be valid JSON."],
+    });
+    expect(db.edges.size).toBe(0);
+  });
+
+  it("rejects indexed columns that drift from the signed edge document", async () => {
+    const db = new RelationshipEdgeDb();
+    const { doc, json } = await signedCrEdge("operator");
+    const write = relationshipEdgeWriteFromDocument(doc, json);
+    Object.assign(write, {
+      edgeId: "edge_wrong",
+      networkId: "network_wrong",
+      fromObjectId: "object_from_wrong",
+      toObjectId: "object_to_wrong",
+      stewardProfileId: "profile_wrong",
+      status: "revoked",
+    });
+
+    const insert = await insertRelationshipEdge(db as unknown as D1Database, write);
+
+    expect(insert).toEqual({
+      ok: false,
+      issues: [
+        "edge_id must match edge_document_json.",
+        "network_id must match edge_document_json.",
+        "from_object_id must match edge_document_json.",
+        "to_object_id must match edge_document_json.",
+        "steward_profile_id must match edge_document_json.",
+        "status must match edge_document_json.",
+      ],
+    });
+    expect(db.edges.size).toBe(0);
+  });
+
   it("loads and verifies signed active witness edge", async () => {
     const db = new RelationshipEdgeDb();
     const owner = await getTestKeypair();
