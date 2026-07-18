@@ -187,6 +187,7 @@ export function initCreatedGameNodeUnlockEdges(ctx) {
       li.className = "is-ready";
       li.textContent = "Unlock graph validates against registered template nodes.";
       issuesEl.append(li);
+      updatePublishState(edges);
       return;
     }
     for (const issue of validation.issues) {

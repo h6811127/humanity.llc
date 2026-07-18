@@ -18,6 +18,35 @@ const GAME_SEASON_ROOT = {
 };
 
 const CHILD_OBJECTS_KEY = `hc_child_objects_v1:${GAME_SEASON_ROOT.profile_id}`;
+const EXAMPLE_NODE_OBJECT_IDS = [
+  "obj_ex_node_01_relay",
+  "obj_ex_node_02_lantern",
+  "obj_ex_node_03_finale",
+  "obj_ex_node_04_lantern",
+  "obj_ex_node_05_relay",
+  "obj_ex_node_06_split",
+  "obj_ex_node_07_lore",
+  "obj_ex_node_08_relay",
+  "obj_ex_node_09_lore",
+  "obj_ex_node_10_witness",
+  "obj_ex_node_11_split",
+  "obj_ex_node_12_sanctuary",
+  "obj_ex_node_13_finale",
+  "obj_ex_node_14_care",
+  "obj_ex_node_15_relay",
+];
+
+function registeredExampleNodes() {
+  return EXAMPLE_NODE_OBJECT_IDS.map((objectId, index) => ({
+    object_id: objectId,
+    object_type: "game_node",
+    public_label: `Example node ${index + 1}`,
+    public_state: "Dormant",
+    created_at: "2026-06-01T12:00:00.000Z",
+    status: "active",
+    qr_id: `qr_example_node_${index + 1}`,
+  }));
+}
 
 function cardStatusRoute(sample: typeof GAME_SEASON_ROOT) {
   return {
@@ -287,6 +316,22 @@ test.describe("city game self-serve setup on /created/", () => {
     await expect(page.locator("#child-object-game-node-print-pack-summary")).toContainText(
       /Register game nodes|scan QRs/i
     );
+  });
+
+  test("enables scan graph publish when the unlock graph and signing keys are valid", async ({
+    page,
+  }) => {
+    await seedGameSeasonControlSession(page, GAME_SEASON_ROOT, {
+      childObjectRows: registeredExampleNodes(),
+    });
+    await openGameSeasonLive(page);
+    await selectExampleSeason(page);
+
+    await page.locator("#child-object-game-node-unlock-edges summary").click();
+    await expect(page.locator("#child-object-game-node-unlock-edges-issues")).toContainText(
+      "Unlock graph validates"
+    );
+    await expect(page.locator("#child-object-game-node-unlock-edges-publish")).toBeEnabled();
   });
 });
 
