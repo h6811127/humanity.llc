@@ -10,6 +10,7 @@ import {
   getRelationshipEdgeStewardRow,
   insertRelationshipEdge,
   listRelationshipEdgesForSteward,
+  reactivateRelationshipEdge,
   relationshipEdgeWriteFromDocument,
   relationshipEdgesSchemaReady,
   revokeRelationshipEdge,
@@ -291,12 +292,28 @@ export async function handlePostRelationshipEdgeIssue(
 
   const existing = await getRelationshipEdgeById(db, parsed.doc.edge_id);
   if (existing) {
-    return errorResponse("EDGE_EXISTS", "Relationship edge already exists.", 409);
-  }
-
-  const insert = await insertRelationshipEdge(db, write);
-  if (!insert.ok) {
-    return errorResponse("MALFORMED_REQUEST", insert.issues.join(" "), 422);
+    if (
+      existing.status !== "revoked" ||
+      existing.steward_profile_id !== pathProfileId
+    ) {
+      return errorResponse("EDGE_EXISTS", "Relationship edge already exists.", 409);
+    }
+    const reactivate = await reactivateRelationshipEdge(db, write);
+    if (!reactivate.ok) {
+      return errorResponse("MALFORMED_REQUEST", reactivate.issues.join(" "), 422);
+    }
+    if (reactivate.changes === 0) {
+      return errorResponse(
+        "EDGE_CONFLICT",
+        "Revoked relationship edge coordinates do not match this signed document.",
+        409
+      );
+    }
+  } else {
+    const insert = await insertRelationshipEdge(db, write);
+    if (!insert.ok) {
+      return errorResponse("MALFORMED_REQUEST", insert.issues.join(" "), 422);
+    }
   }
 
   return jsonResponse(
