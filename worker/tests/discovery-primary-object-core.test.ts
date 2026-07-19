@@ -105,6 +105,106 @@ describe("discovery-primary-object-core", () => {
     ).toBe("obj_plate");
   });
 
+  it.each([
+    {
+      label: "status plate over menu and game objects",
+      entries: [
+        {
+          object_id: "obj_game",
+          object_type: "game_node",
+          label: "Game node",
+          scan_url: "https://humanity.llc/c/game?q=1",
+          network_ids: [],
+        },
+        {
+          object_id: "obj_menu",
+          object_type: "menu_board",
+          label: "Menu board",
+          scan_url: "https://humanity.llc/c/menu?q=2",
+          network_ids: [],
+        },
+        {
+          object_id: "obj_plate",
+          object_type: "status_plate",
+          label: "Door plate",
+          scan_url: "https://humanity.llc/c/plate?q=3",
+          network_ids: [],
+        },
+      ],
+      expected: "obj_plate",
+    },
+    {
+      label: "menu over game objects",
+      entries: [
+        {
+          object_id: "obj_game",
+          object_type: "game_node",
+          label: "Game node",
+          scan_url: "https://humanity.llc/c/game?q=1",
+          network_ids: [],
+        },
+        {
+          object_id: "obj_menu",
+          object_type: "menu_board",
+          label: "Menu board",
+          scan_url: "https://humanity.llc/c/menu?q=2",
+          network_ids: [],
+        },
+      ],
+      expected: "obj_menu",
+    },
+  ])("applies pattern precedence for $label", ({ entries, expected }) => {
+    /** @type {import("../../site/js/discovery-pin-projection-core.mjs").DiscoveryPin} */
+    const pin = {
+      pin_id: "pin_pattern_precedence",
+      region: "cedar-rapids-iowa",
+      display_label: "Shared doorway",
+      object_ids: entries.map((entry) => entry.object_id),
+      network_ids: [],
+      facets: { object_type: "game_node" },
+      listing: { listed: true, title: "Shared doorway" },
+      index_version: "v1",
+    };
+
+    expect(resolveDiscoveryPrimaryObjectId(entries, pin)).toBe(expected);
+  });
+
+  it("does not let a legacy multi-object scan_url bypass primary-object policy", () => {
+    /** @type {import("../../site/js/discovery-pin-projection-core.mjs").DiscoveryPin} */
+    const pin = {
+      pin_id: "pin_multi_legacy",
+      region: "cedar-rapids-iowa",
+      display_label: "Library doorway",
+      object_ids: ["obj_game", "obj_plate"],
+      network_ids: [],
+      facets: { object_type: "game_node" },
+      listing: { listed: true, title: "Library doorway" },
+      scan_url: "https://humanity.llc/c/legacy-game?q=1",
+      index_version: "v1",
+    };
+    const index = buildSeasonNodeScanIndex({
+      nodes: [
+        {
+          object_id: "obj_game",
+          object_type: "game_node",
+          label: "Game node",
+          scan_url: "https://humanity.llc/c/game?q=2",
+        },
+        {
+          object_id: "obj_plate",
+          object_type: "status_plate",
+          label: "Door plate",
+          scan_url: "https://humanity.llc/c/plate?q=3",
+        },
+      ],
+    });
+
+    const targets = resolveDiscoveryPinScanTargets(pin, index);
+    expect(targets.primaryObjectId).toBe("obj_plate");
+    expect(targets.primaryScanUrl).toBe("https://humanity.llc/c/plate?q=3");
+    expect(resolveScanUrlForPin(pin, index)).toBe("https://humanity.llc/c/plate?q=3");
+  });
+
   it("requires explicit chooser when multi-object primary is ambiguous", () => {
     /** @type {import("../../site/js/discovery-pin-projection-core.mjs").DiscoveryPin} */
     const pin = {
