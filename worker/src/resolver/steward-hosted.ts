@@ -33,7 +33,7 @@ import { parseEntitlementsJson, utcDayKey } from "../steward/plans";
 import { generateSessionToken, hashSessionToken } from "../steward/session-token";
 import { authenticateStewardSession } from "./steward-session-auth";
 import {
-  handlePostStewardWebPushSubscribe,
+  handlePostStewardWebPushSubscribe as handlePostStewardWebPushSubscribeCore,
   handleDeleteStewardWebPushSubscribe,
   parseStewardWebPushSubscribeBody,
   parseStewardWebPushUnsubscribeBody,
@@ -513,7 +513,7 @@ export async function handlePostStewardWebPushSubscribe(
     );
   }
 
-  return handlePostStewardWebPushSubscribe(env, db, {
+  return handlePostStewardWebPushSubscribeCore(env, db, {
     accountId: auth.account_id,
     deviceId: auth.device_id,
     body: subscribeBody,
