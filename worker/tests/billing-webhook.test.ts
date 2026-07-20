@@ -21,6 +21,7 @@ function billingDb() {
     billing_subscription_id: null,
   });
   const sessions = new Set<string>();
+  const webPushSubscriptionAccounts = new Set<string>();
 
   const db = {
     prepare: (sql: string) => ({
@@ -72,13 +73,18 @@ function billingDb() {
           if (sql.includes("DELETE FROM steward_sessions")) {
             sessions.clear();
           }
+          if (sql.includes("DELETE FROM steward_web_push_subscriptions")) {
+            const accountId = String(params[0]);
+            const deleted = webPushSubscriptionAccounts.delete(accountId);
+            return { success: true, meta: { changes: deleted ? 1 : 0 } };
+          }
           return { success: true };
         },
       }),
     }),
   } as unknown as D1Database;
 
-  return { db, accounts, sessions };
+  return { db, accounts, sessions, webPushSubscriptionAccounts };
 }
 
 async function signedRequest(
@@ -220,8 +226,8 @@ describe("handlePostBillingWebhook", () => {
     expect(accounts.size).toBe(1);
   });
 
-  it("expires account on subscription.deleted", async () => {
-    const { db, accounts } = billingDb();
+  it("expires account and revokes sessions and push subscriptions on subscription.deleted", async () => {
+    const { db, accounts, sessions, webPushSubscriptionAccounts } = billingDb();
     accounts.set(ACCOUNT, {
       ...accounts.get(ACCOUNT)!,
       plan_id: "hosted_steward_v1",
@@ -229,6 +235,8 @@ describe("handlePostBillingWebhook", () => {
       billing_customer_id: CUSTOMER,
       billing_subscription_id: SUB,
     });
+    sessions.add("session_to_revoke");
+    webPushSubscriptionAccounts.add(ACCOUNT);
     const body = JSON.stringify({
       type: "customer.subscription.deleted",
       data: {
@@ -249,6 +257,8 @@ describe("handlePostBillingWebhook", () => {
     const row = accounts.get(ACCOUNT)!;
     expect(row.status).toBe("expired");
     expect(row.plan_id).toBe("reference_free");
+    expect(sessions.size).toBe(0);
+    expect(webPushSubscriptionAccounts.size).toBe(0);
   });
 
   it("marks invoice payment failures past_due without revoking sessions", async () => {
