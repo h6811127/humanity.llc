@@ -77,6 +77,28 @@ describe("discovery-pin-snapshot-core", () => {
     ).toBe("Live drop");
   });
 
+  it("falls back to the season role hint when snapshot state is unavailable", () => {
+    const pin = projectDiscoveryPinIndexFromSeason(season).pins.find(
+      (row) => row.facets?.entry_id === "node_04"
+    );
+    expect(pin).toBeTruthy();
+
+    const unavailableIndex = buildSnapshotNodeIndex(null);
+    expect(
+      resolveDiscoveryPinRowStateHeadline(
+        /** @type {NonNullable<typeof pin>} */ (pin),
+        unavailableIndex
+      )
+    ).toBe("Awaiting signal");
+
+    const staleIndex = buildSnapshotNodeIndex({
+      nodes: [{ node_id: "node_removed_from_pin_index", chips: [] }],
+    });
+    expect(
+      resolveDiscoveryPinRowStateHeadline(/** @type {NonNullable<typeof pin>} */ (pin), staleIndex)
+    ).toBe("Awaiting signal");
+  });
+
   it("omits row headline for standalone pins without snapshot", () => {
     const pin = {
       pin_id: "pin_standalone",
