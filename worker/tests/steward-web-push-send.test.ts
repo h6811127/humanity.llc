@@ -13,7 +13,7 @@ const VAPID_PUBLIC =
 const VAPID_PRIVATE =
   "UUxI4O8-FbRPOA3_Z-vy_xYs9DIFYP5dYKI13sOJEvI";
 
-function mockFanoutDb() {
+function mockFanoutDb(deletedEndpoints: string[] = []) {
   return {
     prepare: (sql: string) => ({
       bind: (...params: unknown[]) => ({
@@ -39,7 +39,12 @@ function mockFanoutDb() {
             },
           ],
         }),
-        run: async () => ({ success: true }),
+        run: async () => {
+          if (sql.includes("DELETE FROM steward_web_push_subscriptions")) {
+            deletedEndpoints.push(String(params[0]));
+          }
+          return { success: true };
+        },
       }),
     }),
   } as unknown as D1Database;
@@ -103,5 +108,33 @@ describe("fanOutWebPushLiveProofPending", () => {
     expect(String(init.headers && (init.headers as Record<string, string>).Authorization)).toMatch(
       /^vapid t=/
     );
+  });
+
+  it.each([404, 410])("deletes an expired endpoint after push service status %i", async (status) => {
+    const fetchMock = vi.fn(async () => new Response("", { status }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const deletedEndpoints: string[] = [];
+    const db = mockFanoutDb(deletedEndpoints);
+    const env: Env = {
+      DB: db,
+      STEWARD_VAPID_PUBLIC_KEY: VAPID_PUBLIC,
+      STEWARD_VAPID_PRIVATE_KEY: VAPID_PRIVATE,
+    };
+    const delivered = await fanOutWebPushLiveProofPending(env, db, ACCOUNT, {
+      type: LIVE_PROOF_PENDING_TYPE,
+      version: 1,
+      operator_id: "humanity.llc",
+      account_id: ACCOUNT,
+      profile_id: "prof_1",
+      qr_id: "qr_1",
+      challenge_id: "lc_1",
+      issued_at: "2026-05-26T12:00:00.000Z",
+      expires_at: "2026-05-26T12:02:00.000Z",
+    });
+
+    expect(delivered).toBe(0);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(deletedEndpoints).toEqual(["https://push.example.test/sub/1"]);
   });
 });
