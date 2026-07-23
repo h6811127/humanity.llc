@@ -7,6 +7,26 @@ import { isActiveGameNodeRow } from "./created-child-object-game-node-core.mjs";
 import { resolveSeasonTemplateRows } from "./city-game-season-template-core.mjs";
 
 /**
+ * A loaded pack is usable only while it belongs to both the selected season and
+ * the latest refresh. The request id also rejects an older response when the
+ * picker changes away and then back to the same season.
+ *
+ * @param {{ seasonId?: string; requestId?: number } | null | undefined} state
+ * @param {string} selectedSeasonId
+ * @param {number} latestRequestId
+ */
+export function isInstallPackStateCurrent(state, selectedSeasonId, latestRequestId) {
+  const loadedSeasonId = typeof state?.seasonId === "string" ? state.seasonId.trim() : "";
+  const currentSeasonId = String(selectedSeasonId ?? "").trim();
+  return Boolean(
+    loadedSeasonId &&
+      currentSeasonId &&
+      loadedSeasonId === currentSeasonId &&
+      state?.requestId === latestRequestId
+  );
+}
+
+/**
  * @param {string} nodeId
  */
 function nodeSortKey(nodeId) {
