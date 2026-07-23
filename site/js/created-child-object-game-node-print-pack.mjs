@@ -10,6 +10,7 @@ import {
   installPackCsvFilename,
   installPackQrFilename,
   installPackSummaryCopy,
+  isInstallPackStateCurrent,
   resolveInstallPackRows,
 } from "./created-child-object-game-node-print-pack-core.mjs";
 
@@ -50,8 +51,9 @@ export function initCreatedGameNodePrintPack(ctx) {
 
   if (!details) return null;
 
-  /** @type {Record<string, unknown> | null} */
-  let seasonBody = null;
+  let latestRequestId = 0;
+  /** @type {{ seasonId: string; requestId: number } | null} */
+  let loadedPackState = null;
   /** @type {ReturnType<typeof resolveInstallPackRows>} */
   let packRows = [];
   /** @type {ReturnType<typeof assessInstallPackReady>} */
@@ -60,16 +62,21 @@ export function initCreatedGameNodePrintPack(ctx) {
   async function loadSeasonBody(seasonId) {
     const indexRow = ctx.getSeasonIndexRow(seasonId);
     const jsonUrl = typeof indexRow?.json_url === "string" ? indexRow.json_url : "";
-    if (!jsonUrl) {
-      seasonBody = null;
-      return;
-    }
+    if (!jsonUrl) return null;
     try {
       const res = await fetch(jsonUrl, { credentials: "omit" });
-      seasonBody = res.ok ? await res.json() : null;
+      return res.ok ? await res.json() : null;
     } catch {
-      seasonBody = null;
+      return null;
     }
+  }
+
+  function selectedSeasonId() {
+    return ctx.seasonSelect instanceof HTMLSelectElement ? ctx.seasonSelect.value.trim() : "";
+  }
+
+  function hasCurrentPack() {
+    return isInstallPackStateCurrent(loadedPackState, selectedSeasonId(), latestRequestId);
   }
 
   function seasonContext(seasonId) {
@@ -147,32 +154,39 @@ export function initCreatedGameNodePrintPack(ctx) {
   }
 
   function setButtonsEnabled() {
-    const enabled = assessment.ready;
+    const current = hasCurrentPack();
+    const enabled = current && assessment.ready;
     if (csvBtn instanceof HTMLButtonElement) csvBtn.disabled = !enabled;
     if (checklistBtn instanceof HTMLButtonElement) checklistBtn.disabled = !enabled;
     if (downloadAllBtn instanceof HTMLButtonElement) {
-      downloadAllBtn.disabled = assessment.withQr === 0;
+      downloadAllBtn.disabled = !current || assessment.withQr === 0;
     }
   }
 
   async function refresh() {
-    const seasonId =
-      ctx.seasonSelect instanceof HTMLSelectElement ? ctx.seasonSelect.value.trim() : "";
+    const requestId = ++latestRequestId;
+    const seasonId = selectedSeasonId();
+    loadedPackState = null;
+    packRows = [];
+    assessment = assessInstallPackReady(packRows);
+    renderTable([]);
+    setButtonsEnabled();
+
     if (!seasonId) {
-      packRows = [];
-      assessment = assessInstallPackReady(packRows);
       if (summaryEl) {
         summaryEl.textContent = "Choose a season on Live (Game node) to export install materials.";
       }
-      renderTable([]);
-      setButtonsEnabled();
       return;
     }
 
-    await loadSeasonBody(seasonId);
+    const seasonBody = await loadSeasonBody(seasonId);
+    const candidateState = { seasonId, requestId };
+    if (!isInstallPackStateCurrent(candidateState, selectedSeasonId(), latestRequestId)) return;
+
     const registered = readChildObjectRows(localStorage, ctx.profileId);
     packRows = resolveInstallPackRows(seasonBody, seasonId, registered);
     assessment = assessInstallPackReady(packRows);
+    loadedPackState = candidateState;
 
     if (summaryEl) summaryEl.textContent = installPackSummaryCopy(assessment);
     renderTable(packRows);
@@ -190,6 +204,7 @@ export function initCreatedGameNodePrintPack(ctx) {
   tableWrap?.addEventListener("click", async (event) => {
     const target = event.target;
     if (!(target instanceof HTMLElement)) return;
+    if (!hasCurrentPack()) return;
 
     if (target.classList.contains("child-object-print-pack-copy-scan")) {
       const url = target.dataset.scanUrl;
@@ -209,13 +224,14 @@ export function initCreatedGameNodePrintPack(ctx) {
     if (target.classList.contains("child-object-print-pack-download-qr")) {
       const url = target.dataset.scanUrl;
       const nodeId = target.dataset.nodeId ?? "node";
-      const seasonId =
-        ctx.seasonSelect instanceof HTMLSelectElement ? ctx.seasonSelect.value.trim() : "season";
+      const seasonId = selectedSeasonId();
       if (!url) return;
       target.disabled = true;
       try {
         const { downloadQrPng } = await import("./qr-render.mjs");
+        if (!hasCurrentPack()) return;
         await downloadQrPng(url, installPackQrFilename(seasonId, nodeId));
+        if (!hasCurrentPack()) return;
         if (statusEl) {
           statusEl.hidden = false;
           statusEl.textContent = `Downloaded QR for ${nodeId}.`;
@@ -229,9 +245,8 @@ export function initCreatedGameNodePrintPack(ctx) {
   });
 
   csvBtn?.addEventListener("click", () => {
-    const seasonId =
-      ctx.seasonSelect instanceof HTMLSelectElement ? ctx.seasonSelect.value.trim() : "season";
-    if (!assessment.ready) return;
+    if (!hasCurrentPack() || !assessment.ready) return;
+    const seasonId = selectedSeasonId();
     downloadTextFile(
       buildInstallPackCsv(packRows),
       installPackCsvFilename(seasonId),
@@ -244,9 +259,8 @@ export function initCreatedGameNodePrintPack(ctx) {
   });
 
   checklistBtn?.addEventListener("click", async () => {
-    const seasonId =
-      ctx.seasonSelect instanceof HTMLSelectElement ? ctx.seasonSelect.value.trim() : "season";
-    if (!assessment.ready) return;
+    if (!hasCurrentPack() || !assessment.ready) return;
+    const seasonId = selectedSeasonId();
     const text = buildInstallChecklistText(seasonContext(seasonId), packRows);
     try {
       await navigator.clipboard.writeText(text);
@@ -255,6 +269,7 @@ export function initCreatedGameNodePrintPack(ctx) {
         statusEl.textContent = "Install checklist copied — paste into your runbook or notes.";
       }
     } catch {
+      if (!hasCurrentPack()) return;
       downloadTextFile(text, `humanity-${seasonId}-install-checklist.md`, "text/markdown;charset=utf-8");
       if (statusEl) {
         statusEl.hidden = false;
@@ -264,8 +279,8 @@ export function initCreatedGameNodePrintPack(ctx) {
   });
 
   downloadAllBtn?.addEventListener("click", async () => {
-    const seasonId =
-      ctx.seasonSelect instanceof HTMLSelectElement ? ctx.seasonSelect.value.trim() : "season";
+    if (!hasCurrentPack()) return;
+    const seasonId = selectedSeasonId();
     const withQr = packRows.filter((row) => row.qr_issued);
     if (!withQr.length) return;
     if (!(downloadAllBtn instanceof HTMLButtonElement)) return;
@@ -279,7 +294,9 @@ export function initCreatedGameNodePrintPack(ctx) {
     try {
       const { downloadQrPng } = await import("./qr-render.mjs");
       for (const [index, row] of withQr.entries()) {
+        if (!hasCurrentPack()) return;
         await downloadQrPng(row.scan_url, installPackQrFilename(seasonId, row.node_id));
+        if (!hasCurrentPack()) return;
         if (statusEl) {
           statusEl.textContent = `Downloaded ${index + 1} / ${withQr.length} QR PNGs…`;
         }
@@ -293,7 +310,7 @@ export function initCreatedGameNodePrintPack(ctx) {
     } catch (err) {
       ctx.showError(err instanceof Error ? err.message : String(err));
     } finally {
-      downloadAllBtn.disabled = assessment.withQr === 0;
+      setButtonsEnabled();
     }
   });
 
