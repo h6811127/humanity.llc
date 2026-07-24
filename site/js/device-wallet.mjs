@@ -755,6 +755,12 @@ function walletEntrySyncSignature(entry) {
     qr_id: walletEntryQrId(entry),
     scan_url: entry.scan_url ?? null,
     handle: entry.handle ?? null,
+    // Custody wrap / mode must participate: device_unlock re-enroll only changes these
+    // fields after stripping private keys, and skipping the write leaves Face ID unusable.
+    custody_mode: entry.custody_mode ?? null,
+    wrapped_owner_key: entry.wrapped_owner_key ?? null,
+    device_unlock_reenroll_pending: entry.device_unlock_reenroll_pending === true,
+    has_signing_key: entry.has_signing_key === true,
   });
 }
 

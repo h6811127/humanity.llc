@@ -2,9 +2,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { verificationRecordFromLabelState } from "../../site/js/device-wallet-network-core.mjs";
 import {
+  findWalletEntryByProfileId,
   loadWalletSummary,
   markWalletSummaryReconciledForTests,
   mergeWalletEntryFromSession,
+  persistWalletEntry,
   resetWalletCachesForTests,
   saveWallet,
 } from "../../site/js/device-wallet.mjs";
@@ -45,6 +47,75 @@ describe("verificationRecordFromLabelState", () => {
     expect(
       verificationRecordFromLabelState("Steward", "verified_human")
     ).toEqual({ label: "Steward", state: "steward" });
+  });
+});
+
+describe("persistWalletEntry", () => {
+  it("persists device_unlock wrap after re-enroll when private keys stay stripped (K11)", () => {
+    const profileId = "p_reenroll_wrap";
+    saveWallet([
+      {
+        profile_id: profileId,
+        label: "Recovered card",
+        handle: "steward",
+        owner_public_key_b58: "ownerPub",
+        recovery_public_key_b58: "recoveryPub",
+        recovery_private_key_b58: "recoveryPriv",
+        scan_url: `https://humanity.llc/c/${profileId}`,
+        qr_id: "qr_reenrollWrapTest01",
+        custody_mode: "device_unlock",
+        device_unlock_reenroll_pending: true,
+        has_signing_key: true,
+      },
+    ]);
+
+    const wrap = {
+      version: 1,
+      credential_id: "new-device-cred",
+      prf_salt: "salt",
+      iv: "iv",
+      ciphertext: "cipher",
+    };
+    const result = persistWalletEntry({
+      profile_id: profileId,
+      label: "Recovered card",
+      handle: "steward",
+      owner_public_key_b58: "ownerPub",
+      recovery_public_key_b58: "recoveryPub",
+      recovery_private_key_b58: "recoveryPriv",
+      scan_url: `https://humanity.llc/c/${profileId}`,
+      qr_id: "qr_reenrollWrapTest01",
+      custody_mode: "device_unlock",
+      wrapped_owner_key: wrap,
+      has_signing_key: true,
+    });
+
+    expect(result).toEqual({ ok: true, updated: true });
+    const stored = findWalletEntryByProfileId(profileId);
+    expect(stored?.wrapped_owner_key).toEqual(wrap);
+    expect(stored?.device_unlock_reenroll_pending).toBeUndefined();
+  });
+
+  it("still skips no-op wallet writes when custody wrap is unchanged", () => {
+    const profileId = "p_reenroll_noop";
+    const entry = {
+      profile_id: profileId,
+      label: "Card",
+      owner_public_key_b58: "ownerPub",
+      custody_mode: "device_unlock",
+      wrapped_owner_key: {
+        version: 1,
+        credential_id: "cred",
+        prf_salt: "s",
+        iv: "i",
+        ciphertext: "c",
+      },
+      has_signing_key: true,
+    };
+    saveWallet([entry]);
+
+    const result = persistWalletEntry({ ...entry });
+    expect(result).toEqual({ ok: true, already: true });
   });
 });
 
