@@ -16,12 +16,14 @@ import {
   insertRelationshipEdge,
   listActiveWitnessEdgesForTarget,
   relationshipEdgeWriteFromDocument,
+  revokeRelationshipEdge,
   verifyStoredRelationshipEdge,
 } from "../src/db/relationship-edges";
 import type { RelationshipEdgeRow } from "../src/db/types";
 import { CITY_GAME_SEASON_ROOT_PROFILE } from "./city-game-fixture-profile";
 
 const STEWARD = CITY_GAME_SEASON_ROOT_PROFILE;
+const OTHER_STEWARD = "profile_other_steward_zzzz";
 
 type StewardRow = {
   public_key: string;
@@ -87,6 +89,24 @@ class RelationshipEdgeDb {
                 updated_at: String(args[9]),
               };
               db.edges.set(row.edge_id, row);
+              return { success: true, meta: { changes: 1 } };
+            }
+            if (
+              sql.includes("UPDATE relationship_edges") &&
+              sql.includes("status = 'revoked'")
+            ) {
+              const edgeDocumentJson = String(args[0]);
+              const updatedAt = String(args[1]);
+              const edgeId = String(args[2]);
+              const stewardProfileId = String(args[3]);
+              const row = db.edges.get(edgeId);
+              if (!row || row.steward_profile_id !== stewardProfileId) {
+                return { success: true, meta: { changes: 0 } };
+              }
+              row.status = "revoked";
+              row.edge_document_json = edgeDocumentJson;
+              row.updated_at = updatedAt;
+              db.edges.set(edgeId, row);
               return { success: true, meta: { changes: 1 } };
             }
             return { success: true, meta: { changes: 0 } };
@@ -243,5 +263,130 @@ describe("relationship-edges store", () => {
     );
     expect(rows).toHaveLength(0);
     expect(activeRows).toHaveLength(0);
+  });
+
+  it("persists revoked signed document and updated_at for the matching steward row", async () => {
+    const db = new RelationshipEdgeDb();
+    const { doc, json } = await signedCrEdge("operator");
+    const write = relationshipEdgeWriteFromDocument(doc, json);
+    const insert = await insertRelationshipEdge(db as unknown as D1Database, write);
+    expect(insert).toEqual({ ok: true });
+
+    const revoked = await signedCrEdge("operator", { status: "revoked" });
+    const updatedAt = "2026-07-25T10:00:00.000Z";
+    const revoke = await revokeRelationshipEdge(db as unknown as D1Database, {
+      edgeId: revoked.doc.edge_id,
+      stewardProfileId: STEWARD,
+      edgeDocumentJson: revoked.json,
+      updatedAt,
+    });
+
+    expect(revoke).toEqual({ ok: true, changes: 1 });
+    const row = db.edges.get(revoked.doc.edge_id);
+    expect(row?.status).toBe("revoked");
+    expect(row?.edge_document_json).toBe(revoked.json);
+    expect(row?.updated_at).toBe(updatedAt);
+    expect(row?.created_at).toBe(write.createdAt);
+    expect(JSON.parse(row?.edge_document_json ?? "{}").status).toBe("revoked");
+  });
+
+  it("rejects malformed revoke JSON before writing", async () => {
+    const db = new RelationshipEdgeDb();
+    const { doc, json } = await signedCrEdge("operator");
+    const write = relationshipEdgeWriteFromDocument(doc, json);
+    await insertRelationshipEdge(db as unknown as D1Database, write);
+    const before = structuredClone(db.edges.get(doc.edge_id));
+
+    const revoke = await revokeRelationshipEdge(db as unknown as D1Database, {
+      edgeId: doc.edge_id,
+      stewardProfileId: STEWARD,
+      edgeDocumentJson: "{",
+      updatedAt: "2026-07-25T10:00:00.000Z",
+    });
+
+    expect(revoke).toEqual({
+      ok: false,
+      issues: ["edge_document_json must be valid JSON."],
+    });
+    expect(db.edges.get(doc.edge_id)).toEqual(before);
+  });
+
+  it("rejects revoke when edge_id or steward_profile_id drift from the signed document", async () => {
+    const db = new RelationshipEdgeDb();
+    const revoked = await signedCrEdge("operator", { status: "revoked" });
+
+    const edgeIdMismatch = await revokeRelationshipEdge(
+      db as unknown as D1Database,
+      {
+        edgeId: "edge_wrong_id",
+        stewardProfileId: STEWARD,
+        edgeDocumentJson: revoked.json,
+        updatedAt: "2026-07-25T10:00:00.000Z",
+      }
+    );
+    expect(edgeIdMismatch).toEqual({
+      ok: false,
+      issues: ["edge_id must match edge_document_json."],
+    });
+
+    const stewardMismatch = await revokeRelationshipEdge(
+      db as unknown as D1Database,
+      {
+        edgeId: revoked.doc.edge_id,
+        stewardProfileId: OTHER_STEWARD,
+        edgeDocumentJson: revoked.json,
+        updatedAt: "2026-07-25T10:00:00.000Z",
+      }
+    );
+    expect(stewardMismatch).toEqual({
+      ok: false,
+      issues: ["steward_profile_id must match edge_document_json."],
+    });
+    expect(db.edges.size).toBe(0);
+  });
+
+  it("rejects revoke when document status is still active", async () => {
+    const db = new RelationshipEdgeDb();
+    const { doc, json } = await signedCrEdge("operator");
+    const write = relationshipEdgeWriteFromDocument(doc, json);
+    await insertRelationshipEdge(db as unknown as D1Database, write);
+
+    const revoke = await revokeRelationshipEdge(db as unknown as D1Database, {
+      edgeId: doc.edge_id,
+      stewardProfileId: STEWARD,
+      edgeDocumentJson: json,
+      updatedAt: "2026-07-25T10:00:00.000Z",
+    });
+
+    expect(revoke).toEqual({
+      ok: false,
+      issues: ['status must be "revoked" in edge_document_json.'],
+    });
+    expect(db.edges.get(doc.edge_id)?.status).toBe("active");
+  });
+
+  it("returns zero changes when revoke WHERE misses steward scope", async () => {
+    const db = new RelationshipEdgeDb();
+    const { doc, json } = await signedCrEdge("operator");
+    const write = relationshipEdgeWriteFromDocument(doc, json);
+    await insertRelationshipEdge(db as unknown as D1Database, write);
+
+    const row = db.edges.get(doc.edge_id);
+    expect(row).toBeTruthy();
+    if (!row) throw new Error("expected inserted edge");
+    row.steward_profile_id = OTHER_STEWARD;
+    db.edges.set(doc.edge_id, row);
+
+    const revoked = await signedCrEdge("operator", { status: "revoked" });
+    const revoke = await revokeRelationshipEdge(db as unknown as D1Database, {
+      edgeId: revoked.doc.edge_id,
+      stewardProfileId: STEWARD,
+      edgeDocumentJson: revoked.json,
+      updatedAt: "2026-07-25T10:00:00.000Z",
+    });
+
+    expect(revoke).toEqual({ ok: true, changes: 0 });
+    expect(db.edges.get(doc.edge_id)?.status).toBe("active");
+    expect(db.edges.get(doc.edge_id)?.edge_document_json).toBe(json);
   });
 });
