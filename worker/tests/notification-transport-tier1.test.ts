@@ -37,14 +37,28 @@ describe("WS-NOTIF Tier 1 background OS transport contract", () => {
 
   it("T1-4: hosted push hints cache in SW and flush when tab away", () => {
     const sw = readRepoFile("site/sw-live-proof.mjs");
-    expect(sw).toMatch(/cachePushHintInState/);
     expect(sw).toMatch(/flushDeferredOsNotifications/);
     expect(sw).toMatch(/flushCachedOsPlans/);
+    expect(sw).toMatch(/createSwStateLock/);
+    expect(sw).toMatch(/withSwStateLock/);
+    expect(sw).toMatch(/reconcileCachedOsPlansForSync/);
     const swCore = readRepoFile("site/js/device-live-control-sw-core.mjs");
     expect(swCore).toMatch(/upsertSwPushHintCache/);
     expect(swCore).toMatch(/upsertCachedOsPlans/);
+    expect(swCore).toMatch(/reconcileCachedOsPlansForSync/);
+    expect(swCore).toMatch(/createSwStateLock/);
     expect(readRepoFile("site/js/device-notification-delivery-core.mjs")).toMatch(
       /buildRelayOfferOsPlan/
+    );
+  });
+
+  it("T1-4b: hide path delivers OS plans before SW poll/flush sync", () => {
+    const browser = readRepoFile("site/js/device-browser-notifications.mjs");
+    expect(browser).toMatch(
+      /probeAndDeliverBackgroundAlerts\(\)\s*\.finally\(\s*\(\)\s*=>\s*\{[\s\S]*scheduleServiceWorkerPollNow/
+    );
+    expect(browser).not.toMatch(
+      /visibilitychange[\s\S]{0,400}probeAndDeliverBackgroundAlerts\(\);\s*scheduleServiceWorkerPollNow/
     );
   });
 

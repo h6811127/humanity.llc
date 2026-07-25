@@ -508,27 +508,27 @@ export function initBrowserNotifications() {
     scheduleAlertProbeSettle();
   });
   window.addEventListener("hc-live-control-inbox-changed", () => {
+    // Hidden-tab SW poll+flush runs at end of runOsDeliveryFromInbox after DELIVER posts.
     void runOsDeliveryFromInbox();
     syncBrowserNotifPrompts();
-    if (document.visibilityState === "hidden") {
-      scheduleServiceWorkerPollNow();
-    }
   });
   window.addEventListener("hc-relay-offer-inbox-changed", () => {
     void runOsDeliveryFromInbox();
     syncBrowserNotifPrompts();
     syncBackgroundAlertPollTimer();
-    if (document.visibilityState === "hidden") {
-      scheduleServiceWorkerPollNow();
-    } else {
+    if (document.visibilityState !== "hidden") {
       void syncLiveProofServiceWorkerState({ pollNow: false });
     }
   });
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "hidden") {
       syncBackgroundAlertPollTimer();
-      void probeAndDeliverBackgroundAlerts();
-      scheduleServiceWorkerPollNow();
+      // Deliver OS plans before SYNC so SW Cache RMW cannot clobber cachedOsPlans.
+      void probeAndDeliverBackgroundAlerts().finally(() => {
+        if (document.visibilityState === "hidden") {
+          scheduleServiceWorkerPollNow();
+        }
+      });
     } else {
       clearBackgroundAlertPollTimer();
       syncBrowserNotifPrompts();
@@ -540,8 +540,9 @@ export function initBrowserNotifications() {
   });
   window.addEventListener("pagehide", () => {
     syncBackgroundAlertPollTimer();
-    void probeAndDeliverBackgroundAlerts();
-    scheduleServiceWorkerPollNow();
+    void probeAndDeliverBackgroundAlerts().finally(() => {
+      scheduleServiceWorkerPollNow();
+    });
   });
   window.addEventListener("hc-resolver-health-changed", (e) => {
     syncBackgroundAlertPollTimer();

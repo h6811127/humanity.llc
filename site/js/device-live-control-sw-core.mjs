@@ -95,6 +95,59 @@ export function upsertCachedOsPlans(cache, plans) {
   return [...map.values()];
 }
 
+/**
+ * Drop stale cached OS plans when page sync reports a new pending signature / relay count.
+ * Prevents resolved live-proof challenges (or cleared relays) from firing later via SW flush.
+ *
+ * @param {import("./device-notification-delivery-core.mjs").OsNotificationPlan[] | null | undefined} cache
+ * @param {{
+ *   enabled?: boolean,
+ *   lastSig?: string,
+ *   relayOfferCount?: number,
+ * }} sync
+ * @returns {import("./device-notification-delivery-core.mjs").OsNotificationPlan[]}
+ */
+export function reconcileCachedOsPlansForSync(cache, sync = {}) {
+  if (sync.enabled === false) return [];
+  const lastSig = typeof sync.lastSig === "string" ? sync.lastSig : "";
+  const relayOfferCount =
+    typeof sync.relayOfferCount === "number" && sync.relayOfferCount >= 0
+      ? sync.relayOfferCount
+      : 0;
+  return (cache ?? []).filter((plan) => {
+    if (!plan?.kind) return false;
+    if (plan.kind === "live_proof") {
+      return Boolean(lastSig) && plan.dedupeKey === lastSig;
+    }
+    if (plan.kind === "relay_offer") {
+      return relayOfferCount > 0;
+    }
+    return true;
+  });
+}
+
+/**
+ * Serialize async Cache API read-modify-write in the live-proof service worker.
+ * Concurrent `message` / sync handlers otherwise clobber `cachedOsPlans` / push hints.
+ *
+ * @returns {(work: () => Promise<unknown> | unknown) => Promise<unknown>}
+ */
+export function createSwStateLock() {
+  /** @type {Promise<unknown>} */
+  let tail = Promise.resolve();
+  return (work) => {
+    const run = tail.then(
+      () => work(),
+      () => work()
+    );
+    tail = run.then(
+      () => undefined,
+      () => undefined
+    );
+    return run;
+  };
+}
+
 /** Minimum periodicSync interval (request budget Phase 4: 5–15 min; use 15). */
 export const SW_PERIODIC_MIN_INTERVAL_MS = 15 * 60 * 1000;
 
