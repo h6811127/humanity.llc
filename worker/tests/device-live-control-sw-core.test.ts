@@ -17,6 +17,8 @@ import {
   pushHintChallengeId,
   upsertSwPushHintCache,
   upsertCachedOsPlans,
+  reconcileCachedOsPlansForSync,
+  createSwStateLock,
   osPlanCacheKey,
 } from "../../site/js/device-live-control-sw-core.mjs";
 import { REFERENCE_FREE_POLICY } from "../../site/js/device-steward-entitlements-core.mjs";
@@ -281,6 +283,82 @@ describe("upsertCachedOsPlans", () => {
     cache = upsertCachedOsPlans(cache, [{ ...relay, dedupeKey: "2", title: "2 messages" }]);
     expect(cache).toHaveLength(2);
     expect(osPlanCacheKey(relay)).toBe("relay_offer:1");
+  });
+});
+
+describe("reconcileCachedOsPlansForSync", () => {
+  const live = {
+    kind: "live_proof",
+    tag: "hc-live-proof",
+    dedupeKey: "prof:ch_1",
+    title: "Live proof",
+    body: "Approve",
+    openInboxOnClick: false,
+    requireInteraction: true,
+  };
+  const relay = {
+    kind: "relay_offer",
+    tag: "hc-relay-offer",
+    dedupeKey: "1",
+    title: "Finder message",
+    body: "Open Humanity",
+    openInboxOnClick: true,
+    requireInteraction: true,
+  };
+
+  it("keeps matching live_proof + active relay plans", () => {
+    const next = reconcileCachedOsPlansForSync([live, relay], {
+      enabled: true,
+      lastSig: "prof:ch_1",
+      relayOfferCount: 1,
+    });
+    expect(next).toHaveLength(2);
+  });
+
+  it("drops resolved live_proof and cleared relay plans", () => {
+    const next = reconcileCachedOsPlansForSync([live, relay], {
+      enabled: true,
+      lastSig: "",
+      relayOfferCount: 0,
+    });
+    expect(next).toEqual([]);
+  });
+
+  it("drops live_proof when signature changes", () => {
+    const next = reconcileCachedOsPlansForSync([live, relay], {
+      enabled: true,
+      lastSig: "prof:ch_2",
+      relayOfferCount: 2,
+    });
+    expect(next).toHaveLength(1);
+    expect(next[0]?.kind).toBe("relay_offer");
+  });
+});
+
+describe("createSwStateLock", () => {
+  it("serializes overlapping read-modify-write work", async () => {
+    const withLock = createSwStateLock();
+    /** @type {number[]} */
+    const order = [];
+    let shared = 0;
+
+    const a = withLock(async () => {
+      const snap = shared;
+      order.push(1);
+      await new Promise((r) => setTimeout(r, 20));
+      shared = snap + 1;
+      order.push(2);
+    });
+    const b = withLock(async () => {
+      const snap = shared;
+      order.push(3);
+      shared = snap + 1;
+      order.push(4);
+    });
+
+    await Promise.all([a, b]);
+    expect(shared).toBe(2);
+    expect(order).toEqual([1, 2, 3, 4]);
   });
 });
 

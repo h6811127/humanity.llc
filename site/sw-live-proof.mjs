@@ -6,10 +6,12 @@ import {
   anyClientVisible,
   buildLiveProofSwNotification,
   buildLiveProofSwNotificationFromPushHint,
+  createSwStateLock,
   pollAllWalletEntriesForLiveProof,
   pollWalletEntriesForLiveProof,
   pruneSwPushHintCache,
   pushHintChallengeId,
+  reconcileCachedOsPlansForSync,
   shouldShowSwLiveProofNotification,
   swLiveProofPollingShouldRun,
   upsertSwPushHintCache,
@@ -23,6 +25,9 @@ import {
   SW_STATE_CACHE_KEY,
   SW_SYNC_TAG,
 } from "./js/device-live-control-sw-core.mjs";
+
+/** Serialize Cache API RMW across concurrent message/sync/push handlers. */
+const withSwStateLock = createSwStateLock();
 import { osPlanToSwNotificationPayload, buildRelayOfferOsPlan } from "./js/device-notification-delivery-core.mjs";
 import {
   HC_SW_OPEN_INBOX,
@@ -80,88 +85,90 @@ async function writeState(state) {
 }
 
 async function pollAndMaybeNotify(opts = {}) {
-  const state = await readState();
-  if (
-    !state?.enabled ||
-    !state.apiOrigin ||
-    !state.pageOrigin ||
-    !swLiveProofPollingShouldRun({
-      enabled: state.enabled,
-      watchLiveProofEnabled: state.watchLiveProofEnabled === true,
-      resolverHealth: state.resolverHealth,
-      stewardPushEntitled: state.stewardPushEntitled === true,
-      stewardPushHealthy: state.stewardPushHealthy === true,
-      forcePoll: opts.forcePoll === true,
-    })
-  ) {
-    return;
-  }
-
-  if (Date.now() < (state.pollBackoffUntil ?? 0)) return;
-
-  const clients = await self.clients.matchAll({
-    type: "window",
-    includeUncontrolled: true,
-  });
-  if (anyClientVisible(clients)) return;
-
-  const pollResult = opts.fullWallet
-    ? await pollAllWalletEntriesForLiveProof(
-        state.entries,
-        state.apiOrigin,
-        undefined,
-        state.pollSlots ?? {},
-        state.roundRobinCursor ?? 0
-      )
-    : await pollWalletEntriesForLiveProof(
-        state.entries,
-        state.apiOrigin,
-        undefined,
-        state.roundRobinCursor ?? 0,
-        state.pollSlots ?? {}
-      );
-
-  const {
-    pending,
-    signature,
-    nextCursor,
-    pollSlots,
-    rateLimited,
-  } = pollResult;
-
-  const nextState = {
-    ...state,
-    roundRobinCursor: nextCursor,
-    pollSlots,
-    pollBackoffUntil: rateLimited
-      ? Date.now() + SW_RATE_LIMIT_BACKOFF_MS
-      : state.pollBackoffUntil ?? 0,
-  };
-
-  if (!shouldShowSwLiveProofNotification(state.lastSig, signature, pending.length)) {
-    if (pending.length === 0 && state.lastSig) {
-      await writeState({ ...nextState, lastSig: "" });
-    } else {
-      await writeState(nextState);
+  return withSwStateLock(async () => {
+    const state = await readState();
+    if (
+      !state?.enabled ||
+      !state.apiOrigin ||
+      !state.pageOrigin ||
+      !swLiveProofPollingShouldRun({
+        enabled: state.enabled,
+        watchLiveProofEnabled: state.watchLiveProofEnabled === true,
+        resolverHealth: state.resolverHealth,
+        stewardPushEntitled: state.stewardPushEntitled === true,
+        stewardPushHealthy: state.stewardPushHealthy === true,
+        forcePoll: opts.forcePoll === true,
+      })
+    ) {
+      return;
     }
-    return;
-  }
 
-  const first = pending[0];
-  const payload = buildLiveProofSwNotification(first, state.pageOrigin);
-  const requireInteraction = !state.interactShown;
+    if (Date.now() < (state.pollBackoffUntil ?? 0)) return;
 
-  await self.registration.showNotification(payload.title, {
-    body: payload.body,
-    tag: SW_NOTIFICATION_TAG,
-    data: { href: payload.href },
-    requireInteraction,
-  });
+    const clients = await self.clients.matchAll({
+      type: "window",
+      includeUncontrolled: true,
+    });
+    if (anyClientVisible(clients)) return;
 
-  await writeState({
-    ...nextState,
-    lastSig: signature,
-    interactShown: state.interactShown || requireInteraction,
+    const pollResult = opts.fullWallet
+      ? await pollAllWalletEntriesForLiveProof(
+          state.entries,
+          state.apiOrigin,
+          undefined,
+          state.pollSlots ?? {},
+          state.roundRobinCursor ?? 0
+        )
+      : await pollWalletEntriesForLiveProof(
+          state.entries,
+          state.apiOrigin,
+          undefined,
+          state.roundRobinCursor ?? 0,
+          state.pollSlots ?? {}
+        );
+
+    const {
+      pending,
+      signature,
+      nextCursor,
+      pollSlots,
+      rateLimited,
+    } = pollResult;
+
+    const nextState = {
+      ...state,
+      roundRobinCursor: nextCursor,
+      pollSlots,
+      pollBackoffUntil: rateLimited
+        ? Date.now() + SW_RATE_LIMIT_BACKOFF_MS
+        : state.pollBackoffUntil ?? 0,
+    };
+
+    if (!shouldShowSwLiveProofNotification(state.lastSig, signature, pending.length)) {
+      if (pending.length === 0 && state.lastSig) {
+        await writeState({ ...nextState, lastSig: "" });
+      } else {
+        await writeState(nextState);
+      }
+      return;
+    }
+
+    const first = pending[0];
+    const payload = buildLiveProofSwNotification(first, state.pageOrigin);
+    const requireInteraction = !state.interactShown;
+
+    await self.registration.showNotification(payload.title, {
+      body: payload.body,
+      tag: SW_NOTIFICATION_TAG,
+      data: { href: payload.href },
+      requireInteraction,
+    });
+
+    await writeState({
+      ...nextState,
+      lastSig: signature,
+      interactShown: state.interactShown || requireInteraction,
+    });
   });
 }
 
@@ -200,29 +207,27 @@ async function showLiveProofNotificationForPushHint(hint, state) {
  * @param {import("./js/device-live-control-sw-core.mjs").SwCachedPushHint} hint
  * @returns {Promise<SwState | null>}
  */
-async function cachePushHintInState(hint) {
-  const state = await readState();
-  if (!state?.enabled) return state;
-  const cachedPushHints = pruneSwPushHintCache(
-    upsertSwPushHintCache(state.cachedPushHints ?? [], hint)
-  );
-  const next = { ...state, cachedPushHints };
-  await writeState(next);
-  return next;
-}
-
 async function notifyFromPushHint(hint) {
-  const state = await cachePushHintInState(hint);
-  if (!state?.enabled || !state.pageOrigin) return;
+  return withSwStateLock(async () => {
+    const state = await readState();
+    if (!state?.enabled) return;
+    const cachedPushHints = pruneSwPushHintCache(
+      upsertSwPushHintCache(state.cachedPushHints ?? [], hint)
+    );
+    let next = { ...state, cachedPushHints };
+    await writeState(next);
 
-  const clients = await self.clients.matchAll({
-    type: "window",
-    includeUncontrolled: true,
+    if (!next.pageOrigin) return;
+
+    const clients = await self.clients.matchAll({
+      type: "window",
+      includeUncontrolled: true,
+    });
+    if (anyClientVisible(clients)) return;
+
+    next = await showLiveProofNotificationForPushHint(hint, next);
+    await writeState(next);
   });
-  if (anyClientVisible(clients)) return;
-
-  const next = await showLiveProofNotificationForPushHint(hint, state);
-  await writeState(next);
 }
 
 /**
@@ -259,28 +264,30 @@ async function notifyFromWebPushEvent(event) {
 }
 
 async function flushCachedPushHints() {
-  const state = await readState();
-  if (!state?.enabled || !state.pageOrigin) return;
+  return withSwStateLock(async () => {
+    const state = await readState();
+    if (!state?.enabled || !state.pageOrigin) return;
 
-  const clients = await self.clients.matchAll({
-    type: "window",
-    includeUncontrolled: true,
-  });
-  if (anyClientVisible(clients)) return;
+    const clients = await self.clients.matchAll({
+      type: "window",
+      includeUncontrolled: true,
+    });
+    if (anyClientVisible(clients)) return;
 
-  const cachedPushHints = pruneSwPushHintCache(state.cachedPushHints ?? []);
-  if (cachedPushHints.length === 0) {
-    if (cachedPushHints.length !== (state.cachedPushHints ?? []).length) {
-      await writeState({ ...state, cachedPushHints });
+    const cachedPushHints = pruneSwPushHintCache(state.cachedPushHints ?? []);
+    if (cachedPushHints.length === 0) {
+      if (cachedPushHints.length !== (state.cachedPushHints ?? []).length) {
+        await writeState({ ...state, cachedPushHints });
+      }
+      return;
     }
-    return;
-  }
 
-  let next = { ...state, cachedPushHints };
-  for (const hint of cachedPushHints) {
-    next = await showLiveProofNotificationForPushHint(hint, next);
-  }
-  await writeState(next);
+    let next = { ...state, cachedPushHints };
+    for (const hint of cachedPushHints) {
+      next = await showLiveProofNotificationForPushHint(hint, next);
+    }
+    await writeState(next);
+  });
 }
 
 /**
@@ -310,33 +317,37 @@ async function showOsPlanIfNeeded(state, plan) {
 }
 
 async function flushCachedOsPlans() {
-  const state = await readState();
-  if (!state?.enabled || !state.pageOrigin) return;
+  return withSwStateLock(async () => {
+    const state = await readState();
+    if (!state?.enabled || !state.pageOrigin) return;
 
-  const clients = await self.clients.matchAll({
-    type: "window",
-    includeUncontrolled: true,
-  });
-  if (anyClientVisible(clients)) return;
+    const clients = await self.clients.matchAll({
+      type: "window",
+      includeUncontrolled: true,
+    });
+    if (anyClientVisible(clients)) return;
 
-  let next = { ...state };
-  for (const plan of next.cachedOsPlans ?? []) {
-    next = await showOsPlanIfNeeded(next, plan);
-  }
+    let next = { ...state };
+    for (const plan of next.cachedOsPlans ?? []) {
+      next = await showOsPlanIfNeeded(next, plan);
+    }
 
-  const relayPlan = buildRelayOfferOsPlan(next.relayOfferCount ?? 0);
-  if (relayPlan) {
-    next = await showOsPlanIfNeeded(next, relayPlan);
-  }
+    const relayPlan = buildRelayOfferOsPlan(next.relayOfferCount ?? 0);
+    if (relayPlan) {
+      next = await showOsPlanIfNeeded(next, relayPlan);
+    }
 
-  if ((next.relayOfferCount ?? 0) <= 0) {
     next = {
       ...next,
-      cachedOsPlans: (next.cachedOsPlans ?? []).filter((plan) => plan.kind !== "relay_offer"),
+      cachedOsPlans: reconcileCachedOsPlansForSync(next.cachedOsPlans ?? [], {
+        enabled: true,
+        lastSig: next.lastSig,
+        relayOfferCount: next.relayOfferCount ?? 0,
+      }),
     };
-  }
 
-  await writeState(next);
+    await writeState(next);
+  });
 }
 
 async function flushDeferredOsNotifications() {
@@ -349,27 +360,31 @@ async function flushDeferredOsNotifications() {
  * @param {string} pageOrigin
  */
 async function deliverOsPlansFromPage(plans, pageOrigin) {
-  const state = await readState();
-  if (!state?.enabled) return;
+  return withSwStateLock(async () => {
+    const state = await readState();
+    if (!state?.enabled) return;
 
-  const incoming = Array.isArray(plans) ? plans.filter((plan) => plan && typeof plan.title === "string") : [];
-  const cachedOsPlans = upsertCachedOsPlans(state.cachedOsPlans ?? [], incoming);
-  let next = { ...state, cachedOsPlans };
+    const incoming = Array.isArray(plans)
+      ? plans.filter((plan) => plan && typeof plan.title === "string")
+      : [];
+    const cachedOsPlans = upsertCachedOsPlans(state.cachedOsPlans ?? [], incoming);
+    let next = { ...state, cachedOsPlans };
 
-  const clients = await self.clients.matchAll({
-    type: "window",
-    includeUncontrolled: true,
-  });
-  if (anyClientVisible(clients)) {
+    const clients = await self.clients.matchAll({
+      type: "window",
+      includeUncontrolled: true,
+    });
+    if (anyClientVisible(clients)) {
+      await writeState(next);
+      return;
+    }
+
+    const origin = pageOrigin || state.pageOrigin;
+    for (const plan of incoming) {
+      next = await showOsPlanIfNeeded({ ...next, pageOrigin: origin }, plan);
+    }
     await writeState(next);
-    return;
-  }
-
-  const origin = pageOrigin || state.pageOrigin;
-  for (const plan of incoming) {
-    next = await showOsPlanIfNeeded({ ...next, pageOrigin: origin }, plan);
-  }
-  await writeState(next);
+  });
 }
 
 self.addEventListener("install", (event) => {
@@ -407,41 +422,50 @@ self.addEventListener("message", (event) => {
 
   event.waitUntil(
     (async () => {
-      const prev = await readState();
-      const enabled = !!msg.enabled;
-      const watchLiveProofEnabled = msg.watchLiveProofEnabled === true;
-      const state = {
-        enabled,
-        watchLiveProofEnabled,
-        apiOrigin: String(msg.apiOrigin || ""),
-        pageOrigin: String(msg.pageOrigin || self.location.origin),
-        entries: Array.isArray(msg.entries) ? msg.entries : [],
-        lastSig: String(msg.lastSig || ""),
-        interactShown: !!msg.interactShown,
-        resolverHealth:
-          msg.resolverHealth === "ok" ||
-          msg.resolverHealth === "degraded" ||
-          msg.resolverHealth === "offline"
-            ? msg.resolverHealth
-            : "offline",
-        roundRobinCursor: enabled ? (prev?.roundRobinCursor ?? 0) : 0,
-        pollSlots: enabled ? (prev?.pollSlots ?? {}) : {},
-        pollBackoffUntil: enabled ? (prev?.pollBackoffUntil ?? 0) : 0,
-        stewardPushEntitled: msg.stewardPushEntitled === true,
-        stewardPushHealthy: msg.stewardPushHealthy === true,
-        lastPushChallengeId: enabled ? (prev?.lastPushChallengeId ?? "") : "",
-        cachedPushHints: enabled
-          ? pruneSwPushHintCache(prev?.cachedPushHints ?? [])
-          : [],
-        cachedOsPlans: enabled ? (prev?.cachedOsPlans ?? []) : [],
-        lastOsDedupeByKind: enabled ? (prev?.lastOsDedupeByKind ?? {}) : {},
-        relayOfferCount:
+      const state = await withSwStateLock(async () => {
+        const prev = await readState();
+        const enabled = !!msg.enabled;
+        const watchLiveProofEnabled = msg.watchLiveProofEnabled === true;
+        const lastSig = String(msg.lastSig || "");
+        const relayOfferCount =
           enabled && typeof msg.relayOfferCount === "number" && msg.relayOfferCount >= 0
             ? msg.relayOfferCount
-            : 0,
-      };
+            : 0;
+        const next = {
+          enabled,
+          watchLiveProofEnabled,
+          apiOrigin: String(msg.apiOrigin || ""),
+          pageOrigin: String(msg.pageOrigin || self.location.origin),
+          entries: Array.isArray(msg.entries) ? msg.entries : [],
+          lastSig,
+          interactShown: !!msg.interactShown,
+          resolverHealth:
+            msg.resolverHealth === "ok" ||
+            msg.resolverHealth === "degraded" ||
+            msg.resolverHealth === "offline"
+              ? msg.resolverHealth
+              : "offline",
+          roundRobinCursor: enabled ? (prev?.roundRobinCursor ?? 0) : 0,
+          pollSlots: enabled ? (prev?.pollSlots ?? {}) : {},
+          pollBackoffUntil: enabled ? (prev?.pollBackoffUntil ?? 0) : 0,
+          stewardPushEntitled: msg.stewardPushEntitled === true,
+          stewardPushHealthy: msg.stewardPushHealthy === true,
+          lastPushChallengeId: enabled ? (prev?.lastPushChallengeId ?? "") : "",
+          cachedPushHints: enabled
+            ? pruneSwPushHintCache(prev?.cachedPushHints ?? [])
+            : [],
+          cachedOsPlans: reconcileCachedOsPlansForSync(prev?.cachedOsPlans ?? [], {
+            enabled,
+            lastSig,
+            relayOfferCount,
+          }),
+          lastOsDedupeByKind: enabled ? (prev?.lastOsDedupeByKind ?? {}) : {},
+          relayOfferCount,
+        };
 
-      await writeState(state);
+        await writeState(next);
+        return next;
+      });
       if (msg.flushPushCache) {
         await flushDeferredOsNotifications();
       }

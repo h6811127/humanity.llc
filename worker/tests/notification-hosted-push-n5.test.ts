@@ -56,7 +56,8 @@ describe("WS-NOTIF N5 hosted push TIF contract", () => {
 
   it("SW caches hosted push hints for OS when tab is not visible", () => {
     const sw = readRepoFile("site/sw-live-proof.mjs");
-    expect(sw).toMatch(/cachePushHintInState/);
+    expect(sw).toMatch(/upsertSwPushHintCache/);
+    expect(sw).toMatch(/withSwStateLock/);
     expect(sw).toMatch(/flushCachedOsPlans/);
     expect(sw).toMatch(/buildRelayOfferOsPlan/);
     const swCore = readRepoFile("site/js/device-live-control-sw-core.mjs");

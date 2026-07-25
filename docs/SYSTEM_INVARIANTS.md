@@ -166,6 +166,9 @@ Read [`NOTIFICATION_SYSTEM_V2.md`](NOTIFICATION_SYSTEM_V2.md) and [`DEVICE_OS_QA
 |-----------|--------|
 | Hidden tab OS | When `document.visibilityState === "hidden"`, **`applyOsNotificationsFromInbox` must not call `new Notification()`** — OS delivery goes through `sw-live-proof.mjs` only. |
 | SW plan bridge | Inbox OS plans (live proof + relay) post to SW via `HC_SW_DELIVER_OS_PLANS`; SW caches and shows when no visible Humanity client. |
+| SW state lock | Concurrent SW `message` / sync / push handlers must serialize Cache API read-modify-write (`createSwStateLock`) so `HC_SW_SYNC_STATE` cannot clobber `cachedOsPlans` / push hints written by DELIVER/PUSH. |
+| Stale SW plans | On SYNC, `reconcileCachedOsPlansForSync` drops `live_proof` plans whose `dedupeKey` ≠ current `lastSig` and drops `relay_offer` when `relayOfferCount <= 0`. |
+| Hide path order | Tab hide / pagehide must finish page OS plan DELIVER (or probe) before posting `pollNow`+`flushPushCache` SYNC — postMessage is still racy, so the SW lock is authoritative. |
 | Push transport | Hosted SSE `live_proof.pending` is **transport only** — cache hint in SW; flush on tab hide / periodic sync; do not bypass inbox gather on the page. |
 | SW poll modes | `pollNow` on hide uses **full-wallet** live-proof probe; `periodicSync` / background sync stay **round-robin** (request budget). |
 | Relay in SW | Relay OS uses cached inbox plans + synced `relayOfferCount`; SW cannot sign relay API polls — page probe remains source of truth. |
