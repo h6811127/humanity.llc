@@ -1,6 +1,8 @@
+import * as ed from "@noble/ed25519";
 import { describe, expect, it } from "vitest";
 
 import {
+  encodeBase58,
   getTestKeypair,
   PAYLOAD_TYPES,
   signDocument,
@@ -10,9 +12,16 @@ import { buildScanViewModel } from "../src/resolver/scan-state";
 import { renderScanPage } from "../src/resolver/scan-html";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
+const OTHER_PROFILE = "cuAPt5nFYr8VCCWgPbAAupBS";
 const CREATED = "2026-05-16T17:00:00.000Z";
 const OLD_QR = "qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5eF";
 const NEW_QR = "qr_8Yk9nQ3oR5sU7wX9zA2bC3dE6fG";
+
+async function randomKeypair() {
+  const privateKey = ed.utils.randomPrivateKey();
+  const publicKey = await ed.getPublicKeyAsync(privateKey);
+  return { privateKey, publicKeyBase58: encodeBase58(publicKey) };
+}
 
 function rotationMockDb(existing: {
   public_key: string;
@@ -92,18 +101,33 @@ function rotationMockDb(existing: {
 
 async function signedRotationPair(
   publicKeyBase58: string,
-  privateKey: Uint8Array
+  privateKey: Uint8Array,
+  opts: {
+    qrId?: string;
+    epoch?: number;
+    qrProfileId?: string;
+    cardPublicKey?: string;
+    scope?: string;
+    qrStatus?: string;
+    nonce?: string;
+  } = {}
 ) {
+  const qrId = opts.qrId ?? NEW_QR;
+  const epoch = opts.epoch ?? 2;
+  const qrProfileId = opts.qrProfileId ?? PROFILE;
+  const cardPublicKey = opts.cardPublicKey ?? publicKeyBase58;
+  const scope = opts.scope ?? "card";
+  const qrStatus = opts.qrStatus ?? "active";
   const updatedAt = "2026-05-18T10:00:00.000Z";
   const issuedAt = updatedAt;
-  const payload = `https://humanity.llc/c/${PROFILE}?q=${NEW_QR}`;
+  const payload = `https://humanity.llc/c/${qrProfileId}?q=${qrId}`;
   const expiresAt = "2027-05-18T10:00:00.000Z";
 
   const card = await signDocument(
     withProtocolFields(
       {
         profile_id: PROFILE,
-        public_key: publicKeyBase58,
+        public_key: cardPublicKey,
         handle: "river_example",
         manifesto_line: "Open studio",
         created_at: CREATED,
@@ -118,7 +142,7 @@ async function signedRotationPair(
           latest_accepted_vouch_at: null,
         },
         badges: [],
-        qr: { active_qr_id: NEW_QR, epoch: 2 },
+        qr: { active_qr_id: qrId, epoch },
         links: { standards: "https://humanity.llc/standards/v1" },
       },
       PAYLOAD_TYPES.HUMANITY_CARD
@@ -129,15 +153,15 @@ async function signedRotationPair(
   const qr_credential = await signDocument(
     withProtocolFields(
       {
-        qr_id: NEW_QR,
-        profile_id: PROFILE,
-        nonce: "nonce_testRotation1A",
-        epoch: 2,
-        scope: "card",
+        qr_id: qrId,
+        profile_id: qrProfileId,
+        nonce: opts.nonce ?? "nonce_testRotation1A",
+        epoch,
+        scope,
         resolver_hint: "https://humanity.llc",
         issued_at: issuedAt,
         expires_at: expiresAt,
-        status: "active",
+        status: qrStatus,
         payload,
       },
       PAYLOAD_TYPES.QR_CREDENTIAL
@@ -277,6 +301,172 @@ describe("handlePostRotateQr", () => {
     expect(res.status).toBe(410);
     const json = (await res.json()) as { error: string };
     expect(json.error).toBe("CARD_SUSPENDED");
+  });
+
+  it("rejects rotation when card is revoked", async () => {
+    const { handlePostRotateQr } = await import("../src/resolver/rotate-qr");
+    const { privateKey, publicKeyBase58 } = await getTestKeypair();
+    const { card, qr_credential } = await signedRotationPair(publicKeyBase58, privateKey);
+
+    const db = rotationMockDb({
+      public_key: publicKeyBase58,
+      status: "revoked",
+      activeQr: { qr_id: OLD_QR, epoch: 1 },
+    });
+
+    const res = await handlePostRotateQr(
+      new Request(`https://humanity.llc/.well-known/hc/v1/cards/${PROFILE}/qr`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ card, qr_credential }),
+      }),
+      db,
+      PROFILE
+    );
+    expect(res.status).toBe(410);
+    const json = (await res.json()) as { error: string };
+    expect(json.error).toBe("CARD_REVOKED");
+  });
+
+  it("rejects rotation signed by an unrelated key", async () => {
+    const { handlePostRotateQr } = await import("../src/resolver/rotate-qr");
+    const owner = await getTestKeypair();
+    const stranger = await randomKeypair();
+    const { card, qr_credential } = await signedRotationPair(
+      stranger.publicKeyBase58,
+      stranger.privateKey
+    );
+
+    const db = rotationMockDb({
+      public_key: owner.publicKeyBase58,
+      activeQr: { qr_id: OLD_QR, epoch: 1 },
+    });
+
+    const res = await handlePostRotateQr(
+      new Request(`https://humanity.llc/.well-known/hc/v1/cards/${PROFILE}/qr`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ card, qr_credential }),
+      }),
+      db,
+      PROFILE
+    );
+    expect(res.status).toBe(401);
+    const json = (await res.json()) as { error: string };
+    expect(json.error).toBe("CARD_INVALID_SIGNATURE");
+  });
+
+  it("rejects recovery-signed rotation that replaces the stored public_key", async () => {
+    const { handlePostRotateQr } = await import("../src/resolver/rotate-qr");
+    const owner = await getTestKeypair();
+    const recovery = await randomKeypair();
+    // Recovery may sign, but card.public_key must remain the owner key.
+    const { card, qr_credential } = await signedRotationPair(
+      recovery.publicKeyBase58,
+      recovery.privateKey
+    );
+
+    const db = rotationMockDb({
+      public_key: owner.publicKeyBase58,
+      recovery_public_key: recovery.publicKeyBase58,
+      activeQr: { qr_id: OLD_QR, epoch: 1 },
+    });
+
+    const res = await handlePostRotateQr(
+      new Request(`https://humanity.llc/.well-known/hc/v1/cards/${PROFILE}/qr`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ card, qr_credential }),
+      }),
+      db,
+      PROFILE
+    );
+    expect(res.status).toBe(422);
+    const json = (await res.json()) as { error: string; message?: string };
+    expect(json.error).toBe("MALFORMED_REQUEST");
+    expect(json.message ?? "").toMatch(/public_key cannot change/i);
+  });
+
+  it("rejects QR credential profile mismatch", async () => {
+    const { handlePostRotateQr } = await import("../src/resolver/rotate-qr");
+    const { privateKey, publicKeyBase58 } = await getTestKeypair();
+    const { card, qr_credential } = await signedRotationPair(publicKeyBase58, privateKey, {
+      qrProfileId: OTHER_PROFILE,
+      nonce: "nonce_testRotationProf",
+    });
+
+    const db = rotationMockDb({
+      public_key: publicKeyBase58,
+      activeQr: { qr_id: OLD_QR, epoch: 1 },
+    });
+
+    const res = await handlePostRotateQr(
+      new Request(`https://humanity.llc/.well-known/hc/v1/cards/${PROFILE}/qr`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ card, qr_credential }),
+      }),
+      db,
+      PROFILE
+    );
+    expect(res.status).toBe(422);
+    const json = (await res.json()) as { error: string };
+    expect(json.error).toBe("PROFILE_MISMATCH");
+  });
+
+  it("rejects rotation when the QR is already the active card QR", async () => {
+    const { handlePostRotateQr } = await import("../src/resolver/rotate-qr");
+    const { privateKey, publicKeyBase58 } = await getTestKeypair();
+    const { card, qr_credential } = await signedRotationPair(publicKeyBase58, privateKey, {
+      qrId: OLD_QR,
+      epoch: 2,
+      nonce: "nonce_testRotationSame",
+    });
+
+    const db = rotationMockDb({
+      public_key: publicKeyBase58,
+      activeQr: { qr_id: OLD_QR, epoch: 1 },
+    });
+
+    const res = await handlePostRotateQr(
+      new Request(`https://humanity.llc/.well-known/hc/v1/cards/${PROFILE}/qr`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ card, qr_credential }),
+      }),
+      db,
+      PROFILE
+    );
+    expect(res.status).toBe(409);
+    const json = (await res.json()) as { error: string };
+    expect(json.error).toBe("ALREADY_ACTIVE");
+  });
+
+  it("rejects rotated QR credentials that are not card-scoped", async () => {
+    const { handlePostRotateQr } = await import("../src/resolver/rotate-qr");
+    const { privateKey, publicKeyBase58 } = await getTestKeypair();
+    const { card, qr_credential } = await signedRotationPair(publicKeyBase58, privateKey, {
+      scope: "child_object",
+      nonce: "nonce_testRotationScope",
+    });
+
+    const db = rotationMockDb({
+      public_key: publicKeyBase58,
+      activeQr: { qr_id: OLD_QR, epoch: 1 },
+    });
+
+    const res = await handlePostRotateQr(
+      new Request(`https://humanity.llc/.well-known/hc/v1/cards/${PROFILE}/qr`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ card, qr_credential }),
+      }),
+      db,
+      PROFILE
+    );
+    expect(res.status).toBe(422);
+    const json = (await res.json()) as { error: string };
+    expect(json.error).toBe("INVALID_QR_SCOPE");
   });
 });
 
