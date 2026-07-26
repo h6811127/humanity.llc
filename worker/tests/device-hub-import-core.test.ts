@@ -80,4 +80,30 @@ describe("mergeBackupIntoWallet", () => {
     expect(entry.custody_mode).toBe("full_keys");
     expect(entry.device_unlock_reenroll_pending).toBeUndefined();
   });
+
+  it("keeps K11 re-enroll pending when backup follows recovery (wrap already stripped)", () => {
+    const entries = [
+      {
+        profile_id: PROFILE,
+        custody_mode: "device_unlock",
+        device_unlock_reenroll_pending: true,
+        recovery_private_key_b58: "recovery",
+      },
+    ];
+    const { entry } = mergeBackupIntoWallet(
+      entries,
+      {
+        profileId: PROFILE,
+        publicKeyBase58: "newPub",
+        privateKeyBase58: "newPriv",
+      },
+      `https://humanity.llc/c/${PROFILE}`,
+      IMPORTED_AT
+    );
+    expect(entry.owner_private_key_b58).toBe("newPriv");
+    expect(entry.recovery_private_key_b58).toBe("recovery");
+    expect(entry.custody_mode).toBe("device_unlock");
+    expect(entry.device_unlock_reenroll_pending).toBe(true);
+    expect(entry.wrapped_owner_key).toBeUndefined();
+  });
 });

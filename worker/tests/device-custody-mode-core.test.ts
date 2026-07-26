@@ -10,6 +10,7 @@ import {
   shouldDefaultDeviceUnlockAtCreate,
   soleSavedEntryNeedsDeviceUnlock,
   soleSavedEntryNeedsDeviceUnlockReenroll,
+  shouldStripPrivateKeysForDeviceUnlockWallet,
   stripPrivateKeysForDeviceUnlockWallet,
   walletEntryCountsAsSigning,
   walletEntryNeedsDeviceUnlock,
@@ -61,6 +62,23 @@ describe("device-custody-mode-core", () => {
     expect(stripped.recovery_private_key_b58).toBeUndefined();
     expect(stripped.custody_mode).toBe(CUSTODY_MODE_DEVICE_UNLOCK);
     expect(stripped.has_signing_key).toBe(true);
+  });
+
+  it("strips plaintext only when a usable device_unlock wrap exists (K11)", () => {
+    expect(
+      shouldStripPrivateKeysForDeviceUnlockWallet({
+        custody_mode: CUSTODY_MODE_DEVICE_UNLOCK,
+        wrapped_owner_key: wrap,
+      })
+    ).toBe(true);
+    expect(
+      shouldStripPrivateKeysForDeviceUnlockWallet({
+        custody_mode: CUSTODY_MODE_DEVICE_UNLOCK,
+        device_unlock_reenroll_pending: true,
+        owner_private_key_b58: "owner-from-backup",
+        recovery_private_key_b58: "recovery",
+      })
+    ).toBe(false);
   });
 
   it("detects sole device_unlock card for unlock copy", () => {

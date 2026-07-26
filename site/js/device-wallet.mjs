@@ -20,6 +20,7 @@ import { classifyWalletStorageRaw } from "./device-wallet-parse-core.mjs";
 import {
   CUSTODY_MODE_DEVICE_UNLOCK,
   resolveEntryCustodyMode,
+  shouldStripPrivateKeysForDeviceUnlockWallet,
   stripPrivateKeysForDeviceUnlockWallet,
 } from "./device-custody-mode-core.mjs";
 import { walletEntryHasSigningMaterial } from "./device-tab-session-core.mjs";
@@ -800,7 +801,10 @@ export function mergeWalletEntryFromSession(existing, session, label = "") {
     saved_at: new Date().toISOString(),
   };
   const withSeatbelt = mergeOwnershipSeatbeltFields(merged, session);
-  if (resolveEntryCustodyMode(existing) === CUSTODY_MODE_DEVICE_UNLOCK) {
+  if (
+    resolveEntryCustodyMode(existing) === CUSTODY_MODE_DEVICE_UNLOCK &&
+    shouldStripPrivateKeysForDeviceUnlockWallet(existing)
+  ) {
     return stripPrivateKeysForDeviceUnlockWallet(withSeatbelt);
   }
   return withSeatbelt;

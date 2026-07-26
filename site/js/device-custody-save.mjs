@@ -6,7 +6,6 @@ import {
   CUSTODY_MODE_DEVICE_UNLOCK,
   resolveEntryCustodyMode,
   shouldDefaultDeviceUnlockAtCreate,
-  stripPrivateKeysForDeviceUnlockWallet,
 } from "./device-custody-mode-core.mjs";
 import { saveSessionToWalletDeviceUnlock } from "./device-custody-enroll.mjs";
 import { isDeviceUnlockWebAuthnAvailable } from "./device-custody-webauthn-core.mjs";
@@ -37,9 +36,9 @@ export async function saveSessionToWalletWithCustody(session, label = "", opts =
     if (!profileId || !session?.owner_public_key_b58) {
       return { error: "Ownership not loaded in this tab." };
     }
-    const merged = stripPrivateKeysForDeviceUnlockWallet(
-      mergeWalletEntryFromSession(existing, session, label)
-    );
+    // mergeWalletEntryFromSession strips plaintext only when a usable wrap exists.
+    // K11 pending rows (no wrap) must retain backup/recovery keys for re-enroll.
+    const merged = mergeWalletEntryFromSession(existing, session, label);
     return persistWalletEntry(merged);
   }
 
