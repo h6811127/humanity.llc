@@ -3,7 +3,9 @@
 **Purpose:** Single reference for parallel agents and humans — active work, regression gates, file ownership.  
 **Also read:** [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) (rules that must stay true) · [`DOC_MAINTENANCE.md`](DOC_MAINTENANCE.md) (doc policy)
 
-**Last updated:** 2026-06-21
+**Last updated:** 2026-07-26
+
+**Changelog (2026-07-26):** **WS-DISCOVER-P5a–b shipped** — places-first `/` (`#landing-places` pin strip + Sort near me on device) · **Boards & seasons** secondary · `geolocation=(self)` on `/` · contract v12 · [`DISCOVERY_PROJECTION.md`](DISCOVERY_PROJECTION.md) § P5 · `npm run verify:landing`.
 
 **Changelog (2026-06-21):** **Landing live object carriers shipped** — `#landing-live-object-carriers` on `/` after public boards · hydrates from `shop-config.json` + print catalog / store rows · [`landing-live-object-carriers-core.mjs`](../site/js/landing-live-object-carriers-core.mjs) · contract v7+ · `npm run verify:landing` · e2e `landing-copy.spec.ts`.
 

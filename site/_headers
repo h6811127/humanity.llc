@@ -4,6 +4,9 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(self), microphone=(), geolocation=()
 
+/
+  Permissions-Policy: camera=(self), microphone=(), geolocation=(self)
+
 /discover/*
   Permissions-Policy: camera=(), microphone=(), geolocation=(self)
 

@@ -236,6 +236,93 @@
   margin: 0 0 12px;
 }
 
+.landing-places {
+  margin-top: 4px;
+}
+
+.landing-places-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.landing-places-header .group-label {
+  margin: 0;
+}
+
+.landing-places-near-me-btn {
+  appearance: none;
+  -webkit-appearance: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.25;
+  padding: 7px 12px;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.92);
+  color: rgba(0, 0, 0, 0.82);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.landing-places-near-me-btn--active,
+.landing-places-near-me-btn[aria-pressed="true"] {
+  border-color: var(--red);
+  background: var(--red);
+  color: var(--white);
+}
+
+.landing-places-near-me-status {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--text-muted, rgba(0, 0, 0, 0.62));
+  min-height: 1.2em;
+}
+
+.landing-places-privacy {
+  margin: 6px 0 8px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--text-muted, rgba(0, 0, 0, 0.62));
+}
+
+.landing-places-lead {
+  margin: 8px 0 12px;
+}
+
+.landing-places-results {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.landing-places-more {
+  margin: 4px 0 0;
+}
+
+.landing-places-loading,
+.landing-places-empty {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-muted, rgba(0, 0, 0, 0.62));
+}
+
+html[data-theme="dark"] .landing-places-near-me-btn {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.88);
+}
+
+html[data-theme="dark"] .landing-places-near-me-btn--active,
+html[data-theme="dark"] .landing-places-near-me-btn[aria-pressed="true"] {
+  border-color: var(--red);
+  background: var(--red);
+  color: var(--white);
+}
+
 html[data-theme="dark"] .landing-entry-shelf {
   border-color: rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.04);

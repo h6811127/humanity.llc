@@ -1,8 +1,9 @@
 # Discovery projection
 
-**Status:** Strategic spec — discovery plane · **P0 shipped** (WS-DISCOVER-P0) · **P1 shipped** · **P2 shipped** (browse row state + pin detail snapshot) · **P3 shipped** (region hub + network filter + multi-object primary) · belt: `npm run verify:discover`  
+**Status:** Strategic spec — discovery plane · **P0–P4 shipped** · **P5a–b shipped** (places-first `/` + near-me on `/`) · **P5c target** · belt: `npm run verify:discover` · `npm run verify:landing`  
 **Audience:** Product, frontend, operators, agents  
-**Scope:** Public browse, near-me planning, board map lenses — **no resolver, scan, or network-graph changes**
+**Scope:** Public browse, near-me planning, board map lenses — **no resolver, scan, or network-graph changes**  
+**Last updated:** 2026-07-26 — **WS-DISCOVER-P5a–b** homepage places strip + client near-me
 
 **Parent stack:** [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) (resolver L1–L5) · [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) · [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md)  
 **Related:** [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) · [`V1_IMPLEMENTATION_CONTRACTS.md`](V1_IMPLEMENTATION_CONTRACTS.md) (public search deferred in v1 slice) · [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md)
@@ -372,13 +373,12 @@ Discovery plane targets the second without changing resolver cardinality.
 | Gate | Owner | Check |
 |------|-------|-------|
 | Pin index shape | CI | `assertDiscoveryPinPrivacyShape()` on every pin — no visit/player/scan fields; `geo` steward-published only ([`discovery-pin-projection-core.test.ts`](../worker/tests/discovery-pin-projection-core.test.ts)) |
-| Geolocation scope | `_headers` | `geolocation=(self)` only on `/discover/*` — not on `/play/*` map lens |
-| Near-me copy | Browse UI | `DISCOVERY_NEAR_ME_PRIVACY_COPY` visible on `/discover/{region}/` |
+| Geolocation scope | `_headers` | `geolocation=(self)` on `/` (landing near-me) and `/discover/*` — not on `/play/*` map lens |
+| Near-me copy | Browse + landing UI | `DISCOVERY_NEAR_ME_PRIVACY_COPY` visible on `/discover/{region}/` and `#landing-places-privacy` on `/` |
 | Client-only sort | Browse JS | Near-me uses `navigator.geolocation` in client only — no coords sent for ranking |
 | Map lens honesty | Map board | Network lens sketch does **not** request geolocation ([`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) § Discovery cross-links) |
 | Share URL splats | Rebuild | `npm run discover:rebuild-pins -- --check` verifies `_redirects` per-region pin splats |
 
-**Human sign-off (before external near-me marketing):** confirm browse + map cross-links on production; deny location on map page; allow on discover browse only.
 
 **WS-DISCOVER-P1-4 (☑ shipped):** Network lens ↔ discovery cross-links — [`discovery-map-crosslink-core.mjs`](../site/js/discovery-map-crosslink-core.mjs). City board place list shows **Browse places near me** → `/discover/{region}/`; pin rows + selection panel link **Discovery pin** → `/discover/{region}/pin/{pin_id}/` when pin lens members carry `pin_id`. Map page footnote + [`city-game-map-board-core.mjs`](../site/js/city-game-map-board-core.mjs) · [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) § Discovery cross-links. Tests: [`discovery-map-crosslink-core.test.ts`](../worker/tests/discovery-map-crosslink-core.test.ts).
 
@@ -394,7 +394,23 @@ Discovery plane targets the second without changing resolver cardinality.
 
 **WS-DISCOVER-P3-3 (☑ shipped):** Multi-object pin detail — primary-object selection policy ([§ Primary-object selection policy](#primary-object-selection-policy)) in [`discovery-primary-object-core.mjs`](../site/js/discovery-primary-object-core.mjs); object chooser on ambiguous pins; standalone `scan_url` unchanged. Tests: [`discovery-primary-object-core.test.ts`](../worker/tests/discovery-primary-object-core.test.ts).
 
+**Human sign-off (before external near-me marketing):** confirm browse + map cross-links on production; deny location on map page; allow on discover browse and landing places strip.
+
 **WS-DISCOVER-P3 belt (☑ shipped):** `npm run verify:discover` scope extended to P3 modules above · `npm run verify:discover -- --e2e` includes hub + network filter smoke.
+
+### WS-DISCOVER-P5 — places-first landing composition
+
+**Status:** **P5a–b ☑ shipped** · **P5c ☐ target**. Closes the gap between discovery-first copy (“what’s true near me?”) and a boards-primary homepage. **No** new signed documents, scan routes, or network-graph changes.
+
+**Gap (pre-P5a):** `/` listed **networks**; **places (pins)** and client-side **Sort near me** lived only on `/discover/{region}/`.
+
+| Slice | Goal | Status |
+|-------|------|--------|
+| **P5a** | Places-first composition on `/` | **☑ shipped** — `#landing-places` pin strip; shelves filter pins by facet; **Boards & seasons** secondary · [`landing-places-core.mjs`](../site/js/landing-places-core.mjs) · [`landing-places.mjs`](../site/js/landing-places.mjs) · [`public-networks-portal.mjs`](../site/js/public-networks-portal.mjs) (places mount only when `#landing-places-results` exists) |
+| **P5b** | Honest near-me on `/` | **☑ shipped** — `geolocation=(self)` on `/` in [`site/_headers`](../site/_headers); `#landing-places-near-me` button; client sort via [`requestDiscoveryClientCoords()`](../site/js/discovery-near-me-core.mjs) + [`sortDiscoveryPinsByNearMe()`](../site/js/discovery-near-me-core.mjs); required privacy copy on `#landing-places-privacy` |
+| **P5c** | Multi-region places-first | **☐ target** — region picker / default region beyond Cedar Rapids pilot |
+
+**Regression:** `npm run verify:landing` (contract v12+) · [`landing-places-core.test.ts`](../worker/tests/landing-places-core.test.ts) · [`e2e/landing-copy.spec.ts`](../e2e/landing-copy.spec.ts).
 
 ---
 

@@ -33,10 +33,14 @@ describe("landing messaging (Step 3)", () => {
     expect(html).toContain("Live now");
     expect(html).toContain("Open or paused");
     expect(html).toContain("Return, relay, hours");
-    expect(html).toContain("Search live places and boards");
-    expect(html).toContain("Public live boards");
+    expect(html).toContain("Search places and boards");
+    expect(html).toContain("Places near me");
+    expect(html).toContain("Boards &amp; seasons");
+    expect(html).toContain('id="landing-places"');
     expect(html).toContain('id="public-networks-search"');
     expect(html).toContain('id="public-networks-results"');
+    expect(html).not.toContain("Public live boards");
+    expect(html).not.toContain("Search live places and boards");
     expect(html).toContain('id="landing-live-object-carriers"');
     expect(html).toContain("Live object carriers");
     expect(html).toContain('href="/shop/"');
@@ -57,8 +61,8 @@ describe("landing messaging (Step 3)", () => {
 
   it("landing loads public networks portal script and styles", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
-    expect(html).toContain("public-networks-portal.css?v=9");
-    expect(html).toContain("public-networks-portal.mjs?v=10");
+    expect(html).toContain("public-networks-portal.css?v=11");
+    expect(html).toContain("public-networks-portal.mjs?v=12");
     expect(html).not.toContain("landing-showcase.mjs");
   });
 

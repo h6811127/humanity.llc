@@ -11,6 +11,13 @@ describe("site/_headers", () => {
     expect(globalBlock).not.toMatch(/camera=\(\)/);
   });
 
+  it("allows geolocation on home dashboard for landing near-me sort", () => {
+    const headers = readFileSync(join(process.cwd(), "site/_headers"), "utf8");
+    expect(headers).toMatch(
+      /^\/\n\s+Permissions-Policy:[^\n]*geolocation=\(self\)/m
+    );
+  });
+
   it("denies camera on discover browse (near-me uses geolocation only)", () => {
     const headers = readFileSync(join(process.cwd(), "site/_headers"), "utf8");
     expect(headers).toMatch(
