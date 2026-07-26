@@ -96,6 +96,59 @@ describe("mergeWalletEntryFromSession", () => {
     expect(merged.recovery_key_acknowledged).toBe(true);
     expect(merged.key_backup_exported_at).toBe("2026-05-28T12:00:00.000Z");
   });
+
+  it("strips plaintext for wrapped device_unlock rows on sync", () => {
+    const existing = {
+      profile_id: "p1",
+      custody_mode: "device_unlock",
+      wrapped_owner_key: {
+        version: 1,
+        credential_id: "cred",
+        prf_salt: "salt",
+        iv: "iv",
+        ciphertext: "cipher",
+      },
+      recovery_private_key_b58: "recovery",
+    };
+    const session = {
+      profile_id: "p1",
+      owner_public_key_b58: "pub",
+      owner_private_key_b58: "owner-unlocked",
+      recovery_private_key_b58: "recovery",
+    };
+    const merged = mergeWalletEntryFromSession(existing, session);
+    expect(merged.owner_private_key_b58).toBeUndefined();
+    expect(merged.recovery_private_key_b58).toBeUndefined();
+    expect(merged.wrapped_owner_key).toEqual(existing.wrapped_owner_key);
+    expect(merged.custody_mode).toBe("device_unlock");
+  });
+
+  it("keeps backup/recovery plaintext while device_unlock re-enroll is pending (K11)", () => {
+    const existing = {
+      profile_id: "p1",
+      custody_mode: "device_unlock",
+      device_unlock_reenroll_pending: true,
+      owner_public_key_b58: "pub",
+      owner_private_key_b58: "owner-from-backup",
+      recovery_private_key_b58: "recovery",
+    };
+    const session = {
+      profile_id: "p1",
+      owner_public_key_b58: "pub",
+      owner_private_key_b58: "owner-from-backup",
+      recovery_private_key_b58: "recovery",
+      verification: { state: "verified_human", label: "Vouched Human" },
+    };
+    const merged = mergeWalletEntryFromSession(existing, session);
+    expect(merged.owner_private_key_b58).toBe("owner-from-backup");
+    expect(merged.recovery_private_key_b58).toBe("recovery");
+    expect(merged.device_unlock_reenroll_pending).toBe(true);
+    expect(merged.custody_mode).toBe("device_unlock");
+    expect(merged.verification).toEqual({
+      state: "verified_human",
+      label: "Vouched Human",
+    });
+  });
 });
 
 describe("loadWalletSummary", () => {

@@ -98,7 +98,18 @@ export function shouldDefaultDeviceUnlockAtCreate(input) {
 }
 
 /**
+ * Only strip plaintext when a usable wrap can restore the owner key.
+ * K11 re-enroll-pending rows (no wrap after recovery import) must keep
+ * backup/recovery plaintext until Face ID re-enroll wraps again.
+ * @param {Record<string, unknown> | null | undefined} entry
+ */
+export function shouldStripPrivateKeysForDeviceUnlockWallet(entry) {
+  return entryHasDeviceUnlockWrap(entry);
+}
+
+/**
  * Strip private key material before persisting device_unlock wallet rows.
+ * Callers must gate with {@link shouldStripPrivateKeysForDeviceUnlockWallet}.
  * @param {Record<string, unknown>} entry
  */
 export function stripPrivateKeysForDeviceUnlockWallet(entry) {
