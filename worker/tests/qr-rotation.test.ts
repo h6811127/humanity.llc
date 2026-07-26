@@ -1,6 +1,8 @@
+import * as ed from "@noble/ed25519";
 import { describe, expect, it } from "vitest";
 
 import {
+  encodeBase58,
   getTestKeypair,
   PAYLOAD_TYPES,
   signDocument,
@@ -10,9 +12,16 @@ import { buildScanViewModel } from "../src/resolver/scan-state";
 import { renderScanPage } from "../src/resolver/scan-html";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
+const OTHER_PROFILE = "cuAPt5nFYr8VCCWgPbAAupBS";
 const CREATED = "2026-05-16T17:00:00.000Z";
 const OLD_QR = "qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5eF";
 const NEW_QR = "qr_8Yk9nQ3oR5sU7wX9zA2bC3dE6fG";
+
+async function randomKeypair() {
+  const privateKey = ed.utils.randomPrivateKey();
+  const publicKey = await ed.getPublicKeyAsync(privateKey);
+  return { privateKey, publicKeyBase58: encodeBase58(publicKey) };
+}
 
 function rotationMockDb(existing: {
   public_key: string;
@@ -322,7 +331,7 @@ describe("handlePostRotateQr", () => {
   it("rejects rotation signed by an unrelated key", async () => {
     const { handlePostRotateQr } = await import("../src/resolver/rotate-qr");
     const owner = await getTestKeypair();
-    const stranger = await getTestKeypair();
+    const stranger = await randomKeypair();
     const { card, qr_credential } = await signedRotationPair(
       stranger.publicKeyBase58,
       stranger.privateKey
@@ -344,21 +353,22 @@ describe("handlePostRotateQr", () => {
     );
     expect(res.status).toBe(401);
     const json = (await res.json()) as { error: string };
-    expect(json.error).toBe("INVALID_SIGNATURE");
+    expect(json.error).toBe("CARD_INVALID_SIGNATURE");
   });
 
-  it("rejects rotation that changes the stored public_key", async () => {
+  it("rejects recovery-signed rotation that replaces the stored public_key", async () => {
     const { handlePostRotateQr } = await import("../src/resolver/rotate-qr");
     const owner = await getTestKeypair();
-    const replacement = await getTestKeypair();
+    const recovery = await randomKeypair();
+    // Recovery may sign, but card.public_key must remain the owner key.
     const { card, qr_credential } = await signedRotationPair(
-      owner.publicKeyBase58,
-      owner.privateKey,
-      { cardPublicKey: replacement.publicKeyBase58 }
+      recovery.publicKeyBase58,
+      recovery.privateKey
     );
 
     const db = rotationMockDb({
       public_key: owner.publicKeyBase58,
+      recovery_public_key: recovery.publicKeyBase58,
       activeQr: { qr_id: OLD_QR, epoch: 1 },
     });
 
@@ -380,9 +390,8 @@ describe("handlePostRotateQr", () => {
   it("rejects QR credential profile mismatch", async () => {
     const { handlePostRotateQr } = await import("../src/resolver/rotate-qr");
     const { privateKey, publicKeyBase58 } = await getTestKeypair();
-    const otherProfile = "8Yl0nQ3oR5sU7wX9zA2bC4dE6";
     const { card, qr_credential } = await signedRotationPair(publicKeyBase58, privateKey, {
-      qrProfileId: otherProfile,
+      qrProfileId: OTHER_PROFILE,
       nonce: "nonce_testRotationProf",
     });
 
