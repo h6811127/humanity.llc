@@ -5,7 +5,7 @@
 **Parent:** `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` · `docs/STATUS_PLATE_PILOT.md`  
 **Language policy:** [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md)  
 **Object model (protocol):** [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md)  
-**Last updated:** 2026-06-21 — Discovery-first landing + shipped **`#landing-live-object-carriers`** ([`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) § Landing carriers row)
+**Last updated:** 2026-07-26 — Front door **P5a–b shipped:** places-first `/` + landing near-me · **P5c** multi-region still target
 
 ---
 
@@ -25,7 +25,7 @@
 
 ## Front door strategy (June 2026)
 
-**Decision (shipped):** **Discovery-first landing** — `/` is a **live boards dashboard** (no marketing landing). Strangers browse public truth; stewards use create/shop from secondary rows. **Option B (shipped):** top-nav **Create** → steward chooser (deploy + wear), not a protocol form.
+**Decision (shipped):** **Discovery-first landing** — `/` is a **places + boards utility dashboard** (no marketing landing). Primary strip: **Places near me** (DiscoveryPins); **Boards & seasons** secondary. Strangers browse public truth; stewards use create/shop from secondary rows. **Option B (shipped):** top-nav **Create** → steward chooser (deploy + wear), not a protocol form.
 
 **Decision (shipped):** **`#landing-live-object-carriers`** — one static **Live object carriers** row after public boards, hydrating from `shop-config.json` + store catalog when Worker is reachable. Links to `/shop/`; replaces retired **`#launch-doors`**. **Not** a carousel — revisit swipe UI only when ≥5 distinct carriers with photography.
 
@@ -33,7 +33,7 @@
 
 | Job | User question | Primary entry on `/` | Protocol (unchanged) |
 |-----|---------------|----------------------|----------------------|
-| **Activate a place** | “What's happening / what's true near me?” | Shelves + **Public live boards** + [**Browse places**](/discover/cedar-rapids-iowa/) near-me pins ([`DISCOVERY_PROJECTION.md`](DISCOVERY_PROJECTION.md)) | `game_node` + Layer 5 · boards link to `/play/` |
+| **Activate a place** | “What's happening / what's true near me?” | Shelves + **`#landing-places`** (pin strip + Sort near me) + **Boards & seasons** · full browse at [`/discover/cedar-rapids-iowa/`](../site/discover/cedar-rapids-iowa/) ([`DISCOVERY_PROJECTION.md`](DISCOVERY_PROJECTION.md) § P5) | `game_node` + Layer 5 · boards link to `/play/` |
 | **Deploy on something** | “Something in the world should stay *true*.” | **Start with one live object** → `/create/` | Deploy wizard · legacy flat compat per [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) |
 | **Wear live state** | “What I wear should mean something *today*.” | **`#landing-live-object-carriers`** → `/shop/` (shipped) · scan curiosity CTA (primary merch funnel) | `scope: print_artifact`; steward updates from `/created/` |
 
@@ -45,10 +45,11 @@ Lost-item relay, status plate, menus, crisis cards, etc. are **catalog instances
 |-------|---------|------|
 | 1 | Discovery hero + trust chips | Utility headline — check before you go |
 | 2 | **Browse by need** shelves | Filter boards by job (live now · open/paused · return/hours) |
-| 3 | Search + **Public live boards** | Primary `/` job — discovery plane ([`DISCOVERY_PROJECTION.md`](DISCOVERY_PROJECTION.md)) |
-| 4 | **`#landing-live-object-carriers`** (shipped) | Secondary commerce — one featured carrier row → `/shop/` |
-| 5 | **`#landing-start-object-cta`** | Secondary steward entry — BYOP deploy |
-| 6 | Trust disclosures · device settings | Progressive depth — not first scroll |
+| 3 | Search + **`#landing-places`** | Primary `/` job — listed pins + optional near-me sort ([`DISCOVERY_PROJECTION.md`](DISCOVERY_PROJECTION.md) § P5) |
+| 4 | **Boards & seasons** | Network lenses — season maps and public board cards |
+| 5 | **`#landing-live-object-carriers`** (shipped) | Secondary commerce — one featured carrier row → `/shop/` |
+| 6 | **`#landing-start-object-cta`** | Secondary steward entry — BYOP deploy |
+| 7 | Trust disclosures · device settings | Progressive depth — not first scroll |
 
 **Retired:** **`#launch-doors`** (Three ways in hero block). Job routes unchanged; presentation distributed across rows above.
 
@@ -130,7 +131,7 @@ See [`QR_DESIGN_SPACE.md`](QR_DESIGN_SPACE.md) § Catalog roles.
 | Landing hook (secondary) | **The sticker stays — the status changes.** — `#landing-start-object-cta` footnote |
 | Landing carriers row (shipped) | **Live object carriers** — e.g. *Glitch hoodie · unique QR on fabric — preview before checkout* · **See all carriers →** `/shop/` |
 | Browse shelves | Live now · Open or paused · Return, relay, hours |
-| Public boards | Public live boards — open a board to browse places |
+| Public boards | **Boards & seasons** — open a board for the shared season map |
 | Create row (shipped) | **Start with one live object** → `/create/` |
 | Top-nav Create (shipped) | Steward chooser: deploy on something + wear carrier (shop) — not three launch doors |
 | `/shop/` hero | Wear the signal. Keep the story honest. |

@@ -232,13 +232,13 @@ Reuses motion dictionary from [`VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_
 
 ## Landing carriers row (Register A teaser)
 
-**Status:** **Shipped** on `/` (2026-06-21) — `site/index.html` `#landing-live-object-carriers` · [`landing-copy-contract.mjs`](../site/js/landing-copy-contract.mjs) v7 · hydrate via [`landing-live-object-carriers-core.mjs`](../site/js/landing-live-object-carriers-core.mjs) + `shop-config.json` `personalize.checkout_product_id`. Parent: [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) § Landing section order · [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) § Landing.
+**Status:** **Shipped** on `/` (2026-07-26) — `site/index.html` `#landing-live-object-carriers` · [`landing-copy-contract.mjs`](../site/js/landing-copy-contract.mjs) v12+ · hydrate via [`landing-live-object-carriers-core.mjs`](../site/js/landing-live-object-carriers-core.mjs) + `shop-config.json` `personalize.checkout_product_id`. Parent: [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) § Landing section order · [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) § Landing · places-first **`#landing-places`** precedes this row ([`DISCOVERY_PROJECTION.md`](DISCOVERY_PROJECTION.md) § P5).
 
 **Purpose:** Give cold `/` visitors a **visual commerce hook** without turning the discovery dashboard into a shop grid or marketing landing. Discovery stays primary; carriers are **secondary** after public boards.
 
 ### Placement and id
 
-- **After** `#public-networks-results` (Public live boards)
+- **After** `#public-networks-results` (**Boards & seasons**)
 - **Before** `#landing-start-object-cta` (Start with one live object)
 - Section id: **`#landing-live-object-carriers`**
 

@@ -8,6 +8,7 @@ import {
   countDiscoveryPinsWithGeo,
   formatDiscoveryNearMeDistance,
   haversineDistanceMeters,
+  requestDiscoveryClientCoords,
   sortDiscoveryPinsByNearMe,
 } from "../../site/js/discovery-near-me-core.mjs";
 import { projectDiscoveryPinIndexFromSeason } from "../../site/js/discovery-pin-projection-core.mjs";
@@ -18,6 +19,10 @@ const season = JSON.parse(
 );
 
 describe("discovery-near-me-core", () => {
+  it("exports browser geolocation helper for client-only sort", () => {
+    expect(typeof requestDiscoveryClientCoords).toBe("function");
+  });
+
   it("computes haversine distance in meters", () => {
     const meters = haversineDistanceMeters(
       { latitude: 41.978, longitude: -91.665 },

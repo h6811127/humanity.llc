@@ -30,7 +30,10 @@ import {
   parseDiscoveryBrowseQuery,
   parseDiscoveryPathname,
 } from "./discovery-region-path-core.mjs";
-import { sortDiscoveryPinsByNearMe } from "./discovery-near-me-core.mjs";
+import {
+  requestDiscoveryClientCoords,
+  sortDiscoveryPinsByNearMe,
+} from "./discovery-near-me-core.mjs";
 import {
   buildSnapshotNodeIndex,
   fetchDiscoverySeasonSnapshot,
@@ -44,28 +47,6 @@ import { resolveDiscoveryPinScanTargets } from "./discovery-primary-object-core.
 
 /** @typedef {import("./discovery-pin-projection-core.mjs").DiscoveryPin} DiscoveryPin */
 /** @typedef {import("./discovery-pin-projection-core.mjs").DiscoveryPinIndex} DiscoveryPinIndex */
-
-/**
- * @returns {Promise<{ latitude: number; longitude: number; accuracy?: number | null }>}
- */
-function requestDiscoveryClientCoords() {
-  return new Promise((resolve, reject) => {
-    if (typeof navigator === "undefined" || !navigator.geolocation) {
-      reject(new Error("Geolocation unavailable"));
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      (pos) =>
-        resolve({
-          latitude: pos.coords.latitude,
-          longitude: pos.coords.longitude,
-          accuracy: pos.coords.accuracy,
-        }),
-      (err) => reject(err),
-      { enableHighAccuracy: false, timeout: 12000, maximumAge: 60000 }
-    );
-  });
-}
 
 /**
  * @param {string} region

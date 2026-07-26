@@ -1,5 +1,6 @@
 /**
  * Find public networks — `/` and `/play/season/`
+ * On `/` (WS-DISCOVER-P5a/b): also hydrates places strip from DiscoveryPin index.
  */
 import { CITY_GAME_SEASONS_INDEX_URL } from "./city-game-season-resolve.mjs";
 import {
@@ -11,6 +12,15 @@ import {
 } from "./landing-entry-shelves-core.mjs";
 import { hydrateLandingLiveObjectCarriers } from "./landing-live-object-carriers.mjs";
 import {
+  bindLandingPlacesNearMe,
+  fetchLandingPinIndex,
+  fetchLandingPlacesSnapshotIndex,
+  LANDING_DEFAULT_DISCOVERY_REGION,
+  paintLandingPlacesSection,
+  resolveLandingCategoryPinFacet,
+  resolveLandingShelfPinFacet,
+} from "./landing-places.mjs";
+import {
   buildPublicNetworkCardModel,
   filterPublicNetworkCards,
   listedPublicNetworkRows,
@@ -21,6 +31,8 @@ import {
 } from "./public-networks-portal-core.mjs";
 
 /** @typedef {import("./public-networks-portal-core.mjs").PublicNetworkCategoryFilter} PublicNetworkCategoryFilter */
+/** @typedef {import("./landing-places-core.mjs").LandingPinFacet} LandingPinFacet */
+/** @typedef {import("./discovery-pin-projection-core.mjs").DiscoveryPin} DiscoveryPin */
 
 async function fetchSeasonConfig(jsonUrl) {
   const res = await fetch(jsonUrl, { cache: "no-store" });
@@ -74,19 +86,70 @@ function syncLandingShelfActiveState(category) {
   }
 }
 
-function bindPublicNetworksPortal(allCards) {
+/**
+ * @param {LandingPinFacet} facet
+ * @param {string | null} activeShelfId
+ */
+function syncLandingShelfActiveStateForFacet(facet, activeShelfId) {
+  if (activeShelfId) {
+    for (const btn of document.querySelectorAll("[data-landing-shelf]")) {
+      if (!(btn instanceof HTMLElement)) continue;
+      const shelfId = btn.getAttribute("data-landing-shelf");
+      const active = shelfId === activeShelfId;
+      btn.classList.toggle("landing-entry-shelf-btn--active", active);
+      btn.setAttribute("aria-pressed", active ? "true" : "false");
+    }
+    return;
+  }
+  syncLandingShelfActiveState(
+    facet === "live_now" ? "city_games" : facet === "open_paused" ? "resources" : "all"
+  );
+}
+
+/**
+ * @param {import("./public-networks-portal-core.mjs").PublicNetworkCardModel[]} allCards
+ * @param {{
+ *   pins?: DiscoveryPin[];
+ *   region?: string;
+ *   snapshotIndex?: ReturnType<typeof import("./discovery-pin-snapshot-core.mjs").buildSnapshotNodeIndex> | null;
+ *   cityLabel?: string;
+ * } | null} placesCtx
+ */
+function bindPublicNetworksPortal(allCards, placesCtx = null) {
   const searchInput = document.getElementById("public-networks-search");
   const chipsRoot = document.getElementById("public-networks-categories");
   const resultsRoot = document.getElementById("public-networks-results");
   const emptyEl = document.getElementById("public-networks-empty");
   const shelvesRoot = document.getElementById("landing-entry-shelves");
+  const placesRoot = document.getElementById("landing-places-results");
   if (!searchInput || !chipsRoot || !resultsRoot || !emptyEl) return;
 
   /** @type {PublicNetworkCategoryFilter} */
   let activeCategory = readLandingCategoryQueryParam(window.location.search);
+  /** @type {LandingPinFacet} */
+  let activePinFacet = resolveLandingCategoryPinFacet(activeCategory);
+  /** @type {string | null} */
+  let activeShelfId = landingShelfIdForCategory(activeCategory);
+
+  const hasPlaces = Boolean(placesRoot && placesCtx?.pins);
+  /** @type {import("./discovery-near-me-core.mjs").DiscoveryClientCoords | null} */
+  let clientCoords = null;
+
+  const renderPlaces = () => {
+    if (!hasPlaces || !placesCtx) return;
+    paintLandingPlacesSection({
+      pins: placesCtx.pins ?? [],
+      region: placesCtx.region ?? LANDING_DEFAULT_DISCOVERY_REGION,
+      query: searchInput instanceof HTMLInputElement ? searchInput.value : "",
+      facet: activePinFacet,
+      snapshotIndex: placesCtx.snapshotIndex ?? null,
+      cityLabel: placesCtx.cityLabel,
+      clientCoords,
+    });
+  };
 
   const render = () => {
-    const query = searchInput.value;
+    const query = searchInput instanceof HTMLInputElement ? searchInput.value : "";
     const filtered = filterPublicNetworkCards(allCards, { query, category: activeCategory });
     chipsRoot.innerHTML = renderPublicNetworkCategoryChips(activeCategory, allCards);
     resultsRoot.innerHTML = renderPublicNetworkResults(filtered);
@@ -97,16 +160,25 @@ function bindPublicNetworksPortal(allCards) {
       category: activeCategory,
       query,
     });
-    syncLandingShelfActiveState(activeCategory);
+    if (activeShelfId) {
+      syncLandingShelfActiveStateForFacet(activePinFacet, activeShelfId);
+    } else {
+      syncLandingShelfActiveState(activeCategory);
+    }
     syncLandingCategoryUrl(activeCategory);
+    renderPlaces();
   };
 
-  const setCategory = (category) => {
+  const setCategory = (category, facet, shelfId) => {
     activeCategory = category;
+    activePinFacet = facet ?? resolveLandingCategoryPinFacet(category);
+    activeShelfId = shelfId ?? landingShelfIdForCategory(category);
     render();
-    const toolbar = document.querySelector(".public-networks-toolbar");
-    if (toolbar instanceof HTMLElement) {
-      toolbar.scrollIntoView({ block: "start", behavior: "smooth" });
+    const scrollTarget =
+      document.getElementById("landing-places") ??
+      document.querySelector(".public-networks-toolbar");
+    if (scrollTarget instanceof HTMLElement) {
+      scrollTarget.scrollIntoView({ block: "start", behavior: "smooth" });
     }
   };
 
@@ -118,8 +190,11 @@ function bindPublicNetworksPortal(allCards) {
     if (!(button instanceof HTMLButtonElement)) return;
     const next = button.getAttribute("data-public-network-category");
     if (!next) return;
-    activeCategory = /** @type {PublicNetworkCategoryFilter} */ (next);
-    render();
+    setCategory(
+      /** @type {PublicNetworkCategoryFilter} */ (next),
+      resolveLandingCategoryPinFacet(next),
+      landingShelfIdForCategory(/** @type {PublicNetworkCategoryFilter} */ (next))
+    );
   });
 
   if (shelvesRoot instanceof HTMLElement) {
@@ -130,7 +205,21 @@ function bindPublicNetworksPortal(allCards) {
       if (!(button instanceof HTMLButtonElement)) return;
       const shelfId = button.getAttribute("data-landing-shelf");
       if (!shelfId) return;
-      setCategory(resolveLandingShelfCategory(shelfId));
+      setCategory(
+        resolveLandingShelfCategory(shelfId),
+        resolveLandingShelfPinFacet(shelfId),
+        shelfId
+      );
+    });
+  }
+
+  if (hasPlaces) {
+    bindLandingPlacesNearMe({
+      getClientCoords: () => clientCoords,
+      setClientCoords: (coords) => {
+        clientCoords = coords;
+      },
+      render: renderPlaces,
     });
   }
 
@@ -142,6 +231,10 @@ async function bootPublicNetworksPortal() {
 
   const resultsRoot = document.getElementById("public-networks-results");
   if (!resultsRoot) return;
+
+  /** @type {{ pins: DiscoveryPin[]; region: string; snapshotIndex: ReturnType<typeof import("./discovery-pin-snapshot-core.mjs").buildSnapshotNodeIndex> | null; cityLabel: string } | null} */
+  let placesCtx = null;
+  const placesMount = document.getElementById("landing-places-results");
 
   try {
     const res = await fetch(CITY_GAME_SEASONS_INDEX_URL, { cache: "no-store" });
@@ -160,7 +253,40 @@ async function bootPublicNetworksPortal() {
         city: featuredLive.place?.split(",")[0]?.trim() || "Cedar Rapids",
       });
     }
-    bindPublicNetworksPortal(cards);
+
+    if (placesMount instanceof HTMLElement) {
+      try {
+        const region = LANDING_DEFAULT_DISCOVERY_REGION;
+        const pinIndex = await fetchLandingPinIndex(region);
+        const pins = Array.isArray(pinIndex?.pins)
+          ? /** @type {DiscoveryPin[]} */ (pinIndex.pins)
+          : [];
+        const seasonId =
+          featuredLive?.season_id ||
+          String(rows.find((r) => r?.season_id)?.season_id ?? "cr_season_01_wake");
+        const snapshotIndex = await fetchLandingPlacesSnapshotIndex(seasonId);
+        placesCtx = {
+          pins,
+          region: String(pinIndex?.region ?? region),
+          snapshotIndex,
+          cityLabel: featuredLive?.place?.split(",")[0]?.trim() || "Cedar Rapids",
+        };
+        paintLandingPlacesSection({
+          ...placesCtx,
+          query: "",
+          facet: resolveLandingCategoryPinFacet(
+            readLandingCategoryQueryParam(window.location.search)
+          ),
+          clientCoords: null,
+        });
+      } catch (placesErr) {
+        console.warn("[landing-places]", placesErr);
+        placesMount.innerHTML =
+          '<p class="landing-places-empty discovery-region-empty">Could not load places.</p>';
+      }
+    }
+
+    bindPublicNetworksPortal(cards, placesCtx);
   } catch (err) {
     console.warn("[public-networks-portal]", err);
     const emptyEl = document.getElementById("public-networks-empty");

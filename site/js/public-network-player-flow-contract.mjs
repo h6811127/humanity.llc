@@ -14,7 +14,7 @@ import {
 } from "./public-networks-portal-core.mjs";
 
 /** Bump when player-flow shell copy or cross-links change intentionally. */
-export const PLAYER_FLOW_CONTRACT_VERSION = 4;
+export const PLAYER_FLOW_CONTRACT_VERSION = 6;
 
 /** Stale copy that must not return on player discovery surfaces. */
 export const PLAYER_FLOW_FORBIDDEN_SNIPPETS = [
@@ -40,7 +40,7 @@ export const PLAYER_FLOW_PAGE_CHECKS = [
       'href="/play/cedar-rapids/#rules-prove-title"',
       PUBLIC_NETWORK_RULES_PROVE_CTA,
       'id="public-networks-results"',
-      "public-networks-portal.mjs?v=10",
+      "public-networks-portal.mjs?v=12",
     ],
   },
   {
@@ -53,7 +53,7 @@ export const PLAYER_FLOW_PAGE_CHECKS = [
       'id="public-networks-results"',
       "Home dashboard",
       "not live networks",
-      "public-networks-portal.mjs?v=10",
+      "public-networks-portal.mjs?v=12",
     ],
     forbidden: ['>About this network</a>'],
   },

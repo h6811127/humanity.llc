@@ -76,8 +76,9 @@
       })();
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=5" />
-    <link rel="stylesheet" href="/styles.css?v=157" />
-    <link rel="stylesheet" href="/css/public-networks-portal.css?v=9" />
+    <link rel="stylesheet" href="/styles.css?v=162" />
+    <link rel="stylesheet" href="/css/public-networks-portal.css?v=11" />
+    <link rel="stylesheet" href="/css/discovery-region-browse.css?v=5" />
     <link rel="stylesheet" href="/css/device-shell.css?v=94" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=32" />
     <meta property="og:title" content="humanity.llc · Check what's true right now" />
@@ -576,18 +577,18 @@
         </section>
 
         <section class="public-networks-toolbar idea-section" aria-label="Search and filter">
-          <label class="form-label" for="public-networks-search">Search live places and boards</label>
+          <label class="form-label" for="public-networks-search">Search places and boards</label>
           <input
             class="form-input public-networks-search"
             id="public-networks-search"
             type="search"
             name="q"
             autocomplete="off"
-            placeholder="City, name, or keyword"
+            placeholder="Place, city, board, or keyword"
           />
           <p class="form-hint public-networks-toolbar-hint">
-            Public boards group live places by community. Only intentionally listed boards appear
-            here — not a map, feed, or scan history.
+            Places are listed pins you can open before you go. Boards group places by community
+            season. Only intentionally listed rows appear — not a map, feed, or scan history.
           </p>
           <div
             class="public-networks-categories"
@@ -597,18 +598,51 @@
           ></div>
         </section>
 
+        <section
+          class="landing-places idea-section"
+          id="landing-places"
+          aria-labelledby="landing-places-title"
+        >
+          <div class="landing-places-header">
+            <h2 class="group-label" id="landing-places-title">Places near me</h2>
+            <button
+              type="button"
+              class="landing-places-near-me-btn"
+              id="landing-places-near-me"
+              aria-pressed="false"
+            >
+              Sort near me
+            </button>
+          </div>
+          <p class="form-hint landing-places-lead" id="landing-places-lead">
+            Listed places in Cedar Rapids. Sort near me uses location on your device; scans are not
+            tracked.
+          </p>
+          <p class="landing-places-privacy discovery-region-privacy" id="landing-places-privacy">
+            Location is used on your device to sort results; scans are not tracked.
+            <a href="/data-policy.html">Data policy</a>.
+          </p>
+          <p
+            class="landing-places-near-me-status"
+            id="landing-places-near-me-status"
+            aria-live="polite"
+          ></p>
+          <div class="landing-places-results discovery-pin-list" id="landing-places-results">
+            <p class="landing-places-loading">Loading places…</p>
+          </div>
+        </section>
+
         <section class="idea-section" aria-labelledby="public-networks-results-title">
-          <h2 class="group-label" id="public-networks-results-title">Public live boards</h2>
+          <h2 class="group-label" id="public-networks-results-title">Boards &amp; seasons</h2>
           <p class="form-hint public-networks-results-lead">
-            Open a board to browse places, then check what's true on site. Cards map to the shelves
-            above — city games, resources, markets, and events.
+            Network lenses for the places above — open a board for the shared season map.
             <a href="/play/season/">See all listed public networks</a>.
             New to Wake the City?
             <a href="/play/cedar-rapids/#rules-prove-title">What a scan proves</a>
             (2 min read) — Cedar Rapids is the reference public network.
           </p>
           <div class="public-networks-results" id="public-networks-results">
-            <p class="public-networks-loading">Loading live boards…</p>
+            <p class="public-networks-loading">Loading boards…</p>
           </div>
           <p class="public-networks-empty" id="public-networks-empty" hidden></p>
         </section>
@@ -1188,6 +1222,6 @@
     <script src="/js/landing-focus.mjs?v=5" type="module"></script>
     <script src="/js/device-status-bootstrap.mjs?v=94" type="module"></script>
     <script src="/js/landing-device-hub.mjs?v=14" type="module"></script>
-    <script src="/js/public-networks-portal.mjs?v=10" type="module"></script>
+    <script src="/js/public-networks-portal.mjs?v=12" type="module"></script>
   </body>
 </html>

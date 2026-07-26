@@ -5,12 +5,13 @@
  *
  * @see docs/DEVICE_HUB_AND_LOCAL_SEARCH.md § Landing story
  * @see docs/MERCH_VISUAL_CHOREOGRAPHY.md § Landing carriers row
+ * @see docs/DISCOVERY_PROJECTION.md § WS-DISCOVER-P5
  */
 
 /** Bump when hero / discovery dashboard copy or structure changes intentionally. */
-export const LANDING_COPY_CONTRACT_VERSION = 8;
+export const LANDING_COPY_CONTRACT_VERSION = 12;
 
-export const LANDING_STYLES_CACHE_BUST = "157";
+export const LANDING_STYLES_CACHE_BUST = "162";
 
 export const LANDING_REQUIRED_SNIPPETS = [
   "Check what's true right now before you knock, pick up, or show up.",
@@ -22,9 +23,17 @@ export const LANDING_REQUIRED_SNIPPETS = [
   'id="landing-shelf-live-now"',
   'id="landing-shelf-open-paused"',
   'id="landing-shelf-return-hours"',
-  "Search live places and boards",
+  "Search places and boards",
   'id="public-networks-search"',
-  "Public live boards",
+  'id="landing-places"',
+  'id="landing-places-results"',
+  'id="landing-places-near-me"',
+  'id="landing-places-privacy"',
+  "Places near me",
+  "Sort near me",
+  "Location is used on your device to sort results; scans are not tracked.",
+  'href="/data-policy.html"',
+  "Boards &amp; seasons",
   'id="public-networks-results"',
   'href="/play/season/"',
   "See all listed public networks",
@@ -49,8 +58,10 @@ export const LANDING_REQUIRED_SNIPPETS = [
   "No behavioral dossiers",
   "The sticker stays — the status changes.",
   'id="landing-learn-trust"',
-  "public-networks-portal.css?v=9",
+  "public-networks-portal.css?v=11",
+  "discovery-region-browse.css?v=5",
   `styles.css?v=${LANDING_STYLES_CACHE_BUST}`,
+  "public-networks-portal.mjs?v=12",
 ];
 
 /** Reverted matrix copy — must never return on `/`. */
@@ -80,8 +91,10 @@ export const LANDING_FORBIDDEN_SNIPPETS = [
   "<h1>Find public networks</h1>",
   "Listed networks",
   "Search public networks",
+  "Search live places and boards",
   "Community-run networks",
   "Open public networks that expose live places",
+  "Public live boards",
   "custom products",
   'class="landing-carriers-carousel"',
   "swiper",
@@ -93,6 +106,7 @@ export const LANDING_SECTION_ORDER_MARKERS = [
   "Check what's true right now before you knock, pick up, or show up.",
   'id="landing-entry-shelves"',
   'id="public-networks-search"',
+  'id="landing-places"',
   'id="public-networks-results"',
   'id="landing-live-object-carriers"',
   'id="landing-start-object-cta"',

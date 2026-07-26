@@ -5,7 +5,7 @@ import { expect, test } from "@playwright/test";
  * @see site/js/landing-copy-contract.mjs
  */
 test.describe("landing copy contract", () => {
-  test("human hero, entry shelves, boards, and create CTA are visible on /", async ({
+  test("human hero, entry shelves, places, boards, and create CTA are visible on /", async ({
     page,
   }) => {
     await page.goto("/");
@@ -19,8 +19,14 @@ test.describe("landing copy contract", () => {
     await expect(page.getByRole("heading", { name: "Live now" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Open or paused" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Return, relay, hours" })).toBeVisible();
-    await expect(page.getByLabel("Search live places and boards")).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Public live boards" })).toBeVisible();
+    await expect(page.getByLabel("Search places and boards")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Places near me" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Sort near me" })).toBeVisible();
+    await expect(
+      page.locator("#landing-places-privacy")
+    ).toContainText("Location is used on your device to sort results");
+    await expect(page.getByRole("heading", { name: "Boards & seasons" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Public live boards" })).toHaveCount(0);
     await expect(page.getByRole("heading", { name: "Live object carriers" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Customize Glitch hoodie" })).toBeVisible();
     await expect(page.getByRole("link", { name: "See all carriers" })).toBeVisible();
@@ -54,6 +60,15 @@ test.describe("landing copy contract", () => {
     await page.goto("/");
     await page.getByRole("link", { name: "Start with one live object" }).click();
     await expect(page).toHaveURL(/\/create\//);
+  });
+
+  test("loads Cedar Rapids places strip with pin rows", async ({ page }) => {
+    await page.goto("/");
+    const places = page.locator("#landing-places-results");
+    await expect(places.locator(".discovery-pin-row").first()).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(page.getByRole("link", { name: /See all places/i })).toBeVisible();
   });
 
   test("loads Cedar Rapids board card with open board link", async ({ page }) => {

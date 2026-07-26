@@ -1,6 +1,6 @@
 /**
  * Client-side near-me sort for DiscoveryPins — no server-side location storage.
- * @see docs/DISCOVERY_PROJECTION.md · WS-DISCOVER-P1-2
+ * @see docs/DISCOVERY_PROJECTION.md · WS-DISCOVER-P1-2 · WS-DISCOVER-P5b
  */
 
 /** @typedef {import("./discovery-pin-projection-core.mjs").DiscoveryPin} DiscoveryPin */
@@ -12,6 +12,29 @@ export const DISCOVERY_NEAR_ME_PRIVACY_COPY =
 export const DISCOVERY_NEAR_ME_PRIVACY_HREF = "/data-policy.html";
 
 const EARTH_RADIUS_M = 6371008.8;
+
+/**
+ * Browser geolocation for client-side pin sort only — never POST coords for ranking.
+ * @returns {Promise<DiscoveryClientCoords>}
+ */
+export function requestDiscoveryClientCoords() {
+  return new Promise((resolve, reject) => {
+    if (typeof navigator === "undefined" || !navigator.geolocation) {
+      reject(new Error("Geolocation unavailable"));
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) =>
+        resolve({
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude,
+          accuracy: pos.coords.accuracy,
+        }),
+      (err) => reject(err),
+      { enableHighAccuracy: false, timeout: 12000, maximumAge: 60000 }
+    );
+  });
+}
 
 /**
  * @param {DiscoveryClientCoords} from

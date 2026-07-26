@@ -119,7 +119,7 @@ Prefer **surgical** changes aligned with existing patterns:
 
 | Target | Comprehension pass signal |
 |--------|---------------------------|
-| Discovery landing stays utility-first (boards before commerce) | Strangers find live boards without marketing confusion |
+| Discovery landing stays utility-first (places before boards before commerce) | Strangers find listed pins and season boards without marketing confusion |
 | **`#landing-live-object-carriers`** (shipped) teases `/shop/` only | No carousel; no checkout embed on `/` |
 | Top-nav Create = steward chooser (deploy + wear) | No one asks why they must pick “General” before a plate |
 | Deploy create = “what scanners read” | Stewards never say “root” or “child” unprompted |
