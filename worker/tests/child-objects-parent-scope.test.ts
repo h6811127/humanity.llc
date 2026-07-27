@@ -13,7 +13,7 @@ import type { ChildObjectStatus } from "../src/db/types";
 import { handlePostChildObjectCreate } from "../src/resolver/child-objects";
 
 const VICTIM = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
-const ATTACKER = "8Ym0nQ3oR5sU7wX9zA2bC4dE6";
+const ATTACKER = "8Ym1nQ3oR5sU7wX9zA2bC4dE6";
 const CATALOG_OBJECT_ID = "obj_cr_node_07_cabinet";
 const CREATED = "2026-07-27T12:00:00.000Z";
 
@@ -208,7 +208,7 @@ describe("child_objects parent scope", () => {
       VICTIM
     );
     expect(secondRes.status).toBe(409);
-    const body = (await secondRes.json()) as { error?: { code?: string } };
-    expect(body.error?.code).toBe("OBJECT_EXISTS");
+    const body = (await secondRes.json()) as { error?: string };
+    expect(body.error).toBe("OBJECT_EXISTS");
   });
 });

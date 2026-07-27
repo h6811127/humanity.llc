@@ -63,7 +63,11 @@ function scanContextDb(child: ChildObjectRow | null) {
           if (sql.includes("FROM cards")) return cardRow();
           if (sql.includes("FROM qr_credentials")) return childObjectQr();
           if (sql.includes("FROM child_objects")) {
-            return objects.get(String(args[0])) ?? null;
+            const parentId = String(args[0]);
+            const objectId = String(args[1]);
+            const row = objects.get(objectId) ?? null;
+            if (!row || row.parent_profile_id !== parentId) return null;
+            return row;
           }
           if (sql.includes("FROM verification_summaries")) {
             return {

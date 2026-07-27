@@ -255,7 +255,7 @@ describe("unlock-evaluator", () => {
   });
 
   it("does not write unlock side effects onto a foreign parent's catalog object_id", async () => {
-    const foreignParent = "9Zn1oP4pS6tV8xY0aB3cD5eF7";
+    const foreignParent = "9Zn1oP4pS6tV8xYaB3cD5eF7gH";
     const db = new UnlockDb();
     db.objects.set(RIVER_OBJECT, {
       object_id: RIVER_OBJECT,
