@@ -81,7 +81,14 @@ class DelegatedCapabilityRouteDb {
                 status: db.parent.status,
               } as T;
             }
-            if (sql.includes("FROM child_objects WHERE object_id")) {
+            if (sql.includes("FROM child_objects WHERE parent_profile_id = ? AND object_id = ?")) {
+              if (
+                !db.child ||
+                db.child.parent_profile_id !== String(args[0]) ||
+                db.child.object_id !== String(args[1])
+              ) {
+                return null;
+              }
               return db.child as T;
             }
             if (sql.includes("FROM delegated_capabilities WHERE capability_id")) {

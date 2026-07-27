@@ -47,8 +47,11 @@ function issueMockDb(existing: {
                 updated_at: CREATED,
               };
             }
-            if (sql.includes("FROM child_objects WHERE object_id")) {
+            if (sql.includes("FROM child_objects WHERE parent_profile_id = ? AND object_id = ?")) {
               if (!existing.child) return null;
+              if (String(args[0]) !== PROFILE || String(args[1]) !== OBJECT_ID) {
+                return null;
+              }
               return {
                 object_id: OBJECT_ID,
                 parent_profile_id: PROFILE,

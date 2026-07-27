@@ -76,6 +76,7 @@ function parseDocument(json: string): Record<string, unknown> {
 
 async function fragmentAlreadyClaimedPayload(
   db: D1Database,
+  parentProfileId: string,
   objectId: string,
   nodeId: string,
   season: CrSeasonConfig
@@ -87,8 +88,8 @@ async function fragmentAlreadyClaimedPayload(
     complete: false,
   };
   if (finaleObjectId) {
-    const finaleRow = await getChildObject(db, finaleObjectId);
-    if (finaleRow) {
+    const finaleRow = await getChildObject(db, parentProfileId, finaleObjectId);
+    if (finaleRow && finaleRow.parent_profile_id === parentProfileId) {
       const finaleDoc = parseDocument(finaleRow.child_object_document_json);
       lattice = fragmentLatticeProgress(
         normalizeGameMeta(finaleDoc.game_meta),
@@ -198,7 +199,7 @@ export async function handlePostGameContribute(
     return errorResponse("QR_OBJECT_MISMATCH", "QR does not match this object.", 422);
   }
 
-  const existing = await getChildObject(db, pathObjectId);
+  const existing = await getChildObject(db, pathProfileId, pathObjectId);
   if (!existing || existing.parent_profile_id !== pathProfileId) {
     return errorResponse("NOT_FOUND", "Child object not found.", 404);
   }
@@ -248,7 +249,13 @@ export async function handlePostGameContribute(
 
   if (nodeId && seasonFragmentNodeIds(season).includes(nodeId) && meta.unlocked_by.includes(nodeId)) {
     return jsonResponse(
-      await fragmentAlreadyClaimedPayload(db, pathObjectId, nodeId, season),
+      await fragmentAlreadyClaimedPayload(
+        db,
+        pathProfileId,
+        pathObjectId,
+        nodeId,
+        season
+      ),
       200,
       { "Cache-Control": "no-store" }
     );
@@ -468,7 +475,14 @@ export async function handlePostGameContribute(
     updatedAt
   );
 
-  const unlockEffects = await applyUnlockSideEffects(db, nodeId, doc, now, season);
+  const unlockEffects = await applyUnlockSideEffects(
+    db,
+    nodeId,
+    doc,
+    now,
+    season,
+    pathProfileId
+  );
 
   return jsonResponse(
     {

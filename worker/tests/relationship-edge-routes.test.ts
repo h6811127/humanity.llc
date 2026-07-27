@@ -86,8 +86,12 @@ class RelationshipEdgeRouteDb {
             status: db.steward.status,
           } as T;
         }
-        if (sql.includes("FROM child_objects WHERE object_id = ?")) {
-          return (db.children.get(String(args[0])) ?? null) as T | null;
+        if (sql.includes("FROM child_objects WHERE parent_profile_id = ? AND object_id = ?")) {
+          const parentId = String(args[0]);
+          const id = String(args[1]);
+          const row = db.children.get(id);
+          if (!row || row.parent_profile_id !== parentId) return null;
+          return row as T | null;
         }
         if (sql.includes("FROM relationship_edges WHERE edge_id = ?")) {
           return (db.edges.get(String(args[0])) ?? null) as T | null;

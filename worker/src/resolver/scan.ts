@@ -158,7 +158,12 @@ async function loadScanContextWithGameRepairs(
   let reloaded = false;
 
   if (shouldRepairGameUnlockDriftOnScan(env, profileId, ctx, season)) {
-    const { repaired } = await reconcileSeasonUnlockDrift(db, now, season);
+    const { repaired } = await reconcileSeasonUnlockDrift(
+      db,
+      now,
+      season,
+      profileId
+    );
     if (repaired.length > 0) reloaded = true;
   }
 
