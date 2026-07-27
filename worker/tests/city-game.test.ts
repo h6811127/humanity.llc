@@ -125,9 +125,12 @@ class GameNodeDb {
         return {
           async first<T>() {
             if (sql.includes("FROM cards")) return db.parent as T;
-            if (sql.includes("FROM child_objects WHERE object_id")) {
-              const id = String(args[0]);
-              return (db.objects.get(id) as T) ?? null;
+            if (sql.includes("FROM child_objects WHERE parent_profile_id = ? AND object_id = ?")) {
+              const parentId = String(args[0]);
+              const id = String(args[1]);
+              const row = db.objects.get(id);
+              if (!row || row.parent_profile_id !== parentId) return null;
+              return row as T;
             }
             return null as T | null;
           },

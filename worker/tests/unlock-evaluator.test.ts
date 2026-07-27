@@ -35,9 +35,12 @@ class UnlockDb {
       bind(...args: unknown[]) {
         return {
           async first<T>() {
-            if (sql.includes("FROM child_objects WHERE object_id")) {
-              const id = String(args[0]);
-              return (db.objects.get(id) as T) ?? null;
+            if (sql.includes("FROM child_objects WHERE parent_profile_id = ? AND object_id = ?")) {
+              const parentId = String(args[0]);
+              const id = String(args[1]);
+              const row = db.objects.get(id);
+              if (!row || row.parent_profile_id !== parentId) return null;
+              return row as T;
             }
             return null as T | null;
           },
@@ -249,6 +252,58 @@ describe("unlock-evaluator", () => {
     const riverDocAfter = JSON.parse(river.child_object_document_json);
     expect(river.public_state).toContain("Evolved together");
     expect(riverDocAfter.object_streams[0].value).toContain("Evolved clue");
+  });
+
+  it("does not write unlock side effects onto a foreign parent's catalog object_id", async () => {
+    const foreignParent = "9Zn1oP4pS6tV8xYaB3cD5eF7gH";
+    const db = new UnlockDb();
+    db.objects.set(RIVER_OBJECT, {
+      object_id: RIVER_OBJECT,
+      parent_profile_id: PROFILE,
+      object_type: "game_node",
+      public_label: "Riverwalk River Lantern",
+      public_state: "Unlocked together",
+      status: "active",
+      child_object_document_json: JSON.stringify({
+        game_meta: { collective_progress: 20, collective_target: 20, unlocked_by: [] },
+      }),
+      created_at: CREATED,
+      updated_at: CREATED,
+    });
+    // Attacker squatted the catalog cabinet id under a different root.
+    db.objects.set(CABINET_OBJECT, {
+      object_id: CABINET_OBJECT,
+      parent_profile_id: foreignParent,
+      object_type: "game_node",
+      public_label: "Squatted cabinet",
+      public_state: "Locked until River Lantern quorum",
+      status: "active",
+      child_object_document_json: JSON.stringify({
+        public_state: "Locked until River Lantern quorum",
+        game_meta: { unlocked_by: [], vouch_requires: ["node_10"] },
+        object_streams: [],
+      }),
+      created_at: CREATED,
+      updated_at: CREATED,
+    });
+
+    const result = await applyUnlockSideEffects(
+      db as unknown as D1Database,
+      "node_04",
+      {
+        public_state: "Unlocked together",
+        game_meta: { collective_progress: 20, collective_target: 20, unlocked_by: [] },
+      },
+      new Date(CREATED),
+      undefined,
+      PROFILE
+    );
+
+    expect(result.unlockedNodes).toEqual([]);
+    const foreignCabinet = db.objects.get(CABINET_OBJECT)!;
+    const foreignDoc = JSON.parse(foreignCabinet.child_object_document_json);
+    expect(foreignDoc.game_meta.unlocked_by).toEqual([]);
+    expect(foreignCabinet.public_state).toBe("Locked until River Lantern quorum");
   });
 
   it("reconcileSeasonUnlockDrift is a no-op when unlock graph is already consistent", async () => {

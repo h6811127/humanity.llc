@@ -31,17 +31,19 @@ export async function getChildObjectParent(
     .first<ChildObjectParentRow>();
 }
 
+/** Parent-scoped lookup — object_id is unique per root card, not globally. */
 export async function getChildObject(
   db: D1Database,
+  parentProfileId: string,
   objectId: string
 ): Promise<ChildObjectRow | null> {
   return db
     .prepare(
       `SELECT object_id, parent_profile_id, object_type, public_label, public_state,
               status, child_object_document_json, created_at, updated_at
-       FROM child_objects WHERE object_id = ?`
+       FROM child_objects WHERE parent_profile_id = ? AND object_id = ?`
     )
-    .bind(objectId)
+    .bind(parentProfileId, objectId)
     .first<ChildObjectRow>();
 }
 
@@ -147,4 +149,3 @@ export async function updateChildObjectIfUnchanged(
 
   return Boolean(result.success && (result.meta.changes ?? 0) > 0);
 }
-

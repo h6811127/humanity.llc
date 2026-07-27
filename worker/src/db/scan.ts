@@ -69,7 +69,7 @@ export async function loadScanContext(
 
   let childObject: ChildObjectRow | null = null;
   if (qr?.scope === "child_object" && qr.object_id) {
-    const row = await getChildObject(db, qr.object_id);
+    const row = await getChildObject(db, profileId, qr.object_id);
     if (row && row.parent_profile_id === profileId) {
       childObject = row;
     }
@@ -221,7 +221,7 @@ async function loadGameNodeWitnessContext(
   const witnessPeerLabels: Record<string, string> = {};
   const relationshipPeerGameMeta: Record<string, GameMeta> = {};
   for (const peerId of peerObjectIds) {
-    const peerRow = await getChildObject(db, peerId);
+    const peerRow = await getChildObject(db, profileId, peerId);
     if (
       !peerRow ||
       peerRow.parent_profile_id !== profileId ||

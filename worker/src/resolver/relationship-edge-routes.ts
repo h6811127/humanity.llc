@@ -204,7 +204,7 @@ async function verifiedWitnessEdgeIssuance(
   }
 
   for (const objectId of [doc.from.id, doc.to.id]) {
-    const child = await getChildObject(db, objectId);
+    const child = await getChildObject(db, pathProfileId, objectId);
     if (!child || child.parent_profile_id !== pathProfileId) {
       return {
         ok: false,

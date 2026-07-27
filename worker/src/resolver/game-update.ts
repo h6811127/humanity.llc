@@ -134,7 +134,7 @@ export async function handlePostGameUpdate(
     );
   }
 
-  const existing = await getChildObject(db, pathObjectId);
+  const existing = await getChildObject(db, pathProfileId, pathObjectId);
   if (!existing || existing.parent_profile_id !== pathProfileId) {
     return errorResponse("NOT_FOUND", "Child object not found.", 404);
   }
@@ -213,7 +213,14 @@ export async function handlePostGameUpdate(
   const nodeId = seasonNodeIdFromObjectId(pathObjectId, season);
   const unlockEffects =
     nodeId != null
-      ? await applyUnlockSideEffects(db, nodeId, doc, new Date(updatedAt), season)
+      ? await applyUnlockSideEffects(
+          db,
+          nodeId,
+          doc,
+          new Date(updatedAt),
+          season,
+          pathProfileId
+        )
       : { unlockedNodes: [] as string[] };
 
   return jsonResponse(

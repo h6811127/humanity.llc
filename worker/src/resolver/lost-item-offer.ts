@@ -59,7 +59,7 @@ async function loadActiveLostItemRelay(
   profileId: string,
   objectId: string
 ) {
-  const child = await getChildObject(db, objectId);
+  const child = await getChildObject(db, profileId, objectId);
   if (!child || child.parent_profile_id !== profileId) {
     return {
       ok: false as const,

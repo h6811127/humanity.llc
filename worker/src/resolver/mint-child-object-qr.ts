@@ -112,7 +112,7 @@ export async function mintChildObjectFromSignedCredential(
     );
   }
 
-  const childObject = await getChildObject(db, pathObjectId);
+  const childObject = await getChildObject(db, pathProfileId, pathObjectId);
   if (!childObject || childObject.parent_profile_id !== pathProfileId) {
     return fail("NOT_FOUND", "Child object not found.", 404);
   }

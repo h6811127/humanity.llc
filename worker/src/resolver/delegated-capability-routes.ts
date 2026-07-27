@@ -199,7 +199,7 @@ async function verifiedCapabilityIssuance(
     };
   }
   for (const objectId of objectIds) {
-    const child = await getChildObject(db, objectId);
+    const child = await getChildObject(db, pathProfileId, objectId);
     if (!child || child.parent_profile_id !== pathProfileId) {
       return {
         ok: false,

@@ -291,7 +291,7 @@ export async function handlePostChildObjectCreate(
   if (parsed.status !== "active") {
     return errorResponse("MALFORMED_REQUEST", "New child objects must start active.", 422);
   }
-  const existing = await getChildObject(db, parsed.objectId);
+  const existing = await getChildObject(db, pathProfileId, parsed.objectId);
   if (existing) {
     return errorResponse("OBJECT_EXISTS", "Child object already exists.", 409);
   }
@@ -341,7 +341,7 @@ export async function handlePostChildObjectUpdate(
     pathObjectId
   );
   if (!parsed.ok) return parsed.response;
-  const existing = await getChildObject(db, pathObjectId);
+  const existing = await getChildObject(db, pathProfileId, pathObjectId);
   if (!existing || existing.parent_profile_id !== pathProfileId) {
     return errorResponse("NOT_FOUND", "Child object not found.", 404);
   }
@@ -390,7 +390,7 @@ export async function handlePostChildObjectRevoke(
     pathObjectId
   );
   if (!parsed.ok) return parsed.response;
-  const existing = await getChildObject(db, pathObjectId);
+  const existing = await getChildObject(db, pathProfileId, pathObjectId);
   if (!existing || existing.parent_profile_id !== pathProfileId) {
     return errorResponse("NOT_FOUND", "Child object not found.", 404);
   }

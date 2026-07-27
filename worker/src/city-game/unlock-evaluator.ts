@@ -1,4 +1,5 @@
 import { getChildObject, updateChildObject } from "../db/child-objects";
+import { GAME_NODE_OBJECT_TYPE } from "./constants";
 import { normalizeGameMeta } from "./game-meta";
 import {
   seasonFragmentNodeIds,
@@ -28,6 +29,34 @@ export type UnlockSideEffectResult = {
 
 function parseDocument(json: string): Record<string, unknown> {
   return JSON.parse(json) as Record<string, unknown>;
+}
+
+/** Prefer bound season root; otherwise the contributing parent (self-serve / unbound). */
+export function resolveUnlockParentProfileId(
+  season: CrSeasonConfig,
+  fallbackParentProfileId?: string | null
+): string | null {
+  const root = season.season_root_profile_id?.trim();
+  if (root) return root;
+  const fallback = fallbackParentProfileId?.trim();
+  return fallback || null;
+}
+
+async function getSeasonGameNode(
+  db: D1Database,
+  parentProfileId: string,
+  objectId: string
+) {
+  const row = await getChildObject(db, parentProfileId, objectId);
+  if (
+    !row ||
+    row.status !== "active" ||
+    row.object_type !== GAME_NODE_OBJECT_TYPE ||
+    row.parent_profile_id !== parentProfileId
+  ) {
+    return null;
+  }
+  return row;
 }
 
 async function persistGameNodeDocument(
@@ -62,8 +91,14 @@ export async function applyUnlockSideEffects(
   nodeId: string,
   sourceDoc: Record<string, unknown>,
   updatedAt: Date,
-  season: CrSeasonConfig = defaultSeason()
+  season: CrSeasonConfig = defaultSeason(),
+  parentProfileId?: string | null
 ): Promise<UnlockSideEffectResult> {
+  const parentId = resolveUnlockParentProfileId(season, parentProfileId);
+  if (!parentId) {
+    return { unlockedNodes: [] };
+  }
+
   const meta = normalizeGameMeta(sourceDoc.game_meta);
   const unlockedNodes: string[] = [];
   let tick = 0;
@@ -79,8 +114,8 @@ export async function applyUnlockSideEffects(
     if (riverLanternNeedsAntiHoardingEvolve(sourceDoc)) {
       const sourceObjectId = seasonObjectIdForNode(nodeId, season);
       if (sourceObjectId) {
-        const sourceRow = await getChildObject(db, sourceObjectId);
-        if (sourceRow && sourceRow.status === "active") {
+        const sourceRow = await getSeasonGameNode(db, parentId, sourceObjectId);
+        if (sourceRow) {
           const evolved = evolveRiverLanternAntiHoarding(sourceDoc);
           await persistGameNodeDocument(
             db,
@@ -96,8 +131,8 @@ export async function applyUnlockSideEffects(
     }
 
     for (const patch of patchesForQuorumUnlock(nodeId, season)) {
-      const targetRow = await getChildObject(db, patch.objectId);
-      if (!targetRow || targetRow.status !== "active") continue;
+      const targetRow = await getSeasonGameNode(db, parentId, patch.objectId);
+      if (!targetRow) continue;
       const targetDoc = patch.transform(parseDocument(targetRow.child_object_document_json));
       await persistGameNodeDocument(
         db,
@@ -115,8 +150,12 @@ export async function applyUnlockSideEffects(
   if (isFragmentNodeClaimed(meta, nodeId)) {
     const fragmentPatch = patchesForFragmentContribute(nodeId, season);
     if (fragmentPatch) {
-      const finaleRow = await getChildObject(db, fragmentPatch.finaleObjectId);
-      if (finaleRow && finaleRow.status === "active") {
+      const finaleRow = await getSeasonGameNode(
+        db,
+        parentId,
+        fragmentPatch.finaleObjectId
+      );
+      if (finaleRow) {
         let finaleDoc = parseDocument(finaleRow.child_object_document_json);
         const recorded = recordFragmentOnFinale(
           finaleDoc,
@@ -169,6 +208,7 @@ export function seasonNodeIdFromObjectId(
 
 async function quorumUnlockNeedsRepair(
   db: D1Database,
+  parentProfileId: string,
   fromNodeId: string,
   sourceDoc: Record<string, unknown>,
   season: CrSeasonConfig
@@ -179,8 +219,8 @@ async function quorumUnlockNeedsRepair(
   if (target == null || progress < target) return false;
 
   for (const patch of patchesForQuorumUnlock(fromNodeId, season)) {
-    const targetRow = await getChildObject(db, patch.objectId);
-    if (!targetRow || targetRow.status !== "active") continue;
+    const targetRow = await getSeasonGameNode(db, parentProfileId, patch.objectId);
+    if (!targetRow) continue;
     const targetDoc = parseDocument(targetRow.child_object_document_json);
     const targetMeta = normalizeGameMeta(targetDoc.game_meta);
     if (!targetMeta.unlocked_by.includes(fromNodeId)) return true;
@@ -190,6 +230,7 @@ async function quorumUnlockNeedsRepair(
 
 async function fragmentUnlockNeedsRepair(
   db: D1Database,
+  parentProfileId: string,
   fromNodeId: string,
   sourceDoc: Record<string, unknown>,
   season: CrSeasonConfig
@@ -200,8 +241,12 @@ async function fragmentUnlockNeedsRepair(
   const fragmentPatch = patchesForFragmentContribute(fromNodeId, season);
   if (!fragmentPatch) return false;
 
-  const finaleRow = await getChildObject(db, fragmentPatch.finaleObjectId);
-  if (!finaleRow || finaleRow.status !== "active") return false;
+  const finaleRow = await getSeasonGameNode(
+    db,
+    parentProfileId,
+    fragmentPatch.finaleObjectId
+  );
+  if (!finaleRow) return false;
 
   const finaleDoc = parseDocument(finaleRow.child_object_document_json);
   const finaleMeta = normalizeGameMeta(finaleDoc.game_meta);
@@ -218,29 +263,35 @@ async function fragmentUnlockNeedsRepair(
 export async function reconcileSeasonUnlockDrift(
   db: D1Database,
   now: Date,
-  season: CrSeasonConfig = defaultSeason()
+  season: CrSeasonConfig = defaultSeason(),
+  parentProfileId?: string | null
 ): Promise<{ repaired: string[] }> {
+  const parentId = resolveUnlockParentProfileId(season, parentProfileId);
+  if (!parentId) {
+    return { repaired: [] };
+  }
+
   const repaired: string[] = [];
 
   for (const nodeId of seasonQuorumNodeIds(season)) {
     const objectId = seasonObjectIdForNode(nodeId, season);
     if (!objectId) continue;
-    const row = await getChildObject(db, objectId);
-    if (!row || row.status !== "active") continue;
+    const row = await getSeasonGameNode(db, parentId, objectId);
+    if (!row) continue;
     const doc = parseDocument(row.child_object_document_json);
-    if (!(await quorumUnlockNeedsRepair(db, nodeId, doc, season))) continue;
-    const result = await applyUnlockSideEffects(db, nodeId, doc, now, season);
+    if (!(await quorumUnlockNeedsRepair(db, parentId, nodeId, doc, season))) continue;
+    const result = await applyUnlockSideEffects(db, nodeId, doc, now, season, parentId);
     repaired.push(...result.unlockedNodes);
   }
 
   for (const nodeId of seasonFragmentNodeIds(season)) {
     const objectId = seasonObjectIdForNode(nodeId, season);
     if (!objectId) continue;
-    const row = await getChildObject(db, objectId);
-    if (!row || row.status !== "active") continue;
+    const row = await getSeasonGameNode(db, parentId, objectId);
+    if (!row) continue;
     const doc = parseDocument(row.child_object_document_json);
-    if (!(await fragmentUnlockNeedsRepair(db, nodeId, doc, season))) continue;
-    const result = await applyUnlockSideEffects(db, nodeId, doc, now, season);
+    if (!(await fragmentUnlockNeedsRepair(db, parentId, nodeId, doc, season))) continue;
+    const result = await applyUnlockSideEffects(db, nodeId, doc, now, season, parentId);
     repaired.push(...result.unlockedNodes);
   }
 

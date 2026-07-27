@@ -28,7 +28,7 @@ export async function persistRelayDecayIfExpired(
   const maxRetries = input.maxRetries ?? RELAY_CONTRIBUTE_MAX_RETRIES;
 
   for (let attempt = 0; attempt < maxRetries; attempt += 1) {
-    const existing = await getChildObject(db, input.objectId);
+    const existing = await getChildObject(db, input.parentProfileId, input.objectId);
     if (!existing || existing.parent_profile_id !== input.parentProfileId) {
       return false;
     }

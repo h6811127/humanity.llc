@@ -20,9 +20,12 @@ class RelayDecayDb {
       bind(...args: unknown[]) {
         return {
           async first<T>() {
-            if (sql.includes("FROM child_objects WHERE object_id = ?")) {
-              const objectId = String(args[0]);
-              return (self.objects.get(objectId) as T | undefined) ?? null;
+            if (sql.includes("FROM child_objects WHERE parent_profile_id = ? AND object_id = ?")) {
+              const parentId = String(args[0]);
+              const objectId = String(args[1]);
+              const row = self.objects.get(objectId) as { parent_profile_id?: string } | undefined;
+              if (!row || row.parent_profile_id !== parentId) return null;
+              return row as T;
             }
             return null;
           },
