@@ -12,7 +12,7 @@ import {
   recordGameUpdateSeasonUsage,
 } from "../city-game/season-quota";
 import { applyUnlockSideEffects, seasonNodeIdFromObjectId } from "../city-game/unlock-evaluator";
-import { getChildObject, updateChildObject } from "../db/child-objects";
+import { getChildObject, updateChildObjectIfUnchanged } from "../db/child-objects";
 import { errorResponse, jsonResponse } from "../http/resolver";
 import { CHILD_OBJECT_ID_REGEX } from "./child-objects";
 
@@ -192,17 +192,28 @@ export async function handlePostGameUpdate(
   if (updateQuota) return updateQuota;
 
   try {
-    await updateChildObject(db, {
-      objectId: pathObjectId,
-      parentProfileId: pathProfileId,
-      objectType: GAME_NODE_OBJECT_TYPE,
-      publicLabel,
-      publicState,
-      status: "active",
-      documentJson: JSON.stringify(doc),
-      createdAt,
-      updatedAt,
-    });
+    const saved = await updateChildObjectIfUnchanged(
+      db,
+      {
+        objectId: pathObjectId,
+        parentProfileId: pathProfileId,
+        objectType: GAME_NODE_OBJECT_TYPE,
+        publicLabel,
+        publicState,
+        status: "active",
+        documentJson: JSON.stringify(doc),
+        createdAt,
+        updatedAt,
+      },
+      existing.updated_at
+    );
+    if (!saved) {
+      return errorResponse(
+        "UPDATE_CONFLICT",
+        "Game node was updated concurrently. Reload and retry with a newer updated_at.",
+        409
+      );
+    }
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     return errorResponse("RESOLVER_ERROR", msg, 500);

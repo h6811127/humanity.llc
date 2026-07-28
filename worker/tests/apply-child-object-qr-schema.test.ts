@@ -16,5 +16,7 @@ describe("apply-child-object-qr-schema", () => {
     );
     expect(sql).toContain("child_object");
     expect(sql).toContain("live_control_challenges_repair");
+    expect(sql).toContain("idx_qr_one_active_child_object");
+    expect(sql).toContain("idx_qr_one_active_print_artifact");
   });
 });

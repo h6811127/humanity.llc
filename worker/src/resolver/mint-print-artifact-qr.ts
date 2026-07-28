@@ -248,6 +248,26 @@ export async function mintPrintArtifactFromSignedCredential(
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Database error.";
     if (msg.includes("UNIQUE") || msg.includes("unique")) {
+      const activeAgain = await getActivePrintArtifactQr(db, profileId, printArtifactId);
+      if (activeAgain) {
+        if (opts.allowAlreadyMinted && activeAgain.qr_id === newQrId) {
+          return {
+            ok: true,
+            profile_id: profileId,
+            qr_id: newQrId,
+            print_artifact_id: printArtifactId,
+            scan_url: expectedPayload,
+            qr_expires_at: null,
+            status: "active",
+            already_minted: true,
+          };
+        }
+        return fail(
+          "PRINT_ARTIFACT_ACTIVE",
+          "An active QR already exists for this print_artifact_id.",
+          409
+        );
+      }
       if (opts.allowAlreadyMinted) {
         return {
           ok: true,

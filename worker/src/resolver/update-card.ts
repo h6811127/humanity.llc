@@ -160,9 +160,23 @@ export async function handlePostCardUpdate(
   const cardDocumentJson = JSON.stringify(doc);
 
   try {
-    await applyCardUpdate(db, profileId, manifestoLine, cardDocumentJson, updatedAt);
+    await applyCardUpdate(
+      db,
+      profileId,
+      manifestoLine,
+      cardDocumentJson,
+      updatedAt,
+      existing.updated_at
+    );
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Database error.";
+    if (msg === "CARD_UPDATE_CONFLICT") {
+      return errorResponse(
+        "UPDATE_CONFLICT",
+        "Card was updated concurrently. Reload and retry with a newer updated_at.",
+        409
+      );
+    }
     return errorResponse("RESOLVER_ERROR", msg, 500);
   }
 

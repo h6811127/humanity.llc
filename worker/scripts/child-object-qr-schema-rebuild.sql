@@ -73,6 +73,14 @@ CREATE INDEX IF NOT EXISTS idx_qr_credentials_object_id ON qr_credentials (objec
 CREATE UNIQUE INDEX IF NOT EXISTS idx_qr_one_active_card_scope ON qr_credentials (profile_id)
   WHERE scope = 'card' AND status = 'active';
 
+CREATE UNIQUE INDEX IF NOT EXISTS idx_qr_one_active_child_object
+  ON qr_credentials (profile_id, object_id)
+  WHERE scope = 'child_object' AND status = 'active' AND object_id IS NOT NULL;
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_qr_one_active_print_artifact
+  ON qr_credentials (profile_id, print_artifact_id)
+  WHERE scope = 'print_artifact' AND status = 'active' AND print_artifact_id IS NOT NULL;
+
 -- Dependent tables keep stale FK metadata when qr_credentials is dropped/recreated above.
 CREATE TABLE live_control_challenges_repair (
   challenge_id TEXT PRIMARY KEY NOT NULL,

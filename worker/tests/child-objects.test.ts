@@ -97,7 +97,12 @@ class ChildObjectDb {
             if (sql.startsWith("UPDATE child_objects")) {
               const objectId = String(args[6]);
               const existing = db.objects.get(objectId);
-              if (!existing || existing.parent_profile_id !== String(args[7])) {
+              if (
+                !existing ||
+                existing.parent_profile_id !== String(args[7]) ||
+                (sql.includes("AND updated_at = ?") &&
+                  existing.updated_at !== String(args[8]))
+              ) {
                 return { success: true, meta: { changes: 0 } };
               }
               db.objects.set(objectId, {
@@ -267,6 +272,63 @@ describe("child object endpoints", () => {
 
     expect(res.status).toBe(200);
     expect(db.objects.get(OBJECT_ID)?.public_state).toBe("Closed until Monday");
+  });
+
+  it("returns UPDATE_CONFLICT when child object CAS loses after the freshness check", async () => {
+    const keys = await getTestKeypair();
+    const db = new ChildObjectDb();
+    db.parent.public_key = keys.publicKeyBase58;
+    const created = await signedChildObject(keys);
+    await handlePostChildObjectCreate(
+      requestFor(`/.well-known/hc/v1/cards/${PROFILE}/objects`, created),
+      db as unknown as D1Database,
+      PROFILE
+    );
+
+    const stale = await signedChildObject(keys, {
+      public_state: "Stale state",
+      updated_at: "2026-05-17T12:00:00.000Z",
+    });
+
+    // SELECT returns the pre-race row; mutate storage immediately so CAS misses.
+    const originalPrepare = db.prepare.bind(db);
+    db.prepare = ((sql: string) => {
+      const stmt = originalPrepare(sql);
+      if (!sql.includes("FROM child_objects WHERE object_id")) return stmt;
+      const originalBind = stmt.bind.bind(stmt);
+      return {
+        bind: (...args: unknown[]) => {
+          const bound = originalBind(...args);
+          const originalFirst = bound.first.bind(bound);
+          return {
+            ...bound,
+            first: async <T>() => {
+              const row = await originalFirst<T>();
+              const current = db.objects.get(OBJECT_ID);
+              if (current) {
+                db.objects.set(OBJECT_ID, {
+                  ...current,
+                  public_state: "Winner state",
+                  updated_at: "2026-05-17T13:00:00.000Z",
+                });
+              }
+              return row;
+            },
+          };
+        },
+      };
+    }) as typeof db.prepare;
+
+    const staleRes = await handlePostChildObjectUpdate(
+      requestFor(`/.well-known/hc/v1/cards/${PROFILE}/objects/${OBJECT_ID}/update`, stale),
+      db as unknown as D1Database,
+      PROFILE,
+      OBJECT_ID
+    );
+    expect(staleRes.status).toBe(409);
+    const body = (await staleRes.json()) as { error?: string };
+    expect(body.error).toBe("UPDATE_CONFLICT");
+    expect(db.objects.get(OBJECT_ID)?.public_state).toBe("Winner state");
   });
 
   it("disables a child object through the revoke endpoint", async () => {

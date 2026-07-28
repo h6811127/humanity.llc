@@ -253,6 +253,26 @@ export async function mintChildObjectFromSignedCredential(
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Database error.";
     if (msg.includes("UNIQUE") || msg.includes("unique")) {
+      const activeAgain = await getActiveChildObjectQr(db, profileId, objectId);
+      if (activeAgain) {
+        if (opts.allowAlreadyMinted && activeAgain.qr_id === newQrId) {
+          return {
+            ok: true,
+            profile_id: profileId,
+            object_id: objectId,
+            qr_id: newQrId,
+            scan_url: expectedPayload,
+            qr_expires_at: null,
+            status: "active",
+            already_minted: true,
+          };
+        }
+        return fail(
+          "CHILD_OBJECT_QR_ACTIVE",
+          "An active QR already exists for this child object.",
+          409
+        );
+      }
       if (opts.allowAlreadyMinted) {
         return {
           ok: true,

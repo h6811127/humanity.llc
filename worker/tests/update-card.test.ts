@@ -37,17 +37,24 @@ function mockDb(existing: {
   };
   return {
     prepare: (sql: string) => ({
-      bind: () => ({
+      bind: (...args: unknown[]) => ({
         first: async () => {
           if (sql.includes("FROM cards")) return { ...stored };
           return null;
         },
         run: async () => {
           if (sql.includes("UPDATE cards")) {
+            if (
+              sql.includes("AND updated_at = ?") &&
+              String(args[4]) !== stored.updated_at
+            ) {
+              return { success: true, meta: { changes: 0 } };
+            }
             stored = {
               ...stored,
-              manifesto_line: "Studio door\nClosed until Monday",
-              updated_at: "2026-05-17T12:00:00.000Z",
+              manifesto_line: String(args[0] ?? stored.manifesto_line),
+              card_document_json: String(args[1] ?? stored.card_document_json),
+              updated_at: String(args[2] ?? "2026-05-17T12:00:00.000Z"),
             };
             return { success: true, meta: { changes: 1 } };
           }
@@ -58,7 +65,11 @@ function mockDb(existing: {
     get stored() {
       return stored;
     },
-  } as unknown as D1Database;
+    /** Test helper: advance stored updated_at as if a concurrent writer won. */
+    bumpUpdatedAt(iso: string) {
+      stored = { ...stored, updated_at: iso };
+    },
+  } as unknown as D1Database & { bumpUpdatedAt(iso: string): void };
 }
 
 describe("handlePostCardUpdate", () => {
@@ -129,6 +140,81 @@ describe("handlePostCardUpdate", () => {
     expect(res.status).toBe(200);
     const json = (await res.json()) as { manifesto_line: string };
     expect(json.manifesto_line).toBe(manifesto);
+  });
+
+  it("rejects stale card updates that would rewind updated_at", async () => {
+    const { handlePostCardUpdate } = await import("../src/resolver/update-card");
+    const { privateKey, publicKeyBase58 } = await getTestKeypair();
+    const staleUpdatedAt = "2026-05-17T12:00:00.000Z";
+    const manifesto = "Stale manifesto\nShould not win";
+
+    const signed = await signDocument(
+      withProtocolFields(
+        {
+          profile_id: PROFILE,
+          public_key: publicKeyBase58,
+          handle: "river_example",
+          manifesto_line: manifesto,
+          created_at: CREATED,
+          updated_at: staleUpdatedAt,
+          status: "active",
+          verification: {
+            level: 1,
+            label: "Registered",
+            method: "registered",
+            verified_at: CREATED,
+            vouch_count: 0,
+            latest_accepted_vouch_at: null,
+          },
+          badges: [],
+          qr: { active_qr_id: "qr_test", epoch: 1 },
+          links: { standards: "https://humanity.llc/standards/v1" },
+        },
+        PAYLOAD_TYPES.HUMANITY_CARD
+      ),
+      { privateKey, publicKeyBase58 }
+    );
+
+    const db = mockDb({ public_key: publicKeyBase58 });
+    // Concurrent writer already advanced the row past the stale client's base.
+    db.bumpUpdatedAt("2026-05-17T13:00:00.000Z");
+
+    const res = await handlePostCardUpdate(
+      new Request(
+        `https://humanity.llc/.well-known/hc/v1/cards/${PROFILE}/update`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ card: signed }),
+        }
+      ),
+      db,
+      PROFILE
+    );
+
+    // Pre-check rejects updated_at <= stored before CAS runs.
+    expect(res.status).toBe(422);
+    expect(db.stored.updated_at).toBe("2026-05-17T13:00:00.000Z");
+  });
+
+  it("returns UPDATE_CONFLICT when CAS loses a race after the freshness check", async () => {
+    const { applyCardUpdate } = await import("../src/db/card-update");
+    const db = mockDb({
+      public_key: "pk",
+      updated_at: "2026-05-17T12:00:00.000Z",
+    });
+    db.bumpUpdatedAt("2026-05-17T13:00:00.000Z");
+    await expect(
+      applyCardUpdate(
+        db,
+        PROFILE,
+        "Lost write",
+        "{}",
+        "2026-05-17T12:30:00.000Z",
+        "2026-05-17T12:00:00.000Z"
+      )
+    ).rejects.toThrow("CARD_UPDATE_CONFLICT");
+    expect(db.stored.updated_at).toBe("2026-05-17T13:00:00.000Z");
   });
 
   it("accepts owner-signed update with object_streams", async () => {
