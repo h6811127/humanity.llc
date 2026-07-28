@@ -91,16 +91,28 @@ export async function getLostItemOffer(
 
 export async function dismissLostItemOffer(
   db: D1Database,
-  offerId: string,
-  updatedAt: string
+  input: {
+    offerId: string;
+    parentProfileId: string;
+    objectId: string;
+    updatedAt: string;
+  }
 ): Promise<boolean> {
   const result = await db
     .prepare(
       `UPDATE lost_item_relay_offers
        SET status = 'dismissed', updated_at = ?
-       WHERE offer_id = ? AND status = 'pending'`
+       WHERE offer_id = ?
+         AND parent_profile_id = ?
+         AND object_id = ?
+         AND status = 'pending'`
     )
-    .bind(updatedAt, offerId)
+    .bind(
+      input.updatedAt,
+      input.offerId,
+      input.parentProfileId,
+      input.objectId
+    )
     .run();
   return (result.meta.changes ?? 0) > 0;
 }

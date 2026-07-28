@@ -352,7 +352,12 @@ export async function handlePostLostItemOfferOwner(
       );
     }
 
-    const dismissed = await dismissLostItemOffer(db, verified.offerId!, nowIso);
+    const dismissed = await dismissLostItemOffer(db, {
+      offerId: verified.offerId!,
+      parentProfileId: profileId,
+      objectId,
+      updatedAt: nowIso,
+    });
     if (!dismissed) {
       const existing = await getLostItemOffer(db, verified.offerId!);
       if (
