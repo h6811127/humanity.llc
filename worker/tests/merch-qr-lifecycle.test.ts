@@ -5,6 +5,7 @@ import {
   isQrCalendarExpired,
   normalizeExpiresAtForScope,
   resolveStoredQrExpiresAt,
+  validateItemScopedMintExpiry,
   validatePrintArtifactMintExpiry,
 } from "../src/resolver/merch-qr-policy";
 import { buildScanViewModel } from "../src/resolver/scan-state";
@@ -65,6 +66,23 @@ describe("merch-qr-policy", () => {
   it("print_artifact ignores past expires_at for calendar expiry", () => {
     expect(isQrCalendarExpired("print_artifact", "2020-01-01T00:00:00Z")).toBe(false);
     expect(isQrCalendarExpired("card", "2020-01-01T00:00:00Z")).toBe(true);
+  });
+
+  it("child_object is item-scoped and ignores calendar expiry like print_artifact", () => {
+    expect(isQrCalendarExpired("child_object", "2020-01-01T00:00:00Z")).toBe(false);
+    expect(normalizeExpiresAtForScope("child_object", "2027-01-01T00:00:00Z")).toBeNull();
+    expect(
+      resolveStoredQrExpiresAt("child_object", "2027-01-01", () => "2027-01-01T00:00:00.000Z")
+    ).toBeNull();
+
+    const rejected = validateItemScopedMintExpiry("child_object", "2027-01-01");
+    expect(rejected.ok).toBe(false);
+    if (!rejected.ok) {
+      expect(rejected.code).toBe("ITEM_SCOPED_NO_CALENDAR_EXPIRY");
+      expect(rejected.message).toContain("child_object");
+    }
+    expect(validateItemScopedMintExpiry("child_object", null).ok).toBe(true);
+    expect(validateItemScopedMintExpiry("child_object", "").ok).toBe(true);
   });
 
   it("normalizeExpiresAtForScope clears print_artifact expiry", () => {
