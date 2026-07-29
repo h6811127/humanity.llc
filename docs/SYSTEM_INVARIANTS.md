@@ -192,8 +192,9 @@ npm run notify:field-signoff
 | Buyer print frame | Glitch buyer choice `full` \| `transparent` must persist on `artifact_intents.print_frame_background` and `print_orders.print_frame_background` and drive Printify SVG render — not `sessionStorage` only. See [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) § Glitch print frame background. |
 | Transparent on fabric | Allowed in UI for approved colors (not Charcoal Heather / Royal Blue); Printify SVG uses stored `transparent` when persisted; physical QA sign-off still required ([`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md)). |
 | Fulfillment mint idempotency | `allowAlreadyMinted` may return success only when the active `print_artifact` QR for `(profile_id, print_artifact_id)` already equals the requested `qr_id`. A UNIQUE conflict alone (e.g. planned `qr_id` squatted as another credential) must not report minted — see `mintPrintArtifactFromSignedCredential`. |
+| Paid webhook mint/submit retry | Duplicate Shopify paid deliveries for a `processing` commerce order that already has print order ids must still run idempotent auto-mint + Printify submit (`recoverDuplicateProcessingOrder`). Skipping that path permanently stalls fulfillment after a non-fatal first-pass mint/submit failure. |
 
-**Regression:** `npm run worker:test -- worker/tests/print-frame-background.test.ts worker/tests/print-template-render.test.ts worker/tests/artifact-intents.test.ts worker/tests/fulfillment-queue.test.ts worker/tests/printify-line-items.test.ts worker/tests/fulfillment-mint.test.ts`
+**Regression:** `npm run worker:test -- worker/tests/print-frame-background.test.ts worker/tests/print-template-render.test.ts worker/tests/artifact-intents.test.ts worker/tests/fulfillment-queue.test.ts worker/tests/printify-line-items.test.ts worker/tests/fulfillment-mint.test.ts worker/tests/shopify-orders-webhook.test.ts`
 
 Canonical: [`QR_BRANDING.md`](QR_BRANDING.md) § Two registers · [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) · [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md)
 

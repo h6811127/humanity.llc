@@ -506,6 +506,38 @@ describe("Shopify orders webhook (O-001)", () => {
     );
   });
 
+  it("retries auto-mint when a paid webhook retry finds print orders already queued", async () => {
+    const existingOrder = commerceOrderRow({
+      print_order_ids_json: JSON.stringify(["po_already_queued"]),
+    });
+    const state: DbState = {
+      intents: new Map([[INTENT, intentRow({ status: "converted" })]]),
+      orders: new Map([[existingOrder.shopify_order_id, existingOrder]]),
+      receipts: new Map(),
+      printOrders: new Map(),
+      fulfillmentPii: new Map(),
+    };
+
+    const res = await handlePostShopifyOrdersWebhook(
+      await webhookRequest(paidOrderBody(), { "X-Shopify-Webhook-Id": "wh_retry_mint" }),
+      env,
+      dbFor(state)
+    );
+    const json = (await res.json()) as {
+      duplicate: boolean;
+      print_order_ids: string[];
+      auto_mint?: Array<{ attempted: boolean; print_order_id: string | null }>;
+    };
+
+    expect(res.status).toBe(200);
+    expect(json.duplicate).toBe(true);
+    expect(json.print_order_ids).toEqual(["po_already_queued"]);
+    // Recovery must invoke auto-mint (idempotent) instead of returning empty forever.
+    expect(json.auto_mint).toHaveLength(1);
+    expect(json.auto_mint?.[0]?.print_order_id).toBeNull();
+    expect(state.printOrders.size).toBe(0);
+  });
+
   it("holds a new paid order that reuses an already converted artifact intent", async () => {
     const firstOrder = commerceOrderRow({
       commerce_order_id: "co_first_checkout",

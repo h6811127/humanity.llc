@@ -232,7 +232,17 @@ async function recoverDuplicateProcessingOrder(
     const intentIds = JSON.parse(row.artifact_intent_ids_json) as string[];
     const fulfillmentMode: IntentValidation["fulfillment_mode"] =
       intentIds.length > 0 ? "personalized" : "tier0_batch";
-    return { row, autoMint: [], fulfillmentMode };
+    // First delivery may have queued the print order then failed mint/submit while
+    // still returning HTTP 200 (auto-mint is non-fatal). Duplicate paid topics must
+    // retry idempotent auto-mint + Printify submit — not skip forever.
+    const autoMint = await tryAutoMintQueuedPrintOrders(
+      request,
+      env,
+      db,
+      existingPrintOrderIds,
+      intentIds
+    );
+    return { row, autoMint, fulfillmentMode };
   }
 
   const intentIds = JSON.parse(row.artifact_intent_ids_json) as string[];
