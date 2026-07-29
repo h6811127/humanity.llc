@@ -153,4 +153,87 @@ describe("fulfillment mint (print order batch)", () => {
     expect(result.all_planned_minted).toBe(false);
     expect(result.failures[0]?.code).toBe("PLANNED_QR_MISMATCH");
   });
+
+  it("does not treat UNIQUE qr_id squat as already_minted success", async () => {
+    const { privateKey, publicKeyBase58 } = await getTestKeypair();
+    const credential = await signedCredential(publicKeyBase58, privateKey);
+
+    // Simulate planned fulfillment qr_id already taken by an unrelated credential.
+    const squatDb = {
+      prepare: (sql: string) => ({
+        bind: (...args: unknown[]) => ({
+          first: async () => {
+            if (sql.includes("FROM cards WHERE profile_id") && sql.includes("manifesto_line")) {
+              return {
+                public_key: publicKeyBase58,
+                recovery_public_key: null,
+                handle: "river_example",
+                handle_normalized: "river_example",
+                manifesto_line: "Open studio",
+                status: "active",
+                card_document_json: "{}",
+                created_at: CREATED,
+                updated_at: CREATED,
+              };
+            }
+            if (sql.includes("issuer_public_key")) {
+              return {
+                public_key: publicKeyBase58,
+                recovery_public_key: null,
+                issuer_public_key: null,
+                status: "active",
+              };
+            }
+            if (sql.includes("print_artifact_id = ?")) {
+              // No active print_artifact QR for this pa_id (squat was card-scoped).
+              return null;
+            }
+            return null;
+          },
+          run: async () => {
+            if (sql.includes("INSERT INTO qr_credentials")) {
+              throw new Error("UNIQUE constraint failed: qr_credentials.qr_id");
+            }
+            return { success: true };
+          },
+        }),
+      }),
+    } as unknown as D1Database;
+
+    const result = await mintPrintOrderFromCredentials(
+      new Request("https://humanity.llc/v1/print/orders/po_test/mint"),
+      squatDb,
+      printOrderRow(),
+      [credential]
+    );
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.all_planned_minted).toBe(false);
+    expect(result.minted).toHaveLength(0);
+    expect(result.failures[0]?.code).toBe("QR_EXISTS");
+  });
+
+  it("idempotent retry still succeeds when active print_artifact QR matches", async () => {
+    const { privateKey, publicKeyBase58 } = await getTestKeypair();
+    const credential = await signedCredential(publicKeyBase58, privateKey);
+    const { db: okDb } = issueMockDb(publicKeyBase58);
+    const first = await mintPrintOrderFromCredentials(
+      new Request("https://humanity.llc/v1/print/orders/po_test/mint"),
+      okDb,
+      printOrderRow(),
+      [credential]
+    );
+    expect(first.ok && first.all_planned_minted).toBe(true);
+    const second = await mintPrintOrderFromCredentials(
+      new Request("https://humanity.llc/v1/print/orders/po_test/mint"),
+      okDb,
+      printOrderRow(),
+      [credential]
+    );
+    expect(second.ok && second.all_planned_minted).toBe(true);
+    if (second.ok) {
+      expect(second.minted[0]?.already_minted).toBe(true);
+    }
+  });
 });

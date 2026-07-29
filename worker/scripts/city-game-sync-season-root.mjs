@@ -3,7 +3,7 @@
  * Align site season JSON with a local seed profile (no re-mint).
  *
  *   npm run city-game:sync-season-root              # local dev seed
- *   npm run city-game:sync-season-root -- --production   # production mint artifact
+ *   npm run city-game:sync-season-root -- --production --confirm-production
  *
  * Local: worker/.local/city-game-seed.json
  * Production: worker/.local/city-game-production-seed.json (requires prior seed-production)
@@ -13,12 +13,19 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   applySeasonRootSync,
+  assessProductionSeedForSync,
   shouldRefuseLocalSeasonRootSync,
 } from "./city-game-sync-season-root-core.mjs";
+import {
+  DEFAULT_PRODUCTION_API,
+  verifyProductionRoot,
+} from "./city-game-verify-production-root-core.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const useProduction = process.argv.includes("--production");
+const confirmProduction = process.argv.includes("--confirm-production");
 const forceLocal = process.argv.includes("--force-local");
+const force = process.argv.includes("--force");
 const seedPath = join(
   root,
   useProduction
@@ -36,6 +43,14 @@ if (!existsSync(seedPath)) {
   process.exit(1);
 }
 
+if (useProduction && !confirmProduction) {
+  console.error(
+    "Production season-root sync rewrites committed Cedar Rapids season JSON.\n" +
+      "Re-run with: npm run city-game:sync-season-root -- --production --confirm-production"
+  );
+  process.exit(1);
+}
+
 const seed = JSON.parse(readFileSync(seedPath, "utf8"));
 const season = JSON.parse(readFileSync(seasonPath, "utf8"));
 
@@ -44,6 +59,27 @@ if (shouldRefuseLocalSeasonRootSync({ useProduction, forceLocal, season })) {
     "Refusing to sync local seed into production-bound season JSON. Use --production for the production seed, or --force-local when intentionally rewriting local dev URLs."
   );
   process.exit(1);
+}
+
+if (useProduction) {
+  const assessment = assessProductionSeedForSync({ seed, season, force });
+  if (!assessment.ok) {
+    console.error(assessment.message);
+    process.exit(1);
+  }
+
+  const verify = await verifyProductionRoot(
+    { season_root_profile_id: assessment.profileId },
+    DEFAULT_PRODUCTION_API
+  );
+  if (!verify.ok) {
+    console.error(
+      "Production sync refused — seed profile_id is not present on production D1.\n" +
+        `  ${verify.reason ?? "verify failed"}\n` +
+        "Run a real production mint (`city-game:seed-production -- --confirm-production`) before syncing."
+    );
+    process.exit(1);
+  }
 }
 
 let result;

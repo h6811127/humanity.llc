@@ -34,6 +34,9 @@ import {
   missingSeedSiteCodeWarnings,
 } from "./city-game-seed-site-codes-core.mjs";
 import {
+  shouldRefuseLocalWriteSeason,
+} from "./city-game-sync-season-root-core.mjs";
+import {
   createShowcaseWithHandleRetry,
   newShowcaseKeypair,
   randomBase58,
@@ -46,6 +49,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const seasonPath = join(root, "site/data/city-game-cr-season-01.json");
 const writeSeason = process.argv.includes("--write-season");
 const productionOut = process.argv.includes("--production-out");
+const forceLocal = process.argv.includes("--force-local");
 const outPath = join(
   root,
   productionOut
@@ -224,6 +228,25 @@ async function main() {
       `\nseason_root_profile_id already set (${season.season_root_profile_id}).`
     );
     console.error("Use --force to mint another local season, or clear the field first.");
+    process.exit(1);
+  }
+
+  if (
+    writeSeason &&
+    shouldRefuseLocalWriteSeason({ productionOut, forceLocal, season })
+  ) {
+    console.error(
+      "\nRefusing --write-season on production-bound season JSON (humanity.llc scan URLs present)."
+    );
+    console.error(
+      "That would replace season_root_profile_id while leaving production node scan_urls — inconsistent canon."
+    );
+    console.error(
+      "For local D1: npm run city-game:sync-season-root -- --force-local after seeding, or re-run with --force-local --write-season."
+    );
+    console.error(
+      "For production mint: npm run city-game:seed-production -- --confirm-production (uses --production-out)."
+    );
     process.exit(1);
   }
 

@@ -191,8 +191,10 @@ npm run notify:field-signoff
 | Customize Glitch | Planned QR block below mockup; mock toggle does not replace fulfillment artwork alone. |
 | Buyer print frame | Glitch buyer choice `full` \| `transparent` must persist on `artifact_intents.print_frame_background` and `print_orders.print_frame_background` and drive Printify SVG render — not `sessionStorage` only. See [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) § Glitch print frame background. |
 | Transparent on fabric | Allowed in UI for approved colors (not Charcoal Heather / Royal Blue); Printify SVG uses stored `transparent` when persisted; physical QA sign-off still required ([`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md)). |
+| Fulfillment mint idempotency | `allowAlreadyMinted` may return success only when the active `print_artifact` QR for `(profile_id, print_artifact_id)` already equals the requested `qr_id`. A UNIQUE conflict alone (e.g. planned `qr_id` squatted as another credential) must not report minted — see `mintPrintArtifactFromSignedCredential`. |
+| Paid webhook mint/submit retry | Duplicate Shopify paid deliveries for a `processing` commerce order that already has print order ids must still run idempotent auto-mint + Printify submit (`recoverDuplicateProcessingOrder`). Skipping that path permanently stalls fulfillment after a non-fatal first-pass mint/submit failure. |
 
-**Regression:** `npm run worker:test -- worker/tests/print-frame-background.test.ts worker/tests/print-template-render.test.ts worker/tests/artifact-intents.test.ts worker/tests/fulfillment-queue.test.ts worker/tests/printify-line-items.test.ts`
+**Regression:** `npm run worker:test -- worker/tests/print-frame-background.test.ts worker/tests/print-template-render.test.ts worker/tests/artifact-intents.test.ts worker/tests/fulfillment-queue.test.ts worker/tests/printify-line-items.test.ts worker/tests/fulfillment-mint.test.ts worker/tests/shopify-orders-webhook.test.ts`
 
 Canonical: [`QR_BRANDING.md`](QR_BRANDING.md) § Two registers · [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) · [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md)
 
@@ -287,6 +289,8 @@ Canonical spec: [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.m
 | Season root ↔ steward | `GET …/steward/entitlements?season_id=` succeeds only when `steward_account_profiles` links the session `account_id` to that season’s `season_root_profile_id` (bundled season config). |
 | Snapshot quota | Uncached season snapshot builds increment `game.snapshot.get`; **304** (`If-None-Match`) does **not** increment season snapshot quota. |
 | Season config bundle | Worker resolves seasons from `season-registry.generated.ts` imports of `site/data/city-game-*.json` at **bundle load** — editing JSON requires **`worker:dev` restart** (and `city-game:sync-season-root` when local seed ≠ JSON). |
+| Production season-root sync | `city-game:sync-season-root -- --production` requires `--confirm-production`, seed `scan_url`s on `humanity.llc` that embed `seed.profile_id`, refuses root profile changes without `--force`, and verifies the seed profile exists on production D1 before rewriting committed season JSON. |
+| Local write-season vs prod canon | `city-game:seed-local -- --write-season` refuses production-bound season JSON (humanity.llc scan URLs) unless `--force-local` or `--production-out`. Prefer `sync-season-root -- --force-local` after a local seed so root id and node URLs stay consistent. |
 | Self-serve setup | New public seasons register **game_node** child objects on `/created/` Live · Manage — bulk import, QR issue, rules publish. Organizer uses owner/recovery keys + game-operator public key at `/create/`; weekend flips stay on `/game-operator/` only. |
 | Terminal mint scope | `city-game:mint-node` and `city-game:seed-local` are **Cedar Rapids pilot / CI / engineering** only. Self-serve seasons (`auto_rules_page: true`, not pilot) **exit 1** unless `--force` / `--ci` / `CI=1`. Do not document terminal mint for new organizers. |
 

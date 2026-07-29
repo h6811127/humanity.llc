@@ -249,16 +249,33 @@ export async function mintPrintArtifactFromSignedCredential(
     const msg = e instanceof Error ? e.message : "Database error.";
     if (msg.includes("UNIQUE") || msg.includes("unique")) {
       if (opts.allowAlreadyMinted) {
-        return {
-          ok: true,
-          profile_id: profileId,
-          qr_id: newQrId,
-          print_artifact_id: printArtifactId,
-          scan_url: expectedPayload,
-          qr_expires_at: null,
-          status: "active",
-          already_minted: true,
-        };
+        // Only treat UNIQUE as idempotent success when THIS credential is already
+        // the active print_artifact QR. A colliding qr_id on another row (e.g. a
+        // card-scoped squat of a planned fulfillment id) must not report minted.
+        const activeAfterConflict = await getActivePrintArtifactQr(
+          db,
+          profileId,
+          printArtifactId
+        );
+        if (activeAfterConflict && activeAfterConflict.qr_id === newQrId) {
+          return {
+            ok: true,
+            profile_id: profileId,
+            qr_id: newQrId,
+            print_artifact_id: printArtifactId,
+            scan_url: expectedPayload,
+            qr_expires_at: null,
+            status: "active",
+            already_minted: true,
+          };
+        }
+        if (activeAfterConflict) {
+          return fail(
+            "PRINT_ARTIFACT_ACTIVE",
+            "An active QR already exists for this print_artifact_id.",
+            409
+          );
+        }
       }
       return fail("QR_EXISTS", "qr_id already exists.", 409);
     }
