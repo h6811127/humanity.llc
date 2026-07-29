@@ -95,11 +95,44 @@ describe("scan-out token", () => {
 });
 
 describe("scan redirect guard", () => {
-  it("blocks redirect query params on scan URLs", () => {
+  const REDIRECT_QUERY_KEYS = [
+    "redirect",
+    "url",
+    "next",
+    "continue",
+    "dest",
+    "destination",
+    "goto",
+    "return",
+    "return_to",
+    "u",
+    "link",
+    "out",
+  ] as const;
+
+  it.each(REDIRECT_QUERY_KEYS)(
+    "blocks banned redirect query key %s (case-insensitive)",
+    (key) => {
+      const lower = new URL(
+        `https://humanity.llc/c/${PROFILE}?q=${QR}&${key}=https://evil.com`
+      );
+      const upper = new URL(
+        `https://humanity.llc/c/${PROFILE}?q=${QR}&${key.toUpperCase()}=https://evil.com`
+      );
+      const mixed = new URL(
+        `https://humanity.llc/c/${PROFILE}?q=${QR}&${key[0].toUpperCase()}${key.slice(1)}=https://evil.com`
+      );
+      expect(scanRedirectQueryBlocked(lower)).toBe(true);
+      expect(scanRedirectQueryBlocked(upper)).toBe(true);
+      expect(scanRedirectQueryBlocked(mixed)).toBe(true);
+    }
+  );
+
+  it("does not block ordinary scan query params", () => {
     const url = new URL(
-      `https://humanity.llc/c/${PROFILE}?q=${QR}&redirect=https://evil.com`
+      `https://humanity.llc/c/${PROFILE}?q=${QR}&proof=1&tab=live&view=status`
     );
-    expect(scanRedirectQueryBlocked(url)).toBe(true);
+    expect(scanRedirectQueryBlocked(url)).toBe(false);
   });
 
   it("blocks external Location on scan responses", () => {
@@ -115,11 +148,24 @@ describe("scan redirect guard", () => {
 
   it("allows same-origin redirects", () => {
     const req = new Request(`https://humanity.llc/c/${PROFILE}?q=${QR}`);
-    const res = new Response(null, {
+    const relative = new Response(null, {
       status: 302,
       headers: { Location: "/c/other?q=qr_other123456789" },
     });
-    expect(guardScanResponse(req, res).status).toBe(302);
+    const absolute = new Response(null, {
+      status: 301,
+      headers: { Location: `https://humanity.llc/c/${PROFILE}?q=${QR}` },
+    });
+    expect(guardScanResponse(req, relative).status).toBe(302);
+    expect(guardScanResponse(req, absolute).status).toBe(301);
+  });
+
+  it("passes through non-redirect responses and redirects without Location", () => {
+    const req = new Request(`https://humanity.llc/c/${PROFILE}?q=${QR}`);
+    const ok = new Response("scan", { status: 200 });
+    const noLocation = new Response(null, { status: 302 });
+    expect(guardScanResponse(req, ok)).toBe(ok);
+    expect(guardScanResponse(req, noLocation)).toBe(noLocation);
   });
 });
 
