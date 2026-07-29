@@ -40,9 +40,9 @@ npm run city-game:sync-season-root   # align (2) to (1) on disk
 npm run hosted:steward-session-local
 ```
 
-`city-game:seed-local -- --write-season` only updates (2) during a **full seed** when `season_root_profile_id` is empty (or use `--force` to re-mint). Prefer **sync** when D1 already has nodes.
+`city-game:seed-local -- --write-season` only updates (2) during a **full seed** when `season_root_profile_id` is empty (or use `--force` to re-mint). Prefer **sync** when D1 already has nodes. When (2) still has production `humanity.llc` scan URLs, `--write-season` requires `--force-local` (or use `--production-out` via `seed-production`); the safer local path is seed then `npm run city-game:sync-season-root -- --force-local`.
 
-**Production:** committed `season_root_profile_id` in (2) is canonical for deploy; do not commit local-only profile ids from (1) unless ops intends to change production root.
+**Production:** committed `season_root_profile_id` in (2) is canonical for deploy; do not commit local-only profile ids from (1) unless ops intends to change production root. Production sync is `npm run city-game:sync-season-root -- --production --confirm-production` (seed must match prod D1).
 
 Steward entitlements verbs: [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md) § Normative verbs.
 
@@ -258,8 +258,9 @@ From [`CITY_GAME_INSTALL_QA.md`](CITY_GAME_INSTALL_QA.md) § Scenario spot-check
 | Smoke: **HTTP 404** on scan URLs | Seed file points at a profile/QR **not in local D1** — re-run `city-game:seed-local -- --write-season` |
 | `CHECK constraint failed: scope IN ('card', 'print_artifact')` | Run `npm run worker:apply-child-object-qr-schema` then re-seed |
 | After `rm -rf worker/.wrangler/state/v3/d1` | Re-migrate, apply QR schema, **restart** `worker:dev`, then seed |
-| `season_root_profile_id already set` | `npm run city-game:seed-local -- --force` or clear field in season JSON |
-| Steward `season_id is not linked` (403) | Seed `profile_id` ≠ `season_root_profile_id` in season JSON — `npm run city-game:sync-season-root`, restart `worker:dev`, re-mint session |
+| `season_root_profile_id already set` | `npm run city-game:seed-local -- --force` then `npm run city-game:sync-season-root -- --force-local` (or clear field in season JSON) |
+| Refusing `--write-season` on production-bound season | Season JSON still has `humanity.llc` scan URLs — use `sync-season-root -- --force-local` after seed, or pass `--force-local` with write-season; production mint uses `seed-production -- --confirm-production` |
+| Steward `season_id is not linked` (403) | Seed `profile_id` ≠ `season_root_profile_id` in season JSON — `npm run city-game:sync-season-root -- --force-local`, restart `worker:dev`, re-mint session |
 | `object_id already in local D1` | Reuse seed file or reset D1 (migrate + apply-child-object-qr-schema + restart worker) |
 | Game-operator 404 | `CITY_GAME_ENABLED=1` locally; check profile_id matches seed |
 

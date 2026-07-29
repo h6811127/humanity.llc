@@ -32,6 +32,50 @@ function collectSeasonScanUrls(value) {
 }
 
 /**
+ * @param {unknown} seed
+ * @returns {string[]}
+ */
+export function collectSeedScanUrls(seed) {
+  if (!seed || typeof seed !== "object") return [];
+  const nodes = /** @type {{ nodes?: unknown }} */ (seed).nodes;
+  if (!Array.isArray(nodes)) return [];
+  /** @type {string[]} */
+  const urls = [];
+  for (const node of nodes) {
+    if (!node || typeof node !== "object") continue;
+    const scanUrl = /** @type {Record<string, unknown>} */ (node).scan_url;
+    if (typeof scanUrl === "string" && scanUrl.trim()) {
+      urls.push(scanUrl.trim());
+    }
+  }
+  return urls;
+}
+
+/**
+ * Local seed-local defaults SCAN_ORIGIN to humanity.llc even against local D1, so
+ * origin-alone checks are not enough — the profile path must match seed.profile_id.
+ * @param {string} scanUrl
+ * @param {string} profileId
+ */
+export function seedScanUrlEmbedsProfile(scanUrl, profileId) {
+  const id = String(profileId ?? "").trim();
+  if (!id || !scanUrl) return false;
+  const encoded = encodeURIComponent(id);
+  try {
+    const url = new URL(scanUrl);
+    const path = url.pathname.replace(/\/+$/, "");
+    return (
+      path === `/c/${id}` ||
+      path === `/c/${encoded}` ||
+      path.endsWith(`/c/${id}`) ||
+      path.endsWith(`/c/${encoded}`)
+    );
+  } catch {
+    return scanUrl.includes(`/c/${id}`) || scanUrl.includes(`/c/${encoded}`);
+  }
+}
+
+/**
  * @param {unknown} season
  */
 export function seasonLooksProductionBound(season) {
@@ -43,6 +87,80 @@ export function seasonLooksProductionBound(season) {
  */
 export function shouldRefuseLocalSeasonRootSync(input) {
   return !input.useProduction && !input.forceLocal && seasonLooksProductionBound(input.season);
+}
+
+/**
+ * Refuse `--write-season` that would overwrite a production-bound season root with a
+ * local mint unless the operator explicitly opts into local URL rewrites.
+ * Production mint (`--production-out`) remains allowed.
+ * @param {{ productionOut: boolean; forceLocal: boolean; season: unknown }} input
+ */
+export function shouldRefuseLocalWriteSeason(input) {
+  return !input.productionOut && !input.forceLocal && seasonLooksProductionBound(input.season);
+}
+
+/**
+ * Guards for `sync-season-root -- --production` before rewriting committed season JSON.
+ * Origin-only checks are insufficient: local seed-local often stamps humanity.llc URLs
+ * for a local profile_id that does not exist on production D1.
+ *
+ * @param {{
+ *   seed: { profile_id?: string; nodes?: Array<Record<string, unknown>> };
+ *   season: Record<string, unknown>;
+ *   force?: boolean;
+ * }} input
+ * @returns {{ ok: true; profileId: string } | { ok: false; code: string; message: string }}
+ */
+export function assessProductionSeedForSync(input) {
+  const profileId =
+    typeof input.seed?.profile_id === "string" ? input.seed.profile_id.trim() : "";
+  if (!profileId) {
+    return {
+      ok: false,
+      code: "SEED_MISSING_PROFILE",
+      message: "Production seed has no profile_id.",
+    };
+  }
+
+  const urls = collectSeedScanUrls(input.seed);
+  if (urls.length === 0) {
+    return {
+      ok: false,
+      code: "SEED_MISSING_SCAN_URLS",
+      message: "Production seed has no node scan_url values.",
+    };
+  }
+
+  for (const url of urls) {
+    if (!PRODUCTION_SCAN_ORIGIN_RE.test(url)) {
+      return {
+        ok: false,
+        code: "SEED_NON_PRODUCTION_URL",
+        message: `Production sync refuses non-production scan_url: ${url}`,
+      };
+    }
+    if (!seedScanUrlEmbedsProfile(url, profileId)) {
+      return {
+        ok: false,
+        code: "SEED_PROFILE_URL_MISMATCH",
+        message: `Production sync refuses scan_url that does not embed seed profile_id ${profileId}: ${url}`,
+      };
+    }
+  }
+
+  const previous =
+    typeof input.season?.season_root_profile_id === "string"
+      ? input.season.season_root_profile_id.trim()
+      : "";
+  if (previous && previous !== profileId && !input.force) {
+    return {
+      ok: false,
+      code: "ROOT_PROFILE_CHANGE",
+      message: `Refusing to change season_root_profile_id from ${previous} to ${profileId} without --force.`,
+    };
+  }
+
+  return { ok: true, profileId };
 }
 
 /**
