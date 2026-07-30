@@ -303,7 +303,7 @@ export function assessScanGraphPublish(input) {
   }
 
   return {
-    ready: missingEdgeIds.length === 0 && issues.length === built.issues.length,
+    ready: missingEdgeIds.length === 0 && issues.length === 0,
     expectedEdgeIds,
     missingEdgeIds,
     publishedEdgeIds,
