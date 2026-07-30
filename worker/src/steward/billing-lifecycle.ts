@@ -282,3 +282,46 @@ export function isCommerceCheckoutEvent(type: string): boolean {
     type === "checkout.session.async_payment_succeeded"
   );
 }
+
+/** Stripe webhook sources that may replace `billing_subscription_id`. */
+export type StewardBillingUpdateSource =
+  | "checkout.session.completed"
+  | "customer.subscription.created"
+  | "customer.subscription.updated"
+  | "customer.subscription.deleted"
+  | "invoice.payment_failed";
+
+/**
+ * Guard against stale Stripe events for a superseded subscription id.
+ *
+ * Once an account points at `sub_new`, delayed `subscription.deleted` /
+ * `invoice.payment_failed` / demoting `subscription.updated` for `sub_old`
+ * must not downgrade the live plan or rewrite `billing_subscription_id`.
+ * Replacement is allowed only from checkout completion or subscription.created
+ * when the incoming update is an active/trialing grant.
+ */
+export function shouldApplyStewardBillingUpdate(
+  existing: { billing_subscription_id: string | null },
+  update: {
+    billing_subscription_id?: string | null;
+    status: StewardPlanStatus;
+  },
+  source: StewardBillingUpdateSource
+): boolean {
+  const current = (existing.billing_subscription_id ?? "").trim();
+  const next =
+    update.billing_subscription_id === undefined
+      ? current
+      : (update.billing_subscription_id ?? "").trim();
+
+  if (!current || !next || current === next) {
+    return true;
+  }
+
+  const isReplacementGrant =
+    (source === "checkout.session.completed" ||
+      source === "customer.subscription.created") &&
+    (update.status === "active" || update.status === "trialing");
+
+  return isReplacementGrant;
+}

@@ -4,6 +4,7 @@ import {
   HOSTED_GAME_SEASON_PLAN_ID,
   mapStripeSubscriptionStatus,
   PAST_DUE_GRACE_MS,
+  shouldApplyStewardBillingUpdate,
   shouldExpirePastDueAccount,
   stewardUpdateForPaymentFailed,
   stewardUpdateForSubscriptionDeleted,
@@ -145,5 +146,70 @@ describe("stewardUpdateForPaymentFailed", () => {
     const update = stewardUpdateForPaymentFailed("acc_1", "cus_1", "sub_1", NOW);
     expect(update.status).toBe("past_due");
     expect(update.plan_id).toBe("hosted_steward_v1");
+  });
+});
+
+describe("shouldApplyStewardBillingUpdate", () => {
+  const existing = { billing_subscription_id: "sub_new" };
+
+  it("allows same-subscription demotions", () => {
+    expect(
+      shouldApplyStewardBillingUpdate(
+        existing,
+        { billing_subscription_id: "sub_new", status: "expired" },
+        "customer.subscription.deleted"
+      )
+    ).toBe(true);
+  });
+
+  it("rejects stale deleted/payment_failed for a superseded subscription", () => {
+    expect(
+      shouldApplyStewardBillingUpdate(
+        existing,
+        { billing_subscription_id: "sub_old", status: "expired" },
+        "customer.subscription.deleted"
+      )
+    ).toBe(false);
+    expect(
+      shouldApplyStewardBillingUpdate(
+        existing,
+        { billing_subscription_id: "sub_old", status: "past_due" },
+        "invoice.payment_failed"
+      )
+    ).toBe(false);
+    expect(
+      shouldApplyStewardBillingUpdate(
+        existing,
+        { billing_subscription_id: "sub_old", status: "past_due" },
+        "customer.subscription.updated"
+      )
+    ).toBe(false);
+  });
+
+  it("allows checkout/created replacement grants onto a new subscription id", () => {
+    expect(
+      shouldApplyStewardBillingUpdate(
+        { billing_subscription_id: "sub_old" },
+        { billing_subscription_id: "sub_new", status: "active" },
+        "checkout.session.completed"
+      )
+    ).toBe(true);
+    expect(
+      shouldApplyStewardBillingUpdate(
+        { billing_subscription_id: "sub_old" },
+        { billing_subscription_id: "sub_new", status: "trialing" },
+        "customer.subscription.created"
+      )
+    ).toBe(true);
+  });
+
+  it("rejects subscription.updated replacing a different subscription id", () => {
+    expect(
+      shouldApplyStewardBillingUpdate(
+        { billing_subscription_id: "sub_new" },
+        { billing_subscription_id: "sub_old", status: "active" },
+        "customer.subscription.updated"
+      )
+    ).toBe(false);
   });
 });
