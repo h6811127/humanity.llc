@@ -1,5 +1,7 @@
 import { test, expect, type BrowserContext, type Page, type Route } from "@playwright/test";
 
+import { DEVICE_SHELL_ASSET_VERSION } from "../site/js/device-status-shell-modules.mjs";
+
 /**
  * Hosted tier SSE push (E4) — M7 H4 exit tests.
  * @see docs/HOSTED_TIER_IMPLEMENTATION_EPICS.md § E4
@@ -223,12 +225,15 @@ async function waitForPushHealthy(page: Page) {
 }
 
 async function readAutoPollShouldRun(page: Page) {
-  return page.evaluate(async () => {
+  return page.evaluate(async (shellAssetVersion) => {
     const push = await import("/js/device-steward-push.mjs");
     const scheduler = await import("/js/device-live-control-poll-scheduler.mjs");
     const network = await import("/js/device-hub-network-tools-core.mjs");
     const leader = await import("/js/device-live-control-poll-leader.mjs");
-    const wallet = await import("/js/device-wallet-since-visit-gate.mjs");
+    // Shell graph loads the gate with ?v=N — unversioned import is a separate module instance.
+    const wallet = await import(
+      `/js/device-wallet-since-visit-gate.mjs?v=${shellAssetVersion}`
+    );
     const budgetCore = await import("/js/device-live-control-poll-budget-core.mjs");
     const entitlements = await import("/js/device-steward-entitlements.mjs");
     const hubEl = document.getElementById("device-hub");
@@ -258,7 +263,7 @@ async function readAutoPollShouldRun(page: Page) {
       isPollLeader: leader.isLiveControlPollLeaderTab(),
       stewardPushHealthy: push.isStewardPushHealthy(),
     });
-  });
+  }, DEVICE_SHELL_ASSET_VERSION);
 }
 
 async function waitForPollLeader(page: Page) {
