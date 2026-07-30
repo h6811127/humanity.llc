@@ -587,13 +587,17 @@ export const VOUCH_PWA_STEWARD_PARAM_HANDOFF_STEPS =
   "Copy this scan link → open humanity.llc from your Home Screen icon → status dot → Open scan link → paste → attest.";
 
 /** Short handoff interstitial `/v/{code}` (S6). */
-export {
-  STEWARD_HANDOFF_INTERSTITIAL_CONTINUE,
-  STEWARD_HANDOFF_INTERSTITIAL_COPY,
-  STEWARD_HANDOFF_INTERSTITIAL_DETAIL,
-  STEWARD_HANDOFF_INTERSTITIAL_EYEBROW,
-  STEWARD_HANDOFF_INTERSTITIAL_TITLE,
-} from "./steward-handoff-interstitial-copy-core.mjs";
+export const STEWARD_HANDOFF_INTERSTITIAL_EYEBROW = "Steward scan";
+
+export const STEWARD_HANDOFF_INTERSTITIAL_TITLE =
+  "Open this scan in your Home Screen app";
+
+export const STEWARD_HANDOFF_INTERSTITIAL_DETAIL =
+  "Your camera opened Safari. On iPhone, your steward card lives in the Home Screen app. Not this tab. Copy the scan link below, switch apps, then paste under Open scan link.";
+
+export const STEWARD_HANDOFF_INTERSTITIAL_CONTINUE = "Continue to scan page";
+
+export const STEWARD_HANDOFF_INTERSTITIAL_COPY = "Copy scan link";
 
 /** Dual-QR print materials on /created/ (S7). */
 export const DUAL_QR_SECTION_LEAD =
