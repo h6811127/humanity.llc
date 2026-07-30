@@ -19,10 +19,12 @@ import {
   HOSTED_STEWARD_PLAN_ID,
   isCommerceCheckoutEvent,
   isStewardBillingSubscriptionEvent,
+  shouldApplyStewardBillingUpdate,
   stewardUpdateForPaymentFailed,
   stewardUpdateForSubscriptionDeleted,
   stewardUpdateFromHostedCheckoutSession,
   stewardUpdateFromStripeSubscription,
+  type StewardBillingUpdateSource,
   type StripeSubscriptionLike,
 } from "../steward/billing-lifecycle";
 import { closeStewardPushConnectionsForAccount } from "../steward/push";
@@ -45,8 +47,14 @@ async function finalizeExpiredAccount(
 
 async function applyBillingUpdate(
   db: D1Database,
-  update: Parameters<typeof applyStewardBillingUpdate>[1]
-): Promise<"ok" | "account_missing"> {
+  update: Parameters<typeof applyStewardBillingUpdate>[1],
+  source: StewardBillingUpdateSource
+): Promise<"ok" | "account_missing" | "ignored_stale_subscription"> {
+  const existing = await getAccount(db, update.account_id);
+  if (!existing) return "account_missing";
+  if (!shouldApplyStewardBillingUpdate(existing, update, source)) {
+    return "ignored_stale_subscription";
+  }
   const applied = await applyStewardBillingUpdate(db, update);
   if (!applied) return "account_missing";
   if (update.status === "expired") {
@@ -89,21 +97,25 @@ async function handleSubscriptionEvent(
   db: D1Database,
   type: string,
   sub: StripeSubscriptionLike
-): Promise<"ok" | "ignored" | "account_missing"> {
+): Promise<"ok" | "ignored" | "account_missing" | "ignored_stale_subscription"> {
   if (type === "customer.subscription.deleted") {
     const update = stewardUpdateForSubscriptionDeleted(sub);
     if (!update) return "ignored";
-    return applyBillingUpdate(db, update);
+    return applyBillingUpdate(db, update, "customer.subscription.deleted");
   }
   const update = stewardUpdateFromStripeSubscription(sub);
   if (!update) return "ignored";
-  return applyBillingUpdate(db, update);
+  const source: StewardBillingUpdateSource =
+    type === "customer.subscription.created"
+      ? "customer.subscription.created"
+      : "customer.subscription.updated";
+  return applyBillingUpdate(db, update, source);
 }
 
 async function handleInvoicePaymentFailed(
   db: D1Database,
   obj: Record<string, unknown>
-): Promise<"ok" | "ignored" | "account_missing"> {
+): Promise<"ok" | "ignored" | "account_missing" | "ignored_stale_subscription"> {
   const customerId =
     typeof obj.customer === "string"
       ? obj.customer
@@ -115,22 +127,26 @@ async function handleInvoicePaymentFailed(
   if (!customerId) return "ignored";
 
   const subscriptionId =
-    typeof obj.subscription === "string" ? obj.subscription : null;
+    typeof obj.subscription === "string" ? obj.subscription.trim() || null : null;
 
-  let account =
-    (subscriptionId
-      ? await getAccountByBillingSubscription(db, subscriptionId)
-      : null) ?? (await getAccountByBillingCustomer(db, customerId));
+  // Prefer the subscription currently linked on the account. Do not fall back to
+  // customer/metadata when a subscription id is present but no longer current —
+  // that path let stale invoices rewrite billing_subscription_id and past_due
+  // a live replacement subscription.
+  let account = subscriptionId
+    ? await getAccountByBillingSubscription(db, subscriptionId)
+    : await getAccountByBillingCustomer(db, customerId);
 
-  const metadataAccountId =
-    obj.metadata &&
-    typeof obj.metadata === "object" &&
-    typeof (obj.metadata as Record<string, unknown>).account_id === "string"
-      ? String((obj.metadata as Record<string, string>).account_id).trim()
-      : "";
-
-  if (!account && metadataAccountId) {
-    account = await getAccount(db, metadataAccountId);
+  if (!account && !subscriptionId) {
+    const metadataAccountId =
+      obj.metadata &&
+      typeof obj.metadata === "object" &&
+      typeof (obj.metadata as Record<string, unknown>).account_id === "string"
+        ? String((obj.metadata as Record<string, string>).account_id).trim()
+        : "";
+    if (metadataAccountId) {
+      account = await getAccount(db, metadataAccountId);
+    }
   }
   if (!account) return "ignored";
 
@@ -139,7 +155,7 @@ async function handleInvoicePaymentFailed(
     customerId,
     subscriptionId
   );
-  return applyBillingUpdate(db, update);
+  return applyBillingUpdate(db, update, "invoice.payment_failed");
 }
 
 /**
@@ -220,7 +236,11 @@ export async function handlePostBillingWebhook(
     if (type === "checkout.session.completed") {
       const update = stewardUpdateFromHostedCheckoutSession(obj);
       if (update) {
-        const result = await applyBillingUpdate(db, update);
+        const result = await applyBillingUpdate(
+          db,
+          update,
+          "checkout.session.completed"
+        );
         return jsonResponse(
           { received: true, result, source: "checkout.session.completed" },
           200

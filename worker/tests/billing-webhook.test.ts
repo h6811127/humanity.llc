@@ -287,4 +287,82 @@ describe("handlePostBillingWebhook", () => {
     expect(Date.parse(String(row.effective_until))).toBeGreaterThan(Date.now());
     expect(sessions.size).toBe(1);
   });
+
+  it("ignores stale subscription.deleted after the account moved to a new subscription", async () => {
+    const { db, accounts, sessions } = billingDb();
+    const subNew = "sub_replacement_live";
+    accounts.set(ACCOUNT, {
+      ...accounts.get(ACCOUNT)!,
+      plan_id: "hosted_steward_v1",
+      status: "active",
+      billing_customer_id: CUSTOMER,
+      billing_subscription_id: subNew,
+    });
+    sessions.add("session_must_survive_stale_delete");
+
+    const body = JSON.stringify({
+      type: "customer.subscription.deleted",
+      data: {
+        object: {
+          id: SUB,
+          customer: CUSTOMER,
+          status: "canceled",
+          metadata: { account_id: ACCOUNT },
+        },
+      },
+    });
+    const now = Math.floor(Date.now() / 1000);
+    const res = await handlePostBillingWebhook(
+      await signedRequest(secret, body, now),
+      env,
+      db
+    );
+    const json = (await res.json()) as { result?: string };
+    const row = accounts.get(ACCOUNT)!;
+
+    expect(res.status).toBe(200);
+    expect(json.result).toBe("ignored_stale_subscription");
+    expect(row.status).toBe("active");
+    expect(row.plan_id).toBe("hosted_steward_v1");
+    expect(row.billing_subscription_id).toBe(subNew);
+    expect(sessions.size).toBe(1);
+  });
+
+  it("ignores stale invoice.payment_failed for a superseded subscription id", async () => {
+    const { db, accounts, sessions } = billingDb();
+    const subNew = "sub_replacement_live";
+    accounts.set(ACCOUNT, {
+      ...accounts.get(ACCOUNT)!,
+      plan_id: "hosted_steward_v1",
+      status: "active",
+      billing_customer_id: CUSTOMER,
+      billing_subscription_id: subNew,
+    });
+    sessions.add("session_must_survive_stale_invoice");
+
+    const body = JSON.stringify({
+      type: "invoice.payment_failed",
+      data: {
+        object: {
+          customer: CUSTOMER,
+          subscription: SUB,
+          metadata: { account_id: ACCOUNT },
+        },
+      },
+    });
+    const now = Math.floor(Date.now() / 1000);
+    const res = await handlePostBillingWebhook(
+      await signedRequest(secret, body, now),
+      env,
+      db
+    );
+    const json = (await res.json()) as { result?: string };
+    const row = accounts.get(ACCOUNT)!;
+
+    expect(res.status).toBe(200);
+    expect(json.result).toBe("ignored");
+    expect(row.status).toBe("active");
+    expect(row.billing_subscription_id).toBe(subNew);
+    expect(sessions.size).toBe(1);
+  });
 });
