@@ -23,6 +23,12 @@ describe("landing-entry-shelves-core", () => {
     expect(readLandingCategoryQueryParam("?category=invalid")).toBe("all");
     expect(buildLandingCategoryUrl("city_games")).toBe("/?category=city_games");
     expect(buildLandingCategoryUrl("all")).toBe("/");
+    expect(buildLandingCategoryUrl("all", "/", { region: "example-city-template" })).toBe(
+      "/?region=example-city-template"
+    );
+    expect(
+      buildLandingCategoryUrl("city_games", "/", { region: "example-city-template" })
+    ).toBe("/?category=city_games&region=example-city-template");
   });
 
   it("formats live-now shelf copy with place count", () => {

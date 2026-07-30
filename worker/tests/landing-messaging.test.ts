@@ -61,8 +61,8 @@ describe("landing messaging (Step 3)", () => {
 
   it("landing loads public networks portal script and styles", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
-    expect(html).toContain("public-networks-portal.css?v=11");
-    expect(html).toContain("public-networks-portal.mjs?v=12");
+    expect(html).toContain("public-networks-portal.css?v=12");
+    expect(html).toContain("public-networks-portal.mjs?v=14");
     expect(html).not.toContain("landing-showcase.mjs");
   });
 

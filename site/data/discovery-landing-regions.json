@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "kind": "hc.discovery.landing_regions.v0",
+  "default_region": "cedar-rapids-iowa",
+  "regions": [
+    {
+      "region_slug": "cedar-rapids-iowa",
+      "label": "Cedar Rapids",
+      "city": "Cedar Rapids, Iowa",
+      "season_id": "cr_season_01_wake",
+      "summary": "Reference public network — Wake the city places."
+    },
+    {
+      "region_slug": "example-city",
+      "label": "Example City",
+      "city": "Example City (template)",
+      "season_id": null,
+      "summary": "Template region for multi-region landing — empty until organizers list places."
+    }
+  ]
+}

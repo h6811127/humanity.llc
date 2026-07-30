@@ -1,9 +1,13 @@
 /**
- * Landing places strip (WS-DISCOVER-P5a/b) — DiscoveryPin preview on `/`.
+ * Landing places strip (WS-DISCOVER-P5a/b/c) — DiscoveryPin preview on `/`.
  * P5b: client-side Sort near me on `/` (geolocation allowed; coords never sent for ranking).
+ * P5c: multi-region picker + preferred region (query / localStorage / default).
  * @see docs/DISCOVERY_PROJECTION.md § WS-DISCOVER-P5
  */
-import { DEFAULT_DISCOVERY_REGION } from "./discovery-pin-projection-core.mjs";
+import {
+  DEFAULT_DISCOVERY_REGION,
+  slugifyDiscoveryRegion,
+} from "./discovery-pin-projection-core.mjs";
 import {
   DISCOVERY_NEAR_ME_BUTTON_LABEL,
   buildDiscoveryPinRowModel,
@@ -17,19 +21,37 @@ import { resolveDiscoveryPinRowStateHeadline } from "./discovery-pin-snapshot-co
 import {
   DISCOVERY_NEAR_ME_PRIVACY_COPY,
   DISCOVERY_NEAR_ME_PRIVACY_HREF,
+  formatDiscoveryNearMeDistance,
   sortDiscoveryPinsByNearMe,
 } from "./discovery-near-me-core.mjs";
+import {
+  LANDING_PLACES_ALL_REGIONS_CTA,
+  LANDING_PLACES_ALL_REGIONS_HREF,
+  LANDING_PLACES_REGION_STORAGE_KEY,
+} from "./landing-places-region-core.mjs";
 
 /** @typedef {import("./discovery-pin-projection-core.mjs").DiscoveryPin} DiscoveryPin */
 /** @typedef {import("./public-networks-portal-core.mjs").PublicNetworkCategoryFilter} PublicNetworkCategoryFilter */
 /** @typedef {import("./discovery-near-me-core.mjs").DiscoveryClientCoords} DiscoveryClientCoords */
+
+/**
+ * @typedef {Object} LandingPlacesRegion
+ * @property {string} region_slug
+ * @property {string} label
+ * @property {string} city
+ * @property {string | null} [season_id]
+ * @property {string} [summary]
+ */
 
 export const LANDING_DEFAULT_DISCOVERY_REGION = DEFAULT_DISCOVERY_REGION;
 export const LANDING_PLACES_PREVIEW_LIMIT = 12;
 export const LANDING_PLACES_NEAR_ME_CTA = DISCOVERY_NEAR_ME_BUTTON_LABEL;
 export const LANDING_PLACES_SEE_ALL_CTA = "See all places";
 export const LANDING_PLACES_SECTION_TITLE = "Places near me";
-export { DISCOVERY_NEAR_ME_PRIVACY_COPY, DISCOVERY_NEAR_ME_PRIVACY_HREF };
+export const LANDING_PLACES_REGIONS_URL = "/data/discovery-landing-regions.json";
+/** Nearest listed pin beyond this → far-away density notice (client-only). */
+export const LANDING_PLACES_FAR_AWAY_METERS = 80_000;
+export { DISCOVERY_NEAR_ME_PRIVACY_COPY, DISCOVERY_NEAR_ME_PRIVACY_HREF, LANDING_PLACES_REGION_STORAGE_KEY };
 
 /** @typedef {"all" | "live_now" | "open_paused" | "return_hours"} LandingPinFacet */
 
@@ -59,6 +81,88 @@ export function resolveLandingCategoryPinFacet(category) {
   if (cat === "city_games") return "live_now";
   if (cat === "resources") return "open_paused";
   return "all";
+}
+
+/**
+ * @param {unknown} raw
+ * @returns {LandingPlacesRegion[]}
+ */
+export function normalizeLandingPlacesRegions(raw) {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return [];
+  const doc = /** @type {Record<string, unknown>} */ (raw);
+  const rows = Array.isArray(doc.regions) ? doc.regions : [];
+  /** @type {LandingPlacesRegion[]} */
+  const out = [];
+  const seen = new Set();
+  for (const row of rows) {
+    if (!row || typeof row !== "object" || Array.isArray(row)) continue;
+    const r = /** @type {Record<string, unknown>} */ (row);
+    const slug = slugifyDiscoveryRegion(String(r.region_slug ?? ""));
+    if (!slug || seen.has(slug)) continue;
+    seen.add(slug);
+    out.push({
+      region_slug: slug,
+      label: String(r.label ?? slug).trim() || slug,
+      city: String(r.city ?? "").trim(),
+      season_id: r.season_id == null ? null : String(r.season_id).trim() || null,
+      summary: String(r.summary ?? "").trim(),
+    });
+  }
+  return out;
+}
+
+/**
+ * @param {LandingPlacesRegion[]} regions
+ * @param {unknown} raw
+ */
+export function landingPlacesDefaultRegion(regions, raw) {
+  if (raw && typeof raw === "object" && !Array.isArray(raw)) {
+    const fromDoc = slugifyDiscoveryRegion(
+      String(/** @type {Record<string, unknown>} */ (raw).default_region ?? "")
+    );
+    if (fromDoc && regions.some((r) => r.region_slug === fromDoc)) return fromDoc;
+  }
+  if (regions.some((r) => r.region_slug === LANDING_DEFAULT_DISCOVERY_REGION)) {
+    return LANDING_DEFAULT_DISCOVERY_REGION;
+  }
+  return regions[0]?.region_slug ?? LANDING_DEFAULT_DISCOVERY_REGION;
+}
+
+/**
+ * @param {Map<string, number> | null | undefined} distancesByPinId
+ * @returns {number | null}
+ */
+export function resolveLandingPlacesNearestMeters(distancesByPinId) {
+  if (!distancesByPinId || typeof distancesByPinId.values !== "function") return null;
+  let nearest = null;
+  for (const meters of distancesByPinId.values()) {
+    if (typeof meters !== "number" || !Number.isFinite(meters) || meters < 0) continue;
+    if (nearest == null || meters < nearest) nearest = meters;
+  }
+  return nearest;
+}
+
+/**
+ * @param {{
+ *   cityLabel?: string;
+ *   nearestMeters?: number | null;
+ *   farAwayMeters?: number;
+ * }} [ctx]
+ * @returns {string | null}
+ */
+export function formatLandingPlacesFarAwayNotice(ctx = {}) {
+  const nearest = ctx.nearestMeters;
+  const threshold =
+    typeof ctx.farAwayMeters === "number" && ctx.farAwayMeters > 0
+      ? ctx.farAwayMeters
+      : LANDING_PLACES_FAR_AWAY_METERS;
+  if (typeof nearest !== "number" || !Number.isFinite(nearest) || nearest < threshold) {
+    return null;
+  }
+  const city = String(ctx.cityLabel ?? "this region").trim() || "this region";
+  const dist = formatDiscoveryNearMeDistance(nearest);
+  const distBit = dist ? ` (nearest listed place ~${dist})` : "";
+  return `Looks like you're far from ${city}${distBit}. Showing that region's places — or browse other regions.`;
 }
 
 /**
@@ -159,11 +263,21 @@ export function formatLandingPlacesLead(ctx = {}) {
 }
 
 /**
- * @param {{ totalMatching: number; truncated: boolean; hasPins: boolean; facet?: LandingPinFacet; query?: string }} ctx
+ * @param {{
+ *   totalMatching: number;
+ *   truncated: boolean;
+ *   hasPins: boolean;
+ *   facet?: LandingPinFacet;
+ *   query?: string;
+ *   cityLabel?: string;
+ * }} ctx
  */
 export function landingPlacesEmptyMessage(ctx) {
   if (!ctx.hasPins) {
-    return "No listed places for this region yet.";
+    const city = String(ctx.cityLabel ?? "").trim();
+    return city
+      ? `No listed places in ${city} yet. Browse other regions or check back soon.`
+      : "No listed places for this region yet. Browse other regions or check back soon.";
   }
   const facet = String(ctx.facet ?? "all");
   const q = String(ctx.query ?? "").trim();
@@ -213,6 +327,7 @@ export function buildLandingPlacesRows(pins, opts) {
  *   sourcePinCount?: number;
  *   facet?: LandingPinFacet;
  *   query?: string;
+ *   cityLabel?: string;
  * }} [opts]
  */
 export function renderLandingPlacesResults(model, opts = {}) {
@@ -224,9 +339,10 @@ export function renderLandingPlacesResults(model, opts = {}) {
       truncated: model.truncated,
       facet: opts.facet,
       query: opts.query,
+      cityLabel: opts.cityLabel,
     });
     return `<p class="landing-places-empty discovery-region-empty">${escapeDiscoveryHtml(empty)}</p>
-<p class="landing-places-more idea-footnote"><a id="landing-places-see-all" href="${escapeDiscoveryHtml(browseHref)}">${escapeDiscoveryHtml(LANDING_PLACES_SEE_ALL_CTA)}</a></p>`;
+<p class="landing-places-more idea-footnote"><a href="${escapeDiscoveryHtml(LANDING_PLACES_ALL_REGIONS_HREF)}">${escapeDiscoveryHtml(LANDING_PLACES_ALL_REGIONS_CTA)}</a> · <a id="landing-places-see-all" href="${escapeDiscoveryHtml(browseHref)}">${escapeDiscoveryHtml(LANDING_PLACES_SEE_ALL_CTA)}</a></p>`;
   }
   const list = renderDiscoveryPinRows(model.rows);
   const moreLabel = model.truncated

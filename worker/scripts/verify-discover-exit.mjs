@@ -57,6 +57,8 @@ step("Discovery Vitest belt", [
   "worker/tests/discovery-regions-index-core.test.ts",
   "worker/tests/discovery-network-filter-core.test.ts",
   "worker/tests/discovery-primary-object-core.test.ts",
+  "worker/tests/landing-places-core.test.ts",
+  "worker/tests/landing-places-region-core.test.ts",
   "worker/tests/site-headers.test.ts",
 ]);
 

@@ -84,13 +84,16 @@ export function readLandingCategoryQueryParam(search = "") {
 /**
  * @param {PublicNetworkCategoryFilter} category
  * @param {string} [pathname]
+ * @param {{ region?: string | null }} [opts]
  * @returns {string}
  */
-export function buildLandingCategoryUrl(category, pathname = "/") {
+export function buildLandingCategoryUrl(category, pathname = "/", opts = {}) {
   const path = String(pathname ?? "/").trim() || "/";
   const cat = String(category ?? "all").trim();
-  if (!cat || cat === "all") return path;
   const params = new URLSearchParams();
-  params.set("category", cat);
-  return `${path}?${params.toString()}`;
+  if (cat && cat !== "all") params.set("category", cat);
+  const region = String(opts.region ?? "").trim();
+  if (region) params.set("region", region);
+  const qs = params.toString();
+  return qs ? `${path}?${qs}` : path;
 }

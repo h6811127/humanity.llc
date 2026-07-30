@@ -18,8 +18,8 @@ describe("play/season public networks page", () => {
     expect(html).toContain('id="public-networks-search"');
     expect(html).toContain('id="public-networks-categories"');
     expect(html).toContain('id="public-networks-results"');
-    expect(html).toContain("/js/public-networks-portal.mjs?v=12");
-    expect(html).toContain("/css/public-networks-portal.css?v=11");
+    expect(html).toContain("/js/public-networks-portal.mjs?v=14");
+    expect(html).toContain("/css/public-networks-portal.css?v=12");
     expect(html).toContain('id="landing-entry-shelves"');
     expect(html).toContain("player-flow-breadcrumb");
     expect(html).toContain("data-landing-shelf");

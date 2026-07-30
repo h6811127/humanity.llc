@@ -9,7 +9,7 @@
  */
 
 /** Bump when hero / discovery dashboard copy or structure changes intentionally. */
-export const LANDING_COPY_CONTRACT_VERSION = 12;
+export const LANDING_COPY_CONTRACT_VERSION = 13;
 
 export const LANDING_STYLES_CACHE_BUST = "162";
 
@@ -29,8 +29,12 @@ export const LANDING_REQUIRED_SNIPPETS = [
   'id="landing-places-results"',
   'id="landing-places-near-me"',
   'id="landing-places-privacy"',
+  'id="landing-places-region"',
+  'id="landing-places-all-regions"',
+  'id="landing-places-density"',
   "Places near me",
   "Sort near me",
+  "All regions",
   "Location is used on your device to sort results; scans are not tracked.",
   'href="/data-policy.html"',
   "Boards &amp; seasons",
@@ -58,10 +62,10 @@ export const LANDING_REQUIRED_SNIPPETS = [
   "No behavioral dossiers",
   "The sticker stays — the status changes.",
   'id="landing-learn-trust"',
-  "public-networks-portal.css?v=11",
+  "public-networks-portal.css?v=12",
   "discovery-region-browse.css?v=5",
   `styles.css?v=${LANDING_STYLES_CACHE_BUST}`,
-  "public-networks-portal.mjs?v=12",
+  "public-networks-portal.mjs?v=14",
 ];
 
 /** Reverted matrix copy — must never return on `/`. */

@@ -3,7 +3,9 @@
 **Purpose:** Single reference for parallel agents and humans — active work, regression gates, file ownership.  
 **Also read:** [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) (rules that must stay true) · [`DOC_MAINTENANCE.md`](DOC_MAINTENANCE.md) (doc policy)
 
-**Last updated:** 2026-07-26
+**Last updated:** 2026-07-29
+
+**Changelog (2026-07-29):** **WS-DISCOVER-P5c shipped** — landing region picker (`#landing-places-region`) + persisted default + `?region=` · **All regions** → `/discover/` · contract v13 · [`DISCOVERY_PROJECTION.md`](DISCOVERY_PROJECTION.md) § P5 · `npm run verify:landing`.
 
 **Changelog (2026-07-26):** **WS-DISCOVER-P5a–b shipped** — places-first `/` (`#landing-places` pin strip + Sort near me on device) · **Boards & seasons** secondary · `geolocation=(self)` on `/` · contract v12 · [`DISCOVERY_PROJECTION.md`](DISCOVERY_PROJECTION.md) § P5 · `npm run verify:landing`.
 
