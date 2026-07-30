@@ -30,13 +30,14 @@ function billingDb() {
           if (sql.includes("FROM steward_accounts WHERE account_id")) {
             return accounts.get(String(params[0])) ?? null;
           }
-          if (sql.includes("billing_customer_id")) {
+          // Match WHERE targets, not SELECT column lists (both billing_* appear in SELECT).
+          if (sql.includes("WHERE billing_customer_id")) {
             for (const row of accounts.values()) {
               if (row.billing_customer_id === params[0]) return row;
             }
             return null;
           }
-          if (sql.includes("billing_subscription_id")) {
+          if (sql.includes("WHERE billing_subscription_id")) {
             for (const row of accounts.values()) {
               if (row.billing_subscription_id === params[0]) return row;
             }
