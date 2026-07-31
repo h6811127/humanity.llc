@@ -160,7 +160,7 @@ export type RelationshipEdgeStatus = "active" | "revoked";
 export interface RelationshipEdgeRow {
   edge_id: string;
   network_id: string;
-  kind: "witnesses";
+  kind: "witnesses" | "unlocks";
   from_object_id: string;
   to_object_id: string;
   steward_profile_id: string;

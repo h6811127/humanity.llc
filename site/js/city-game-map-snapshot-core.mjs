@@ -160,7 +160,7 @@ export function applyMysteryRowPresentation(row, nodeId, role, season) {
  * @param {HTMLElement} boardRoot
  * @param {string} mapVisibility
  */
-function rumoredNodeSet(boardRoot, mapVisibility) {
+function rumoredNodeSet(boardRoot, mapVisibility, snapshot = {}) {
   const rumoredRaw =
     boardRoot instanceof HTMLElement && boardRoot.dataset.rumoredNodes
       ? boardRoot.dataset.rumoredNodes
@@ -171,7 +171,14 @@ function rumoredNodeSet(boardRoot, mapVisibility) {
       .map((id) => id.trim())
       .filter(Boolean)
   );
-  if (fromBoard.size) return fromBoard;
+  const fromSnapshot = new Set(
+    (Array.isArray(snapshot.rumored_node_ids) ? snapshot.rumored_node_ids : [])
+      .map((id) => String(id ?? "").trim())
+      .filter(Boolean)
+  );
+  if (fromBoard.size || fromSnapshot.size) {
+    return new Set([...fromBoard, ...fromSnapshot]);
+  }
   if (mapVisibility === "public") return new Set();
   return seasonRumoredNodeIds({});
 }
@@ -495,7 +502,7 @@ export function applySnapshotToMapBoard(boardRoot, snapshot) {
   };
   const mapVisibility =
     typeof snapshot.map_visibility === "string" ? snapshot.map_visibility.trim() : "public";
-  const rumored = rumoredNodeSet(boardRoot, mapVisibility);
+  const rumored = rumoredNodeSet(boardRoot, mapVisibility, snapshot);
 
   for (const row of boardRoot.querySelectorAll(".city-game-map-node-row[data-node-id]")) {
     const nodeId = row.getAttribute("data-node-id");

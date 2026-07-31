@@ -59,9 +59,12 @@ describe("WS-NOTIF Tier 2 Web Push transport contract (P2 step 1)", () => {
     const browser = readRepoFile("site/js/device-browser-notifications.mjs");
     expect(browser).toMatch(/web_push:\s*stewardWebPushTransportSnapshot/);
     expect(browser).toMatch(/__hcWebPushSubscriptionEndpoint/);
-    expect(readRepoFile("site/js/device-steward-web-push.mjs")).toMatch(
-      /stewardWebPushTransportSnapshot/
-    );
+    const webPush = readRepoFile("site/js/device-steward-web-push.mjs");
+    expect(webPush).toMatch(/stewardWebPushTransportSnapshot/);
+    expect(webPush).toMatch(/hc_steward_web_push_subscribed_endpoint/);
+    const swSync = readRepoFile("site/js/device-browser-notifications-sw.mjs");
+    expect(swSync).toMatch(/stewardPushDeliveryReady/);
+    expect(swSync).toMatch(/readStoredWebPushSubscribedEndpoint/);
     expect(readRepoFile("docs/DEVICE_OS_QA.md")).toMatch(/P0-N2-T2/);
     expect(readRepoFile("worker/scripts/notify-web-push-preflight.mjs")).toMatch(
       /assessNotifyWebPushPreflight/

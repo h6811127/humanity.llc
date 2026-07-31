@@ -8,6 +8,7 @@ import {
 } from "../src/city-game/map-node-snapshot";
 import { CR_SEASON_01 } from "../src/city-game/season-config";
 import { composeChildObjectScanState } from "../src/live-object/compose-child-object-scan";
+import { crWitnessEdgeDocumentUnsigned } from "../src/live-object/relationship-edge-spec";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 
@@ -235,5 +236,31 @@ describe("deriveMapNodeSnapshot", () => {
     expect(snap?.map_mode).toBe(composed.gameNode?.mode);
     expect(snap?.public_state).toBe(composed.publicState);
     expect(snap?.active_bulletin).not.toBeNull();
+  });
+
+  it("evaluates signed witness edges when target meta no longer carries legacy vouch_requires", () => {
+    const snap = deriveMapNodeSnapshot({
+      child: {
+        object_id: "obj_cr_node_07_cabinet",
+        object_type: "game_node",
+        status: "active",
+        public_label: "Czech Village cabinet",
+        public_state: "Cabinet path",
+        child_object_document_json: childDocument({
+          nodeId: "node_07",
+          role: "lore_archive",
+          district: "czech_village",
+          meta: { unlocked_by: ["node_04"], vouch_requires: [] },
+        }),
+      },
+      season: CR_SEASON_01,
+      env: { CITY_GAME_ENABLED: "1" },
+      now: new Date("2026-06-07T00:00:00-05:00"),
+      witnessMetaByNodeId: { node_10: baseMeta({ vouch_active_for: [] }) },
+      witnessRelationshipEdges: [crWitnessEdgeDocumentUnsigned(PROFILE)],
+    });
+
+    expect(snap?.vouch_gate?.required).toEqual(["node_10"]);
+    expect(snap?.vouch_gate?.met).toBe(false);
   });
 });

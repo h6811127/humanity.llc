@@ -65,7 +65,8 @@ export async function persistRelayDecayIfExpired(
     if (saved) return true;
   }
 
-  throw new Error("RELAY_DECAY_WRITE_CONFLICT");
+  // Decay is a best-effort repair on scan/snapshot reads; a fresh write can retry next pass.
+  return false;
 }
 
 /**
