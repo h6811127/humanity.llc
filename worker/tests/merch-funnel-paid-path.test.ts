@@ -202,13 +202,30 @@ function createDb(state: DbState): D1Database {
           }
           if (sql.includes("UPDATE artifact_intents")) {
             const existing = state.intents.get(args[2] as string);
-            if (existing) {
+            if (!existing) {
+              return { success: true, meta: { changes: 0 } };
+            }
+            if (sql.includes("NOT IN")) {
+              if (
+                existing.status === "converted" ||
+                existing.status === "expired" ||
+                existing.status === "blocked"
+              ) {
+                return { success: true, meta: { changes: 0 } };
+              }
               state.intents.set(args[2] as string, {
                 ...existing,
-                status: args[0] as ArtifactIntentRow["status"],
+                status: "converted",
                 updated_at: args[1] as string,
               });
+              return { success: true, meta: { changes: 1 } };
             }
+            state.intents.set(args[2] as string, {
+              ...existing,
+              status: args[0] as ArtifactIntentRow["status"],
+              updated_at: args[1] as string,
+            });
+            return { success: true, meta: { changes: 1 } };
           }
           if (sql.includes("INSERT INTO commerce_order_links")) {
             const row: CommerceOrderRow = {

@@ -125,13 +125,30 @@ function dbFor(state: DbState, cardPublicKey: string): D1Database {
           if (sql.includes("UPDATE artifact_intents")) {
             const id = args[2] as string;
             const existing = state.intents.get(id);
-            if (existing) {
+            if (!existing) {
+              return { success: true, meta: { changes: 0 } };
+            }
+            if (sql.includes("NOT IN")) {
+              if (
+                existing.status === "converted" ||
+                existing.status === "expired" ||
+                existing.status === "blocked"
+              ) {
+                return { success: true, meta: { changes: 0 } };
+              }
               state.intents.set(id, {
                 ...existing,
-                status: args[0] as ArtifactIntentRow["status"],
+                status: "converted",
                 updated_at: args[1] as string,
               });
+              return { success: true, meta: { changes: 1 } };
             }
+            state.intents.set(id, {
+              ...existing,
+              status: args[0] as ArtifactIntentRow["status"],
+              updated_at: args[1] as string,
+            });
+            return { success: true, meta: { changes: 1 } };
           }
           if (sql.includes("UPDATE commerce_order_links") && sql.includes("print_order_ids_json")) {
             const printOrderIds = JSON.parse(args[0] as string) as string[];
