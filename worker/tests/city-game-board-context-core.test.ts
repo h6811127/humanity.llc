@@ -49,6 +49,35 @@ describe("city-game board context view", () => {
     expect(lantern?.scan_url).toContain("GcP3Ee17yGqMHdidhEVMYBzq");
   });
 
+  it("falls back to season members without pin ids when the pin index is unavailable", () => {
+    const members = resolveBoardContextMembers(season, { pinIndex: null });
+    expect(members.length).toBe(40);
+    expect(members.every((row) => !("pin_id" in row))).toBe(true);
+
+    const lantern = members.find((row) => row.entry_id === "node_04");
+    expect(lantern).toMatchObject({
+      entry_id: "node_04",
+      object_id: "obj_cr_node_04_river",
+      label: "Riverwalk River Lantern",
+    });
+  });
+
+  it("falls back to season members when pin network ids do not match the lens", () => {
+    const pinIndex = projectDiscoveryPinIndexFromSeason(season);
+    const mismatchedPinIndex = {
+      ...pinIndex,
+      pins: pinIndex.pins.map((pin) => ({
+        ...pin,
+        network_ids: ["stale_network_id"],
+      })),
+    };
+
+    const members = resolveBoardContextMembers(season, { pinIndex: mismatchedPinIndex });
+    expect(members.length).toBe(40);
+    expect(members.every((row) => !("pin_id" in row))).toBe(true);
+    expect(resolveBoardContextMembers(season, { pinIndex }).every((row) => row.pin_id)).toBe(true);
+  });
+
   it("reuses comprehension_kit spine for primary and probe entries", () => {
     const spine = resolveBoardContextSpine(season);
     expect(spine.primary_entry_id).toBe("node_04");
