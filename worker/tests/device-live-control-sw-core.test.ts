@@ -15,6 +15,9 @@ import {
   SW_PERIODIC_MIN_INTERVAL_MS,
   pruneSwPushHintCache,
   pushHintChallengeId,
+  markSwPushHintShown,
+  shownSwPushChallengeIds,
+  swPushHintAlreadyShown,
   upsertSwPushHintCache,
   upsertCachedOsPlans,
   osPlanCacheKey,
@@ -259,6 +262,27 @@ describe("sw push hint cache (Tier 1 hosted push → SW OS)", () => {
     );
     expect(cache).toHaveLength(1);
     expect(pushHintChallengeId(cache[0])).toBe("ch_push_1");
+  });
+
+  it("remembers previously shown challenge ids across cached-hint flushes", () => {
+    const first = { ...hint, challenge_id: "ch_push_1" };
+    const second = { ...hint, challenge_id: "ch_push_2" };
+    const stateAfterFirst = markSwPushHintShown(
+      { lastPushChallengeId: "", shownPushChallengeIds: [] },
+      first
+    );
+    const stateAfterSecond = markSwPushHintShown(stateAfterFirst, second);
+
+    expect(stateAfterSecond.lastPushChallengeId).toBe("ch_push_2");
+    expect(shownSwPushChallengeIds(stateAfterSecond)).toEqual([
+      "ch_push_1",
+      "ch_push_2",
+    ]);
+    expect(swPushHintAlreadyShown(stateAfterSecond, first)).toBe(true);
+    expect(swPushHintAlreadyShown(stateAfterSecond, second)).toBe(true);
+    expect(swPushHintAlreadyShown(stateAfterSecond, { ...hint, challenge_id: "ch_push_3" })).toBe(
+      false
+    );
   });
 });
 

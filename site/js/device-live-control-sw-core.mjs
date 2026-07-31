@@ -73,6 +73,51 @@ export function pruneSwPushHintCache(cache, now = Date.now()) {
   return (cache ?? []).filter((row) => !isStaleLiveProofPushEvent(row, now));
 }
 
+const SW_PUSH_SHOWN_DEDUPE_LIMIT = 50;
+
+/**
+ * @param {{ lastPushChallengeId?: string, shownPushChallengeIds?: unknown }} state
+ * @returns {string[]}
+ */
+export function shownSwPushChallengeIds(state) {
+  const ids = Array.isArray(state?.shownPushChallengeIds)
+    ? state.shownPushChallengeIds
+        .filter((id) => typeof id === "string")
+        .map((id) => id.trim())
+        .filter(Boolean)
+    : [];
+  const last = typeof state?.lastPushChallengeId === "string" ? state.lastPushChallengeId.trim() : "";
+  if (last && !ids.includes(last)) ids.push(last);
+  return ids.slice(-SW_PUSH_SHOWN_DEDUPE_LIMIT);
+}
+
+/**
+ * @param {{ lastPushChallengeId?: string, shownPushChallengeIds?: unknown }} state
+ * @param {SwCachedPushHint | null | undefined} hint
+ */
+export function swPushHintAlreadyShown(state, hint) {
+  const challengeId = pushHintChallengeId(hint);
+  return Boolean(challengeId && shownSwPushChallengeIds(state).includes(challengeId));
+}
+
+/**
+ * @template T
+ * @param {T & { lastPushChallengeId?: string, shownPushChallengeIds?: unknown }} state
+ * @param {SwCachedPushHint | null | undefined} hint
+ * @returns {T & { lastPushChallengeId?: string, shownPushChallengeIds?: string[] }}
+ */
+export function markSwPushHintShown(state, hint) {
+  const challengeId = pushHintChallengeId(hint);
+  if (!challengeId) return state;
+  const ids = shownSwPushChallengeIds(state).filter((id) => id !== challengeId);
+  ids.push(challengeId);
+  return {
+    ...state,
+    lastPushChallengeId: challengeId,
+    shownPushChallengeIds: ids.slice(-SW_PUSH_SHOWN_DEDUPE_LIMIT),
+  };
+}
+
 /**
  * @param {import("./device-notification-delivery-core.mjs").OsNotificationPlan} plan
  */
