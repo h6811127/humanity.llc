@@ -11,6 +11,7 @@ import {
   resignDocument,
   signDocument,
   toCanonicalJson,
+  validateRequiredSignedFields,
   verifySignedDocument,
   withProtocolFields,
 } from "../src/crypto/index.ts";
@@ -110,6 +111,33 @@ describe("verifySignedDocument failures", () => {
     await expect(
       signDocument(unsigned, { privateKey, publicKeyBase58 })
     ).rejects.toThrow(/version/i);
+  });
+});
+
+describe("signed payload field rules", () => {
+  const relationshipEdge = {
+    type: PAYLOAD_TYPES.RELATIONSHIP_EDGE,
+    version: "1.0",
+    steward_profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+    edge_id: "edge_cr_witness_river_library",
+    created_at: "2026-06-30T12:00:00.000Z",
+  };
+
+  it("accepts relationship edge documents with steward subject, timestamp, and edge id", () => {
+    expect(validateRequiredSignedFields(relationshipEdge)).toBe(
+      PAYLOAD_TYPES.RELATIONSHIP_EDGE
+    );
+  });
+
+  it.each([
+    ["steward subject", { steward_profile_id: "" }, CRYPTO_ERROR.MISSING_REQUIRED_FIELD],
+    ["valid steward profile id", { steward_profile_id: "bad-profile" }, CRYPTO_ERROR.INVALID_PROFILE_ID],
+    ["created timestamp", { created_at: "2026-06-30 12:00:00" }, CRYPTO_ERROR.MISSING_REQUIRED_FIELD],
+    ["edge id", { edge_id: "" }, CRYPTO_ERROR.MISSING_REQUIRED_FIELD],
+  ])("rejects relationship edge documents without %s", (_label, override, code) => {
+    expect(() =>
+      validateRequiredSignedFields({ ...relationshipEdge, ...override })
+    ).toThrow(expect.objectContaining({ code }));
   });
 });
 
