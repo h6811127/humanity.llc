@@ -222,13 +222,35 @@ async function verifiedChildObjectDoc(
   }
 
   if (objectType === GAME_NODE_OBJECT_TYPE) {
-    const seasonForDistricts = resolveSeasonForProfile(pathProfileId);
+    const seasonForProfile = resolveSeasonForProfile(pathProfileId);
     try {
-      validateGameNodeDocument(doc, {
-        allowedDistricts: seasonForDistricts?.districts?.length
-          ? seasonForDistricts.districts
+      const gameNode = validateGameNodeDocument(doc, {
+        allowedDistricts: seasonForProfile?.districts?.length
+          ? seasonForProfile.districts
           : undefined,
       });
+      if (route !== "child_object.revoke") {
+        if (!seasonForProfile) {
+          return {
+            ok: false,
+            response: errorResponse(
+              "SEASON_NOT_LINKED",
+              "game_node objects require a season linked to the parent profile.",
+              422
+            ),
+          };
+        }
+        if (gameNode.seasonId !== seasonForProfile.season_id) {
+          return {
+            ok: false,
+            response: errorResponse(
+              "SEASON_MISMATCH",
+              "game_node season_id must match the parent profile's linked season.",
+              422
+            ),
+          };
+        }
+      }
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Invalid game_node document.";
       return {
