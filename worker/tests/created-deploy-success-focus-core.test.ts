@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  buildDeployIssueFailedCreatedUrl,
   buildDeploySuccessCreatedUrl,
   deployEndpointOutcomeFromParams,
   deployEndpointTypeFromParams,
@@ -54,6 +55,21 @@ describe("created-deploy-success-focus-core", () => {
     expect(url.searchParams.get("deploy_success")).toBe("1");
     expect(deployEndpointTypeFromParams(url.searchParams)).toBe("status_plate");
     expect(url.searchParams.get("object_id")).toBe("obj_door_01");
+    expect(url.hash).toBe("#child-object-obj_door_01");
+  });
+
+  it("builds a recovery URL without root QR promotion when issue-qr fails", () => {
+    const href = buildDeployIssueFailedCreatedUrl({
+      origin: "https://humanity.llc",
+      profileId: "prof_abc",
+      objectId: "obj_door_01",
+    });
+    const url = new URL(href);
+    expect(url.pathname).toBe("/created/");
+    expect(url.searchParams.get("profile_id")).toBe("prof_abc");
+    expect(url.searchParams.has("qr_id")).toBe(false);
+    expect(url.searchParams.has("fresh")).toBe(false);
+    expect(url.searchParams.has("deploy_success")).toBe(false);
     expect(url.hash).toBe("#child-object-obj_door_01");
   });
 

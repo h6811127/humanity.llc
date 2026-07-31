@@ -159,6 +159,20 @@ export function buildDeploySuccessCreatedUrl(input) {
 }
 
 /**
+ * @param {{
+ *   origin: string;
+ *   profileId: string;
+ *   objectId: string;
+ * }} input
+ */
+export function buildDeployIssueFailedCreatedUrl(input) {
+  const url = new URL("/created/", input.origin);
+  url.searchParams.set("profile_id", input.profileId);
+  url.hash = childObjectHubFocusHash(input.objectId);
+  return url.href;
+}
+
+/**
  * Scan / test affordances on a child-object list row.
  * @param {ParentNode | null | undefined} row
  */
