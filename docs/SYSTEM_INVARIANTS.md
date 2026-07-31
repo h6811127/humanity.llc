@@ -169,6 +169,7 @@ Read [`NOTIFICATION_SYSTEM_V2.md`](NOTIFICATION_SYSTEM_V2.md) and [`DEVICE_OS_QA
 | Push transport | Hosted SSE `live_proof.pending` is **transport only** — cache hint in SW; flush on tab hide / periodic sync; do not bypass inbox gather on the page. |
 | SW poll modes | `pollNow` on hide uses **full-wallet** live-proof probe; `periodicSync` / background sync stay **round-robin** (request budget). |
 | Relay in SW | Relay OS uses cached inbox plans + synced `relayOfferCount`; SW cannot sign relay API polls — page probe remains source of truth. |
+| Locked relay keys | A no-prompt background probe that cannot unlock an active lost-item relay keeps the last finder-message snapshot; lack of signing keys is not proof that pending messages were cleared. |
 | Tap-through | Live proof: `HC_NOTIFICATION_NAVIGATE` deep link. Relay: `HC_SW_OPEN_INBOX` → inbox sheet. |
 
 **Regression:**
@@ -281,6 +282,7 @@ Canonical spec: [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.m
 | Game-operator scope | `issuer_public_key` may `game-update` **game_node** only — not owner manifesto, human vouch issuance, or non-game child types. |
 | Human vs game vouch | Game `vouch_requires` / `vouch_active_for` on `game_meta` is separate from root-card Steward vouch graph; do not conflate in copy or tests. |
 | Scan object graph | When verified signed witness edges exist, scan HTML + status JSON expose `scan.relationships[]` and name the season steward; legacy `vouch_requires` chips remain when no signed edges. Board/map snapshot unchanged — [`WS_OBJECT_GRAPH_V1.md`](WS_OBJECT_GRAPH_V1.md) · product copy [`WS_OBJECT_GRAPH_PRODUCT_V1.md`](WS_OBJECT_GRAPH_PRODUCT_V1.md) · launch [`WS_OBJECT_GRAPH_LAUNCH_V1.md`](WS_OBJECT_GRAPH_LAUNCH_V1.md). |
+| Relationship edge lifecycle | A revoked deterministic edge ID may be re-issued only under the same steward with the same network, kind, and object endpoints. Re-issue must not move an existing edge to different graph coordinates. |
 | Launch deploy | Public “live season” HTML (`city-game:launch-surfaces --apply`) and Worker `CITY_GAME_ENABLED=1` ship in the **same** release train. |
 | Map dashboard | Read-only **city state board** — same public truth as scan; **no** GPS, visit log, player ID, or device-local scarcity on server snapshot. Passive `GET` snapshot does not increment quorum/fragments. Plan: [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md). Play pages boot via **`city-game-play-page.mjs` only** (one season fetch → board + guide + banners + snapshot). Snapshot chips apply to **`.city-game-map-node-live`** inside each list row — do not remove when editing Maps links. |
 | Season fair use | Organizer caps via `game.*` entitlements on linked steward account (`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md` § City game season). Stranger play stays free; IP rate limits remain. |

@@ -282,6 +282,45 @@ export async function insertRelationshipEdge(
   return { ok: true };
 }
 
+export async function reactivateRelationshipEdge(
+  db: D1Database,
+  input: RelationshipEdgeWrite
+): Promise<{ ok: true; changes: number } | { ok: false; issues: string[] }> {
+  const validation = validateRelationshipEdgeWrite(input);
+  if (!validation.ok) return validation;
+  if (input.status !== "active") {
+    return { ok: false, issues: ['status must be "active" when reactivating an edge.'] };
+  }
+
+  const result = await db
+    .prepare(
+      `UPDATE relationship_edges
+       SET status = 'active',
+           edge_document_json = ?,
+           updated_at = ?
+       WHERE edge_id = ?
+         AND steward_profile_id = ?
+         AND status = 'revoked'
+         AND network_id = ?
+         AND kind = ?
+         AND from_object_id = ?
+         AND to_object_id = ?`
+    )
+    .bind(
+      input.edgeDocumentJson,
+      input.updatedAt,
+      input.edgeId,
+      input.stewardProfileId,
+      input.networkId,
+      input.kind,
+      input.fromObjectId,
+      input.toObjectId
+    )
+    .run();
+
+  return { ok: true, changes: result.meta.changes ?? 0 };
+}
+
 export async function revokeRelationshipEdge(
   db: D1Database,
   input: {

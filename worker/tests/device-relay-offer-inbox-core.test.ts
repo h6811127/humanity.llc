@@ -5,6 +5,7 @@ import {
   relayOfferInboxAggregateTitle,
   relayOfferInboxChanged,
   relayOfferInboxRowSubtitle,
+  resolveRelayOfferPendingWithoutKeys,
 } from "../../site/js/device-relay-offer-inbox-core.mjs";
 
 describe("device-relay-offer-inbox-core", () => {
@@ -61,5 +62,19 @@ describe("device-relay-offer-inbox-core", () => {
     ];
     expect(relayOfferInboxChanged(a, a)).toBe(false);
     expect(relayOfferInboxChanged(a, b)).toBe(true);
+  });
+
+  it("keeps the last finder-message snapshot when relay keys are locked", () => {
+    const pending = [
+      {
+        profileId: "p1",
+        objectId: "o1",
+        publicLabel: "Relay",
+        pendingCount: 1,
+      },
+    ];
+
+    expect(resolveRelayOfferPendingWithoutKeys(pending, true)).toBe(pending);
+    expect(resolveRelayOfferPendingWithoutKeys(pending, false)).toEqual([]);
   });
 });
