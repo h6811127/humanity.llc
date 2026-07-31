@@ -69,24 +69,38 @@ export function initCreatedGameNodeUnlockEdges(ctx) {
 
   /** @type {Record<string, unknown> | null} */
   let seasonBody = null;
+  let seasonBodySeasonId = "";
+  let seasonBodyLoadSeq = 0;
   /** @type {Array<{ node_id: string; label: string; registered: boolean }>} */
   let nodeOptions = [];
   /** @type {Array<{ from: string; to: string; label?: string }>} */
   let edgeRows = [];
 
   async function loadSeasonBody(seasonId) {
+    const loadSeq = ++seasonBodyLoadSeq;
+    seasonBody = null;
+    seasonBodySeasonId = "";
+    updatePublishState(edgeRows);
     const indexRow = ctx.getSeasonIndexRow(seasonId);
     const jsonUrl = typeof indexRow?.json_url === "string" ? indexRow.json_url : "";
     if (!jsonUrl) {
-      seasonBody = null;
       return;
     }
     try {
       const res = await fetch(jsonUrl, { credentials: "omit" });
-      seasonBody = res.ok ? await res.json() : null;
+      const body = res.ok ? await res.json() : null;
+      if (loadSeq !== seasonBodyLoadSeq) return;
+      seasonBody = body;
+      seasonBodySeasonId = body ? seasonId : "";
     } catch {
+      if (loadSeq !== seasonBodyLoadSeq) return;
       seasonBody = null;
+      seasonBodySeasonId = "";
     }
+  }
+
+  function activeSeasonBody(seasonId) {
+    return seasonBodySeasonId === seasonId ? seasonBody : null;
   }
 
   function readEdgesFromDom() {
@@ -120,9 +134,10 @@ export function initCreatedGameNodeUnlockEdges(ctx) {
       liveEl.hidden = true;
       return;
     }
-    const templateRows = resolveSeasonTemplateRows(seasonBody, seasonId);
+    const season = activeSeasonBody(seasonId);
+    const templateRows = resolveSeasonTemplateRows(season, seasonId);
     const built = buildScanGraphRelationshipEdgesFromUnlockDraft({
-      season: seasonBody ?? {},
+      season: season ?? {},
       profileId: ctx.profileId,
       seasonId,
       templateRows,
@@ -165,9 +180,10 @@ export function initCreatedGameNodeUnlockEdges(ctx) {
     const keys = ctx.getSigningKeys?.() ?? null;
     const seasonId =
       ctx.seasonSelect instanceof HTMLSelectElement ? ctx.seasonSelect.value.trim() : "";
-    const templateRows = resolveSeasonTemplateRows(seasonBody, seasonId);
+    const season = activeSeasonBody(seasonId);
+    const templateRows = resolveSeasonTemplateRows(season, seasonId);
     const validation = validateUnlockEdgesDraft(templateRows, edges);
-    publishBtn.disabled = !keys || !seasonId || !edges.length || !validation.ok;
+    publishBtn.disabled = !keys || !season || !seasonId || !edges.length || !validation.ok;
   }
 
   function renderIssues(templateRows, edges) {
@@ -284,7 +300,7 @@ export function initCreatedGameNodeUnlockEdges(ctx) {
 
     const seasonId =
       ctx.seasonSelect instanceof HTMLSelectElement ? ctx.seasonSelect.value.trim() : "";
-    const templateRows = resolveSeasonTemplateRows(seasonBody, seasonId);
+    const templateRows = resolveSeasonTemplateRows(activeSeasonBody(seasonId), seasonId);
     renderIssues(templateRows, edges);
     renderLiveScanGraphStatus(seasonId, edges);
 
@@ -299,7 +315,7 @@ export function initCreatedGameNodeUnlockEdges(ctx) {
       ctx.seasonSelect instanceof HTMLSelectElement ? ctx.seasonSelect.value.trim() : "";
     const edges = normalizeUnlockEdgesDraft(readEdgesFromDom());
     persistEdges(seasonId, edges);
-    const templateRows = resolveSeasonTemplateRows(seasonBody, seasonId);
+    const templateRows = resolveSeasonTemplateRows(activeSeasonBody(seasonId), seasonId);
     renderIssues(templateRows, edges);
     if (downloadBtn instanceof HTMLButtonElement) {
       downloadBtn.disabled = !seasonId || edges.length === 0;
@@ -321,11 +337,12 @@ export function initCreatedGameNodeUnlockEdges(ctx) {
     await loadSeasonBody(seasonId);
     await loadLiveEdges();
     const registered = readChildObjectRows(localStorage, ctx.profileId);
-    const templateRows = resolveSeasonTemplateRows(seasonBody, seasonId);
+    const season = activeSeasonBody(seasonId);
+    const templateRows = resolveSeasonTemplateRows(season, seasonId);
     nodeOptions = resolveUnlockEdgeNodeOptions(registered, templateRows);
 
     const stored = readSeasonPublishDraft(localStorage, ctx.profileId, seasonId);
-    const edges = resolveUnlockEdgesForEditor(seasonBody, seasonId, stored?.unlock_edges);
+    const edges = resolveUnlockEdgesForEditor(season, seasonId, stored?.unlock_edges);
 
     if (summaryEl) {
       summaryEl.textContent =
@@ -388,9 +405,10 @@ export function initCreatedGameNodeUnlockEdges(ctx) {
   downloadBtn?.addEventListener("click", () => {
     const seasonId =
       ctx.seasonSelect instanceof HTMLSelectElement ? ctx.seasonSelect.value.trim() : "";
-    if (!seasonBody || !seasonId) return;
+    const season = activeSeasonBody(seasonId);
+    if (!season || !seasonId) return;
     const draft = readSeasonPublishDraft(localStorage, ctx.profileId, seasonId);
-    const exportBody = buildSeasonMetadataDraftExport(seasonBody, draft, ctx.profileId);
+    const exportBody = buildSeasonMetadataDraftExport(season, draft, ctx.profileId);
     const filename = suggestedSeasonMetadataDraftFilename(seasonId);
     downloadTextFile(
       `${JSON.stringify(exportBody, null, 2)}\n`,
@@ -412,7 +430,12 @@ export function initCreatedGameNodeUnlockEdges(ctx) {
       return;
     }
     const edges = normalizeUnlockEdgesDraft(readEdgesFromDom());
-    const templateRows = resolveSeasonTemplateRows(seasonBody, seasonId);
+    const season = activeSeasonBody(seasonId);
+    if (!season) {
+      ctx.showError("Wait for this season's network graph template to finish loading before publishing.");
+      return;
+    }
+    const templateRows = resolveSeasonTemplateRows(season, seasonId);
     const validation = validateUnlockEdgesDraft(templateRows, edges);
     if (!validation.ok) {
       ctx.showError(validation.issues[0] ?? "Fix unlock edge validation first.");
@@ -427,7 +450,7 @@ export function initCreatedGameNodeUnlockEdges(ctx) {
       const result = await publishRelationshipEdgesFromUnlockDraft({
         profileId: ctx.profileId,
         seasonId,
-        season: seasonBody ?? {},
+        season,
         templateRows,
         unlockEdges: edges,
         privateKeyBase58: keys.privateKeyBase58,

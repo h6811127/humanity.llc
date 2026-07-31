@@ -345,5 +345,10 @@ describe("WS-OBJECT-GRAPH-LAUNCH-V1", () => {
     expect(createdHtml).toContain("Publish scan graph edges");
     expect(createdHtml).toContain("child-object-game-node-unlock-edges-publish");
     expect(unlockEdgesJs).toContain("created-relationship-edge-publish.mjs");
+    expect(unlockEdgesJs).toContain("seasonBodySeasonId");
+    expect(unlockEdgesJs).toContain("activeSeasonBody(seasonId)");
+    expect(unlockEdgesJs).toContain(
+      "Wait for this season's network graph template to finish loading before publishing."
+    );
   });
 });

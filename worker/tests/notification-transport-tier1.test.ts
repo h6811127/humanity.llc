@@ -26,6 +26,7 @@ describe("WS-NOTIF Tier 1 background OS transport contract", () => {
     expect(browser).toMatch(/flushPushCache:\s*true/);
     expect(browser).toMatch(/notifyTransportFieldSnapshot/);
     expect(browser).toMatch(/__hcNotifyTransportSnapshot/);
+    expect(browser).toMatch(/let\s+backgroundProbeInFlight\s*=\s*false/);
   });
 
   it("T1-3: SW full-wallet probe on pollNow only", () => {

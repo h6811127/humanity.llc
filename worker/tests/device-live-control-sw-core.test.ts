@@ -74,6 +74,19 @@ describe("swLiveProofPollingShouldRun", () => {
     ).toBe(false);
   });
 
+  it("allows SW polling when the last push-healthy page is gone", () => {
+    expect(
+      swLiveProofPollingShouldRun({
+        enabled: true,
+        watchLiveProofEnabled: true,
+        resolverHealth: "ok",
+        stewardPushEntitled: true,
+        stewardPushHealthy: true,
+        hasWindowClients: false,
+      })
+    ).toBe(true);
+  });
+
   it("allows explicit pollNow when push is healthy (forcePoll)", () => {
     expect(
       swLiveProofPollingShouldRun({

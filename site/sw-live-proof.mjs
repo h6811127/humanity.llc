@@ -81,16 +81,19 @@ async function writeState(state) {
 
 async function pollAndMaybeNotify(opts = {}) {
   const state = await readState();
+  if (!state?.enabled || !state.apiOrigin || !state.pageOrigin) return;
+  const clients = await self.clients.matchAll({
+    type: "window",
+    includeUncontrolled: true,
+  });
   if (
-    !state?.enabled ||
-    !state.apiOrigin ||
-    !state.pageOrigin ||
     !swLiveProofPollingShouldRun({
       enabled: state.enabled,
       watchLiveProofEnabled: state.watchLiveProofEnabled === true,
       resolverHealth: state.resolverHealth,
       stewardPushEntitled: state.stewardPushEntitled === true,
       stewardPushHealthy: state.stewardPushHealthy === true,
+      hasWindowClients: clients.length > 0,
       forcePoll: opts.forcePoll === true,
     })
   ) {
@@ -99,10 +102,6 @@ async function pollAndMaybeNotify(opts = {}) {
 
   if (Date.now() < (state.pollBackoffUntil ?? 0)) return;
 
-  const clients = await self.clients.matchAll({
-    type: "window",
-    includeUncontrolled: true,
-  });
   if (anyClientVisible(clients)) return;
 
   const pollResult = opts.fullWallet
