@@ -176,6 +176,40 @@ describe("handlePostStewardWebPushSubscribe", () => {
 });
 
 describe("handlePostStewardWebPushSubscribe route", () => {
+  it("persists a valid subscription with an authenticated session", async () => {
+    const db = mockSubscribeDb({ webPushTable: true });
+    const env: Env = {
+      DB: db,
+      HOSTED_STEWARD_ENABLED: "1",
+      STEWARD_VAPID_PUBLIC_KEY: VAPID_PUBLIC,
+    };
+    const res = await handlePostStewardWebPushSubscribeRoute(
+      new Request(
+        "https://humanity.llc/.well-known/hc/v1/steward/push/subscribe",
+        {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer tok",
+            "Content-Type": "application/json",
+            "X-HC-Device-Id": DEVICE,
+          },
+          body: JSON.stringify({
+            endpoint: "https://fcm.googleapis.com/fcm/send/route",
+            keys: { p256dh: "p256dh-key", auth: "auth-key" },
+            expirationTime: null,
+          }),
+        }
+      ),
+      env,
+      db
+    );
+
+    expect(res.status).toBe(200);
+    expect(
+      (db as D1Database & { inserts: unknown[][] }).inserts.length
+    ).toBeGreaterThan(0);
+  });
+
   it("returns 401 without session", async () => {
     const db = mockSubscribeDb({ webPushTable: true });
     const env: Env = {
