@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Env } from "../src/index";
 import {
@@ -12,11 +12,17 @@ import {
   stewardPushConnectionCount,
   stewardPushNotifyFailuresSinceBoot,
 } from "../src/steward/push";
+import { clearWebPushSendCacheForTests } from "../src/steward/web-push-send";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const ACCOUNT = "acc_pushNotifyTest01";
 const QR_ID = "qr_xBZTq7M27tueCzBY";
 const CHALLENGE = "lc_pushNotifyTest1";
+const VAPID_PUBLIC =
+  "BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U";
+const VAPID_PRIVATE =
+  "UUxI4O8-FbRPOA3_Z-vy_xYs9DIFYP5dYKI13sOJEvI";
+const WEB_PUSH_ENDPOINT = "https://push.example.test/live-proof/integration";
 
 const HOSTED_ENTITLEMENTS = {
   "steward.hosted": true,
@@ -28,6 +34,7 @@ function mockPushDb(opts: {
   linked?: boolean;
   status?: string;
   entitlements?: Record<string, boolean | number>;
+  webPushSubscription?: boolean;
   incrementSpy?: (args: unknown[]) => void;
 }) {
   const entitlements = opts.entitlements ?? HOSTED_ENTITLEMENTS;
@@ -53,7 +60,33 @@ function mockPushDb(opts: {
           if (sql.includes("FROM steward_plan_definitions")) {
             return { entitlements_json: JSON.stringify(entitlements) };
           }
+          if (sql.includes("SELECT count FROM steward_usage_counters")) {
+            return { count: 0 };
+          }
           return null;
+        },
+        all: async () => {
+          if (
+            sql.includes("FROM steward_web_push_subscriptions") &&
+            opts.webPushSubscription
+          ) {
+            return {
+              results: [
+                {
+                  endpoint: WEB_PUSH_ENDPOINT,
+                  account_id: ACCOUNT,
+                  device_id: "dev_web_push_1",
+                  p256dh:
+                    "BMVa1/ONWNvzwqczIVJz3q+bkT0yzIOLrgwZfzOd6B3nLi3FgqRSXdpe+kG2Ad4GoGy6MYx6z7H+gJbVB0PKEA8=",
+                  auth_key: "IkRYX7oHtMTTC1bPyb0lBw==",
+                  expiration_time: null,
+                  created_at: "2026-05-26T12:00:00.000Z",
+                  updated_at: "2026-05-26T12:00:00.000Z",
+                },
+              ],
+            };
+          }
+          return { results: [] };
         },
         run: async () => {
           opts.incrementSpy?.(params);
@@ -66,6 +99,8 @@ function mockPushDb(opts: {
 
 afterEach(() => {
   clearStewardPushConnectionsForTests();
+  clearWebPushSendCacheForTests();
+  vi.unstubAllGlobals();
 });
 
 describe("formatLiveProofPendingSse", () => {
@@ -143,6 +178,35 @@ describe("notifyLiveProofPending", () => {
     expect(writes[0]).toContain(CHALLENGE);
     expect(incrementCalls.length).toBe(1);
     expect(incrementCalls[0]?.[1]).toBe("dev_1");
+  });
+
+  it("fans out Web Push when live proof is pending and no SSE tab is connected", async () => {
+    const fetchMock = vi.fn(async () => new Response("", { status: 201 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const db = mockPushDb({ webPushSubscription: true });
+    const env: Env = {
+      DB: db,
+      HOSTED_STEWARD_ENABLED: "1",
+      STEWARD_VAPID_PUBLIC_KEY: VAPID_PUBLIC,
+      STEWARD_VAPID_PRIVATE_KEY: VAPID_PRIVATE,
+    };
+
+    const result = await notifyLiveProofPending(env, db, {
+      profile_id: PROFILE,
+      qr_id: QR_ID,
+      challenge_id: CHALLENGE,
+      issued_at: "2026-05-26T12:00:00.000Z",
+      expires_at: "2026-05-26T12:02:00.000Z",
+    });
+
+    expect(result.account_id).toBe(ACCOUNT);
+    expect(result.delivered).toBe(0);
+    expect(result.web_push_delivered).toBe(1);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe(WEB_PUSH_ENDPOINT);
+    expect(init.method).toBe("POST");
   });
 
   it("skips when profile is not linked to an account", async () => {
