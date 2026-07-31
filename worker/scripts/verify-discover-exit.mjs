@@ -50,6 +50,7 @@ step("Discovery Vitest belt", [
   "worker/tests/discovery-near-me-core.test.ts",
   "worker/tests/discovery-region-path-core.test.ts",
   "worker/tests/discovery-region-browse-core.test.ts",
+  "worker/tests/discovery-orchestration-errors.test.ts",
   "worker/tests/discovery-pin-snapshot-core.test.ts",
   "worker/tests/discovery-redirects-sync-core.test.ts",
   "worker/tests/discovery-map-crosslink-core.test.ts",
