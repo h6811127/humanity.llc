@@ -12,7 +12,10 @@ import {
   type PrintOrderRow,
 } from "../db/print-orders";
 import type { Env } from "../env";
-import { statusFromPrintifyWebhookEvent } from "../print/printify-status-map";
+import {
+  shouldApplyPrintifyStatus,
+  statusFromPrintifyWebhookEvent,
+} from "../print/printify-status-map";
 import {
   mergeTracking,
   parsePrintifyTrackingFromWebhookData,
@@ -153,7 +156,8 @@ export async function handlePostPrintifyWebhook(
   }
 
   const mergedTracking = mergeTracking(trackingFromRow(printOrder), incomingTracking);
-  const statusChanged = nextStatus !== null && nextStatus !== printOrder.status;
+  const statusChanged =
+    nextStatus !== null && shouldApplyPrintifyStatus(printOrder.status, nextStatus);
   const hasTrackingUpdate = trackingChanged(printOrder, mergedTracking);
 
   if (!statusChanged && !hasTrackingUpdate) {
@@ -171,11 +175,14 @@ export async function handlePostPrintifyWebhook(
       printify_order_id: printifyOrderId,
       print_order_id: printOrder.order_id,
       processing_status: "ignored",
-      reason: "NO_STATUS_TRANSITION",
+      reason:
+        nextStatus !== null && nextStatus !== printOrder.status
+          ? "STALE_STATUS_TRANSITION"
+          : "NO_STATUS_TRANSITION",
     });
   }
 
-  const appliedStatus = nextStatus ?? printOrder.status;
+  const appliedStatus = statusChanged && nextStatus ? nextStatus : printOrder.status;
   await syncPrintOrderFromPrintify(db, {
     order_id: printOrder.order_id,
     status: appliedStatus,

@@ -14,6 +14,7 @@ import {
 } from "../commerce/shopify-order-metadata";
 import { readTier0FulfillmentConfig, readTier0InventoryFulfillmentConfig } from "../commerce/tier0-fulfillment-config";
 import {
+  claimArtifactIntentConverted,
   getArtifactIntent,
   updateArtifactIntentStatus,
   type ArtifactIntentRow,
@@ -203,16 +204,17 @@ async function resolvePaidOrderValidation(
   };
 }
 
-async function markIntentsConverted(
+/** CAS-claim every intent; false if any intent was already claimed/terminal. */
+async function claimIntentsConverted(
   db: D1Database,
   intentIds: string[],
   nowIso: string
-): Promise<void> {
+): Promise<boolean> {
   for (const intentId of intentIds) {
-    const row = await getArtifactIntent(db, intentId);
-    if (!row || row.status === "converted") continue;
-    await updateArtifactIntentStatus(db, intentId, "converted", nowIso);
+    const claimed = await claimArtifactIntentConverted(db, intentId, nowIso);
+    if (!claimed) return false;
   }
+  return true;
 }
 
 async function recoverDuplicateProcessingOrder(
@@ -305,7 +307,30 @@ async function handlePaidOrder(
     };
   }
 
-  const validation = await resolvePaidOrderValidation(db, order, metadata, env, nowIso);
+  let validation = await resolvePaidOrderValidation(db, order, metadata, env, nowIso);
+
+  // Claim intents before insert/queue so two paid Shopify orders that reuse the
+  // same artifact_intent_id cannot both race past the soft status check and
+  // enqueue duplicate Printify fulfillment for one intent.
+  if (
+    validation.status === "processing" &&
+    validation.artifact_intent_ids.length > 0
+  ) {
+    const claimed = await claimIntentsConverted(
+      db,
+      validation.artifact_intent_ids,
+      nowIso
+    );
+    if (!claimed) {
+      validation = {
+        ...validation,
+        status: "held_for_review",
+        hold_reason: "ARTIFACT_INTENT_ALREADY_CONVERTED",
+        fulfillment_mode: null,
+      };
+    }
+  }
+
   const commerceOrderId = generateCommerceOrderId();
   const buyerEmailHash = metadata.buyer_email
     ? await hashBuyerEmail(metadata.buyer_email)
@@ -323,10 +348,6 @@ async function handlePaidOrder(
     hold_reason: validation.hold_reason,
     created_at: nowIso,
   });
-
-  if (validation.status === "processing") {
-    await markIntentsConverted(db, validation.artifact_intent_ids, nowIso);
-  }
 
   if (fulfillmentPiiEncryptionConfigured(env)) {
     const shippingAddress = parseShopifyOrderShippingAddress(order);

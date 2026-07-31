@@ -123,15 +123,36 @@ function dbFor(state: DbState, cardPublicKey: string): D1Database {
             state.orders.set(row.shopify_order_id, row);
           }
           if (sql.includes("UPDATE artifact_intents")) {
-            const id = args[2] as string;
-            const existing = state.intents.get(id);
-            if (existing) {
+            if (sql.includes("NOT IN")) {
+              const updatedAt = args[0] as string;
+              const id = args[1] as string;
+              const existing = state.intents.get(id);
+              if (
+                !existing ||
+                existing.status === "converted" ||
+                existing.status === "expired" ||
+                existing.status === "blocked"
+              ) {
+                return { success: true, meta: { changes: 0 } };
+              }
               state.intents.set(id, {
                 ...existing,
-                status: args[0] as ArtifactIntentRow["status"],
-                updated_at: args[1] as string,
+                status: "converted",
+                updated_at: updatedAt,
               });
+              return { success: true, meta: { changes: 1 } };
             }
+            const id = args[2] as string;
+            const existing = state.intents.get(id);
+            if (!existing) {
+              return { success: true, meta: { changes: 0 } };
+            }
+            state.intents.set(id, {
+              ...existing,
+              status: args[0] as ArtifactIntentRow["status"],
+              updated_at: args[1] as string,
+            });
+            return { success: true, meta: { changes: 1 } };
           }
           if (sql.includes("UPDATE commerce_order_links") && sql.includes("print_order_ids_json")) {
             const printOrderIds = JSON.parse(args[0] as string) as string[];

@@ -201,14 +201,36 @@ function createDb(state: DbState): D1Database {
             state.intents.set(row.artifact_intent_id, row);
           }
           if (sql.includes("UPDATE artifact_intents")) {
-            const existing = state.intents.get(args[2] as string);
-            if (existing) {
-              state.intents.set(args[2] as string, {
+            if (sql.includes("NOT IN")) {
+              const updatedAt = args[0] as string;
+              const id = args[1] as string;
+              const existing = state.intents.get(id);
+              if (
+                !existing ||
+                existing.status === "converted" ||
+                existing.status === "expired" ||
+                existing.status === "blocked"
+              ) {
+                return { success: true, meta: { changes: 0 } };
+              }
+              state.intents.set(id, {
                 ...existing,
-                status: args[0] as ArtifactIntentRow["status"],
-                updated_at: args[1] as string,
+                status: "converted",
+                updated_at: updatedAt,
               });
+              return { success: true, meta: { changes: 1 } };
             }
+            const id = args[2] as string;
+            const existing = state.intents.get(id);
+            if (!existing) {
+              return { success: true, meta: { changes: 0 } };
+            }
+            state.intents.set(id, {
+              ...existing,
+              status: args[0] as ArtifactIntentRow["status"],
+              updated_at: args[1] as string,
+            });
+            return { success: true, meta: { changes: 1 } };
           }
           if (sql.includes("INSERT INTO commerce_order_links")) {
             const row: CommerceOrderRow = {

@@ -115,15 +115,36 @@ function dbFor(state: DbState): D1Database {
             state.orders.set(row.shopify_order_id, row);
           }
           if (sql.includes("UPDATE artifact_intents")) {
-            const id = args[2] as string;
-            const existing = state.intents.get(id);
-            if (existing) {
+            if (sql.includes("NOT IN")) {
+              const updatedAt = args[0] as string;
+              const id = args[1] as string;
+              const existing = state.intents.get(id);
+              if (
+                !existing ||
+                existing.status === "converted" ||
+                existing.status === "expired" ||
+                existing.status === "blocked"
+              ) {
+                return { success: true, meta: { changes: 0 } };
+              }
               state.intents.set(id, {
                 ...existing,
-                status: args[0] as ArtifactIntentRow["status"],
-                updated_at: args[1] as string,
+                status: "converted",
+                updated_at: updatedAt,
               });
+              return { success: true, meta: { changes: 1 } };
             }
+            const id = args[2] as string;
+            const existing = state.intents.get(id);
+            if (!existing) {
+              return { success: true, meta: { changes: 0 } };
+            }
+            state.intents.set(id, {
+              ...existing,
+              status: args[0] as ArtifactIntentRow["status"],
+              updated_at: args[1] as string,
+            });
+            return { success: true, meta: { changes: 1 } };
           }
           if (sql.includes("UPDATE commerce_order_links") && sql.includes("print_order_ids_json")) {
             const printOrderIds = JSON.parse(args[0] as string) as string[];
@@ -539,6 +560,83 @@ describe("Shopify orders webhook (O-001)", () => {
     expect(json.print_order_ids).toEqual([]);
     expect(state.orders.get("450789469")?.status).toBe("held_for_review");
     expect(state.printOrders.size).toBe(0);
+  });
+
+  it("holds a second paid order when convert CAS loses a concurrent race", async () => {
+    const state: DbState = {
+      intents: new Map([[INTENT, intentRow()]]),
+      orders: new Map(),
+      receipts: new Map(),
+      printOrders: new Map(),
+      fulfillmentPii: new Map(),
+    };
+
+    // Soft status reads always see pre-convert status (stale concurrent snapshot),
+    // while CAS updates observe the real row — mirrors two webhooks that both
+    // passed validatePaidOrderIntents before either claim committed.
+    const baseDb = dbFor(state);
+    const raceDb = {
+      prepare: (sql: string) => {
+        const stmt = baseDb.prepare(sql);
+        return {
+          bind: (...args: unknown[]) => {
+            const bound = stmt.bind(...args);
+            return {
+              first: async () => {
+                if (sql.includes("FROM artifact_intents")) {
+                  const row = state.intents.get(args[0] as string);
+                  if (!row) return null;
+                  return { ...row, status: "attached_to_cart" };
+                }
+                return bound.first();
+              },
+              run: () => bound.run(),
+            };
+          },
+        };
+      },
+    } as unknown as D1Database;
+
+    const first = await handlePostShopifyOrdersWebhook(
+      await webhookRequest(paidOrderBody(), { "X-Shopify-Webhook-Id": "wh_race_a" }),
+      env,
+      raceDb
+    );
+    const firstJson = (await first.json()) as {
+      status: string;
+      print_order_ids: string[];
+    };
+    expect(first.status).toBe(200);
+    expect(firstJson.status).toBe("processing");
+    expect(firstJson.print_order_ids).toHaveLength(1);
+
+    const second = await handlePostShopifyOrdersWebhook(
+      await webhookRequest(
+        paidOrderBody({
+          id: 450789470,
+          checkout_id: 901414061,
+          order_number: 1002,
+          name: "#1002",
+        }),
+        { "X-Shopify-Webhook-Id": "wh_race_b" }
+      ),
+      env,
+      raceDb
+    );
+    const secondJson = (await second.json()) as {
+      status: string;
+      hold_reason: string | null;
+      print_order_ids: string[];
+    };
+
+    expect(second.status).toBe(200);
+    expect(secondJson.status).toBe("held_for_review");
+    expect(secondJson.hold_reason).toBe("ARTIFACT_INTENT_ALREADY_CONVERTED");
+    expect(secondJson.print_order_ids).toEqual([]);
+    expect(state.printOrders.size).toBe(1);
+    expect(state.orders.size).toBe(2);
+    expect(state.orders.get("450789470")?.status).toBe("held_for_review");
+    expect(state.intents.get(INTENT)?.status).toBe("converted");
   });
 
   it("rejects invalid HMAC", async () => {

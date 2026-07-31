@@ -128,6 +128,27 @@ export async function updateArtifactIntentStatus(
     .run();
 }
 
+/**
+ * Atomically claim an intent for commerce conversion.
+ * Returns false when another paid webhook already converted (or blocked/expired) it.
+ */
+export async function claimArtifactIntentConverted(
+  db: D1Database,
+  artifactIntentId: string,
+  updatedAt: string
+): Promise<boolean> {
+  const result = await db
+    .prepare(
+      `UPDATE artifact_intents
+       SET status = 'converted', updated_at = ?
+       WHERE artifact_intent_id = ?
+         AND status NOT IN ('converted', 'expired', 'blocked')`
+    )
+    .bind(updatedAt, artifactIntentId)
+    .run();
+  return (result.meta.changes ?? 0) > 0;
+}
+
 export async function updateArtifactIntentAttachFields(
   db: D1Database,
   artifactIntentId: string,

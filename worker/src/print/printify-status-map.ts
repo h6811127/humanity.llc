@@ -48,3 +48,41 @@ export function statusFromPrintifyWebhookEvent(
       return null;
   }
 }
+
+/**
+ * Happy-path progress rank. Null means an exception/side status that may apply
+ * from any point (canceled, on_hold, has_issues, etc.).
+ */
+export function printifyWebhookStatusRank(status: PrintOrderStatus): number | null {
+  switch (status) {
+    case "submitted":
+      return 10;
+    case "awaiting_production_approval":
+      return 20;
+    case "in_production":
+      return 30;
+    case "partially_fulfilled":
+      return 40;
+    case "fulfilled":
+      return 50;
+    default:
+      return null;
+  }
+}
+
+/**
+ * Reject stale Printify deliveries that would regress buyer-visible progress
+ * (e.g. fulfilled ← delayed order:sent-to-production / order:updated).
+ * Exception statuses (canceled, on_hold, has_issues, …) still apply.
+ */
+export function shouldApplyPrintifyStatus(
+  current: PrintOrderStatus,
+  next: PrintOrderStatus
+): boolean {
+  if (current === next) return false;
+  const nextRank = printifyWebhookStatusRank(next);
+  if (nextRank === null) return true;
+  const currentRank = printifyWebhookStatusRank(current);
+  if (currentRank === null) return true;
+  return nextRank >= currentRank;
+}
