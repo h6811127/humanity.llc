@@ -34,6 +34,65 @@ describe("city-game-sync-season-root-core", () => {
     ).toBe(false);
   });
 
+  it.each([
+    [
+      "status plate charter",
+      {
+        network_charter: {
+          status_plate_scan_url: "  https://WWW.HUMANITY.LLC/c/prod-root?q=qr_status  ",
+        },
+      },
+    ],
+    [
+      "game node charter",
+      {
+        network_charter: {
+          game_node_scan_url: "https://humanity.llc/c/prod-root?q=qr_game",
+        },
+      },
+    ],
+    [
+      "season node",
+      {
+        nodes: [
+          {
+            node_id: "node_01",
+            scan_url: "https://humanity.llc/c/prod-root?q=qr_node",
+          },
+        ],
+      },
+    ],
+  ])("detects production binding from the %s URL alone", (_source, season) => {
+    expect(seasonLooksProductionBound(season)).toBe(true);
+    expect(
+      shouldRefuseLocalSeasonRootSync({
+        useProduction: false,
+        forceLocal: false,
+        season,
+      })
+    ).toBe(true);
+  });
+
+  it.each([
+    "https://humanity.llc.example/c/local-root?q=qr_1",
+    "http://humanity.llc/c/local-root?q=qr_1",
+    "http://127.0.0.1:8787/c/local-root?q=qr_1",
+  ])("does not classify a non-production origin as production-bound: %s", (scanUrl) => {
+    const season = {
+      network_charter: { status_plate_scan_url: scanUrl },
+      nodes: [{ node_id: "node_01", scan_url: scanUrl }],
+    };
+
+    expect(seasonLooksProductionBound(season)).toBe(false);
+    expect(
+      shouldRefuseLocalSeasonRootSync({
+        useProduction: false,
+        forceLocal: false,
+        season,
+      })
+    ).toBe(false);
+  });
+
   it("applies seed root and node scan URLs to a cloned season object", () => {
     const inputSeason = {
       season_root_profile_id: "old_root",
