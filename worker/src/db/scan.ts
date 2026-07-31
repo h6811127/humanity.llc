@@ -217,6 +217,9 @@ async function loadGameNodeWitnessContext(
     if (edge.from.id !== childObject.object_id) peerObjectIds.add(edge.from.id);
     if (edge.to.id !== childObject.object_id) peerObjectIds.add(edge.to.id);
   }
+  for (const witnessObjectId of witnessObjectIds.values()) {
+    peerObjectIds.add(witnessObjectId);
+  }
 
   const witnessPeerLabels: Record<string, string> = {};
   const relationshipPeerGameMeta: Record<string, GameMeta> = {};
