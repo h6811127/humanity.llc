@@ -49,6 +49,7 @@ import {
  *   pollBackoffUntil?: number,
  *   stewardPushEntitled?: boolean,
  *   stewardPushHealthy?: boolean,
+ *   stewardWebPushRegistered?: boolean,
  *   lastPushChallengeId?: string,
  *   cachedPushHints?: import("./js/device-live-control-sw-core.mjs").SwCachedPushHint[],
  *   cachedOsPlans?: import("./js/device-notification-delivery-core.mjs").OsNotificationPlan[],
@@ -91,6 +92,7 @@ async function pollAndMaybeNotify(opts = {}) {
       resolverHealth: state.resolverHealth,
       stewardPushEntitled: state.stewardPushEntitled === true,
       stewardPushHealthy: state.stewardPushHealthy === true,
+      stewardWebPushRegistered: state.stewardWebPushRegistered === true,
       forcePoll: opts.forcePoll === true,
     })
   ) {
@@ -429,6 +431,7 @@ self.addEventListener("message", (event) => {
         pollBackoffUntil: enabled ? (prev?.pollBackoffUntil ?? 0) : 0,
         stewardPushEntitled: msg.stewardPushEntitled === true,
         stewardPushHealthy: msg.stewardPushHealthy === true,
+        stewardWebPushRegistered: msg.stewardWebPushRegistered === true,
         lastPushChallengeId: enabled ? (prev?.lastPushChallengeId ?? "") : "",
         cachedPushHints: enabled
           ? pruneSwPushHintCache(prev?.cachedPushHints ?? [])
@@ -453,6 +456,7 @@ self.addEventListener("message", (event) => {
           resolverHealth: state.resolverHealth,
           stewardPushEntitled: state.stewardPushEntitled,
           stewardPushHealthy: state.stewardPushHealthy,
+          stewardWebPushRegistered: state.stewardWebPushRegistered,
           forcePoll: true,
         })
       ) {

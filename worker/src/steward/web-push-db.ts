@@ -66,14 +66,17 @@ export async function upsertStewardWebPushSubscription(
     body: StewardWebPushSubscribeBody;
     now?: string;
   }
-): Promise<{ ok: true } | { ok: false; reason: "subscription_limit" }> {
+): Promise<
+  | { ok: true }
+  | { ok: false; reason: "subscription_limit" | "endpoint_account_conflict" }
+> {
   const now = input.now ?? new Date().toISOString();
   const existing = await db
     .prepare(
-      `SELECT endpoint FROM ${STEWARD_WEB_PUSH_TABLE} WHERE endpoint = ?`
+      `SELECT endpoint, account_id FROM ${STEWARD_WEB_PUSH_TABLE} WHERE endpoint = ?`
     )
     .bind(input.body.endpoint)
-    .first();
+    .first<{ endpoint: string; account_id: string }>();
 
   if (!existing) {
     const count = await countStewardWebPushSubscriptions(db, input.accountId);
@@ -98,6 +101,9 @@ export async function upsertStewardWebPushSubscription(
       )
       .run();
     return { ok: true };
+  }
+  if (existing.account_id !== input.accountId) {
+    return { ok: false, reason: "endpoint_account_conflict" };
   }
 
   await db
