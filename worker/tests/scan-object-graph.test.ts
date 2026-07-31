@@ -130,6 +130,46 @@ describe("scan-object-graph", () => {
     });
   });
 
+  it("drops revoked signed edges from scan relationship rows", () => {
+    const revokedWitness = {
+      ...crWitnessEdgeDocumentUnsigned(STEWARD),
+      status: "revoked" as const,
+    };
+    const revokedUnlock = {
+      ...crUnlockEdgeDocumentUnsigned(STEWARD),
+      status: "revoked" as const,
+    };
+
+    const rows = buildScanWitnessRelationships({
+      scannedObjectId: CABINET,
+      incomingEdges: [revokedWitness, revokedUnlock],
+      outgoingEdges: [revokedWitness, revokedUnlock],
+      incomingGate: {
+        required: ["node_10"],
+        satisfied: [],
+        pending: ["node_10"],
+        met: false,
+      },
+      scannerGameMeta: {
+        ...witnessMeta(["node_07"]),
+        unlocked_by: ["node_04"],
+      },
+      peerLabels: {
+        [LIBRARY]: "Library witness",
+        [RIVER]: "Riverwalk River Lantern",
+        [CABINET]: "Czech Village cabinet",
+      },
+      peerGameMetaByObjectId: {
+        [CABINET]: { ...witnessMeta([]), unlocked_by: ["node_04"] },
+      },
+    });
+
+    expect(rows).toEqual([]);
+    expect(
+      scanRelationshipRulesFromEdges([revokedWitness, revokedUnlock], rows.length)
+    ).toBeNull();
+  });
+
   it("builds incoming unlock required_by and outgoing unlock rows (OG-2)", () => {
     const unlockEdge = crUnlockEdgeDocumentUnsigned(STEWARD);
     const cabinetPending = buildScanWitnessRelationships({
