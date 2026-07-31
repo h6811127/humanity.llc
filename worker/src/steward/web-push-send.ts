@@ -18,6 +18,7 @@ import {
   stewardWebPushSendConfigured,
   decodeBase64Url,
 } from "./web-push-send-core";
+import { isAllowedWebPushEndpoint } from "./web-push-subscribe";
 
 let cachedVapidKeys: {
   publicKeyBase64Url: string;
@@ -82,6 +83,14 @@ export async function fanOutWebPushLiveProofPending(
   let delivered = 0;
 
   for (const row of subscriptions) {
+    if (!isAllowedWebPushEndpoint(row.endpoint)) {
+      console.error("steward_web_push_endpoint_rejected", {
+        account_id: accountId,
+        endpoint: row.endpoint,
+      });
+      await deleteStewardWebPushSubscription(db, row.endpoint);
+      continue;
+    }
     try {
       const res = await sendWebPushTextMessage(
         {

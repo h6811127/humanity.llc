@@ -66,14 +66,17 @@ export async function upsertStewardWebPushSubscription(
     body: StewardWebPushSubscribeBody;
     now?: string;
   }
-): Promise<{ ok: true } | { ok: false; reason: "subscription_limit" }> {
+): Promise<
+  | { ok: true }
+  | { ok: false; reason: "subscription_limit" | "endpoint_conflict" }
+> {
   const now = input.now ?? new Date().toISOString();
   const existing = await db
     .prepare(
-      `SELECT endpoint FROM ${STEWARD_WEB_PUSH_TABLE} WHERE endpoint = ?`
+      `SELECT endpoint, account_id FROM ${STEWARD_WEB_PUSH_TABLE} WHERE endpoint = ?`
     )
     .bind(input.body.endpoint)
-    .first();
+    .first<{ endpoint: string; account_id: string }>();
 
   if (!existing) {
     const count = await countStewardWebPushSubscriptions(db, input.accountId);
@@ -100,15 +103,18 @@ export async function upsertStewardWebPushSubscription(
     return { ok: true };
   }
 
+  if (existing.account_id !== input.accountId) {
+    return { ok: false, reason: "endpoint_conflict" };
+  }
+
   await db
     .prepare(
       `UPDATE ${STEWARD_WEB_PUSH_TABLE}
-       SET account_id = ?, device_id = ?, p256dh = ?, auth_key = ?,
+       SET device_id = ?, p256dh = ?, auth_key = ?,
            expiration_time = ?, updated_at = ?
        WHERE endpoint = ?`
     )
     .bind(
-      input.accountId,
       input.deviceId,
       input.body.keys.p256dh,
       input.body.keys.auth,

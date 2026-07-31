@@ -208,6 +208,26 @@ export function filterConfirmedLiveControlPending(
 }
 
 /**
+ * Leader snapshots contain only rows already confirmed by a resolver GET in the
+ * leader tab. Mirror that confirmation set in follower tabs without fetching.
+ *
+ * @param {Set<string>} confirmedIds
+ * @param {LiveControlPendingItem[]} items
+ */
+export function applyLiveControlSnapshotConfirmation(confirmedIds, items) {
+  const nextIds = new Set();
+  for (const item of items) {
+    if (typeof item?.challenge_id === "string" && item.challenge_id) {
+      nextIds.add(item.challenge_id);
+    }
+  }
+  for (const id of [...confirmedIds]) {
+    if (!nextIds.has(id)) confirmedIds.delete(id);
+  }
+  for (const id of nextIds) confirmedIds.add(id);
+}
+
+/**
  * Record server GET confirmation for one poll tick.
  *
  * @param {Set<string>} confirmedIds

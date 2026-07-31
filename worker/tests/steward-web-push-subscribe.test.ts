@@ -10,6 +10,7 @@ import {
   handleDeleteStewardWebPushSubscribe,
   parseStewardWebPushSubscribeBody,
   parseStewardWebPushUnsubscribeBody,
+  isAllowedWebPushEndpoint,
   WEB_PUSH_SUBSCRIBE_NOT_ENABLED,
   stewardWebPushSubscribeConfigured,
 } from "../src/steward/web-push-subscribe";
@@ -24,7 +25,13 @@ const HOSTED_ENTITLEMENTS = {
   "notify.push.live_proof": true,
 };
 
-function mockSubscribeDb(opts: { webPushTable?: boolean; existingEndpoint?: boolean } = {}) {
+function mockSubscribeDb(
+  opts: {
+    webPushTable?: boolean;
+    existingEndpoint?: boolean;
+    existingAccountId?: string;
+  } = {}
+) {
   const inserts: unknown[][] = [];
   const deletes: unknown[][] = [];
   return {
@@ -68,7 +75,9 @@ function mockSubscribeDb(opts: { webPushTable?: boolean; existingEndpoint?: bool
           }
           if (sql.includes("steward_web_push_subscriptions") && sql.includes("endpoint =")) {
             if (sql.includes("SELECT endpoint")) {
-              return opts.existingEndpoint ? { endpoint: params[0] } : null;
+              return opts.existingEndpoint
+                ? { endpoint: params[0], account_id: opts.existingAccountId ?? ACCOUNT }
+                : null;
             }
             return null;
           }
@@ -108,6 +117,21 @@ describe("parseStewardWebPushSubscribeBody", () => {
         endpoint: "https://example.com/push",
       })
     ).toBeNull();
+  });
+
+  it("rejects arbitrary HTTPS endpoints", () => {
+    expect(
+      parseStewardWebPushSubscribeBody({
+        endpoint: "https://example.com/push",
+        keys: { p256dh: "p256dh-key", auth: "auth-key" },
+      })
+    ).toBeNull();
+    expect(isAllowedWebPushEndpoint("https://fcm.googleapis.com/fcm/send/abc")).toBe(
+      true
+    );
+    expect(isAllowedWebPushEndpoint("http://fcm.googleapis.com/fcm/send/abc")).toBe(
+      false
+    );
   });
 });
 
@@ -156,6 +180,30 @@ describe("handlePostStewardWebPushSubscribe", () => {
     expect(res.status).toBe(200);
     expect(stewardWebPushSubscribeConfigured(env)).toBe(true);
     expect((db as D1Database & { inserts: unknown[][] }).inserts.length).toBeGreaterThan(0);
+  });
+
+  it("rejects an endpoint already registered to another account", async () => {
+    const db = mockSubscribeDb({
+      webPushTable: true,
+      existingEndpoint: true,
+      existingAccountId: "acc_other",
+    });
+    const env: Env = {
+      DB: db,
+      HOSTED_STEWARD_ENABLED: "1",
+      STEWARD_VAPID_PUBLIC_KEY: VAPID_PUBLIC,
+    };
+    const res = await handlePostStewardWebPushSubscribe(env, db, {
+      accountId: ACCOUNT,
+      deviceId: DEVICE,
+      body: {
+        endpoint: "https://fcm.googleapis.com/fcm/send/x",
+        keys: { p256dh: "p256dh-key", auth: "auth-key" },
+      },
+    });
+    expect(res.status).toBe(409);
+    const body = (await res.json()) as { error: string };
+    expect(body.error).toBe("steward_web_push_endpoint_conflict");
   });
 
   it("removes subscription for account", async () => {

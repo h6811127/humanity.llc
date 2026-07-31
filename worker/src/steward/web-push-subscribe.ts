@@ -22,6 +22,29 @@ export interface StewardWebPushSubscribeBody {
   expirationTime?: number | null;
 }
 
+const ALLOWED_WEB_PUSH_ENDPOINT_HOSTS = new Set([
+  "fcm.googleapis.com",
+  "fcmregistrations.googleapis.com",
+  "updates.push.services.mozilla.com",
+  "web.push.apple.com",
+  "wns.notify.windows.com",
+]);
+
+export function isAllowedWebPushEndpoint(endpoint: string): boolean {
+  let url: URL;
+  try {
+    url = new URL(endpoint);
+  } catch {
+    return false;
+  }
+  if (url.protocol !== "https:") return false;
+  const host = url.hostname.toLowerCase();
+  return (
+    ALLOWED_WEB_PUSH_ENDPOINT_HOSTS.has(host) ||
+    host.endsWith(".notify.windows.com")
+  );
+}
+
 export function parseStewardWebPushSubscribeBody(
   raw: unknown
 ): StewardWebPushSubscribeBody | null {
@@ -33,7 +56,7 @@ export function parseStewardWebPushSubscribeBody(
   const keys = keysRaw as Record<string, unknown>;
   const p256dh = typeof keys.p256dh === "string" ? keys.p256dh.trim() : "";
   const auth = typeof keys.auth === "string" ? keys.auth.trim() : "";
-  if (!p256dh || !auth) return null;
+  if (!p256dh || !auth || !isAllowedWebPushEndpoint(endpoint)) return null;
   const expirationTime =
     body.expirationTime === null || body.expirationTime === undefined
       ? null
@@ -91,6 +114,13 @@ export async function handlePostStewardWebPushSubscribe(
     body: input.body,
   });
   if (!result.ok) {
+    if (result.reason === "endpoint_conflict") {
+      return errorResponse(
+        "steward_web_push_endpoint_conflict",
+        "This Web Push endpoint is already registered to another steward account.",
+        409
+      );
+    }
     return errorResponse(
       "steward_web_push_subscription_limit",
       `Too many Web Push subscriptions for this account (max ${STEWARD_WEB_PUSH_MAX_SUBSCRIPTIONS_PER_ACCOUNT}).`,
