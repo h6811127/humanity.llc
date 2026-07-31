@@ -24,7 +24,13 @@ const HOSTED_ENTITLEMENTS = {
   "notify.push.live_proof": true,
 };
 
-function mockSubscribeDb(opts: { webPushTable?: boolean; existingEndpoint?: boolean } = {}) {
+function mockSubscribeDb(
+  opts: {
+    webPushTable?: boolean;
+    existingEndpoint?: boolean;
+    subscriptionCount?: number;
+  } = {}
+) {
   const inserts: unknown[][] = [];
   const deletes: unknown[][] = [];
   return {
@@ -73,7 +79,7 @@ function mockSubscribeDb(opts: { webPushTable?: boolean; existingEndpoint?: bool
             return null;
           }
           if (sql.includes("COUNT(*)") && sql.includes("steward_web_push_subscriptions")) {
-            return { count: 0 };
+            return { count: opts.subscriptionCount ?? 0 };
           }
           return null;
         },
@@ -156,6 +162,31 @@ describe("handlePostStewardWebPushSubscribe", () => {
     expect(res.status).toBe(200);
     expect(stewardWebPushSubscribeConfigured(env)).toBe(true);
     expect((db as D1Database & { inserts: unknown[][] }).inserts.length).toBeGreaterThan(0);
+  });
+
+  it("returns 429 when account has reached the Web Push subscription cap", async () => {
+    const db = mockSubscribeDb({
+      webPushTable: true,
+      subscriptionCount: 10,
+    });
+    const env: Env = {
+      DB: db,
+      HOSTED_STEWARD_ENABLED: "1",
+      STEWARD_VAPID_PUBLIC_KEY: VAPID_PUBLIC,
+    };
+    const res = await handlePostStewardWebPushSubscribe(env, db, {
+      accountId: ACCOUNT,
+      deviceId: DEVICE,
+      body: {
+        endpoint: "https://fcm.googleapis.com/fcm/send/over-cap",
+        keys: { p256dh: "p256dh-key", auth: "auth-key" },
+      },
+    });
+    expect(res.status).toBe(429);
+    expect(res.headers.get("Retry-After")).toBe("60");
+    const body = (await res.json()) as { error: string };
+    expect(body.error).toBe("steward_web_push_subscription_limit");
+    expect((db as D1Database & { inserts: unknown[][] }).inserts).toHaveLength(0);
   });
 
   it("removes subscription for account", async () => {
