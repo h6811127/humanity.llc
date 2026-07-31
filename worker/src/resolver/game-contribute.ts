@@ -312,9 +312,6 @@ export async function handlePostGameContribute(
     );
   }
 
-  await incrementGameContributeBucket(db, pathObjectId, fields.seasonId, bucketDate);
-  await recordGameContributeSeasonUsage(db, season.season_id);
-
   if (contributeMode === "quorum") {
     const target = meta.collective_target!;
     try {
@@ -328,6 +325,13 @@ export async function handlePostGameContribute(
       if (!bumped) {
         return errorResponse("NOT_FOUND", "Child object not found.", 404);
       }
+      await recordAcceptedGameContribution(
+        db,
+        pathObjectId,
+        fields.seasonId,
+        bucketDate,
+        season.season_id
+      );
 
       return jsonResponse(
         {
@@ -366,6 +370,13 @@ export async function handlePostGameContribute(
       doc,
       typeof doc.public_state === "string" ? doc.public_state : existing.public_state,
       updatedAt
+    );
+    await recordAcceptedGameContribution(
+      db,
+      pathObjectId,
+      fields.seasonId,
+      bucketDate,
+      season.season_id
     );
 
     return jsonResponse(
@@ -406,6 +417,13 @@ export async function handlePostGameContribute(
       if (!relayResult) {
         return errorResponse("NOT_FOUND", "Child object not found.", 404);
       }
+      await recordAcceptedGameContribution(
+        db,
+        pathObjectId,
+        fields.seasonId,
+        bucketDate,
+        season.season_id
+      );
 
       return jsonResponse(
         {
@@ -469,6 +487,13 @@ export async function handlePostGameContribute(
   );
 
   const unlockEffects = await applyUnlockSideEffects(db, nodeId, doc, now, season);
+  await recordAcceptedGameContribution(
+    db,
+    pathObjectId,
+    fields.seasonId,
+    bucketDate,
+    season.season_id
+  );
 
   return jsonResponse(
     {
@@ -484,4 +509,15 @@ export async function handlePostGameContribute(
     200,
     { "Cache-Control": "no-store" }
   );
+}
+
+async function recordAcceptedGameContribution(
+  db: D1Database,
+  objectId: string,
+  bucketSeasonId: string,
+  bucketDate: string,
+  usageSeasonId: string
+): Promise<void> {
+  await incrementGameContributeBucket(db, objectId, bucketSeasonId, bucketDate);
+  await recordGameContributeSeasonUsage(db, usageSeasonId);
 }

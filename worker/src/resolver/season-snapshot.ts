@@ -217,7 +217,13 @@ export async function handleGetSeasonSnapshot(
   if (seasonQuota) return seasonQuota;
 
   const now = new Date();
-  await runRelayTerritoryDecayCron(env.DB, env, now, season);
+  try {
+    await runRelayTerritoryDecayCron(env.DB, env, now, season);
+  } catch (e) {
+    if (!(e instanceof Error) || e.message !== "RELAY_DECAY_WRITE_CONFLICT") {
+      throw e;
+    }
+  }
 
   const origin = new URL(request.url).origin;
   const windowPhase = resolveSeasonWindowPhase(now, season);
