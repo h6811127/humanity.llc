@@ -43,14 +43,14 @@ describe("public network player flow pages (shell regression)", () => {
     expect(home).toContain("See all listed public networks");
     expect(home).toContain('href="/play/cedar-rapids/#rules-prove-title"');
     expect(home).toContain(PUBLIC_NETWORK_RULES_PROVE_CTA);
-    expect(home).toContain("public-networks-portal.mjs?v=12");
+    expect(home).toContain("public-networks-portal.mjs?v=14");
   });
 
   it("catalog page links home and hydrates portal", () => {
     expect(catalog).toContain("player-flow-breadcrumb");
     expect(catalog).toContain('href="/"');
     expect(catalog).toContain("Home dashboard");
-    expect(catalog).toContain("public-networks-portal.mjs?v=12");
+    expect(catalog).toContain("public-networks-portal.mjs?v=14");
     expect(catalog).toContain("not live networks");
   });
 

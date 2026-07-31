@@ -1,6 +1,6 @@
 /**
  * Find public networks — `/` and `/play/season/`
- * On `/` (WS-DISCOVER-P5a/b): also hydrates places strip from DiscoveryPin index.
+ * On `/` (WS-DISCOVER-P5a/b/c): hydrates places strip + multi-region picker.
  */
 import { CITY_GAME_SEASONS_INDEX_URL } from "./city-game-season-resolve.mjs";
 import {
@@ -13,12 +13,18 @@ import {
 import { hydrateLandingLiveObjectCarriers } from "./landing-live-object-carriers.mjs";
 import {
   bindLandingPlacesNearMe,
+  bindLandingPlacesRegionPicker,
+  cityLabelForLandingPlacesRegion,
   fetchLandingPinIndex,
+  fetchLandingPlacesRegionOptions,
   fetchLandingPlacesSnapshotIndex,
   LANDING_DEFAULT_DISCOVERY_REGION,
   paintLandingPlacesSection,
   resolveLandingCategoryPinFacet,
+  resolveLandingPlacesRegionSelection,
   resolveLandingShelfPinFacet,
+  seasonIdForLandingPlacesRegion,
+  syncLandingRegionQueryParam,
 } from "./landing-places.mjs";
 import {
   buildPublicNetworkCardModel,
@@ -33,6 +39,17 @@ import {
 /** @typedef {import("./public-networks-portal-core.mjs").PublicNetworkCategoryFilter} PublicNetworkCategoryFilter */
 /** @typedef {import("./landing-places-core.mjs").LandingPinFacet} LandingPinFacet */
 /** @typedef {import("./discovery-pin-projection-core.mjs").DiscoveryPin} DiscoveryPin */
+/** @typedef {import("./landing-places-region-core.mjs").LandingPlacesRegionOption} LandingPlacesRegionOption */
+
+/**
+ * @typedef {{
+ *   pins: DiscoveryPin[];
+ *   region: string;
+ *   snapshotIndex: ReturnType<typeof import("./discovery-pin-snapshot-core.mjs").buildSnapshotNodeIndex> | null;
+ *   cityLabel: string;
+ *   regionOptions: LandingPlacesRegionOption[];
+ * }} LandingPlacesCtx
+ */
 
 async function fetchSeasonConfig(jsonUrl) {
   const res = await fetch(jsonUrl, { cache: "no-store" });
@@ -63,11 +80,45 @@ async function loadPublicNetworkCards(rows) {
 }
 
 /**
- * @param {PublicNetworkCategoryFilter} category
+ * @param {LandingPlacesRegionOption[]} regionOptions
+ * @param {string} regionSlug
+ * @param {string | null | undefined} [fallbackSeasonId]
+ * @returns {Promise<LandingPlacesCtx>}
  */
-function syncLandingCategoryUrl(category) {
+async function loadLandingPlacesCtx(regionOptions, regionSlug, fallbackSeasonId) {
+  const region = regionSlug || LANDING_DEFAULT_DISCOVERY_REGION;
+  const pinIndex = await fetchLandingPinIndex(region);
+  const pins = Array.isArray(pinIndex?.pins)
+    ? /** @type {DiscoveryPin[]} */ (pinIndex.pins)
+    : [];
+  const knownSeason = seasonIdForLandingPlacesRegion(regionOptions, region, "");
+  const seasonId =
+    knownSeason ||
+    (region === LANDING_DEFAULT_DISCOVERY_REGION
+      ? String(fallbackSeasonId ?? "").trim()
+      : "");
+  const snapshotIndex = await fetchLandingPlacesSnapshotIndex(seasonId || null);
+  return {
+    pins,
+    region: String(pinIndex?.region ?? region),
+    snapshotIndex,
+    cityLabel: cityLabelForLandingPlacesRegion(regionOptions, region),
+    regionOptions,
+  };
+}
+
+/**
+ * @param {PublicNetworkCategoryFilter} category
+ * @param {string} region
+ */
+function syncLandingPlacesUrl(category, region) {
   if (typeof window === "undefined" || typeof history?.replaceState !== "function") return;
-  const nextUrl = buildLandingCategoryUrl(category, window.location.pathname);
+  const regionSlug = String(region ?? "").trim();
+  const nextUrl = buildLandingCategoryUrl(category, window.location.pathname, {
+    search: window.location.search,
+    region:
+      regionSlug && regionSlug !== LANDING_DEFAULT_DISCOVERY_REGION ? regionSlug : null,
+  });
   if (`${window.location.pathname}${window.location.search}` === nextUrl) return;
   history.replaceState(null, "", nextUrl);
 }
@@ -109,13 +160,11 @@ function syncLandingShelfActiveStateForFacet(facet, activeShelfId) {
 /**
  * @param {import("./public-networks-portal-core.mjs").PublicNetworkCardModel[]} allCards
  * @param {{
- *   pins?: DiscoveryPin[];
- *   region?: string;
- *   snapshotIndex?: ReturnType<typeof import("./discovery-pin-snapshot-core.mjs").buildSnapshotNodeIndex> | null;
- *   cityLabel?: string;
- * } | null} placesCtx
+ *   placesCtx: LandingPlacesCtx | null;
+ *   onRegionChange?: (regionSlug: string) => void | Promise<void>;
+ * }} [placesApi]
  */
-function bindPublicNetworksPortal(allCards, placesCtx = null) {
+function bindPublicNetworksPortal(allCards, placesApi = {}) {
   const searchInput = document.getElementById("public-networks-search");
   const chipsRoot = document.getElementById("public-networks-categories");
   const resultsRoot = document.getElementById("public-networks-results");
@@ -131,20 +180,23 @@ function bindPublicNetworksPortal(allCards, placesCtx = null) {
   /** @type {string | null} */
   let activeShelfId = landingShelfIdForCategory(activeCategory);
 
-  const hasPlaces = Boolean(placesRoot && placesCtx?.pins);
+  const hasPlaces = Boolean(placesRoot && placesApi.placesCtx);
   /** @type {import("./discovery-near-me-core.mjs").DiscoveryClientCoords | null} */
   let clientCoords = null;
+  let regionLoadGeneration = 0;
 
   const renderPlaces = () => {
-    if (!hasPlaces || !placesCtx) return;
+    const activePlacesCtx = placesApi.placesCtx;
+    if (!hasPlaces || !activePlacesCtx) return;
     paintLandingPlacesSection({
-      pins: placesCtx.pins ?? [],
-      region: placesCtx.region ?? LANDING_DEFAULT_DISCOVERY_REGION,
+      pins: activePlacesCtx.pins ?? [],
+      region: activePlacesCtx.region ?? LANDING_DEFAULT_DISCOVERY_REGION,
       query: searchInput instanceof HTMLInputElement ? searchInput.value : "",
       facet: activePinFacet,
-      snapshotIndex: placesCtx.snapshotIndex ?? null,
-      cityLabel: placesCtx.cityLabel,
+      snapshotIndex: activePlacesCtx.snapshotIndex ?? null,
+      cityLabel: activePlacesCtx.cityLabel,
       clientCoords,
+      regionOptions: activePlacesCtx.regionOptions ?? [],
     });
   };
 
@@ -165,7 +217,16 @@ function bindPublicNetworksPortal(allCards, placesCtx = null) {
     } else {
       syncLandingShelfActiveState(activeCategory);
     }
-    syncLandingCategoryUrl(activeCategory);
+    if (hasPlaces && placesApi.placesCtx) {
+      syncLandingPlacesUrl(activeCategory, placesApi.placesCtx.region);
+    } else {
+      const nextUrl = buildLandingCategoryUrl(activeCategory, window.location.pathname, {
+        search: window.location.search,
+      });
+      if (`${window.location.pathname}${window.location.search}` !== nextUrl) {
+        history.replaceState(null, "", nextUrl);
+      }
+    }
     renderPlaces();
   };
 
@@ -221,6 +282,33 @@ function bindPublicNetworksPortal(allCards, placesCtx = null) {
       },
       render: renderPlaces,
     });
+    bindLandingPlacesRegionPicker({
+      onRegionChange: async (regionSlug) => {
+        if (!placesApi.onRegionChange) return;
+        const loadGen = ++regionLoadGeneration;
+        clientCoords = null;
+        const placesMount = document.getElementById("landing-places-results");
+        if (placesMount instanceof HTMLElement) {
+          placesMount.innerHTML = '<p class="landing-places-loading">Loading places…</p>';
+        }
+        try {
+          await placesApi.onRegionChange(regionSlug);
+          if (loadGen !== regionLoadGeneration) return;
+          syncLandingRegionQueryParam(regionSlug);
+          renderPlaces();
+          if (placesApi.placesCtx) {
+            syncLandingPlacesUrl(activeCategory, placesApi.placesCtx.region);
+          }
+        } catch (err) {
+          if (loadGen !== regionLoadGeneration) return;
+          console.warn("[landing-places-region]", err);
+          if (placesMount instanceof HTMLElement) {
+            placesMount.innerHTML =
+              '<p class="landing-places-empty discovery-region-empty">Could not load places.</p>';
+          }
+        }
+      },
+    });
   }
 
   render();
@@ -232,7 +320,7 @@ async function bootPublicNetworksPortal() {
   const resultsRoot = document.getElementById("public-networks-results");
   if (!resultsRoot) return;
 
-  /** @type {{ pins: DiscoveryPin[]; region: string; snapshotIndex: ReturnType<typeof import("./discovery-pin-snapshot-core.mjs").buildSnapshotNodeIndex> | null; cityLabel: string } | null} */
+  /** @type {LandingPlacesCtx | null} */
   let placesCtx = null;
   const placesMount = document.getElementById("landing-places-results");
 
@@ -254,23 +342,42 @@ async function bootPublicNetworksPortal() {
       });
     }
 
+    /** @type {LandingPlacesRegionOption[]} */
+    let regionOptions = [];
+    let defaultRegion = LANDING_DEFAULT_DISCOVERY_REGION;
+    try {
+      const catalog = await fetchLandingPlacesRegionOptions();
+      regionOptions = catalog.options;
+      defaultRegion = catalog.defaultRegion;
+    } catch (catalogErr) {
+      console.warn("[landing-places] regions catalog", catalogErr);
+      regionOptions = [
+        {
+          region_slug: LANDING_DEFAULT_DISCOVERY_REGION,
+          label: "Cedar Rapids",
+          city: "Cedar Rapids, Iowa",
+          season_id: "cr_season_01_wake",
+          browse_href: "/discover/cedar-rapids-iowa/",
+        },
+      ];
+    }
+
     if (placesMount instanceof HTMLElement) {
       try {
-        const region = LANDING_DEFAULT_DISCOVERY_REGION;
-        const pinIndex = await fetchLandingPinIndex(region);
-        const pins = Array.isArray(pinIndex?.pins)
-          ? /** @type {DiscoveryPin[]} */ (pinIndex.pins)
-          : [];
-        const seasonId =
+        const storage =
+          typeof localStorage !== "undefined" ? localStorage : null;
+        const region = resolveLandingPlacesRegionSelection(
+          regionOptions,
+          window.location.search,
+          storage,
+          defaultRegion
+        );
+        placesCtx = await loadLandingPlacesCtx(
+          regionOptions,
+          region,
           featuredLive?.season_id ||
-          String(rows.find((r) => r?.season_id)?.season_id ?? "cr_season_01_wake");
-        const snapshotIndex = await fetchLandingPlacesSnapshotIndex(seasonId);
-        placesCtx = {
-          pins,
-          region: String(pinIndex?.region ?? region),
-          snapshotIndex,
-          cityLabel: featuredLive?.place?.split(",")[0]?.trim() || "Cedar Rapids",
-        };
+            String(rows.find((r) => r?.season_id)?.season_id ?? "cr_season_01_wake")
+        );
         paintLandingPlacesSection({
           ...placesCtx,
           query: "",
@@ -286,7 +393,21 @@ async function bootPublicNetworksPortal() {
       }
     }
 
-    bindPublicNetworksPortal(cards, placesCtx);
+    /** Mutable holder so region switches update the bound portal. */
+    const placesApi = {
+      placesCtx,
+      /**
+       * @param {string} regionSlug
+       */
+      onRegionChange: async (regionSlug) => {
+        placesApi.placesCtx = await loadLandingPlacesCtx(
+          regionOptions,
+          regionSlug,
+          featuredLive?.season_id || null
+        );
+      },
+    };
+    bindPublicNetworksPortal(cards, placesApi);
   } catch (err) {
     console.warn("[public-networks-portal]", err);
     const emptyEl = document.getElementById("public-networks-empty");

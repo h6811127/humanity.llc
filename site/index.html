@@ -77,7 +77,7 @@
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=5" />
     <link rel="stylesheet" href="/styles.css?v=162" />
-    <link rel="stylesheet" href="/css/public-networks-portal.css?v=11" />
+    <link rel="stylesheet" href="/css/public-networks-portal.css?v=12" />
     <link rel="stylesheet" href="/css/discovery-region-browse.css?v=5" />
     <link rel="stylesheet" href="/css/device-shell.css?v=94" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=32" />
@@ -614,6 +614,20 @@
               Sort near me
             </button>
           </div>
+          <div class="landing-places-region-row">
+            <label class="landing-places-region-label" for="landing-places-region">Region</label>
+            <select
+              class="landing-places-region"
+              id="landing-places-region"
+              aria-label="Discovery region"
+            >
+              <option value="cedar-rapids-iowa">Cedar Rapids · Cedar Rapids, Iowa</option>
+              <option value="example-city">Example City · Example City (template)</option>
+            </select>
+            <a class="landing-places-all-regions" id="landing-places-all-regions" href="/discover/"
+              >All regions</a
+            >
+          </div>
           <p class="form-hint landing-places-lead" id="landing-places-lead">
             Listed places in Cedar Rapids. Sort near me uses location on your device; scans are not
             tracked.
@@ -625,6 +639,12 @@
           <p
             class="landing-places-near-me-status"
             id="landing-places-near-me-status"
+            aria-live="polite"
+          ></p>
+          <p
+            class="landing-places-density form-hint"
+            id="landing-places-density"
+            hidden
             aria-live="polite"
           ></p>
           <div class="landing-places-results discovery-pin-list" id="landing-places-results">
@@ -1222,6 +1242,6 @@
     <script src="/js/landing-focus.mjs?v=5" type="module"></script>
     <script src="/js/device-status-bootstrap.mjs?v=94" type="module"></script>
     <script src="/js/landing-device-hub.mjs?v=14" type="module"></script>
-    <script src="/js/public-networks-portal.mjs?v=12" type="module"></script>
+    <script src="/js/public-networks-portal.mjs?v=14" type="module"></script>
   </body>
 </html>

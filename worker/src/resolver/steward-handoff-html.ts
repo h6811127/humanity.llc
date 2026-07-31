@@ -6,7 +6,7 @@ import {
   STEWARD_HANDOFF_INTERSTITIAL_DETAIL,
   STEWARD_HANDOFF_INTERSTITIAL_EYEBROW,
   STEWARD_HANDOFF_INTERSTITIAL_TITLE,
-} from "../../../site/js/device-ownership-copy-core.mjs";
+} from "../../../site/js/steward-handoff-interstitial-copy-core.mjs";
 
 export interface StewardHandoffInterstitialModel {
   origin: string;

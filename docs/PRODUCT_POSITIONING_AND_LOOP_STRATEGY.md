@@ -5,7 +5,7 @@
 **Parent:** `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` · `docs/STATUS_PLATE_PILOT.md`  
 **Language policy:** [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md)  
 **Object model (protocol):** [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md)  
-**Last updated:** 2026-07-26 — Front door **P5a–b shipped:** places-first `/` + landing near-me · **P5c** multi-region still target
+**Last updated:** 2026-07-29 — Front door **P5a–c shipped:** places-first `/` + landing near-me + multi-region picker
 
 ---
 

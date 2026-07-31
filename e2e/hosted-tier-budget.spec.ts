@@ -244,7 +244,11 @@ test.describe("hosted tier E2 budget policy", () => {
 
     await page.goto("/create/");
 
-    await expect(page.getByRole("heading", { name: "Create a live card" })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Ways to make live status" })
+    ).toBeVisible();
+    await page.getByRole("button", { name: /Your @handle/i }).click();
+    await expect(page.getByRole("heading", { name: "Pick your @handle" })).toBeVisible();
     await expect(page.locator("#submit")).toBeVisible();
     await expect(page.getByText(/paywall|premium verified/i)).toHaveCount(0);
     expect(entitlementRequests).toBe(0);

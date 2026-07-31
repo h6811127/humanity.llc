@@ -40,7 +40,7 @@ export const PLAYER_FLOW_PAGE_CHECKS = [
       'href="/play/cedar-rapids/#rules-prove-title"',
       PUBLIC_NETWORK_RULES_PROVE_CTA,
       'id="public-networks-results"',
-      "public-networks-portal.mjs?v=12",
+      "public-networks-portal.mjs?v=14",
     ],
   },
   {
@@ -53,7 +53,7 @@ export const PLAYER_FLOW_PAGE_CHECKS = [
       'id="public-networks-results"',
       "Home dashboard",
       "not live networks",
-      "public-networks-portal.mjs?v=12",
+      "public-networks-portal.mjs?v=14",
     ],
     forbidden: ['>About this network</a>'],
   },

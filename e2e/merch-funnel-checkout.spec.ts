@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { decodeShopifyCartLineProperties } from "../site/js/shop-customize-core.mjs";
 
 /**
  * Merch funnel — artifact intent checkout handoff (docs/MERCH_FUNNEL_MVP.md).
@@ -132,7 +133,10 @@ test.describe("merch funnel checkout handoff", () => {
       page.locator("#shop-customize-checkout").click(),
     ]);
     const checkoutUrl = new URL(page.url());
-    expect(checkoutUrl.searchParams.get("properties[artifact_intent_id]")).toBe(E2E_INTENT);
+    const encodedProperties = checkoutUrl.searchParams.get("properties");
+    expect(encodedProperties).toBeTruthy();
+    const lineProperties = decodeShopifyCartLineProperties(encodedProperties ?? "");
+    expect(lineProperties.artifact_intent_id).toBe(E2E_INTENT);
   });
 
   test("blocks checkout until recovery seatbelt is satisfied", async ({ page }) => {

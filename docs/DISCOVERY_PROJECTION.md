@@ -1,9 +1,9 @@
 # Discovery projection
 
-**Status:** Strategic spec — discovery plane · **P0–P4 shipped** · **P5a–b shipped** (places-first `/` + near-me on `/`) · **P5c target** · belt: `npm run verify:discover` · `npm run verify:landing`  
+**Status:** Strategic spec — discovery plane · **P0–P4 shipped** · **P5a–c shipped** (places-first `/` + near-me + multi-region picker) · belt: `npm run verify:discover` · `npm run verify:landing`  
 **Audience:** Product, frontend, operators, agents  
 **Scope:** Public browse, near-me planning, board map lenses — **no resolver, scan, or network-graph changes**  
-**Last updated:** 2026-07-26 — **WS-DISCOVER-P5a–b** homepage places strip + client near-me
+**Last updated:** 2026-07-29 — **WS-DISCOVER-P5c** landing region picker + persisted default
 
 **Parent stack:** [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) (resolver L1–L5) · [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) · [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md)  
 **Related:** [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) · [`V1_IMPLEMENTATION_CONTRACTS.md`](V1_IMPLEMENTATION_CONTRACTS.md) (public search deferred in v1 slice) · [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md)
@@ -400,7 +400,7 @@ Discovery plane targets the second without changing resolver cardinality.
 
 ### WS-DISCOVER-P5 — places-first landing composition
 
-**Status:** **P5a–b ☑ shipped** · **P5c ☐ target**. Closes the gap between discovery-first copy (“what’s true near me?”) and a boards-primary homepage. **No** new signed documents, scan routes, or network-graph changes.
+**Status:** **P5a–c ☑ shipped**. Closes the gap between discovery-first copy (“what’s true near me?”) and a boards-primary homepage. **No** new signed documents, scan routes, or network-graph changes.
 
 **Gap (pre-P5a):** `/` listed **networks**; **places (pins)** and client-side **Sort near me** lived only on `/discover/{region}/`.
 
@@ -408,9 +408,9 @@ Discovery plane targets the second without changing resolver cardinality.
 |-------|------|--------|
 | **P5a** | Places-first composition on `/` | **☑ shipped** — `#landing-places` pin strip; shelves filter pins by facet; **Boards & seasons** secondary · [`landing-places-core.mjs`](../site/js/landing-places-core.mjs) · [`landing-places.mjs`](../site/js/landing-places.mjs) · [`public-networks-portal.mjs`](../site/js/public-networks-portal.mjs) (places mount only when `#landing-places-results` exists) |
 | **P5b** | Honest near-me on `/` | **☑ shipped** — `geolocation=(self)` on `/` in [`site/_headers`](../site/_headers); `#landing-places-near-me` button; client sort via [`requestDiscoveryClientCoords()`](../site/js/discovery-near-me-core.mjs) + [`sortDiscoveryPinsByNearMe()`](../site/js/discovery-near-me-core.mjs); required privacy copy on `#landing-places-privacy` |
-| **P5c** | Multi-region places-first | **☐ target** — region picker / default region beyond Cedar Rapids pilot |
+| **P5c** | Multi-region places-first | **☑ shipped** — `#landing-places-region` picker from [`discovery-landing-regions.json`](../site/data/discovery-landing-regions.json) (Cedar Rapids + Example City template) · persisted default (`hc_landing_places_region`) · `?region=` deep link · **All regions** → [`/discover/`](../site/discover/) · empty / far-away density copy (`#landing-places-density`) · empty pin index [`discovery-example-city.json`](../site/data/discovery-example-city.json) · [`landing-places-region-core.mjs`](../site/js/landing-places-region-core.mjs) · [`landing-places-core.mjs`](../site/js/landing-places-core.mjs) |
 
-**Regression:** `npm run verify:landing` (contract v12+) · [`landing-places-core.test.ts`](../worker/tests/landing-places-core.test.ts) · [`e2e/landing-copy.spec.ts`](../e2e/landing-copy.spec.ts).
+**Regression:** `npm run verify:landing` (contract v13+) · [`landing-places-core.test.ts`](../worker/tests/landing-places-core.test.ts) · [`landing-places-region-core.test.ts`](../worker/tests/landing-places-region-core.test.ts) · [`e2e/landing-copy.spec.ts`](../e2e/landing-copy.spec.ts).
 
 ---
 

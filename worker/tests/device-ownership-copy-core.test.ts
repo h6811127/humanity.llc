@@ -57,7 +57,10 @@ import {
   VOUCH_PWA_CAMERA_HANDOFF_STEPS,
   VOUCH_PWA_STEWARD_PARAM_HANDOFF_LEAD,
   VOUCH_PWA_STEWARD_PARAM_HANDOFF_STEPS,
+  STEWARD_HANDOFF_INTERSTITIAL_CONTINUE,
+  STEWARD_HANDOFF_INTERSTITIAL_COPY,
   STEWARD_HANDOFF_INTERSTITIAL_DETAIL,
+  STEWARD_HANDOFF_INTERSTITIAL_EYEBROW,
   STEWARD_HANDOFF_INTERSTITIAL_TITLE,
   DUAL_QR_PUBLIC_HINT,
   DUAL_QR_STEWARD_HINT,
@@ -74,6 +77,29 @@ import {
 } from "../../site/js/device-ownership-copy-core.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
+
+describe("steward handoff interstitial copy twin", () => {
+  it("keeps Node-safe interstitial module aligned with shell ownership copy", async () => {
+    const interstitial = await import(
+      "../../site/js/steward-handoff-interstitial-copy-core.mjs"
+    );
+    expect(interstitial.STEWARD_HANDOFF_INTERSTITIAL_EYEBROW).toBe(
+      STEWARD_HANDOFF_INTERSTITIAL_EYEBROW
+    );
+    expect(interstitial.STEWARD_HANDOFF_INTERSTITIAL_TITLE).toBe(
+      STEWARD_HANDOFF_INTERSTITIAL_TITLE
+    );
+    expect(interstitial.STEWARD_HANDOFF_INTERSTITIAL_DETAIL).toBe(
+      STEWARD_HANDOFF_INTERSTITIAL_DETAIL
+    );
+    expect(interstitial.STEWARD_HANDOFF_INTERSTITIAL_CONTINUE).toBe(
+      STEWARD_HANDOFF_INTERSTITIAL_CONTINUE
+    );
+    expect(interstitial.STEWARD_HANDOFF_INTERSTITIAL_COPY).toBe(
+      STEWARD_HANDOFF_INTERSTITIAL_COPY
+    );
+  });
+});
 
 describe("device-ownership-copy-core", () => {
   it("exports Layer 2 custody strings without signing-key jargon", () => {

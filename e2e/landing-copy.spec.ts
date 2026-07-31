@@ -16,9 +16,13 @@ test.describe("landing copy contract", () => {
       })
     ).toBeVisible();
     await expect(page.getByRole("heading", { name: "Browse by need" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Live now" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Open or paused" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Return, relay, hours" })).toBeVisible();
+    await expect(page.locator(".landing-entry-shelf-title", { hasText: "Live now" })).toBeVisible();
+    await expect(
+      page.locator(".landing-entry-shelf-title", { hasText: "Open or paused" })
+    ).toBeVisible();
+    await expect(
+      page.locator(".landing-entry-shelf-title", { hasText: "Return, relay, hours" })
+    ).toBeVisible();
     await expect(page.getByLabel("Search places and boards")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Places near me" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Sort near me" })).toBeVisible();
@@ -62,6 +66,30 @@ test.describe("landing copy contract", () => {
     await expect(page).toHaveURL(/\/create\//);
   });
 
+  test("shows region picker and can switch to Example City", async ({ page }) => {
+    await page.goto("/");
+    const region = page.locator("#landing-places-region");
+    await expect(region).toBeVisible();
+    await expect(page.locator("#landing-places-results .discovery-pin-row").first()).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(region.locator("option")).toHaveCount(2);
+    await expect(region).toBeEnabled();
+    await expect(region).toHaveValue("cedar-rapids-iowa");
+    await expect(page.getByRole("link", { name: "All regions" })).toHaveAttribute(
+      "href",
+      "/discover/"
+    );
+    await region.selectOption("example-city");
+    await expect(region).toHaveValue("example-city");
+    await expect(page.locator("#landing-places-lead")).toContainText("Example City", {
+      timeout: 10_000,
+    });
+    await expect(page.locator("#landing-places-results")).toContainText(
+      /No listed places in Example City|Browse other regions|See all places/
+    );
+  });
+
   test("loads Cedar Rapids places strip with pin rows", async ({ page }) => {
     await page.goto("/");
     const places = page.locator("#landing-places-results");
@@ -101,11 +129,12 @@ test.describe("landing copy contract", () => {
     await openBoard.click();
     await expect(page).toHaveURL(/\/play\/cedar-rapids\/map\//);
     await expect(page.locator(".player-flow-breadcrumb")).toContainText("Wake the city board");
-    await expect(page.getByRole("link", { name: "How this network works" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "All public networks" })).toHaveAttribute(
-      "href",
-      "/play/season/"
-    );
+    await expect(
+      page.locator(".hero-line").getByRole("link", { name: "How this network works" })
+    ).toBeVisible();
+    await expect(
+      page.locator(".city-game-map-page-footnote").getByRole("link", { name: "All public networks" })
+    ).toHaveAttribute("href", "/play/season/");
   });
 
   test("discovery card links what a scan proves to rules charter", async ({ page }) => {

@@ -23,6 +23,19 @@ const WALLET_ENTRY = {
   status: "active",
 };
 
+/** Metadata-only — quiet rehydrate must not auto-load signing keys into the tab. */
+const WALLET_ENTRY_NO_KEYS = {
+  id: WALLET_ENTRY.id,
+  label: WALLET_ENTRY.label,
+  profile_id: WALLET_ENTRY.profile_id,
+  qr_id: WALLET_ENTRY.qr_id,
+  handle: WALLET_ENTRY.handle,
+  manifesto_line: WALLET_ENTRY.manifesto_line,
+  scan_url: WALLET_ENTRY.scan_url,
+  owner_public_key_b58: WALLET_ENTRY.owner_public_key_b58,
+  status: "active",
+};
+
 const HOSTED_ENTITLEMENTS_BODY = {
   plan_id: "hosted_steward_v1",
   status: "active",
@@ -80,8 +93,12 @@ async function installCommonRoutes(page: import("@playwright/test").Page) {
 
 async function installWalletEntry(
   page: import("@playwright/test").Page,
-  opts: { withTabKeys?: boolean } = {}
+  opts: {
+    withTabKeys?: boolean;
+    entry?: typeof WALLET_ENTRY | typeof WALLET_ENTRY_NO_KEYS;
+  } = {}
 ) {
+  const entry = opts.entry ?? WALLET_ENTRY;
   await page.addInitScript(
     ({ entry, withTabKeys }) => {
       localStorage.setItem("hc_wallet", JSON.stringify([entry]));
@@ -94,7 +111,7 @@ async function installWalletEntry(
       sessionStorage.removeItem("hc_steward_session");
       sessionStorage.removeItem("hc_steward_pending_account_id");
     },
-    { entry: WALLET_ENTRY, withTabKeys: opts.withTabKeys === true }
+    { entry, withTabKeys: opts.withTabKeys === true }
   );
 }
 
@@ -125,7 +142,7 @@ test.describe("hosted steward billing checkout return", () => {
     page,
   }) => {
     await installCommonRoutes(page);
-    await installWalletEntry(page, { withTabKeys: false });
+    await installWalletEntry(page, { withTabKeys: false, entry: WALLET_ENTRY_NO_KEYS });
 
     await page.goto(`/?${new URLSearchParams({ hc_account_id: ACCOUNT_ID }).toString()}`);
     await expect.poll(() => readPendingAccountId(page)).toBe(ACCOUNT_ID);
@@ -135,7 +152,7 @@ test.describe("hosted steward billing checkout return", () => {
     const pendingLine = page.locator("#device-hub-steward-billing-pending-line");
     await expect(pendingLine).toBeVisible();
     await expect(pendingLine).toContainText(/open or import a saved card/i);
-    expect(page.url()).toContain(`hc_account_id=${ACCOUNT_ID}`);
+    await expect.poll(() => readPendingAccountId(page)).toBe(ACCOUNT_ID);
   });
 
   test("retries link after keys load and clears checkout param on success", async ({

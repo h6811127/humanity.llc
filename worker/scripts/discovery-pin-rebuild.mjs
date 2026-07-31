@@ -87,9 +87,12 @@ function listDiscoveryRegionsOnDisk() {
   for (const name of readdirSync(dataDir)) {
     if (!name.startsWith("discovery-") || !name.endsWith(".json")) continue;
     if (name.startsWith("discovery-standalone-")) continue;
+    if (name === "discovery-landing-regions.json") continue;
     const path = join(dataDir, name);
     try {
       const parsed = JSON.parse(readFileSync(path, "utf8"));
+      // Pin indexes carry pins[]; catalogs / other discovery JSON do not.
+      if (!Array.isArray(parsed?.pins)) continue;
       rows.push({ region: parsed.region, filename: name });
     } catch {
       rows.push({ filename: name });
