@@ -75,13 +75,11 @@ export async function runDeployRootAndChildCreate(template, fields, ctx) {
       : {}),
   });
 
-  const qrId =
-    childResult.qrId || createResult.qrId;
   location.replace(
     buildDeploySuccessCreatedUrl({
       origin: location.origin,
       profileId,
-      qrId,
+      qrId: childResult.qrId,
       objectId: childResult.objectId,
       objectType,
     })
