@@ -115,8 +115,9 @@ export function renderDiscoveryNetworkFilterChips(options, activeNetworkId) {
  */
 export function resolveDiscoveryNetworkBoardHref(options, activeNetworkId) {
   const active = String(activeNetworkId ?? "").trim();
+  const fallback = options.find((opt) => opt.board_href)?.board_href ?? null;
   if (!active || active === DISCOVERY_NETWORK_FILTER_ALL) {
-    return options[0]?.board_href ?? null;
+    return fallback;
   }
-  return options.find((opt) => opt.network_id === active)?.board_href ?? options[0]?.board_href ?? null;
+  return options.find((opt) => opt.network_id === active)?.board_href ?? fallback;
 }
