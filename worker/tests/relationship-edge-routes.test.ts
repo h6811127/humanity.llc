@@ -27,6 +27,7 @@ const TO_OBJECT = "obj_cr_node_07_cabinet";
 const RIVER_OBJECT = "obj_cr_node_04_river";
 const EDGE_ID = "edge_cr_witness_10_07";
 const UNLOCK_EDGE_ID = "edge_cr_unlock_04_07";
+const OTHER_STEWARD = "222222222222222222222222";
 
 async function randomKeypair() {
   const privateKey = ed.utils.randomPrivateKey();
@@ -162,6 +163,36 @@ async function signedEdge(
     keys
   )) as RelationshipEdgeDocument;
   return { doc: signed, json: JSON.stringify(signed) };
+}
+
+async function activeRouteDb(): Promise<RelationshipEdgeRouteDb> {
+  const db = new RelationshipEdgeRouteDb();
+  const owner = await getTestKeypair();
+  db.steward = {
+    public_key: owner.publicKeyBase58,
+    recovery_public_key: null,
+    issuer_public_key: owner.publicKeyBase58,
+    status: "active",
+  };
+  db.seedGameNodes();
+  return db;
+}
+
+function relationshipEdgeRequest(json: string): Request {
+  return new Request("https://humanity.llc/v1/cards/x/relationship-edges", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ relationship_edge: JSON.parse(json) }),
+  });
+}
+
+async function expectRouteError(
+  response: Response,
+  status: number,
+  error: string
+): Promise<void> {
+  expect(response.status).toBe(status);
+  await expect(response.json()).resolves.toMatchObject({ error });
 }
 
 describe("relationship-edge-routes", () => {
@@ -359,6 +390,152 @@ describe("relationship-edge-routes", () => {
       STEWARD
     );
     expect(res.status).toBe(401);
+  });
+
+  it("rejects duplicate edge ids without replacing persisted truth", async () => {
+    const db = await activeRouteDb();
+    const { json } = await signedEdge("owner");
+
+    const first = await handlePostRelationshipEdgeIssue(
+      relationshipEdgeRequest(json),
+      db as unknown as D1Database,
+      STEWARD
+    );
+    expect(first.status).toBe(201);
+    const originalDocument = db.edges.get(EDGE_ID)?.edge_document_json;
+
+    const duplicate = await handlePostRelationshipEdgeIssue(
+      relationshipEdgeRequest(json),
+      db as unknown as D1Database,
+      STEWARD
+    );
+
+    await expectRouteError(duplicate, 409, "EDGE_EXISTS");
+    expect(db.edges.size).toBe(1);
+    expect(db.edges.get(EDGE_ID)?.edge_document_json).toBe(originalDocument);
+  });
+
+  it("rejects edge issuance for an inactive steward card", async () => {
+    const db = await activeRouteDb();
+    db.steward.status = "revoked";
+    const { json } = await signedEdge("owner");
+
+    const res = await handlePostRelationshipEdgeIssue(
+      relationshipEdgeRequest(json),
+      db as unknown as D1Database,
+      STEWARD
+    );
+
+    await expectRouteError(res, 410, "CARD_NOT_ACTIVE");
+    expect(db.edges.size).toBe(0);
+  });
+
+  it("rejects a signed document for a different steward profile", async () => {
+    const db = await activeRouteDb();
+    const { json } = await signedEdge("owner", {
+      steward_profile_id: OTHER_STEWARD,
+    });
+
+    const res = await handlePostRelationshipEdgeIssue(
+      relationshipEdgeRequest(json),
+      db as unknown as D1Database,
+      STEWARD
+    );
+
+    await expectRouteError(res, 422, "PROFILE_MISMATCH");
+    expect(db.edges.size).toBe(0);
+  });
+
+  it("rejects relationship endpoints that are not game nodes", async () => {
+    const db = await activeRouteDb();
+    const from = db.children.get(FROM_OBJECT);
+    if (!from) throw new Error("expected seeded from child");
+    from.object_type = "status_plate";
+    const { json } = await signedEdge("owner");
+
+    const res = await handlePostRelationshipEdgeIssue(
+      relationshipEdgeRequest(json),
+      db as unknown as D1Database,
+      STEWARD
+    );
+
+    await expectRouteError(res, 422, "NOT_GAME_NODE");
+    expect(db.edges.size).toBe(0);
+  });
+
+  it("rejects inactive relationship endpoints", async () => {
+    const db = await activeRouteDb();
+    const to = db.children.get(TO_OBJECT);
+    if (!to) throw new Error("expected seeded to child");
+    to.status = "revoked";
+    const { json } = await signedEdge("owner");
+
+    const res = await handlePostRelationshipEdgeIssue(
+      relationshipEdgeRequest(json),
+      db as unknown as D1Database,
+      STEWARD
+    );
+
+    await expectRouteError(res, 409, "OBJECT_NOT_ACTIVE");
+    expect(db.edges.size).toBe(0);
+  });
+
+  it("does not expose relationship endpoints owned by another steward", async () => {
+    const db = await activeRouteDb();
+    const to = db.children.get(TO_OBJECT);
+    if (!to) throw new Error("expected seeded to child");
+    to.parent_profile_id = OTHER_STEWARD;
+    const { json } = await signedEdge("owner");
+
+    const res = await handlePostRelationshipEdgeIssue(
+      relationshipEdgeRequest(json),
+      db as unknown as D1Database,
+      STEWARD
+    );
+
+    await expectRouteError(res, 404, "OBJECT_NOT_FOUND");
+    expect(db.edges.size).toBe(0);
+  });
+
+  it("rejects repeated revocation without mutating the stored edge", async () => {
+    const db = await activeRouteDb();
+    const issued = await signedEdge("owner");
+    const issueRes = await handlePostRelationshipEdgeIssue(
+      relationshipEdgeRequest(issued.json),
+      db as unknown as D1Database,
+      STEWARD
+    );
+    expect(issueRes.status).toBe(201);
+
+    const revoked = await signedEdge("owner", { status: "revoked" });
+    const revokeRequest = () =>
+      new Request(
+        `https://humanity.llc/v1/cards/x/relationship-edges/${EDGE_ID}/revoke`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ relationship_edge: JSON.parse(revoked.json) }),
+        }
+      );
+    const firstRevoke = await handlePostRelationshipEdgeRevoke(
+      revokeRequest(),
+      db as unknown as D1Database,
+      STEWARD,
+      EDGE_ID
+    );
+    expect(firstRevoke.status).toBe(200);
+    const firstUpdatedAt = db.edges.get(EDGE_ID)?.updated_at;
+
+    const repeatedRevoke = await handlePostRelationshipEdgeRevoke(
+      revokeRequest(),
+      db as unknown as D1Database,
+      STEWARD,
+      EDGE_ID
+    );
+
+    await expectRouteError(repeatedRevoke, 409, "EDGE_REVOKED");
+    expect(db.edges.get(EDGE_ID)?.status).toBe("revoked");
+    expect(db.edges.get(EDGE_ID)?.updated_at).toBe(firstUpdatedAt);
   });
 
   it("returns 503 when migration is missing", async () => {
