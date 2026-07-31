@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  CHILD_OBJECT_TYPE_LOST_ITEM_RELAY,
+  CHILD_OBJECT_TYPE_STATUS_PLATE,
+} from "../../site/js/created-child-object-core.mjs";
+import {
+  childObjectTypeForDeployTemplate,
   DEPLOY_OBJECT_TYPE_OPTIONS,
+  deployCreatedFocusHash,
   deployNameStepCopy,
   deployObjectTypeOptionByTemplate,
   generalRootManifestoForDeploy,
@@ -80,6 +86,17 @@ describe("Simple Object Create object type step", () => {
     expect(normalizeDeployObjectTemplate("status_plate")).toBe("status_plate");
     expect(normalizeDeployObjectTemplate("unknown")).toBe("status_plate");
     expect(deployObjectTypeOptionByTemplate("lost_item_relay")?.title).toBe("Return tag");
+  });
+
+  it("maps selected deploy object type to the child object route and created focus", () => {
+    expect(childObjectTypeForDeployTemplate("status_plate")).toBe(
+      CHILD_OBJECT_TYPE_STATUS_PLATE
+    );
+    expect(childObjectTypeForDeployTemplate("lost_item_relay")).toBe(
+      CHILD_OBJECT_TYPE_LOST_ITEM_RELAY
+    );
+    expect(deployCreatedFocusHash("status_plate")).toBe("add-status-plate");
+    expect(deployCreatedFocusHash("lost_item_relay")).toBe("add-lost-item");
   });
 
   it("names the next step by selected object type", () => {
@@ -166,6 +183,28 @@ describe("parseDeployChildFields", () => {
       publicLabel: "Studio door",
       publicState: "Open until 9 PM",
     });
+  });
+
+  it("parses return-tag deploy fields through lost-item relay validation", () => {
+    expect(
+      parseDeployChildFields("lost_item_relay", {
+        objectLabel: "Ignored sign label",
+        statusLine: "Ignored status line",
+        relayItem: "House keys",
+        relayMessage: "Text the owner through the relay.",
+      })
+    ).toEqual({
+      publicLabel: "House keys",
+      publicState: "Text the owner through the relay.",
+    });
+    expect(() =>
+      parseDeployChildFields("lost_item_relay", {
+        objectLabel: "Studio door",
+        statusLine: "Open until 9 PM",
+        relayItem: "",
+        relayMessage: "Can return at front desk.",
+      })
+    ).toThrow(/item name/i);
   });
 });
 
