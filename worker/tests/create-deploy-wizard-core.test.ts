@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   DEPLOY_OBJECT_TYPE_OPTIONS,
+  childObjectTypeForDeployTemplate,
   deployNameStepCopy,
   deployObjectTypeOptionByTemplate,
   generalRootManifestoForDeploy,
@@ -80,6 +81,12 @@ describe("Simple Object Create object type step", () => {
     expect(normalizeDeployObjectTemplate("status_plate")).toBe("status_plate");
     expect(normalizeDeployObjectTemplate("unknown")).toBe("status_plate");
     expect(deployObjectTypeOptionByTemplate("lost_item_relay")?.title).toBe("Return tag");
+  });
+
+  it("maps return tag selection to the lost-item child object type", () => {
+    expect(childObjectTypeForDeployTemplate("lost_item_relay")).toBe("lost_item_relay");
+    expect(childObjectTypeForDeployTemplate("status_plate")).toBe("status_plate");
+    expect(childObjectTypeForDeployTemplate("unknown")).toBe("status_plate");
   });
 
   it("names the next step by selected object type", () => {
@@ -165,6 +172,20 @@ describe("parseDeployChildFields", () => {
     ).toEqual({
       publicLabel: "Studio door",
       publicState: "Open until 9 PM",
+    });
+  });
+
+  it("parses return tag deploy fields from relay item and message", () => {
+    expect(
+      parseDeployChildFields("lost_item_relay", {
+        objectLabel: "Ignored QR sign label",
+        statusLine: "Ignored sign status",
+        relayItem: "  House keys  ",
+        relayMessage: "  Text the relay code on the tag.  ",
+      })
+    ).toEqual({
+      publicLabel: "House keys",
+      publicState: "Text the relay code on the tag.",
     });
   });
 });
