@@ -7,7 +7,9 @@ import { CITY_GAME_SEASON_ROOT_PROFILE } from "./city-game-fixture-profile";
 const PROFILE = CITY_GAME_SEASON_ROOT_PROFILE;
 const RIVER_OBJECT = "obj_cr_node_04_river";
 const CABINET_OBJECT = "obj_cr_node_07_cabinet";
+const WITNESS_OBJECT = "obj_cr_node_10_library";
 const QR = "qr_cr_node_04_river01";
+const WITNESS_QR = "qr_cr_node_10_library01";
 const CREATED = "2026-06-01T12:00:00.000Z";
 
 function riverDocument(progress: number) {
@@ -134,6 +136,7 @@ class ContributeDb {
 
   rateBuckets = new Map<string, { count: number; window_start: string }>();
   contributeBuckets = new Map<string, number>();
+  depleteWitnessOnNextCas = false;
 
   prepare(sql: string) {
     const db = this;
@@ -171,6 +174,19 @@ class ContributeDb {
               }
               if (sql.includes("AND updated_at = ?")) {
                 const expectedUpdatedAt = String(args[8]);
+                if (db.depleteWitnessOnNextCas && objectId === WITNESS_OBJECT) {
+                  const doc = JSON.parse(row.child_object_document_json);
+                  doc.game_meta = {
+                    ...(doc.game_meta ?? {}),
+                    scarcity_remaining: 0,
+                    vouch_active_for: ["node_07"],
+                  };
+                  row.public_state = "Witness seal closed for the night — sunset passes exhausted";
+                  row.child_object_document_json = JSON.stringify(doc);
+                  row.updated_at = "2026-06-07T23:00:00.001Z";
+                  db.depleteWitnessOnNextCas = false;
+                  return { success: true, meta: { changes: 0 } };
+                }
                 if (row.updated_at !== expectedUpdatedAt) {
                   return { success: true, meta: { changes: 0 } };
                 }
@@ -213,6 +229,62 @@ class ContributeDb {
       },
     };
   }
+}
+
+function seedWitnessNode(db: ContributeDb, scarcityRemaining: number) {
+  db.qr = {
+    ...db.qr,
+    qr_id: WITNESS_QR,
+    object_id: WITNESS_OBJECT,
+  };
+  db.objects.set(WITNESS_OBJECT, {
+    object_id: WITNESS_OBJECT,
+    parent_profile_id: PROFILE,
+    object_type: "game_node",
+    public_label: "Library witness seal",
+    public_state: "Witness seal open",
+    status: "active",
+    child_object_document_json: JSON.stringify({
+      object_id: WITNESS_OBJECT,
+      parent_profile_id: PROFILE,
+      object_type: "game_node",
+      public_label: "Library witness seal",
+      public_state: "Witness seal open",
+      status: "active",
+      season_id: "cr_season_01_wake",
+      node_role: "witness",
+      district: "downtown",
+      object_streams: [
+        {
+          id: "relay",
+          class: "route",
+          label: "Passes",
+          value: `${scarcityRemaining} sunset pass${scarcityRemaining === 1 ? "" : "es"} remain`,
+        },
+        {
+          id: "bulletin",
+          class: "narrative",
+          label: "Vouch",
+          value: "Issues trust for cabinet path",
+        },
+      ],
+      game_meta: {
+        visible_until: null,
+        compromised: false,
+        collective_progress: null,
+        collective_target: null,
+        unlocked_by: [],
+        vouch_requires: [],
+        vouch_active_for: [],
+        scarcity_remaining: scarcityRemaining,
+        fragment_id: null,
+      },
+      created_at: CREATED,
+      updated_at: CREATED,
+    }),
+    created_at: CREATED,
+    updated_at: CREATED,
+  });
 }
 
 describe("game-contribute", () => {
@@ -555,6 +627,34 @@ describe("game-contribute", () => {
     expect(finalBody.scarcity_remaining).toBe(0);
     expect(finalBody.witness_depleted).toBe(true);
     expect(witness.public_state).toContain("closed for the night");
+  });
+
+  it("does not issue or meter a scarcity pass when a concurrent writer exhausts the node", async () => {
+    const db = new ContributeDb();
+    seedWitnessNode(db, 1);
+    db.depleteWitnessOnNextCas = true;
+
+    const res = await handlePostGameContribute(
+      new Request("https://humanity.llc/.well-known/hc/v1/cards/x/objects/y/game-contribute", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "CF-Connecting-IP": "203.0.113.22" },
+        body: JSON.stringify({ qr_id: WITNESS_QR, site_code: "CR-WITNS-4P" }),
+      }),
+      db as unknown as D1Database,
+      { CITY_GAME_ENABLED: "1" },
+      PROFILE,
+      WITNESS_OBJECT
+    );
+
+    expect(res.status).toBe(409);
+    const body = (await res.json()) as { error?: string };
+    expect(body.error).toBe("WITNESS_DEPLETED");
+    expect(
+      db.contributeBuckets.get(`${WITNESS_OBJECT}:cr_season_01_wake:2026-06-07`)
+    ).toBeUndefined();
+    const witnessDoc = JSON.parse(db.objects.get(WITNESS_OBJECT)!.child_object_document_json);
+    expect(witnessDoc.game_meta.scarcity_remaining).toBe(0);
+    expect(witnessDoc.game_meta.vouch_active_for).toEqual(["node_07"]);
   });
 
   it("rejects contribute when season window is closed", async () => {
