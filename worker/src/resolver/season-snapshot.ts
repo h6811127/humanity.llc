@@ -1,6 +1,11 @@
 import { listChildObjectsForParent } from "../db/child-objects";
 import { listActiveChildObjectQrsForParent } from "../db/child-object-qr";
 import {
+  listRelationshipEdgesForSteward,
+  relationshipEdgesSchemaReady,
+  verifyStoredRelationshipEdge,
+} from "../db/relationship-edges";
+import {
   checkSeasonSnapshotRateLimit,
   hashIp,
 } from "../db/rate-limit";
@@ -43,6 +48,10 @@ import {
   ifNoneMatchSatisfied,
   weakEtagFromSerializedJson,
 } from "../http/conditional-json";
+import {
+  isWitnessRelationshipEdge,
+  type RelationshipEdgeDocument,
+} from "../live-object/relationship-edge-spec";
 import {
   clientIp,
   errorResponse,
@@ -174,6 +183,35 @@ function buildFinaleSummary(nodes: MapNodeSnapshotRow[], season: CrSeasonConfig)
   };
 }
 
+async function loadVerifiedWitnessEdgesByTarget(
+  db: D1Database,
+  stewardProfileId: string,
+  seasonId: string
+): Promise<Map<string, RelationshipEdgeDocument[]>> {
+  const byTarget = new Map<string, RelationshipEdgeDocument[]>();
+  if (!(await relationshipEdgesSchemaReady(db))) return byTarget;
+
+  const rows = await listRelationshipEdgesForSteward(db, stewardProfileId);
+  for (const row of rows) {
+    if (
+      row.status !== "active" ||
+      row.network_id !== seasonId ||
+      row.kind !== "witnesses"
+    ) {
+      continue;
+    }
+    const doc = await verifyStoredRelationshipEdge(db, row);
+    if (!doc || !isWitnessRelationshipEdge(doc)) continue;
+    const existing = byTarget.get(doc.to.id);
+    if (existing) {
+      existing.push(doc);
+    } else {
+      byTarget.set(doc.to.id, [doc]);
+    }
+  }
+  return byTarget;
+}
+
 /**
  * GET /.well-known/hc/v1/seasons/{season_id}/snapshot
  * Read-only aggregate city state — no scan logging, no unlock repair.
@@ -238,6 +276,11 @@ export async function handleGetSeasonSnapshot(
       );
     }
     const witnessMetaByNodeId = buildWitnessMetaByNodeId(rows, season);
+    const witnessEdgesByTarget = await loadVerifiedWitnessEdgesByTarget(
+      env.DB,
+      rootProfile,
+      season.season_id
+    );
     for (const row of rows) {
       if (row.status !== "active") continue;
       const snap = deriveMapNodeSnapshot({
@@ -246,6 +289,7 @@ export async function handleGetSeasonSnapshot(
         env,
         now,
         witnessMetaByNodeId,
+        witnessRelationshipEdges: witnessEdgesByTarget.get(row.object_id) ?? null,
       });
       if (snap) nodes.push(snap);
     }

@@ -8,6 +8,7 @@ import {
 } from "../src/city-game/map-node-snapshot";
 import { CR_SEASON_01 } from "../src/city-game/season-config";
 import { composeChildObjectScanState } from "../src/live-object/compose-child-object-scan";
+import { crWitnessEdgeDocumentUnsigned } from "../src/live-object/relationship-edge-spec";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 
@@ -235,5 +236,61 @@ describe("deriveMapNodeSnapshot", () => {
     expect(snap?.map_mode).toBe(composed.gameNode?.mode);
     expect(snap?.public_state).toBe(composed.publicState);
     expect(snap?.active_bulletin).not.toBeNull();
+  });
+
+  it("uses signed witness edges for board gate parity when legacy vouch_requires is cleared", () => {
+    const now = new Date("2026-06-07T00:00:00-05:00");
+    const edge = crWitnessEdgeDocumentUnsigned(PROFILE);
+    const documentJson = childDocument({
+      nodeId: "node_07",
+      role: "lore_archive",
+      district: "czech_village",
+      meta: { vouch_requires: [], unlocked_by: ["node_04"], fragment_id: "czech_1" },
+    });
+    const child = {
+      object_id: "obj_cr_node_07_cabinet",
+      parent_profile_id: PROFILE,
+      object_type: "game_node" as const,
+      public_label: "Czech Village cabinet",
+      public_state: "Unlocked together",
+      status: "active" as const,
+      child_object_document_json: documentJson,
+      created_at: "2026-06-01T12:00:00.000Z",
+      updated_at: "2026-06-01T12:05:00.000Z",
+    };
+    const witnessMetaByNodeId = { node_10: baseMeta({ vouch_active_for: [] }) };
+
+    const withoutSignedEdge = deriveMapNodeSnapshot({
+      child,
+      season: CR_SEASON_01,
+      env: { CITY_GAME_ENABLED: "1" },
+      now,
+      witnessMetaByNodeId,
+    });
+    expect(withoutSignedEdge?.vouch_gate).toBeNull();
+
+    const composed = composeChildObjectScanState({
+      child,
+      season: CR_SEASON_01,
+      env: { CITY_GAME_ENABLED: "1" },
+      now,
+      vouchWitnesses: witnessMetaByNodeId,
+      witnessRelationshipEdges: [edge],
+    });
+    const snap = deriveMapNodeSnapshot({
+      child,
+      season: CR_SEASON_01,
+      env: { CITY_GAME_ENABLED: "1" },
+      now,
+      witnessMetaByNodeId,
+      witnessRelationshipEdges: [edge],
+    });
+
+    expect(snap?.vouch_gate).toEqual(composed.gameNode?.vouchGate);
+    expect(snap?.vouch_gate?.met).toBe(false);
+    expect(snap?.vouch_gate?.pending).toEqual(["node_10"]);
+    expect(buildMapNodeChips(snap!, "open").find((c) => c.label === "Vouch")?.value).toBe(
+      "Sealed · needs node_10"
+    );
   });
 });
