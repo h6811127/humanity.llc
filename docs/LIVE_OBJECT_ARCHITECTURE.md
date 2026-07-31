@@ -622,7 +622,7 @@ Still open (implementation deferred):
 | Criterion | Surface | Status |
 |-----------|---------|--------|
 | Mesh/cache clients emit `freshness.source: cache \| mesh` | Offline/mesh relay | Open |
-| Resolver accepts delegated signer on child routes | Step 17 gates G1–G5 | Open |
+| Seeded delegated signer acceptance on child routes | `delegated-child-signer.ts`, `child-objects.ts` | Dormant prep shipped; public issue/list/revoke routes + UI still gated by G1–G5 |
 | `inherit` verb + dispute fork UX | Governance research | Open |
 | HTML staleness banner from `freshness` block | `scan-freshness-banner.ts`, `scan-html.ts` | Shipped |
 
@@ -648,7 +648,7 @@ These from [`QR_DESIGN_SPACE.md`](QR_DESIGN_SPACE.md) are **decisions**, not bac
 When changing live-object composition:
 
 ```bash
-npm run worker:test -- worker/tests/live-object-staleness-contract.test.ts worker/tests/live-object-delegation-spec.test.ts worker/tests/live-object-succession-spec.test.ts worker/tests/scan-freshness-banner.test.ts worker/tests/network-graph-core.test.ts worker/tests/live-object-network-graph.test.ts
+npm run worker:test -- worker/tests/live-object-staleness-contract.test.ts worker/tests/live-object-delegation-spec.test.ts worker/tests/live-object-succession-spec.test.ts worker/tests/delegated-capability-gate.test.ts worker/tests/scan-freshness-banner.test.ts worker/tests/network-graph-core.test.ts worker/tests/live-object-network-graph.test.ts
 npm run verify:city-game   # if game overlay touched
 npm run worker:test -- worker/tests/update-card.test.ts worker/tests/create-card-object-streams.test.ts worker/tests/scan-status.test.ts
 ```
