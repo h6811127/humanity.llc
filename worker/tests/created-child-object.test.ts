@@ -31,6 +31,7 @@ import {
   CHILD_OBJECT_STATUS_DISABLED,
   isActiveGameNodeRow,
   parseGameNodeChildFields,
+  resolveGameNodeSeasonIdForSubmit,
   shouldOfferAddGameNode,
 } from "../../site/js/created-child-object-game-node-core.mjs";
 
@@ -389,6 +390,19 @@ describe("created-child-object-game-node-core", () => {
     expect(payload.node_role).toBe("temp_drop");
   });
 
+  it("resolves submit season id from picker before remembered fallback", () => {
+    expect(
+      resolveGameNodeSeasonIdForSubmit("cedar_rapids_summer", "remembered_city")
+    ).toBe("cedar_rapids_summer");
+    expect(resolveGameNodeSeasonIdForSubmit("", "remembered_city")).toBe(
+      "remembered_city"
+    );
+    expect(() => resolveGameNodeSeasonIdForSubmit("", "Bad Season")).toThrow(
+      /lowercase slug/i
+    );
+    expect(() => resolveGameNodeSeasonIdForSubmit("", "")).toThrow(/required/i);
+  });
+
   it("created game node module wires register + issue flow", () => {
     const src = readFileSync(
       join(process.cwd(), "site/js/created-child-object-game-node.mjs"),
@@ -409,6 +423,7 @@ describe("created-child-object-game-node-core", () => {
 
     expect(gameNodeSrc).toContain("async function selectSeasonId");
     expect(gameNodeSrc).toContain("readRememberedGameSeasonId(ctx.profileId)");
+    expect(gameNodeSrc).toContain("resolveGameNodeSeasonIdForSubmit");
     expect(createdSrc).toContain("gameNodeCtl.selectSeasonId(seasonId)");
   });
 });
