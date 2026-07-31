@@ -55,6 +55,7 @@ if (!skipTests) {
     "worker/tests/city-game.test.ts",
     "worker/tests/city-game-scan.test.ts",
     "worker/tests/city-game-contribute.test.ts",
+    "worker/tests/city-game-abuse-rate-limit.test.ts",
     "worker/tests/city-game-season-window.test.ts",
     "worker/tests/city-game-season-readiness.test.ts",
     "worker/tests/network-graph-core.test.ts",
