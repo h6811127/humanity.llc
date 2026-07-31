@@ -115,13 +115,12 @@ function dbFor(state: DbState): D1Database {
             state.orders.set(row.shopify_order_id, row);
           }
           if (sql.includes("UPDATE artifact_intents")) {
-            const id = args[2] as string;
-            const existing = state.intents.get(id);
-            if (!existing) {
-              return { success: true, meta: { changes: 0 } };
-            }
             if (sql.includes("NOT IN")) {
+              const updatedAt = args[0] as string;
+              const id = args[1] as string;
+              const existing = state.intents.get(id);
               if (
+                !existing ||
                 existing.status === "converted" ||
                 existing.status === "expired" ||
                 existing.status === "blocked"
@@ -131,9 +130,14 @@ function dbFor(state: DbState): D1Database {
               state.intents.set(id, {
                 ...existing,
                 status: "converted",
-                updated_at: args[1] as string,
+                updated_at: updatedAt,
               });
               return { success: true, meta: { changes: 1 } };
+            }
+            const id = args[2] as string;
+            const existing = state.intents.get(id);
+            if (!existing) {
+              return { success: true, meta: { changes: 0 } };
             }
             state.intents.set(id, {
               ...existing,
