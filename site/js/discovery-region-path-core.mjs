@@ -61,6 +61,17 @@ export function parseDiscoveryBrowseQuery(search) {
 }
 
 /**
+ * @param {string} segment
+ */
+function safeDecodePathSegment(segment) {
+  try {
+    return decodeURIComponent(segment);
+  } catch {
+    return null;
+  }
+}
+
+/**
  * @param {string | null | undefined} pathname
  * @returns {DiscoveryPathContext | null}
  */
@@ -70,14 +81,18 @@ export function parseDiscoveryPathname(pathname) {
     .replace(/\/+$/, "");
   const browseMatch = trimmed.match(/^\/discover\/([^/]+)$/);
   if (browseMatch) {
-    return { mode: "browse", region: decodeURIComponent(browseMatch[1]) };
+    const region = safeDecodePathSegment(browseMatch[1]);
+    return region ? { mode: "browse", region } : null;
   }
   const pinMatch = trimmed.match(/^\/discover\/([^/]+)\/pin\/([^/]+)$/);
   if (pinMatch) {
+    const region = safeDecodePathSegment(pinMatch[1]);
+    const pinId = safeDecodePathSegment(pinMatch[2]);
+    if (!region || !pinId) return null;
     return {
       mode: "pin",
-      region: decodeURIComponent(pinMatch[1]),
-      pinId: decodeURIComponent(pinMatch[2]),
+      region,
+      pinId,
     };
   }
   return null;

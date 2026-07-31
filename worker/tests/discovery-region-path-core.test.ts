@@ -48,6 +48,19 @@ describe("discovery-region-path-core", () => {
     });
   });
 
+  it("round-trips encoded pin ids and rejects malformed path escapes", () => {
+    const encoded = discoveryPinDetailPath("cedar-rapids-iowa", "pin/with space");
+    expect(encoded).toBe("/discover/cedar-rapids-iowa/pin/pin%2Fwith%20space/");
+    expect(parseDiscoveryPathname(encoded)).toEqual({
+      mode: "pin",
+      region: "cedar-rapids-iowa",
+      pinId: "pin/with space",
+    });
+
+    expect(parseDiscoveryPathname("/discover/%E0%A4%A/")).toBeNull();
+    expect(parseDiscoveryPathname("/discover/cedar-rapids-iowa/pin/%E0%A4%A/")).toBeNull();
+  });
+
   it("resolves season json url from seasons index", () => {
     const seasonsIndex = {
       seasons: [
