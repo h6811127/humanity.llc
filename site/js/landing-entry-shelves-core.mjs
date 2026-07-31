@@ -84,16 +84,23 @@ export function readLandingCategoryQueryParam(search = "") {
 /**
  * @param {PublicNetworkCategoryFilter} category
  * @param {string} [pathname]
- * @param {{ region?: string | null }} [opts]
+ * @param {{ region?: string | null; search?: string | null }} [opts]
  * @returns {string}
  */
 export function buildLandingCategoryUrl(category, pathname = "/", opts = {}) {
   const path = String(pathname ?? "/").trim() || "/";
   const cat = String(category ?? "all").trim();
-  const params = new URLSearchParams();
+  const rawSearch = String(opts.search ?? "").trim();
+  const params = new URLSearchParams(
+    rawSearch.startsWith("?") ? rawSearch.slice(1) : rawSearch
+  );
   if (cat && cat !== "all") params.set("category", cat);
-  const region = String(opts.region ?? "").trim();
-  if (region) params.set("region", region);
+  else params.delete("category");
+  if (Object.prototype.hasOwnProperty.call(opts, "region")) {
+    const region = String(opts.region ?? "").trim();
+    if (region) params.set("region", region);
+    else params.delete("region");
+  }
   const qs = params.toString();
   return qs ? `${path}?${qs}` : path;
 }

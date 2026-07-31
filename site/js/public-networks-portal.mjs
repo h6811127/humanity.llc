@@ -115,6 +115,7 @@ function syncLandingPlacesUrl(category, region) {
   if (typeof window === "undefined" || typeof history?.replaceState !== "function") return;
   const regionSlug = String(region ?? "").trim();
   const nextUrl = buildLandingCategoryUrl(category, window.location.pathname, {
+    search: window.location.search,
     region:
       regionSlug && regionSlug !== LANDING_DEFAULT_DISCOVERY_REGION ? regionSlug : null,
   });
@@ -219,7 +220,9 @@ function bindPublicNetworksPortal(allCards, placesApi = {}) {
     if (hasPlaces && placesApi.placesCtx) {
       syncLandingPlacesUrl(activeCategory, placesApi.placesCtx.region);
     } else {
-      const nextUrl = buildLandingCategoryUrl(activeCategory, window.location.pathname);
+      const nextUrl = buildLandingCategoryUrl(activeCategory, window.location.pathname, {
+        search: window.location.search,
+      });
       if (`${window.location.pathname}${window.location.search}` !== nextUrl) {
         history.replaceState(null, "", nextUrl);
       }

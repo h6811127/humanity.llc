@@ -176,6 +176,10 @@ export function mountHubNetworkTools(config) {
       if (billingLine) {
         billingPendingEl.textContent = billingLine;
         billingPendingEl.hidden = false;
+        // Checkout return must be visible without hunting Advanced.
+        if (advancedBlock instanceof HTMLDetailsElement) {
+          advancedBlock.open = true;
+        }
       } else {
         billingPendingEl.textContent = "";
         billingPendingEl.hidden = true;
