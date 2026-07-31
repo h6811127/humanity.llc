@@ -37,4 +37,19 @@ describe("device-status partial load (P2 Step 3)", () => {
     expect(partialFn).not.toMatch(/scheduleLoadErrorCoachCard/);
     expect(partialFn).not.toMatch(/statusLoadErrorWired/);
   });
+
+  it("partial click fallback only intercepts real hub sheets", () => {
+    const src = fs.readFileSync(path.join(siteJsDir, "device-status-load-error.mjs"), "utf8");
+    const partialClickHandler = src.slice(
+      src.indexOf("function wirePartialLoadHubOpen"),
+      src.indexOf("/**\n * Core loaded but device-status.mjs failed")
+    );
+
+    const sheetGuard = partialClickHandler.indexOf('classList.contains("device-hub--sheet")');
+    const preventDefault = partialClickHandler.indexOf("event.preventDefault()");
+
+    expect(sheetGuard).toBeGreaterThan(-1);
+    expect(preventDefault).toBeGreaterThan(-1);
+    expect(sheetGuard).toBeLessThan(preventDefault);
+  });
 });
