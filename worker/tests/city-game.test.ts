@@ -150,6 +150,12 @@ class GameNodeDb {
               const objectId = String(args[6]);
               const row = db.objects.get(objectId);
               if (!row) throw new Error("missing object");
+              if (sql.includes("AND updated_at = ?")) {
+                const expectedUpdatedAt = String(args[8]);
+                if (row.updated_at !== expectedUpdatedAt) {
+                  return { success: true, meta: { changes: 0 } };
+                }
+              }
               row.object_type = String(args[0]);
               row.public_label = String(args[1]);
               row.public_state = String(args[2]);

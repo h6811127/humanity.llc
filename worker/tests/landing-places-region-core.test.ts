@@ -10,6 +10,7 @@ import {
   buildLandingPlacesHubEntriesFromRegistry,
   buildLandingPlacesRegionOptions,
   cityLabelForLandingPlacesRegion,
+  commitLandingPlacesRegionCtx,
   mergeLandingPlacesHubRegions,
   readLandingPlacesRegionPreference,
   readLandingPlacesRegionQueryParam,
@@ -138,5 +139,19 @@ describe("landing-places-region-core", () => {
       "example-city",
     ]);
     expect(merged[1].season_id).toBe("");
+  });
+
+  it("does not commit stale async region loads over a newer selection", () => {
+    const placesApi = {
+      placesCtx: { region: "cedar-rapids-iowa" },
+    };
+    const stale = { region: "example-city" };
+    const fresh = { region: "cedar-rapids-iowa" };
+
+    expect(commitLandingPlacesRegionCtx(placesApi, fresh, 2, 2)).toBe(true);
+    expect(placesApi.placesCtx).toEqual(fresh);
+
+    expect(commitLandingPlacesRegionCtx(placesApi, stale, 1, 2)).toBe(false);
+    expect(placesApi.placesCtx).toEqual(fresh);
   });
 });

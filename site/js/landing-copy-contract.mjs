@@ -65,7 +65,7 @@ export const LANDING_REQUIRED_SNIPPETS = [
   "public-networks-portal.css?v=12",
   "discovery-region-browse.css?v=5",
   `styles.css?v=${LANDING_STYLES_CACHE_BUST}`,
-  "public-networks-portal.mjs?v=14",
+  "public-networks-portal.mjs?v=15",
 ];
 
 /** Reverted matrix copy — must never return on `/`. */
