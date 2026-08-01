@@ -277,7 +277,9 @@ describe("landing-places-core", () => {
     expect(html).toContain(`>${LANDING_PLACES_SEE_ALL_CTA} (${model.totalMatching})<`);
     expect(html).toContain('id="landing-places-see-all"');
     expect(html).toContain('href="/discover/cedar-rapids-iowa/"');
-    expect(html).not.toContain(LANDING_PLACES_ALL_REGIONS_HREF);
+    // Populated strip only offers region browse — All regions CTA is empty-state only.
+    expect(html).not.toContain(`>${LANDING_PLACES_ALL_REGIONS_CTA}<`);
+    expect(html).not.toContain(`href="${LANDING_PLACES_ALL_REGIONS_HREF}"`);
 
     const emptyFacet = buildLandingPlacesRows(pins, {
       region: "cedar-rapids-iowa",
@@ -340,7 +342,9 @@ describe("landing-places-core", () => {
     expect(html).not.toContain("<script>");
     expect(html).not.toContain("<img src=x");
     expect(html).toContain("&lt;img src=x onerror=alert(1)&gt;");
-    expect(html).toContain("&lt;script&gt;alert(1)&lt;/script&gt;");
+    // Snapshot headlines truncate long values; escaped markup must still be inert.
+    expect(html).toContain('discovery-pin-row__state">&lt;script&gt;alert(1)&lt;/sc…');
+    expect(html).toContain("&lt;b&gt;District&lt;/b&gt;");
     expect(html).toContain('href="/discover/cedar-rapids-iowa/?q=&quot;1&quot;"');
   });
 });
