@@ -227,6 +227,22 @@ export function mergeLandingPlacesHubRegions(listedHubs, landingRegistry) {
 }
 
 /**
+ * Commit a loaded places ctx only when the async region load is still current.
+ * Stale fetches must not mutate shared portal state (wrong pins / ?region=).
+ *
+ * @param {{ placesCtx?: unknown }} placesApi
+ * @param {unknown} nextCtx
+ * @param {number} loadGen
+ * @param {number} currentGen
+ * @returns {boolean} true when committed
+ */
+export function commitLandingPlacesRegionCtx(placesApi, nextCtx, loadGen, currentGen) {
+  if (loadGen !== currentGen) return false;
+  if (nextCtx) placesApi.placesCtx = nextCtx;
+  return true;
+}
+
+/**
  * @param {LandingPlacesRegionOption[]} options
  * @param {string} selectedSlug
  */

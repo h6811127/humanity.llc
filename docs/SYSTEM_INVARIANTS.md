@@ -93,6 +93,7 @@ Canonical inbox taxonomy: [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
 | Hero H1 (shipped) | **“Check what's true right now before you knock, pick up, or show up.”** — trust chips below (No account · Community-run boards · No scan surveillance). |
 | Hook (secondary) | **“The sticker stays — the status changes.”** on the create footnote (`#landing-start-object-cta`), not the hero H1. |
 | Section order (shipped) | Hero → **Browse by need** shelves → search → **`#landing-places`** (Places near me + region picker + Sort near me) → **Boards & seasons** → **`#landing-live-object-carriers`** → **Start with one live object** → trust disclosures → device settings. Spec: [`DISCOVERY_PROJECTION.md`](DISCOVERY_PROJECTION.md) § WS-DISCOVER-P5. |
+| Region picker race | Async region loads must not assign shared `placesCtx` until the load generation is still current (`commitLandingPlacesRegionCtx`). A slower prior fetch must not rewrite pins or `?region=` after a newer selection. |
 | Commerce row (shipped) | **`#landing-live-object-carriers`** — static featured row after **`#public-networks-results`**. Hydrates from `shop-config.json` **`personalize.checkout_product_id`** via [`landing-live-object-carriers-core.mjs`](../site/js/landing-live-object-carriers-core.mjs); static HTML fallback if config fetch fails. **No** carousel. Spec: [`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) § Landing carriers row. |
 | Job routes (via discovery UI) | **Play / place** → shelves + public boards (e.g. Cedar Rapids); **Deploy** → `#landing-start-object-cta` → `/create/`; **Wear / buy** → `#landing-live-object-carriers` → `/shop/` (shipped row) · primary merch conversion remains **scan → customize**. |
 | Retired | **`#launch-doors`** three-row chooser — removed from `/` (discovery pivot). Routes unchanged; presentation moved to shelves + boards + create/shop rows. Do not restore as hero block. |
@@ -254,6 +255,7 @@ Canonical architecture: [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE
 |-----------|--------|
 | Single composition pipeline | Scan HTML and `GET …/status` derive from `buildScanViewModel` in `scan-state.ts` — do not fork parallel scan products per use case. |
 | Lifecycle first | Revoked / suspended card or QR or paused child shows lifecycle truth; overlays (game, streams) do not override. |
+| Child object write CAS | `child_object.update`, `child_object.revoke`, and `game-update` persist via `updateChildObjectIfUnchanged` against the read `updated_at`. Lost races return `OBJECT_WRITE_CONFLICT` (409) — never last-writer-wins resurrection of a disabled/revoked row. |
 | Passive scan | Opening `/c/…` does not log scanner identity or increment game aggregates ([`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md)). |
 | Verbs are explicit (target) | New scanner/owner actions ship as documented capabilities on status JSON, not ad-hoc HTML-only blocks. |
 | Stream precedence | Care/maintenance streams mute game bulletin copy when in conflict — generalize via shared precedence, not one-off game checks. |

@@ -100,6 +100,12 @@ class ChildObjectDb {
               if (!existing || existing.parent_profile_id !== String(args[7])) {
                 return { success: true, meta: { changes: 0 } };
               }
+              if (sql.includes("AND updated_at = ?")) {
+                const expectedUpdatedAt = String(args[8]);
+                if (existing.updated_at !== expectedUpdatedAt) {
+                  return { success: true, meta: { changes: 0 } };
+                }
+              }
               db.objects.set(objectId, {
                 ...existing,
                 object_type: String(args[0]),
@@ -294,6 +300,70 @@ describe("child object endpoints", () => {
 
     expect(res.status).toBe(200);
     expect(db.objects.get(OBJECT_ID)?.status).toBe("disabled");
+  });
+
+  it("returns OBJECT_WRITE_CONFLICT when a concurrent revoke wins the race", async () => {
+    const keys = await getTestKeypair();
+    const db = new ChildObjectDb();
+    db.parent.public_key = keys.publicKeyBase58;
+    const created = await signedChildObject(keys);
+    await handlePostChildObjectCreate(
+      requestFor(`/.well-known/hc/v1/cards/${PROFILE}/objects`, created),
+      db as unknown as D1Database,
+      PROFILE
+    );
+
+    // After the update handler reads the active row, a concurrent revoke lands.
+    // Soft checks still pass against the stale snapshot; CAS must reject.
+    const origPrepare = db.prepare.bind(db);
+    let mutatedAfterRead = false;
+    db.prepare = (sql: string) => {
+      const stmt = origPrepare(sql);
+      if (!sql.includes("FROM child_objects WHERE object_id")) return stmt;
+      return {
+        bind(...args: unknown[]) {
+          const bound = stmt.bind(...args);
+          return {
+            async first<T>() {
+              const row = await bound.first<T>();
+              if (row && !mutatedAfterRead) {
+                mutatedAfterRead = true;
+                const cur = db.objects.get(OBJECT_ID)!;
+                db.objects.set(OBJECT_ID, {
+                  ...cur,
+                  status: "revoked",
+                  public_state: "Taken down",
+                  updated_at: "2026-05-18T12:00:00.000Z",
+                });
+              }
+              return row;
+            },
+            all: bound.all.bind(bound),
+            run: bound.run.bind(bound),
+          };
+        },
+      };
+    };
+
+    const staleActive = await signedChildObject(keys, {
+      public_state: "Still open (stale tab)",
+      updated_at: "2026-05-17T18:00:00.000Z",
+    });
+    const res = await handlePostChildObjectUpdate(
+      requestFor(
+        `/.well-known/hc/v1/cards/${PROFILE}/objects/${OBJECT_ID}/update`,
+        staleActive
+      ),
+      db as unknown as D1Database,
+      PROFILE,
+      OBJECT_ID
+    );
+
+    expect(res.status).toBe(409);
+    const body = (await res.json()) as { error?: string };
+    expect(body.error).toBe("OBJECT_WRITE_CONFLICT");
+    expect(db.objects.get(OBJECT_ID)?.status).toBe("revoked");
+    expect(db.objects.get(OBJECT_ID)?.public_state).toBe("Taken down");
   });
 
   it("rejects signatures that are not root owner or recovery key", async () => {

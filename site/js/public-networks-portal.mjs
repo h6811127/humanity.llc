@@ -11,6 +11,7 @@ import {
   syncLiveNowShelfCopy,
 } from "./landing-entry-shelves-core.mjs";
 import { hydrateLandingLiveObjectCarriers } from "./landing-live-object-carriers.mjs";
+import { commitLandingPlacesRegionCtx } from "./landing-places-region-core.mjs";
 import {
   bindLandingPlacesNearMe,
   bindLandingPlacesRegionPicker,
@@ -161,7 +162,9 @@ function syncLandingShelfActiveStateForFacet(facet, activeShelfId) {
  * @param {import("./public-networks-portal-core.mjs").PublicNetworkCardModel[]} allCards
  * @param {{
  *   placesCtx: LandingPlacesCtx | null;
- *   onRegionChange?: (regionSlug: string) => void | Promise<void>;
+ *   onRegionChange?: (
+ *     regionSlug: string
+ *   ) => void | Promise<void | LandingPlacesCtx | null | undefined>;
  * }} [placesApi]
  */
 function bindPublicNetworksPortal(allCards, placesApi = {}) {
@@ -292,8 +295,19 @@ function bindPublicNetworksPortal(allCards, placesApi = {}) {
           placesMount.innerHTML = '<p class="landing-places-loading">Loading places…</p>';
         }
         try {
-          await placesApi.onRegionChange(regionSlug);
-          if (loadGen !== regionLoadGeneration) return;
+          // Load first; assign shared ctx only if this generation is still current
+          // so a slower prior region fetch cannot clobber a newer selection.
+          const nextCtx = await placesApi.onRegionChange(regionSlug);
+          if (
+            !commitLandingPlacesRegionCtx(
+              placesApi,
+              nextCtx,
+              loadGen,
+              regionLoadGeneration
+            )
+          ) {
+            return;
+          }
           syncLandingRegionQueryParam(regionSlug);
           renderPlaces();
           if (placesApi.placesCtx) {
@@ -397,10 +411,12 @@ async function bootPublicNetworksPortal() {
     const placesApi = {
       placesCtx,
       /**
+       * Load pins for a region without mutating shared state.
+       * Caller assigns `placesCtx` only after generation checks pass.
        * @param {string} regionSlug
        */
       onRegionChange: async (regionSlug) => {
-        placesApi.placesCtx = await loadLandingPlacesCtx(
+        return loadLandingPlacesCtx(
           regionOptions,
           regionSlug,
           featuredLive?.season_id || null

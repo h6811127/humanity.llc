@@ -9,7 +9,7 @@ import {
   getChildObjectParent,
   insertChildObject,
   listChildObjectsForParent,
-  updateChildObject,
+  updateChildObjectIfUnchanged,
   type ChildObjectParentRow,
 } from "../db/child-objects";
 import { listActiveChildObjectQrsForParent } from "../db/child-object-qr";
@@ -358,17 +358,28 @@ export async function handlePostChildObjectUpdate(
     return errorResponse("MALFORMED_REQUEST", "updated_at must be newer.", 422);
   }
   try {
-    await updateChildObject(db, {
-      objectId: parsed.objectId,
-      parentProfileId: pathProfileId,
-      objectType: parsed.objectType,
-      publicLabel: parsed.publicLabel,
-      publicState: parsed.publicState,
-      status: parsed.status,
-      documentJson: JSON.stringify(parsed.doc),
-      createdAt: parsed.createdAt,
-      updatedAt: parsed.updatedAt,
-    });
+    const saved = await updateChildObjectIfUnchanged(
+      db,
+      {
+        objectId: parsed.objectId,
+        parentProfileId: pathProfileId,
+        objectType: parsed.objectType,
+        publicLabel: parsed.publicLabel,
+        publicState: parsed.publicState,
+        status: parsed.status,
+        documentJson: JSON.stringify(parsed.doc),
+        createdAt: parsed.createdAt,
+        updatedAt: parsed.updatedAt,
+      },
+      existing.updated_at
+    );
+    if (!saved) {
+      return errorResponse(
+        "OBJECT_WRITE_CONFLICT",
+        "Child object changed concurrently; reload and retry.",
+        409
+      );
+    }
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     return errorResponse("RESOLVER_ERROR", msg, 500);
@@ -411,17 +422,28 @@ export async function handlePostChildObjectRevoke(
     return errorResponse("MALFORMED_REQUEST", "updated_at must be newer.", 422);
   }
   try {
-    await updateChildObject(db, {
-      objectId: parsed.objectId,
-      parentProfileId: pathProfileId,
-      objectType: parsed.objectType,
-      publicLabel: parsed.publicLabel,
-      publicState: parsed.publicState,
-      status: parsed.status,
-      documentJson: JSON.stringify(parsed.doc),
-      createdAt: parsed.createdAt,
-      updatedAt: parsed.updatedAt,
-    });
+    const saved = await updateChildObjectIfUnchanged(
+      db,
+      {
+        objectId: parsed.objectId,
+        parentProfileId: pathProfileId,
+        objectType: parsed.objectType,
+        publicLabel: parsed.publicLabel,
+        publicState: parsed.publicState,
+        status: parsed.status,
+        documentJson: JSON.stringify(parsed.doc),
+        createdAt: parsed.createdAt,
+        updatedAt: parsed.updatedAt,
+      },
+      existing.updated_at
+    );
+    if (!saved) {
+      return errorResponse(
+        "OBJECT_WRITE_CONFLICT",
+        "Child object changed concurrently; reload and retry.",
+        409
+      );
+    }
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     return errorResponse("RESOLVER_ERROR", msg, 500);
