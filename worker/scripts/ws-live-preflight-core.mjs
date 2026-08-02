@@ -136,6 +136,7 @@ export function assessWsLiveLayerRegressionFiles(root) {
     "L6-spec": [
       "worker/tests/live-object-staleness-contract.test.ts",
       "worker/tests/live-object-delegation-spec.test.ts",
+      "worker/tests/delegated-child-signer-denials.test.ts",
       "worker/tests/live-object-succession-spec.test.ts",
     ],
   };
