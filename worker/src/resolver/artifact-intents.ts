@@ -3,6 +3,7 @@ import { PROFILE_ID_REGEX } from "../crypto";
 import {
   getArtifactIntent,
   insertArtifactIntent,
+  markArtifactIntentAttachedToCart,
   updateArtifactIntentAttachFields,
   updateArtifactIntentPendingMint,
   updateArtifactIntentStatus,
@@ -409,17 +410,42 @@ export async function handlePostArtifactIntentAttach(
   });
 
   const updatedAt = new Date().toISOString();
-  await updateArtifactIntentAttachFields(db, artifactIntentId, {
+  const fieldsWritten = await updateArtifactIntentAttachFields(db, artifactIntentId, {
     print_variant_id: printVariantId,
     print_frame_background: printFrameBackground,
     updatedAt,
   });
+  if (!fieldsWritten) {
+    return errorResponse(
+      "ARTIFACT_INTENT_UNAVAILABLE",
+      "Artifact intent cannot be attached to cart.",
+      409
+    );
+  }
   row.print_variant_id = printVariantId;
   row.print_frame_background = printFrameBackground;
   row.updated_at = updatedAt;
 
   if (row.status === "proofed" || row.status === "draft") {
-    await updateArtifactIntentStatus(db, artifactIntentId, "attached_to_cart", updatedAt);
+    const marked = await markArtifactIntentAttachedToCart(db, artifactIntentId, updatedAt);
+    if (!marked) {
+      const latest = await getArtifactIntent(db, artifactIntentId);
+      // Concurrent attach may already be attached_to_cart; convert/block must 409.
+      if (!latest || latest.status === "converted" || latest.status === "blocked") {
+        return errorResponse(
+          "ARTIFACT_INTENT_UNAVAILABLE",
+          "Artifact intent cannot be attached to cart.",
+          409
+        );
+      }
+      if (latest.status !== "attached_to_cart") {
+        return errorResponse(
+          "ARTIFACT_INTENT_UNAVAILABLE",
+          "Artifact intent cannot be attached to cart.",
+          409
+        );
+      }
+    }
     row.status = "attached_to_cart";
   }
 
@@ -489,12 +515,19 @@ export async function handlePostArtifactIntentPreMint(
   }
 
   const updatedAt = new Date().toISOString();
-  await updateArtifactIntentPendingMint(
+  const stored = await updateArtifactIntentPendingMint(
     db,
     artifactIntentId,
     JSON.stringify(validation.credentials),
     updatedAt
   );
+  if (!stored) {
+    return errorResponse(
+      "ARTIFACT_INTENT_UNAVAILABLE",
+      "Artifact intent cannot accept pre-mint credentials.",
+      409
+    );
+  }
 
   return jsonResponse(
     {

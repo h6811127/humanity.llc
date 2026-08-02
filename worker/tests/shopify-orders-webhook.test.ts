@@ -173,6 +173,26 @@ function dbFor(state: DbState): D1Database {
             };
             state.printOrders.set(row.commerce_order_id, row);
           }
+          if (
+            sql.includes("UPDATE print_orders") &&
+            sql.includes("commerce_order_id") &&
+            sql.includes("status IN")
+          ) {
+            const nextStatus = args[0] as PrintOrderRow["status"];
+            const updatedAt = args[1] as string;
+            const commerceOrderId = args[2] as string;
+            const allowed = new Set(args.slice(3) as string[]);
+            const existing = state.printOrders.get(commerceOrderId);
+            if (existing && allowed.has(existing.status)) {
+              state.printOrders.set(commerceOrderId, {
+                ...existing,
+                status: nextStatus,
+                updated_at: updatedAt,
+              });
+              return { success: true, meta: { changes: 1 } };
+            }
+            return { success: true, meta: { changes: 0 } };
+          }
           if (sql.includes("INSERT INTO shopify_webhook_receipts")) {
             state.receipts.set(args[0] as string, {
               webhook_id: args[0] as string,
@@ -539,6 +559,168 @@ describe("Shopify orders webhook (O-001)", () => {
     expect(json.print_order_ids).toEqual([]);
     expect(state.orders.get("450789469")?.status).toBe("held_for_review");
     expect(state.printOrders.size).toBe(0);
+  });
+
+  it("cancels queued print orders on orders/cancelled", async () => {
+    const printOrder: PrintOrderRow = {
+      order_id: "po_cancel_webhook_01",
+      profile_id: PROFILE,
+      print_artifact_ids_json: JSON.stringify(["pa_planned1"]),
+      planned_item_qr_ids_json: JSON.stringify(["qr_planned1"]),
+      commerce_order_id: "co_existing_paid_webhook",
+      shopify_order_id: "450789469",
+      printify_order_id: null,
+      printify_shop_id: null,
+      template_id: DEFAULT_PRINT_TEMPLATE_ID,
+      print_variant_id: null,
+      print_frame_background: "full",
+      status: "awaiting_production_approval",
+      shipping_method: "standard",
+      tracking_carrier: null,
+      tracking_number: null,
+      tracking_url: null,
+      last_reconciled_at: null,
+      created_at: "2026-05-16T17:10:00Z",
+      updated_at: "2026-05-16T17:10:00Z",
+    };
+    const state: DbState = {
+      intents: new Map([[INTENT, intentRow({ status: "converted" })]]),
+      orders: new Map([
+        [
+          "450789469",
+          commerceOrderRow({
+            print_order_ids_json: JSON.stringify([printOrder.order_id]),
+          }),
+        ],
+      ]),
+      receipts: new Map(),
+      printOrders: new Map([[printOrder.commerce_order_id, { ...printOrder }]]),
+      fulfillmentPii: new Map(),
+    };
+
+    const res = await handlePostShopifyOrdersWebhook(
+      await webhookRequest(
+        { id: 450789469, financial_status: "voided", cancel_reason: "customer" },
+        {
+          "X-Shopify-Topic": "orders/cancelled",
+          "X-Shopify-Webhook-Id": "wh_cancel_1",
+        }
+      ),
+      env,
+      dbFor(state)
+    );
+
+    expect(res.status).toBe(200);
+    expect(state.orders.get("450789469")?.status).toBe("canceled");
+    expect(state.printOrders.get(printOrder.commerce_order_id)?.status).toBe("canceled");
+  });
+
+  it("cancels queued print orders on orders/refunded", async () => {
+    const printOrder: PrintOrderRow = {
+      order_id: "po_refund_webhook_01",
+      profile_id: PROFILE,
+      print_artifact_ids_json: JSON.stringify(["pa_planned1"]),
+      planned_item_qr_ids_json: JSON.stringify(["qr_planned1"]),
+      commerce_order_id: "co_existing_paid_webhook",
+      shopify_order_id: "450789469",
+      printify_order_id: null,
+      printify_shop_id: null,
+      template_id: DEFAULT_PRINT_TEMPLATE_ID,
+      print_variant_id: "navy-m",
+      print_frame_background: "full",
+      status: "awaiting_production_approval",
+      shipping_method: "standard",
+      tracking_carrier: null,
+      tracking_number: null,
+      tracking_url: null,
+      last_reconciled_at: null,
+      created_at: "2026-05-16T17:10:00Z",
+      updated_at: "2026-05-16T17:10:00Z",
+    };
+    const state: DbState = {
+      intents: new Map([[INTENT, intentRow({ status: "converted" })]]),
+      orders: new Map([
+        [
+          "450789469",
+          commerceOrderRow({
+            print_order_ids_json: JSON.stringify([printOrder.order_id]),
+          }),
+        ],
+      ]),
+      receipts: new Map(),
+      printOrders: new Map([[printOrder.commerce_order_id, { ...printOrder }]]),
+      fulfillmentPii: new Map(),
+    };
+
+    const res = await handlePostShopifyOrdersWebhook(
+      await webhookRequest(
+        { id: 450789469, financial_status: "refunded" },
+        {
+          "X-Shopify-Topic": "orders/refunded",
+          "X-Shopify-Webhook-Id": "wh_refund_1",
+        }
+      ),
+      env,
+      dbFor(state)
+    );
+
+    expect(res.status).toBe(200);
+    expect(state.orders.get("450789469")?.status).toBe("refunded");
+    expect(state.printOrders.get(printOrder.commerce_order_id)?.status).toBe("canceled");
+  });
+
+  it("does not cancel already-submitted print orders on Shopify cancel", async () => {
+    const printOrder: PrintOrderRow = {
+      order_id: "po_submitted_keep_01",
+      profile_id: PROFILE,
+      print_artifact_ids_json: JSON.stringify(["pa_planned1"]),
+      planned_item_qr_ids_json: JSON.stringify(["qr_planned1"]),
+      commerce_order_id: "co_existing_paid_webhook",
+      shopify_order_id: "450789469",
+      printify_order_id: "5a96f649b2439217d070f507",
+      printify_shop_id: 99,
+      template_id: DEFAULT_PRINT_TEMPLATE_ID,
+      print_variant_id: null,
+      print_frame_background: "full",
+      status: "submitted",
+      shipping_method: "standard",
+      tracking_carrier: null,
+      tracking_number: null,
+      tracking_url: null,
+      last_reconciled_at: null,
+      created_at: "2026-05-16T17:10:00Z",
+      updated_at: "2026-05-16T17:10:00Z",
+    };
+    const state: DbState = {
+      intents: new Map([[INTENT, intentRow({ status: "converted" })]]),
+      orders: new Map([
+        [
+          "450789469",
+          commerceOrderRow({
+            print_order_ids_json: JSON.stringify([printOrder.order_id]),
+          }),
+        ],
+      ]),
+      receipts: new Map(),
+      printOrders: new Map([[printOrder.commerce_order_id, { ...printOrder }]]),
+      fulfillmentPii: new Map(),
+    };
+
+    const res = await handlePostShopifyOrdersWebhook(
+      await webhookRequest(
+        { id: 450789469, cancel_reason: "customer" },
+        {
+          "X-Shopify-Topic": "orders/cancelled",
+          "X-Shopify-Webhook-Id": "wh_cancel_submitted",
+        }
+      ),
+      env,
+      dbFor(state)
+    );
+
+    expect(res.status).toBe(200);
+    expect(state.orders.get("450789469")?.status).toBe("canceled");
+    expect(state.printOrders.get(printOrder.commerce_order_id)?.status).toBe("submitted");
   });
 
   it("rejects invalid HMAC", async () => {

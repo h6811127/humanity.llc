@@ -148,13 +148,20 @@ function dbFor(state: DbState, cardPublicKey: string): D1Database {
         run: async () => {
           if (sql.includes("UPDATE artifact_intents") && sql.includes("pending_mint_credentials_json")) {
             const existing = state.intents.get(args[2] as string);
-            if (existing) {
+            const open =
+              existing &&
+              (existing.status === "draft" ||
+                existing.status === "proofed" ||
+                existing.status === "attached_to_cart");
+            if (existing && open) {
               state.intents.set(args[2] as string, {
                 ...existing,
                 pending_mint_credentials_json: args[0] as string,
                 updated_at: args[1] as string,
               });
+              return { success: true, meta: { changes: 1 } };
             }
+            return { success: true, meta: { changes: 0 } };
           }
           if (sql.includes("UPDATE artifact_intents SET status")) {
             const existing = state.intents.get(args[2] as string);

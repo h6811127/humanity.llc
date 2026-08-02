@@ -180,6 +180,39 @@ export async function updatePrintOrderStatus(
     .run();
 }
 
+/** Pre-factory statuses that Shopify cancel/refund may safely mark canceled. */
+export const PRINT_ORDER_CANCELABLE_STATUSES: readonly PrintOrderStatus[] = [
+  "draft",
+  "awaiting_payment",
+  "payment_failed",
+  "paid",
+  "awaiting_production_approval",
+] as const;
+
+/**
+ * Cancel linked print orders that have not yet been submitted to Printify.
+ * Returns how many rows were canceled. Already-submitted factory orders are left
+ * for operator/Printify reconciliation (do not lie that production stopped).
+ */
+export async function cancelPreSubmitPrintOrdersForCommerceOrder(
+  db: D1Database,
+  commerceOrderId: string,
+  updatedAt: string
+): Promise<number> {
+  const placeholders = PRINT_ORDER_CANCELABLE_STATUSES.map(() => "?").join(", ");
+  const result = await db
+    .prepare(
+      `UPDATE print_orders
+       SET status = ?, updated_at = ?
+       WHERE commerce_order_id = ?
+         AND status IN (${placeholders})`
+    )
+    .bind("canceled", updatedAt, commerceOrderId, ...PRINT_ORDER_CANCELABLE_STATUSES)
+    .run();
+
+  return result.meta?.changes ?? 0;
+}
+
 export async function updatePrintOrderTracking(
   db: D1Database,
   orderId: string,

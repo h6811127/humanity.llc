@@ -74,7 +74,7 @@ function printOrderRow(): PrintOrderRow {
   };
 }
 
-function commerceOrder(): CommerceOrderRow {
+function commerceOrder(overrides: Partial<CommerceOrderRow> = {}): CommerceOrderRow {
   return {
     commerce_order_id: COMMERCE,
     shopify_order_id: "450789469",
@@ -88,10 +88,15 @@ function commerceOrder(): CommerceOrderRow {
     hold_reason: null,
     created_at: CREATED,
     updated_at: CREATED,
+    ...overrides,
   };
 }
 
-function dbFor(publicKeyBase58: string, printOrder: PrintOrderRow): D1Database {
+function dbFor(
+  publicKeyBase58: string,
+  printOrder: PrintOrderRow,
+  commerce: CommerceOrderRow = commerceOrder()
+): D1Database {
   const activeByPa = new Map<string, string>();
 
   return {
@@ -102,7 +107,7 @@ function dbFor(publicKeyBase58: string, printOrder: PrintOrderRow): D1Database {
             return args[0] === PRINT_ORDER ? printOrder : null;
           }
           if (sql.includes("FROM commerce_order_links WHERE commerce_order_id")) {
-            return args[0] === COMMERCE ? commerceOrder() : null;
+            return args[0] === COMMERCE ? commerce : null;
           }
           if (sql.includes("FROM cards WHERE profile_id") && sql.includes("manifesto_line")) {
             return {
@@ -204,6 +209,47 @@ describe("submitPrintOrderToPrintify", () => {
     expect(result.printOrder.printify_order_id).toBe("5a96f649b2439217d070f507");
     expect(result.shippingSource).toBe("request_body");
     expect(fetchMock).toHaveBeenCalledOnce();
+  });
+
+  it("blocks Printify submit when commerce order is canceled", async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+
+    const printOrder = printOrderRow();
+    const result = await submitPrintOrderToPrintify(
+      new Request("https://humanity.llc/v1/print/orders"),
+      env(),
+      dbFor("pubkey", printOrder, commerceOrder({ status: "canceled" })),
+      printOrder,
+      { shipping_address: ADDRESS }
+    );
+
+    vi.unstubAllGlobals();
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.code).toBe("COMMERCE_ORDER_CANCELED");
+    expect(result.httpStatus).toBe(409);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("blocks Printify submit when commerce order is refunded", async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+
+    const printOrder = printOrderRow();
+    const result = await submitPrintOrderToPrintify(
+      new Request("https://humanity.llc/v1/print/orders"),
+      env(),
+      dbFor("pubkey", printOrder, commerceOrder({ status: "refunded" })),
+      printOrder,
+      { shipping_address: ADDRESS }
+    );
+
+    vi.unstubAllGlobals();
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.code).toBe("COMMERCE_ORDER_CANCELED");
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 });
 
