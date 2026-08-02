@@ -49,6 +49,7 @@ step("Live-object five-layer vitest", [
   "worker/tests/live-object-network-graph.test.ts",
   "worker/tests/live-object-staleness-contract.test.ts",
   "worker/tests/live-object-delegation-spec.test.ts",
+  "worker/tests/delegated-child-signer-denials.test.ts",
   "worker/tests/live-object-succession-spec.test.ts",
   "worker/tests/live-object-child-scan.test.ts",
   "worker/tests/ws-live-preflight-core.test.ts",
