@@ -31,6 +31,7 @@ import { verifyShopifyWebhookHmac } from "./shopify-webhook-verify";
 import type { Env } from "../env";
 import { generateCommerceOrderId } from "../id";
 import { tryAutoMintQueuedPrintOrders, type AutoMintFromIntentsResult } from "../commerce/fulfillment-auto-mint";
+import { cancelPreSubmitPrintOrdersForCommerceOrder } from "../db/print-orders";
 import { queuePrintOrderAfterPaidWebhook } from "../print/print-orders-handler";
 
 const PAID_TOPICS = new Set(["orders/paid", "orders/create"]);
@@ -397,6 +398,8 @@ async function handleStatusOrder(
   }
 
   await updateCommerceOrderStatus(db, existing.commerce_order_id, status, null, nowIso);
+  // Stop queued Printify work for refunded/canceled checkouts (buyer mint already gated).
+  await cancelPreSubmitPrintOrdersForCommerceOrder(db, existing.commerce_order_id, nowIso);
   return jsonResponse(
     commerceOrderResponse({ ...existing, status, hold_reason: null, updated_at: nowIso }),
     200

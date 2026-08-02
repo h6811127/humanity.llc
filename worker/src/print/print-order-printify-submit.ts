@@ -70,6 +70,15 @@ export async function submitPrintOrderToPrintify(
     };
   }
 
+  if (commerceOrder.status === "canceled" || commerceOrder.status === "refunded") {
+    return {
+      ok: false,
+      code: "COMMERCE_ORDER_CANCELED",
+      message: "Commerce order is canceled or refunded; Printify submit is blocked.",
+      httpStatus: 409,
+    };
+  }
+
   const resolvedShipping = await resolvePrintifyShippingForSubmit(
     env,
     db,
