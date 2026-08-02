@@ -200,15 +200,67 @@ function createDb(state: DbState): D1Database {
             };
             state.intents.set(row.artifact_intent_id, row);
           }
-          if (sql.includes("UPDATE artifact_intents")) {
+          if (sql.includes("UPDATE artifact_intents") && sql.includes("print_frame_background")) {
+            const printVariantId = args[0] as string | null;
+            const printFrameBackground = args[1] as ArtifactIntentRow["print_frame_background"];
+            const updatedAt = args[2] as string;
+            const id = args[3] as string;
+            const existing = state.intents.get(id);
+            const open =
+              existing &&
+              (existing.status === "draft" ||
+                existing.status === "proofed" ||
+                existing.status === "attached_to_cart");
+            if (existing && open) {
+              state.intents.set(id, {
+                ...existing,
+                print_variant_id: printVariantId,
+                print_frame_background: printFrameBackground,
+                updated_at: updatedAt,
+              });
+              return { success: true, meta: { changes: 1 } };
+            }
+            return { success: true, meta: { changes: 0 } };
+          }
+          if (
+            sql.includes("UPDATE artifact_intents") &&
+            sql.includes("pending_mint_credentials_json")
+          ) {
             const existing = state.intents.get(args[2] as string);
-            if (existing) {
+            const open =
+              existing &&
+              (existing.status === "draft" ||
+                existing.status === "proofed" ||
+                existing.status === "attached_to_cart");
+            if (existing && open) {
               state.intents.set(args[2] as string, {
                 ...existing,
-                status: args[0] as ArtifactIntentRow["status"],
+                pending_mint_credentials_json: args[0] as string,
                 updated_at: args[1] as string,
               });
+              return { success: true, meta: { changes: 1 } };
             }
+            return { success: true, meta: { changes: 0 } };
+          }
+          if (sql.includes("UPDATE artifact_intents")) {
+            const status = args[0] as ArtifactIntentRow["status"];
+            const updatedAt = args[1] as string;
+            const id = args[2] as string;
+            const existing = state.intents.get(id);
+            if (!existing) {
+              return { success: true, meta: { changes: 0 } };
+            }
+            if (sql.includes("status IN ('draft', 'proofed')")) {
+              if (existing.status !== "draft" && existing.status !== "proofed") {
+                return { success: true, meta: { changes: 0 } };
+              }
+            }
+            state.intents.set(id, {
+              ...existing,
+              status,
+              updated_at: updatedAt,
+            });
+            return { success: true, meta: { changes: 1 } };
           }
           if (sql.includes("INSERT INTO commerce_order_links")) {
             const row: CommerceOrderRow = {

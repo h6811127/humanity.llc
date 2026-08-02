@@ -127,7 +127,7 @@ export async function updateArtifactIntentPendingMint(
     )
     .run();
 
-  return Boolean(result.success && (result.meta.changes ?? 0) > 0);
+  return Boolean(result.success && (result.meta?.changes ?? 0) > 0);
 }
 
 export async function updateArtifactIntentStatus(
@@ -174,7 +174,7 @@ export async function updateArtifactIntentAttachFields(
     )
     .run();
 
-  return Boolean(result.success && (result.meta.changes ?? 0) > 0);
+  return Boolean(result.success && (result.meta?.changes ?? 0) > 0);
 }
 
 /** proofed/draft → attached_to_cart; no-op (false) when already converted/blocked. */
@@ -193,5 +193,5 @@ export async function markArtifactIntentAttachedToCart(
     .bind("attached_to_cart", updatedAt, artifactIntentId)
     .run();
 
-  return Boolean(result.success && (result.meta.changes ?? 0) > 0);
+  return Boolean(result.success && (result.meta?.changes ?? 0) > 0);
 }

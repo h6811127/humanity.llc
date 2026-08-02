@@ -210,7 +210,7 @@ export async function cancelPreSubmitPrintOrdersForCommerceOrder(
     .bind("canceled", updatedAt, commerceOrderId, ...PRINT_ORDER_CANCELABLE_STATUSES)
     .run();
 
-  return result.meta.changes ?? 0;
+  return result.meta?.changes ?? 0;
 }
 
 export async function updatePrintOrderTracking(
