@@ -98,20 +98,36 @@ export async function getArtifactIntent(
     .first<ArtifactIntentRow>();
 }
 
+/** Statuses that may still accept cart attach / pre-mint mutations. */
+export const ARTIFACT_INTENT_OPEN_STATUSES: readonly ArtifactIntentStatus[] = [
+  "draft",
+  "proofed",
+  "attached_to_cart",
+] as const;
+
 export async function updateArtifactIntentPendingMint(
   db: D1Database,
   artifactIntentId: string,
   pendingMintCredentialsJson: string,
   updatedAt: string
-): Promise<void> {
-  await db
+): Promise<boolean> {
+  const placeholders = ARTIFACT_INTENT_OPEN_STATUSES.map(() => "?").join(", ");
+  const result = await db
     .prepare(
       `UPDATE artifact_intents
        SET pending_mint_credentials_json = ?, updated_at = ?
-       WHERE artifact_intent_id = ?`
+       WHERE artifact_intent_id = ?
+         AND status IN (${placeholders})`
     )
-    .bind(pendingMintCredentialsJson, updatedAt, artifactIntentId)
+    .bind(
+      pendingMintCredentialsJson,
+      updatedAt,
+      artifactIntentId,
+      ...ARTIFACT_INTENT_OPEN_STATUSES
+    )
     .run();
+
+  return Boolean(result.success && (result.meta.changes ?? 0) > 0);
 }
 
 export async function updateArtifactIntentStatus(
@@ -128,6 +144,10 @@ export async function updateArtifactIntentStatus(
     .run();
 }
 
+/**
+ * Cart-attach field write — refuses terminal statuses so a concurrent convert
+ * cannot be demoted or have paid print options overwritten.
+ */
 export async function updateArtifactIntentAttachFields(
   db: D1Database,
   artifactIntentId: string,
@@ -136,18 +156,42 @@ export async function updateArtifactIntentAttachFields(
     print_frame_background: BuyerPrintFrameBackground;
     updatedAt: string;
   }
-): Promise<void> {
-  await db
+): Promise<boolean> {
+  const placeholders = ARTIFACT_INTENT_OPEN_STATUSES.map(() => "?").join(", ");
+  const result = await db
     .prepare(
       `UPDATE artifact_intents
        SET print_variant_id = ?, print_frame_background = ?, updated_at = ?
-       WHERE artifact_intent_id = ?`
+       WHERE artifact_intent_id = ?
+         AND status IN (${placeholders})`
     )
     .bind(
       fields.print_variant_id,
       fields.print_frame_background,
       fields.updatedAt,
-      artifactIntentId
+      artifactIntentId,
+      ...ARTIFACT_INTENT_OPEN_STATUSES
     )
     .run();
+
+  return Boolean(result.success && (result.meta.changes ?? 0) > 0);
+}
+
+/** proofed/draft → attached_to_cart; no-op (false) when already converted/blocked. */
+export async function markArtifactIntentAttachedToCart(
+  db: D1Database,
+  artifactIntentId: string,
+  updatedAt: string
+): Promise<boolean> {
+  const result = await db
+    .prepare(
+      `UPDATE artifact_intents
+       SET status = ?, updated_at = ?
+       WHERE artifact_intent_id = ?
+         AND status IN ('draft', 'proofed')`
+    )
+    .bind("attached_to_cart", updatedAt, artifactIntentId)
+    .run();
+
+  return Boolean(result.success && (result.meta.changes ?? 0) > 0);
 }

@@ -128,24 +128,62 @@ function dbFor(
             const updatedAt = args[2] as string;
             const id = args[3] as string;
             const existing = intents.get(id);
-            if (existing) {
+            const open =
+              existing &&
+              (existing.status === "draft" ||
+                existing.status === "proofed" ||
+                existing.status === "attached_to_cart");
+            if (existing && open) {
               intents.set(id, {
                 ...existing,
                 print_variant_id: printVariantId,
                 print_frame_background: printFrameBackground,
                 updated_at: updatedAt,
               });
+              return { success: true, meta: { changes: 1 } };
             }
-          } else if (sql.includes("UPDATE artifact_intents")) {
+            return { success: true, meta: { changes: 0 } };
+          }
+          if (
+            sql.includes("UPDATE artifact_intents") &&
+            sql.includes("pending_mint_credentials_json")
+          ) {
+            const pending = args[0] as string;
+            const updatedAt = args[1] as string;
+            const id = args[2] as string;
+            const existing = intents.get(id);
+            const open =
+              existing &&
+              (existing.status === "draft" ||
+                existing.status === "proofed" ||
+                existing.status === "attached_to_cart");
+            if (existing && open) {
+              intents.set(id, {
+                ...existing,
+                pending_mint_credentials_json: pending,
+                updated_at: updatedAt,
+              });
+              return { success: true, meta: { changes: 1 } };
+            }
+            return { success: true, meta: { changes: 0 } };
+          }
+          if (sql.includes("UPDATE artifact_intents")) {
             const status = args[0] as ArtifactIntentRow["status"];
             const updatedAt = args[1] as string;
             const id = args[2] as string;
             const existing = intents.get(id);
-            if (existing) {
-              intents.set(id, { ...existing, status, updated_at: updatedAt });
+            if (!existing) {
+              return { success: true, meta: { changes: 0 } };
             }
+            if (sql.includes("status IN ('draft', 'proofed')")) {
+              if (existing.status !== "draft" && existing.status !== "proofed") {
+                return { success: true, meta: { changes: 0 } };
+              }
+            }
+            intents.set(id, { ...existing, status, updated_at: updatedAt });
+            return { success: true, meta: { changes: 1 } };
           }
-          return { success: true };
+          return { success: true, meta: { changes: 1 } };
         },
       }),
     }),
@@ -353,6 +391,111 @@ describe("artifact intent pre-commerce guard (M4.4)", () => {
       error: "PROOF_CONSENT_REQUIRED",
     });
     expect(intents.get(intentId)?.status).toBe("proofed");
+  });
+
+  it("attach refuses to mutate converted intents (paid webhook race)", async () => {
+    const future = new Date(Date.now() + ARTIFACT_INTENT_TTL_MS).toISOString();
+    const intentId = "ai_ConvertedAttachRace01";
+    const row: ArtifactIntentRow = {
+      artifact_intent_id: intentId,
+      profile_id: PROFILE,
+      source_qr_id: QR,
+      product_id: "glitch_hoodie_v1",
+      print_variant_id: "navy-m",
+      print_frame_background: "full",
+      quantity: 1,
+      planned_item_qr_ids_json: JSON.stringify(["qr_planned1"]),
+      planned_print_artifact_ids_json: JSON.stringify(["pa_planned1"]),
+      pending_mint_credentials_json: null,
+      status: "converted",
+      expires_at: future,
+      created_at: "2026-05-16T17:00:00Z",
+      updated_at: "2026-05-16T17:00:00Z",
+    };
+    const intents = new Map([[intentId, { ...row }]]);
+
+    const res = await handlePostArtifactIntentAttach(
+      request(
+        {
+          print_variant_id: "navy-xxl",
+          print_frame_background: "transparent",
+          proof_acknowledged: true,
+        },
+        `/v1/store/artifact-intents/${intentId}/attach`
+      ),
+      dbFor({ card: card(), qr: qr(), verification: summary() }, intents),
+      intentId
+    );
+
+    expect(res.status).toBe(409);
+    expect((await res.json()) as { error: string }).toMatchObject({
+      error: "ARTIFACT_INTENT_UNAVAILABLE",
+    });
+    expect(intents.get(intentId)?.status).toBe("converted");
+    expect(intents.get(intentId)?.print_variant_id).toBe("navy-m");
+    expect(intents.get(intentId)?.print_frame_background).toBe("full");
+  });
+
+  it("attach field write loses race when status flips to converted", async () => {
+    const future = new Date(Date.now() + ARTIFACT_INTENT_TTL_MS).toISOString();
+    const intentId = "ai_AttachConvertTOCTOU01";
+    const row: ArtifactIntentRow = {
+      artifact_intent_id: intentId,
+      profile_id: PROFILE,
+      source_qr_id: QR,
+      product_id: "glitch_hoodie_v1",
+      print_variant_id: "navy-m",
+      print_frame_background: "full",
+      quantity: 1,
+      planned_item_qr_ids_json: JSON.stringify(["qr_planned1"]),
+      planned_print_artifact_ids_json: JSON.stringify(["pa_planned1"]),
+      pending_mint_credentials_json: null,
+      status: "proofed",
+      expires_at: future,
+      created_at: "2026-05-16T17:00:00Z",
+      updated_at: "2026-05-16T17:00:00Z",
+    };
+    const intents = new Map([[intentId, { ...row }]]);
+    const db = dbFor({ card: card(), qr: qr(), verification: summary() }, intents);
+    // Soft-read window: convert lands before attach field UPDATE.
+    const originalPrepare = db.prepare.bind(db);
+    db.prepare = ((sql: string) => {
+      const stmt = originalPrepare(sql);
+      if (sql.includes("UPDATE artifact_intents") && sql.includes("print_frame_background")) {
+        return {
+          bind: (...args: unknown[]) => ({
+            run: async () => {
+              const existing = intents.get(intentId);
+              if (existing) {
+                intents.set(intentId, {
+                  ...existing,
+                  status: "converted",
+                  updated_at: "2026-05-16T17:05:00Z",
+                });
+              }
+              return stmt.bind(...args).run();
+            },
+          }),
+        };
+      }
+      return stmt;
+    }) as typeof db.prepare;
+
+    const res = await handlePostArtifactIntentAttach(
+      request(
+        {
+          print_variant_id: "navy-xxl",
+          proof_acknowledged: true,
+        },
+        `/v1/store/artifact-intents/${intentId}/attach`
+      ),
+      db,
+      intentId
+    );
+
+    expect(res.status).toBe(409);
+    expect(intents.get(intentId)?.status).toBe("converted");
+    expect(intents.get(intentId)?.print_variant_id).toBe("navy-m");
   });
 
   it("attach rejects expired intents", async () => {
