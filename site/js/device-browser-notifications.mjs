@@ -309,6 +309,7 @@ function scheduleAlertProbeSettle() {
 }
 /** @type {ReturnType<typeof setInterval> | null} */
 let backgroundAlertPollTimer = null;
+let backgroundProbeInFlight = false;
 
 function readBackgroundAlertPollContext() {
   return {

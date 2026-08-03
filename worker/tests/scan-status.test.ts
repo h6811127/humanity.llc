@@ -6,6 +6,7 @@ import type { CardRow, QrCredentialRow, VerificationSummaryRow } from "../src/db
 import {
   BEARER_WARNING,
   httpStatusForScanKind,
+  type ScanStatusBody,
   scanStatusBodyForWeakEtag,
   scanStatusBodyFromViewModel,
 } from "../src/resolver/scan-status";
@@ -16,9 +17,12 @@ import {
   malformedScanView,
 } from "../src/resolver/scan-state";
 import { d1WithRateLimitBuckets } from "./rate-limit-db-mock";
+import { CITY_GAME_SEASON_ROOT_PROFILE } from "./city-game-fixture-profile";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const QR = "qr_7Xk9mP2nQ4rT6vW8";
+const GAME_PROFILE = CITY_GAME_SEASON_ROOT_PROFILE;
+const GAME_OBJECT = "obj_cr_node_04_river";
 
 function card(overrides: Partial<CardRow> = {}): CardRow {
   return {
@@ -67,6 +71,32 @@ function summary(): VerificationSummaryRow {
     summary_document_json: null,
     updated_at: "2026-05-16T17:00:00Z",
   };
+}
+
+function gameChildDocument(progress = 0): string {
+  return JSON.stringify({
+    object_id: GAME_OBJECT,
+    parent_profile_id: GAME_PROFILE,
+    object_type: "game_node",
+    public_label: "Riverwalk River Lantern",
+    public_state: "Seed clue live",
+    status: "active",
+    season_id: "cr_season_01_wake",
+    node_role: "temp_drop",
+    district: "river_spine",
+    object_streams: [
+      { id: "relay", class: "route", label: "Collective", value: `${progress} / 20` },
+      { id: "care", class: "care", label: "Trail", value: "Open" },
+    ],
+    game_meta: {
+      collective_progress: progress,
+      collective_target: 20,
+      unlocked_by: [],
+      vouch_requires: [],
+      scarcity_remaining: null,
+      fragment_id: null,
+    },
+  });
 }
 
 describe("scan status JSON (M3.4)", () => {
@@ -357,6 +387,67 @@ describe("scan status JSON (M3.4)", () => {
     );
     expect(second.status).toBe(304);
     expect(second.headers.get("Cache-Control")).toContain("max-age=30");
+  });
+
+  it("status JSON uses the same city-game context as scan HTML for QR scans", async () => {
+    const gameCard = card({
+      profile_id: GAME_PROFILE,
+      handle: "cedar_rapids_wake",
+      handle_normalized: "cedar_rapids_wake",
+      manifesto_line: "Wake the city",
+    });
+    const gameQr = qr({
+      profile_id: GAME_PROFILE,
+      scope: "child_object",
+      object_id: GAME_OBJECT,
+      payload: `https://humanity.llc/c/${GAME_PROFILE}?q=${QR}`,
+    });
+    const gameSummary = { ...summary(), profile_id: GAME_PROFILE };
+    const childObject = {
+      object_id: GAME_OBJECT,
+      parent_profile_id: GAME_PROFILE,
+      object_type: "game_node",
+      public_label: "Riverwalk River Lantern",
+      public_state: "Seed clue live",
+      status: "active",
+      child_object_document_json: gameChildDocument(),
+      created_at: "2026-06-01T12:00:00.000Z",
+      updated_at: "2026-06-01T12:05:00.000Z",
+    };
+    const db = d1WithRateLimitBuckets((sql: string) => ({
+      bind: (...args: unknown[]) => ({
+        first: async () => {
+          if (sql.includes("FROM cards")) return gameCard;
+          if (sql.includes("FROM qr_credentials")) return gameQr;
+          if (sql.includes("FROM child_objects WHERE object_id")) {
+            return String(args[0]) === GAME_OBJECT ? childObject : null;
+          }
+          if (sql.includes("verification_summaries")) return gameSummary;
+          if (sql.includes("sqlite_master")) return null;
+          return null;
+        },
+        run: async () => ({ meta: { changes: 0 } }),
+        all: async () => ({ results: [] }),
+      }),
+    }));
+
+    const { handleGetScanStatus } = await import("../src/resolver/scan-status");
+    const res = await handleGetScanStatus(
+      new Request(`https://humanity.llc/.well-known/hc/v1/cards/${GAME_PROFILE}/status?q=${QR}`),
+      db,
+      GAME_PROFILE,
+      { CITY_GAME_ENABLED: "1", CITY_GAME_LOCAL_PLAY_OPEN: "1" }
+    );
+    const body = (await res.json()) as ScanStatusBody;
+    const read = body.scan.capabilities?.find((cap) => cap.verb === "read");
+    const contribute = body.scan.capabilities?.find((cap) => cap.verb === "contribute");
+
+    expect(res.status).toBe(200);
+    expect(read).toMatchObject({ kind: "game_node", room: "season" });
+    expect(contribute).toMatchObject({
+      available: true,
+      kind: "game_quorum",
+    });
   });
 
   it("GET status through worker.fetch includes CORS for Pages dev origin", async () => {

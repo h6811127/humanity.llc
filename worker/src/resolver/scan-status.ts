@@ -1,4 +1,5 @@
 import { loadScanContext, type ScanContext } from "../db/scan";
+import { resolveSeasonForProfile } from "../city-game/season-loader";
 import { checkCardResolutionRateLimit, hashIp } from "../db/rate-limit";
 import { PROFILE_ID_REGEX } from "../crypto";
 import { jsonResponseWithWeakEtag } from "../http/conditional-json";
@@ -50,6 +51,7 @@ import {
   type SuccessionScanContext,
 } from "../live-object/succession-spec";
 import { AI_EXPLAIN_ENDPOINT } from "./ai-explain-snapshot";
+import { loadScanContextWithGameRepairs } from "./scan";
 
 export { BEARER_WARNING };
 
@@ -265,7 +267,8 @@ export { httpStatusForScanKind };
 export async function handleGetScanStatus(
   request: Request,
   db: D1Database,
-  profileId: string
+  profileId: string,
+  env: { CITY_GAME_ENABLED?: string; CITY_GAME_LOCAL_PLAY_OPEN?: string } = {}
 ): Promise<Response> {
   const ipHash = await hashIp(clientIp(request));
   const rate = await checkCardResolutionRateLimit(db, ipHash);
@@ -312,9 +315,24 @@ export async function handleGetScanStatus(
         await statusResponse(request, malformedScanView(profileId, qrId, origin))
       );
     }
-    const ctx = await loadScanContext(db, profileId, qrId);
-    const vm = buildScanViewModel(profileId, qrId, ctx, origin);
-    return guardScanResponse(request, await statusResponse(request, vm));
+    const now = new Date();
+    const season = resolveSeasonForProfile(profileId);
+    const ctx = await loadScanContextWithGameRepairs(
+      db,
+      profileId,
+      qrId,
+      now,
+      env,
+      season
+    );
+    const vm = buildScanViewModel(profileId, qrId, ctx, origin, now, {
+      env: {
+        CITY_GAME_ENABLED: env.CITY_GAME_ENABLED,
+        CITY_GAME_LOCAL_PLAY_OPEN: env.CITY_GAME_LOCAL_PLAY_OPEN,
+      },
+      season: season ?? undefined,
+    });
+    return guardScanResponse(request, await statusResponse(request, vm, now));
   }
 
   const card = await db
@@ -345,10 +363,11 @@ export async function handleGetScanStatus(
 
 async function statusResponse(
   request: Request,
-  vm: ScanViewModel
+  vm: ScanViewModel,
+  now: Date = new Date()
 ): Promise<Response> {
   const status = httpStatusForScanKind(vm.kind);
-  const body = scanStatusBodyFromViewModel(vm);
+  const body = scanStatusBodyFromViewModel(vm, now);
   const payload =
     vm.kind === "malformed"
       ? {

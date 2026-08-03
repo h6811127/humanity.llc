@@ -144,12 +144,12 @@ export async function handleGetScan(
   );
 }
 
-async function loadScanContextWithGameRepairs(
+export async function loadScanContextWithGameRepairs(
   db: D1Database,
   profileId: string,
   qrId: string,
   now: Date,
-  env: { CITY_GAME_ENABLED?: string },
+  env: { CITY_GAME_ENABLED?: string; CITY_GAME_LOCAL_PLAY_OPEN?: string },
   season: ReturnType<typeof resolveSeasonForProfile>
 ): Promise<ScanContext> {
   let ctx = await loadScanContext(db, profileId, qrId);
