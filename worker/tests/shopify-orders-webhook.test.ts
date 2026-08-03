@@ -98,9 +98,13 @@ function dbFor(state: DbState): D1Database {
         },
         run: async () => {
           if (sql.includes("INSERT INTO commerce_order_links")) {
+            const shopifyOrderId = args[1] as string;
+            if (state.orders.has(shopifyOrderId)) {
+              throw new Error("UNIQUE constraint failed: commerce_order_links.shopify_order_id");
+            }
             const row: CommerceOrderRow = {
               commerce_order_id: args[0] as string,
-              shopify_order_id: args[1] as string,
+              shopify_order_id: shopifyOrderId,
               shopify_checkout_id: args[2] as string | null,
               shopify_order_number: args[3] as number | null,
               buyer_email_hash: args[4] as string | null,
@@ -539,6 +543,120 @@ describe("Shopify orders webhook (O-001)", () => {
     expect(json.print_order_ids).toEqual([]);
     expect(state.orders.get("450789469")?.status).toBe("held_for_review");
     expect(state.printOrders.size).toBe(0);
+  });
+
+  it("marks existing commerce order refunded using refunds/create order_id", async () => {
+    const existingOrder = commerceOrderRow();
+    const state: DbState = {
+      intents: new Map([[INTENT, intentRow({ status: "converted" })]]),
+      orders: new Map([[existingOrder.shopify_order_id, existingOrder]]),
+      receipts: new Map(),
+      printOrders: new Map(),
+      fulfillmentPii: new Map(),
+    };
+
+    const res = await handlePostShopifyOrdersWebhook(
+      await webhookRequest(
+        {
+          id: 890088186047892319,
+          order_id: 450789469,
+          created_at: "2026-05-16T18:00:00Z",
+          note: "Buyer requested refund",
+        },
+        {
+          "X-Shopify-Topic": "refunds/create",
+          "X-Shopify-Webhook-Id": "wh_refund_create",
+        }
+      ),
+      env,
+      dbFor(state)
+    );
+    const json = (await res.json()) as { status: string; shopify_order_id: string };
+
+    expect(res.status).toBe(200);
+    expect(json.status).toBe("refunded");
+    expect(json.shopify_order_id).toBe("450789469");
+    expect(state.orders.get("450789469")?.status).toBe("refunded");
+    expect(state.orders.has("890088186047892319")).toBe(false);
+  });
+
+  it("rejects refunds/create when order_id is missing (does not use refund id)", async () => {
+    const state: DbState = {
+      intents: new Map(),
+      orders: new Map(),
+      receipts: new Map(),
+      printOrders: new Map(),
+      fulfillmentPii: new Map(),
+    };
+
+    const res = await handlePostShopifyOrdersWebhook(
+      await webhookRequest(
+        { id: 890088186047892319, created_at: "2026-05-16T18:00:00Z" },
+        {
+          "X-Shopify-Topic": "refunds/create",
+          "X-Shopify-Webhook-Id": "wh_refund_missing_order",
+        }
+      ),
+      env,
+      dbFor(state)
+    );
+    const json = (await res.json()) as { error: string };
+
+    expect(res.status).toBe(422);
+    expect(json.error).toBe("MALFORMED_REQUEST");
+    expect(state.orders.size).toBe(0);
+  });
+
+  it("records canceled stub before paid so late paid cannot queue print", async () => {
+    const state: DbState = {
+      intents: new Map([[INTENT, intentRow()]]),
+      orders: new Map(),
+      receipts: new Map(),
+      printOrders: new Map(),
+      fulfillmentPii: new Map(),
+    };
+    const db = dbFor(state);
+
+    const cancelRes = await handlePostShopifyOrdersWebhook(
+      await webhookRequest(paidOrderBody({ financial_status: "voided" }), {
+        "X-Shopify-Topic": "orders/cancelled",
+        "X-Shopify-Webhook-Id": "wh_cancel_first",
+      }),
+      env,
+      db
+    );
+    const cancelJson = (await cancelRes.json()) as {
+      status: string;
+      shopify_order_id: string;
+      print_order_ids: string[];
+    };
+
+    expect(cancelRes.status).toBe(200);
+    expect(cancelJson.status).toBe("canceled");
+    expect(cancelJson.shopify_order_id).toBe("450789469");
+    expect(cancelJson.print_order_ids).toEqual([]);
+    expect(state.orders.get("450789469")?.status).toBe("canceled");
+    expect(state.printOrders.size).toBe(0);
+
+    const paidRes = await handlePostShopifyOrdersWebhook(
+      await webhookRequest(paidOrderBody(), { "X-Shopify-Webhook-Id": "wh_paid_late" }),
+      env,
+      db
+    );
+    const paidJson = (await paidRes.json()) as {
+      status: string;
+      duplicate: boolean;
+      print_order_ids: string[];
+    };
+
+    expect(paidRes.status).toBe(200);
+    expect(paidJson.duplicate).toBe(true);
+    expect(paidJson.status).toBe("canceled");
+    expect(paidJson.print_order_ids).toEqual([]);
+    expect(state.orders.size).toBe(1);
+    expect(state.orders.get("450789469")?.status).toBe("canceled");
+    expect(state.printOrders.size).toBe(0);
+    expect(state.intents.get(INTENT)?.status).toBe("attached_to_cart");
   });
 
   it("rejects invalid HMAC", async () => {

@@ -7,6 +7,7 @@ import { fulfillmentPiiEncryptionConfigured } from "../commerce/fulfillment-pii-
 import { parseShopifyOrderShippingAddress } from "../commerce/shopify-shipping-address";
 import { upsertEncryptedShippingAddress } from "../db/commerce-fulfillment-pii";
 import {
+  coerceShopifyWebhookOrderPayload,
   countTier0LineQuantity,
   extractShopifyOrderMetadata,
   shopifyOrderIsPaid,
@@ -387,9 +388,53 @@ async function handleStatusOrder(
     return errorResponse("MALFORMED_REQUEST", "Shopify order id missing.", 422);
   }
 
-  const existing = await getCommerceOrderByShopifyId(db, metadata.shopify_order_id);
+  let existing = await getCommerceOrderByShopifyId(db, metadata.shopify_order_id);
   if (!existing) {
-    return jsonResponse({ ignored: true, reason: "commerce_order_not_found" }, 200);
+    // Cancel/refund can race ahead of orders/paid. Persist a terminal commerce row so a
+    // later paid webhook cannot create a processing order and queue Printify.
+    const commerceOrderId = generateCommerceOrderId();
+    const buyerEmailHash = metadata.buyer_email
+      ? await hashBuyerEmail(metadata.buyer_email)
+      : null;
+    try {
+      await insertCommerceOrder(db, {
+        commerce_order_id: commerceOrderId,
+        shopify_order_id: metadata.shopify_order_id,
+        shopify_checkout_id: metadata.shopify_checkout_id,
+        shopify_order_number: metadata.shopify_order_number,
+        buyer_email_hash: buyerEmailHash,
+        profile_id: metadata.profile_id,
+        artifact_intent_ids: metadata.artifact_intent_ids,
+        status,
+        hold_reason: null,
+        created_at: nowIso,
+      });
+      existing = {
+        commerce_order_id: commerceOrderId,
+        shopify_order_id: metadata.shopify_order_id,
+        shopify_checkout_id: metadata.shopify_checkout_id,
+        shopify_order_number: metadata.shopify_order_number,
+        buyer_email_hash: buyerEmailHash,
+        profile_id: metadata.profile_id,
+        artifact_intent_ids_json: JSON.stringify(metadata.artifact_intent_ids),
+        print_order_ids_json: "[]",
+        status,
+        hold_reason: null,
+        created_at: nowIso,
+        updated_at: nowIso,
+      };
+      return jsonResponse(commerceOrderResponse(existing, false), 200);
+    } catch {
+      // Concurrent paid webhook won the shopify_order_id insert — fall through to update.
+      existing = await getCommerceOrderByShopifyId(db, metadata.shopify_order_id);
+      if (!existing) {
+        return errorResponse(
+          "INTERNAL_ERROR",
+          "Failed to record canceled or refunded commerce order.",
+          500
+        );
+      }
+    }
   }
 
   if (existing.status === status) {
@@ -436,13 +481,14 @@ export async function handlePostShopifyOrdersWebhook(
     return errorResponse("MISSING_WEBHOOK_TOPIC", "Missing Shopify topic header.", 400);
   }
 
-  let order: ShopifyOrderLike;
+  let rawOrder: ShopifyOrderLike;
   try {
-    order = JSON.parse(payload) as ShopifyOrderLike;
+    rawOrder = JSON.parse(payload) as ShopifyOrderLike;
   } catch {
     return errorResponse("MALFORMED_REQUEST", "Invalid JSON body.", 400);
   }
 
+  const order = coerceShopifyWebhookOrderPayload(topic, rawOrder, payload);
   const metadata = extractShopifyOrderMetadata(order);
   const nowIso = new Date().toISOString();
 

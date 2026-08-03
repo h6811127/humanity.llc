@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  coerceShopifyWebhookOrderPayload,
   countTier0LineQuantity,
   extractShopifyOrderMetadata,
   shopifyOrderIsPaid,
@@ -58,5 +59,38 @@ describe("shopifyOrderIsPaid", () => {
     expect(shopifyOrderIsPaid({ financial_status: "paid" })).toBe(true);
     expect(shopifyOrderIsPaid({ financial_status: "partially_paid" })).toBe(true);
     expect(shopifyOrderIsPaid({ financial_status: "pending" })).toBe(false);
+  });
+});
+
+describe("coerceShopifyWebhookOrderPayload", () => {
+  it("rewrites refunds/create id from order_id", () => {
+    const coerced = coerceShopifyWebhookOrderPayload("refunds/create", {
+      id: 987654321,
+      order_id: 450789469,
+    });
+    expect(extractShopifyOrderMetadata(coerced)?.shopify_order_id).toBe("450789469");
+  });
+
+  it("preserves large order_id digits from the raw webhook body", () => {
+    const raw =
+      '{"id":890088186047892319,"order_id":820982911946154508,"note":"damaged"}';
+    const coerced = coerceShopifyWebhookOrderPayload(
+      "refunds/create",
+      JSON.parse(raw) as { id: number; order_id: number },
+      raw
+    );
+    expect(extractShopifyOrderMetadata(coerced)?.shopify_order_id).toBe("820982911946154508");
+  });
+
+  it("does not fall back to refund id when order_id is missing", () => {
+    const coerced = coerceShopifyWebhookOrderPayload("refunds/create", {
+      id: 890088186047892319,
+    });
+    expect(extractShopifyOrderMetadata(coerced)).toBeNull();
+  });
+
+  it("leaves order topic payloads unchanged", () => {
+    const payload = { id: 450789469, financial_status: "paid" };
+    expect(coerceShopifyWebhookOrderPayload("orders/paid", payload)).toBe(payload);
   });
 });
