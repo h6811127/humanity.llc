@@ -14,6 +14,8 @@ export interface ShopifyLineItem {
 
 export interface ShopifyOrderLike {
   id?: number | string;
+  /** Present on `refunds/create` (Shopify order id). Not the refund id. */
+  order_id?: number | string | null;
   checkout_id?: number | string | null;
   checkout_token?: string | null;
   financial_status?: string | null;
@@ -101,6 +103,42 @@ export function shopifyOrderIdString(order: ShopifyOrderLike): string | null {
     return order.id.trim();
   }
   return null;
+}
+
+function shopifyRefundOrderIdString(order: ShopifyOrderLike): string | null {
+  if (typeof order.order_id === "number" && Number.isFinite(order.order_id)) {
+    return String(order.order_id);
+  }
+  if (typeof order.order_id === "string" && order.order_id.trim()) {
+    return order.order_id.trim();
+  }
+  return null;
+}
+
+/**
+ * Prefer digit capture from the raw webhook body so JSON number coercion cannot
+ * truncate Shopify order ids beyond Number.MAX_SAFE_INTEGER.
+ */
+export function extractShopifyRefundOrderIdFromRawPayload(raw: string): string | null {
+  const match = raw.match(/"order_id"\s*:\s*(\d+)/);
+  return match?.[1] ?? null;
+}
+
+/**
+ * Map Shopify webhook JSON to an order-shaped payload for metadata extraction.
+ * `refunds/create` puts the refund id in `id` and the commerce order id in `order_id`.
+ */
+export function coerceShopifyWebhookOrderPayload(
+  topic: string,
+  payload: ShopifyOrderLike,
+  rawBody?: string
+): ShopifyOrderLike {
+  if (topic !== "refunds/create") return payload;
+  const orderId =
+    (typeof rawBody === "string" ? extractShopifyRefundOrderIdFromRawPayload(rawBody) : null) ??
+    shopifyRefundOrderIdString(payload);
+  // Never fall back to refund `id` — that would miss (or wrongly create) commerce links.
+  return { ...payload, id: orderId ?? undefined };
 }
 
 export function extractShopifyOrderMetadata(
