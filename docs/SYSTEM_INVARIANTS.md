@@ -169,6 +169,7 @@ Read [`NOTIFICATION_SYSTEM_V2.md`](NOTIFICATION_SYSTEM_V2.md) and [`DEVICE_OS_QA
 | Push transport | Hosted SSE `live_proof.pending` is **transport only** — cache hint in SW; flush on tab hide / periodic sync; do not bypass inbox gather on the page. |
 | SW poll modes | `pollNow` on hide uses **full-wallet** live-proof probe; `periodicSync` / background sync stay **round-robin** (request budget). |
 | Relay in SW | Relay OS uses cached inbox plans + synced `relayOfferCount`; SW cannot sign relay API polls — page probe remains source of truth. |
+| Relay summary API | `device-relay-offer-inbox.mjs` polls `POST …/cards/{profile_id}/relay-offers/summary` with a signed `relay_offer_profile_summary` query. That route MUST stay mounted and owner/recovery-key authorized — otherwise inbox badge, hub, and OS alerts never learn about finder messages. |
 | Tap-through | Live proof: `HC_NOTIFICATION_NAVIGATE` deep link. Relay: `HC_SW_OPEN_INBOX` → inbox sheet. |
 
 **Regression:**
