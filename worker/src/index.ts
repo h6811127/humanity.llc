@@ -45,6 +45,7 @@ import { handlePostGameContribute } from "./resolver/game-contribute";
 import {
   handlePostLostItemOffer,
   handlePostLostItemOfferOwner,
+  handlePostRelayOfferProfileSummary,
 } from "./resolver/lost-item-offer";
 import {
   handleGetRelationshipEdges,
@@ -860,6 +861,24 @@ export default {
         env.DB,
         childObjectOfferOwnerMatch[1]!,
         childObjectOfferOwnerMatch[2]!
+      );
+      return withCors(request, res);
+    }
+
+    const relayOfferProfileSummaryMatch = path.match(
+      /^\/\.well-known\/hc\/v1\/cards\/([^/]+)\/relay-offers\/summary$/
+    );
+    if (relayOfferProfileSummaryMatch && request.method === "POST") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostRelayOfferProfileSummary(
+        request,
+        env.DB,
+        relayOfferProfileSummaryMatch[1]!
       );
       return withCors(request, res);
     }

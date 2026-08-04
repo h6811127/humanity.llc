@@ -91,18 +91,23 @@ function commerceOrder(): CommerceOrderRow {
   };
 }
 
-function dbFor(publicKeyBase58: string, printOrder: PrintOrderRow): D1Database {
+function dbFor(
+  publicKeyBase58: string,
+  printOrder: PrintOrderRow,
+  commerce: CommerceOrderRow = commerceOrder()
+): D1Database {
   const activeByPa = new Map<string, string>();
+  let current: PrintOrderRow = { ...printOrder };
 
   return {
     prepare: (sql: string) => ({
       bind: (...args: unknown[]) => ({
         first: async () => {
           if (sql.includes("FROM print_orders WHERE order_id")) {
-            return args[0] === PRINT_ORDER ? printOrder : null;
+            return args[0] === PRINT_ORDER ? current : null;
           }
           if (sql.includes("FROM commerce_order_links WHERE commerce_order_id")) {
-            return args[0] === COMMERCE ? commerceOrder() : null;
+            return args[0] === COMMERCE ? commerce : null;
           }
           if (sql.includes("FROM cards WHERE profile_id") && sql.includes("manifesto_line")) {
             return {
@@ -135,19 +140,41 @@ function dbFor(publicKeyBase58: string, printOrder: PrintOrderRow): D1Database {
         run: async () => {
           if (sql.includes("INSERT INTO qr_credentials")) {
             activeByPa.set(args[3] as string, args[0] as string);
-            return { success: true };
+            return { success: true, meta: { changes: 1 } };
+          }
+          if (
+            sql.includes("UPDATE print_orders") &&
+            sql.includes("AND status = ?")
+          ) {
+            const status = args[0] as PrintOrderRow["status"];
+            const updatedAt = args[1] as string;
+            const printifyOrderId = args[2] as string;
+            const printifyShopId = args[3] as number;
+            const orderId = args[4] as string;
+            const requiredStatus = args[5] as PrintOrderRow["status"];
+            if (current.order_id !== orderId || current.status !== requiredStatus) {
+              return { success: true, meta: { changes: 0 } };
+            }
+            current = {
+              ...current,
+              status,
+              updated_at: updatedAt,
+              printify_order_id: printifyOrderId,
+              printify_shop_id: printifyShopId,
+            };
+            return { success: true, meta: { changes: 1 } };
           }
           if (sql.includes("UPDATE print_orders SET")) {
-            printOrder = {
-              ...printOrder,
-              status: args[0] as string,
-              printify_order_id: args[1] as string,
-              printify_shop_id: args[2] as number,
-              updated_at: args[3] as string,
+            current = {
+              ...current,
+              status: args[0] as PrintOrderRow["status"],
+              updated_at: args[1] as string,
+              printify_order_id: (args[2] as string | null) ?? current.printify_order_id,
+              printify_shop_id: (args[3] as number | null) ?? current.printify_shop_id,
             };
-            return { success: true };
+            return { success: true, meta: { changes: 1 } };
           }
-          return { success: true };
+          return { success: true, meta: { changes: 1 } };
         },
       }),
     }),
@@ -204,6 +231,47 @@ describe("submitPrintOrderToPrintify", () => {
     expect(result.printOrder.printify_order_id).toBe("5a96f649b2439217d070f507");
     expect(result.shippingSource).toBe("request_body");
     expect(fetchMock).toHaveBeenCalledOnce();
+  });
+  it("CAS-fails submit when print order was canceled during Printify HTTP and cancels orphan", async () => {
+    const fetchMock = vi.fn(async (url: string) => {
+      if (String(url).endsWith("/orders.json")) {
+        return new Response(JSON.stringify({ id: "pfy_orphan_race_01" }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      if (String(url).includes("/cancel.json")) {
+        return new Response(JSON.stringify({ id: "pfy_orphan_race_01", status: "canceled" }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      return new Response("unexpected", { status: 500 });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const printOrder = printOrderRow();
+    printOrder.status = "canceled";
+    const db = dbFor("pubkey", printOrder);
+    const staleSnapshot = { ...printOrderRow(), status: "awaiting_production_approval" as const };
+    const result = await submitPrintOrderToPrintify(
+      new Request("https://humanity.llc/v1/print/orders"),
+      env(),
+      db,
+      staleSnapshot,
+      { shipping_address: ADDRESS }
+    );
+
+    vi.unstubAllGlobals();
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.code).toBe("PRINT_ORDER_SUBMIT_RACE");
+    expect(result.httpStatus).toBe(409);
+    expect(printOrder.status).toBe("canceled");
+    expect(printOrder.printify_order_id).toBeNull();
+    expect(
+      fetchMock.mock.calls.some(([url]) => String(url).includes("/cancel.json"))
+    ).toBe(true);
   });
 });
 

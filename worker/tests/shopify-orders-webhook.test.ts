@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import type { ArtifactIntentRow } from "../src/db/artifact-intents";
 import type { CommerceOrderRow } from "../src/db/commerce-orders";
@@ -186,7 +186,32 @@ function dbFor(state: DbState): D1Database {
               shipping_ciphertext_b64: args[2] as string,
             });
           }
-          return { success: true };
+          if (sql.includes("UPDATE print_orders") && sql.includes("SET status")) {
+            const status = args[0] as PrintOrderRow["status"];
+            const updatedAt = args[1] as string;
+            const printifyOrderId = args[2] as string | null;
+            const printifyShopId = args[3] as number | null;
+            const orderId = args[4] as string;
+            for (const [key, row] of state.printOrders) {
+              if (row.order_id === orderId) {
+                state.printOrders.set(key, {
+                  ...row,
+                  status,
+                  updated_at: updatedAt,
+                  printify_order_id:
+                    printifyOrderId === null || printifyOrderId === undefined
+                      ? row.printify_order_id
+                      : printifyOrderId,
+                  printify_shop_id:
+                    printifyShopId === null || printifyShopId === undefined
+                      ? row.printify_shop_id
+                      : printifyShopId,
+                });
+              }
+            }
+            return { success: true, meta: { changes: 1 } };
+          }
+          return { success: true, meta: { changes: 1 } };
         },
       }),
     }),
@@ -539,6 +564,133 @@ describe("Shopify orders webhook (O-001)", () => {
     expect(json.print_order_ids).toEqual([]);
     expect(state.orders.get("450789469")?.status).toBe("held_for_review");
     expect(state.printOrders.size).toBe(0);
+  });
+
+
+  it("cancels already-submitted Printify orders on Shopify refund", async () => {
+    const existingOrder = commerceOrderRow({
+      print_order_ids_json: JSON.stringify(["po_submitted_refund_01"]),
+    });
+    const printOrder: PrintOrderRow = {
+      order_id: "po_submitted_refund_01",
+      profile_id: PROFILE,
+      print_artifact_ids_json: JSON.stringify(["pa_planned1"]),
+      planned_item_qr_ids_json: JSON.stringify(["qr_planned1"]),
+      commerce_order_id: existingOrder.commerce_order_id,
+      shopify_order_id: existingOrder.shopify_order_id,
+      printify_order_id: "pfy_order_refund_01",
+      printify_shop_id: 99,
+      template_id: DEFAULT_PRINT_TEMPLATE_ID,
+      print_variant_id: null,
+      print_frame_background: "full",
+      status: "submitted",
+      shipping_method: "standard",
+      tracking_carrier: null,
+      tracking_number: null,
+      tracking_url: null,
+      last_reconciled_at: null,
+      created_at: "2026-05-16T17:10:00Z",
+      updated_at: "2026-05-16T17:12:00Z",
+    };
+    const state: DbState = {
+      intents: new Map([[INTENT, intentRow({ status: "converted" })]]),
+      orders: new Map([[existingOrder.shopify_order_id, existingOrder]]),
+      receipts: new Map(),
+      printOrders: new Map([[existingOrder.commerce_order_id, printOrder]]),
+      fulfillmentPii: new Map(),
+    };
+
+    const fetchMock = vi.fn(async (url: string) => {
+      expect(String(url)).toContain("/shops/99/orders/pfy_order_refund_01/cancel.json");
+      return new Response(JSON.stringify({ id: "pfy_order_refund_01", status: "canceled" }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const res = await handlePostShopifyOrdersWebhook(
+      await webhookRequest(
+        { id: 450789469, order_number: 1001, financial_status: "refunded" },
+        {
+          "X-Shopify-Topic": "orders/refunded",
+          "X-Shopify-Webhook-Id": "wh_refund_submitted",
+        }
+      ),
+      {
+        ...env,
+        PRINTIFY_API_TOKEN: "token",
+        PRINTIFY_SHOP_ID: "99",
+      } as Env,
+      dbFor(state)
+    );
+
+    vi.unstubAllGlobals();
+    expect(res.status).toBe(200);
+    const json = (await res.json()) as { status: string };
+    expect(json.status).toBe("refunded");
+    expect(state.orders.get("450789469")?.status).toBe("refunded");
+    expect(state.printOrders.get(existingOrder.commerce_order_id)?.status).toBe("canceled");
+    expect(fetchMock).toHaveBeenCalledOnce();
+  });
+
+  it("leaves in_production Printify orders for operator reconcile on cancel", async () => {
+    const existingOrder = commerceOrderRow({
+      print_order_ids_json: JSON.stringify(["po_in_prod_01"]),
+    });
+    const printOrder: PrintOrderRow = {
+      order_id: "po_in_prod_01",
+      profile_id: PROFILE,
+      print_artifact_ids_json: JSON.stringify(["pa_planned1"]),
+      planned_item_qr_ids_json: JSON.stringify(["qr_planned1"]),
+      commerce_order_id: existingOrder.commerce_order_id,
+      shopify_order_id: existingOrder.shopify_order_id,
+      printify_order_id: "pfy_order_in_prod_01",
+      printify_shop_id: 99,
+      template_id: DEFAULT_PRINT_TEMPLATE_ID,
+      print_variant_id: null,
+      print_frame_background: "full",
+      status: "in_production",
+      shipping_method: "standard",
+      tracking_carrier: null,
+      tracking_number: null,
+      tracking_url: null,
+      last_reconciled_at: null,
+      created_at: "2026-05-16T17:10:00Z",
+      updated_at: "2026-05-16T17:12:00Z",
+    };
+    const state: DbState = {
+      intents: new Map([[INTENT, intentRow({ status: "converted" })]]),
+      orders: new Map([[existingOrder.shopify_order_id, existingOrder]]),
+      receipts: new Map(),
+      printOrders: new Map([[existingOrder.commerce_order_id, printOrder]]),
+      fulfillmentPii: new Map(),
+    };
+
+    const fetchMock = vi.fn(async () => new Response("should not call", { status: 500 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const res = await handlePostShopifyOrdersWebhook(
+      await webhookRequest(
+        { id: 450789469, order_number: 1001 },
+        {
+          "X-Shopify-Topic": "orders/cancelled",
+          "X-Shopify-Webhook-Id": "wh_cancel_in_prod",
+        }
+      ),
+      {
+        ...env,
+        PRINTIFY_API_TOKEN: "token",
+        PRINTIFY_SHOP_ID: "99",
+      } as Env,
+      dbFor(state)
+    );
+
+    vi.unstubAllGlobals();
+    expect(res.status).toBe(200);
+    expect((await res.json() as { status: string }).status).toBe("canceled");
+    expect(state.printOrders.get(existingOrder.commerce_order_id)?.status).toBe("in_production");
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it("rejects invalid HMAC", async () => {

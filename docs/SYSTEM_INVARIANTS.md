@@ -169,6 +169,7 @@ Read [`NOTIFICATION_SYSTEM_V2.md`](NOTIFICATION_SYSTEM_V2.md) and [`DEVICE_OS_QA
 | Push transport | Hosted SSE `live_proof.pending` is **transport only** — cache hint in SW; flush on tab hide / periodic sync; do not bypass inbox gather on the page. |
 | SW poll modes | `pollNow` on hide uses **full-wallet** live-proof probe; `periodicSync` / background sync stay **round-robin** (request budget). |
 | Relay in SW | Relay OS uses cached inbox plans + synced `relayOfferCount`; SW cannot sign relay API polls — page probe remains source of truth. |
+| Relay summary API | `device-relay-offer-inbox.mjs` polls `POST …/cards/{profile_id}/relay-offers/summary` with a signed `relay_offer_profile_summary` query. That route MUST stay mounted and owner/recovery-key authorized — otherwise inbox badge, hub, and OS alerts never learn about finder messages. |
 | Tap-through | Live proof: `HC_NOTIFICATION_NAVIGATE` deep link. Relay: `HC_SW_OPEN_INBOX` → inbox sheet. |
 
 **Regression:**
@@ -191,8 +192,10 @@ npm run notify:field-signoff
 | Customize Glitch | Planned QR block below mockup; mock toggle does not replace fulfillment artwork alone. |
 | Buyer print frame | Glitch buyer choice `full` \| `transparent` must persist on `artifact_intents.print_frame_background` and `print_orders.print_frame_background` and drive Printify SVG render — not `sessionStorage` only. See [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) § Glitch print frame background. |
 | Transparent on fabric | Allowed in UI for approved colors (not Charcoal Heather / Royal Blue); Printify SVG uses stored `transparent` when persisted; physical QA sign-off still required ([`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md)). |
+| Shopify cancel reaches Printify | For `print_orders` already submitted to Printify (`submitted` / `on_hold`), Shopify `orders/cancelled` / refund topics MUST call Printify `cancel.json` and mark the print order `canceled` on success. In-production / fulfilled stay for operator reconcile (PM-FR-36/37). Submit CAS (`claimPrintOrderSubmitted`) must not resurrect a canceled row after a raced cancel; orphan Printify ids are best-effort canceled. |
+| Canceled print orders stay canceled | Once `print_orders.status` is `canceled`, Printify webhooks must not reopen it to happy-path statuses (`submitted` / `in_production` / `fulfilled`). `shouldApplyPrintifyStatus` rejects those transitions; tracking-only updates may still land while keeping `canceled`. |
 
-**Regression:** `npm run worker:test -- worker/tests/print-frame-background.test.ts worker/tests/print-template-render.test.ts worker/tests/artifact-intents.test.ts worker/tests/fulfillment-queue.test.ts worker/tests/printify-line-items.test.ts`
+**Regression:** `npm run worker:test -- worker/tests/print-frame-background.test.ts worker/tests/print-template-render.test.ts worker/tests/artifact-intents.test.ts worker/tests/fulfillment-queue.test.ts worker/tests/printify-line-items.test.ts worker/tests/shopify-orders-webhook.test.ts worker/tests/print-order-mint-submit.test.ts worker/tests/printify-client.test.ts worker/tests/printify-webhook.test.ts`
 
 Canonical: [`QR_BRANDING.md`](QR_BRANDING.md) § Two registers · [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) · [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md)
 

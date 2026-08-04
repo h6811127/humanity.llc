@@ -31,6 +31,7 @@ import { verifyShopifyWebhookHmac } from "./shopify-webhook-verify";
 import type { Env } from "../env";
 import { generateCommerceOrderId } from "../id";
 import { tryAutoMintQueuedPrintOrders, type AutoMintFromIntentsResult } from "../commerce/fulfillment-auto-mint";
+import { cancelSubmittedPrintifyOrdersForCommerceOrder } from "../print/printify-cancel-commerce";
 import { queuePrintOrderAfterPaidWebhook } from "../print/print-orders-handler";
 
 const PAID_TOPICS = new Set(["orders/paid", "orders/create"]);
@@ -378,6 +379,7 @@ async function handlePaidOrder(
 
 async function handleStatusOrder(
   db: D1Database,
+  env: Env,
   order: ShopifyOrderLike,
   status: "canceled" | "refunded",
   nowIso: string
@@ -397,6 +399,14 @@ async function handleStatusOrder(
   }
 
   await updateCommerceOrderStatus(db, existing.commerce_order_id, status, null, nowIso);
+  // Already-submitted factory orders: reach Printify cancel.json (PM-FR-36).
+  // Pre-submit local cancel is covered by open #237; in-production stays for operator reconcile.
+  await cancelSubmittedPrintifyOrdersForCommerceOrder(
+    db,
+    env,
+    existing.commerce_order_id,
+    nowIso
+  );
   return jsonResponse(
     commerceOrderResponse({ ...existing, status, hold_reason: null, updated_at: nowIso }),
     200
@@ -475,13 +485,13 @@ export async function handlePostShopifyOrdersWebhook(
       200
     );
   } else if (CANCELED_TOPICS.has(topic)) {
-    response = (await handleStatusOrder(db, order, "canceled", nowIso))!;
+    response = (await handleStatusOrder(db, env, order, "canceled", nowIso))!;
     const existing = metadata
       ? await getCommerceOrderByShopifyId(db, metadata.shopify_order_id)
       : null;
     commerceOrderId = existing?.commerce_order_id ?? null;
   } else if (REFUND_TOPICS.has(topic)) {
-    response = (await handleStatusOrder(db, order, "refunded", nowIso))!;
+    response = (await handleStatusOrder(db, env, order, "refunded", nowIso))!;
     const existing = metadata
       ? await getCommerceOrderByShopifyId(db, metadata.shopify_order_id)
       : null;

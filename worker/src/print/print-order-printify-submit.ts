@@ -1,9 +1,9 @@
 import { resolvePrintifyShippingForSubmit } from "../commerce/resolve-printify-shipping";
 import type { PrintifyShippingSource } from "../commerce/resolve-printify-shipping";
 import { getCommerceOrderById } from "../db/commerce-orders";
-import { updatePrintOrderStatus, type PrintOrderRow } from "../db/print-orders";
+import { claimPrintOrderSubmitted, type PrintOrderRow } from "../db/print-orders";
 import type { Env } from "../env";
-import { submitPrintifyOrder } from "./printify-client";
+import { cancelPrintifyOrder, submitPrintifyOrder } from "./printify-client";
 
 export interface SubmitPrintOrderOptions {
   shipping_address?: unknown;
@@ -21,6 +21,7 @@ export type SubmitPrintOrderResult =
 
 function submitHttpStatus(code: string): number {
   if (code === "PRINTIFY_RATE_LIMITED") return 429;
+  if (code === "PRINT_ORDER_SUBMIT_RACE") return 409;
   if (
     code === "PRINTIFY_INVALID_ADDRESS" ||
     code === "PRINTIFY_TEMPLATE_UNCONFIGURED" ||
@@ -125,14 +126,24 @@ export async function submitPrintOrderToPrintify(
     };
   }
 
-  await updatePrintOrderStatus(
+  const claimed = await claimPrintOrderSubmitted(
     db,
     printOrder.order_id,
-    "submitted",
     nowIso,
     submit.printify_order_id,
     submit.printify_shop_id
   );
+  if (!claimed) {
+    // Shopify cancel/refund won the race — do not leave an orphan factory order.
+    await cancelPrintifyOrder(env, submit.printify_shop_id, submit.printify_order_id);
+    return {
+      ok: false,
+      code: "PRINT_ORDER_SUBMIT_RACE",
+      message:
+        "Print order was canceled before Printify submit could be recorded; factory cancel was attempted.",
+      httpStatus: 409,
+    };
+  }
 
   return {
     ok: true,

@@ -12,6 +12,7 @@ import {
   getLostItemOffer,
   insertLostItemOffer,
   listPendingLostItemOffers,
+  summarizePendingLostItemOffersByProfile,
 } from "../db/lost-item-offers";
 import { loadQrCredentialById } from "../db/qr-metadata";
 import { checkRelayOfferRateLimit, hashIp } from "../db/rate-limit";
@@ -381,6 +382,118 @@ export async function handlePostLostItemOfferOwner(
         version: "1.0",
         offer_id: verified.offerId,
         status: "dismissed",
+      },
+      200,
+      { "Cache-Control": "no-store" }
+    );
+  } catch (e) {
+    const detail = String(e);
+    if (isRelayOfferStorageError(detail)) {
+      return errorResponse(
+        "RESOLVER_SCHEMA",
+        "Return relay is temporarily unavailable. Try again shortly.",
+        503
+      );
+    }
+    throw e;
+  }
+}
+
+async function verifiedOwnerProfileSummaryQuery(
+  request: Request,
+  db: D1Database,
+  profileId: string
+): Promise<{ ok: true } | { ok: false; response: Response }> {
+  let body: OwnerOfferBody;
+  try {
+    body = (await request.json()) as OwnerOfferBody;
+  } catch {
+    return {
+      ok: false,
+      response: errorResponse("MALFORMED_REQUEST", "Invalid JSON body.", 400),
+    };
+  }
+
+  const query = body.query;
+  if (!query || typeof query !== "object") {
+    return {
+      ok: false,
+      response: errorResponse("MALFORMED_REQUEST", "query is required.", 422),
+    };
+  }
+
+  const verified = await verifySignedDocument(query as Record<string, unknown>, {
+    expectedType: PAYLOAD_TYPES.RELAY_OFFER_PROFILE_SUMMARY,
+  });
+  if (!verified.ok) {
+    return {
+      ok: false,
+      response: errorResponse(verified.code, verified.message, 401),
+    };
+  }
+
+  const doc = verified.unsigned;
+  if (doc.profile_id !== profileId) {
+    return {
+      ok: false,
+      response: errorResponse("PROFILE_OBJECT_MISMATCH", "Query path mismatch.", 422),
+    };
+  }
+
+  const parent = await getChildObjectParent(db, profileId);
+  if (!parent || parent.status !== "active") {
+    return {
+      ok: false,
+      response: errorResponse("NOT_FOUND", "Parent card not found.", 404),
+    };
+  }
+  if (!parentSignerAllowed(verified.signature.public_key, parent)) {
+    return {
+      ok: false,
+      response: errorResponse(
+        CRYPTO_ERROR.INVALID_SIGNATURE,
+        "Query must be signed by the card owner or recovery key.",
+        401
+      ),
+    };
+  }
+
+  return { ok: true };
+}
+
+/**
+ * Owner POST — profile-wide pending finder-message summary for device inbox / OS alerts.
+ * Client: `POST …/cards/{profile_id}/relay-offers/summary`.
+ */
+export async function handlePostRelayOfferProfileSummary(
+  request: Request,
+  db: D1Database,
+  profileId: string
+): Promise<Response> {
+  if (!PROFILE_ID_REGEX.test(profileId)) {
+    return errorResponse(CRYPTO_ERROR.INVALID_PROFILE_ID, "Invalid profile_id.", 400);
+  }
+
+  const verified = await verifiedOwnerProfileSummaryQuery(request, db, profileId);
+  if (!verified.ok) return verified.response;
+
+  const nowIso = new Date().toISOString();
+
+  try {
+    await expireLostItemOffers(db, nowIso);
+    const objects = await summarizePendingLostItemOffersByProfile(db, profileId);
+    const totalPending = objects.reduce((sum, row) => sum + row.pending_count, 0);
+    return jsonResponse(
+      {
+        type: "relay_offer_profile_summary",
+        version: "1.0",
+        profile_id: profileId,
+        total_pending: totalPending,
+        objects: objects.map((row) => ({
+          object_id: row.object_id,
+          public_label: row.public_label,
+          pending_count: row.pending_count,
+        })),
       },
       200,
       { "Cache-Control": "no-store" }

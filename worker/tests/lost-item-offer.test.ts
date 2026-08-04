@@ -12,6 +12,7 @@ import type { LostItemOfferRow } from "../src/live-object/lost-item-offer-core";
 import {
   handlePostLostItemOffer,
   handlePostLostItemOfferOwner,
+  handlePostRelayOfferProfileSummary,
 } from "../src/resolver/lost-item-offer";
 import { d1WithRateLimitBuckets } from "./rate-limit-db-mock";
 
@@ -96,6 +97,50 @@ class LostItemOfferDb {
             return null as T | null;
           },
           async all<T>() {
+            if (
+              sql.includes("FROM lost_item_relay_offers") &&
+              sql.includes("GROUP BY")
+            ) {
+              const profileId = String(args[0]);
+              const nowIso = String(args[1]);
+              const limit = Number(args[3] ?? 50);
+              const counts = new Map<string, number>();
+              for (const row of db.offers.values()) {
+                if (
+                  row.parent_profile_id !== profileId ||
+                  row.status !== "pending" ||
+                  row.expires_at <= nowIso
+                ) {
+                  continue;
+                }
+                const child = db.objects.get(row.object_id);
+                if (
+                  !child ||
+                  child.parent_profile_id !== profileId ||
+                  child.object_type !== "lost_item_relay" ||
+                  child.status !== "active"
+                ) {
+                  continue;
+                }
+                counts.set(row.object_id, (counts.get(row.object_id) ?? 0) + 1);
+              }
+              const rows = Array.from(counts.entries())
+                .map(([objectId, pendingCount]) => ({
+                  object_id: objectId,
+                  public_label: db.objects.get(objectId)?.public_label ?? "",
+                  pending_count: pendingCount,
+                }))
+                .sort((a, b) => {
+                  if (b.pending_count !== a.pending_count) {
+                    return b.pending_count - a.pending_count;
+                  }
+                  const labelCmp = a.public_label.localeCompare(b.public_label);
+                  if (labelCmp !== 0) return labelCmp;
+                  return a.object_id.localeCompare(b.object_id);
+                })
+                .slice(0, limit);
+              return { results: rows as T[] };
+            }
             if (sql.includes("FROM lost_item_relay_offers")) {
               const profileId = String(args[0]);
               const objectId = String(args[1]);
@@ -360,6 +405,130 @@ describe("lost-item-offer API", () => {
       db,
       PROFILE,
       OBJECT_ID
+    );
+    expect(res.status).toBe(401);
+  });
+
+  async function signedProfileSummaryQuery(
+    keypair: Awaited<ReturnType<typeof getTestKeypair>>,
+    overrides: Record<string, unknown> = {}
+  ) {
+    return signDocument(
+      withProtocolFields(
+        {
+          profile_id: PROFILE,
+          created_at: CREATED,
+          ...overrides,
+        },
+        PAYLOAD_TYPES.RELAY_OFFER_PROFILE_SUMMARY
+      ),
+      keypair
+    );
+  }
+
+  function profileSummaryRequest(query: Record<string, unknown>) {
+    return new Request(
+      `https://humanity.llc/.well-known/hc/v1/cards/${PROFILE}/relay-offers/summary`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query }),
+      }
+    );
+  }
+
+  it("summarizes pending offers across active relays for signed owner", async () => {
+    const keypair = await getTestKeypair();
+    const { db, inner } = dbWithRelay(keypair);
+    const secondObject = "obj_lost_item_relay02";
+    inner.objects.set(secondObject, {
+      object_id: secondObject,
+      parent_profile_id: PROFILE,
+      object_type: "lost_item_relay",
+      public_label: "Blue backpack",
+      public_state: "Lost — contact owner through relay",
+      status: "active",
+      child_object_document_json: "{}",
+      created_at: CREATED,
+      updated_at: CREATED,
+    });
+    inner.offers.set(OFFER_ID, {
+      offer_id: OFFER_ID,
+      parent_profile_id: PROFILE,
+      object_id: OBJECT_ID,
+      qr_id: null,
+      message: "On the bench outside",
+      status: "pending",
+      created_at: CREATED,
+      updated_at: CREATED,
+      expires_at: "2026-07-01T12:00:00.000Z",
+    });
+    inner.offers.set("ro_7Xk9mP2nQ4rT6vW8yZ1aB4", {
+      offer_id: "ro_7Xk9mP2nQ4rT6vW8yZ1aB4",
+      parent_profile_id: PROFILE,
+      object_id: secondObject,
+      qr_id: null,
+      message: "At lost and found",
+      status: "pending",
+      created_at: CREATED,
+      updated_at: CREATED,
+      expires_at: "2026-07-01T12:00:00.000Z",
+    });
+    inner.offers.set("ro_7Xk9mP2nQ4rT6vW8yZ1aB5", {
+      offer_id: "ro_7Xk9mP2nQ4rT6vW8yZ1aB5",
+      parent_profile_id: PROFILE,
+      object_id: secondObject,
+      qr_id: null,
+      message: "Also saw it near the cafe",
+      status: "pending",
+      created_at: CREATED,
+      updated_at: CREATED,
+      expires_at: "2026-07-01T12:00:00.000Z",
+    });
+
+    const query = await signedProfileSummaryQuery(keypair);
+    const res = await handlePostRelayOfferProfileSummary(
+      profileSummaryRequest(query),
+      db,
+      PROFILE
+    );
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      type: string;
+      total_pending: number;
+      objects: Array<{ object_id: string; public_label: string; pending_count: number }>;
+    };
+    expect(body.type).toBe("relay_offer_profile_summary");
+    expect(body.total_pending).toBe(3);
+    expect(body.objects).toEqual([
+      {
+        object_id: secondObject,
+        public_label: "Blue backpack",
+        pending_count: 2,
+      },
+      {
+        object_id: OBJECT_ID,
+        public_label: "House keys",
+        pending_count: 1,
+      },
+    ]);
+  });
+
+  it("rejects profile summary signed by non-owner key", async () => {
+    const owner = await getTestKeypair();
+    const strangerPrivate = ed.utils.randomPrivateKey();
+    const strangerPublic = await ed.getPublicKeyAsync(strangerPrivate);
+    const stranger = {
+      privateKey: strangerPrivate,
+      publicKey: strangerPublic,
+      publicKeyBase58: encodeBase58(strangerPublic),
+    };
+    const { db } = dbWithRelay(owner);
+    const query = await signedProfileSummaryQuery(stranger);
+    const res = await handlePostRelayOfferProfileSummary(
+      profileSummaryRequest(query),
+      db,
+      PROFILE
     );
     expect(res.status).toBe(401);
   });

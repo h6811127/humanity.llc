@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { parsePrintifyShippingAddress } from "../src/print/printify-shipping";
 import { resolvePrintifyLineItem } from "../src/print/printify-template-config";
 import {
+  cancelPrintifyOrder,
   printifySubmitEnabled,
   submitPrintifyOrder,
 } from "../src/print/printify-client";
@@ -212,5 +213,44 @@ describe("submitPrintifyOrder", () => {
   it("detects submit enabled flag", () => {
     expect(printifySubmitEnabled({ PRINTIFY_SUBMIT_ENABLED: "1" })).toBe(true);
     expect(printifySubmitEnabled({ PRINTIFY_SUBMIT_ENABLED: "0" })).toBe(false);
+  });
+});
+
+describe("cancelPrintifyOrder", () => {
+  it("posts cancel.json for the shop order", async () => {
+    const fetchMock = vi.fn(async () =>
+      new Response(JSON.stringify({ id: "pfy_1", status: "canceled" }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      })
+    );
+
+    const result = await cancelPrintifyOrder(
+      { PRINTIFY_API_TOKEN: "token", PRINTIFY_SHOP_ID: "99" },
+      99,
+      "pfy_1",
+      fetchMock
+    );
+
+    expect(result.ok).toBe(true);
+    expect(fetchMock).toHaveBeenCalledOnce();
+    const [url, init] = fetchMock.mock.calls[0]!;
+    expect(url).toBe("https://api.printify.com/v1/shops/99/orders/pfy_1/cancel.json");
+    expect(init?.method).toBe("POST");
+  });
+
+  it("maps non-OK Printify responses to PRINTIFY_CANCEL_FAILED", async () => {
+    const fetchMock = vi.fn(async () => new Response("already in production", { status: 400 }));
+    const result = await cancelPrintifyOrder(
+      { PRINTIFY_API_TOKEN: "token", PRINTIFY_SHOP_ID: "99" },
+      99,
+      "pfy_1",
+      fetchMock
+    );
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.code).toBe("PRINTIFY_CANCEL_FAILED");
+      expect(result.status).toBe(400);
+    }
   });
 });

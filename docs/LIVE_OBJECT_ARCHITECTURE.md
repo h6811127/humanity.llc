@@ -222,7 +222,7 @@ Verbs are **capabilities the resolver advertises**, not marketing categories. Sc
 |------|-------|---------|---------|-------------------|
 | **read** | Scanner | Current signed state at scan time | ✅ | Default `GET /c/…`, `GET …/status` |
 | **request** | Scanner → owner | Ask for action (live proof, permission, reply) | Partial | Live control (`scan-live-control*`) |
-| **offer** | Scanner → object | Contribute message or signal **without identity trail** | Partial | `POST …/objects/{id}/offer` (finder) · `POST …/offer/owner` (signed list/dismiss) · scan offer form on `lost_item_relay` |
+| **offer** | Scanner → object | Contribute message or signal **without identity trail** | Partial | `POST …/objects/{id}/offer` (finder) · `POST …/offer/owner` (signed list/dismiss) · `POST …/relay-offers/summary` (signed profile inbox poll) · scan offer form on `lost_item_relay` |
 | **contribute** | Scanner → network | Append-only **aggregate** public effect | Partial | `POST …/game-contribute` · `scan.capabilities[]` on status JSON (game nodes) |
 | **delegate** | Owner → holder | Temporary capability on object | Research | Future `delegated_capability` on child doc |
 | **inherit** | Governance | Succession when signer/org ends | Research | Future stream signer rotation |

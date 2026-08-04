@@ -5,6 +5,7 @@ import type { PrintifyWebhookReceiptRow } from "../src/db/printify-webhooks";
 import { handlePostPrintifyWebhook } from "../src/http/printify-webhook";
 import {
   mapPrintifyOrderStatus,
+  shouldApplyPrintifyStatus,
   statusFromPrintifyWebhookEvent,
 } from "../src/print/printify-status-map";
 import { verifyPrintifyWebhookSignature } from "../src/print/printify-webhook-verify";
@@ -302,6 +303,43 @@ describe("handlePostPrintifyWebhook", () => {
     const body = (await res.json()) as { processing_status: string; reason: string };
     expect(body.processing_status).toBe("ignored");
     expect(body.reason).toBe("NO_STATUS_TRANSITION");
+    expect(state.lastStatusUpdate).toBeNull();
+  });
+
+  it("does not reopen canceled print orders via delayed in_production webhooks", async () => {
+    expect(shouldApplyPrintifyStatus("canceled", "in_production")).toBe(false);
+    expect(shouldApplyPrintifyStatus("canceled", "fulfilled")).toBe(false);
+    expect(shouldApplyPrintifyStatus("submitted", "in_production")).toBe(true);
+
+    const state: DbState = {
+      printOrders: new Map([[PRINTIFY_ORDER_ID, printOrderRow({ status: "canceled" })]]),
+      receipts: new Map(),
+      lastStatusUpdate: null,
+    };
+    const payload = JSON.stringify({
+      id: "evt_stale_after_cancel",
+      type: "order:sent-to-production",
+      resource: {
+        id: PRINTIFY_ORDER_ID,
+        type: "order",
+        data: { status: "in-production" },
+      },
+    });
+    const request = new Request("https://humanity.llc/v1/print/webhooks/printify", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Pfy-Signature": await signPayload(payload),
+      },
+      body: payload,
+    });
+
+    const res = await handlePostPrintifyWebhook(request, { PRINTIFY_WEBHOOK_SECRET: SECRET } as Env, dbFor(state));
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { processing_status: string; reason: string };
+    expect(body.processing_status).toBe("ignored");
+    expect(body.reason).toBe("STATUS_TRANSITION_REJECTED");
+    expect(state.printOrders.get(PRINTIFY_ORDER_ID)?.status).toBe("canceled");
     expect(state.lastStatusUpdate).toBeNull();
   });
 
