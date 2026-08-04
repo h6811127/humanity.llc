@@ -48,3 +48,19 @@ export function statusFromPrintifyWebhookEvent(
       return null;
   }
 }
+
+/**
+ * Whether an automated Printify status push may replace `current` with `next`.
+ *
+ * `canceled` is terminal: Shopify/local cancel (or a prior cancel webhook) must
+ * not be reopened by delayed `order:sent-to-production` / `order:updated`
+ * deliveries. Tracking-only updates keep the canceled status separately.
+ */
+export function shouldApplyPrintifyStatus(
+  current: PrintOrderStatus,
+  next: PrintOrderStatus
+): boolean {
+  if (current === next) return false;
+  if (current === "canceled") return false;
+  return true;
+}
