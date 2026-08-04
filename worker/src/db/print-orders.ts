@@ -180,6 +180,43 @@ export async function updatePrintOrderStatus(
     .run();
 }
 
+/**
+ * CAS: mark submitted only while still awaiting_production_approval.
+ * Prevents a late Printify HTTP success from resurrecting a Shopify-canceled row.
+ */
+export async function claimPrintOrderSubmitted(
+  db: D1Database,
+  orderId: string,
+  updatedAt: string,
+  printifyOrderId: string,
+  printifyShopId: number
+): Promise<boolean> {
+  const result = await db
+    .prepare(
+      `UPDATE print_orders
+       SET status = ?, updated_at = ?,
+           printify_order_id = ?,
+           printify_shop_id = ?
+       WHERE order_id = ? AND status = ?`
+    )
+    .bind(
+      "submitted",
+      updatedAt,
+      printifyOrderId,
+      printifyShopId,
+      orderId,
+      "awaiting_production_approval"
+    )
+    .run();
+  return (result.meta?.changes ?? 0) > 0;
+}
+
+/** Factory statuses where Printify cancel.json may still succeed (PM-FR-36/37). */
+export const PRINTIFY_CANCELABLE_STATUSES: PrintOrderStatus[] = [
+  "submitted",
+  "on_hold",
+];
+
 export async function updatePrintOrderTracking(
   db: D1Database,
   orderId: string,

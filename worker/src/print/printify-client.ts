@@ -260,3 +260,58 @@ export async function fetchPrintifyOrder(
     return { ok: false, status: res.status };
   }
 }
+
+export type PrintifyCancelResult =
+  | { ok: true }
+  | { ok: false; code: "PRINTIFY_UNCONFIGURED" | "PRINTIFY_CANCEL_FAILED"; status?: number; message: string };
+
+/**
+ * POST Printify cancel for an eligible factory order (PM-FR-36).
+ * Printify only cancels unpaid / on-hold orders — in-production must stay for operator reconcile.
+ */
+export async function cancelPrintifyOrder(
+  env: PrintifyEnv,
+  shopId: number,
+  printifyOrderId: string,
+  fetchImpl: typeof fetch = fetch
+): Promise<PrintifyCancelResult> {
+  if (!printifyConfigured(env)) {
+    return {
+      ok: false,
+      code: "PRINTIFY_UNCONFIGURED",
+      message: "Printify credentials are not configured.",
+    };
+  }
+
+  const orderId = printifyOrderId.trim();
+  if (!orderId || !Number.isFinite(shopId) || shopId <= 0) {
+    return {
+      ok: false,
+      code: "PRINTIFY_CANCEL_FAILED",
+      message: "Printify shop id or order id missing.",
+    };
+  }
+
+  const res = await fetchImpl(
+    `${PRINTIFY_API_BASE}/shops/${shopId}/orders/${encodeURIComponent(orderId)}/cancel.json`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${env.PRINTIFY_API_TOKEN!.trim()}`,
+        Accept: "application/json",
+      },
+    }
+  );
+
+  if (res.ok) {
+    return { ok: true };
+  }
+
+  const bodyText = await res.text();
+  return {
+    ok: false,
+    code: "PRINTIFY_CANCEL_FAILED",
+    status: res.status,
+    message: bodyText.slice(0, 240) || `Printify cancel returned ${res.status}.`,
+  };
+}
