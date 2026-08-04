@@ -77,6 +77,12 @@ export const PAYLOAD_FIELD_RULES: Record<PayloadType, PayloadFieldRules> = {
     timestampFields: ["created_at"],
     uniqueIdFields: ["object_id"],
   },
+  [PAYLOAD_TYPES.RELAY_OFFER_PROFILE_SUMMARY]: {
+    subjectProfileField: "profile_id",
+    timestampFields: ["created_at"],
+    // Read-only inbox poll — created_at is the per-request differentiator.
+    uniqueIdFields: ["created_at"],
+  },
   [PAYLOAD_TYPES.DELEGATED_CAPABILITY]: {
     subjectProfileField: "parent_profile_id",
     timestampFields: ["created_at", "expires_at"],

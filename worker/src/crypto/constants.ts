@@ -21,6 +21,7 @@ export const PAYLOAD_TYPES = {
   STEWARD_ACCOUNT_LINK: "steward_account_link_v1",
   CHILD_OBJECT: "child_object",
   RELAY_OFFER_OWNER_QUERY: "relay_offer_owner_query",
+  RELAY_OFFER_PROFILE_SUMMARY: "relay_offer_profile_summary",
   DELEGATED_CAPABILITY: "delegated_capability",
   RELATIONSHIP_EDGE: "relationship_edge",
 } as const;
