@@ -1,6 +1,7 @@
 import {
   listPrintOrdersForReconciliation,
   syncPrintOrderFromPrintify,
+  touchPrintOrderLastReconciledAt,
   type PrintOrderRow,
 } from "../db/print-orders";
 import type { PrintifyEnv } from "./printify-client";
@@ -17,6 +18,8 @@ export interface PrintifyReconcileResult {
   polled: number;
   updated: number;
   errors: number;
+  /** Concurrent status advances that blocked a stale reconcile write. */
+  skipped_conflict: number;
 }
 
 const DEFAULT_BATCH = 25;
@@ -43,6 +46,7 @@ export async function runPrintifyReconcile(
   const rows = await listPrintOrdersForReconciliation(db, limit);
   let updated = 0;
   let errors = 0;
+  let skippedConflict = 0;
 
   for (const row of rows) {
     if (!row.printify_order_id || row.printify_shop_id === null) continue;
@@ -73,24 +77,26 @@ export async function runPrintifyReconcile(
         mergedTracking.tracking_url !== row.tracking_url);
 
     if (statusChanged || trackingChanged) {
-      await syncPrintOrderFromPrintify(db, {
+      // CAS on the list-time status so a concurrent webhook (e.g. fulfilled /
+      // canceled) cannot be overwritten by this stale snapshot.
+      const sync = await syncPrintOrderFromPrintify(db, {
         order_id: row.order_id,
         status: statusChanged ? nextStatus! : row.status,
+        expected_status: row.status,
         tracking: mergedTracking,
         last_reconciled_at: nowIso,
         updated_at: nowIso,
       });
-      updated += 1;
+      if (sync.applied) {
+        updated += 1;
+      } else {
+        skippedConflict += 1;
+      }
     } else {
-      await syncPrintOrderFromPrintify(db, {
-        order_id: row.order_id,
-        status: row.status,
-        tracking: trackingFromRow(row),
-        last_reconciled_at: nowIso,
-        updated_at: row.updated_at,
-      });
+      // Heartbeat only — never rewrite status/tracking from the list snapshot.
+      await touchPrintOrderLastReconciledAt(db, row.order_id, nowIso);
     }
   }
 
-  return { polled: rows.length, updated, errors };
+  return { polled: rows.length, updated, errors, skipped_conflict: skippedConflict };
 }

@@ -206,11 +206,30 @@ export async function updatePrintOrderTracking(
     .run();
 }
 
+/** Stamp reconcile heartbeat without rewriting status/tracking (avoids stale snapshot clobber). */
+export async function touchPrintOrderLastReconciledAt(
+  db: D1Database,
+  orderId: string,
+  lastReconciledAt: string
+): Promise<void> {
+  await db
+    .prepare(`UPDATE print_orders SET last_reconciled_at = ? WHERE order_id = ?`)
+    .bind(lastReconciledAt, orderId)
+    .run();
+}
+
+/**
+ * Sync Printify status/tracking onto a print order.
+ * When `expected_status` is set, CAS so a concurrent webhook advance cannot be
+ * overwritten by a stale reconcile/list snapshot.
+ */
 export async function syncPrintOrderFromPrintify(
   db: D1Database,
   input: {
     order_id: string;
     status: PrintOrderStatus;
+    /** When set, UPDATE only applies if the row is still at this status. */
+    expected_status?: PrintOrderStatus;
     tracking: {
       carrier: string | null;
       tracking_number: string | null;
@@ -219,8 +238,34 @@ export async function syncPrintOrderFromPrintify(
     last_reconciled_at: string;
     updated_at: string;
   }
-): Promise<void> {
-  await db
+): Promise<{ applied: boolean }> {
+  if (input.expected_status !== undefined) {
+    const result = await db
+      .prepare(
+        `UPDATE print_orders
+         SET status = ?,
+             tracking_carrier = ?,
+             tracking_number = ?,
+             tracking_url = ?,
+             last_reconciled_at = ?,
+             updated_at = ?
+         WHERE order_id = ? AND status = ?`
+      )
+      .bind(
+        input.status,
+        input.tracking?.carrier ?? null,
+        input.tracking?.tracking_number ?? null,
+        input.tracking?.tracking_url ?? null,
+        input.last_reconciled_at,
+        input.updated_at,
+        input.order_id,
+        input.expected_status
+      )
+      .run();
+    return { applied: Boolean(result.success && (result.meta?.changes ?? 0) > 0) };
+  }
+
+  const result = await db
     .prepare(
       `UPDATE print_orders
        SET status = ?,
@@ -241,4 +286,5 @@ export async function syncPrintOrderFromPrintify(
       input.order_id
     )
     .run();
+  return { applied: Boolean(result.success && (result.meta?.changes ?? 0) > 0) };
 }
