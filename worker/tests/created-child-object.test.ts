@@ -60,6 +60,56 @@ describe("child-object-store-core", () => {
     expect(rows[0].public_state).toBe("Open");
   });
 
+  it("drops malformed rows and recovers from corrupt storage", () => {
+    const storage = new Map();
+    const ls = {
+      getItem(key: string) {
+        return storage.get(key) ?? null;
+      },
+      setItem(key: string, value: string) {
+        storage.set(key, String(value));
+      },
+    };
+    storage.set(childObjectsBucketKey(PROFILE), "not-json");
+    expect(readChildObjectRows(ls, PROFILE)).toEqual([]);
+
+    storage.set(
+      childObjectsBucketKey(PROFILE),
+      JSON.stringify({ object_id: "obj_not_an_array" })
+    );
+    expect(readChildObjectRows(ls, PROFILE)).toEqual([]);
+
+    storage.set(
+      childObjectsBucketKey(PROFILE),
+      JSON.stringify([
+        {
+          object_id: "obj_ok",
+          object_type: CHILD_OBJECT_TYPE_STATUS_PLATE,
+          public_label: "Studio door",
+          public_state: "Open",
+        },
+        { object_id: "obj_missing_fields" },
+        {
+          object_id: "obj_bad_qr",
+          object_type: CHILD_OBJECT_TYPE_STATUS_PLATE,
+          public_label: "Studio door",
+          public_state: "Open",
+          qr_id: 123,
+        },
+        null,
+        "row",
+      ])
+    );
+    expect(readChildObjectRows(ls, PROFILE)).toEqual([
+      {
+        object_id: "obj_ok",
+        object_type: CHILD_OBJECT_TYPE_STATUS_PLATE,
+        public_label: "Studio door",
+        public_state: "Open",
+      },
+    ]);
+  });
+
   it("updates stored child object rows", () => {
     const storage = new Map();
     const ls = {

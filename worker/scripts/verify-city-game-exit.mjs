@@ -115,6 +115,7 @@ if (!skipTests) {
     "worker/tests/city-game-map-board-core.test.ts",
     "worker/tests/city-game-map-node-card-core.test.ts",
     "worker/tests/city-game-map-explore-core.test.ts",
+    "worker/tests/city-game-map-type-filter-core.test.ts",
     "worker/tests/city-game-map-filter-core.test.ts",
     "worker/tests/city-game-map-interaction-core.test.ts",
     "worker/tests/live-map-ticker.test.ts",
