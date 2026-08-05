@@ -40,7 +40,11 @@ function dbFor(state: DbState): D1Database {
   return {
     prepare: (sql: string) => ({
       bind: (...args: unknown[]) => ({
-        all: async () => ({ results: state.rows }),
+        // Deep-copy so concurrent DB mutations during fetch do not alter the
+        // list-time snapshot held by runPrintifyReconcile (matches D1 behavior).
+        all: async () => ({
+          results: state.rows.map((row) => ({ ...row })),
+        }),
         run: async () => {
           if (
             sql.includes("UPDATE print_orders") &&
@@ -62,7 +66,7 @@ function dbFor(state: DbState): D1Database {
 
           if (sql.includes("UPDATE print_orders") && sql.includes("last_reconciled_at")) {
             const cas = sql.includes("AND status = ?");
-            const orderId = (cas ? args[6] : args[6]) as string;
+            const orderId = args[6] as string;
             const expectedStatus = cas ? (args[7] as PrintOrderRow["status"]) : null;
             const row = state.rows.find((r) => r.order_id === orderId);
             if (cas && row && expectedStatus !== null && row.status !== expectedStatus) {
