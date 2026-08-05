@@ -29,17 +29,21 @@ export async function applyCardUpdate(
   profileId: string,
   manifestoLine: string,
   cardDocumentJson: string,
-  updatedAt: string
+  updatedAt: string,
+  expectedUpdatedAt: string
 ): Promise<void> {
   const result = await db
     .prepare(
       `UPDATE cards SET manifesto_line = ?, card_document_json = ?, updated_at = ?
-       WHERE profile_id = ? AND status = 'active'`
+       WHERE profile_id = ? AND status = 'active' AND updated_at = ?`
     )
-    .bind(manifestoLine, cardDocumentJson, updatedAt, profileId)
+    .bind(manifestoLine, cardDocumentJson, updatedAt, profileId, expectedUpdatedAt)
     .run();
 
-  if (!result.success || result.meta.changes === 0) {
+  if (!result.success) {
     throw new Error("Card update failed or card is not active.");
+  }
+  if ((result.meta.changes ?? 0) === 0) {
+    throw new Error("CARD_UPDATE_CONFLICT");
   }
 }

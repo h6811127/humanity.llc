@@ -145,12 +145,22 @@ class LostItemOfferDb {
             }
             if (
               sql.includes("UPDATE lost_item_relay_offers") &&
-              sql.includes("WHERE offer_id = ? AND status = 'pending'")
+              sql.includes("WHERE offer_id = ?") &&
+              sql.includes("parent_profile_id = ?") &&
+              sql.includes("object_id = ?") &&
+              sql.includes("status = 'pending'")
             ) {
               const updatedAt = String(args[0]);
               const offerId = String(args[1]);
+              const parentProfileId = String(args[2]);
+              const objectId = String(args[3]);
               const row = db.offers.get(offerId);
-              if (row && row.status === "pending") {
+              if (
+                row &&
+                row.status === "pending" &&
+                row.parent_profile_id === parentProfileId &&
+                row.object_id === objectId
+              ) {
                 row.status = "dismissed";
                 row.updated_at = updatedAt;
                 return { success: true, meta: { changes: 1 } };
@@ -339,6 +349,57 @@ describe("lost-item-offer API", () => {
     expect(body.type).toBe("relay_offer_dismissed");
     expect(body.status).toBe("dismissed");
     expect(inner.offers.get(OFFER_ID)?.status).toBe("dismissed");
+  });
+
+  it("rejects dismiss of another steward's offer_id via attacker's own relay path", async () => {
+    const attackerPrivate = ed.utils.randomPrivateKey();
+    const attackerPublic = await ed.getPublicKeyAsync(attackerPrivate);
+    const attacker = {
+      privateKey: attackerPrivate,
+      publicKey: attackerPublic,
+      publicKeyBase58: encodeBase58(attackerPublic),
+    };
+    const attackerProfile = "8Yk9mP2nQ4rT6vW8yZ1aB3cD5";
+    const attackerObject = "obj_lost_item_attacker1";
+    const { db, inner } = dbWithRelay(attacker);
+    inner.parent.public_key = attacker.publicKeyBase58;
+    inner.objects.set(attackerObject, {
+      object_id: attackerObject,
+      parent_profile_id: attackerProfile,
+      object_type: "lost_item_relay",
+      public_label: "Attacker bag",
+      public_state: "Lost — contact owner through relay",
+      status: "active",
+      child_object_document_json: "{}",
+      created_at: CREATED,
+      updated_at: CREATED,
+    });
+    // Victim pending offer — finder learned offer_id from POST …/offer 201 body.
+    inner.offers.set(OFFER_ID, {
+      offer_id: OFFER_ID,
+      parent_profile_id: PROFILE,
+      object_id: OBJECT_ID,
+      qr_id: null,
+      message: "On the bench outside",
+      status: "pending",
+      created_at: CREATED,
+      updated_at: CREATED,
+      expires_at: "2026-07-01T12:00:00.000Z",
+    });
+
+    const query = await signedOwnerQuery(attacker, "dismiss", {
+      profile_id: attackerProfile,
+      object_id: attackerObject,
+      offer_id: OFFER_ID,
+    });
+    const res = await handlePostLostItemOfferOwner(
+      ownerRequest(query),
+      db,
+      attackerProfile,
+      attackerObject
+    );
+    expect(res.status).toBe(404);
+    expect(inner.offers.get(OFFER_ID)?.status).toBe("pending");
   });
 
   it("rejects owner query signed by non-owner key", async () => {

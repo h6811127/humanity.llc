@@ -154,7 +154,13 @@ class DelegatedChildResolverDb {
             if (sql.startsWith("UPDATE child_objects")) {
               const objectId = String(args[6]);
               const existing = db.objects.get(objectId);
-              if (!existing) return { success: true, meta: { changes: 0 } };
+              if (
+                !existing ||
+                (sql.includes("AND updated_at = ?") &&
+                  existing.updated_at !== String(args[8]))
+              ) {
+                return { success: true, meta: { changes: 0 } };
+              }
               db.objects.set(objectId, {
                 ...existing,
                 object_type: String(args[0]),
