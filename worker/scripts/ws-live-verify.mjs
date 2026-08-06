@@ -42,6 +42,7 @@ step("Live-object five-layer vitest", [
   "--",
   "worker/tests/live-object-compose-child-scan.test.ts",
   "worker/tests/live-object-compose-card-scan.test.ts",
+  "worker/tests/live-object-types.test.ts",
   "worker/tests/live-object-scan-capabilities.test.ts",
   "worker/tests/live-object-stream-policy.test.ts",
   "worker/tests/live-object-time-policy.test.ts",
