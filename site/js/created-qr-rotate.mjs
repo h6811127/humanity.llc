@@ -134,37 +134,42 @@ export function initQrRotate(ctx) {
   const validitySelect = document.getElementById("qr-rotate-validity");
   if (!panel || !btn) return null;
 
-  async function resolveCreatedAt() {
+  /**
+   * Always refresh public copy + epoch from the network before signing rotate.
+   * Session manifesto can be stale after another /created/ tab updates the line.
+   */
+  async function resolveCardForRotation() {
     const s = ctx.getSession();
-    if (s?.created_at) return String(s.created_at);
     const res = await fetch(getCardJsonUrl(ctx.profileId), {
       headers: { Accept: "application/json" },
       cache: "no-store",
     });
     if (!res.ok) throw new Error("Could not load card from network.");
     const card = await res.json();
-    if (!card.created_at) throw new Error("Card missing created_at.");
-    const next = { ...s, created_at: card.created_at };
-    ctx.setSession(next);
-    return String(card.created_at);
-  }
-
-  async function resolveEpoch() {
-    const s = ctx.getSession();
-    if (typeof s?.qr_epoch === "number" && s.qr_epoch >= 1) return s.qr_epoch;
-    const res = await fetch(getCardJsonUrl(ctx.profileId), {
-      headers: { Accept: "application/json" },
-      cache: "no-store",
-    });
-    if (!res.ok) throw new Error("Could not load card epoch from network.");
-    const card = await res.json();
+    const manifesto_line = card?.manifesto_line;
+    if (typeof manifesto_line !== "string" || !manifesto_line.trim()) {
+      throw new Error("Card missing public line on network.");
+    }
     const epoch = card?.qr?.epoch;
     if (!Number.isInteger(epoch) || epoch < 1) {
       throw new Error("Card missing qr.epoch on network.");
     }
-    const next = { ...s, qr_epoch: epoch };
+    const created_at = card?.created_at || s?.created_at;
+    if (!created_at) throw new Error("Card missing created_at.");
+    const next = {
+      ...s,
+      manifesto_line,
+      created_at,
+      qr_epoch: epoch,
+      ...(card.verification ? { verification: card.verification } : {}),
+    };
+    if (Object.prototype.hasOwnProperty.call(card, "object_streams")) {
+      next.object_streams = card.object_streams;
+    } else {
+      delete next.object_streams;
+    }
     ctx.setSession(next);
-    return epoch;
+    return next;
   }
 
   btn.addEventListener("click", async () => {
@@ -178,9 +183,8 @@ export function initQrRotate(ctx) {
     }
     const sessionNow = ctx.getSession();
     const handle = sessionNow?.handle;
-    const manifestoLine = sessionNow?.manifesto_line;
-    if (!handle || !manifestoLine) {
-      ctx.showError("Missing handle or public line in session.");
+    if (!handle) {
+      ctx.showError("Missing handle in session.");
       return;
     }
     if (
@@ -197,20 +201,22 @@ export function initQrRotate(ctx) {
       statusEl.textContent = "Signing and rotating…";
     }
     try {
-      const createdAt = await resolveCreatedAt();
-      const previousEpoch = await resolveEpoch();
+      const fresh = await resolveCardForRotation();
+      const createdAt = String(fresh.created_at);
+      const previousEpoch = Number(fresh.qr_epoch);
+      const manifestoLine = String(fresh.manifesto_line);
       const validityDays = Number(validitySelect?.value) || 365;
       const signed = await signQrRotation({
         profileId: ctx.profileId,
         handle: String(handle),
         createdAt,
-        manifestoLine: String(manifestoLine),
+        manifestoLine,
         previousEpoch,
         privateKeyBase58: keys.privateKeyBase58,
         publicKeyBase58: keys.publicKeyBase58,
         validityDays,
         cardExtras: {
-          verification: sessionNow?.verification || {
+          verification: fresh?.verification || {
             level: 1,
             label: "Registered",
             method: "registered",
@@ -223,11 +229,14 @@ export function initQrRotate(ctx) {
             standards: "https://humanity.llc/standards/v1",
             data_policy: "https://humanity.llc/data-policy.html",
           },
-          ...(sessionNow?.recovery_public_key
-            ? { recovery_public_key: sessionNow.recovery_public_key }
+          ...(Object.prototype.hasOwnProperty.call(fresh, "object_streams")
+            ? { object_streams: fresh.object_streams }
             : {}),
-          ...(sessionNow?.issuer_public_key
-            ? { issuer_public_key: sessionNow.issuer_public_key }
+          ...(fresh?.recovery_public_key
+            ? { recovery_public_key: fresh.recovery_public_key }
+            : {}),
+          ...(fresh?.issuer_public_key
+            ? { issuer_public_key: fresh.issuer_public_key }
             : {}),
         },
       });
@@ -236,7 +245,7 @@ export function initQrRotate(ctx) {
         qr_credential: signed.qr_credential,
       });
       const next = {
-        ...sessionNow,
+        ...fresh,
         qr_id: result.qr_id || signed.newQrId,
         scan_url: result.scan_url || signed.scanUrl,
         qr_expires_at: result.qr_expires_at || signed.expiresAt,
