@@ -19,6 +19,7 @@ function rotationMockDb(existing: {
   recovery_public_key?: string | null;
   handle?: string;
   manifesto_line?: string;
+  card_document_json?: string;
   status?: string;
   created_at?: string;
   updated_at?: string;
@@ -32,7 +33,11 @@ function rotationMockDb(existing: {
     handle_normalized: existing.handle ?? "river_example",
     manifesto_line: existing.manifesto_line ?? "Open studio",
     status: existing.status ?? "active",
-    card_document_json: "{}",
+    card_document_json:
+      existing.card_document_json ??
+      JSON.stringify({
+        manifesto_line: existing.manifesto_line ?? "Open studio",
+      }),
     created_at: existing.created_at ?? CREATED,
     updated_at: existing.updated_at ?? CREATED,
   };
@@ -277,6 +282,77 @@ describe("handlePostRotateQr", () => {
     expect(res.status).toBe(410);
     const json = (await res.json()) as { error: string };
     expect(json.error).toBe("CARD_SUSPENDED");
+  });
+
+  it("rejects rotation that would clobber a newer manifesto_line", async () => {
+    const { handlePostRotateQr } = await import("../src/resolver/rotate-qr");
+    const { privateKey, publicKeyBase58 } = await getTestKeypair();
+    // Signed body still carries the stale public line from another /created/ tab.
+    const { card, qr_credential } = await signedRotationPair(publicKeyBase58, privateKey);
+
+    const db = rotationMockDb({
+      public_key: publicKeyBase58,
+      manifesto_line: "Closed until Monday",
+      card_document_json: JSON.stringify({
+        manifesto_line: "Closed until Monday",
+      }),
+      updated_at: "2026-05-17T12:00:00.000Z",
+      activeQr: { qr_id: OLD_QR, epoch: 1 },
+    });
+
+    const res = await handlePostRotateQr(
+      new Request(`https://humanity.llc/.well-known/hc/v1/cards/${PROFILE}/qr`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ card, qr_credential }),
+      }),
+      db,
+      PROFILE
+    );
+    expect(res.status).toBe(409);
+    const json = (await res.json()) as { error: string };
+    expect(json.error).toBe("UPDATE_CONFLICT");
+    // Stale rotate must not mark the prior QR replaced.
+    expect(db.activeQr?.qr_id).toBe(OLD_QR);
+  });
+});
+
+describe("rotatePublicCopyMatchesStored", () => {
+  it("requires manifesto_line and object_streams to match stored card", async () => {
+    const { rotatePublicCopyMatchesStored } = await import(
+      "../src/resolver/rotate-qr"
+    );
+    const existing = {
+      manifesto_line: "Open studio",
+      card_document_json: JSON.stringify({
+        manifesto_line: "Open studio",
+        object_streams: [
+          {
+            id: "care",
+            class: "care",
+            label: "Care",
+            value: "Open",
+          },
+        ],
+      }),
+    };
+    expect(
+      rotatePublicCopyMatchesStored("Open studio", {
+        object_streams: [
+          { id: "care", class: "care", label: "Care", value: "Open" },
+        ],
+      }, existing)
+    ).toBe(true);
+    expect(
+      rotatePublicCopyMatchesStored("Closed", {
+        object_streams: [
+          { id: "care", class: "care", label: "Care", value: "Open" },
+        ],
+      }, existing)
+    ).toBe(false);
+    expect(
+      rotatePublicCopyMatchesStored("Open studio", {}, existing)
+    ).toBe(false);
   });
 });
 

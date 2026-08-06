@@ -15,9 +15,26 @@ import {
 import { getCardOwner } from "../db/revoke";
 import { errorResponse, jsonResponse, requestOrigin } from "../http/resolver";
 import { validateManifestoLine } from "../validation/manifesto";
-import { validateObjectStreamsField } from "../validation/object-streams";
+import {
+  objectStreamsFromCardDocumentJson,
+  validateObjectStreamsField,
+} from "../validation/object-streams";
 import { resolveStoredQrExpiresAt } from "./merch-qr-policy";
 import { purgeScanCacheAfterMutation } from "./scan-cache-purge";
+
+/** Stable compare for rotate: must not rewrite public copy from a stale /created/ tab. */
+export function rotatePublicCopyMatchesStored(
+  requestManifestoLine: string,
+  requestCard: Record<string, unknown>,
+  existing: { manifesto_line: string; card_document_json: string }
+): boolean {
+  if (requestManifestoLine !== existing.manifesto_line) return false;
+  const requestStreams = validateObjectStreamsField(requestCard);
+  const storedStreams = objectStreamsFromCardDocumentJson(
+    existing.card_document_json
+  );
+  return JSON.stringify(requestStreams) === JSON.stringify(storedStreams);
+}
 
 function parseRotateBody(body: unknown): {
   card: Record<string, unknown>;
@@ -289,6 +306,17 @@ export async function handlePostRotateQr(
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Invalid object_streams.";
     return errorResponse("MALFORMED_REQUEST", msg, 422);
+  }
+
+  // Rotate issues a new QR only. A stale /created/ tab must not clobber a
+  // concurrent manifesto / object_streams update by signing old public copy
+  // with a fresh updated_at.
+  if (!rotatePublicCopyMatchesStored(manifestoLine, card, existing)) {
+    return errorResponse(
+      "UPDATE_CONFLICT",
+      "Public line or object streams changed since this session loaded. Refresh and try rotating again.",
+      409
+    );
   }
 
   const issuedAt = qr.issued_at as string;
