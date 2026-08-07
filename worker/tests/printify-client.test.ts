@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { parsePrintifyShippingAddress } from "../src/print/printify-shipping";
 import { resolvePrintifyLineItem } from "../src/print/printify-template-config";
 import {
+  findPrintifyOrderByExternalId,
   printifySubmitEnabled,
   submitPrintifyOrder,
 } from "../src/print/printify-client";
@@ -212,5 +213,63 @@ describe("submitPrintifyOrder", () => {
   it("detects submit enabled flag", () => {
     expect(printifySubmitEnabled({ PRINTIFY_SUBMIT_ENABLED: "1" })).toBe(true);
     expect(printifySubmitEnabled({ PRINTIFY_SUBMIT_ENABLED: "0" })).toBe(false);
+  });
+});
+
+describe("findPrintifyOrderByExternalId", () => {
+  it("matches shop_order_id and skips canceled duplicates", async () => {
+    const fetchMock = vi.fn(async (url: string) => {
+      expect(String(url)).toContain("/shops/99/orders.json?");
+      return new Response(
+        JSON.stringify({
+          current_page: 1,
+          last_page: 1,
+          data: [
+            {
+              id: "pfy_canceled",
+              status: "canceled",
+              created_at: "2026-05-16T16:00:00+00:00",
+              metadata: { shop_order_id: "po_test123456789012345" },
+            },
+            {
+              id: "pfy_keep",
+              status: "on-hold",
+              created_at: "2026-05-16T17:00:00+00:00",
+              metadata: {
+                shop_order_id: "po_test123456789012345",
+                shop_order_label: "po_test123456789012345",
+              },
+            },
+          ],
+        }),
+        { status: 200, headers: { "Content-Type": "application/json" } }
+      );
+    });
+
+    const result = await findPrintifyOrderByExternalId(
+      { PRINTIFY_API_TOKEN: "token", PRINTIFY_SHOP_ID: "99" },
+      "po_test123456789012345",
+      fetchMock
+    );
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.printify_order_id).toBe("pfy_keep");
+    expect(result.printify_shop_id).toBe(99);
+  });
+
+  it("returns ok:false when no matching factory order exists", async () => {
+    const fetchMock = vi.fn(async () =>
+      new Response(JSON.stringify({ current_page: 1, last_page: 1, data: [] }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      })
+    );
+    const result = await findPrintifyOrderByExternalId(
+      { PRINTIFY_API_TOKEN: "token", PRINTIFY_SHOP_ID: "99" },
+      "po_missing0000000000001",
+      fetchMock
+    );
+    expect(result).toEqual({ ok: false });
   });
 });

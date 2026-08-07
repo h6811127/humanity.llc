@@ -177,14 +177,34 @@ async function signedCredential(publicKeyBase58: string, privateKey: Uint8Array)
   );
 }
 
-describe("submitPrintOrderToPrintify", () => {
-  it("submits with request body shipping when enabled", async () => {
-    const fetchMock = vi.fn(async () =>
-      new Response(JSON.stringify({ id: "5a96f649b2439217d070f507" }), {
+function printifyFetchMock(opts: {
+  listOrders?: Array<Record<string, unknown>>;
+  createId?: string;
+}): ReturnType<typeof vi.fn> {
+  const listOrders = opts.listOrders ?? [];
+  const createId = opts.createId ?? "5a96f649b2439217d070f507";
+  return vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = String(input);
+    const method = (init?.method ?? "GET").toUpperCase();
+    if (url.includes("/orders.json") && method === "GET") {
+      return new Response(
+        JSON.stringify({ current_page: 1, last_page: 1, data: listOrders }),
+        { status: 200, headers: { "Content-Type": "application/json" } }
+      );
+    }
+    if (url.endsWith("/orders.json") && method === "POST") {
+      return new Response(JSON.stringify({ id: createId }), {
         status: 200,
         headers: { "Content-Type": "application/json" },
-      })
-    );
+      });
+    }
+    return new Response("unexpected", { status: 500 });
+  });
+}
+
+describe("submitPrintOrderToPrintify", () => {
+  it("submits with request body shipping when enabled", async () => {
+    const fetchMock = printifyFetchMock({ createId: "5a96f649b2439217d070f507" });
     vi.stubGlobal("fetch", fetchMock);
 
     const printOrder = printOrderRow();
@@ -203,18 +223,85 @@ describe("submitPrintOrderToPrintify", () => {
     expect(result.printOrder.status).toBe("submitted");
     expect(result.printOrder.printify_order_id).toBe("5a96f649b2439217d070f507");
     expect(result.shippingSource).toBe("request_body");
-    expect(fetchMock).toHaveBeenCalledOnce();
+    expect(result.recovered).toBeUndefined();
+    expect(fetchMock.mock.calls.some((c) => String(c[0]).includes("/orders.json") && (c[1]?.method ?? "GET").toUpperCase() === "GET")).toBe(true);
+    expect(fetchMock.mock.calls.some((c) => String(c[0]).endsWith("/orders.json") && c[1]?.method === "POST")).toBe(true);
+  });
+
+  it("adopts an existing Printify order by external_id instead of creating a duplicate", async () => {
+    const existingId = "5a96f649b2439217d070f599";
+    const fetchMock = printifyFetchMock({
+      listOrders: [
+        {
+          id: existingId,
+          status: "on-hold",
+          created_at: "2026-05-16T17:01:00+00:00",
+          metadata: {
+            order_type: "api",
+            shop_order_id: PRINT_ORDER,
+            shop_order_label: PRINT_ORDER,
+          },
+        },
+      ],
+      createId: "should-not-create",
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const printOrder = printOrderRow();
+    const db = dbFor("pubkey", printOrder);
+    const result = await submitPrintOrderToPrintify(
+      new Request("https://humanity.llc/v1/print/orders"),
+      env(),
+      db,
+      printOrder,
+      { shipping_address: ADDRESS }
+    );
+
+    vi.unstubAllGlobals();
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.recovered).toBe(true);
+    expect(result.printOrder.status).toBe("submitted");
+    expect(result.printOrder.printify_order_id).toBe(existingId);
+    expect(result.printOrder.printify_shop_id).toBe(99);
+    expect(
+      fetchMock.mock.calls.some(
+        (c) => String(c[0]).endsWith("/orders.json") && c[1]?.method === "POST"
+      )
+    ).toBe(false);
+  });
+
+  it("finishes submit when printify_order_id is already linked but status is still awaiting", async () => {
+    const fetchMock = printifyFetchMock({ createId: "should-not-create" });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const printOrder = {
+      ...printOrderRow(),
+      printify_order_id: "5a96f649b2439217d070f588",
+      printify_shop_id: 99,
+    };
+    const db = dbFor("pubkey", printOrder);
+    const result = await submitPrintOrderToPrintify(
+      new Request("https://humanity.llc/v1/print/orders"),
+      env(),
+      db,
+      printOrder,
+      { shipping_address: ADDRESS }
+    );
+
+    vi.unstubAllGlobals();
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.recovered).toBe(true);
+    expect(result.printOrder.status).toBe("submitted");
+    expect(result.printOrder.printify_order_id).toBe("5a96f649b2439217d070f588");
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 });
 
 describe("handlePostPrintOrderMint submit_to_printify", () => {
   it("chains Printify submit after successful mint", async () => {
-    const fetchMock = vi.fn(async () =>
-      new Response(JSON.stringify({ id: "5a96f649b2439217d070f508" }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      })
-    );
+    const fetchMock = printifyFetchMock({ createId: "5a96f649b2439217d070f508" });
     vi.stubGlobal("fetch", fetchMock);
 
     const { privateKey, publicKeyBase58 } = await getTestKeypair();
@@ -245,7 +332,11 @@ describe("handlePostPrintOrderMint submit_to_printify", () => {
     expect(json.printify_submit?.printify_order_id).toBe("5a96f649b2439217d070f508");
     expect(json.printify_submit?.shipping_source).toBe("request_body");
     expect(json.print_order_status).toBe("submitted");
-    expect(fetchMock).toHaveBeenCalledOnce();
+    expect(
+      fetchMock.mock.calls.some(
+        (c) => String(c[0]).endsWith("/orders.json") && c[1]?.method === "POST"
+      )
+    ).toBe(true);
   });
 
   it("returns 409 when submit_to_printify is set but mint is incomplete", async () => {
