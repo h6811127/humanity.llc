@@ -8,6 +8,7 @@ import {
   buildMapBoardInnerHtml,
   showMapBoardError,
 } from "../../site/js/city-game-map-board-core.mjs";
+import { cityStateHashBoardRedirect } from "../../site/js/city-game-play-page-core.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const season = JSON.parse(
@@ -51,5 +52,19 @@ describe("city game play page integration", () => {
     expect(rulesHtml.indexOf("rules-prove-title")).toBeLessThan(
       rulesHtml.indexOf("rules-start-title")
     );
+  });
+
+  it("maps legacy #city-state hash to the season board path", () => {
+    expect(cityStateHashBoardRedirect("#city-state", "/play/cedar-rapids/")).toBe(
+      "/play/cedar-rapids/map/"
+    );
+    expect(cityStateHashBoardRedirect("#city-state", "/play/example-city")).toBe(
+      "/play/example-city/map/"
+    );
+    expect(cityStateHashBoardRedirect("#other", "/play/cedar-rapids/")).toBe(null);
+    expect(cityStateHashBoardRedirect("#city-state", "/play/not/a/season")).toBe(
+      null
+    );
+    expect(cityStateHashBoardRedirect("#city-state", "")).toBe(null);
   });
 });
