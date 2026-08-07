@@ -24,13 +24,26 @@ function showPlayerGuideFallback(list) {
 }
 
 /**
+ * Legacy #city-state hash → dedicated board path (or null when no redirect).
+ * @param {string} hash
+ * @param {unknown} rulesPath
+ * @returns {string | null}
+ */
+export function cityStateHashBoardRedirect(hash, rulesPath) {
+  if (hash !== "#city-state") return null;
+  return seasonBoardPath(String(rulesPath ?? "")) || null;
+}
+
+/**
  * Legacy #city-state links open the dedicated board page.
  * @param {Record<string, unknown>} season
  * @returns {boolean} true when navigation was triggered
  */
 function redirectCityStateHashToBoardPage(season) {
-  if (location.hash !== "#city-state") return false;
-  const boardPath = seasonBoardPath(String(season.rules_path ?? ""));
+  const boardPath = cityStateHashBoardRedirect(
+    location.hash,
+    season.rules_path
+  );
   if (!boardPath) return false;
   location.replace(boardPath);
   return true;
