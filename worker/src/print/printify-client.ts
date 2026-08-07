@@ -260,3 +260,115 @@ export async function fetchPrintifyOrder(
     return { ok: false, status: res.status };
   }
 }
+
+export interface PrintifyExternalIdMatch {
+  ok: true;
+  printify_order_id: string;
+  printify_shop_id: number;
+  status: string;
+}
+
+/** How many list pages to scan when recovering a submit by external_id (PM-FR-25). */
+const EXTERNAL_ID_RECOVERY_MAX_PAGES = 5;
+const EXTERNAL_ID_RECOVERY_PAGE_LIMIT = 50;
+
+function printifyStatusIsCanceled(status: unknown): boolean {
+  if (typeof status !== "string") return false;
+  const normalized = status.trim().toLowerCase();
+  return normalized === "canceled" || normalized === "cancelled";
+}
+
+function orderMatchesExternalId(order: Record<string, unknown>, externalId: string): boolean {
+  if (typeof order.external_id === "string" && order.external_id.trim() === externalId) {
+    return true;
+  }
+  const metadata =
+    order.metadata && typeof order.metadata === "object"
+      ? (order.metadata as Record<string, unknown>)
+      : null;
+  if (!metadata) return false;
+  for (const key of ["shop_order_id", "shop_order_label"] as const) {
+    const raw = metadata[key];
+    if (raw === externalId) return true;
+    if (typeof raw === "string" && raw.trim() === externalId) return true;
+  }
+  return false;
+}
+
+/**
+ * Find an existing Printify factory order created with external_id === print_order_id.
+ * Used to make submit retry-safe after POST-success / D1-persist failure (PM-FR-25).
+ * Printify list has no external_id filter — scan recent pages newest-first.
+ */
+export async function findPrintifyOrderByExternalId(
+  env: PrintifyEnv,
+  externalId: string,
+  fetchImpl: typeof fetch = fetch
+): Promise<PrintifyExternalIdMatch | { ok: false }> {
+  const id = externalId.trim();
+  if (!id || !printifyConfigured(env)) {
+    return { ok: false };
+  }
+
+  const shopId = parseShopId(env.PRINTIFY_SHOP_ID!);
+  if (!shopId) {
+    return { ok: false };
+  }
+
+  const authHeaders = {
+    Authorization: `Bearer ${env.PRINTIFY_API_TOKEN!.trim()}`,
+    Accept: "application/json",
+  };
+
+  let best: PrintifyExternalIdMatch | null = null;
+  let bestCreatedAt = "";
+
+  for (let page = 1; page <= EXTERNAL_ID_RECOVERY_MAX_PAGES; page += 1) {
+    const url =
+      `${PRINTIFY_API_BASE}/shops/${shopId}/orders.json` +
+      `?page=${page}&limit=${EXTERNAL_ID_RECOVERY_PAGE_LIMIT}`;
+    const res = await fetchImpl(url, { method: "GET", headers: authHeaders });
+    const text = await res.text();
+    if (!res.ok) {
+      return best ?? { ok: false };
+    }
+
+    let parsed: { data?: unknown; last_page?: unknown };
+    try {
+      parsed = JSON.parse(text) as { data?: unknown; last_page?: unknown };
+    } catch {
+      return best ?? { ok: false };
+    }
+
+    const rows = Array.isArray(parsed.data) ? parsed.data : [];
+    for (const row of rows) {
+      if (!row || typeof row !== "object") continue;
+      const order = row as Record<string, unknown>;
+      if (!orderMatchesExternalId(order, id)) continue;
+      if (printifyStatusIsCanceled(order.status)) continue;
+      const printifyOrderId = typeof order.id === "string" ? order.id.trim() : "";
+      if (!printifyOrderId) continue;
+      const createdAt = typeof order.created_at === "string" ? order.created_at : "";
+      // Prefer the oldest match so retries keep the first factory order.
+      if (!best || (createdAt && (!bestCreatedAt || createdAt < bestCreatedAt))) {
+        best = {
+          ok: true,
+          printify_order_id: printifyOrderId,
+          printify_shop_id: shopId,
+          status: typeof order.status === "string" ? order.status : "",
+        };
+        bestCreatedAt = createdAt;
+      }
+    }
+
+    const lastPage =
+      typeof parsed.last_page === "number" && Number.isFinite(parsed.last_page)
+        ? parsed.last_page
+        : page;
+    if (page >= lastPage || rows.length === 0) {
+      break;
+    }
+  }
+
+  return best ?? { ok: false };
+}

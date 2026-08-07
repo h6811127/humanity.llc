@@ -3,7 +3,10 @@ import type { PrintifyShippingSource } from "../commerce/resolve-printify-shippi
 import { getCommerceOrderById } from "../db/commerce-orders";
 import { updatePrintOrderStatus, type PrintOrderRow } from "../db/print-orders";
 import type { Env } from "../env";
-import { submitPrintifyOrder } from "./printify-client";
+import {
+  findPrintifyOrderByExternalId,
+  submitPrintifyOrder,
+} from "./printify-client";
 
 export interface SubmitPrintOrderOptions {
   shipping_address?: unknown;
@@ -16,6 +19,7 @@ export type SubmitPrintOrderResult =
       printOrder: PrintOrderRow;
       shippingSource?: PrintifyShippingSource;
       skipped?: boolean;
+      recovered?: boolean;
     }
   | { ok: false; code: string; message: string; httpStatus: number };
 
@@ -36,6 +40,39 @@ function submitHttpStatus(code: string): number {
     return 503;
   }
   return 502;
+}
+
+function asSubmittedPrintOrder(
+  printOrder: PrintOrderRow,
+  nowIso: string,
+  printifyOrderId: string,
+  printifyShopId: number
+): PrintOrderRow {
+  return {
+    ...printOrder,
+    status: "submitted",
+    printify_order_id: printifyOrderId,
+    printify_shop_id: printifyShopId,
+    updated_at: nowIso,
+  };
+}
+
+async function persistSubmittedPrintOrder(
+  db: D1Database,
+  printOrder: PrintOrderRow,
+  nowIso: string,
+  printifyOrderId: string,
+  printifyShopId: number
+): Promise<PrintOrderRow> {
+  await updatePrintOrderStatus(
+    db,
+    printOrder.order_id,
+    "submitted",
+    nowIso,
+    printifyOrderId,
+    printifyShopId
+  );
+  return asSubmittedPrintOrder(printOrder, nowIso, printifyOrderId, printifyShopId);
 }
 
 /** Operator-gated Printify HTTP submit for a queued print order. */
@@ -68,6 +105,42 @@ export async function submitPrintOrderToPrintify(
       message: "Commerce order not found.",
       httpStatus: 404,
     };
+  }
+
+  const nowIso = new Date().toISOString();
+
+  // Partial persist / operator repair: factory id already linked while still awaiting.
+  const existingPrintifyId = printOrder.printify_order_id?.trim() ?? "";
+  const existingShopId = printOrder.printify_shop_id;
+  if (
+    existingPrintifyId &&
+    !existingPrintifyId.startsWith("pending:") &&
+    typeof existingShopId === "number" &&
+    Number.isFinite(existingShopId) &&
+    existingShopId > 0
+  ) {
+    const submitted = await persistSubmittedPrintOrder(
+      db,
+      printOrder,
+      nowIso,
+      existingPrintifyId,
+      existingShopId
+    );
+    return { ok: true, printOrder: submitted, recovered: true };
+  }
+
+  // PM-FR-25: if a prior POST succeeded but D1 never reached "submitted", adopt that
+  // factory order by external_id instead of creating a billable duplicate.
+  const recovered = await findPrintifyOrderByExternalId(env, printOrder.order_id);
+  if (recovered.ok) {
+    const submitted = await persistSubmittedPrintOrder(
+      db,
+      printOrder,
+      nowIso,
+      recovered.printify_order_id,
+      recovered.printify_shop_id
+    );
+    return { ok: true, printOrder: submitted, recovered: true };
   }
 
   const resolvedShipping = await resolvePrintifyShippingForSubmit(
@@ -104,7 +177,6 @@ export async function submitPrintOrderToPrintify(
     quantity = options.quantity;
   }
 
-  const nowIso = new Date().toISOString();
   const submit = await submitPrintifyOrder(env, {
     print_order_id: printOrder.order_id,
     template_id: printOrder.template_id,
@@ -125,10 +197,9 @@ export async function submitPrintOrderToPrintify(
     };
   }
 
-  await updatePrintOrderStatus(
+  const submitted = await persistSubmittedPrintOrder(
     db,
-    printOrder.order_id,
-    "submitted",
+    printOrder,
     nowIso,
     submit.printify_order_id,
     submit.printify_shop_id
@@ -136,13 +207,7 @@ export async function submitPrintOrderToPrintify(
 
   return {
     ok: true,
-    printOrder: {
-      ...printOrder,
-      status: "submitted",
-      printify_order_id: submit.printify_order_id,
-      printify_shop_id: submit.printify_shop_id,
-      updated_at: nowIso,
-    },
+    printOrder: submitted,
     shippingSource: resolvedShipping.source,
   };
 }
