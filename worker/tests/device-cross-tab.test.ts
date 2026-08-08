@@ -18,6 +18,8 @@ import {
 import {
   addRemovedProfileId,
   isProfileRemovedFromDevice,
+  MAX_REMOVED_PROFILE_IDS,
+  normalizeRemovedProfileIds,
   reconcileRemovedProfileIds,
 } from "../../site/js/device-wallet-removed-profiles-core.mjs";
 
@@ -189,6 +191,19 @@ describe("device-wallet-removed-profiles-core", () => {
     const removed = ["7Xk9mP2nQ4rT6vW8yZ1aB3cD6", "7Xk9mP2nQ4rT6vW8yZ1aB3cD7"];
     const next = reconcileRemovedProfileIds(removed, ["7Xk9mP2nQ4rT6vW8yZ1aB3cD6"]);
     expect(next).toEqual(["7Xk9mP2nQ4rT6vW8yZ1aB3cD7"]);
+  });
+
+  it("dedupes and truncates denylist to MAX_REMOVED_PROFILE_IDS", () => {
+    const flooded = Array.from({ length: MAX_REMOVED_PROFILE_IDS + 8 }, (_, i) => `p${i}`);
+    const normalized = normalizeRemovedProfileIds([...flooded, "p0", "  ", 12, "p1"]);
+    expect(normalized).toHaveLength(MAX_REMOVED_PROFILE_IDS);
+    expect(normalized[0]).toBe("p0");
+    expect(normalized.filter((id) => id === "p0")).toHaveLength(1);
+
+    const capped = addRemovedProfileId(normalized, "fresh_removed");
+    expect(capped[0]).toBe("fresh_removed");
+    expect(capped).toHaveLength(MAX_REMOVED_PROFILE_IDS);
+    expect(capped).not.toContain(normalized[normalized.length - 1]);
   });
 });
 
