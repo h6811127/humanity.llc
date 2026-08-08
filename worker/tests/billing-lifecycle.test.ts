@@ -2,8 +2,10 @@ import { describe, expect, it } from "vitest";
 
 import {
   HOSTED_GAME_SEASON_PLAN_ID,
+  HOSTED_STEWARD_PLAN_ID,
   mapStripeSubscriptionStatus,
   PAST_DUE_GRACE_MS,
+  planIdForPaymentFailedGrace,
   shouldExpirePastDueAccount,
   stewardUpdateForPaymentFailed,
   stewardUpdateForSubscriptionDeleted,
@@ -140,10 +142,45 @@ describe("past_due grace expiry", () => {
   });
 });
 
+describe("planIdForPaymentFailedGrace", () => {
+  it("preserves paid hosted SKUs and defaults unknown plans to steward", () => {
+    expect(planIdForPaymentFailedGrace(HOSTED_GAME_SEASON_PLAN_ID)).toBe(
+      HOSTED_GAME_SEASON_PLAN_ID
+    );
+    expect(planIdForPaymentFailedGrace(HOSTED_STEWARD_PLAN_ID)).toBe(
+      HOSTED_STEWARD_PLAN_ID
+    );
+    expect(planIdForPaymentFailedGrace("reference_free")).toBe(HOSTED_STEWARD_PLAN_ID);
+    expect(planIdForPaymentFailedGrace(null)).toBe(HOSTED_STEWARD_PLAN_ID);
+  });
+});
+
 describe("stewardUpdateForPaymentFailed", () => {
   it("keeps hosted plan with grace window", () => {
-    const update = stewardUpdateForPaymentFailed("acc_1", "cus_1", "sub_1", NOW);
+    const update = stewardUpdateForPaymentFailed(
+      "acc_1",
+      "cus_1",
+      "sub_1",
+      NOW,
+      HOSTED_STEWARD_PLAN_ID
+    );
     expect(update.status).toBe("past_due");
     expect(update.plan_id).toBe("hosted_steward_v1");
+  });
+
+  it("preserves hosted_game_season_v1 during past_due grace", () => {
+    const update = stewardUpdateForPaymentFailed(
+      "acc_game",
+      "cus_game",
+      "sub_game",
+      NOW,
+      HOSTED_GAME_SEASON_PLAN_ID,
+      1
+    );
+    expect(update.status).toBe("past_due");
+    expect(update.plan_id).toBe(HOSTED_GAME_SEASON_PLAN_ID);
+    expect(update.plan_version).toBe(1);
+    const end = Date.parse(update.effective_until!);
+    expect(end - NOW).toBe(PAST_DUE_GRACE_MS);
   });
 });

@@ -210,19 +210,39 @@ export function stewardUpdateForSubscriptionDeleted(
   };
 }
 
-/** invoice.payment_failed — grace window at hosted caps (E5.3). */
+/**
+ * Paid hosted plans that keep their SKU entitlements during past_due grace (E5.3).
+ * Unknown / free plan ids fall back to hosted_steward_v1 so grace still grants hosted caps.
+ */
+export function planIdForPaymentFailedGrace(currentPlanId: string | null | undefined): string {
+  const planId = typeof currentPlanId === "string" ? currentPlanId.trim() : "";
+  if (planId === HOSTED_GAME_SEASON_PLAN_ID || planId === HOSTED_STEWARD_PLAN_ID) {
+    return planId;
+  }
+  return HOSTED_STEWARD_PLAN_ID;
+}
+
+/** invoice.payment_failed — grace window at the account's current hosted caps (E5.3). */
 export function stewardUpdateForPaymentFailed(
   accountId: string,
   customerId: string,
   subscriptionId: string | null,
-  now = Date.now()
+  now = Date.now(),
+  currentPlanId?: string | null,
+  currentPlanVersion?: number | null
 ): Omit<StewardBillingAccountUpdate, "billing_subscription_id"> & {
   billing_subscription_id: string | null;
 } {
+  const planVersion =
+    typeof currentPlanVersion === "number" &&
+    Number.isFinite(currentPlanVersion) &&
+    currentPlanVersion > 0
+      ? Math.floor(currentPlanVersion)
+      : 1;
   return {
     account_id: accountId,
-    plan_id: HOSTED_STEWARD_PLAN_ID,
-    plan_version: 1,
+    plan_id: planIdForPaymentFailedGrace(currentPlanId),
+    plan_version: planVersion,
     status: "past_due",
     effective_from: new Date(now).toISOString(),
     effective_until: new Date(now + PAST_DUE_GRACE_MS).toISOString(),

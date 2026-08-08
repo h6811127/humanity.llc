@@ -137,7 +137,10 @@ async function handleInvoicePaymentFailed(
   const update = stewardUpdateForPaymentFailed(
     account.account_id,
     customerId,
-    subscriptionId
+    subscriptionId,
+    Date.now(),
+    account.plan_id,
+    account.plan_version
   );
   return applyBillingUpdate(db, update);
 }

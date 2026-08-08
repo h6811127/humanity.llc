@@ -311,6 +311,7 @@ Canonical spec: [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLE
 | Entitlements authority | Server `GET …/steward/entitlements` is source of truth for paid caps; client may cache ≤300s; fail closed to `reference_free` when session missing or invalid. |
 | Profile link | One `profile_id` maps to at most one `account_id` (`idx_steward_profile_unique`); link requires owner-signed `steward_account_link_v1`. |
 | Game season attachment | `game_season` on entitlements requires steward account linked to season root profile; optional `?season_id=` must match that link. |
+| Past-due grace plan | `invoice.payment_failed` sets `past_due` with a 7-day grace but must keep the account’s current paid `plan_id` (`hosted_steward_v1` or `hosted_game_season_v1`). Do not hardcode steward SKU — organizers on `hosted_game_season_v1` keep season caps during grace ([`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md)). |
 | No paywall on identity | Paid plans must not block card create, public scan, or vouch ([`SKEPTIC_FAQ.md`](SKEPTIC_FAQ.md)). |
 
 **Regression:**
