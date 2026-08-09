@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { handlePostGameContribute } from "../src/resolver/game-contribute";
 import * as seasonWindow from "../src/city-game/season-window";
@@ -265,6 +265,17 @@ describe("city-game-contribute-load-core", () => {
 });
 
 describe("game-contribute load (B5)", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    // Inside season window and before river lantern visible_until (2026-06-14).
+    vi.setSystemTime(new Date("2026-06-07T18:00:00-05:00"));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
   it("handles 20 concurrent POSTs without server errors", async () => {
     vi.spyOn(seasonWindow, "resolveSeasonWindowPhase").mockReturnValue("open");
 
