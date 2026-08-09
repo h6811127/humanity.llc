@@ -276,6 +276,7 @@ Canonical spec: [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.m
 | Feature flag | `CITY_GAME_ENABLED=0` in production until launch checklist signed; game scan template and `game-contribute` only when enabled. |
 | Passive scan | `GET /c/…` (scan SSR) does **not** increment collective progress, scarcity, or fragment state. |
 | Contribute | `POST …/game-contribute` may update **aggregate-only** fields (`collective_progress`, `unlocked_by`, `scarcity_remaining`) and count buckets — **no** per-player ID, scan log row, or fingerprint. |
+| Temp-drop expiry | When `game_meta.visible_until` is in the past, scan is dormant **and** `POST …/game-contribute` returns `OBJECT_EXPIRED` (409) before metering or state writes — same `isGameNodeExpired` gate as scan capabilities. |
 | Care wins | When care stream is maintenance pause / closure, game bulletins are muted on scan (`scan-view` / `scan-html` precedence). |
 | Lifecycle first | Revoked or paused child object or QR shows lifecycle truth; game hero does not override. |
 | Game-operator scope | `issuer_public_key` may `game-update` **game_node** only — not owner manifesto, human vouch issuance, or non-game child types. |
