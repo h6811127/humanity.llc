@@ -3,8 +3,14 @@ import { describe, expect, it } from "vitest";
 import { hashBuyerEmail } from "../src/commerce/buyer-email-hash";
 import type { CommerceOrderRow } from "../src/db/commerce-orders";
 import type { PrintOrderRow } from "../src/db/print-orders";
-import { buildOrderTimeline } from "../src/store/store-order-status";
+import {
+  buildOrderTimeline,
+  isValidArtifactIntentLookupId,
+  isValidShopifyOrderLookupId,
+  printStatusLabel,
+} from "../src/store/store-order-status";
 import { handleGetStoreOrderStatus } from "../src/resolver/store-order-status";
+import type { PrintOrderStatus } from "../src/db/print-orders";
 
 const EMAIL = "buyer@example.com";
 const ORDER_NUMBER = 1001;
@@ -37,6 +43,47 @@ function dbFor(commerce: CommerceOrderRow | null, printOrders: PrintOrderRow[] =
     }),
   } as unknown as D1Database;
 }
+
+describe("store order status lookup id validation", () => {
+  it("accepts Base58 artifact intent ids and numeric Shopify order ids", () => {
+    expect(isValidArtifactIntentLookupId("ai_Hc9mP2nQ4rT6vW8yZ1")).toBe(true);
+    expect(isValidArtifactIntentLookupId("  ai_Hc9mP2nQ4rT6vW8yZ1  ")).toBe(true);
+    expect(isValidShopifyOrderLookupId("450789469")).toBe(true);
+    expect(isValidShopifyOrderLookupId("  450789469  ")).toBe(true);
+  });
+
+  it("rejects lookalike and undersized lookup ids that widen enumeration", () => {
+    expect(isValidArtifactIntentLookupId("ai_short")).toBe(false);
+    expect(isValidArtifactIntentLookupId("ai_0OIllookalike1")).toBe(false);
+    expect(isValidArtifactIntentLookupId("co_Hc9mP2nQ4rT6vW8yZ1")).toBe(false);
+    expect(isValidArtifactIntentLookupId("")).toBe(false);
+    expect(isValidShopifyOrderLookupId("45")).toBe(false);
+    expect(isValidShopifyOrderLookupId("450789469a")).toBe(false);
+    expect(isValidShopifyOrderLookupId("order-450789469")).toBe(false);
+  });
+});
+
+describe("printStatusLabel", () => {
+  it("maps shopper-facing labels and falls back for unknown/processing statuses", () => {
+    const cases: Array<[PrintOrderStatus | null, string | null]> = [
+      [null, null],
+      ["awaiting_production_approval", "Awaiting print approval"],
+      ["submitted", "Sent to print partner"],
+      ["in_production", "In production"],
+      ["fulfilled", "Shipped"],
+      ["partially_fulfilled", "Shipped"],
+      ["on_hold", "On hold"],
+      ["has_issues", "Production issue — support will follow up"],
+      ["canceled", "Print canceled"],
+      ["unfulfillable", "Unable to fulfill"],
+      ["draft", "Processing"],
+      ["paid", "Processing"],
+    ];
+    for (const [status, label] of cases) {
+      expect(printStatusLabel(status)).toBe(label);
+    }
+  });
+});
 
 describe("buildOrderTimeline", () => {
   it("shows Shopify inventory steps for tier0_inventory commerce orders", () => {
