@@ -577,6 +577,36 @@ describe("game-contribute", () => {
     vi.restoreAllMocks();
   });
 
+  it("rejects contribute after game_meta.visible_until while season is still open", async () => {
+    vi.setSystemTime(new Date("2026-06-15T12:00:00-05:00"));
+    const db = new ContributeDb();
+    const before = JSON.parse(db.objects.get(RIVER_OBJECT)!.child_object_document_json) as {
+      game_meta: { collective_progress: number };
+    };
+    expect(before.game_meta.collective_progress).toBe(19);
+
+    const res = await handlePostGameContribute(
+      new Request("https://humanity.llc/.well-known/hc/v1/cards/x/objects/y/game-contribute", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "CF-Connecting-IP": "203.0.113.32" },
+        body: JSON.stringify({ qr_id: QR, site_code: "CR-LANTERN-7K" }),
+      }),
+      db as unknown as D1Database,
+      { CITY_GAME_ENABLED: "1" },
+      PROFILE,
+      RIVER_OBJECT
+    );
+    expect(res.status).toBe(409);
+    const body = (await res.json()) as { error?: string };
+    expect(body.error).toBe("OBJECT_EXPIRED");
+
+    const after = JSON.parse(db.objects.get(RIVER_OBJECT)!.child_object_document_json) as {
+      game_meta: { collective_progress: number };
+    };
+    expect(after.game_meta.collective_progress).toBe(19);
+    expect(db.contributeBuckets.size).toBe(0);
+  });
+
   it("allows contribute before window when CITY_GAME_LOCAL_PLAY_OPEN=1", async () => {
     vi.spyOn(seasonWindow, "resolveSeasonWindowPhase").mockReturnValue("before");
     const db = new ContributeDb();

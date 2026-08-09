@@ -1,5 +1,5 @@
 import { PROFILE_ID_REGEX } from "../crypto";
-import { isCareStreamPaused } from "../city-game/scan-view";
+import { isCareStreamPaused, isGameNodeExpired } from "../city-game/scan-view";
 import { validateGameNodeDocument, normalizeGameMeta } from "../city-game/game-meta";
 import { GAME_NODE_OBJECT_TYPE, isCityGameEnabled } from "../city-game/constants";
 import {
@@ -241,6 +241,14 @@ export async function handlePostGameContribute(
   }
 
   const meta = fields.gameMeta;
+
+  if (isGameNodeExpired(meta, now)) {
+    return errorResponse(
+      "OBJECT_EXPIRED",
+      "This temporary drop is no longer accepting contributions.",
+      409
+    );
+  }
 
   if (fields.seasonId !== season.season_id) {
     return errorResponse("SEASON_MISMATCH", "Object season does not match this game.", 403);
