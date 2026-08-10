@@ -164,12 +164,13 @@ function dbFor(state: DbState): D1Database {
               print_frame_background: (args[8] as PrintOrderRow["print_frame_background"]) ?? "full",
               status: args[9] as PrintOrderRow["status"],
               shipping_method: args[10] as string,
+              quantity: args[11] as number,
               tracking_carrier: null,
               tracking_number: null,
               tracking_url: null,
               last_reconciled_at: null,
-              created_at: args[11] as string,
-              updated_at: args[12] as string,
+              created_at: args[12] as string,
+              updated_at: args[13] as string,
             };
             state.printOrders.set(row.commerce_order_id, row);
           }
@@ -384,6 +385,42 @@ describe("Shopify orders webhook (O-001)", () => {
     const printOrder = [...state.printOrders.values()][0];
     expect(printOrder?.template_id).toBe("hc-tier0-sticker-batch-v1");
     expect(JSON.parse(printOrder!.planned_item_qr_ids_json)).toEqual([]);
+    expect(printOrder?.quantity).toBe(1);
+  });
+
+  it("persists Shopify line quantity on Tier 0 batch print orders when qty > 1", async () => {
+    const state: DbState = {
+      intents: new Map(),
+      orders: new Map(),
+      receipts: new Map(),
+      printOrders: new Map(),
+      fulfillmentPii: new Map(),
+    };
+
+    const res = await handlePostShopifyOrdersWebhook(
+      await webhookRequest(
+        paidOrderBody({
+          line_items: [{ variant_id: Number(TIER0_VARIANT), quantity: 3 }],
+        })
+      ),
+      tier0Env,
+      dbFor(state)
+    );
+    const json = (await res.json()) as {
+      status: string;
+      fulfillment_mode: string;
+      print_order_ids: string[];
+    };
+
+    expect(res.status).toBe(200);
+    expect(json.status).toBe("processing");
+    expect(json.fulfillment_mode).toBe("tier0_batch");
+    expect(json.print_order_ids).toHaveLength(1);
+
+    const printOrder = [...state.printOrders.values()][0];
+    expect(printOrder?.template_id).toBe("hc-tier0-sticker-batch-v1");
+    expect(JSON.parse(printOrder!.planned_item_qr_ids_json)).toEqual([]);
+    expect(printOrder?.quantity).toBe(3);
   });
 
   it("accepts tier0 inventory orders without queuing print fulfillment", async () => {

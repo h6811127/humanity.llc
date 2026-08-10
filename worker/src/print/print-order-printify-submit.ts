@@ -1,7 +1,11 @@
 import { resolvePrintifyShippingForSubmit } from "../commerce/resolve-printify-shipping";
 import type { PrintifyShippingSource } from "../commerce/resolve-printify-shipping";
 import { getCommerceOrderById } from "../db/commerce-orders";
-import { updatePrintOrderStatus, type PrintOrderRow } from "../db/print-orders";
+import {
+  normalizePrintOrderQuantity,
+  updatePrintOrderStatus,
+  type PrintOrderRow,
+} from "../db/print-orders";
 import type { Env } from "../env";
 import { submitPrintifyOrder } from "./printify-client";
 
@@ -86,8 +90,13 @@ export async function submitPrintOrderToPrintify(
     };
   }
 
-  let quantity = JSON.parse(printOrder.planned_item_qr_ids_json).length;
-  if (quantity < 1) quantity = 1;
+  // Prefer persisted print_orders.quantity (Tier 0 Shopify line qty). Fall back to
+  // planned QR count for legacy rows, then 1 — never silently force 1 when qty is stored.
+  const plannedLen = (JSON.parse(printOrder.planned_item_qr_ids_json) as unknown[]).length;
+  let quantity = normalizePrintOrderQuantity(
+    printOrder.quantity,
+    plannedLen >= 1 ? plannedLen : 1
+  );
   if (options.quantity !== undefined && options.quantity !== null) {
     if (
       typeof options.quantity !== "number" ||
@@ -101,7 +110,7 @@ export async function submitPrintOrderToPrintify(
         httpStatus: 422,
       };
     }
-    quantity = options.quantity;
+    quantity = normalizePrintOrderQuantity(options.quantity, quantity);
   }
 
   const nowIso = new Date().toISOString();
