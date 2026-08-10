@@ -56,7 +56,7 @@ function authMintRequest(body: Record<string, unknown>): Request {
   });
 }
 
-function printOrderRow(): PrintOrderRow {
+function printOrderRow(overrides: Partial<PrintOrderRow> = {}): PrintOrderRow {
   return {
     order_id: PRINT_ORDER,
     profile_id: PROFILE,
@@ -67,10 +67,18 @@ function printOrderRow(): PrintOrderRow {
     printify_order_id: null,
     printify_shop_id: null,
     template_id: TIER0_BATCH_PRINT_TEMPLATE_ID,
+    print_variant_id: null,
+    print_frame_background: "full",
     status: "awaiting_production_approval",
     shipping_method: "standard",
+    quantity: 1,
+    tracking_carrier: null,
+    tracking_number: null,
+    tracking_url: null,
+    last_reconciled_at: null,
     created_at: CREATED,
     updated_at: CREATED,
+    ...overrides,
   };
 }
 
@@ -204,6 +212,41 @@ describe("submitPrintOrderToPrintify", () => {
     expect(result.printOrder.printify_order_id).toBe("5a96f649b2439217d070f507");
     expect(result.shippingSource).toBe("request_body");
     expect(fetchMock).toHaveBeenCalledOnce();
+  });
+
+  it("uses persisted print_orders.quantity for Tier 0 batch when planned QRs are empty", async () => {
+    const fetchMock = vi.fn(async () =>
+      new Response(JSON.stringify({ id: "5a96f649b2439217d070f509" }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      })
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const printOrder = printOrderRow({
+      print_artifact_ids_json: "[]",
+      planned_item_qr_ids_json: "[]",
+      quantity: 2,
+    });
+    const db = dbFor("pubkey", printOrder);
+    const result = await submitPrintOrderToPrintify(
+      new Request("https://humanity.llc/v1/print/orders"),
+      env(),
+      db,
+      printOrder,
+      { shipping_address: ADDRESS }
+    );
+
+    vi.unstubAllGlobals();
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(fetchMock).toHaveBeenCalledOnce();
+    const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    const body = JSON.parse(String(init.body)) as {
+      line_items: Array<{ quantity: number }>;
+    };
+    expect(body.line_items).toHaveLength(1);
+    expect(body.line_items[0]?.quantity).toBe(2);
   });
 });
 

@@ -12,6 +12,7 @@ import type { BuyerPrintFrameBackground } from "../print/print-frame-background"
 import {
   getPrintOrderByCommerceOrderId,
   insertPrintOrder,
+  normalizePrintOrderQuantity,
   type PrintOrderRow,
 } from "../db/print-orders";
 import { generatePrintOrderId } from "../id";
@@ -23,6 +24,15 @@ import {
 export interface QueuedPrintOrder {
   print_order: PrintOrderRow;
   created: boolean;
+}
+
+export interface EnsurePrintOrderOptions {
+  /**
+   * Explicit units to print. Required for correct Tier 0 batch fulfillment when
+   * planned_item_qr_ids is empty (shared campaign QR). Personalized path ignores
+   * this and uses planned_item_qr_ids.length.
+   */
+  quantity?: number;
 }
 
 function isTier0BatchCommerceOrder(commerceOrder: CommerceOrderRow): boolean {
@@ -37,7 +47,8 @@ function isTier0BatchCommerceOrder(commerceOrder: CommerceOrderRow): boolean {
 export async function ensurePrintOrderForCommerceOrder(
   db: D1Database,
   commerceOrder: CommerceOrderRow,
-  nowIso: string
+  nowIso: string,
+  options: EnsurePrintOrderOptions = {}
 ): Promise<QueuedPrintOrder | null> {
   if (commerceOrder.status !== "processing" || !commerceOrder.profile_id) {
     return null;
@@ -64,6 +75,7 @@ export async function ensurePrintOrderForCommerceOrder(
   if (isTier0BatchCommerceOrder(commerceOrder)) {
     const orderId = generatePrintOrderId();
     const templateId = TIER0_BATCH_PRINT_TEMPLATE_ID;
+    const quantity = normalizePrintOrderQuantity(options.quantity, 1);
     await insertPrintOrder(db, {
       order_id: orderId,
       profile_id: commerceOrder.profile_id!,
@@ -74,6 +86,7 @@ export async function ensurePrintOrderForCommerceOrder(
       template_id: templateId,
       status: "awaiting_production_approval",
       shipping_method: "standard",
+      quantity,
       created_at: nowIso,
     });
 
@@ -98,6 +111,11 @@ export async function ensurePrintOrderForCommerceOrder(
       print_frame_background: DEFAULT_BUYER_PRINT_FRAME_BACKGROUND,
       status: "awaiting_production_approval",
       shipping_method: "standard",
+      quantity,
+      tracking_carrier: null,
+      tracking_number: null,
+      tracking_url: null,
+      last_reconciled_at: null,
       created_at: nowIso,
       updated_at: nowIso,
     };
@@ -129,6 +147,7 @@ export async function ensurePrintOrderForCommerceOrder(
   }
 
   const orderId = generatePrintOrderId();
+  const quantity = plannedItemQrIds.length;
   await insertPrintOrder(db, {
     order_id: orderId,
     profile_id: commerceOrder.profile_id,
@@ -141,6 +160,7 @@ export async function ensurePrintOrderForCommerceOrder(
     print_frame_background: printFrameBackground,
     status: "awaiting_production_approval",
     shipping_method: "standard",
+    quantity,
     created_at: nowIso,
   });
 
@@ -165,6 +185,11 @@ export async function ensurePrintOrderForCommerceOrder(
     print_frame_background: printFrameBackground,
     status: "awaiting_production_approval",
     shipping_method: "standard",
+    quantity,
+    tracking_carrier: null,
+    tracking_number: null,
+    tracking_url: null,
+    last_reconciled_at: null,
     created_at: nowIso,
     updated_at: nowIso,
   };

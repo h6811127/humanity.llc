@@ -269,12 +269,13 @@ function createDb(state: DbState): D1Database {
               print_frame_background: (args[8] as PrintOrderRow["print_frame_background"]) ?? "full",
               status: args[9] as PrintOrderRow["status"],
               shipping_method: args[10] as string,
+              quantity: args[11] as number,
               tracking_carrier: null,
               tracking_number: null,
               tracking_url: null,
               last_reconciled_at: null,
-              created_at: args[11] as string,
-              updated_at: args[12] as string,
+              created_at: args[12] as string,
+              updated_at: args[13] as string,
             };
             state.printOrders.set(row.order_id, row);
             state.printOrdersByCommerce.set(row.commerce_order_id, row);

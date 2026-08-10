@@ -1,6 +1,33 @@
 import type { BuyerPrintFrameBackground } from "../print/print-frame-background";
 import { normalizeBuyerPrintFrameBackground } from "../print/print-frame-background";
 
+/** Inclusive bounds for print_orders.quantity (Shopify Tier 0 line qty + personalized planned length). */
+export const MIN_PRINT_ORDER_QUANTITY = 1;
+export const MAX_PRINT_ORDER_QUANTITY = 1000;
+
+/** Coerce a positive integer quantity in [MIN, MAX]; otherwise return fallback (clamped). */
+export function normalizePrintOrderQuantity(
+  raw: unknown,
+  fallback: number = MIN_PRINT_ORDER_QUANTITY
+): number {
+  if (
+    typeof raw === "number" &&
+    Number.isInteger(raw) &&
+    raw >= MIN_PRINT_ORDER_QUANTITY &&
+    raw <= MAX_PRINT_ORDER_QUANTITY
+  ) {
+    return raw;
+  }
+  if (
+    typeof fallback === "number" &&
+    Number.isInteger(fallback) &&
+    fallback >= MIN_PRINT_ORDER_QUANTITY
+  ) {
+    return Math.min(fallback, MAX_PRINT_ORDER_QUANTITY);
+  }
+  return MIN_PRINT_ORDER_QUANTITY;
+}
+
 export const PRINT_ORDER_STATUSES = [
   "draft",
   "awaiting_payment",
@@ -33,6 +60,8 @@ export interface PrintOrderRow {
   print_frame_background: BuyerPrintFrameBackground;
   status: PrintOrderStatus;
   shipping_method: string;
+  /** Units to print (Tier 0 batch line qty, or personalized planned QR count). */
+  quantity: number;
   tracking_carrier: string | null;
   tracking_number: string | null;
   tracking_url: string | null;
@@ -53,13 +82,14 @@ export interface InsertPrintOrderInput {
   print_frame_background?: BuyerPrintFrameBackground;
   status: PrintOrderStatus;
   shipping_method: string;
+  quantity?: number;
   created_at: string;
 }
 
 const PRINT_ORDER_COLUMNS = `order_id, profile_id, print_artifact_ids_json, planned_item_qr_ids_json,
               commerce_order_id, shopify_order_id, printify_order_id, printify_shop_id,
               template_id, print_variant_id, print_frame_background, status, shipping_method,
-              tracking_carrier, tracking_number, tracking_url, last_reconciled_at,
+              quantity, tracking_carrier, tracking_number, tracking_url, last_reconciled_at,
               created_at, updated_at`;
 
 /** Active print orders linked to Printify — reconciliation poll batch (PM-FR-33). */
@@ -134,13 +164,14 @@ export async function insertPrintOrder(
   db: D1Database,
   input: InsertPrintOrderInput
 ): Promise<void> {
+  const quantity = normalizePrintOrderQuantity(input.quantity, MIN_PRINT_ORDER_QUANTITY);
   await db
     .prepare(
       `INSERT INTO print_orders (
         order_id, profile_id, print_artifact_ids_json, planned_item_qr_ids_json,
         commerce_order_id, shopify_order_id, template_id, print_variant_id, print_frame_background,
-        status, shipping_method, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        status, shipping_method, quantity, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .bind(
       input.order_id,
@@ -154,6 +185,7 @@ export async function insertPrintOrder(
       normalizeBuyerPrintFrameBackground(input.print_frame_background),
       input.status,
       input.shipping_method,
+      quantity,
       input.created_at,
       input.created_at
     )

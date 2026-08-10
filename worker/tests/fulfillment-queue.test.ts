@@ -88,12 +88,13 @@ function dbFor(state: State): D1Database {
               print_frame_background: normalizeBuyerPrintFrameBackground(args[8]),
               status: args[9] as PrintOrderRow["status"],
               shipping_method: args[10] as string,
+              quantity: args[11] as number,
               tracking_carrier: null,
               tracking_number: null,
               tracking_url: null,
               last_reconciled_at: null,
-              created_at: args[11] as string,
-              updated_at: args[12] as string,
+              created_at: args[12] as string,
+              updated_at: args[13] as string,
             };
             state.printOrders.set(row.commerce_order_id, row);
           }
@@ -211,6 +212,7 @@ describe("ensurePrintOrderForCommerceOrder", () => {
       print_frame_background: "full",
       status: "awaiting_production_approval",
       shipping_method: "standard",
+      quantity: 1,
       tracking_carrier: null,
       tracking_number: null,
       tracking_url: null,
@@ -245,5 +247,29 @@ describe("ensurePrintOrderForCommerceOrder", () => {
       "2026-05-16T18:00:00Z"
     );
     expect(result).toBeNull();
+  });
+
+  it("stores explicit quantity on Tier 0 batch queue with empty planned QRs", async () => {
+    const state: State = {
+      intents: new Map(),
+      printOrders: new Map(),
+      commercePrintOrderIds: new Map(),
+    };
+
+    const result = await ensurePrintOrderForCommerceOrder(
+      dbFor(state),
+      commerceOrder({
+        artifact_intent_ids_json: "[]",
+        profile_id: PROFILE,
+      }),
+      "2026-05-16T18:00:00Z",
+      { quantity: 4 }
+    );
+
+    expect(result?.created).toBe(true);
+    expect(result?.print_order.template_id).toBe("hc-tier0-sticker-batch-v1");
+    expect(JSON.parse(result!.print_order.planned_item_qr_ids_json)).toEqual([]);
+    expect(result?.print_order.quantity).toBe(4);
+    expect(state.printOrders.get(COMMERCE)?.quantity).toBe(4);
   });
 });

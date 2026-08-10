@@ -53,6 +53,7 @@ function printOrderResponse(row: PrintOrderRow) {
     template_id: row.template_id,
     status: row.status,
     shipping_method: row.shipping_method,
+    quantity: row.quantity,
     tracking: printOrderTracking(row),
     created_at: row.created_at,
     updated_at: row.updated_at,
@@ -272,9 +273,10 @@ export async function handlePostPrintOrderMint(
 export async function queuePrintOrderAfterPaidWebhook(
   db: D1Database,
   commerceOrder: CommerceOrderRow,
-  nowIso: string
+  nowIso: string,
+  options: { quantity?: number } = {}
 ): Promise<string[]> {
-  const queued = await ensurePrintOrderForCommerceOrder(db, commerceOrder, nowIso);
+  const queued = await ensurePrintOrderForCommerceOrder(db, commerceOrder, nowIso, options);
   if (!queued) return JSON.parse(commerceOrder.print_order_ids_json) as string[];
   return [queued.print_order.order_id];
 }

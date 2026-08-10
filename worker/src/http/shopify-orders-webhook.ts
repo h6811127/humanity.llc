@@ -215,6 +215,13 @@ async function markIntentsConverted(
   }
 }
 
+function tier0BatchQuantityFromOrder(order: ShopifyOrderLike, env: Env): number | undefined {
+  const tier0 = readTier0FulfillmentConfig(env);
+  if (!tier0) return undefined;
+  const quantity = countTier0LineQuantity(order, tier0.shopify_variant_ids);
+  return quantity > 0 ? quantity : undefined;
+}
+
 async function recoverDuplicateProcessingOrder(
   request: Request,
   env: Env,
@@ -256,7 +263,9 @@ async function recoverDuplicateProcessingOrder(
     return { row, autoMint: [], fulfillmentMode };
   }
 
-  const printOrderIds = await queuePrintOrderAfterPaidWebhook(db, row, nowIso);
+  const quantity =
+    fulfillmentMode === "tier0_batch" ? tier0BatchQuantityFromOrder(order, env) : undefined;
+  const printOrderIds = await queuePrintOrderAfterPaidWebhook(db, row, nowIso, { quantity });
   const autoMint = await tryAutoMintQueuedPrintOrders(
     request,
     env,
@@ -361,7 +370,11 @@ async function handlePaidOrder(
       validation.fulfillment_mode === "personalized" ||
       validation.fulfillment_mode === "tier0_batch"
     ) {
-      printOrderIds = await queuePrintOrderAfterPaidWebhook(db, row, nowIso);
+      const quantity =
+        validation.fulfillment_mode === "tier0_batch"
+          ? tier0BatchQuantityFromOrder(order, env)
+          : undefined;
+      printOrderIds = await queuePrintOrderAfterPaidWebhook(db, row, nowIso, { quantity });
       row.print_order_ids_json = JSON.stringify(printOrderIds);
       autoMint = await tryAutoMintQueuedPrintOrders(
         request,
