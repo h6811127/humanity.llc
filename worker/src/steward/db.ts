@@ -163,6 +163,10 @@ export async function revokeAllSessionsForAccount(
 
 /**
  * Lazy lifecycle transitions on entitlement fetch (past_due grace, canceled period end).
+ *
+ * Expire writes CAS on `(status, effective_until)` so a concurrent Stripe
+ * reactivation cannot be overwritten, and sessions/push are only revoked when
+ * the expire row actually applied.
  */
 export async function applyStewardLifecycleTransitions(
   db: D1Database,
@@ -177,7 +181,7 @@ export async function applyStewardLifecycleTransitions(
     shouldExpireCanceledAccount(account, now)
   ) {
     const expired = stewardUpdateForExpiredAccount(account, now);
-    await db
+    const result = await db
       .prepare(
         `UPDATE steward_accounts SET
           plan_id = ?,
@@ -185,16 +189,24 @@ export async function applyStewardLifecycleTransitions(
           effective_from = ?,
           effective_until = NULL,
           updated_at = ?
-         WHERE account_id = ?`
+         WHERE account_id = ?
+           AND status = ?
+           AND effective_until = ?`
       )
       .bind(
         expired.plan_id,
         expired.status,
         expired.effective_from,
         new Date(now).toISOString(),
-        accountId
+        accountId,
+        account.status,
+        account.effective_until
       )
       .run();
+    if ((result.meta?.changes ?? 0) === 0) {
+      // Concurrent billing update (reactivation / plan change) won the row.
+      return getAccount(db, accountId);
+    }
     await revokeAllSessionsForAccount(db, accountId);
     closeStewardPushConnectionsForAccount(accountId);
     await deleteStewardWebPushSubscriptionsForAccount(db, accountId);
