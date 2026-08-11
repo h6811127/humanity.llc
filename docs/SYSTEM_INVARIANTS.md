@@ -310,6 +310,7 @@ Canonical spec: [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLE
 | Session bearer | `Authorization: Bearer <token>` from `POST …/steward/session` only — not checkout `acc_…` IDs; token stored client-side as `hc_steward_session` (see entitlements doc). |
 | Entitlements authority | Server `GET …/steward/entitlements` is source of truth for paid caps; client may cache ≤300s; fail closed to `reference_free` when session missing or invalid. |
 | Profile link | One `profile_id` maps to at most one `account_id` (`idx_steward_profile_unique`); link requires owner-signed `steward_account_link_v1`. |
+| Lazy expire CAS | `applyStewardLifecycleTransitions` expires `past_due`/`canceled` only when `status` + `effective_until` still match the read row; session/push revoke runs only if that UPDATE applied — concurrent Stripe reactivation must not be clobbered to `expired`. |
 | Game season attachment | `game_season` on entitlements requires steward account linked to season root profile; optional `?season_id=` must match that link. |
 | No paywall on identity | Paid plans must not block card create, public scan, or vouch ([`SKEPTIC_FAQ.md`](SKEPTIC_FAQ.md)). |
 

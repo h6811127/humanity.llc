@@ -15,7 +15,11 @@ import {
   handleGetStewardEntitlements,
   handlePostStewardSession,
 } from "../src/resolver/steward-hosted";
-import { stewardSchemaReady, stewardPushSchemaReady } from "../src/steward/db";
+import {
+  applyStewardLifecycleTransitions,
+  stewardSchemaReady,
+  stewardPushSchemaReady,
+} from "../src/steward/db";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const ACCOUNT = "acc_TestHostedSteward1";
@@ -169,22 +173,39 @@ function stewardDb(ownerPublicKey: string): StewardTestDb {
             }
           }
           if (sql.includes("UPDATE steward_accounts")) {
-            const accountId = String(params[params.length - 1]);
-            const row = accounts.get(accountId);
-            if (row) {
-              row.plan_id = params[0];
-              if (sql.includes("plan_version = ?")) {
+            if (sql.includes("plan_version = ?")) {
+              const accountId = String(params[params.length - 1]);
+              const row = accounts.get(accountId);
+              if (row) {
+                row.plan_id = params[0];
                 row.plan_version = params[1];
                 row.status = params[2];
                 row.effective_from = params[3];
                 row.effective_until = params[4];
-              } else {
-                row.status = params[1];
-                row.effective_from = params[2];
-                row.effective_until = null;
+                accounts.set(accountId, row);
+                return { success: true, meta: { changes: 1 } };
               }
-              accounts.set(accountId, row);
+              return { success: true, meta: { changes: 0 } };
             }
+            // Lazy expire CAS: plan_id, status, effective_from, updated_at,
+            // account_id, expected status, expected effective_until
+            const accountId = String(params[4]);
+            const expectedStatus = String(params[5]);
+            const expectedUntil = String(params[6]);
+            const row = accounts.get(accountId);
+            if (
+              !row ||
+              row.status !== expectedStatus ||
+              row.effective_until !== expectedUntil
+            ) {
+              return { success: true, meta: { changes: 0 } };
+            }
+            row.plan_id = params[0];
+            row.status = params[1];
+            row.effective_from = params[2];
+            row.effective_until = null;
+            accounts.set(accountId, row);
+            return { success: true, meta: { changes: 1 } };
           }
           if (sql.includes("DELETE FROM steward_sessions WHERE account_id")) {
             const accountId = String(params[0]);
@@ -194,7 +215,7 @@ function stewardDb(ownerPublicKey: string): StewardTestDb {
               }
             }
           }
-          return { success: true };
+          return { success: true, meta: { changes: 0 } };
         },
         all: async () => {
           if (sql.includes("FROM steward_plan_definitions ORDER")) {
@@ -432,6 +453,107 @@ describe("steward hosted E1", () => {
       db
     );
     expect(revokedSessionRes.status).toBe(401);
+  });
+
+  it("does not clobber concurrent Stripe reactivation during lazy expire", async () => {
+    const { privateKey, publicKeyBase58 } = await getTestKeypair();
+    const db = stewardDb(publicKeyBase58);
+    const env: Env = { DB: db, HOSTED_STEWARD_ENABLED: "1" };
+
+    const linkProof = await buildLinkProof(
+      privateKey,
+      publicKeyBase58,
+      "nonce_lazy_expire_race_001"
+    );
+
+    const sessionRes = await handlePostStewardSession(
+      new Request("https://humanity.llc/.well-known/hc/v1/steward/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          profile_id: PROFILE,
+          device_id: DEVICE,
+          link_proof: linkProof,
+        }),
+      }),
+      env,
+      db
+    );
+    expect(sessionRes.status).toBe(200);
+    const sessionBody = (await sessionRes.json()) as { token: string };
+
+    db.accounts.set(ACCOUNT, {
+      ...db.accounts.get(ACCOUNT)!,
+      plan_id: "hosted_steward_v1",
+      status: "past_due",
+      effective_until: "2026-05-01T00:00:00.000Z",
+      billing_customer_id: "cus_lazy_expire_race",
+      billing_subscription_id: "sub_lazy_expire_race",
+    });
+    expect(db.sessions.size).toBe(1);
+
+    // Simulate Stripe recovery winning between the expire read and write.
+    const originalPrepare = db.prepare.bind(db);
+    let expireSelectSeen = false;
+    db.prepare = ((sql: string) => {
+      const stmt = originalPrepare(sql);
+      if (
+        sql.includes("FROM steward_accounts WHERE account_id") &&
+        !sql.includes("UPDATE")
+      ) {
+        const originalBind = stmt.bind.bind(stmt);
+        stmt.bind = (...params: unknown[]) => {
+          const bound = originalBind(...params);
+          const originalFirst = bound.first.bind(bound);
+          bound.first = async () => {
+            const row = await originalFirst();
+            if (
+              !expireSelectSeen &&
+              row &&
+              (row as { status?: string }).status === "past_due"
+            ) {
+              expireSelectSeen = true;
+              db.accounts.set(ACCOUNT, {
+                ...db.accounts.get(ACCOUNT)!,
+                plan_id: "hosted_steward_v1",
+                status: "active",
+                effective_until: "2026-06-01T00:00:00.000Z",
+              });
+            }
+            return row;
+          };
+          return bound;
+        };
+      }
+      return stmt;
+    }) as typeof db.prepare;
+
+    const after = await applyStewardLifecycleTransitions(db, ACCOUNT);
+    expect(after?.status).toBe("active");
+    expect(after?.plan_id).toBe("hosted_steward_v1");
+    expect(after?.effective_until).toBe("2026-06-01T00:00:00.000Z");
+    expect(db.sessions.size).toBe(1);
+
+    const entRes = await handleGetStewardEntitlements(
+      new Request("https://humanity.llc/.well-known/hc/v1/steward/entitlements", {
+        headers: {
+          Authorization: `Bearer ${sessionBody.token}`,
+          "X-HC-Device-Id": DEVICE,
+        },
+      }),
+      env,
+      db
+    );
+    const ent = (await entRes.json()) as {
+      plan_id: string;
+      status: string;
+      entitlements: Record<string, unknown>;
+    };
+    expect(entRes.status).toBe(200);
+    expect(ent.plan_id).toBe("hosted_steward_v1");
+    expect(ent.status).toBe("active");
+    expect(ent.entitlements["steward.hosted"]).toBe(true);
+    expect(db.sessions.size).toBe(1);
   });
 
   it("lists public plans when enabled", async () => {
