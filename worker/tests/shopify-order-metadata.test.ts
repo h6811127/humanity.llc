@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  countPaidQuantityForArtifactIntent,
   countTier0LineQuantity,
   extractShopifyOrderMetadata,
   shopifyOrderIsPaid,
@@ -50,6 +51,56 @@ describe("countTier0LineQuantity", () => {
       new Set(["12345678"])
     );
     expect(qty).toBe(2);
+  });
+});
+
+describe("countPaidQuantityForArtifactIntent", () => {
+  it("sums line quantities that reference the intent", () => {
+    const qty = countPaidQuantityForArtifactIntent(
+      {
+        line_items: [
+          {
+            quantity: 2,
+            properties: [{ name: "artifact_intent_id", value: "ai_one" }],
+          },
+          {
+            quantity: 3,
+            properties: [{ name: "artifact_intent_id", value: "ai_one" }],
+          },
+          {
+            quantity: 9,
+            properties: [{ name: "artifact_intent_id", value: "ai_other" }],
+          },
+        ],
+      },
+      "ai_one"
+    );
+    expect(qty).toBe(5);
+  });
+
+  it("defaults missing line quantity to 1", () => {
+    const qty = countPaidQuantityForArtifactIntent(
+      {
+        line_items: [
+          {
+            properties: [{ name: "artifact_intent_id", value: "ai_one" }],
+          },
+        ],
+      },
+      "ai_one"
+    );
+    expect(qty).toBe(1);
+  });
+
+  it("ignores note-attribute-only intents with no matching line properties", () => {
+    const qty = countPaidQuantityForArtifactIntent(
+      {
+        note_attributes: [{ name: "artifact_intent_id", value: "ai_one" }],
+        line_items: [{ quantity: 4, variant_id: 1 }],
+      },
+      "ai_one"
+    );
+    expect(qty).toBe(0);
   });
 });
 

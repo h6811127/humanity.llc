@@ -7,6 +7,7 @@ import { fulfillmentPiiEncryptionConfigured } from "../commerce/fulfillment-pii-
 import { parseShopifyOrderShippingAddress } from "../commerce/shopify-shipping-address";
 import { upsertEncryptedShippingAddress } from "../db/commerce-fulfillment-pii";
 import {
+  countPaidQuantityForArtifactIntent,
   countTier0LineQuantity,
   extractShopifyOrderMetadata,
   shopifyOrderIsPaid,
@@ -93,6 +94,7 @@ function isIntentExpired(row: ArtifactIntentRow, nowMs: number): boolean {
 
 async function validatePaidOrderIntents(
   db: D1Database,
+  order: ShopifyOrderLike,
   metadata: NonNullable<ReturnType<typeof extractShopifyOrderMetadata>>,
   nowIso: string
 ): Promise<IntentValidation> {
@@ -150,6 +152,37 @@ async function validatePaidOrderIntents(
         fulfillment_mode: null,
       };
     }
+
+    // Paid Shopify qty must match planned personalized qty (intent.quantity /
+    // planned_item_qr_ids). Prevents overfulfill when cart stays at :1 while
+    // intent was created with quantity > 1, and underfulfill when cart qty is bumped.
+    const paidQty = countPaidQuantityForArtifactIntent(order, intentId);
+    let plannedLen = 0;
+    try {
+      const planned = JSON.parse(row.planned_item_qr_ids_json) as unknown;
+      if (Array.isArray(planned)) plannedLen = planned.length;
+    } catch {
+      plannedLen = 0;
+    }
+    const intentQty =
+      typeof row.quantity === "number" && Number.isFinite(row.quantity) && row.quantity > 0
+        ? row.quantity
+        : 0;
+    if (
+      paidQty < 1 ||
+      intentQty < 1 ||
+      plannedLen < 1 ||
+      paidQty !== intentQty ||
+      paidQty !== plannedLen
+    ) {
+      return {
+        artifact_intent_ids: metadata.artifact_intent_ids,
+        profile_id: profileId ?? row.profile_id,
+        hold_reason: "ARTIFACT_INTENT_QUANTITY_MISMATCH",
+        status: "held_for_review",
+        fulfillment_mode: null,
+      };
+    }
   }
 
   return {
@@ -169,7 +202,7 @@ async function resolvePaidOrderValidation(
   nowIso: string
 ): Promise<IntentValidation> {
   if (metadata.artifact_intent_ids.length > 0) {
-    return validatePaidOrderIntents(db, metadata, nowIso);
+    return validatePaidOrderIntents(db, order, metadata, nowIso);
   }
 
   const inventory = readTier0InventoryFulfillmentConfig(env);

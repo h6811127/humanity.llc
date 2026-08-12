@@ -506,6 +506,156 @@ describe("Shopify orders webhook (O-001)", () => {
     );
   });
 
+  it("holds when paid Shopify qty is less than personalized intent quantity", async () => {
+    const state: DbState = {
+      intents: new Map([
+        [
+          INTENT,
+          intentRow({
+            quantity: 10,
+            planned_item_qr_ids_json: JSON.stringify(
+              Array.from({ length: 10 }, (_, i) => `qr_planned${i + 1}`)
+            ),
+            planned_print_artifact_ids_json: JSON.stringify(
+              Array.from({ length: 10 }, (_, i) => `pa_planned${i + 1}`)
+            ),
+          }),
+        ],
+      ]),
+      orders: new Map(),
+      receipts: new Map(),
+      printOrders: new Map(),
+      fulfillmentPii: new Map(),
+    };
+
+    const res = await handlePostShopifyOrdersWebhook(
+      await webhookRequest(
+        paidOrderBody({
+          line_items: [
+            {
+              quantity: 1,
+              properties: [
+                { name: "artifact_intent_id", value: INTENT },
+                { name: "profile_id", value: PROFILE },
+              ],
+            },
+          ],
+        }),
+        { "X-Shopify-Webhook-Id": "wh_qty_underpay" }
+      ),
+      env,
+      dbFor(state)
+    );
+    const json = (await res.json()) as {
+      status: string;
+      hold_reason: string | null;
+      print_order_ids: string[];
+    };
+
+    expect(res.status).toBe(200);
+    expect(json.status).toBe("held_for_review");
+    expect(json.hold_reason).toBe("ARTIFACT_INTENT_QUANTITY_MISMATCH");
+    expect(json.print_order_ids).toEqual([]);
+    expect(state.intents.get(INTENT)?.status).toBe("attached_to_cart");
+    expect(state.printOrders.size).toBe(0);
+  });
+
+  it("holds when paid Shopify qty exceeds personalized intent quantity", async () => {
+    const state: DbState = {
+      intents: new Map([[INTENT, intentRow({ quantity: 1 })]]),
+      orders: new Map(),
+      receipts: new Map(),
+      printOrders: new Map(),
+      fulfillmentPii: new Map(),
+    };
+
+    const res = await handlePostShopifyOrdersWebhook(
+      await webhookRequest(
+        paidOrderBody({
+          line_items: [
+            {
+              quantity: 3,
+              properties: [
+                { name: "artifact_intent_id", value: INTENT },
+                { name: "profile_id", value: PROFILE },
+              ],
+            },
+          ],
+        }),
+        { "X-Shopify-Webhook-Id": "wh_qty_overpay" }
+      ),
+      env,
+      dbFor(state)
+    );
+    const json = (await res.json()) as {
+      status: string;
+      hold_reason: string | null;
+      print_order_ids: string[];
+    };
+
+    expect(res.status).toBe(200);
+    expect(json.status).toBe("held_for_review");
+    expect(json.hold_reason).toBe("ARTIFACT_INTENT_QUANTITY_MISMATCH");
+    expect(json.print_order_ids).toEqual([]);
+    expect(state.printOrders.size).toBe(0);
+  });
+
+  it("processes when paid Shopify qty matches personalized intent quantity", async () => {
+    const planned = ["qr_a", "qr_b"];
+    const artifacts = ["pa_a", "pa_b"];
+    const state: DbState = {
+      intents: new Map([
+        [
+          INTENT,
+          intentRow({
+            quantity: 2,
+            planned_item_qr_ids_json: JSON.stringify(planned),
+            planned_print_artifact_ids_json: JSON.stringify(artifacts),
+          }),
+        ],
+      ]),
+      orders: new Map(),
+      receipts: new Map(),
+      printOrders: new Map(),
+      fulfillmentPii: new Map(),
+    };
+
+    const res = await handlePostShopifyOrdersWebhook(
+      await webhookRequest(
+        paidOrderBody({
+          line_items: [
+            {
+              quantity: 2,
+              properties: [
+                { name: "artifact_intent_id", value: INTENT },
+                { name: "profile_id", value: PROFILE },
+              ],
+            },
+          ],
+        }),
+        { "X-Shopify-Webhook-Id": "wh_qty_match" }
+      ),
+      env,
+      dbFor(state)
+    );
+    const json = (await res.json()) as {
+      status: string;
+      hold_reason: string | null;
+      print_order_ids: string[];
+      fulfillment_mode: string;
+    };
+
+    expect(res.status).toBe(200);
+    expect(json.status).toBe("processing");
+    expect(json.hold_reason).toBeNull();
+    expect(json.fulfillment_mode).toBe("personalized");
+    expect(json.print_order_ids).toHaveLength(1);
+    expect(state.intents.get(INTENT)?.status).toBe("converted");
+    expect(JSON.parse([...state.printOrders.values()][0]!.planned_item_qr_ids_json)).toEqual(
+      planned
+    );
+  });
+
   it("holds a new paid order that reuses an already converted artifact intent", async () => {
     const firstOrder = commerceOrderRow({
       commerce_order_id: "co_first_checkout",
