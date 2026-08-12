@@ -44,6 +44,12 @@ function lineItemVariantId(item: ShopifyLineItem): string | null {
   return null;
 }
 
+function lineItemQuantity(item: ShopifyLineItem): number {
+  return typeof item.quantity === "number" && Number.isFinite(item.quantity) && item.quantity > 0
+    ? item.quantity
+    : 1;
+}
+
 export function countTier0LineQuantity(
   order: ShopifyOrderLike,
   variantIds: Set<string>
@@ -52,11 +58,30 @@ export function countTier0LineQuantity(
   for (const item of order.line_items ?? []) {
     const variantId = lineItemVariantId(item);
     if (!variantId || !variantIds.has(variantId)) continue;
-    const qty =
-      typeof item.quantity === "number" && Number.isFinite(item.quantity) && item.quantity > 0
-        ? item.quantity
-        : 1;
-    quantity += qty;
+    quantity += lineItemQuantity(item);
+  }
+  return quantity;
+}
+
+/**
+ * Sum Shopify line quantities whose line properties reference the given
+ * artifact_intent_id. Used to reject paid qty ≠ planned personalized qty.
+ */
+export function countPaidQuantityForArtifactIntent(
+  order: ShopifyOrderLike,
+  artifactIntentId: string
+): number {
+  const target = artifactIntentId.trim();
+  if (!target.startsWith("ai_")) return 0;
+
+  let quantity = 0;
+  for (const item of order.line_items ?? []) {
+    const props = readAttributes(item.properties);
+    const raw = props.get("artifact_intent_id");
+    if (!raw) continue;
+    const ids = collectIntentIds([raw]);
+    if (!ids.includes(target)) continue;
+    quantity += lineItemQuantity(item);
   }
   return quantity;
 }

@@ -87,6 +87,8 @@ function holdDetail(holdReason: string | null): string | null {
       return "We received payment but need to verify order details. Support will follow up.";
     case "ARTIFACT_INTENT_EXPIRED":
       return "Your personalization session expired before payment cleared. Contact support.";
+    case "ARTIFACT_INTENT_QUANTITY_MISMATCH":
+      return "We received payment but the paid quantity does not match your personalization. Support will follow up.";
     default:
       return "Your order needs a manual review. Support will follow up.";
   }
