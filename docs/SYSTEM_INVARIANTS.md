@@ -312,11 +312,12 @@ Canonical spec: [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLE
 | Profile link | One `profile_id` maps to at most one `account_id` (`idx_steward_profile_unique`); link requires owner-signed `steward_account_link_v1`. |
 | Game season attachment | `game_season` on entitlements requires steward account linked to season root profile; optional `?season_id=` must match that link. |
 | No paywall on identity | Paid plans must not block card create, public scan, or vouch ([`SKEPTIC_FAQ.md`](SKEPTIC_FAQ.md)). |
+| Billing subscription match | Stripe demotions (`subscription.deleted`, `invoice.payment_failed`, demoting `subscription.updated`) apply only when the event subscription id matches the account’s current `billing_subscription_id`. Stale events for a superseded subscription must not expire sessions or rewrite the live plan. Replacement grants may change the subscription id only from `checkout.session.completed` or `customer.subscription.created` when status is `active`/`trialing`. |
 
 **Regression:**
 
 ```bash
-npm run worker:test -- worker/tests/steward-hosted.test.ts worker/tests/city-game-season-entitlements-api.test.ts worker/tests/billing-lifecycle.test.ts
+npm run worker:test -- worker/tests/steward-hosted.test.ts worker/tests/city-game-season-entitlements-api.test.ts worker/tests/billing-lifecycle.test.ts worker/tests/billing-webhook.test.ts
 ```
 
 Touching `worker/src/resolver/steward-hosted.ts`, `worker/src/steward/*`, or `site/js/device-steward-entitlements*.mjs` requires the block above when behavior changes.
