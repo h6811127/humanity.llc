@@ -171,7 +171,7 @@ describe("tryAutoMintPrintOrderFromIntents", () => {
     expect(printifySubmit.submitPrintOrderToPrintify).not.toHaveBeenCalled();
   });
 
-  it("submits Printify after a complete mint", async () => {
+  it("submits Printify after a complete mint that the DB also reports minted", async () => {
     vi.spyOn(artifactIntents, "getArtifactIntent").mockResolvedValue({
       artifact_intent_id: INTENT,
       pending_mint_credentials_json: JSON.stringify([{ qr_id: "qr_one" }]),
@@ -182,6 +182,7 @@ describe("tryAutoMintPrintOrderFromIntents", () => {
       failures: [],
       all_planned_minted: true,
     });
+    vi.spyOn(fulfillmentMint, "allPlannedQrsMinted").mockResolvedValue(true);
 
     const result = await tryAutoMintPrintOrderFromIntents(
       request(),
@@ -199,6 +200,37 @@ describe("tryAutoMintPrintOrderFromIntents", () => {
       failure_count: 0,
     });
     expect(result.printify_submit.submitted).toBe(true);
+  });
+
+  it("does not submit Printify when mint claims complete but planned QRs are not yet stored", async () => {
+    vi.spyOn(artifactIntents, "getArtifactIntent").mockResolvedValue({
+      artifact_intent_id: INTENT,
+      pending_mint_credentials_json: JSON.stringify([{ qr_id: "qr_one" }]),
+    } as Awaited<ReturnType<typeof artifactIntents.getArtifactIntent>>);
+    vi.spyOn(fulfillmentMint, "mintPrintOrderFromCredentials").mockResolvedValue({
+      ok: true,
+      minted: [{ qr_id: "qr_one" } as never],
+      failures: [],
+      all_planned_minted: true,
+    });
+    vi.spyOn(fulfillmentMint, "allPlannedQrsMinted").mockResolvedValue(false);
+
+    const result = await tryAutoMintPrintOrderFromIntents(
+      request(),
+      env(true),
+      {} as D1Database,
+      PRINT_ORDER,
+      [INTENT]
+    );
+
+    expect(result.attempted).toBe(true);
+    expect(result.all_planned_minted).toBe(true);
+    expect(result.printify_submit).toEqual({
+      attempted: false,
+      submitted: false,
+      skipped: true,
+    });
+    expect(printifySubmit.submitPrintOrderToPrintify).not.toHaveBeenCalled();
   });
 });
 
