@@ -91,6 +91,26 @@ function isIntentExpired(row: ArtifactIntentRow, nowMs: number): boolean {
   return Number.isFinite(expiresMs) && expiresMs <= nowMs;
 }
 
+/** Paid fulfillment queues one Printify order; mixed product/variant/frame would last-win. */
+export function intentsShareSinglePrintSpec(
+  intents: Pick<
+    ArtifactIntentRow,
+    "product_id" | "print_variant_id" | "print_frame_background"
+  >[]
+): boolean {
+  if (intents.length <= 1) return true;
+  const first = intents[0]!;
+  const productId = first.product_id ?? "";
+  const variantId = first.print_variant_id?.trim() ?? "";
+  const frame = first.print_frame_background;
+  return intents.every(
+    (row) =>
+      (row.product_id ?? "") === productId &&
+      (row.print_variant_id?.trim() ?? "") === variantId &&
+      row.print_frame_background === frame
+  );
+}
+
 async function validatePaidOrderIntents(
   db: D1Database,
   metadata: NonNullable<ReturnType<typeof extractShopifyOrderMetadata>>,
@@ -98,6 +118,7 @@ async function validatePaidOrderIntents(
 ): Promise<IntentValidation> {
   let profileId = metadata.profile_id;
   const nowMs = Date.parse(nowIso);
+  const loadedIntents: ArtifactIntentRow[] = [];
 
   for (const intentId of metadata.artifact_intent_ids) {
     const row = await getArtifactIntent(db, intentId);
@@ -150,6 +171,17 @@ async function validatePaidOrderIntents(
         fulfillment_mode: null,
       };
     }
+    loadedIntents.push(row);
+  }
+
+  if (!intentsShareSinglePrintSpec(loadedIntents)) {
+    return {
+      artifact_intent_ids: metadata.artifact_intent_ids,
+      profile_id: profileId,
+      hold_reason: "ARTIFACT_INTENT_PRODUCT_MISMATCH",
+      status: "held_for_review",
+      fulfillment_mode: null,
+    };
   }
 
   return {
