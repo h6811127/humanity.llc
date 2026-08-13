@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { ArtifactIntentRow } from "../src/db/artifact-intents";
 import type { CommerceOrderRow } from "../src/db/commerce-orders";
 import type { PrintOrderRow } from "../src/db/print-orders";
-import { handlePostShopifyOrdersWebhook } from "../src/http/shopify-orders-webhook";
+import { handlePostShopifyOrdersWebhook, intentsShareSinglePrintSpec } from "../src/http/shopify-orders-webhook";
 import type { Env } from "../src/env";
 import { DEFAULT_PRINT_TEMPLATE_ID } from "../src/print/print-catalog";
 
@@ -258,6 +258,54 @@ const tier0InventoryEnv = {
 } as Env;
 
 describe("Shopify orders webhook (O-001)", () => {
+  it("treats same product/variant/frame intents as one print spec", () => {
+    expect(
+      intentsShareSinglePrintSpec([
+        {
+          product_id: "prod_glitch_hoodie",
+          print_variant_id: "black-m",
+          print_frame_background: "full",
+        },
+        {
+          product_id: "prod_glitch_hoodie",
+          print_variant_id: "black-m",
+          print_frame_background: "full",
+        },
+      ])
+    ).toBe(true);
+  });
+
+  it("rejects mixed product or variant print specs", () => {
+    expect(
+      intentsShareSinglePrintSpec([
+        {
+          product_id: "prod_sticker_square",
+          print_variant_id: null,
+          print_frame_background: "full",
+        },
+        {
+          product_id: "prod_glitch_hoodie",
+          print_variant_id: "black-m",
+          print_frame_background: "full",
+        },
+      ])
+    ).toBe(false);
+    expect(
+      intentsShareSinglePrintSpec([
+        {
+          product_id: "prod_glitch_hoodie",
+          print_variant_id: "black-s",
+          print_frame_background: "full",
+        },
+        {
+          product_id: "prod_glitch_hoodie",
+          print_variant_id: "black-l",
+          print_frame_background: "full",
+        },
+      ])
+    ).toBe(false);
+  });
+
   it("creates processing commerce order and converts intent", async () => {
     const state: DbState = {
       intents: new Map([[INTENT, intentRow()]]),
@@ -539,6 +587,173 @@ describe("Shopify orders webhook (O-001)", () => {
     expect(json.print_order_ids).toEqual([]);
     expect(state.orders.get("450789469")?.status).toBe("held_for_review");
     expect(state.printOrders.size).toBe(0);
+  });
+
+  it("holds mixed personalized products instead of last-win Printify template", async () => {
+    const secondIntent = "ai_PaidWebhookTest02";
+    const state: DbState = {
+      intents: new Map([
+        [INTENT, intentRow({ product_id: "prod_sticker_square" })],
+        [
+          secondIntent,
+          intentRow({
+            artifact_intent_id: secondIntent,
+            product_id: "prod_glitch_hoodie",
+            print_variant_id: "black-m",
+            planned_item_qr_ids_json: JSON.stringify(["qr_planned2"]),
+            planned_print_artifact_ids_json: JSON.stringify(["pa_planned2"]),
+          }),
+        ],
+      ]),
+      orders: new Map(),
+      receipts: new Map(),
+      printOrders: new Map(),
+      fulfillmentPii: new Map(),
+    };
+
+    const res = await handlePostShopifyOrdersWebhook(
+      await webhookRequest(
+        paidOrderBody({
+          line_items: [
+            {
+              properties: [
+                { name: "artifact_intent_id", value: INTENT },
+                { name: "profile_id", value: PROFILE },
+              ],
+            },
+            {
+              properties: [
+                { name: "artifact_intent_id", value: secondIntent },
+                { name: "profile_id", value: PROFILE },
+              ],
+            },
+          ],
+        })
+      ),
+      env,
+      dbFor(state)
+    );
+    const json = (await res.json()) as {
+      status: string;
+      hold_reason: string | null;
+      print_order_ids: string[];
+    };
+
+    expect(res.status).toBe(200);
+    expect(json.status).toBe("held_for_review");
+    expect(json.hold_reason).toBe("ARTIFACT_INTENT_PRODUCT_MISMATCH");
+    expect(json.print_order_ids).toEqual([]);
+    expect(state.printOrders.size).toBe(0);
+    expect(state.intents.get(INTENT)?.status).toBe("attached_to_cart");
+    expect(state.intents.get(secondIntent)?.status).toBe("attached_to_cart");
+  });
+
+  it("holds mixed Glitch sizes on one paid order", async () => {
+    const secondIntent = "ai_PaidWebhookTest03";
+    const state: DbState = {
+      intents: new Map([
+        [
+          INTENT,
+          intentRow({
+            product_id: "prod_glitch_hoodie",
+            print_variant_id: "black-s",
+          }),
+        ],
+        [
+          secondIntent,
+          intentRow({
+            artifact_intent_id: secondIntent,
+            product_id: "prod_glitch_hoodie",
+            print_variant_id: "black-l",
+            planned_item_qr_ids_json: JSON.stringify(["qr_planned2"]),
+            planned_print_artifact_ids_json: JSON.stringify(["pa_planned2"]),
+          }),
+        ],
+      ]),
+      orders: new Map(),
+      receipts: new Map(),
+      printOrders: new Map(),
+      fulfillmentPii: new Map(),
+    };
+
+    const res = await handlePostShopifyOrdersWebhook(
+      await webhookRequest(
+        paidOrderBody({
+          line_items: [
+            {
+              properties: [{ name: "artifact_intent_id", value: INTENT }],
+            },
+            {
+              properties: [{ name: "artifact_intent_id", value: secondIntent }],
+            },
+          ],
+        })
+      ),
+      env,
+      dbFor(state)
+    );
+    const json = (await res.json()) as { status: string; hold_reason: string | null };
+
+    expect(res.status).toBe(200);
+    expect(json.status).toBe("held_for_review");
+    expect(json.hold_reason).toBe("ARTIFACT_INTENT_PRODUCT_MISMATCH");
+    expect(state.printOrders.size).toBe(0);
+  });
+
+  it("still queues one print order when same-spec intents share a checkout", async () => {
+    const secondIntent = "ai_PaidWebhookTest04";
+    const state: DbState = {
+      intents: new Map([
+        [INTENT, intentRow({ product_id: "prod_sticker_square" })],
+        [
+          secondIntent,
+          intentRow({
+            artifact_intent_id: secondIntent,
+            product_id: "prod_sticker_square",
+            planned_item_qr_ids_json: JSON.stringify(["qr_planned2"]),
+            planned_print_artifact_ids_json: JSON.stringify(["pa_planned2"]),
+          }),
+        ],
+      ]),
+      orders: new Map(),
+      receipts: new Map(),
+      printOrders: new Map(),
+      fulfillmentPii: new Map(),
+    };
+
+    const res = await handlePostShopifyOrdersWebhook(
+      await webhookRequest(
+        paidOrderBody({
+          line_items: [
+            {
+              properties: [{ name: "artifact_intent_id", value: INTENT }],
+            },
+            {
+              properties: [{ name: "artifact_intent_id", value: secondIntent }],
+            },
+          ],
+        })
+      ),
+      env,
+      dbFor(state)
+    );
+    const json = (await res.json()) as {
+      status: string;
+      hold_reason: string | null;
+      print_order_ids: string[];
+    };
+
+    expect(res.status).toBe(200);
+    expect(json.status).toBe("processing");
+    expect(json.hold_reason).toBeNull();
+    expect(json.print_order_ids).toHaveLength(1);
+    expect(state.intents.get(INTENT)?.status).toBe("converted");
+    expect(state.intents.get(secondIntent)?.status).toBe("converted");
+    const printOrder = [...state.printOrders.values()][0];
+    expect(JSON.parse(printOrder!.planned_item_qr_ids_json)).toEqual([
+      "qr_planned1",
+      "qr_planned2",
+    ]);
   });
 
   it("rejects invalid HMAC", async () => {
