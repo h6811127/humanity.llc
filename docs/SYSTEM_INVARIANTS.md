@@ -215,6 +215,7 @@ New floating UI must use `--surface-popover-*` per [`UI_COLOR_SCHEME_STANDARD.md
 ## Cards, keys, verification
 
 - Steward status is on the resolver; vouch signing needs root `hc_created` keys on the same browser tab.
+- Vouch **90-day wait** and **yearly issuance quota** are evaluated at **server receipt time**, not the signed `created_at`. A client-chosen timestamp must not skip `VOUCHER_TOO_NEW` or reset the sliding year window ([`M6_VOUCHING_DESIGN.md`](M6_VOUCHING_DESIGN.md) § Abuse prevention).
 - Cross-device restore: **recovery code** (primary) or encrypted backup (advanced).
 - Large wallets (~10+ saved root cards): poll budget and shell perf limits in [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) still apply.
 

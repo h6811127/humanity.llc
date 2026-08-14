@@ -114,9 +114,9 @@ Design for hostile actors, not only happy-path founders. **Full threat catalog:*
 | Control | V1 status |
 |---|---|
 | 3 distinct vouchers required | Enforced in summary recalc |
-| 5 yearly issuances per verified-human voucher | **Enforced** (`VOUCHER_ACTIVE_QUOTA_PER_YEAR`) |
-| 3 yearly issuances per steward voucher | **Enforced** (`STEWARD_VOUCHER_ISSUANCE_CAP_PER_YEAR`) |
-| 90-day wait after voucher becomes verified | **Enforced** (`VOUCHER_WAIT_DAYS`) |
+| 5 yearly issuances per verified-human voucher | **Enforced** (`VOUCHER_ACTIVE_QUOTA_PER_YEAR`) — window from **server receipt time**, not signed `created_at` |
+| 3 yearly issuances per steward voucher | **Enforced** (`STEWARD_VOUCHER_ISSUANCE_CAP_PER_YEAR`) — same server-time window |
+| 90-day wait after voucher becomes verified | **Enforced** (`VOUCHER_WAIT_DAYS`) — compared to server receipt time, not signed `created_at` |
 | One active vouch per voucher→vouchee pair | **Unique index** |
 | Steward audit hooks for suspicious clusters | **Shipped** (`closed_loop_only`, `shared_voucher_set`, `directed_cycle_cluster`, `steward_issuance_burst`) |
 
