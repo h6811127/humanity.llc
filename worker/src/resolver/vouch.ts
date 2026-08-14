@@ -167,8 +167,12 @@ export async function handlePostVouch(
     );
   }
 
+  // Wait and yearly quota use server receipt time. Signed created_at is
+  // client-chosen and must not move the eligibility window.
+  const receivedAt = new Date().toISOString();
+
   if (summary.state !== "steward") {
-    const eligibleSince = minusDaysIso(createdAt, VOUCHER_WAIT_DAYS);
+    const eligibleSince = minusDaysIso(receivedAt, VOUCHER_WAIT_DAYS);
     if (summary.updated_at > eligibleSince) {
       return errorResponse(
         "VOUCHER_TOO_NEW",
@@ -186,7 +190,7 @@ export async function handlePostVouch(
     );
   }
 
-  const quotaSince = minusDaysIso(createdAt, 365);
+  const quotaSince = minusDaysIso(receivedAt, 365);
   const activeIssued = await voucherIssuanceCountSince(db, voucherProfileId, quotaSince);
   const yearlyCap =
     summary.state === "steward"

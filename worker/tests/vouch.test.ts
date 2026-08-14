@@ -356,7 +356,7 @@ describe("handlePostVouch", () => {
       level: 2,
       label: "Vouched Human",
       method: "vouch",
-      updated_at: "2026-05-01T00:00:00.000Z",
+      updated_at: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
     });
 
     const res = await post(
@@ -370,6 +370,91 @@ describe("handlePostVouch", () => {
     expect(res.status).toBe(403);
     expect((await res.json()) as { error: string }).toMatchObject({
       error: "VOUCHER_TOO_NEW",
+    });
+  });
+
+  it("does not skip the 90 day wait when created_at is in the future", async () => {
+    const db = new FakeVerificationDb();
+    const voucherKeys = await keypair();
+    const voucheeKeys = await keypair();
+    const voucherProfileId = "8Ym8nQ3pR5sU7wX9zA2bC4dE6";
+    db.addCard(voucherProfileId, voucherKeys.publicKeyBase58);
+    db.addCard(VOUCHEE, voucheeKeys.publicKeyBase58);
+    db.setSummary(voucherProfileId, {
+      state: "verified_human",
+      level: 2,
+      label: "Vouched Human",
+      method: "vouch",
+      updated_at: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+    });
+
+    const futureCreatedAt = new Date(Date.now() + 120 * 24 * 60 * 60 * 1000).toISOString();
+    const res = await post(
+      db,
+      await signedVouch({
+        voucherProfileId,
+        createdAt: futureCreatedAt,
+        ...voucherKeys,
+      })
+    );
+    expect(res.status).toBe(403);
+    expect((await res.json()) as { error: string }).toMatchObject({
+      error: "VOUCHER_TOO_NEW",
+    });
+  });
+
+  it("does not reset yearly quota when created_at is far in the future", async () => {
+    const db = new FakeVerificationDb();
+    const voucheeKeys = await keypair();
+    db.addCard(VOUCHEE, voucheeKeys.publicKeyBase58);
+
+    const stewardProfileId = "8Ym8nQ3pR5sU7wX9zA2bC4dE6";
+    const stewardKeys = await keypair();
+    db.addCard(stewardProfileId, stewardKeys.publicKeyBase58);
+    db.setSummary(stewardProfileId, {
+      state: "steward",
+      level: 3,
+      label: "Steward",
+      method: "governance",
+      updated_at: "2026-01-01T00:00:00.000Z",
+    });
+
+    for (let i = 0; i < 3; i++) {
+      const target = `7Xk9mP2nQ4rT6vW8yZ1aB3cD${i + 1}`;
+      const targetKeys = await keypair();
+      db.addCard(target, targetKeys.publicKeyBase58);
+      const ok = await post(
+        db,
+        await signedVouch({
+          voucherProfileId: stewardProfileId,
+          voucheeProfileId: target,
+          vouchId: `vouch_future_quota_${i}`,
+          nonce: `nonce_future_quota_${i}`,
+          createdAt: `2026-05-${20 + i}T17:00:00.000Z`,
+          ...stewardKeys,
+        })
+      );
+      expect(ok.status).toBe(201);
+    }
+
+    const extraTarget = "7Xk9mP2nQ4rT6vW8yZ1aB3cD9";
+    const extraTargetKeys = await keypair();
+    db.addCard(extraTarget, extraTargetKeys.publicKeyBase58);
+    const futureCreatedAt = new Date(Date.now() + 400 * 24 * 60 * 60 * 1000).toISOString();
+    const blocked = await post(
+      db,
+      await signedVouch({
+        voucherProfileId: stewardProfileId,
+        voucheeProfileId: extraTarget,
+        vouchId: "vouch_future_quota_blocked",
+        nonce: "nonce_future_quota_blocked",
+        createdAt: futureCreatedAt,
+        ...stewardKeys,
+      })
+    );
+    expect(blocked.status).toBe(403);
+    expect((await blocked.json()) as { error: string }).toMatchObject({
+      error: "STEWARD_VOUCH_QUOTA_EXCEEDED",
     });
   });
 });
