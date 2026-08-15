@@ -31,6 +31,7 @@ import { verifyShopifyWebhookHmac } from "./shopify-webhook-verify";
 import type { Env } from "../env";
 import { generateCommerceOrderId } from "../id";
 import { tryAutoMintQueuedPrintOrders, type AutoMintFromIntentsResult } from "../commerce/fulfillment-auto-mint";
+import { validateIntentPaidShopifyVariants } from "../commerce/personalized-variant-bind";
 import { queuePrintOrderAfterPaidWebhook } from "../print/print-orders-handler";
 
 const PAID_TOPICS = new Set(["orders/paid", "orders/create"]);
@@ -93,6 +94,7 @@ function isIntentExpired(row: ArtifactIntentRow, nowMs: number): boolean {
 
 async function validatePaidOrderIntents(
   db: D1Database,
+  order: ShopifyOrderLike,
   metadata: NonNullable<ReturnType<typeof extractShopifyOrderMetadata>>,
   nowIso: string
 ): Promise<IntentValidation> {
@@ -140,6 +142,16 @@ async function validatePaidOrderIntents(
         fulfillment_mode: null,
       };
     }
+    const variantBind = validateIntentPaidShopifyVariants(row, order, intentId);
+    if (!variantBind.ok) {
+      return {
+        artifact_intent_ids: metadata.artifact_intent_ids,
+        profile_id: profileId ?? row.profile_id,
+        hold_reason: variantBind.hold_reason,
+        status: "held_for_review",
+        fulfillment_mode: null,
+      };
+    }
     if (!profileId) profileId = row.profile_id;
     else if (profileId !== row.profile_id) {
       return {
@@ -169,7 +181,7 @@ async function resolvePaidOrderValidation(
   nowIso: string
 ): Promise<IntentValidation> {
   if (metadata.artifact_intent_ids.length > 0) {
-    return validatePaidOrderIntents(db, metadata, nowIso);
+    return validatePaidOrderIntents(db, order, metadata, nowIso);
   }
 
   const inventory = readTier0InventoryFulfillmentConfig(env);
