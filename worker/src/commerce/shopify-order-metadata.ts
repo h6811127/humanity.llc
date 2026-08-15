@@ -34,7 +34,7 @@ export interface ExtractedShopifyOrderMetadata {
   artifact_intent_ids: string[];
 }
 
-function lineItemVariantId(item: ShopifyLineItem): string | null {
+export function lineItemVariantId(item: ShopifyLineItem): string | null {
   if (typeof item.variant_id === "number" && Number.isFinite(item.variant_id)) {
     return String(item.variant_id);
   }
@@ -42,6 +42,22 @@ function lineItemVariantId(item: ShopifyLineItem): string | null {
     return item.variant_id.trim();
   }
   return null;
+}
+
+export function lineItemHasArtifactIntent(
+  item: ShopifyLineItem,
+  artifactIntentId: string
+): boolean {
+  const intentId = artifactIntentId.trim();
+  if (!intentId) return false;
+  for (const pair of item.properties ?? []) {
+    if (typeof pair.name !== "string" || typeof pair.value !== "string") continue;
+    if (pair.name.trim() !== "artifact_intent_id") continue;
+    for (const part of pair.value.split(",")) {
+      if (part.trim() === intentId) return true;
+    }
+  }
+  return false;
 }
 
 export function countTier0LineQuantity(

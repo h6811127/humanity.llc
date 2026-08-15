@@ -328,6 +328,55 @@ describe("Shopify orders webhook (O-001)", () => {
     expect(JSON.parse(printOrder!.planned_item_qr_ids_json)).toEqual(["qr_planned1"]);
   });
 
+  it("holds personalized order when paid Shopify variant does not match intent print spec", async () => {
+    const state: DbState = {
+      intents: new Map([
+        [
+          INTENT,
+          intentRow({
+            product_id: "glitch_hoodie_v1",
+            print_variant_id: "navy-3xl",
+          }),
+        ],
+      ]),
+      orders: new Map(),
+      receipts: new Map(),
+      printOrders: new Map(),
+      fulfillmentPii: new Map(),
+    };
+
+    const res = await handlePostShopifyOrdersWebhook(
+      await webhookRequest(
+        paidOrderBody({
+          line_items: [
+            {
+              variant_id: 52946880266549,
+              quantity: 1,
+              properties: [
+                { name: "artifact_intent_id", value: INTENT },
+                { name: "profile_id", value: PROFILE },
+              ],
+            },
+          ],
+        })
+      ),
+      env,
+      dbFor(state)
+    );
+    const json = (await res.json()) as {
+      status: string;
+      hold_reason: string;
+      print_order_ids: string[];
+    };
+
+    expect(res.status).toBe(200);
+    expect(json.status).toBe("held_for_review");
+    expect(json.hold_reason).toBe("ARTIFACT_INTENT_VARIANT_MISMATCH");
+    expect(json.print_order_ids).toEqual([]);
+    expect(state.printOrders.size).toBe(0);
+    expect(state.intents.get(INTENT)?.status).toBe("attached_to_cart");
+  });
+
   it("holds order when artifact intent metadata is missing", async () => {
     const state: DbState = {
       intents: new Map(),
