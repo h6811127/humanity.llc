@@ -108,7 +108,7 @@ describe("parseShopifyOrderShippingAddress leftover edges", () => {
   });
 
   it("returns null when email is missing or blank", () => {
-    expect(parseShopifyOrderShippingAddress(order(COMPLETE_SHIP, undefined))).toBeNull();
+    expect(parseShopifyOrderShippingAddress(order(COMPLETE_SHIP, null))).toBeNull();
     expect(parseShopifyOrderShippingAddress(order(COMPLETE_SHIP, "   "))).toBeNull();
   });
 
