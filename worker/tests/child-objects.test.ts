@@ -269,6 +269,67 @@ describe("child object endpoints", () => {
     expect(db.objects.get(OBJECT_ID)?.public_state).toBe("Closed until Monday");
   });
 
+  it("rejects update that retypes a status plate into a game_node", async () => {
+    const keys = await getTestKeypair();
+    const db = new ChildObjectDb();
+    db.parent.public_key = keys.publicKeyBase58;
+    const created = await signedChildObject(keys);
+    await handlePostChildObjectCreate(
+      requestFor(`/.well-known/hc/v1/cards/${PROFILE}/objects`, created),
+      db as unknown as D1Database,
+      PROFILE
+    );
+
+    const retyped = await signedChildObject(keys, {
+      object_type: "game_node",
+      season_id: "cedar_rapids_s1",
+      node_role: "witness",
+      updated_at: "2026-05-17T12:00:00.000Z",
+    });
+    const res = await handlePostChildObjectUpdate(
+      requestFor(`/.well-known/hc/v1/cards/${PROFILE}/objects/${OBJECT_ID}/update`, retyped),
+      db as unknown as D1Database,
+      PROFILE,
+      OBJECT_ID
+    );
+
+    expect(res.status).toBe(422);
+    const body = (await res.json()) as { error?: string };
+    expect(body.error).toBe("OBJECT_TYPE_IMMUTABLE");
+    expect(db.objects.get(OBJECT_ID)?.object_type).toBe("status_plate");
+  });
+
+  it("rejects revoke that changes object_type", async () => {
+    const keys = await getTestKeypair();
+    const db = new ChildObjectDb();
+    db.parent.public_key = keys.publicKeyBase58;
+    const created = await signedChildObject(keys);
+    await handlePostChildObjectCreate(
+      requestFor(`/.well-known/hc/v1/cards/${PROFILE}/objects`, created),
+      db as unknown as D1Database,
+      PROFILE
+    );
+
+    const disabled = await signedChildObject(keys, {
+      object_type: "lost_item_relay",
+      status: "disabled",
+      public_state: "Retired",
+      updated_at: "2026-05-18T12:00:00.000Z",
+    });
+    const res = await handlePostChildObjectRevoke(
+      requestFor(`/.well-known/hc/v1/cards/${PROFILE}/objects/${OBJECT_ID}/revoke`, disabled),
+      db as unknown as D1Database,
+      PROFILE,
+      OBJECT_ID
+    );
+
+    expect(res.status).toBe(422);
+    const body = (await res.json()) as { error?: string };
+    expect(body.error).toBe("OBJECT_TYPE_IMMUTABLE");
+    expect(db.objects.get(OBJECT_ID)?.object_type).toBe("status_plate");
+    expect(db.objects.get(OBJECT_ID)?.status).toBe("active");
+  });
+
   it("disables a child object through the revoke endpoint", async () => {
     const keys = await getTestKeypair();
     const db = new ChildObjectDb();
