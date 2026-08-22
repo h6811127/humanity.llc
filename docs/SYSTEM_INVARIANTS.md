@@ -252,7 +252,7 @@ Canonical architecture: [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE
 
 | Invariant | Detail |
 |-----------|--------|
-| Single composition pipeline | Scan HTML and `GET …/status` derive from `buildScanViewModel` in `scan-state.ts` — do not fork parallel scan products per use case. |
+| Child `object_type` immutable | After create, `POST …/objects/{id}` and `…/revoke` must keep `object_type` (`OBJECT_TYPE_IMMUTABLE`). Season `game.season.node_cap` is enforced only on create — retyping a plate/relay into `game_node` would bypass it and orphan type-specific scan/offer/contribute routing. |
 | Lifecycle first | Revoked / suspended card or QR or paused child shows lifecycle truth; overlays (game, streams) do not override. |
 | Passive scan | Opening `/c/…` does not log scanner identity or increment game aggregates ([`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md)). |
 | Verbs are explicit (target) | New scanner/owner actions ship as documented capabilities on status JSON, not ad-hoc HTML-only blocks. |
@@ -283,7 +283,7 @@ Canonical spec: [`CITY_GAME_V1_IMPLEMENTATION.md`](CITY_GAME_V1_IMPLEMENTATION.m
 | Scan object graph | When verified signed witness edges exist, scan HTML + status JSON expose `scan.relationships[]` and name the season steward; legacy `vouch_requires` chips remain when no signed edges. Board/map snapshot unchanged — [`WS_OBJECT_GRAPH_V1.md`](WS_OBJECT_GRAPH_V1.md) · product copy [`WS_OBJECT_GRAPH_PRODUCT_V1.md`](WS_OBJECT_GRAPH_PRODUCT_V1.md) · launch [`WS_OBJECT_GRAPH_LAUNCH_V1.md`](WS_OBJECT_GRAPH_LAUNCH_V1.md). |
 | Launch deploy | Public “live season” HTML (`city-game:launch-surfaces --apply`) and Worker `CITY_GAME_ENABLED=1` ship in the **same** release train. |
 | Map dashboard | Read-only **city state board** — same public truth as scan; **no** GPS, visit log, player ID, or device-local scarcity on server snapshot. Passive `GET` snapshot does not increment quorum/fragments. Plan: [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md). Play pages boot via **`city-game-play-page.mjs` only** (one season fetch → board + guide + banners + snapshot). Snapshot chips apply to **`.city-game-map-node-live`** inside each list row — do not remove when editing Maps links. |
-| Season fair use | Organizer caps via `game.*` entitlements on linked steward account (`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md` § City game season). Stranger play stays free; IP rate limits remain. |
+| Season fair use | Organizer caps via `game.*` entitlements on linked steward account (`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md` § City game season). Stranger play stays free; IP rate limits remain. Node cap is create-time only — child `object_type` must stay immutable so plates cannot be retyped into extra `game_node` rows. |
 | Season root ↔ steward | `GET …/steward/entitlements?season_id=` succeeds only when `steward_account_profiles` links the session `account_id` to that season’s `season_root_profile_id` (bundled season config). |
 | Snapshot quota | Uncached season snapshot builds increment `game.snapshot.get`; **304** (`If-None-Match`) does **not** increment season snapshot quota. |
 | Season config bundle | Worker resolves seasons from `season-registry.generated.ts` imports of `site/data/city-game-*.json` at **bundle load** — editing JSON requires **`worker:dev` restart** (and `city-game:sync-season-root` when local seed ≠ JSON). |

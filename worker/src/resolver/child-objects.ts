@@ -357,6 +357,13 @@ export async function handlePostChildObjectUpdate(
   if (parsed.updatedAt <= existing.updated_at) {
     return errorResponse("MALFORMED_REQUEST", "updated_at must be newer.", 422);
   }
+  if (parsed.objectType !== existing.object_type) {
+    return errorResponse(
+      "OBJECT_TYPE_IMMUTABLE",
+      "object_type cannot change after creation.",
+      422
+    );
+  }
   try {
     await updateChildObject(db, {
       objectId: parsed.objectId,
@@ -409,6 +416,13 @@ export async function handlePostChildObjectRevoke(
   }
   if (parsed.updatedAt <= existing.updated_at) {
     return errorResponse("MALFORMED_REQUEST", "updated_at must be newer.", 422);
+  }
+  if (parsed.objectType !== existing.object_type) {
+    return errorResponse(
+      "OBJECT_TYPE_IMMUTABLE",
+      "object_type cannot change after creation.",
+      422
+    );
   }
   try {
     await updateChildObject(db, {
