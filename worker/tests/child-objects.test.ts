@@ -212,6 +212,28 @@ describe("child object endpoints", () => {
     expect(res.status).toBe(422);
   });
 
+  it("rejects time_policy with an unknown IANA timezone", async () => {
+    const keys = await getTestKeypair();
+    const db = new ChildObjectDb();
+    db.parent.public_key = keys.publicKeyBase58;
+    const object = await signedChildObject(keys, {
+      time_policy: {
+        timezone: "America/Chicag",
+        schedule: [{ local_hour_from: 9, local_hour_until: 17 }],
+      },
+    });
+
+    const res = await handlePostChildObjectCreate(
+      requestFor(`/.well-known/hc/v1/cards/${PROFILE}/objects`, object),
+      db as unknown as D1Database,
+      PROFILE
+    );
+
+    expect(res.status).toBe(422);
+    const body = (await res.json()) as { error?: string; message?: string };
+    expect(body.message ?? body.error ?? "").toMatch(/IANA time zone/i);
+  });
+
   it("accepts optional custody on lost_item_relay create", async () => {
     const keys = await getTestKeypair();
     const db = new ChildObjectDb();

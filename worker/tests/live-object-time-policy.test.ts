@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  isValidTimeZone,
   parseObjectTimePolicy,
   resolveChildTimePolicyContext,
   resolveObjectTimePolicyPhase,
@@ -142,6 +143,67 @@ describe("live-object time_policy (Layer 1)", () => {
         time_policy: { grace_period_hours: 48 },
       })
     ).toThrow(/requires valid_until/);
+  });
+
+  it("rejects unknown IANA timezones on write validation", () => {
+    expect(isValidTimeZone("America/Chicago")).toBe(true);
+    expect(isValidTimeZone("America/Chicag")).toBe(false);
+    expect(() =>
+      validateTimePolicyForChildDocument(
+        {
+          time_policy: {
+            timezone: "America/Chicag",
+            schedule: [{ local_hour_from: 9, local_hour_until: 17 }],
+          },
+        },
+        "status_plate"
+      )
+    ).toThrow(/IANA time zone/);
+  });
+
+  it("parses stored invalid timezones so list/GET can still show the typo", () => {
+    const policy = parseObjectTimePolicy({
+      time_policy: {
+        timezone: "America/Chicag",
+        schedule: [{ local_hour_from: 9, local_hour_until: 17 }],
+      },
+    });
+    expect(policy?.timezone).toBe("America/Chicag");
+  });
+
+  it("does not throw when resolving a stored typo timezone with weekly hours", () => {
+    const applied = resolveChildTimePolicyContext({
+      documentJson: JSON.stringify({
+        time_policy: {
+          timezone: "America/Chicag",
+          schedule: [
+            {
+              local_hour_from: 9,
+              local_hour_until: 17,
+              public_state: "Open 9–5 (should not apply)",
+            },
+          ],
+        },
+      }),
+      publicState: "Owner default state",
+      now: new Date("2026-06-15T12:00:00.000Z"),
+    });
+    expect(applied.context?.phase).toBe("active");
+    expect(applied.publicState).toBe("Owner default state");
+    expect(applied.context?.schedulePublicState).toBeNull();
+  });
+
+  it("still applies absolute windows when timezone is invalid", () => {
+    const policy = parseObjectTimePolicy({
+      time_policy: {
+        timezone: "Central Time",
+        valid_until: "2026-06-10T12:00:00.000Z",
+        schedule: [{ local_hour_from: 0, local_hour_until: 24 }],
+      },
+    });
+    expect(
+      resolveObjectTimePolicyPhase(policy, new Date("2026-06-11T12:00:00.000Z"))
+    ).toBe("after");
   });
 
   it("exposes graceEndsAt during recall grace on scan context", () => {

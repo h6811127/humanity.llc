@@ -106,6 +106,17 @@ describe("child-object-time-policy-core", () => {
     expect(policy?.valid_until).toMatch(/2026-06-14/);
   });
 
+  it("rejects unknown IANA timezones before publish", () => {
+    expect(() =>
+      buildTimePolicyFromForm({
+        time_policy_enabled: "1",
+        time_policy_timezone: "America/Chicag",
+        time_policy_schedule_hour_from: "9",
+        time_policy_schedule_hour_until: "17",
+      })
+    ).toThrow(/IANA name/);
+  });
+
   it("rejects recall grace without valid until", () => {
     expect(() =>
       buildTimePolicyFromForm({

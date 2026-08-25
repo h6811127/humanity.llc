@@ -335,6 +335,7 @@ Time-bound truth is a **core differentiator** vs static QR. Today it is split ac
 | Field | Example | Status |
 |-------|---------|--------|
 | `valid_from` / `valid_until` | Flyer valid through Sunday | **Shipped** — `time-policy.ts` |
+| `timezone` | IANA zone for weekly hours (`America/Chicago`) | **Shipped** — write rejects unknown ids; scan skips schedule (never 500) |
 | `schedule` | Open Thu–Sat (local TZ slots) | **Shipped** — `time-policy.ts` schedule slots |
 | `dormant_until` | Season start; object readable but game actions gated | Partial — child `time_policy` + `season-window.ts` |
 | `grace_period_hours` | “Recall in 48h unless cleared” after `valid_until` | **Shipped** — `time-policy.ts` grace phase + owner form |

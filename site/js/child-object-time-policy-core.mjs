@@ -2,6 +2,20 @@
 
 export const DEFAULT_TIME_POLICY_TIMEZONE = "America/Chicago";
 
+/**
+ * @param {unknown} timeZone
+ * @returns {boolean}
+ */
+export function isValidTimeZone(timeZone) {
+  if (typeof timeZone !== "string" || !timeZone.trim()) return false;
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone: timeZone.trim() });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export const TIME_POLICY_DAY_OPTIONS = [
   { value: "", label: "Every day" },
   { value: "0", label: "Sunday" },
@@ -82,6 +96,9 @@ export function buildTimePolicyFromForm(input) {
     typeof timezoneRaw === "string" && timezoneRaw.trim()
       ? timezoneRaw.trim()
       : DEFAULT_TIME_POLICY_TIMEZONE;
+  if (!isValidTimeZone(timezone)) {
+    throw new Error("Timezone must be a valid IANA name such as America/Chicago.");
+  }
 
   /** @type {Record<string, unknown>} */
   const policy = {

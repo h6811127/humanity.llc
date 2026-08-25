@@ -87,7 +87,10 @@ export function renderChildObjectTimePolicySection(row) {
   timezoneInput.maxLength = 64;
   timezoneInput.placeholder = DEFAULT_TIME_POLICY_TIMEZONE;
   timezoneInput.value = defaults.timezone;
-  form.append(timezoneLabel, timezoneInput);
+  const timezoneHint = document.createElement("p");
+  timezoneHint.className = "form-hint";
+  timezoneHint.textContent = "IANA name, for example America/Chicago. Typos break weekly hours.";
+  form.append(timezoneLabel, timezoneInput, timezoneHint);
 
   const scheduleLegend = document.createElement("p");
   scheduleLegend.className = "form-label";
