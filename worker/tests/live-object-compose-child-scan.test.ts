@@ -39,6 +39,39 @@ describe("composeChildObjectScanState (Order 4 — time + stream pipeline)", () 
     expect(composed.childTimePolicy?.phase).toBe("active");
   });
 
+  it("does not crash compose when stored time_policy timezone is not IANA", () => {
+    const composed = composeChildObjectScanState({
+      child: {
+        object_id: "obj_status_plate_compose_bad_tz",
+        parent_profile_id: PROFILE,
+        object_type: "status_plate",
+        public_label: "Studio door",
+        public_state: "Open",
+        status: "active",
+        child_object_document_json: JSON.stringify({
+          time_policy: {
+            timezone: "America/Chicag",
+            schedule: [
+              {
+                local_hour_from: 9,
+                local_hour_until: 17,
+                public_state: "Open until 5 PM",
+              },
+            ],
+          },
+        }),
+        created_at: "2026-05-16T17:00:00Z",
+        updated_at: "2026-05-16T17:00:00Z",
+      },
+      season: defaultSeason(),
+      env: { CITY_GAME_ENABLED: "1" },
+      now: new Date("2026-06-15T14:00:00.000Z"),
+    });
+
+    expect(composed.publicState).toBe("Open");
+    expect(composed.childTimePolicy?.phase).toBe("active");
+  });
+
   it("composes game node streams with bulletin schedule during season window", () => {
     const season = defaultSeason();
     const composed = composeChildObjectScanState({

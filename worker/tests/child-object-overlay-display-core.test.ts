@@ -33,6 +33,27 @@ describe("child-object-overlay-display-core", () => {
     expect(timePolicyHubChip("dormant")).toBe("Object asleep");
   });
 
+  it("does not throw when stored timezone is not IANA", () => {
+    expect(() =>
+      resolveTimePolicyPhaseFromPolicy(
+        {
+          timezone: "America/Chicag",
+          schedule: [{ local_hour_from: 9, local_hour_until: 17 }],
+        },
+        new Date("2026-06-05T18:00:00.000Z")
+      )
+    ).not.toThrow();
+    expect(
+      resolveTimePolicyPhaseFromPolicy(
+        {
+          timezone: "America/Chicag",
+          schedule: [{ local_hour_from: 9, local_hour_until: 17 }],
+        },
+        new Date("2026-06-05T18:00:00.000Z")
+      )
+    ).toBe("active");
+  });
+
   it("applyHubChildObjectOverlays warns outside schedule", () => {
     const result = applyHubChildObjectOverlays(
       { label: "Open until 9 PM", tone: "ok" },

@@ -38,12 +38,27 @@ function parseInstant(value) {
 }
 
 /**
+ * @param {unknown} timeZone
+ * @returns {boolean}
+ */
+function isValidTimeZone(timeZone) {
+  if (typeof timeZone !== "string" || !timeZone.trim()) return false;
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone: timeZone.trim() });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * @param {Date} now
  * @param {string} timeZone
  */
 function localHourInTimeZone(now, timeZone) {
+  const zone = isValidTimeZone(timeZone) ? timeZone.trim() : "UTC";
   const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone,
+    timeZone: zone,
     hour: "numeric",
     hour12: false,
   }).formatToParts(now);
@@ -57,8 +72,9 @@ function localHourInTimeZone(now, timeZone) {
  * @param {string} timeZone
  */
 function localDayOfWeekInTimeZone(now, timeZone) {
+  const zone = isValidTimeZone(timeZone) ? timeZone.trim() : "UTC";
   const weekday = new Intl.DateTimeFormat("en-US", {
-    timeZone,
+    timeZone: zone,
     weekday: "short",
   }).format(now);
   const map = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
@@ -157,6 +173,9 @@ export function resolveTimePolicyPhaseFromPolicy(policy, now = new Date()) {
   }
 
   if (normalized.schedule.length) {
+    if (!isValidTimeZone(timezone)) {
+      return "active";
+    }
     if (!resolveActiveScheduleSlot(normalized, now)) {
       return "outside_schedule";
     }

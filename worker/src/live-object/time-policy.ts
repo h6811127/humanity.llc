@@ -5,6 +5,17 @@ const ISO_RE =
 
 const DEFAULT_TIMEZONE = "UTC";
 
+/** True when `timeZone` is accepted by `Intl` (IANA or a recognized alias such as `UTC`). */
+export function isValidTimeZone(timeZone: string): boolean {
+  if (!timeZone.trim()) return false;
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export type ObjectTimePolicyPhase =
   | "unset"
   | "dormant"
@@ -197,7 +208,10 @@ export function validateTimePolicyForChildDocument(
     }
     return;
   }
-  parseObjectTimePolicy(doc);
+  const policy = parseObjectTimePolicy(doc);
+  if (policy && !isValidTimeZone(policy.timezone)) {
+    throw new Error("time_policy.timezone must be a valid IANA time zone.");
+  }
 }
 
 function parseInstant(raw: string | null | undefined): number | null {
@@ -207,8 +221,9 @@ function parseInstant(raw: string | null | undefined): number | null {
 }
 
 export function localHourInTimeZone(now: Date, timeZone: string): number {
+  const zone = isValidTimeZone(timeZone) ? timeZone : DEFAULT_TIMEZONE;
   const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone,
+    timeZone: zone,
     hour: "numeric",
     hour12: false,
   }).formatToParts(now);
@@ -218,8 +233,9 @@ export function localHourInTimeZone(now: Date, timeZone: string): number {
 }
 
 export function localDayOfWeekInTimeZone(now: Date, timeZone: string): number {
+  const zone = isValidTimeZone(timeZone) ? timeZone : DEFAULT_TIMEZONE;
   const weekday = new Intl.DateTimeFormat("en-US", {
-    timeZone,
+    timeZone: zone,
     weekday: "short",
   }).format(now);
   const map: Record<string, number> = {
@@ -321,6 +337,10 @@ export function resolveObjectTimePolicyPhase(
   }
 
   if (policy.schedule.length) {
+    if (!isValidTimeZone(policy.timezone)) {
+      // Cannot honestly evaluate local hours — keep absolute windows, skip schedule.
+      return "active";
+    }
     const activeSlot = resolveActiveScheduleSlot(policy, now);
     if (!activeSlot) return "outside_schedule";
   }
@@ -398,26 +418,33 @@ export function resolveChildTimePolicyContext(input: {
     return { policy: null, context: null, publicState: input.publicState };
   }
 
-  const now = input.now ?? new Date();
-  const phase = resolveObjectTimePolicyPhase(policy, now);
-  const activeSlot =
-    phase === "active" ? resolveActiveScheduleSlot(policy, now) : null;
-  const schedulePublicState = activeSlot?.public_state?.trim() || null;
-  const graceEndsAt = phase === "grace" ? graceEndsAtIso(policy, now) : null;
-  let publicState = input.publicState;
-  if (schedulePublicState) {
-    publicState = schedulePublicState;
-  }
+  try {
+    const now = input.now ?? new Date();
+    const phase = resolveObjectTimePolicyPhase(policy, now);
+    const activeSlot =
+      phase === "active" && isValidTimeZone(policy.timezone)
+        ? resolveActiveScheduleSlot(policy, now)
+        : null;
+    const schedulePublicState = activeSlot?.public_state?.trim() || null;
+    const graceEndsAt = phase === "grace" ? graceEndsAtIso(policy, now) : null;
+    let publicState = input.publicState;
+    if (schedulePublicState) {
+      publicState = schedulePublicState;
+    }
 
-  return {
-    policy,
-    context: {
-      phase,
-      scanNote: timePolicyScanNote(phase),
-      chip: timePolicyChip(phase),
-      schedulePublicState,
-      graceEndsAt,
-    },
-    publicState,
-  };
+    return {
+      policy,
+      context: {
+        phase,
+        scanNote: timePolicyScanNote(phase),
+        chip: timePolicyChip(phase),
+        schedulePublicState,
+        graceEndsAt,
+      },
+      publicState,
+    };
+  } catch {
+    // Invalid timezone / Intl failures must not 500 public scan.
+    return { policy: null, context: null, publicState: input.publicState };
+  }
 }
