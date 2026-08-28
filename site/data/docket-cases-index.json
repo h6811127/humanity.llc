@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "id": "netanyahu",
+      "rank": 1,
+      "display_name": "Benjamin Netanyahu",
+      "role": "Prime Minister of Israel (at time of alleged conduct)",
+      "badge": { "kind": "icc_warrant", "label": "ICC arrest warrant" },
+      "status": "open",
+      "count_preview": "Murder",
+      "photo_ref": null
+    },
+    {
+      "id": "putin",
+      "rank": 2,
+      "display_name": "Vladimir Putin",
+      "role": "President of the Russian Federation",
+      "badge": { "kind": "icc_warrant", "label": "ICC arrest warrant" },
+      "status": "open",
+      "count_preview": "Unlawful deportation of population (children)",
+      "photo_ref": null
+    },
+    {
+      "id": "altman",
+      "rank": 3,
+      "display_name": "Sam Altman",
+      "role": "CEO, OpenAI",
+      "badge": { "kind": "docket_counts", "label": "Docket counts · not ICC" },
+      "status": "open",
+      "count_preview": "Unaccountable AI power concentration",
+      "photo_ref": null
+    },
+    {
+      "id": "musk",
+      "rank": 4,
+      "display_name": "Elon Musk",
+      "role": "Owner, X · CEO, SpaceX / Tesla / xAI (roles vary)",
+      "badge": { "kind": "docket_counts", "label": "Docket counts · not ICC" },
+      "status": "open",
+      "count_preview": "Platform amplification of mass harm",
+      "photo_ref": null
+    }
+  ]
+}

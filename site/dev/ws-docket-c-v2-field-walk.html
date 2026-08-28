@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WS-DOCKET-C-v2 · casefile mint plumbing</title>
+    <meta name="robots" content="noindex" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="page">
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">humanity.llc</a>
+        <span class="form-hint">WS-DOCKET-C-v2 · local field walk</span>
+      </header>
+      <main class="screen">
+        <h1>Casefile mint plumbing</h1>
+        <p class="form-hint">
+          Reuses child-object create + issue-qr for optional QR upgrade. Starter-four
+          cases are <strong>bound</strong> to <code>/docket/{id}/</code> (interim) under the
+          nonviolence charter. Upgrade to <code>/c/{profile}?q={qr}</code> when issued.
+          Discovery opt-in stays false (C-v3).
+        </p>
+
+        <h2 class="group-label">Fixture bind preview</h2>
+        <pre class="form-hint" style="white-space:pre-wrap;font-size:13px">{
+  &quot;status&quot;: &quot;bound&quot;,
+  &quot;object_id&quot;: &quot;obj_docket_casefile_fixture_v1&quot;,
+  &quot;scan_path&quot;: &quot;/c/docketCasefileFix01?q=qr_docket_casefile_fix_v1&quot;,
+  &quot;discovery_opt_in&quot;: false,
+  &quot;bind_notes&quot;: &quot;WS-DOCKET-C-v2 fixture bind (child-object QR shape). Not a public roster slug.&quot;
+}</pre>
+        <p class="form-hint">
+          object_id: <code>obj_docket_casefile_fixture_v1</code><br />
+          scan_path: <code>/c/docketCasefileFix01?q=qr_docket_casefile_fix_v1</code><br />
+          Example scan (local Worker): <a href="http://127.0.0.1:8787/c/docketCasefileFix01?q=qr_docket_casefile_fix_v1">http://127.0.0.1:8787/c/docketCasefileFix01?q=qr_docket_casefile_fix_v1</a>
+        </p>
+
+        <h2 class="group-label">Mint steps (local)</h2>
+        <ol class="list list-compact">
+<li>Starter-four cases are bound to /docket/{id}/ (interim casefile URL) under the nonviolence charter.</li>
+<li>Optional upgrade: unlock a steward parent card → create child_object → issue-qr.</li>
+<li>Then set scan_path to /c/{profile_id}?q={qr_id}; keep object_id = obj_docket_casefile_{id}.</li>
+<li>Preview the upgraded live_object on /docket/{id}/steward/ (#qr-upgrade) before editing published JSON.</li>
+<li>discovery_opt_in must stay false until C-v3 (docket stays an opt-in branch).</li>
+        </ol>
+
+        <h2 class="group-label">Surfaces</h2>
+        <ul class="list list-compact">
+          <li><a href="http://127.0.0.1:8788/docket/">/docket/</a> — roster (interim case URL binds)</li>
+          <li><a href="http://127.0.0.1:8788/docket/netanyahu/steward/">Steward shell example</a> — <code>#qr-upgrade</code></li>
+          <li><a href="/created/">/created/</a> — create + issue QR with owner key</li>
+          <li><a href="/docket/goods/qr-field-kit/">QR field kit</a> — print → case → action</li>
+        </ul>
+
+        <p class="form-hint">
+          Engineering: <code>npm run ws-docket:c-v2-preflight -- --strict</code>
+        </p>
+      </main>
+    </div>
+  </body>
+</html>

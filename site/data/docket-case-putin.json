@@ -1,0 +1,149 @@
+{
+  "id": "putin",
+  "rank": 2,
+  "display_name": "Vladimir Putin",
+  "role": "President of the Russian Federation",
+  "badge": {
+    "kind": "icc_warrant",
+    "label": "ICC arrest warrant"
+  },
+  "status": "open",
+  "counts_heading": "Alleged war crimes (children)",
+  "counts": [
+    {
+      "id": "count-1",
+      "kind": "icc_allegation",
+      "title": "Unlawful deportation of population (children)",
+      "body": "From occupied areas of Ukraine to the Russian Federation"
+    },
+    {
+      "id": "count-2",
+      "kind": "icc_allegation",
+      "title": "Unlawful transfer of population (children)",
+      "body": "From occupied areas of Ukraine to the Russian Federation"
+    }
+  ],
+  "sources": [
+    {
+      "label": "ICC Pre-Trial Chamber II",
+      "url": "https://www.icc-cpi.int/news/situation-ukraine-icc-judges-issue-arrest-warrants-against-vladimir-vladimirovich-putin-and",
+      "dated": "2023-03-17",
+      "note": "Alleged from at least 24 Feb 2022. Allegations, not convictions."
+    }
+  ],
+  "action": {
+    "label": "Read primary source",
+    "href": "https://www.icc-cpi.int/news/situation-ukraine-icc-judges-issue-arrest-warrants-against-vladimir-vladimirovich-putin-and"
+  },
+  "actions": [
+    {
+      "id": "act-1",
+      "kind": "read_source",
+      "label": "Read the ICC warrant announcement",
+      "body": "Primary court source for the children-deportation counts cited here.",
+      "href": "https://www.icc-cpi.int/news/situation-ukraine-icc-judges-issue-arrest-warrants-against-vladimir-vladimirovich-putin-and",
+      "regions": [
+        "global"
+      ]
+    },
+    {
+      "id": "act-2",
+      "kind": "share_sources",
+      "label": "Share the verified ICC link",
+      "body": "Cite the warrant page \u2014 not unverified viral claims.",
+      "href": "https://www.icc-cpi.int/news/situation-ukraine-icc-judges-issue-arrest-warrants-against-vladimir-vladimirovich-putin-and",
+      "regions": [
+        "global"
+      ]
+    },
+    {
+      "id": "act-3",
+      "kind": "donate",
+      "label": "Support UNHCR Ukraine response",
+      "body": "Humanitarian relief for displaced people \u2014 institutional channel.",
+      "href": "https://www.unhcr.org/emergencies/ukraine-emergency",
+      "regions": [
+        "global"
+      ]
+    },
+    {
+      "id": "act-4",
+      "kind": "contact_rep",
+      "label": "Contact your U.S. representative",
+      "body": "Ask about ICC cooperation, sanctions oversight, and civilian protection \u2014 peaceful speech only.",
+      "href": "https://www.house.gov/representatives/find-your-representative",
+      "regions": [
+        "us"
+      ]
+    },
+    {
+      "id": "act-5",
+      "kind": "teach_in",
+      "label": "Read the Public Docket charter",
+      "body": "Nonviolence and evidence rules before any local teach-in.",
+      "href": "/docket/#charter",
+      "regions": [
+        "global"
+      ]
+    }
+  ],
+  "photo_ref": null,
+  "closed_reason": null,
+  "closed_kind": null,
+  "note": "Broader public docket context: war of aggression against Ukraine and documented civilian harms are widely reported by UN and independent investigators; the ICC warrant above is the formal charge cited here.",
+  "counter_docket": {
+    "status": "open_for_submissions",
+    "summary": null
+  },
+  "stewards": [
+    {
+      "id": "hc-founders",
+      "display_name": "humanity.llc stewards",
+      "role_label": "Case maintainers (interim)",
+      "mailto": "info@humanity.llc",
+      "room_ref": "/docket/putin/steward/"
+    },
+    {
+      "id": "hc-reviewer",
+      "display_name": "Public Docket reviewer",
+      "role_label": "Second gate (interim)",
+      "mailto": "info@humanity.llc",
+      "room_ref": "/docket/putin/steward/"
+    }
+  ],
+  "changelog": [
+    {
+      "id": "log-1",
+      "dated": "2026-07-16",
+      "summary": "Case opened on Public Docket with ICC-linked counts and action kit."
+    },
+    {
+      "id": "log-2",
+      "dated": "2026-07-16",
+      "summary": "Steward visibility + public changelog shipped (room bind deferred)."
+    },
+    {
+      "id": "log-c1",
+      "dated": "2026-07-16",
+      "summary": "WS-DOCKET-C v1: live_object unbound + steward shell linked (no Worker mint)."
+    },
+    {
+      "id": "log-c2-bind",
+      "dated": "2026-07-16",
+      "summary": "WS-DOCKET-C-v2: live_object bound to case URL under nonviolence charter (discovery opt-in still false)."
+    },
+    {
+      "id": "log-dg-v0",
+      "dated": "2026-07-16",
+      "summary": "Dual-gate steward edits (DG-v0): second steward slot + propose/approve/apply on steward shell (session-local)."
+    }
+  ],
+  "live_object": {
+    "status": "bound",
+    "object_id": "obj_docket_casefile_putin",
+    "scan_path": "/docket/putin/",
+    "discovery_opt_in": false,
+    "bind_notes": "WS-DOCKET-C-v2: casefile bound to Public Docket case URL. Upgrade scan_path to /c/{profile}?q={qr} when a child-object QR is issued. discovery_opt_in stays false (C-v3)."
+  },
+  "edit_proposals": []
+}

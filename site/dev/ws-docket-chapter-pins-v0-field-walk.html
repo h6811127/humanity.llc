@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WS-DOCKET · Chapter discovery pins</title>
+    <meta name="robots" content="noindex" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="page">
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">humanity.llc</a>
+        <span class="form-hint">WS-DOCKET · C-v3 chapter pins</span>
+      </header>
+      <main class="screen">
+        <h1>Chapter discovery pins (non-starter)</h1>
+        <p class="form-hint">
+          Publish opt-in chapter fixtures on the docket branch only. Never starter-four.
+          Never merge into city discovery / homepage by default.
+        </p>
+        <h2 class="group-label">Steps</h2>
+        <ol class="list list-compact">
+<li>Confirm starter-four case JSON still has discovery_opt_in: false.</li>
+<li>Open /docket/chapters/ — one or more non-starter chapter pins load.</li>
+<li>Confirm pin href is a docket commons path (research kit / chapter), not a Most Wanted case.</li>
+<li>Confirm scan_path is /c/…?q=… (child QR). After QR-mint-v0: mint_status minted + Base58 ids.</li>
+<li>Confirm site/data/discovery-cedar-rapids-iowa.json has no chapter pin ids.</li>
+<li>Run npm run ws-docket:chapter-pins-preflight -- --strict.</li>
+<li>Optional: npm run ws-docket:chapter-mint -- --write-pins (local Worker).</li>
+        </ol>
+        <h2 class="group-label">Surfaces</h2>
+        <ul class="list list-compact">
+          <li><a href="http://127.0.0.1:8788/docket/chapters/">/docket/chapters/</a></li>
+          <li><a href="http://127.0.0.1:8788/data/docket-chapter-discovery-pins.json">Registry JSON</a></li>
+          <li><a href="http://127.0.0.1:8788/docket/">Most Wanted roster (starter-four stay discovery off)</a></li>
+        </ul>
+        <p class="form-hint">
+          Engineering: <code>npm run ws-docket:chapter-pins-preflight -- --strict</code>
+        </p>
+      </main>
+    </div>
+  </body>
+</html>

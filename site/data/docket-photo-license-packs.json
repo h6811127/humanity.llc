@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "kind": "hc.docket.photo_license_packs.v0",
+  "policy": "Formal license pack before any face goes live. Starter-four Most Wanted stay draft/awaiting_assets until a real human likeness is cleared. Rehearsal packs prove the pipeline with non-person artwork only.",
+  "starter_four_faces_live": false,
+  "packs": [
+    {
+      "id": "pack-rehearsal-commons-v0",
+      "subject_id": "rehearsal-commons",
+      "status": "applied",
+      "photo_ref": "/assets/docket/license-pack-rehearsal.svg",
+      "license": {
+        "type": "rehearsal",
+        "attribution": "humanity.llc abstract plate · license-pack-v0 rehearsal · not a person",
+        "source_url": "https://humanity.llc/assets/docket/license-pack-rehearsal.svg",
+        "obtained_at": "2026-07-17"
+      },
+      "notes": "Proves licensed render path without shipping Most Wanted faces."
+    },
+    {
+      "id": "pack-netanyahu-awaiting",
+      "subject_id": "netanyahu",
+      "status": "awaiting_assets",
+      "photo_ref": null,
+      "license": {
+        "type": "press",
+        "attribution": "TBD — official / press likeness only",
+        "source_url": "https://humanity.llc/docket/netanyahu/",
+        "obtained_at": "pending"
+      },
+      "notes": "Starter-four fence — monogram until a real license pack is cleared."
+    },
+    {
+      "id": "pack-putin-awaiting",
+      "subject_id": "putin",
+      "status": "awaiting_assets",
+      "photo_ref": null,
+      "license": {
+        "type": "press",
+        "attribution": "TBD — official / press likeness only",
+        "source_url": "https://humanity.llc/docket/putin/",
+        "obtained_at": "pending"
+      },
+      "notes": "Starter-four fence — monogram until a real license pack is cleared."
+    },
+    {
+      "id": "pack-altman-awaiting",
+      "subject_id": "altman",
+      "status": "awaiting_assets",
+      "photo_ref": null,
+      "license": {
+        "type": "press",
+        "attribution": "TBD — official / press likeness only",
+        "source_url": "https://humanity.llc/docket/altman/",
+        "obtained_at": "pending"
+      },
+      "notes": "Starter-four fence — monogram until a real license pack is cleared."
+    },
+    {
+      "id": "pack-musk-awaiting",
+      "subject_id": "musk",
+      "status": "awaiting_assets",
+      "photo_ref": null,
+      "license": {
+        "type": "press",
+        "attribution": "TBD — official / press likeness only",
+        "source_url": "https://humanity.llc/docket/musk/",
+        "obtained_at": "pending"
+      },
+      "notes": "Starter-four fence — monogram until a real license pack is cleared."
+    }
+  ]
+}

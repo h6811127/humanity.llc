@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WS-DOCKET · chapter mint v0</title>
+    <meta name="robots" content="noindex" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="page">
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">humanity.llc</a>
+        <span class="form-hint">WS-DOCKET · real chapter child QR</span>
+      </header>
+      <main class="screen">
+        <h1>Chapter child QR mint (QR-mint-v0)</h1>
+        <p class="form-hint">
+          Mint a real Worker <code>status_plate</code> + child QR for non-starter chapter pins.
+          Never starter-four. Never city discovery. Keys stay in <code>worker/.local/</code>.
+        </p>
+        <h2 class="group-label">Steps</h2>
+        <ol class="list list-compact">
+<li>Confirm starter-four stay discovery_opt_in: false (never mint Most Wanted into city discovery).</li>
+<li>Start local Worker: npm run worker:migrate:local &amp;&amp; npm run worker:dev</li>
+<li>Run: API_ORIGIN=http://127.0.0.1:8787 npm run ws-docket:chapter-mint -- --write-pins</li>
+<li>Confirm /docket/chapters/ shows mint_status minted + real /c/{profile}?q={qr} path.</li>
+<li>Keys stay in worker/.local/docket-chapter-mint.json (gitignored) — never commit.</li>
+<li>Production: same script with API_ORIGIN=https://humanity.llc only when intentionally minting prod.</li>
+        </ol>
+        <h2 class="group-label">Sample receipt (shape)</h2>
+        <pre class="form-hint" style="white-space:pre-wrap;font-size:13px">{
+  &quot;kind&quot;: &quot;hc.docket.chapter_mint_receipt.v0&quot;,
+  &quot;pin_id&quot;: &quot;chapter-cr-research-circle&quot;,
+  &quot;scan_path&quot;: &quot;/c/7Xk9mP2nQ4rT6vW8yZ1aB3cD?q=qr_7Xk9mP2nQ4rT6vW8&quot;,
+  &quot;mint_status&quot;: &quot;minted&quot;,
+  &quot;mintable&quot;: true
+}</pre>
+        <h2 class="group-label">Surfaces</h2>
+        <ul class="list list-compact">
+          <li><a href="http://127.0.0.1:8788/docket/chapters/">/docket/chapters/</a></li>
+          <li><code>npm run ws-docket:chapter-mint -- --write-pins</code></li>
+        </ul>
+        <p class="form-hint">
+          Engineering: <code>npm run ws-docket:chapter-mint-preflight -- --strict</code>
+        </p>
+      </main>
+    </div>
+  </body>
+</html>

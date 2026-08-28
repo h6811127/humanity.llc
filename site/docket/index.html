@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Humanity’s Most Wanted · Public Docket</title>
+    <meta
+      name="description"
+      content="Humanity’s Most Wanted — scrollable Public Docket of alleged crimes against humanity and systemic harms. Nonviolent. Evidence-linked. Not a hit list."
+    />
+    <meta name="theme-color" content="#0a0a0a" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <script>
+      (function () {
+        try {
+          if (localStorage.getItem("hc_theme") === "dark") {
+            document.documentElement.dataset.theme = "dark";
+            document.documentElement.style.colorScheme = "dark";
+          }
+        } catch (e) {
+          /* ignore */
+        }
+      })();
+    </script>
+    <link rel="stylesheet" href="/styles.css?v=160" />
+    <link rel="stylesheet" href="/css/docket.css?v=10" />
+    <link rel="stylesheet" href="/css/theme-dark.css?v=39" />
+  </head>
+  <body class="page-docket">
+    <div class="page docket-page">
+      <header class="top docket-top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="docket-top-charter" href="#charter">Charter</a>
+      </header>
+
+      <main class="screen docket-screen">
+        <header class="docket-list-head">
+          <p class="docket-kicker">Public Docket</p>
+          <h1>Humanity’s Most Wanted</h1>
+          <p class="docket-list-lead">
+            Alleged crimes against humanity and systemic harms — linked to public record.
+            Nonviolent civic pressure only. Not a hit list.
+          </p>
+        </header>
+
+        <p class="form-hint" id="docket-roster-status" role="status">Loading docket…</p>
+        <!-- WS-DOCKET-B: hydrated from /data/docket-cases-index.json + case JSON -->
+        <ol class="docket-wanted-list" id="wanted" aria-label="Most wanted members"></ol>
+
+        <noscript>
+          <ul class="list list-compact">
+            <li><a href="/docket/netanyahu/">Benjamin Netanyahu</a></li>
+            <li><a href="/docket/putin/">Vladimir Putin</a></li>
+            <li><a href="/docket/altman/">Sam Altman</a></li>
+            <li><a href="/docket/musk/">Elon Musk</a></li>
+          </ul>
+        </noscript>
+
+        <section class="docket-commons" aria-label="Network goods and ritual">
+          <h2 class="docket-case-section-title" id="network-good">Build while you pressure</h2>
+          <div id="docket-network-good-body">
+            <noscript>
+              <p class="form-hint">
+                <a href="/docket/goods/research-kit/">Public Docket research kit</a>
+                ·
+                <a href="/docket/goods/qr-field-kit/">QR field kit</a>
+                ·
+                <a href="/docket/chapters/">Chapter discovery pins</a>
+                ·
+                <a href="/docket/accountability-day/">Accountability Day</a>
+              </p>
+            </noscript>
+          </div>
+        </section>
+
+        <details class="docket-charter-disclosure" id="charter">
+          <summary>Nonviolence charter · how this list works</summary>
+          <div class="docket-charter-disclosure-body">
+            <ul class="docket-charter-compact">
+              <li>No violence, threats, stalking, or doxxing.</li>
+              <li>
+                Allowed actions: petition, boycott, shareholder vote, FOIA, peaceful protest
+                info, contact representatives, donate to legal aid or journalism, share verified
+                sources.
+              </li>
+              <li>
+                ICC rows cite court allegations. Docket rows are campaign counts — labeled, not
+                convictions.
+              </li>
+              <li>
+                Success = documented civic outcomes (policy, court process, divestment) — never
+                harm to persons.
+              </li>
+              <li>
+                <a href="#closed-criteria">When a case closes</a> — exit criteria published before
+                new nominations expand.
+              </li>
+              <li>
+                <a href="#tos">ToS</a> — violence, doxxing, threats, and LE impersonation are banned
+                forever.
+              </li>
+            </ul>
+            <p class="docket-charter-north">
+              We don’t overthrow people. We withdraw legitimacy from unjust power and build what
+              deserves it.
+            </p>
+            <p class="form-hint">
+              <a href="/">Back to live boards</a>
+              ·
+              <a href="mailto:info@humanity.llc?subject=Public%20Docket">Contact / corrections</a>
+            </p>
+          </div>
+        </details>
+
+        <details class="docket-charter-disclosure" id="closed-criteria">
+          <summary>When a case closes · exit criteria</summary>
+          <div class="docket-charter-disclosure-body" id="closed-criteria-body">
+            <noscript>
+              <p class="form-hint">
+                Enable JavaScript to load the full exit criteria, or read
+                <a href="/docs/PUBLIC_DOCKET_AND_ACCOUNTABILITY_VERTICAL.md">the Public Docket spec</a>.
+              </p>
+            </noscript>
+          </div>
+        </details>
+
+        <details class="docket-charter-disclosure" id="tos">
+          <summary>ToS · removal for violence-adjacent content</summary>
+          <div class="docket-charter-disclosure-body">
+            <p class="docket-tos-lead form-hint">
+              Official Public Docket surfaces and tip / counter-docket submissions are removed — and
+              submitters banned from docket tools — for:
+            </p>
+            <ul class="docket-charter-compact">
+              <li>Violence or threats — including “take out,” celebrating injury or death.</li>
+              <li>Stalking or doxxing — private addresses, “how to find,” non-public contact maps.</li>
+              <li>Harassment of private persons — recruiting tips to confront non-public figures.</li>
+              <li>
+                Law-enforcement impersonation — fake warrants, agency seals, FBI / WANTED chrome.
+              </li>
+            </ul>
+            <p class="form-hint">
+              Corrections and good-faith rebuttals are welcome on each case page
+              (counter-docket / corrections) — never via threats. Report abuse:
+              <a href="mailto:info@humanity.llc?subject=Public%20Docket%20abuse">info@humanity.llc</a>.
+            </p>
+          </div>
+        </details>
+      </main>
+    </div>
+    <script type="module" src="/js/docket-roster.mjs?v=5"></script>
+  </body>
+</html>

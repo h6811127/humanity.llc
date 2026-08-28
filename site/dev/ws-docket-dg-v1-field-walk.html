@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WS-DOCKET-DG-v1 · signed dual-gate</title>
+  <style>
+    body { font-family: ui-sans-serif, system-ui, sans-serif; max-width: 42rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.45; }
+    code { font-size: 0.9em; }
+    .cta { display: inline-block; margin: 0.4rem 0.4rem 0.4rem 0; padding: 0.55rem 0.9rem; background: #111; color: #fff; text-decoration: none; border-radius: 6px; }
+    .cta-secondary { background: #444; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th, td { border: 1px solid #ddd; padding: 0.45rem 0.55rem; text-align: left; }
+  </style>
+</head>
+<body>
+  <h1>WS-DOCKET · signed dual-gate (DG-v1)</h1>
+  <p class="lead">
+    Each steward approval carries an Ed25519 fixture signature over the proposal digest.
+    Session-local apply only — no published JSON auto-merge, no Worker mint.
+    Canon: <code>PUBLIC_DOCKET_AND_ACCOUNTABILITY_VERTICAL.md</code>.
+  </p>
+  <p>Origin: http://127.0.0.1:8788</p>
+
+  <h2>Field walk</h2>
+  <a class="cta" href="http://127.0.0.1:8788/docket/altman/steward/#dual-gate-edits">1. Open Altman steward · #dual-gate-edits</a>
+  <ol>
+    <li>Confirm fixture proposal shows 1 approval + 1 DG-v1 signature (<code>hc-founders</code>).</li>
+    <li>Acting as <code>hc-reviewer</code>, click <strong>Sign + approve</strong>.</li>
+    <li>Apply when signed dual-gate is met — session log updates; public JSON unchanged.</li>
+  </ol>
+  <a class="cta cta-secondary" href="http://127.0.0.1:8788/dev/ws-docket-dg-v0-field-walk.html">DG-v0 kit</a>
+  <a class="cta cta-secondary" href="http://127.0.0.1:8788/docket/altman/">Public case</a>
+
+  <h2>Scorecard</h2>
+  <table>
+    <thead><tr><th>Check</th><th>Pass?</th></tr></thead>
+    <tbody>
+      <tr><td>DGV1-1 — Fixture proposal has founders signature</td><td>☐</td></tr>
+      <tr><td>DGV1-2 — Second steward sign+approve reaches 2 signatures</td><td>☐</td></tr>
+      <tr><td>DGV1-3 — Apply verifies signatures before session changelog</td><td>☐</td></tr>
+      <tr><td>DGV1-4 — Published case JSON untouched</td><td>☐</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Engineering</h2>
+  <ol>
+    <li><code>npm run ws-docket:dg-v1-preflight -- --strict</code></li>
+    <li><code>npm run worker:test -- worker/tests/docket-edit-proposal-sign-core.test.ts</code></li>
+  </ol>
+</body>
+</html>

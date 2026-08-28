@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "campaign": "campaign_one",
+  "goods": [
+    {
+      "id": "research-kit-v1",
+      "label": "Public Docket research kit",
+      "href": "/docket/goods/research-kit/",
+      "summary": "Label hygiene, primary sources, FOIA entry, corrections, nonviolence — commons upgrade beside the first roster."
+    },
+    {
+      "id": "qr-field-kit-v1",
+      "label": "QR field kit",
+      "href": "/docket/goods/qr-field-kit/",
+      "summary": "Print and place stickers that open a case and one legal action — Public Docket naming, charter on materials, no LE chrome."
+    }
+  ],
+  "ritual": {
+    "id": "accountability-day",
+    "label": "Accountability Day",
+    "href": "/docket/accountability-day/",
+    "summary": "Annual ritual outline: closed with receipts, corrections honored, goods fair — never harm to persons."
+  }
+}

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="144" height="192" viewBox="0 0 144 192" role="img" aria-label="Public Docket license-pack rehearsal plate">
+  <title>License-pack rehearsal · not a person</title>
+  <rect width="144" height="192" fill="#111111"/>
+  <rect x="12" y="12" width="120" height="168" fill="none" stroke="#c8c2b4" stroke-width="2"/>
+  <text x="72" y="72" text-anchor="middle" fill="#c8c2b4" font-family="Georgia, serif" font-size="14">PUBLIC</text>
+  <text x="72" y="94" text-anchor="middle" fill="#c8c2b4" font-family="Georgia, serif" font-size="14">DOCKET</text>
+  <line x1="36" y1="112" x2="108" y2="112" stroke="#8a8578" stroke-width="1"/>
+  <text x="72" y="138" text-anchor="middle" fill="#8a8578" font-family="ui-monospace, monospace" font-size="10">REHEARSAL</text>
+  <text x="72" y="156" text-anchor="middle" fill="#8a8578" font-family="ui-monospace, monospace" font-size="9">not a likeness</text>
+</svg>

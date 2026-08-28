@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Vladimir Putin · Public Docket</title>
+    <meta
+      name="description"
+      content="Unlawful deportation of population (children). Nonviolent · sources linked · not law enforcement. (Vladimir Putin)"
+    />
+    <meta property="og:title" content="Vladimir Putin · Public Docket" />
+    <meta
+      property="og:description"
+      content="Unlawful deportation of population (children). Nonviolent · sources linked · not law enforcement. (Vladimir Putin)"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://humanity.llc/docket/putin/" />
+    <meta name="theme-color" content="#0a0a0a" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <script>
+      (function () {
+        try {
+          if (localStorage.getItem("hc_theme") === "dark") {
+            document.documentElement.dataset.theme = "dark";
+            document.documentElement.style.colorScheme = "dark";
+          }
+        } catch (e) {
+          /* ignore */
+        }
+      })();
+    </script>
+    <link rel="stylesheet" href="/styles.css?v=159" />
+    <link rel="stylesheet" href="/css/docket.css?v=9" />
+    <link rel="stylesheet" href="/css/theme-dark.css?v=39" />
+  </head>
+  <body class="page-docket">
+    <div class="page docket-page">
+      <header class="top docket-top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="docket-top-charter" href="/docket/#charter">Charter</a>
+      </header>
+      <main class="screen docket-screen">
+        <p class="form-hint">
+          <a href="/docket/">← Most Wanted list</a>
+        </p>
+        <p class="form-hint" id="docket-case-status" role="status">Loading case…</p>
+        <div id="docket-case-root" data-docket-case-id="putin"></div>
+      </main>
+    </div>
+    <script type="module" src="/js/docket-case-page.mjs?v=4"></script>
+  </body>
+</html>

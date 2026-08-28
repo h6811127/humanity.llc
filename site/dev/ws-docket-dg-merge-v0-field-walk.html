@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WS-DOCKET · DG-merge-v0</title>
+    <meta name="robots" content="noindex" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="page">
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">humanity.llc</a>
+        <span class="form-hint">WS-DOCKET · human-gated merge pack</span>
+      </header>
+      <main class="screen">
+        <h1>Human-gated merge pack (DG-merge-v0)</h1>
+        <p class="form-hint">
+          Export a PR-ready preview after DG-v1 signed apply. Never auto-writes published
+          case JSON. Signed proposals may also live in Worker DG-store-v0.
+        </p>
+        <h2 class="group-label">Steps</h2>
+        <ol class="list list-compact">
+<li>Propose + dual-sign (DG-v1 fixture keys) on the steward shell.</li>
+<li>Persist to Worker store (DG-store-v0) and/or keep session cache.</li>
+<li>Apply — marks proposal applied; published case JSON unchanged.</li>
+<li>Download the merge pack (human-gated preview + case_after_merge).</li>
+<li>Human reviews sources + charter, then hand-edits site/data/docket-case-{id}.json.</li>
+        </ol>
+        <h2 class="group-label">Sample pack preview</h2>
+        <pre class="form-hint" style="white-space:pre-wrap;font-size:13px">{
+  &quot;kind&quot;: &quot;hc.docket.merge_pack.v0&quot;,
+  &quot;case_id&quot;: &quot;altman&quot;,
+  &quot;writes_published_json&quot;: false,
+  &quot;previews&quot;: [
+    {
+      &quot;proposal_id&quot;: &quot;prop_demo&quot;,
+      &quot;field_path&quot;: &quot;counts[0].body&quot;,
+      &quot;summary&quot;: &quot;Clarify wording&quot;,
+      &quot;status&quot;: &quot;applied&quot;,
+      &quot;published_before&quot;: &quot;Before body&quot;,
+      &quot;proposal_before&quot;: &quot;Before body&quot;,
+      &quot;proposal_after&quot;: &quot;After body (human-reviewed)&quot;,
+      &quot;merged_value&quot;: &quot;After body (human-reviewed)&quot;,
+      &quot;signatures&quot;: [],
+      &quot;approvals&quot;: [
+        &quot;hc-founders&quot;,
+        &quot;hc-reviewer&quot;
+      ],
+      &quot;human_gated&quot;: true,
+      &quot;writes_published_json&quot;: false
+    }
+  ]
+}</pre>
+        <h2 class="group-label">Surfaces</h2>
+        <ul class="list list-compact">
+          <li><a href="http://127.0.0.1:8788/docket/altman/steward/#merge-pack">Steward #merge-pack</a></li>
+          <li><a href="http://127.0.0.1:8788/dev/ws-docket-dg-v1-field-walk.html">DG-v1 field walk</a></li>
+        </ul>
+        <p class="form-hint">
+          Engineering: <code>npm run ws-docket:dg-merge-preflight -- --strict</code>
+        </p>
+      </main>
+    </div>
+  </body>
+</html>

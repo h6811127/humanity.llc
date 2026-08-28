@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WS-DOCKET · License-pack-v0</title>
+    <meta name="robots" content="noindex" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="page">
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">humanity.llc</a>
+        <span class="form-hint">WS-DOCKET · photo license packs</span>
+      </header>
+      <main class="screen">
+        <h1>Photo license packs (license-pack-v0)</h1>
+        <p class="form-hint">
+          Formal attribution gate before any face goes live. Starter-four Most Wanted
+          stay <code>not_licensed</code>. Rehearsal pack proves the licensed render path
+          with non-person artwork.
+        </p>
+        <h2 class="group-label">Steps</h2>
+        <ol class="list list-compact">
+<li>Fill a pack row: subject_id · photo_ref · license.type · attribution · source_url · obtained_at.</li>
+<li>Store the likeness under /assets/docket/ (site path only — no hotlinks).</li>
+<li>Set pack status to ready only when the asset file exists and fields validate.</li>
+<li>Apply ready pack → checklist license_status=licensed + matching photo_ref.</li>
+<li>Starter-four Most Wanted packs stay draft/awaiting_assets — never auto-apply without a real license.</li>
+<li>Caption remains “Public likeness · not a mugshot”. Fail open to monogram otherwise.</li>
+        </ol>
+        <h2 class="group-label">Surfaces</h2>
+        <ul class="list list-compact">
+          <li><a href="http://127.0.0.1:8788/data/docket-photo-license-packs.json">Packs registry</a></li>
+          <li><a href="http://127.0.0.1:8788/assets/docket/license-pack-rehearsal.svg">Rehearsal asset</a></li>
+          <li><a href="http://127.0.0.1:8788/docket/altman/steward/#photos">Steward #photos (pack status)</a></li>
+          <li><a href="http://127.0.0.1:8788/docket/">Most Wanted (starter-four monograms)</a></li>
+        </ul>
+        <p class="form-hint">
+          Engineering: <code>npm run ws-docket:license-pack-preflight -- --strict</code>
+        </p>
+      </main>
+    </div>
+  </body>
+</html>

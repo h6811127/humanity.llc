@@ -1,0 +1,161 @@
+{
+  "id": "netanyahu",
+  "rank": 1,
+  "display_name": "Benjamin Netanyahu",
+  "role": "Prime Minister of Israel (at time of alleged conduct)",
+  "badge": {
+    "kind": "icc_warrant",
+    "label": "ICC arrest warrant"
+  },
+  "status": "open",
+  "counts_heading": "Alleged crimes against humanity",
+  "counts": [
+    {
+      "id": "count-1",
+      "kind": "icc_allegation",
+      "title": "Murder",
+      "body": "As a crime against humanity, as part of a widespread and systematic attack against the civilian population of Gaza"
+    },
+    {
+      "id": "count-2",
+      "kind": "icc_allegation",
+      "title": "Persecution",
+      "body": "As a crime against humanity"
+    },
+    {
+      "id": "count-3",
+      "kind": "icc_allegation",
+      "title": "Other inhumane acts",
+      "body": "As a crime against humanity"
+    },
+    {
+      "id": "count-4",
+      "kind": "icc_allegation",
+      "title": "War crime: starvation as a method of warfare",
+      "body": ""
+    }
+  ],
+  "sources": [
+    {
+      "label": "ICC Pre-Trial Chamber I",
+      "url": "https://www.icc-cpi.int/news/situation-state-palestine-icc-pre-trial-chamber-i-rejects-state-israels-challenges",
+      "dated": "2024-11-21",
+      "note": "Warrants allege criminal responsibility as co-perpetrator for conduct from at least 8 Oct 2023 to at least 20 May 2024. Allegations, not convictions."
+    }
+  ],
+  "action": {
+    "label": "Read primary source",
+    "href": "https://www.icc-cpi.int/news/situation-state-palestine-icc-pre-trial-chamber-i-rejects-state-israels-challenges"
+  },
+  "actions": [
+    {
+      "id": "act-1",
+      "kind": "read_source",
+      "label": "Read the ICC primary source",
+      "body": "Start with the court\u2019s own wording \u2014 allegations, not convictions.",
+      "href": "https://www.icc-cpi.int/news/situation-state-palestine-icc-pre-trial-chamber-i-rejects-state-israels-challenges",
+      "regions": [
+        "global"
+      ]
+    },
+    {
+      "id": "act-2",
+      "kind": "share_sources",
+      "label": "Share the verified ICC link",
+      "body": "Pass the primary source, not rumor screenshots.",
+      "href": "https://www.icc-cpi.int/news/situation-state-palestine-icc-pre-trial-chamber-i-rejects-state-israels-challenges",
+      "regions": [
+        "global"
+      ]
+    },
+    {
+      "id": "act-3",
+      "kind": "contact_rep",
+      "label": "Contact your U.S. representative",
+      "body": "Ask about ICC cooperation, civilian protection, and arms-export oversight \u2014 peaceful civic speech only.",
+      "href": "https://www.house.gov/representatives/find-your-representative",
+      "regions": [
+        "us"
+      ]
+    },
+    {
+      "id": "act-4",
+      "kind": "donate",
+      "label": "Support ICRC humanitarian work",
+      "body": "Institutional aid \u2014 not targeting private persons.",
+      "href": "https://www.icrc.org/en/donate",
+      "regions": [
+        "global"
+      ]
+    },
+    {
+      "id": "act-5",
+      "kind": "teach_in",
+      "label": "Read the Public Docket charter",
+      "body": "Before hosting a teach-in, lock the nonviolence and evidence rules.",
+      "href": "/docket/#charter",
+      "regions": [
+        "global"
+      ]
+    }
+  ],
+  "photo_ref": null,
+  "closed_reason": null,
+  "closed_kind": null,
+  "note": null,
+  "counter_docket": {
+    "status": "open_for_submissions",
+    "summary": null
+  },
+  "stewards": [
+    {
+      "id": "hc-founders",
+      "display_name": "humanity.llc stewards",
+      "role_label": "Case maintainers (interim)",
+      "mailto": "info@humanity.llc",
+      "room_ref": "/docket/netanyahu/steward/"
+    },
+    {
+      "id": "hc-reviewer",
+      "display_name": "Public Docket reviewer",
+      "role_label": "Second gate (interim)",
+      "mailto": "info@humanity.llc",
+      "room_ref": "/docket/netanyahu/steward/"
+    }
+  ],
+  "changelog": [
+    {
+      "id": "log-1",
+      "dated": "2026-07-16",
+      "summary": "Case opened on Public Docket with ICC-linked counts and action kit."
+    },
+    {
+      "id": "log-2",
+      "dated": "2026-07-16",
+      "summary": "Steward visibility + public changelog shipped (room bind deferred)."
+    },
+    {
+      "id": "log-c1",
+      "dated": "2026-07-16",
+      "summary": "WS-DOCKET-C v1: live_object unbound + steward shell linked (no Worker mint)."
+    },
+    {
+      "id": "log-c2-bind",
+      "dated": "2026-07-16",
+      "summary": "WS-DOCKET-C-v2: live_object bound to case URL under nonviolence charter (discovery opt-in still false)."
+    },
+    {
+      "id": "log-dg-v0",
+      "dated": "2026-07-16",
+      "summary": "Dual-gate steward edits (DG-v0): second steward slot + propose/approve/apply on steward shell (session-local)."
+    }
+  ],
+  "live_object": {
+    "status": "bound",
+    "object_id": "obj_docket_casefile_netanyahu",
+    "scan_path": "/docket/netanyahu/",
+    "discovery_opt_in": false,
+    "bind_notes": "WS-DOCKET-C-v2: casefile bound to Public Docket case URL. Upgrade scan_path to /c/{profile}?q={qr} when a child-object QR is issued. discovery_opt_in stays false (C-v3)."
+  },
+  "edit_proposals": []
+}

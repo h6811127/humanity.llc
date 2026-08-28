@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Sam Altman · Steward · Public Docket</title>
+    <meta
+      name="description"
+      content="Steward shell for Sam Altman — Public Docket maintenance. Nonviolent · not law enforcement."
+    />
+    <meta property="og:title" content="Sam Altman · Steward · Public Docket" />
+    <meta
+      property="og:description"
+      content="Case steward shell. Casefile live object bound. Nonviolent · not law enforcement."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://humanity.llc/docket/altman/steward/" />
+    <meta name="theme-color" content="#0a0a0a" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <script>
+      (function () {
+        try {
+          if (localStorage.getItem("hc_theme") === "dark") {
+            document.documentElement.dataset.theme = "dark";
+            document.documentElement.style.colorScheme = "dark";
+          }
+        } catch (e) {
+          /* ignore */
+        }
+      })();
+    </script>
+    <link rel="stylesheet" href="/styles.css?v=160" />
+    <link rel="stylesheet" href="/css/docket.css?v=9" />
+    <link rel="stylesheet" href="/css/theme-dark.css?v=39" />
+  </head>
+  <body class="page-docket">
+    <div class="page docket-page">
+      <header class="top docket-top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="docket-top-charter" href="/docket/#charter">Charter</a>
+      </header>
+      <main class="screen docket-screen">
+        <p class="form-hint">
+          <a href="/docket/altman/">← Public case</a>
+        </p>
+        <p class="form-hint" id="docket-steward-status" role="status">Loading steward shell…</p>
+        <div id="docket-steward-root" data-docket-case-id="altman"></div>
+      </main>
+    </div>
+    <script type="module" src="/js/docket-steward-page.mjs?v=8"></script>
+  </body>
+</html>

@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "phase": 2,
+  "policy": "Licensed / press / official likeness only. Fail open to monogram. Caption must say Public likeness · not a mugshot. rehearsal-* rows prove the licensed path without Most Wanted faces.",
+  "cases": [
+    {
+      "id": "netanyahu",
+      "photo_ref": null,
+      "license_status": "not_licensed",
+      "notes": "Monogram until real human license pack."
+    },
+    {
+      "id": "putin",
+      "photo_ref": null,
+      "license_status": "not_licensed",
+      "notes": "Monogram until real human license pack."
+    },
+    {
+      "id": "altman",
+      "photo_ref": null,
+      "license_status": "not_licensed",
+      "notes": "Monogram until real human license pack."
+    },
+    {
+      "id": "musk",
+      "photo_ref": null,
+      "license_status": "not_licensed",
+      "notes": "Monogram until real human license pack."
+    },
+    {
+      "id": "rehearsal-commons",
+      "photo_ref": "/assets/docket/license-pack-rehearsal.svg",
+      "license_status": "licensed",
+      "notes": "License pack pack-rehearsal-commons-v0: humanity.llc abstract plate · license-pack-v0 rehearsal · not a person"
+    }
+  ]
+}

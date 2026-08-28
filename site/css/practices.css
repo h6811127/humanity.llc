@@ -1,0 +1,183 @@
+/* Book of Weird Practices — cultural branch page */
+
+.practices-page {
+  max-width: 40rem;
+}
+
+.practices-top {
+  align-items: center;
+}
+
+.practices-top-note {
+  font-size: 13px;
+  color: var(--grey);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--grey) 40%, transparent);
+}
+
+.practices-top-note:hover,
+.practices-top-note:focus-visible {
+  color: var(--text, #111);
+  border-bottom-color: currentColor;
+  outline: none;
+}
+
+.practices-screen {
+  gap: 1.25rem;
+  padding-bottom: 3rem;
+}
+
+.practices-list-head {
+  margin: 0 0 0.25rem;
+}
+
+.practices-kicker {
+  margin: 0 0 0.35rem;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--grey);
+}
+
+.practices-list-head h1 {
+  margin: 0 0 0.6rem;
+  font-size: clamp(1.65rem, 4.5vw, 2rem);
+  line-height: 1.15;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.practices-list-lead {
+  margin: 0;
+  font-size: 1.02rem;
+  line-height: 1.45;
+  color: var(--grey);
+}
+
+/* Chapter jump — plain text links, not pills */
+.practices-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+  margin: 0.25rem 0 0.5rem;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.practices-jump a {
+  color: var(--grey);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--grey) 40%, transparent);
+}
+
+.practices-jump a:hover,
+.practices-jump a:focus-visible {
+  color: var(--text, #111);
+  border-bottom-color: currentColor;
+  outline: none;
+}
+
+.practices-book {
+  counter-reset: practice;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.practices-chapter {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+.practices-chapter-title {
+  margin: 0 0 0.25rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--grey);
+}
+
+.practices-chapter-lead {
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: var(--grey);
+}
+
+.practices-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.practices-item {
+  counter-increment: practice;
+  margin: 0;
+  padding: 0 0 0 2.4rem;
+  position: relative;
+  border: none;
+  background: none;
+  box-shadow: none;
+}
+
+.practices-item::before {
+  content: counter(practice, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 0.15rem;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  color: var(--grey);
+}
+
+.practices-title {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.practices-how {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--text, #111);
+}
+
+.practices-how-disclosure {
+  margin-top: 1.5rem;
+  padding: 0.75rem 0;
+  border-top: 1px solid color-mix(in srgb, var(--grey) 28%, transparent);
+  font-size: 0.92rem;
+}
+
+.practices-how-disclosure summary {
+  cursor: pointer;
+  color: var(--grey);
+  list-style: none;
+}
+
+.practices-how-disclosure summary::-webkit-details-marker {
+  display: none;
+}
+
+.practices-how-body {
+  margin-top: 0.75rem;
+}
+
+.practices-how-list {
+  margin: 0 0 0.75rem;
+  padding-left: 1.15rem;
+  line-height: 1.45;
+}
+
+.practices-how-list li + li {
+  margin-top: 0.4rem;
+}

@@ -1,0 +1,155 @@
+{
+  "id": "musk",
+  "rank": 4,
+  "display_name": "Elon Musk",
+  "role": "Owner, X \u00b7 CEO, SpaceX / Tesla / xAI (roles vary)",
+  "badge": {
+    "kind": "docket_counts",
+    "label": "Docket counts \u00b7 not ICC"
+  },
+  "status": "open",
+  "counts_heading": "Counts against humanity (docket)",
+  "counts": [
+    {
+      "id": "count-1",
+      "kind": "docket_count",
+      "title": "Platform amplification of mass harm",
+      "body": "Using control of a global speech network to elevate conflict, disinformation, and targeting of vulnerable groups"
+    },
+    {
+      "id": "count-2",
+      "kind": "docket_count",
+      "title": "Labor and workplace rights conflicts",
+      "body": "Repeated public legal and regulatory fights over worker organizing and safety culture across companies"
+    },
+    {
+      "id": "count-3",
+      "kind": "docket_count",
+      "title": "Privatization of critical infrastructure leverage",
+      "body": "Concentrating space, connectivity, and AI capacity in ways that outrun public accountability"
+    }
+  ],
+  "sources": [
+    {
+      "label": "Corrections / evidence tips",
+      "url": "mailto:info@humanity.llc?subject=Docket%20correction%20Musk",
+      "dated": null,
+      "note": "Public Docket campaign counts of systemic harm \u2014 not International Criminal Court charges."
+    }
+  ],
+  "action": {
+    "label": "Contact your U.S. representative on platform accountability",
+    "href": "https://www.house.gov/representatives/find-your-representative"
+  },
+  "actions": [
+    {
+      "id": "act-1",
+      "kind": "contact_rep",
+      "label": "Contact your U.S. representative on platform accountability",
+      "body": "Ask for transparent rules on large platforms \u2014 institutional, not personal harassment.",
+      "href": "https://www.house.gov/representatives/find-your-representative",
+      "regions": [
+        "us"
+      ]
+    },
+    {
+      "id": "act-2",
+      "kind": "shareholder_vote",
+      "label": "Learn shareholder rights (U.S. Investor.gov)",
+      "body": "Institutional capital voice \u2014 proxy voting and disclosures, not personal confrontation.",
+      "href": "https://www.investor.gov/",
+      "regions": [
+        "us"
+      ]
+    },
+    {
+      "id": "act-3",
+      "kind": "foia",
+      "label": "Learn how to file a U.S. FOIA request",
+      "body": "Public records on government contracts with major tech and space vendors.",
+      "href": "https://www.foia.gov/how-to.html",
+      "regions": [
+        "us"
+      ]
+    },
+    {
+      "id": "act-4",
+      "kind": "share_sources",
+      "label": "Send a correction or evidence tip",
+      "body": "Citeable sources only \u2014 no private addresses or threats.",
+      "href": "mailto:info@humanity.llc?subject=Docket%20correction%20Musk",
+      "regions": [
+        "global"
+      ]
+    },
+    {
+      "id": "act-5",
+      "kind": "teach_in",
+      "label": "Read the Public Docket charter",
+      "body": "Lock nonviolence rules before any local action.",
+      "href": "/docket/#charter",
+      "regions": [
+        "global"
+      ]
+    }
+  ],
+  "photo_ref": null,
+  "closed_reason": null,
+  "closed_kind": null,
+  "note": "These are Public Docket campaign counts of systemic harm \u2014 not International Criminal Court charges.",
+  "counter_docket": {
+    "status": "open_for_submissions",
+    "summary": null
+  },
+  "stewards": [
+    {
+      "id": "hc-founders",
+      "display_name": "humanity.llc stewards",
+      "role_label": "Case maintainers (interim)",
+      "mailto": "info@humanity.llc",
+      "room_ref": "/docket/musk/steward/"
+    },
+    {
+      "id": "hc-reviewer",
+      "display_name": "Public Docket reviewer",
+      "role_label": "Second gate (interim)",
+      "mailto": "info@humanity.llc",
+      "room_ref": "/docket/musk/steward/"
+    }
+  ],
+  "changelog": [
+    {
+      "id": "log-1",
+      "dated": "2026-07-16",
+      "summary": "Case opened with docket campaign counts (not ICC) and action kit."
+    },
+    {
+      "id": "log-2",
+      "dated": "2026-07-16",
+      "summary": "Steward visibility + public changelog shipped (room bind deferred)."
+    },
+    {
+      "id": "log-c1",
+      "dated": "2026-07-16",
+      "summary": "WS-DOCKET-C v1: live_object unbound + steward shell linked (no Worker mint)."
+    },
+    {
+      "id": "log-c2-bind",
+      "dated": "2026-07-16",
+      "summary": "WS-DOCKET-C-v2: live_object bound to case URL under nonviolence charter (discovery opt-in still false)."
+    },
+    {
+      "id": "log-dg-v0",
+      "dated": "2026-07-16",
+      "summary": "Dual-gate steward edits (DG-v0): second steward slot + propose/approve/apply on steward shell (session-local)."
+    }
+  ],
+  "live_object": {
+    "status": "bound",
+    "object_id": "obj_docket_casefile_musk",
+    "scan_path": "/docket/musk/",
+    "discovery_opt_in": false,
+    "bind_notes": "WS-DOCKET-C-v2: casefile bound to Public Docket case URL. Upgrade scan_path to /c/{profile}?q={qr} when a child-object QR is issued. discovery_opt_in stays false (C-v3)."
+  },
+  "edit_proposals": []
+}

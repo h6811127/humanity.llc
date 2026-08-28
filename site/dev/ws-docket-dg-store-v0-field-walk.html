@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WS-DOCKET · DG-store-v0</title>
+    <meta name="robots" content="noindex" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="page">
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">humanity.llc</a>
+        <span class="form-hint">WS-DOCKET · Worker store for signed proposals</span>
+      </header>
+      <main class="screen">
+        <h1>Worker store (DG-store-v0)</h1>
+        <p class="form-hint">
+          Persist DG-v1 signed dual-gate proposals in D1. Never auto-writes published
+          case JSON (<code>writes_published_json: false</code>). Kind:
+          <code>hc.docket.edit_proposals_store.v0</code>
+        </p>
+        <h2 class="group-label">Steps</h2>
+        <ol class="list list-compact">
+<li>Propose + dual-sign (DG-v1 fixture keys) on the steward shell.</li>
+<li>Persist to Worker store (PUT) — session cache remains a fallback.</li>
+<li>Reload / second device: GET restores signed proposals from D1.</li>
+<li>Apply still does not rewrite published case JSON — download merge pack for human review.</li>
+<li>No production steward key custody yet — fixture keys only.</li>
+        </ol>
+        <h2 class="group-label">API</h2>
+        <ul class="list list-compact">
+          <li>GET/PUT <code>http://127.0.0.1:8787/.well-known/hc/v1/docket/altman/edit-proposals</code></li>
+        </ul>
+        <h2 class="group-label">Surfaces</h2>
+        <ul class="list list-compact">
+          <li><a href="http://127.0.0.1:8788/docket/altman/steward/#dual-gate-edits">Steward #dual-gate-edits</a></li>
+          <li><a href="http://127.0.0.1:8788/docket/altman/steward/#merge-pack">Steward #merge-pack</a></li>
+        </ul>
+        <p class="form-hint">
+          Engineering: <code>npm run ws-docket:dg-store-preflight -- --strict</code>
+        </p>
+      </main>
+    </div>
+  </body>
+</html>

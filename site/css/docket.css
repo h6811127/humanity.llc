@@ -1,0 +1,989 @@
+/* Public Docket — docket plates (WS-DOCKET-A)
+   Court / exhibit tone. No law-enforcement stamps, seals, or mugshot-hero chrome. */
+
+.docket-page {
+  max-width: 640px;
+}
+
+.docket-top {
+  align-items: center;
+}
+
+.docket-top-chrome {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--grey);
+}
+
+.docket-top-label {
+  letter-spacing: 0.02em;
+}
+
+.docket-top-sep {
+  opacity: 0.55;
+}
+
+.docket-top .docket-top-charter {
+  font-size: 13px;
+  color: var(--grey);
+  text-decoration: none;
+}
+
+.docket-top .docket-top-charter:hover,
+.docket-top .docket-top-charter:focus-visible {
+  color: var(--text, #111);
+  text-decoration: underline;
+}
+
+.docket-screen {
+  gap: 0;
+  padding-bottom: 48px;
+}
+
+.docket-list-head {
+  margin: 8px 0 20px;
+  padding: 0 2px;
+}
+
+.docket-kicker {
+  margin: 0 0 6px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--grey);
+}
+
+.docket-list-head h1 {
+  margin: 0 0 10px;
+  font-size: clamp(1.75rem, 5vw, 2.15rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.docket-list-lead {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--grey);
+}
+
+/* Roster */
+.docket-wanted-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Shared plate grammar — site radius + restrained frosted surface.
+   Reuses emphasis-card shadow/fill tokens; skips tinted status chrome
+   (active/warn/urgent) so cases stay exhibit-like, not product notices. */
+.docket-plate,
+.docket-wanted-card {
+  margin: 0;
+  padding: 16px 16px 14px;
+  border: 0.5px solid var(--hc-emphasis-card-border-neutral, rgba(60, 60, 67, 0.14));
+  border-radius: 14px;
+  background: var(
+    --hc-emphasis-card-fill-info-glass,
+    linear-gradient(
+      160deg,
+      rgba(246, 247, 248, 0.78) 0%,
+      rgba(242, 243, 245, 0.68) 48%,
+      rgba(236, 238, 241, 0.74) 100%
+    )
+  );
+  box-shadow: var(--hc-emphasis-card-shadow);
+  -webkit-backdrop-filter: var(--hc-emphasis-card-backdrop, blur(16px) saturate(1.15));
+  backdrop-filter: var(--hc-emphasis-card-backdrop, blur(16px) saturate(1.15));
+  scroll-margin-top: 72px;
+}
+
+.docket-plate-row,
+.docket-case-hero-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.docket-plate-body {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Monogram / Phase-2 photo slot */
+.docket-plate-mono {
+  flex: 0 0 auto;
+  width: 56px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0.5px solid rgba(60, 60, 67, 0.16);
+  border-radius: 10px;
+  background: linear-gradient(
+    165deg,
+    rgba(255, 255, 255, 0.55) 0%,
+    rgba(60, 60, 67, 0.08) 100%
+  );
+  overflow: hidden;
+}
+
+.docket-plate-mono-lg {
+  width: 72px;
+  height: 96px;
+}
+
+.docket-plate-mono-text {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: rgba(60, 60, 67, 0.72);
+  font-variant-numeric: tabular-nums;
+}
+
+.docket-plate-mono img,
+.docket-plate-mono[data-docket-photo] {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.docket-photo-caption {
+  margin: 6px 0 0;
+  font-size: 12px;
+  max-width: 12rem;
+}
+
+.docket-wanted-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.docket-wanted-rank {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+  color: var(--grey);
+}
+
+.docket-status {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(60, 60, 67, 0.72);
+  border: 0.5px solid rgba(60, 60, 67, 0.18);
+  border-radius: 8px;
+  padding: 3px 8px;
+}
+
+.docket-plate[data-docket-status="closed"],
+.docket-case-screen[data-docket-status="closed"] .docket-plate-case {
+  opacity: 0.72;
+}
+
+.docket-plate[data-docket-status="closed"] .docket-status,
+.docket-case-screen[data-docket-status="closed"] .docket-status {
+  color: var(--grey);
+}
+
+.docket-status-closed-reason {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--grey);
+}
+
+.docket-wanted-badge {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--red);
+  border: 0.5px solid color-mix(in srgb, var(--red) 35%, transparent);
+  border-radius: 8px;
+  padding: 4px 9px;
+}
+
+.docket-wanted-badge-docket {
+  color: #5c5c5c;
+  border-color: rgba(60, 60, 67, 0.22);
+}
+
+.docket-plate-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.docket-wanted-name {
+  margin: 0 0 4px;
+  font-size: 1.28rem;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.docket-plate-name-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.docket-plate-name-link:hover,
+.docket-plate-name-link:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.docket-wanted-role {
+  margin: 0;
+  font-size: 14px;
+  color: var(--grey);
+  line-height: 1.35;
+}
+
+.docket-wanted-counts-label {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--grey);
+}
+
+.docket-wanted-counts {
+  margin: 0 0 12px;
+  padding: 0 0 0 1.05rem;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.docket-wanted-counts li {
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.docket-plate-counts-preview {
+  margin-bottom: 10px;
+}
+
+.docket-wanted-note,
+.docket-wanted-source {
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--grey);
+}
+
+.docket-wanted-source a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.docket-plate-action {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 2px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text, #111);
+  text-decoration: none;
+  border: 0.5px solid rgba(60, 60, 67, 0.22);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.docket-plate-action:hover,
+.docket-plate-action:focus-visible {
+  border-color: rgba(60, 60, 67, 0.4);
+  background: rgba(255, 255, 255, 0.82);
+  outline: none;
+}
+
+/* Action kit (below the fold) */
+.docket-action-kit-lead {
+  margin: 0 0 12px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.docket-action-kit {
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  counter-reset: docket-action;
+}
+
+.docket-action-item {
+  margin: 0;
+  padding: 12px 14px 12px 40px;
+  position: relative;
+  border: 0.5px solid var(--hc-emphasis-card-border-neutral, rgba(60, 60, 67, 0.14));
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  counter-increment: docket-action;
+}
+
+.docket-action-item::before {
+  content: counter(docket-action, decimal-leading-zero);
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  color: var(--grey);
+}
+
+.docket-action-link {
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--text, #111);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.docket-action-regions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+.docket-action-region {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--grey);
+  border: 0.5px solid rgba(60, 60, 67, 0.18);
+  border-radius: 6px;
+  padding: 1px 6px;
+}
+
+.docket-action-body {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--grey);
+}
+
+/* Case page */
+.docket-case-back {
+  margin: 0 0 12px;
+  font-size: 13px;
+}
+
+.docket-case-back a {
+  color: var(--grey);
+  text-decoration: none;
+}
+
+.docket-case-back a:hover,
+.docket-case-back a:focus-visible {
+  color: var(--text, #111);
+  text-decoration: underline;
+}
+
+.docket-case-eyebrow {
+  margin-bottom: 14px;
+}
+
+.docket-case-name {
+  font-size: clamp(1.65rem, 5vw, 2rem);
+  margin-bottom: 6px;
+}
+
+.docket-case-hero {
+  margin-bottom: 28px;
+}
+
+.docket-case-strongest {
+  margin: 4px 0 14px;
+  padding: 14px 0 0;
+  border-top: 0.5px solid rgba(60, 60, 67, 0.12);
+}
+
+.docket-case-count-lead {
+  margin: 0;
+}
+
+.docket-case-count-title {
+  margin: 0 0 6px;
+  font-size: 1.15rem;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+}
+
+.docket-case-count-body {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.45;
+  color: rgba(60, 60, 67, 0.88);
+}
+
+.docket-case-primary-source {
+  margin-bottom: 12px;
+}
+
+.docket-case-below {
+  padding-top: 4px;
+}
+
+.docket-case-section-title {
+  margin: 22px 0 10px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--grey);
+}
+
+.docket-case-section-title:first-child {
+  margin-top: 0;
+}
+
+.docket-case-sources {
+  margin: 0 0 16px;
+  padding: 0 0 0 1.05rem;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--grey);
+}
+
+.docket-case-sources a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.docket-case-source-dated {
+  display: inline-block;
+  margin-left: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.docket-case-never {
+  margin: 18px 0 12px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--grey);
+}
+
+.docket-case-never a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.docket-exit-criteria,
+.docket-corrections,
+.docket-tos-lead {
+  margin: 0 0 12px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--grey);
+}
+
+.docket-counter-slot {
+  margin: 0 0 16px;
+  padding: 14px;
+  border: 0.5px solid var(--hc-emphasis-card-border-neutral, rgba(60, 60, 67, 0.14));
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.docket-counter-status {
+  margin: 0 0 8px;
+}
+
+.docket-counter-body {
+  margin: 0 0 12px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--grey);
+}
+
+.docket-closed-criteria-subhead {
+  margin: 14px 0 8px;
+  font-size: 13px;
+}
+
+.docket-closed-criteria-reopen {
+  margin-top: 12px;
+}
+
+.docket-closed-kind {
+  font-weight: 600;
+}
+
+.docket-commons {
+  margin: 24px 0 8px;
+}
+
+.docket-network-good-card {
+  margin: 0 0 8px;
+  padding: 14px 16px;
+  border: 0.5px solid var(--hc-emphasis-card-border-neutral, rgba(60, 60, 67, 0.14));
+  border-radius: 14px;
+  background: var(
+    --hc-emphasis-card-fill-info-glass,
+    rgba(255, 255, 255, 0.72)
+  );
+  box-shadow: var(--hc-emphasis-card-shadow, none);
+}
+
+.docket-network-good-kicker {
+  margin: 0 0 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--grey);
+}
+
+.docket-network-good-title {
+  margin: 0 0 6px;
+  font-size: 1.1rem;
+  letter-spacing: -0.015em;
+}
+
+.docket-network-good-title a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.docket-network-good-title a:hover,
+.docket-network-good-title a:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.docket-network-good-body {
+  margin: 0 0 8px;
+}
+
+.docket-goods-plate {
+  margin-bottom: 24px;
+}
+
+.docket-goods-title {
+  margin: 0 0 10px;
+  font-size: clamp(1.55rem, 4.5vw, 1.9rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.docket-goods-foot {
+  margin-top: 20px;
+}
+
+.docket-stewards-lead {
+  margin: 0 0 10px;
+}
+
+.docket-stewards-list {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.docket-steward-item {
+  margin: 0;
+  padding: 12px 14px;
+  border: 0.5px solid var(--hc-emphasis-card-border-neutral, rgba(60, 60, 67, 0.14));
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.45);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.docket-steward-name {
+  font-size: 15px;
+}
+
+.docket-steward-role,
+.docket-steward-contact,
+.docket-steward-room {
+  font-size: 13px;
+  color: var(--grey);
+  line-height: 1.4;
+}
+
+.docket-steward-contact a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.docket-changelog-list {
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.docket-changelog-item {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.docket-changelog-dated {
+  font-variant-numeric: tabular-nums;
+  color: var(--grey);
+}
+
+.docket-changelog-summary {
+  color: inherit;
+}
+
+.docket-live-object-slot {
+  margin: 0 0 16px;
+  padding: 14px;
+  border: 0.5px solid var(--hc-emphasis-card-border-neutral, rgba(60, 60, 67, 0.14));
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.docket-live-object-status {
+  margin: 0 0 8px;
+}
+
+.docket-live-object-body,
+.docket-live-object-scan {
+  margin: 0 0 12px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--grey);
+}
+
+.docket-steward-shell .docket-live-object-slot {
+  margin-bottom: 18px;
+}
+
+.docket-edit-proposals {
+  margin: 0 0 22px;
+}
+
+.docket-edit-proposal-list {
+  list-style: none;
+  margin: 12px 0 16px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.docket-edit-proposal {
+  margin: 0;
+  padding: 12px 0;
+  border-top: 1px solid rgba(60, 60, 67, 0.12);
+}
+
+.docket-edit-proposal-head {
+  margin: 0 0 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.docket-edit-proposal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.docket-edit-before,
+.docket-edit-after {
+  font-weight: 600;
+  color: var(--ink, #111);
+}
+
+.docket-edit-propose {
+  margin: 12px 0 18px;
+}
+
+.docket-edit-propose > summary {
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--grey);
+}
+
+/* Charter — secondary */
+.docket-charter-disclosure {
+  margin-top: 28px;
+  padding: 14px 4px 0;
+  border-top: 1px solid rgba(60, 60, 67, 0.12);
+}
+
+.docket-charter-disclosure > summary {
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--grey);
+  list-style: none;
+}
+
+.docket-charter-disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+
+.docket-charter-disclosure-body {
+  margin-top: 12px;
+}
+
+.docket-charter-compact {
+  margin: 0 0 12px;
+  padding-left: 1.1rem;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--grey);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.docket-charter-north {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-style: italic;
+  line-height: 1.4;
+  color: var(--grey);
+}
+
+/* Motion — subtle stagger only */
+@keyframes docket-plate-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.docket-wanted-list .docket-plate {
+  animation: docket-plate-in 0.42s ease both;
+  animation-delay: calc(var(--docket-stagger, 0) * 55ms);
+}
+
+.docket-case-strongest .docket-case-count-lead {
+  animation: docket-plate-in 0.45s ease both;
+  animation-delay: 80ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .docket-wanted-list .docket-plate,
+  .docket-case-strongest .docket-case-count-lead {
+    animation: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .docket-plate-mono {
+    width: 48px;
+    height: 62px;
+  }
+
+  .docket-plate-mono-lg {
+    width: 56px;
+    height: 74px;
+  }
+
+  .docket-plate-mono-text {
+    font-size: 13px;
+  }
+}
+
+/* Dual-gate edit proposals (steward shell) */
+.docket-edit-proposals {
+  margin: 0 0 20px;
+}
+
+.docket-edit-proposal-list {
+  list-style: none;
+  margin: 0 0 14px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.docket-edit-proposal {
+  margin: 0;
+  padding: 12px;
+  border: 1px solid rgba(60, 60, 67, 0.16);
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.docket-edit-proposal-head {
+  margin: 0 0 6px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.docket-edit-proposal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.docket-edit-before,
+.docket-edit-after {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.docket-edit-propose {
+  margin: 12px 0 16px;
+  padding: 10px 0 0;
+  border-top: 1px solid rgba(60, 60, 67, 0.12);
+}
+
+.docket-edit-propose > summary {
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--grey);
+}
+
+.docket-edit-propose .compact-form {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* QR upgrade (steward shell) */
+.docket-qr-upgrade-root {
+  margin: 0 0 20px;
+}
+
+.docket-qr-upgrade {
+  margin: 0;
+}
+
+.docket-qr-upgrade-form {
+  margin: 12px 0 8px;
+  padding: 10px 0 0;
+  border-top: 1px solid rgba(60, 60, 67, 0.12);
+}
+
+.docket-qr-upgrade-form > summary {
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--grey);
+}
+
+.docket-qr-upgrade-form .compact-form {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.docket-qr-upgrade-preview {
+  margin: 12px 0;
+  padding: 10px 12px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  font-size: 12px;
+  line-height: 1.4;
+  border: 1px solid rgba(60, 60, 67, 0.14);
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.55);
+}
+
+/* Discovery opt-in (steward shell, C-v3) */
+.docket-discovery-opt-in-root {
+  margin: 0 0 20px;
+}
+
+.docket-discovery-opt-in {
+  margin: 0;
+}
+
+.docket-discovery-opt-in-form {
+  margin: 12px 0 8px;
+  padding: 10px 0 0;
+  border-top: 1px solid rgba(60, 60, 67, 0.12);
+}
+
+.docket-discovery-opt-in-form > summary {
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--grey);
+}
+
+.docket-discovery-opt-in-form .compact-form {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.docket-cv3-approvals {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.docket-cv3-approval {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.docket-discovery-opt-in-preview {
+  margin: 12px 0;
+  padding: 10px 12px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  font-size: 12px;
+  line-height: 1.4;
+  border: 1px solid rgba(60, 60, 67, 0.14);
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.55);
+}

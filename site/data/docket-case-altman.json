@@ -1,0 +1,168 @@
+{
+  "id": "altman",
+  "rank": 3,
+  "display_name": "Sam Altman",
+  "role": "CEO, OpenAI",
+  "badge": {
+    "kind": "docket_counts",
+    "label": "Docket counts · not ICC"
+  },
+  "status": "open",
+  "counts_heading": "Counts against humanity (docket)",
+  "counts": [
+    {
+      "id": "count-1",
+      "kind": "docket_count",
+      "title": "Unaccountable AI power concentration",
+      "body": "Racing frontier systems that lab leadership has publicly described as carrying catastrophic risk, while democratic oversight lags"
+    },
+    {
+      "id": "count-2",
+      "kind": "docket_count",
+      "title": "Labor and worker voice suppression patterns",
+      "body": "Public disputes over NDAs, equity, and organizing inside AI labs"
+    },
+    {
+      "id": "count-3",
+      "kind": "docket_count",
+      "title": "Capture of the public AI commons",
+      "body": "Converting open research culture into closed commercial control over tools that shape speech, work, and knowledge"
+    }
+  ],
+  "sources": [
+    {
+      "label": "Corrections / evidence tips",
+      "url": "mailto:info@humanity.llc?subject=Docket%20correction%20Altman",
+      "dated": null,
+      "note": "Public Docket campaign counts of systemic harm — not International Criminal Court charges."
+    }
+  ],
+  "action": {
+    "label": "Contact your U.S. representative on AI oversight",
+    "href": "https://www.house.gov/representatives/find-your-representative"
+  },
+  "actions": [
+    {
+      "id": "act-1",
+      "kind": "contact_rep",
+      "label": "Contact your U.S. representative on AI oversight",
+      "body": "Ask for transparent, democratic rules on frontier AI — not personal targeting.",
+      "href": "https://www.house.gov/representatives/find-your-representative",
+      "regions": [
+        "us"
+      ]
+    },
+    {
+      "id": "act-2",
+      "kind": "foia",
+      "label": "Learn how to file a U.S. FOIA request",
+      "body": "Public records on agency AI procurement and contracts — institutional pressure.",
+      "href": "https://www.foia.gov/how-to.html",
+      "regions": [
+        "us"
+      ]
+    },
+    {
+      "id": "act-3",
+      "kind": "share_sources",
+      "label": "Send a correction or evidence tip",
+      "body": "Strengthen the docket with citeable sources — no doxxing.",
+      "href": "mailto:info@humanity.llc?subject=Docket%20correction%20Altman",
+      "regions": [
+        "global"
+      ]
+    },
+    {
+      "id": "act-4",
+      "kind": "teach_in",
+      "label": "Read the Public Docket charter",
+      "body": "Nonviolence, evidence bar, and allowed actions before any campaign work.",
+      "href": "/docket/#charter",
+      "regions": [
+        "global"
+      ]
+    }
+  ],
+  "photo_ref": null,
+  "closed_reason": null,
+  "closed_kind": null,
+  "note": "These are Public Docket campaign counts of systemic harm — not International Criminal Court charges.",
+  "counter_docket": {
+    "status": "open_for_submissions",
+    "summary": null
+  },
+  "stewards": [
+    {
+      "id": "hc-founders",
+      "display_name": "humanity.llc stewards",
+      "role_label": "Case maintainers (interim)",
+      "mailto": "info@humanity.llc",
+      "room_ref": "/docket/altman/steward/"
+    },
+    {
+      "id": "hc-reviewer",
+      "display_name": "Public Docket reviewer",
+      "role_label": "Second gate (interim)",
+      "mailto": "info@humanity.llc",
+      "room_ref": "/docket/altman/steward/"
+    }
+  ],
+  "edit_proposals": [
+    {
+      "id": "prop-altman-count1-clarify",
+      "field_path": "counts[0].body",
+      "summary": "Clarify first count wording (sourced systemic harm, not personal attack)",
+      "before": "Racing frontier systems that lab leadership has publicly described as carrying catastrophic risk, while democratic oversight lags",
+      "after": "Publicly documented race dynamics around frontier systems that lab leadership has described as carrying catastrophic risk, while democratic oversight lags",
+      "proposed_by": "hc-founders",
+      "approvals": [
+        "hc-founders"
+      ],
+      "status": "pending",
+      "proposed_at": "2026-07-16",
+      "resolved_at": null,
+      "signatures": [
+        {
+          "steward_id": "hc-founders",
+          "public_key_base58": "Fur4zrupG4Mw31SYJqX9Q6ZADBYAxkUxuYTQNBKLWQ8M",
+          "signature_base58": "4BfD9oyPAhemu6nyRmdvjFmdpRfmmrvwazfQdv8N1pFm4LXDrLdzM5nUEpo69BtQsBiToNXpcqqgWJhWov5ByAfG",
+          "signed_at": "2026-07-16T12:00:00.000Z"
+        }
+      ]
+    }
+  ],
+  "changelog": [
+    {
+      "id": "log-1",
+      "dated": "2026-07-16",
+      "summary": "Case opened with docket campaign counts (not ICC) and action kit."
+    },
+    {
+      "id": "log-2",
+      "dated": "2026-07-16",
+      "summary": "Steward visibility + public changelog shipped (room bind deferred)."
+    },
+    {
+      "id": "log-c1",
+      "dated": "2026-07-16",
+      "summary": "WS-DOCKET-C v1: live_object unbound + steward shell linked (no Worker mint)."
+    },
+    {
+      "id": "log-c2-bind",
+      "dated": "2026-07-16",
+      "summary": "WS-DOCKET-C-v2: live_object bound to case URL under nonviolence charter (discovery opt-in still false)."
+    },
+    {
+      "id": "log-dg-v0",
+      "dated": "2026-07-16",
+      "summary": "Dual-gate steward edits (DG-v0): second steward slot + propose/approve/apply on steward shell (session-local)."
+    }
+  ],
+  "live_object": {
+    "status": "bound",
+    "object_id": "obj_docket_casefile_altman",
+    "scan_path": "/docket/altman/",
+    "discovery_opt_in": false,
+    "bind_notes": "WS-DOCKET-C-v2: casefile bound to Public Docket case URL. Upgrade scan_path to /c/{profile}?q={qr} when a child-object QR is issued. discovery_opt_in stays false (C-v3)."
+  }
+}

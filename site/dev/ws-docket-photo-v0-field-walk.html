@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WS-DOCKET · photos Phase 2</title>
+    <meta name="robots" content="noindex" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/css/docket.css" />
+  </head>
+  <body class="page">
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">humanity.llc</a>
+        <span class="form-hint">WS-DOCKET · photos Phase 2</span>
+      </header>
+      <main class="screen">
+        <h1>Licensed likeness plumbing</h1>
+        <p class="form-hint">
+          Fail open to monogram. Caption: <em>Public likeness · not a mugshot</em>.
+          Starter-four stay <code>not_licensed</code> until a real license pack.
+        </p>
+        <h2 class="group-label">Steps</h2>
+        <ol class="list list-compact">
+<li>Obtain official / press / clearly licensed likeness (no scraped social, no private photos).</li>
+<li>Store under /assets/docket/ (or /media/) — site-relative path only.</li>
+<li>Set checklist license_status=licensed + photo_ref + attribution notes.</li>
+<li>Set matching case JSON photo_ref; caption is always “Public likeness · not a mugshot”.</li>
+<li>Same treatment for every case that ships a face — no selective demonizing crops.</li>
+<li>Fail open: if license_status is not licensed, keep monogram.</li>
+        </ol>
+        <h2 class="group-label">Monogram (default)</h2>
+        <div class="docket-plate-row"><span class="docket-plate-mono docket-plate-mono-lg docket-wanted-mono" aria-hidden="true"><span class="docket-plate-mono-text">BN</span></span></div>
+        <h2 class="group-label">Licensed slot demo (asset placeholder — not a person)</h2>
+        <div class="docket-plate-row"><span class="docket-plate-mono docket-plate-mono-lg docket-wanted-mono" data-docket-photo="1">
+  <img src="/assets/red_qr_transparent_bg.png" alt="" width="72" height="96" loading="lazy" decoding="async" />
+</span><p class="docket-photo-caption form-hint">Public likeness · not a mugshot</p></div>
+        <p class="form-hint">resolve mode: <code>photo</code></p>
+        <h2 class="group-label">Surfaces</h2>
+        <ul class="list list-compact">
+          <li><a href="http://127.0.0.1:8788/docket/netanyahu/steward/#photos">Steward #photos</a></li>
+          <li><a href="http://127.0.0.1:8788/docket/">Roster</a></li>
+          <li><a href="http://127.0.0.1:8788/data/docket-photo-license-checklist.json">Checklist JSON</a></li>
+        </ul>
+        <p class="form-hint">
+          Engineering: <code>npm run ws-docket:photo-preflight -- --strict</code>
+        </p>
+      </main>
+    </div>
+  </body>
+</html>
