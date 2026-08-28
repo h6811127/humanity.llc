@@ -198,4 +198,37 @@ describe("runPrintifyReconcile", () => {
     expect(state.rows[0]?.updated_at).toBe("2026-05-27T00:30:00.000Z");
     expect(state.lastSync?.updated_at).toBe("2026-05-27T00:30:00.000Z");
   });
+
+  it("advances a partial shipment to fulfilled on later Printify poll", async () => {
+    const state: DbState = {
+      rows: [printOrderRow({ status: "partially_fulfilled" })],
+      lastSync: null,
+    };
+
+    const fetchImpl = vi.fn(async () =>
+      new Response(
+        JSON.stringify({
+          id: PRINTIFY_ORDER_ID,
+          status: "fulfilled",
+          shipments: [
+            {
+              carrier: "USPS",
+              tracking_number: "9400111899223344556677",
+              tracking_url: "https://tools.usps.com/go/TrackConfirmAction",
+            },
+          ],
+        }),
+        { status: 200, headers: { "Content-Type": "application/json" } }
+      )
+    );
+
+    const result = await runPrintifyReconcile(
+      dbFor(state),
+      { PRINTIFY_API_TOKEN: "token", PRINTIFY_SHOP_ID: "99" },
+      { now: "2026-05-27T02:00:00.000Z", fetchImpl }
+    );
+
+    expect(result).toEqual({ polled: 1, updated: 1, errors: 0 });
+    expect(state.rows[0]?.status).toBe("fulfilled");
+  });
 });

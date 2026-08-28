@@ -110,13 +110,29 @@ describe("printify-status-map", () => {
   it("maps provider statuses", () => {
     expect(mapPrintifyOrderStatus("in-production")).toBe("in_production");
     expect(mapPrintifyOrderStatus("on-hold")).toBe("on_hold");
+    expect(mapPrintifyOrderStatus("partially-fulfilled")).toBe("partially_fulfilled");
+    expect(mapPrintifyOrderStatus("fulfilled")).toBe("fulfilled");
   });
 
   it("derives status from webhook event types", () => {
     expect(statusFromPrintifyWebhookEvent("order:sent-to-production", null)).toBe(
       "in_production"
     );
-    expect(statusFromPrintifyWebhookEvent("order:shipment:created", null)).toBe("fulfilled");
+    expect(statusFromPrintifyWebhookEvent("order:shipment:created", null)).toBe(
+      "partially_fulfilled"
+    );
+    expect(
+      statusFromPrintifyWebhookEvent("order:shipment:created", "partially-fulfilled")
+    ).toBe("partially_fulfilled");
+    expect(statusFromPrintifyWebhookEvent("order:shipment:created", "fulfilled")).toBe(
+      "fulfilled"
+    );
+    expect(statusFromPrintifyWebhookEvent("order:shipment:delivered", null)).toBe(
+      "partially_fulfilled"
+    );
+    expect(statusFromPrintifyWebhookEvent("order:updated", "partially-fulfilled")).toBe(
+      "partially_fulfilled"
+    );
     expect(statusFromPrintifyWebhookEvent("order:updated", "canceled")).toBe("canceled");
   });
 });
@@ -200,6 +216,95 @@ describe("handlePostPrintifyWebhook", () => {
     const row = state.printOrders.get(PRINTIFY_ORDER_ID);
     expect(row?.status).toBe("fulfilled");
     expect(row?.tracking_number).toBe("9400111899223344556677");
+  });
+
+  it("keeps multi-item orders partially_fulfilled on first shipment", async () => {
+    const state: DbState = {
+      printOrders: new Map([
+        [PRINTIFY_ORDER_ID, printOrderRow({ status: "in_production" })],
+      ]),
+      receipts: new Map(),
+      lastStatusUpdate: null,
+    };
+    const payload = JSON.stringify({
+      id: "evt_shipment_partial_1",
+      type: "order:shipment:created",
+      resource: {
+        id: PRINTIFY_ORDER_ID,
+        type: "order",
+        data: {
+          status: "partially-fulfilled",
+          shipments: [
+            {
+              carrier: "USPS",
+              tracking_number: "9400111899223344556677",
+              tracking_url: "https://tools.usps.com/go/TrackConfirmAction",
+            },
+          ],
+        },
+      },
+    });
+    const request = new Request("https://humanity.llc/v1/print/webhooks/printify", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Pfy-Signature": await signPayload(payload),
+      },
+      body: payload,
+    });
+
+    const res = await handlePostPrintifyWebhook(
+      request,
+      { PRINTIFY_WEBHOOK_SECRET: SECRET } as Env,
+      dbFor(state)
+    );
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { status: string; processing_status: string };
+    expect(body.processing_status).toBe("processed");
+    expect(body.status).toBe("partially_fulfilled");
+    expect(state.printOrders.get(PRINTIFY_ORDER_ID)?.status).toBe("partially_fulfilled");
+  });
+
+  it("does not assume the whole order shipped when shipment payload omits status", async () => {
+    const state: DbState = {
+      printOrders: new Map([
+        [PRINTIFY_ORDER_ID, printOrderRow({ status: "in_production" })],
+      ]),
+      receipts: new Map(),
+      lastStatusUpdate: null,
+    };
+    const payload = JSON.stringify({
+      id: "evt_shipment_no_status_1",
+      type: "order:shipment:created",
+      resource: {
+        id: PRINTIFY_ORDER_ID,
+        type: "order",
+        data: {
+          shipments: [
+            {
+              carrier: "USPS",
+              tracking_number: "9400111899223344556677",
+            },
+          ],
+        },
+      },
+    });
+    const request = new Request("https://humanity.llc/v1/print/webhooks/printify", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Pfy-Signature": await signPayload(payload),
+      },
+      body: payload,
+    });
+
+    const res = await handlePostPrintifyWebhook(
+      request,
+      { PRINTIFY_WEBHOOK_SECRET: SECRET } as Env,
+      dbFor(state)
+    );
+    expect(res.status).toBe(200);
+    expect(state.printOrders.get(PRINTIFY_ORDER_ID)?.status).toBe("partially_fulfilled");
   });
 
   it("processes tracking-only updates when provider status is unchanged", async () => {

@@ -13,6 +13,8 @@ export function mapPrintifyOrderStatus(raw: string): PrintOrderStatus | null {
       return "in_production";
     case "fulfilled":
       return "fulfilled";
+    case "partially-fulfilled":
+      return "partially_fulfilled";
     case "canceled":
       return "canceled";
     case "has-issues":
@@ -38,8 +40,16 @@ export function statusFromPrintifyWebhookEvent(
     case "order:sent-to-production":
       return "in_production";
     case "order:shipment:created":
-    case "order:shipment:delivered":
-      return "fulfilled";
+    case "order:shipment:delivered": {
+      const mapped = providerStatus ? mapPrintifyOrderStatus(providerStatus) : null;
+      if (mapped === "fulfilled" || mapped === "partially_fulfilled") {
+        return mapped;
+      }
+      // A shipment event is not proof the whole Printify order is done.
+      // Personalized qty>1 submits N line items; first package must stay on
+      // the reconcile poll (`partially_fulfilled`) until provider says fulfilled.
+      return "partially_fulfilled";
+    }
     case "order:updated":
       return providerStatus ? mapPrintifyOrderStatus(providerStatus) : null;
     case "order:created":
