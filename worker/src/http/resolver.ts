@@ -53,7 +53,7 @@ export function corsHeaders(request: Request): HeadersInit {
   if (!origin || !isAllowedCorsOrigin(origin)) return {};
   const headers: Record<string, string> = {
     "Access-Control-Allow-Origin": origin,
-    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, OPTIONS",
     "Access-Control-Allow-Headers":
       "Content-Type, If-None-Match, Authorization, X-HC-Device-Id, X-HC-Live-Proof-Manual",
     "Access-Control-Max-Age": "86400",

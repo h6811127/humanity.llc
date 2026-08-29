@@ -1,6 +1,6 @@
 # Public Docket — accountability vertical on the physical internet
 
-**Status:** Strategic product draft — **not shipped**; charter-first before engineering  
+**Status:** Active movement-depth branch — Tier 1 roster and case loop shipped; charter remains binding
 **Folk / campaign name:** “Humanity’s Most Wanted” (allowed only with nonviolence charter on every official surface)  
 **Public / partner name:** Public Docket · Accountability Board · Power Watch · Open Casefile  
 **Audience:** Founders, stewards, partners, legal review, agents  
@@ -156,6 +156,9 @@ Until fuller NGI tooling exists, ship **case templates** for:
 | Vladimir Putin | Aggression, sanctions, war-crimes documentation from official/NGO sources | Treaty/sanctions/investigation milestones |
 | Sam Altman | AI governance, labor, concentration of power | Policy commitments, audits, regulation wins |
 | Elon Musk | Platform governance, labor, contracts, public statements vs outcomes | Measurable civic/market pressure outcomes |
+| Mark Zuckerberg | Privacy extraction, platform amplification, youth mental health externalities | Policy commitments, audits, regulation wins |
+| Marc Andreessen | Venture power over public tech, techno-acceleration without consent | Policy commitments, audits, regulation wins |
+| Peter Thiel | Surveillance commercialization, anti-democratic power concentration | Policy commitments, audits, FOIA / contract transparency |
 
 Each page structure: **Why this case** → **Evidence** → **What you can do** → **What we never do**.
 
@@ -320,7 +323,7 @@ The product sells **membership in a method**, not fandom of enemies. The docket 
 8. Parallel **network goods** for campaign one + Accountability Day outline. **Shipped** — research kit · QR field kit · `/docket/accountability-day/`.
 9. **Photos (Phase 2)** — licensed likeness only; monograms until then. **Checklist shipped** — `docket-photo-license-checklist.json` (all `not_licensed`).
 
-**Later forks (not A/B):** governance constitution · metrics · real **human** likeness license packs for starter-four · production steward key custody · production replay of chapter mint.
+**Later forks (not A/B):** governance constitution · metrics · real **human** likeness license packs for starter-four · production steward key custody. Production replay of the chapter mint shipped 2026-07-31.
 
 ---
 
@@ -367,7 +370,7 @@ The product sells **membership in a method**, not fandom of enemies. The docket 
 | **QR-v0** | **Shipped** | Steward `#qr-upgrade` · session `/c/{profile}?q={qr}` preview · published JSON stays interim · `npm run ws-docket:qr-preflight` |
 | **C-v3** | **Shipped plumbing** | Schema allows `discovery_opt_in: true` only with child QR + dual steward `discovery.approvals` + `listed_reason` · steward `#discovery-opt-in` · **starter-four stay false** · kit/preflight |
 | **Chapter pins** | **Shipped** | Non-starter registry `docket-chapter-discovery-pins.json` · `/docket/chapters/` · C-v3 rules · **never** city discovery / homepage · `npm run ws-docket:chapter-pins-preflight` |
-| **QR-mint-v0** | **Shipped** | Real Worker parent + `status_plate` + issue-qr for chapter pin · `mint_status` · `npm run ws-docket:chapter-mint` · keys in `worker/.local/` · starter-four never minted |
+| **QR-mint-v0** | **Shipped + production replay verified** | Real Worker parent + `status_plate` + issue-qr for chapter pin · live scan verified · `npm run ws-docket:chapter-mint` requires explicit production confirmation/replay flags · keys in `worker/.local/` · starter-four never minted |
 
 ### `live_object` schema (locked)
 
@@ -540,7 +543,7 @@ Both forks are **in scope now**. Parallel agents are encouraged **only** with th
 | `site/docket/{id}/` structure / generation scripts | Worker crypto / child-objects |
 | `worker/tests/docket-*.test.ts` | FBI imagery assets |
 
-**Exit:** Four starter cases load from data; deep links resolve; roster not solely hand-maintained HTML prose; tests cover schema.
+**Exit:** Starter cases load from data; deep links resolve; roster not solely hand-maintained HTML prose; tests cover schema.
 
 ### Parallel agent protocol
 
@@ -548,7 +551,7 @@ Both forks are **in scope now**. Parallel agents are encouraged **only** with th
 |------|--------|
 | **Yes, parallelize A ∥ B** | Different file trees; merge via thin HTML hooks (`data-docket-case`, empty monogram slots) |
 | **Integrate order** | Prefer **B schema land first** if conflict, then A binds plates to data attributes — or agree a stub JSON shape in this doc before both start |
-| **Shared contract** | Case id slugs: `netanyahu`, `putin`, `altman`, `musk` |
+| **Shared contract** | Case id slugs: `netanyahu`, `putin`, `altman`, `musk`, `zuckerberg`, `andreessen`, `thiel` |
 | **Do not both edit** | `site/docket/index.html` body structure in the same hour — B adds hydrate hooks; A owns class names/CSS |
 | **Regression** | `npm run verify:landing` · `worker/tests/public-docket-landing.test.ts` · new `docket-*` unit tests from B |
 | **Workstream IDs** | **WS-DOCKET-A** (visual) · **WS-DOCKET-B** (data/URLs) under Public Docket |
@@ -593,7 +596,7 @@ Both forks are **in scope now**. Parallel agents are encouraged **only** with th
 | Topic | Decision |
 |-------|----------|
 | Files | `site/data/docket-cases-index.json` (slim roster) + `site/data/docket-case-{id}.json` (full) |
-| Slugs | `netanyahu` · `putin` · `altman` · `musk` |
+| Slugs | `netanyahu` · `putin` · `altman` · `musk` · `zuckerberg` · `andreessen` · `thiel` |
 | `badge.kind` | `icc_warrant` \| `docket_counts` |
 | `counts[].kind` | `icc_allegation` \| `docket_count` |
 | `status` | `open` \| `monitoring` \| `closed` — `closed` requires `closed_reason` + `closed_kind` |
@@ -758,7 +761,7 @@ Read and follow:
 
 Mission:
 1. Add site/data/docket-cases-index.json + site/data/docket-case-{id}.json for
-   netanyahu, putin, altman, musk (migrate content from current site/docket/index.html).
+   netanyahu, putin, altman, musk, zuckerberg, andreessen, thiel (migrate content from current site/docket/index.html).
 2. Add site/js/docket-case-core.mjs (load/validate). Enforce:
    - icc_allegation rows require a sources[] URL
    - status closed requires closed_reason
@@ -1001,8 +1004,8 @@ Litmus shows how NGI extracts calibrated human judgment beside AI research. For 
 | Optional child-object QR upgrade path (QR-v0) | **Shipped** (2026-07-16) — classify/upgrade helpers · steward session preview · kit/preflight · starter four remain interim |
 | Discovery opt-in (C-v3) | **Shipped plumbing** (2026-07-16) — schema unlock · steward `#discovery-opt-in` · starter-four stay false · kit/preflight |
 | Chapter discovery pins (non-starter) | **Shipped** (2026-07-16) — registry · `/docket/chapters/` · city fence · `ws-docket:chapter-pins-preflight` |
-| Chapter child QR mint (QR-mint-v0) | **Shipped** (2026-07-17) — Worker parent + status_plate + issue-qr · `mint_status` · kit/preflight · keys gitignored |
-| Next MVP | Real human likeness packs for starter-four · production steward key custody · production chapter mint replay |
+| Chapter child QR mint (QR-mint-v0) | **Shipped + production replay verified** (2026-07-31) — Worker parent + status_plate + issue-qr · live `/c/{profile}?q={qr}` · explicit production replay guard · keys gitignored |
+| Next MVP | Real human likeness packs for starter-four · production steward key custody |
 | Legal / ethics posture | **Charter clearance** for starter four (product assumption); counsel optional for expansion / paid promo |
 
 This document does **not** imply counsel signed every count. Update [`PRODUCT_WORKSTREAM_COORDINATION.md`](PRODUCT_WORKSTREAM_COORDINATION.md) when docket agents are assigned.
@@ -1041,3 +1044,6 @@ This document does **not** imply counsel signed every count. Update [`PRODUCT_WO
 | 2026-07-16 | **DG-store-v0:** Worker D1 GET/PUT signed proposals · steward sync · kit/preflight · no published rewrite |
 | 2026-07-17 | **QR-mint-v0:** chapter child QR mint script · receipt apply · `mint_status` · kit/preflight · starter-four never minted |
 | 2026-07-17 | **License-pack-v0:** packs registry · rehearsal SVG · starter-four stay not_licensed · steward pack status · `ws-docket:license-pack-preflight` |
+| 2026-07-31 | **Production chapter mint replay:** replaced stale 404 receipt with verified live non-starter chapter `status_plate` QR · added `--production --confirm-production-mint --replay` guard · starter-four and city-discovery fences unchanged |
+| 2026-08-08 | **Roster +1:** Mark Zuckerberg (`zuckerberg`) — docket counts · discovery off · monogram until license pack |
+| 2026-08-08 | **Roster +2:** Marc Andreessen (`andreessen`) · Peter Thiel (`thiel`) — docket counts · discovery off · monogram until license pack |

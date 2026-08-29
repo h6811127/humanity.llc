@@ -32,7 +32,7 @@
       "live_object": {
         "status": "bound",
         "object_id": "obj_docket_casefile_chapter-cr-research-circle",
-        "scan_path": "/c/ACDFG2QneXeEKLqQWNjn84NX?q=qr_HnorznAytX6S9SL2",
+        "scan_path": "/c/kLexdmYqCCFvdHPdAA2817K7?q=qr_cQQZFeTJPLLkVoeR",
         "discovery_opt_in": true,
         "discovery": {
           "listed_reason": "Chapter teach-in pin · venue consent · research kit commons · not a Most Wanted case",
@@ -42,7 +42,7 @@
           ],
           "region_id": "cedar-rapids-iowa"
         },
-        "bind_notes": "WS-DOCKET chapter mint (QR-mint-v0): real child QR qr_HnorznAytX6S9SL2 on parent ACDFG2QneXeEKLqQWNjn84NX. discovery_opt_in stays chapter-only."
+        "bind_notes": "WS-DOCKET chapter mint (QR-mint-v0): real child QR qr_cQQZFeTJPLLkVoeR on parent kLexdmYqCCFvdHPdAA2817K7. discovery_opt_in stays chapter-only."
       }
     }
   ]

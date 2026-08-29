@@ -27,6 +27,67 @@ export const DOCKET_MINT_QR_ID_RE =
   /^qr_[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{8,40}$/;
 
 export const DOCKET_CHAPTER_MINT_OBJECT_TYPE = "status_plate";
+export const DOCKET_CHAPTER_PRODUCTION_ORIGIN = "https://humanity.llc";
+
+/**
+ * Guard a chapter mint before generating keys or mutating a Worker.
+ * Production replay is intentionally noisy and requires two explicit flags.
+ * @param {{
+ *   apiOrigin: string;
+ *   scanOrigin: string;
+ *   production?: boolean;
+ *   confirmProduction?: boolean;
+ *   replay?: boolean;
+ *   currentMintStatus?: string;
+ * }} input
+ */
+export function assessDocketChapterMintExecution(input) {
+  const apiOrigin = String(input.apiOrigin ?? "").replace(/\/$/, "");
+  const scanOrigin = String(input.scanOrigin ?? "").replace(/\/$/, "");
+  const isLocal = (() => {
+    try {
+      const hostname = new URL(apiOrigin).hostname;
+      return hostname === "localhost" || hostname === "127.0.0.1";
+    } catch {
+      return false;
+    }
+  })();
+  const isProduction = apiOrigin === DOCKET_CHAPTER_PRODUCTION_ORIGIN;
+  const errors = [];
+
+  if (!isLocal && !isProduction) {
+    errors.push(
+      `API_ORIGIN must be local or ${DOCKET_CHAPTER_PRODUCTION_ORIGIN}`
+    );
+  }
+  if (isProduction && input.production !== true) {
+    errors.push("production mint requires --production");
+  }
+  if (isProduction && input.confirmProduction !== true) {
+    errors.push("production mint requires --confirm-production-mint");
+  }
+  if (isProduction && scanOrigin !== DOCKET_CHAPTER_PRODUCTION_ORIGIN) {
+    errors.push(
+      `production SCAN_ORIGIN must be ${DOCKET_CHAPTER_PRODUCTION_ORIGIN}`
+    );
+  }
+  if (!isProduction && input.production === true) {
+    errors.push("--production requires API_ORIGIN=https://humanity.llc");
+  }
+  if (
+    String(input.currentMintStatus ?? "fixture") === "minted" &&
+    input.replay !== true
+  ) {
+    errors.push("minted registry entry requires explicit --replay");
+  }
+
+  return {
+    ok: errors.length === 0,
+    errors,
+    isLocal,
+    isProduction,
+  };
+}
 
 /**
  * @returns {string[]}
@@ -38,7 +99,7 @@ export function docketChapterMintV0Steps() {
     "Run: API_ORIGIN=http://127.0.0.1:8787 npm run ws-docket:chapter-mint -- --write-pins",
     "Confirm /docket/chapters/ shows mint_status minted + real /c/{profile}?q={qr} path.",
     "Keys stay in worker/.local/docket-chapter-mint.json (gitignored) — never commit.",
-    "Production: same script with API_ORIGIN=https://humanity.llc only when intentionally minting prod.",
+    "Production replay: API_ORIGIN=https://humanity.llc npm run ws-docket:chapter-mint -- --production --confirm-production-mint --replay --write-pins.",
   ];
 }
 

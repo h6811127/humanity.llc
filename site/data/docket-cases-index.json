@@ -40,6 +40,36 @@
       "status": "open",
       "count_preview": "Platform amplification of mass harm",
       "photo_ref": null
+    },
+    {
+      "id": "zuckerberg",
+      "rank": 5,
+      "display_name": "Mark Zuckerberg",
+      "role": "CEO, Meta Platforms (Facebook / Instagram / WhatsApp)",
+      "badge": { "kind": "docket_counts", "label": "Docket counts · not ICC" },
+      "status": "open",
+      "count_preview": "Planetary-scale privacy extraction",
+      "photo_ref": null
+    },
+    {
+      "id": "andreessen",
+      "rank": 6,
+      "display_name": "Marc Andreessen",
+      "role": "Co-founder & general partner, Andreessen Horowitz (a16z)",
+      "badge": { "kind": "docket_counts", "label": "Docket counts · not ICC" },
+      "status": "open",
+      "count_preview": "Unaccountable venture power over public tech",
+      "photo_ref": null
+    },
+    {
+      "id": "thiel",
+      "rank": 7,
+      "display_name": "Peter Thiel",
+      "role": "Co-founder, PayPal / Palantir · venture investor (roles vary)",
+      "badge": { "kind": "docket_counts", "label": "Docket counts · not ICC" },
+      "status": "open",
+      "count_preview": "Surveillance state commercialization",
+      "photo_ref": null
     }
   ]
 }

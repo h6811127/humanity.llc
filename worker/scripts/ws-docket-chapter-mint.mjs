@@ -10,6 +10,8 @@
  *   API_ORIGIN=http://127.0.0.1:8787 npm run ws-docket:chapter-mint
  *   API_ORIGIN=http://127.0.0.1:8787 npm run ws-docket:chapter-mint -- --write-pins
  *   API_ORIGIN=http://127.0.0.1:8787 npm run ws-docket:chapter-mint -- --force
+ *   API_ORIGIN=https://humanity.llc npm run ws-docket:chapter-mint -- \
+ *     --production --confirm-production-mint --replay --write-pins
  *
  * Writes keys + receipt to worker/.local/docket-chapter-mint.json (gitignored).
  * `--write-pins` updates site/data/docket-chapter-discovery-pins.json (public ids only).
@@ -28,6 +30,7 @@ import {
   withProtocolFields,
 } from "./seed-showcase-core.mjs";
 import {
+  assessDocketChapterMintExecution,
   applyDocketChapterMintReceiptToRegistry,
   buildDocketChapterChildObjectFields,
   buildDocketChapterMintReceipt,
@@ -38,9 +41,11 @@ import { validateDocketChapterDiscoveryPins } from "../../site/js/docket-chapter
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const pinsPath = join(root, "site/data/docket-chapter-discovery-pins.json");
-const outPath = join(root, "worker/.local/docket-chapter-mint.json");
 const writePins = process.argv.includes("--write-pins");
 const force = process.argv.includes("--force");
+const replay = process.argv.includes("--replay");
+const production = process.argv.includes("--production");
+const confirmProduction = process.argv.includes("--confirm-production-mint");
 
 const apiOrigin = (process.env.API_ORIGIN || "http://127.0.0.1:8787").replace(
   /\/$/,
@@ -50,6 +55,12 @@ const scanOrigin = (
   process.env.SCAN_ORIGIN ||
   (isLocalApiOrigin(apiOrigin) ? "https://humanity.llc" : apiOrigin)
 ).replace(/\/$/, "");
+const outPath = join(
+  root,
+  isLocalApiOrigin(apiOrigin)
+    ? "worker/.local/docket-chapter-mint.json"
+    : "worker/.local/docket-chapter-mint-production.json"
+);
 
 const DEFAULT_PIN_ID = "chapter-cr-research-circle";
 
@@ -91,9 +102,9 @@ async function main() {
     process.exit(1);
   }
 
-  if (existsSync(outPath) && !force) {
+  if (existsSync(outPath) && !force && !replay) {
     console.error(`\nMint receipt already exists: ${outPath}`);
-    console.error("Re-run with --force to mint another parent/child pair.");
+    console.error("Re-run with --force/--replay to mint another parent/child pair.");
     process.exit(1);
   }
 
@@ -109,6 +120,22 @@ async function main() {
   if (!pin) {
     console.error(`Pin ${DEFAULT_PIN_ID} not found in registry`);
     process.exit(1);
+  }
+  const execution = assessDocketChapterMintExecution({
+    apiOrigin,
+    scanOrigin,
+    production,
+    confirmProduction,
+    replay,
+    currentMintStatus: String(pin.mint_status ?? "fixture"),
+  });
+  if (!execution.ok) {
+    console.error("\nMint guard refused execution:");
+    for (const error of execution.errors) console.error(`  - ${error}`);
+    process.exit(1);
+  }
+  if (execution.isProduction) {
+    console.log("Mode: PRODUCTION REPLAY (explicitly confirmed)");
   }
 
   const owner = await newShowcaseKeypair();
@@ -205,11 +232,11 @@ async function main() {
   if (
     !createRes.ok &&
     createRes.body?.error === "OBJECT_EXISTS" &&
-    force
+    (force || replay)
   ) {
     childFields.object_id = `${childFields.object_id}_${randomBase58(6)}`;
     console.warn(
-      `object_id taken — using ${childFields.object_id} (--force)`
+      `object_id taken — using ${childFields.object_id} (${replay ? "--replay" : "--force"})`
     );
     signedObject = await signDocument(
       withProtocolFields(childFields, "child_object"),
@@ -224,7 +251,9 @@ async function main() {
   if (!createRes.ok) {
     console.error("\nCreate child failed:", createRes.body);
     if (createRes.body?.error === "OBJECT_EXISTS") {
-      console.error("Re-run with --force, or reset local D1 + apply child QR schema.");
+      console.error(
+        "Re-run with --force/--replay, or reset local D1 + apply child QR schema."
+      );
     }
     process.exit(1);
   }

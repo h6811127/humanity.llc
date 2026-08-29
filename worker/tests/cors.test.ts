@@ -31,5 +31,6 @@ describe("resolver CORS headers", () => {
       "https://413ac9a6.humanity-llc.pages.dev"
     );
     expect(headers["Access-Control-Allow-Methods"]).toContain("POST");
+    expect(headers["Access-Control-Allow-Methods"]).toContain("PUT");
   });
 });

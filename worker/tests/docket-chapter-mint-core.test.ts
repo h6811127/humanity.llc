@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { readFileSync } from "node:fs";
 
 import {
+  assessDocketChapterMintExecution,
   applyDocketChapterMintReceiptToRegistry,
   buildDocketChapterMintReceipt,
   isFixtureDocketChildScanPath,
@@ -70,6 +71,46 @@ describe("docket-chapter-mint-core (QR-mint-v0)", () => {
         objectId: "obj_docket_casefile_altman",
       })
     ).toThrow(/starter-four/);
+  });
+
+  it("requires explicit confirmation and replay for production", () => {
+    const refused = assessDocketChapterMintExecution({
+      apiOrigin: "https://humanity.llc",
+      scanOrigin: "https://humanity.llc",
+      currentMintStatus: "minted",
+    });
+    expect(refused.ok).toBe(false);
+    expect(refused.errors).toEqual(
+      expect.arrayContaining([
+        "production mint requires --production",
+        "production mint requires --confirm-production-mint",
+        "minted registry entry requires explicit --replay",
+      ])
+    );
+
+    expect(
+      assessDocketChapterMintExecution({
+        apiOrigin: "https://humanity.llc",
+        scanOrigin: "https://humanity.llc",
+        production: true,
+        confirmProduction: true,
+        replay: true,
+        currentMintStatus: "minted",
+      })
+    ).toMatchObject({ ok: true, isProduction: true });
+  });
+
+  it("refuses arbitrary remote origins", () => {
+    const report = assessDocketChapterMintExecution({
+      apiOrigin: "https://example.com",
+      scanOrigin: "https://humanity.llc",
+      production: true,
+      confirmProduction: true,
+      replay: true,
+      currentMintStatus: "minted",
+    });
+    expect(report.ok).toBe(false);
+    expect(report.errors.join(" ")).toMatch(/API_ORIGIN must be local/);
   });
 });
 

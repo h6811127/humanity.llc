@@ -9,9 +9,9 @@
  */
 
 /** Bump when hero / discovery dashboard copy or structure changes intentionally. */
-export const LANDING_COPY_CONTRACT_VERSION = 13;
+export const LANDING_COPY_CONTRACT_VERSION = 14;
 
-export const LANDING_STYLES_CACHE_BUST = "162";
+export const LANDING_STYLES_CACHE_BUST = "163";
 
 export const LANDING_REQUIRED_SNIPPETS = [
   "Check what's true right now before you knock, pick up, or show up.",
@@ -66,6 +66,12 @@ export const LANDING_REQUIRED_SNIPPETS = [
   "discovery-region-browse.css?v=5",
   `styles.css?v=${LANDING_STYLES_CACHE_BUST}`,
   "public-networks-portal.mjs?v=14",
+  'id="landing-public-docket"',
+  'href="/docket/"',
+  "Public Docket · nonviolent accountability",
+  'id="landing-weird-practices"',
+  'href="/practices/"',
+  "Book of Weird Practices · for people with bodies",
 ];
 
 /** Reverted matrix copy — must never return on `/`. */
@@ -103,6 +109,8 @@ export const LANDING_FORBIDDEN_SNIPPETS = [
   'class="landing-carriers-carousel"',
   "swiper",
   "carousel",
+  "Humanity\u2019s Most Wanted",
+  "Most Wanted",
 ];
 
 /** Narrative sections must appear in document order. */

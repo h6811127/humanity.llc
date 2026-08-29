@@ -68,6 +68,45 @@
         "obtained_at": "pending"
       },
       "notes": "Starter-four fence — monogram until a real license pack is cleared."
+    },
+    {
+      "id": "pack-zuckerberg-awaiting",
+      "subject_id": "zuckerberg",
+      "status": "awaiting_assets",
+      "photo_ref": null,
+      "license": {
+        "type": "press",
+        "attribution": "TBD — official / press likeness only",
+        "source_url": "https://humanity.llc/docket/zuckerberg/",
+        "obtained_at": "pending"
+      },
+      "notes": "Starter roster fence — monogram until a real license pack is cleared."
+    },
+    {
+      "id": "pack-andreessen-awaiting",
+      "subject_id": "andreessen",
+      "status": "awaiting_assets",
+      "photo_ref": null,
+      "license": {
+        "type": "press",
+        "attribution": "TBD — official / press likeness only",
+        "source_url": "https://humanity.llc/docket/andreessen/",
+        "obtained_at": "pending"
+      },
+      "notes": "Starter roster fence — monogram until a real license pack is cleared."
+    },
+    {
+      "id": "pack-thiel-awaiting",
+      "subject_id": "thiel",
+      "status": "awaiting_assets",
+      "photo_ref": null,
+      "license": {
+        "type": "press",
+        "attribution": "TBD — official / press likeness only",
+        "source_url": "https://humanity.llc/docket/thiel/",
+        "obtained_at": "pending"
+      },
+      "notes": "Starter roster fence — monogram until a real license pack is cleared."
     }
   ]
 }

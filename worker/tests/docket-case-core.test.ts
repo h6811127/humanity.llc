@@ -243,9 +243,9 @@ describe("docket-case-core", () => {
     );
     expect(validateDocketPhotoLicenseChecklist(raw).ok).toBe(true);
     const starter = raw.cases.filter((row) =>
-      ["netanyahu", "putin", "altman", "musk"].includes(row.id)
+      DOCKET_CASE_IDS.includes(row.id)
     );
-    expect(starter.length).toBe(4);
+    expect(starter.length).toBe(DOCKET_CASE_IDS.length);
     for (const row of starter) {
       expect(row.license_status).toBe("not_licensed");
       expect(row.photo_ref).toBeNull();

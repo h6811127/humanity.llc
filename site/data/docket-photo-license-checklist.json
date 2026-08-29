@@ -28,6 +28,24 @@
       "notes": "Monogram until real human license pack."
     },
     {
+      "id": "zuckerberg",
+      "photo_ref": null,
+      "license_status": "not_licensed",
+      "notes": "Monogram until real human license pack."
+    },
+    {
+      "id": "andreessen",
+      "photo_ref": null,
+      "license_status": "not_licensed",
+      "notes": "Monogram until real human license pack."
+    },
+    {
+      "id": "thiel",
+      "photo_ref": null,
+      "license_status": "not_licensed",
+      "notes": "Monogram until real human license pack."
+    },
+    {
       "id": "rehearsal-commons",
       "photo_ref": "/assets/docket/license-pack-rehearsal.svg",
       "license_status": "licensed",

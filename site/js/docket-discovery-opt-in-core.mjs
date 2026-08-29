@@ -22,6 +22,9 @@ export const DOCKET_STARTER_CASE_IDS = Object.freeze([
   "putin",
   "altman",
   "musk",
+  "zuckerberg",
+  "andreessen",
+  "thiel",
 ]);
 
 /**

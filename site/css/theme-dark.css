@@ -1424,3 +1424,157 @@ html[data-theme="dark"] .city-game-map-node-row--maintenance {
   background: rgba(255, 255, 255, 0.06);
   border-color: rgba(255, 255, 255, 0.18);
 }
+
+html[data-theme="dark"] .landing-branch-micros {
+  color: var(--surface-popover-fg-muted);
+}
+
+html[data-theme="dark"] .landing-branch-micro a:hover,
+html[data-theme="dark"] .landing-branch-micro a:focus-visible {
+  color: var(--shell-label-strong);
+}
+
+html[data-theme="dark"] .practices-list-lead,
+html[data-theme="dark"] .practices-kicker,
+html[data-theme="dark"] .practices-chapter-title,
+html[data-theme="dark"] .practices-chapter-lead,
+html[data-theme="dark"] .practices-jump a,
+html[data-theme="dark"] .practices-item::before,
+html[data-theme="dark"] .practices-top-note,
+html[data-theme="dark"] .practices-how-disclosure summary {
+  color: var(--surface-popover-fg-muted);
+}
+
+html[data-theme="dark"] .practices-jump a:hover,
+html[data-theme="dark"] .practices-jump a:focus-visible {
+  color: var(--shell-label-strong);
+}
+
+html[data-theme="dark"] .practices-how {
+  color: var(--shell-label-strong);
+}
+
+html[data-theme="dark"] .practices-top-note:hover,
+html[data-theme="dark"] .practices-top-note:focus-visible {
+  color: var(--shell-label-strong);
+}
+
+html[data-theme="dark"] .practices-how-disclosure {
+  border-top-color: rgba(255, 255, 255, 0.14);
+}
+
+html[data-theme="dark"] .docket-plate,
+html[data-theme="dark"] .docket-wanted-card {
+  background: var(--hc-emphasis-card-fill-info-glass);
+  border-color: var(--hc-emphasis-card-border-neutral);
+  box-shadow: var(--hc-emphasis-card-shadow);
+}
+
+html[data-theme="dark"] .docket-plate-mono {
+  border-color: rgba(255, 255, 255, 0.16);
+  background: linear-gradient(
+    165deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+}
+
+html[data-theme="dark"] .docket-plate-mono-text {
+  color: var(--surface-popover-fg-muted);
+}
+
+html[data-theme="dark"] .docket-status {
+  color: var(--surface-popover-fg-muted);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+html[data-theme="dark"] .docket-wanted-badge-docket {
+  color: var(--surface-popover-fg-muted);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+html[data-theme="dark"] .docket-wanted-name,
+html[data-theme="dark"] .docket-case-count-title {
+  color: var(--shell-label-strong);
+}
+
+html[data-theme="dark"] .docket-list-head h1 {
+  color: var(--shell-label-strong);
+}
+
+html[data-theme="dark"] .docket-case-count-body {
+  color: var(--surface-popover-fg-muted);
+}
+
+html[data-theme="dark"] .docket-case-strongest {
+  border-top-color: rgba(255, 255, 255, 0.12);
+}
+
+html[data-theme="dark"] .docket-plate-action {
+  color: var(--shell-label-strong);
+  border-color: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+html[data-theme="dark"] .docket-plate-action:hover,
+html[data-theme="dark"] .docket-plate-action:focus-visible {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+html[data-theme="dark"] .docket-action-item {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+html[data-theme="dark"] .docket-counter-slot {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+html[data-theme="dark"] .docket-network-good-card,
+html[data-theme="dark"] .docket-goods-plate {
+  background: var(--hc-emphasis-card-fill-info-glass);
+  border-color: var(--hc-emphasis-card-border-neutral);
+}
+
+html[data-theme="dark"] .docket-steward-item {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+html[data-theme="dark"] .docket-live-object-slot {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+html[data-theme="dark"] .docket-edit-proposal {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+html[data-theme="dark"] .docket-edit-propose {
+  border-top-color: rgba(255, 255, 255, 0.12);
+}
+
+html[data-theme="dark"] .docket-action-link {
+  color: var(--text, #f2f2f2);
+}
+
+html[data-theme="dark"] .docket-action-region {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+html[data-theme="dark"] .docket-charter-disclosure {
+  border-top-color: rgba(255, 255, 255, 0.12);
+}
+
+html[data-theme="dark"] .docket-top-chrome,
+html[data-theme="dark"] .docket-top .docket-top-charter {
+  color: var(--surface-popover-fg-muted);
+}
+
+html[data-theme="dark"] .docket-top .docket-top-charter:hover,
+html[data-theme="dark"] .docket-top .docket-top-charter:focus-visible {
+  color: var(--shell-label-strong);
+}

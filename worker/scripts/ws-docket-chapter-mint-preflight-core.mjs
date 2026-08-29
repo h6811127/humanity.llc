@@ -40,11 +40,26 @@ export function assessWsDocketChapterMintPreflight(root) {
   });
 
   const script = existsSync(join(root, "worker/scripts/ws-docket-chapter-mint.mjs"));
+  const scriptBody = script
+    ? readFileSync(join(root, "worker/scripts/ws-docket-chapter-mint.mjs"), "utf8")
+    : "";
   rows.push({
     id: "CM-script",
     label: "ws-docket-chapter-mint.mjs",
     met: script,
     detail: script ? "present" : "missing",
+  });
+  const productionGuard =
+    scriptBody.includes("--production") &&
+    scriptBody.includes("--confirm-production-mint") &&
+    scriptBody.includes("--replay");
+  rows.push({
+    id: "CM-production-guard",
+    label: "production replay requires explicit confirmation",
+    met: productionGuard,
+    detail: productionGuard
+      ? "--production + --confirm-production-mint + --replay"
+      : "missing production replay guard",
   });
 
   const pkg = readFileSync(join(root, "package.json"), "utf8");
@@ -145,8 +160,10 @@ export function formatWsDocketChapterMintPreflightReport(report) {
       : "✗ WS-DOCKET chapter mint engineering preflight FAIL — fix ☐ rows above",
     "",
     "Next:",
-    "  API_ORIGIN=http://127.0.0.1:8787 npm run ws-docket:chapter-mint -- --write-pins",
-    "  Real license packs · production steward key custody"
+    "  Production replay:",
+    "  API_ORIGIN=https://humanity.llc npm run ws-docket:chapter-mint -- --production --confirm-production-mint --replay --write-pins",
+    "  Then verify the new /c/{profile}?q={qr} path before deploying the registry.",
+    "  Remaining external inputs: real license packs · production steward key custody"
   );
   return lines.join("\n");
 }

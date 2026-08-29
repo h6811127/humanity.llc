@@ -43,6 +43,9 @@ describe("Public Docket Most Wanted list (landing destination)", () => {
         "Vladimir Putin",
         "Sam Altman",
         "Elon Musk",
+        "Mark Zuckerberg",
+        "Marc Andreessen",
+        "Peter Thiel",
       ])
     );
   });

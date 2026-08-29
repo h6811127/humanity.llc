@@ -13824,3 +13824,34 @@ span.city-game-map-spotlight-hint:active {
   line-height: 1.4;
   color: var(--grey);
 }
+
+.landing-branch-micros {
+  margin: 8px 0 28px;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+  text-align: center;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--grey);
+}
+
+.landing-branch-micro {
+  margin: 0;
+  padding: 0;
+}
+
+.landing-branch-micro a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--grey) 45%, transparent);
+}
+
+.landing-branch-micro a:hover,
+.landing-branch-micro a:focus-visible {
+  color: var(--text, #111);
+  border-bottom-color: currentColor;
+  outline: none;
+}

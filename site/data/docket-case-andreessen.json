@@ -1,0 +1,140 @@
+{
+  "id": "andreessen",
+  "rank": 6,
+  "display_name": "Marc Andreessen",
+  "role": "Co-founder & general partner, Andreessen Horowitz (a16z)",
+  "badge": {
+    "kind": "docket_counts",
+    "label": "Docket counts · not ICC"
+  },
+  "status": "open",
+  "counts_heading": "Counts against humanity (docket)",
+  "counts": [
+    {
+      "id": "count-1",
+      "kind": "docket_count",
+      "title": "Unaccountable venture power over public tech",
+      "body": "Concentrating capital and board influence over AI, crypto, and platform companies that shape speech, labor, and infrastructure — faster than democratic oversight"
+    },
+    {
+      "id": "count-2",
+      "kind": "docket_count",
+      "title": "Techno-acceleration without public consent",
+      "body": "Public advocacy for deploying frontier systems at maximum speed while externalities (safety, labor displacement, civic trust) lag enforceable remedies"
+    },
+    {
+      "id": "count-3",
+      "kind": "docket_count",
+      "title": "Policy capture via capital networks",
+      "body": "Using investment scale and elite networks to shape regulation and narrative around technologies that outrun public accountability"
+    }
+  ],
+  "sources": [
+    {
+      "label": "Corrections / evidence tips",
+      "url": "mailto:info@humanity.llc?subject=Docket%20correction%20Andreessen",
+      "dated": null,
+      "note": "Public Docket campaign counts of systemic harm — not International Criminal Court charges."
+    }
+  ],
+  "action": {
+    "label": "Contact your U.S. representative on AI and platform oversight",
+    "href": "https://www.house.gov/representatives/find-your-representative"
+  },
+  "actions": [
+    {
+      "id": "act-1",
+      "kind": "contact_rep",
+      "label": "Contact your U.S. representative on AI and platform oversight",
+      "body": "Ask for transparent, democratic rules on frontier tech capital — institutional, not personal harassment.",
+      "href": "https://www.house.gov/representatives/find-your-representative",
+      "regions": [
+        "us"
+      ]
+    },
+    {
+      "id": "act-2",
+      "kind": "shareholder_vote",
+      "label": "Learn shareholder rights (U.S. Investor.gov)",
+      "body": "Institutional capital voice — proxy voting and disclosures, not personal confrontation.",
+      "href": "https://www.investor.gov/",
+      "regions": [
+        "us"
+      ]
+    },
+    {
+      "id": "act-3",
+      "kind": "foia",
+      "label": "Learn how to file a U.S. FOIA request",
+      "body": "Public records on agency AI procurement and venture-backed vendor contracts.",
+      "href": "https://www.foia.gov/how-to.html",
+      "regions": [
+        "us"
+      ]
+    },
+    {
+      "id": "act-4",
+      "kind": "share_sources",
+      "label": "Send a correction or evidence tip",
+      "body": "Citeable sources only — no private addresses or threats.",
+      "href": "mailto:info@humanity.llc?subject=Docket%20correction%20Andreessen",
+      "regions": [
+        "global"
+      ]
+    },
+    {
+      "id": "act-5",
+      "kind": "teach_in",
+      "label": "Read the Public Docket charter",
+      "body": "Lock nonviolence rules before any local action.",
+      "href": "/docket/#charter",
+      "regions": [
+        "global"
+      ]
+    }
+  ],
+  "photo_ref": null,
+  "closed_reason": null,
+  "closed_kind": null,
+  "note": "These are Public Docket campaign counts of systemic harm — not International Criminal Court charges.",
+  "counter_docket": {
+    "status": "open_for_submissions",
+    "summary": null
+  },
+  "stewards": [
+    {
+      "id": "hc-founders",
+      "display_name": "humanity.llc stewards",
+      "role_label": "Case maintainers (interim)",
+      "mailto": "info@humanity.llc",
+      "room_ref": "/docket/andreessen/steward/"
+    },
+    {
+      "id": "hc-reviewer",
+      "display_name": "Public Docket reviewer",
+      "role_label": "Second gate (interim)",
+      "mailto": "info@humanity.llc",
+      "room_ref": "/docket/andreessen/steward/"
+    }
+  ],
+  "changelog": [
+    {
+      "id": "log-1",
+      "dated": "2026-08-08",
+      "summary": "Case opened with docket campaign counts (not ICC) and action kit."
+    },
+    {
+      "id": "log-c2-bind",
+      "dated": "2026-08-08",
+      "summary": "WS-DOCKET-C-v2: live_object bound to case URL under nonviolence charter (discovery opt-in still false)."
+    }
+  ],
+  "live_object": {
+    "status": "bound",
+    "object_id": "obj_docket_casefile_andreessen",
+    "scan_path": "/docket/andreessen/",
+    "discovery_opt_in": false,
+    "bind_notes": "WS-DOCKET-C-v2: casefile bound to Public Docket case URL. Upgrade scan_path to /c/{profile}?q={qr} when a child-object QR is issued. discovery_opt_in stays false (C-v3)."
+  },
+  "edit_proposals": []
+}

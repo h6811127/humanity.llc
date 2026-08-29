@@ -23,6 +23,10 @@ import { handleGetStoreProduct, handleGetStoreRows } from "./store/store-rows-ha
 import { handleGetStoreOrderStatus } from "./resolver/store-order-status";
 import { handlePostStoreOrderMint } from "./resolver/store-order-mint";
 import { handleGetSeasonSnapshot } from "./resolver/season-snapshot";
+import {
+  handleGetDocketEditProposals,
+  handlePutDocketEditProposals,
+} from "./resolver/docket-edit-proposals";
 import { handleGetCard, handlePostCards } from "./resolver/create-card";
 import {
   handleGetLiveControlChallenge,
@@ -244,6 +248,27 @@ export default {
         env,
         seasonSnapshotMatch[1]!
       );
+      return withCors(request, res);
+    }
+
+    const docketEditMatch = path.match(
+      /^\/\.well-known\/hc\/v1\/docket\/([^/]+)\/edit-proposals$/
+    );
+    if (
+      docketEditMatch &&
+      (request.method === "GET" || request.method === "PUT")
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const caseId = docketEditMatch[1]!;
+      const res =
+        request.method === "GET"
+          ? await handleGetDocketEditProposals(request, env.DB, caseId)
+          : await handlePutDocketEditProposals(request, env.DB, caseId);
       return withCors(request, res);
     }
 

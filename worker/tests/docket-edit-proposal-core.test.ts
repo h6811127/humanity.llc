@@ -122,7 +122,15 @@ describe("docket-edit-proposal-core (dual-gate DG-v0)", () => {
   });
 
   it("ships altman fixture pending proposal and ≥2 stewards on all cases", () => {
-    for (const id of ["netanyahu", "putin", "altman", "musk"]) {
+    for (const id of [
+      "netanyahu",
+      "putin",
+      "altman",
+      "musk",
+      "zuckerberg",
+      "andreessen",
+      "thiel",
+    ]) {
       const raw = JSON.parse(
         readFileSync(join(dataDir, `docket-case-${id}.json`), "utf8")
       );

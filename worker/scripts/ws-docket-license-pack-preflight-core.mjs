@@ -174,6 +174,24 @@ export function assessWsDocketLicensePackPreflight(root) {
               license_status: "not_licensed",
               notes: "x",
             },
+            {
+              id: "zuckerberg",
+              photo_ref: null,
+              license_status: "not_licensed",
+              notes: "x",
+            },
+            {
+              id: "andreessen",
+              photo_ref: null,
+              license_status: "not_licensed",
+              notes: "x",
+            },
+            {
+              id: "thiel",
+              photo_ref: null,
+              license_status: "not_licensed",
+              notes: "x",
+            },
           ],
         },
         packsDoc

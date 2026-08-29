@@ -19,6 +19,9 @@ export const DOCKET_STARTER_CASE_IDS_FOR_PHOTOS = Object.freeze([
   "putin",
   "altman",
   "musk",
+  "zuckerberg",
+  "andreessen",
+  "thiel",
 ]);
 
 /**

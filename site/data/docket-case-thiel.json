@@ -1,0 +1,140 @@
+{
+  "id": "thiel",
+  "rank": 7,
+  "display_name": "Peter Thiel",
+  "role": "Co-founder, PayPal / Palantir · venture investor (roles vary)",
+  "badge": {
+    "kind": "docket_counts",
+    "label": "Docket counts · not ICC"
+  },
+  "status": "open",
+  "counts_heading": "Counts against humanity (docket)",
+  "counts": [
+    {
+      "id": "count-1",
+      "kind": "docket_count",
+      "title": "Surveillance state commercialization",
+      "body": "Building and financing data systems that expand government and private surveillance capacity faster than democratic oversight and due-process safeguards"
+    },
+    {
+      "id": "count-2",
+      "kind": "docket_count",
+      "title": "Anti-democratic power concentration",
+      "body": "Public advocacy and capital strategies that concentrate decision-making among unelected tech elites while weakening shared civic institutions"
+    },
+    {
+      "id": "count-3",
+      "kind": "docket_count",
+      "title": "Monopoly and market foreclosure patterns",
+      "body": "Investment and governance patterns that favor winner-take-most platforms over competitive, accountable markets for critical digital infrastructure"
+    }
+  ],
+  "sources": [
+    {
+      "label": "Corrections / evidence tips",
+      "url": "mailto:info@humanity.llc?subject=Docket%20correction%20Thiel",
+      "dated": null,
+      "note": "Public Docket campaign counts of systemic harm — not International Criminal Court charges."
+    }
+  ],
+  "action": {
+    "label": "Contact your U.S. representative on surveillance oversight",
+    "href": "https://www.house.gov/representatives/find-your-representative"
+  },
+  "actions": [
+    {
+      "id": "act-1",
+      "kind": "contact_rep",
+      "label": "Contact your U.S. representative on surveillance oversight",
+      "body": "Ask for transparent rules on government data contracts and civil liberties — institutional, not personal harassment.",
+      "href": "https://www.house.gov/representatives/find-your-representative",
+      "regions": [
+        "us"
+      ]
+    },
+    {
+      "id": "act-2",
+      "kind": "shareholder_vote",
+      "label": "Learn shareholder rights (U.S. Investor.gov)",
+      "body": "Institutional capital voice — proxy voting and disclosures, not personal confrontation.",
+      "href": "https://www.investor.gov/",
+      "regions": [
+        "us"
+      ]
+    },
+    {
+      "id": "act-3",
+      "kind": "foia",
+      "label": "Learn how to file a U.S. FOIA request",
+      "body": "Public records on agency contracts with major data and analytics vendors.",
+      "href": "https://www.foia.gov/how-to.html",
+      "regions": [
+        "us"
+      ]
+    },
+    {
+      "id": "act-4",
+      "kind": "share_sources",
+      "label": "Send a correction or evidence tip",
+      "body": "Citeable sources only — no private addresses or threats.",
+      "href": "mailto:info@humanity.llc?subject=Docket%20correction%20Thiel",
+      "regions": [
+        "global"
+      ]
+    },
+    {
+      "id": "act-5",
+      "kind": "teach_in",
+      "label": "Read the Public Docket charter",
+      "body": "Lock nonviolence rules before any local action.",
+      "href": "/docket/#charter",
+      "regions": [
+        "global"
+      ]
+    }
+  ],
+  "photo_ref": null,
+  "closed_reason": null,
+  "closed_kind": null,
+  "note": "These are Public Docket campaign counts of systemic harm — not International Criminal Court charges.",
+  "counter_docket": {
+    "status": "open_for_submissions",
+    "summary": null
+  },
+  "stewards": [
+    {
+      "id": "hc-founders",
+      "display_name": "humanity.llc stewards",
+      "role_label": "Case maintainers (interim)",
+      "mailto": "info@humanity.llc",
+      "room_ref": "/docket/thiel/steward/"
+    },
+    {
+      "id": "hc-reviewer",
+      "display_name": "Public Docket reviewer",
+      "role_label": "Second gate (interim)",
+      "mailto": "info@humanity.llc",
+      "room_ref": "/docket/thiel/steward/"
+    }
+  ],
+  "changelog": [
+    {
+      "id": "log-1",
+      "dated": "2026-08-08",
+      "summary": "Case opened with docket campaign counts (not ICC) and action kit."
+    },
+    {
+      "id": "log-c2-bind",
+      "dated": "2026-08-08",
+      "summary": "WS-DOCKET-C-v2: live_object bound to case URL under nonviolence charter (discovery opt-in still false)."
+    }
+  ],
+  "live_object": {
+    "status": "bound",
+    "object_id": "obj_docket_casefile_thiel",
+    "scan_path": "/docket/thiel/",
+    "discovery_opt_in": false,
+    "bind_notes": "WS-DOCKET-C-v2: casefile bound to Public Docket case URL. Upgrade scan_path to /c/{profile}?q={qr} when a child-object QR is issued. discovery_opt_in stays false (C-v3)."
+  },
+  "edit_proposals": []
+}

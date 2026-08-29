@@ -3,7 +3,9 @@
 **Purpose:** Single reference for parallel agents and humans — active work, regression gates, file ownership.  
 **Also read:** [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) (rules that must stay true) · [`DOC_MAINTENANCE.md`](DOC_MAINTENANCE.md) (doc policy)
 
-**Last updated:** 2026-07-29
+**Last updated:** 2026-07-31
+
+**Changelog (2026-07-31):** **WS-DOCKET production chapter mint replay verified** — replaced stale chapter receipt with a live non-starter `status_plate` QR · explicit `--production --confirm-production-mint --replay` guard · starter-four remain unminted and excluded from discovery · [`PUBLIC_DOCKET_AND_ACCOUNTABILITY_VERTICAL.md`](PUBLIC_DOCKET_AND_ACCOUNTABILITY_VERTICAL.md).
 
 **Changelog (2026-07-29):** **WS-DISCOVER-P5c shipped** — landing region picker (`#landing-places-region`) + persisted default + `?region=` · **All regions** → `/discover/` · contract v13 · [`DISCOVERY_PROJECTION.md`](DISCOVERY_PROJECTION.md) § P5 · `npm run verify:landing`.
 
@@ -44,6 +46,7 @@
 | **Smooth mode (low-end mobile)** | [`DEVICE_LITE_MOBILE_PLAN.md`](DEVICE_LITE_MOBILE_PLAN.md) | **Phase 0 lab 3/3 ☑** · Phase 1 **deferred** (Nord cold boot → boot graph) · [`DEVICE_SMOOTH_MODE_PHASE0_GATE.md`](DEVICE_SMOOTH_MODE_PHASE0_GATE.md) | Boot graph investigation for Nord cold open |
 | **Notifications v2 (tiered inbox)** | [`NOTIFICATION_SYSTEM_V2.md`](NOTIFICATION_SYSTEM_V2.md) | **WS-NOTIF closed** — N0–N5 ☑ · **P0-N2 OS deferred** · in-app N4 only | **No new notify engineering** — `notify:verify` guards only |
 | **Core product loop (quality + UX)** | [`CORE_PRODUCT_LOOP.md`](CORE_PRODUCT_LOOP.md) | **WS-QUALITY** — WS-LIVE sub-track · Q0 ☑ · **Q2–Q3** | `npm run verify:desk` · P1-MOTO-* repair · L1–L8 |
+| **Public Docket (movement-depth branch)** | [`PUBLIC_DOCKET_AND_ACCOUNTABILITY_VERTICAL.md`](PUBLIC_DOCKET_AND_ACCOUNTABILITY_VERTICAL.md) | Tier 1 + production chapter mint replay ☑ · next requires real likeness licenses or custody decision | `/docket/` · non-starter chapter QR · `npm run ws-docket:chapter-mint-preflight -- --strict` |
 
 ---
 

@@ -19,6 +19,9 @@ export const DOCKET_CASE_IDS = Object.freeze([
   "putin",
   "altman",
   "musk",
+  "zuckerberg",
+  "andreessen",
+  "thiel",
 ]);
 
 export const DOCKET_BADGE_KINDS = Object.freeze(["icc_warrant", "docket_counts"]);
