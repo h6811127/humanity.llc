@@ -122,7 +122,13 @@ export function gameContributeModeFromCapability(
 ): GameContributeMode | null {
   if (!cap?.kind?.startsWith("game_")) return null;
   const mode = cap.kind.slice("game_".length);
-  if (mode === "quorum" || mode === "fragment" || mode === "scarcity") {
+  if (
+    mode === "quorum" ||
+    mode === "fragment" ||
+    mode === "scarcity" ||
+    mode === "capture" ||
+    mode === "reinforce"
+  ) {
     return mode;
   }
   return null;
