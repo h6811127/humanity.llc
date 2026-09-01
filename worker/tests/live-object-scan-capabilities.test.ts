@@ -4,6 +4,7 @@ import type { CardRow, ChildObjectRow, QrCredentialRow, VerificationSummaryRow }
 import {
   buildScanCapabilities,
   findScanCapability,
+  gameContributeModeFromCapability,
   readCapabilityRoom,
   readTrustGroups,
   shouldShowLiveControlTrustGroup,
@@ -119,6 +120,53 @@ function gameScanVm(
     { env }
   );
 }
+
+describe("gameContributeModeFromCapability", () => {
+  it("maps every GameContributeMode kind including capture and reinforce", () => {
+    expect(
+      gameContributeModeFromCapability({
+        verb: "contribute",
+        available: true,
+        kind: "game_quorum",
+      })
+    ).toBe("quorum");
+    expect(
+      gameContributeModeFromCapability({
+        verb: "contribute",
+        available: true,
+        kind: "game_fragment",
+      })
+    ).toBe("fragment");
+    expect(
+      gameContributeModeFromCapability({
+        verb: "contribute",
+        available: true,
+        kind: "game_scarcity",
+      })
+    ).toBe("scarcity");
+    expect(
+      gameContributeModeFromCapability({
+        verb: "contribute",
+        available: true,
+        kind: "game_capture",
+      })
+    ).toBe("capture");
+    expect(
+      gameContributeModeFromCapability({
+        verb: "contribute",
+        available: true,
+        kind: "game_reinforce",
+      })
+    ).toBe("reinforce");
+    expect(
+      gameContributeModeFromCapability({
+        verb: "contribute",
+        available: true,
+        kind: "game_unknown",
+      })
+    ).toBeNull();
+  });
+});
 
 describe("buildScanCapabilities (Order 2 — Cedar Rapids verbs)", () => {
   it("advertises open contribute during season play window", () => {

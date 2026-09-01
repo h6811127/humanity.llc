@@ -377,6 +377,59 @@ describe("city game scan view", () => {
     expect(html).toContain('placeholder="CR-LANTERN-7K"');
   });
 
+  it("renders capture/reinforce contribute block on relay_capture nodes", async () => {
+    const bridgeObject = "obj_cr_node_05_bridge";
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: cardRow(),
+        qr: { ...qrRow(), object_id: bridgeObject },
+        verification: summary(),
+        childObject: childRow({
+          object_id: bridgeObject,
+          public_label: "16th Avenue bridge",
+          child_object_document_json: childDocument({
+            object_id: bridgeObject,
+            node_role: "relay_gate",
+            district: "river_spine",
+            public_label: "16th Avenue bridge",
+            public_state: "Unclaimed relay",
+            object_streams: [
+              { id: "territory", class: "place", label: "Controller", value: "Unclaimed" },
+              { id: "care", class: "care", label: "Site", value: "Clear" },
+            ],
+            game_meta: {
+              visible_until: null,
+              compromised: false,
+              held_by_faction: null,
+              collective_progress: null,
+              collective_target: null,
+            },
+          }),
+        }),
+        revocationDisplay: null,
+      },
+      "https://humanity.llc",
+      SEASON_OPEN_NOW,
+      { env: { CITY_GAME_ENABLED: "1" } }
+    );
+
+    expect(vm.gameNode?.contributeMode).toBe("capture");
+    expect(vm.gameNode?.showsContribute).toBe(true);
+    const html = await renderScanPage(vm, "https://humanity.llc");
+    expect(html).toContain('data-game-contribute="1"');
+    expect(html).toContain('data-game-contribute-mode="capture"');
+    expect(html).toContain('id="scan-game-contribute"');
+    expect(html).toContain("Relay capture");
+    expect(html).toContain("Capture relay");
+    expect(html).toContain("Reinforce hold");
+    expect(html).toContain('id="scan-game-contribute-faction"');
+    expect(html).toContain('data-relay-action="capture"');
+    expect(html).toContain('data-relay-action="reinforce"');
+    expect(html).toContain("scan-game-contribute.mjs?v=3");
+  });
+
   it("uses season site-code placeholders per contribute node", async () => {
     expect(gameNodeContributeSiteCodePlaceholder("node_04")).toBe("CR-LANTERN-7K");
     expect(gameNodeContributeSiteCodePlaceholder("node_09")).toBe("CR-MURAL-2F");
