@@ -8,6 +8,7 @@ import {
   postChildObjectUpdate,
   signChildObjectUpdate,
 } from "./child-object-update.mjs";
+import { resolveCreatedCardQrBinding } from "./created-card-qr-binding.mjs";
 import { postCardUpdate, signCardUpdate } from "./created-update.mjs";
 import { getCardJsonUrl } from "./hc-sign.mjs";
 import { isCreatedCollectionFlagEnabled } from "./created-collection-flag-core.mjs";
@@ -321,6 +322,7 @@ export function initCreatedFocusedObject(ctx) {
         const payload = focusedObjectPublishPayload("root", formValues, { pilot });
         if (payload.publishMode !== "root") throw new Error("Invalid publish payload.");
         const createdAt = await resolveCreatedAt(sessionNow);
+        const qrBinding = await resolveCreatedCardQrBinding(ctx.profileId, sessionNow);
         const signed = await signCardUpdate({
           profileId: ctx.profileId,
           handle: String(handle),
@@ -331,11 +333,16 @@ export function initCreatedFocusedObject(ctx) {
           cardExtras: {
             verification: sessionNow?.verification,
             badges: [],
-            qr: { active_qr_id: sessionNow?.qr_id, epoch: 1 },
+            qr: qrBinding,
           },
         });
         await postCardUpdate(ctx.profileId, signed);
-        ctx.setSession({ ...sessionNow, manifesto_line: payload.manifestoLine });
+        ctx.setSession({
+          ...sessionNow,
+          manifesto_line: payload.manifestoLine,
+          qr_id: qrBinding.active_qr_id,
+          qr_epoch: qrBinding.epoch,
+        });
       }
 
       if (publishStatusEl) {

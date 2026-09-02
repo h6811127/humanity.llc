@@ -1,3 +1,4 @@
+import { resolveCreatedCardQrBinding } from "./created-card-qr-binding.mjs";
 import { getCardJsonUrl } from "./hc-sign.mjs";
 import { postCardUpdate, signCardUpdate } from "./created-update.mjs";
 import { inferPilotTemplate } from "./manifesto-display.mjs";
@@ -213,6 +214,7 @@ export function initManifestoUpdate(ctx) {
       const manifestoLine = buildManifesto();
       const objectStreams = buildObjectStreamsForUpdate(sessionNow);
       const createdAt = await resolveCreatedAt();
+      const qrBinding = await resolveCreatedCardQrBinding(ctx.profileId, sessionNow);
       const signed = await signCardUpdate({
         profileId: ctx.profileId,
         handle: String(handle),
@@ -230,7 +232,7 @@ export function initManifestoUpdate(ctx) {
             latest_accepted_vouch_at: null,
           },
           badges: [],
-          qr: { active_qr_id: sessionNow?.qr_id, epoch: 1 },
+          qr: qrBinding,
           links: {
             standards: "https://humanity.llc/standards/v1",
             data_policy: "https://humanity.llc/data-policy.html",
@@ -242,6 +244,8 @@ export function initManifestoUpdate(ctx) {
       const next = {
         ...sessionNow,
         manifesto_line: manifestoLine,
+        qr_id: qrBinding.active_qr_id,
+        qr_epoch: qrBinding.epoch,
         ...(objectStreams.length
           ? { object_streams: objectStreams }
           : { object_streams: undefined }),
