@@ -1,3 +1,4 @@
+import { resolveCreatedCardQrBinding } from "./created-card-qr-binding.mjs";
 import {
   decodePrivateKeyBase58,
   generateQrId,
@@ -151,20 +152,15 @@ export function initQrRotate(ctx) {
 
   async function resolveEpoch() {
     const s = ctx.getSession();
-    if (typeof s?.qr_epoch === "number" && s.qr_epoch >= 1) return s.qr_epoch;
-    const res = await fetch(getCardJsonUrl(ctx.profileId), {
-      headers: { Accept: "application/json" },
-      cache: "no-store",
-    });
-    if (!res.ok) throw new Error("Could not load card epoch from network.");
-    const card = await res.json();
-    const epoch = card?.qr?.epoch;
-    if (!Number.isInteger(epoch) || epoch < 1) {
-      throw new Error("Card missing qr.epoch on network.");
+    const binding = await resolveCreatedCardQrBinding(ctx.profileId, s);
+    if (s?.qr_epoch !== binding.epoch || s?.qr_id !== binding.active_qr_id) {
+      ctx.setSession({
+        ...s,
+        qr_id: binding.active_qr_id,
+        qr_epoch: binding.epoch,
+      });
     }
-    const next = { ...s, qr_epoch: epoch };
-    ctx.setSession(next);
-    return epoch;
+    return binding.epoch;
   }
 
   btn.addEventListener("click", async () => {

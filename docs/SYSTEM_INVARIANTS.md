@@ -217,6 +217,7 @@ New floating UI must use `--surface-popover-*` per [`UI_COLOR_SCHEME_STANDARD.md
 - Steward status is on the resolver; vouch signing needs root `hc_created` keys on the same browser tab.
 - Cross-device restore: **recovery code** (primary) or encrypted backup (advanced).
 - Large wallets (~10+ saved root cards): poll budget and shell perf limits in [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) still apply.
+- **Card QR public copy:** `POST …/cards/{id}/update` signed documents must copy the live card-scoped `qr.active_qr_id` + `qr.epoch` from tab session or `GET …/status?q=` (qr_credentials). Do not hardcode `epoch: 1`. A poisoned GET `/cards/{id}` JSON must not be the first source for the next rotate.
 
 Canonical: [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md)
 
@@ -229,7 +230,7 @@ Canonical: [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) ·
 | Human-trust row | `/created/` shows **Checking…** on human-trust icon/copy until first successful resolver status poll; steward review queue hidden until poll confirms `verification.state === "steward"`. |
 | Poll confirmed | Mark poll confirmed on any successful status response, not only when `scan.human_trust` is present. |
 
-**Regression:** `npm run worker:test -- worker/tests/created-verification-boot.test.ts`
+**Regression:** `npm run worker:test -- worker/tests/created-verification-boot.test.ts worker/tests/created-card-qr-binding-core.test.ts`
 
 ---
 
