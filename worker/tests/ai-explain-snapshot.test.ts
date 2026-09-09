@@ -25,7 +25,7 @@ const validBody = {
 };
 
 describe("ai explain snapshot", () => {
-  it("returns deterministic summary when AI binding is absent", async () => {
+  it("returns deterministic summary for a valid snapshot", async () => {
     const db = rateLimitDb();
     const res = await handlePostAiExplainSnapshot(
       new Request("https://humanity.llc/.well-known/hc/v1/ai/explain-snapshot", {
@@ -45,8 +45,11 @@ describe("ai explain snapshot", () => {
       disclaimer: string;
       limits: { ai_explain_warning: string };
     };
+    // Deterministic-only: source never varies and no model output enters the response.
     expect(body.source).toBe("deterministic");
-    expect(body.summary).toContain("Studio door");
+    expect(body.summary).toBe(
+      "This object is Studio door. Current status: Open until 9 PM. Special hours: Thursday closes at 6 PM."
+    );
     expect(body.limits.ai_explain_warning).toContain("Plain-language summary");
     expect(body.disclaimer).toContain("not signed network state");
   });
@@ -96,30 +99,5 @@ describe("ai explain snapshot", () => {
     } finally {
       vi.useRealTimers();
     }
-  });
-
-  it("uses Workers AI when binding returns text", async () => {
-    const db = rateLimitDb();
-    const ai = {
-      run: vi.fn().mockResolvedValue({
-        response: "The studio door is open until 9 PM on most days.",
-      }),
-    };
-    const res = await handlePostAiExplainSnapshot(
-      new Request("https://humanity.llc/.well-known/hc/v1/ai/explain-snapshot", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "CF-Connecting-IP": "203.0.113.52",
-        },
-        body: JSON.stringify(validBody),
-      }),
-      { DB: db, AI: ai as unknown as Ai }
-    );
-    expect(res.status).toBe(200);
-    const body = (await res.json()) as { source: string; summary: string };
-    expect(body.source).toBe("workers_ai");
-    expect(body.summary).toContain("studio door");
-    expect(ai.run).toHaveBeenCalledOnce();
   });
 });

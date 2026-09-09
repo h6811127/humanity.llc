@@ -1,6 +1,6 @@
 # L3 P2 — Steward draft API (UI retired)
 
-**Status:** **UI retired** (2026-05-27) — API kept for tests/integrators only  
+**Status:** **UI retired** (2026-05-27) — API kept for tests/integrators only. **Deterministic in production** (2026-09-08): the reference operator removed its Workers AI binding with the L3 P1 decision, so this API answers `source: "deterministic"` on the live operator; unit tests may still mock `AI`.  
 **Parent:** [`AI_FEATURE_DEVELOPMENT.md`](AI_FEATURE_DEVELOPMENT.md) · [`MANIFESTO_STATUS_UPDATE.md`](MANIFESTO_STATUS_UPDATE.md)
 
 ---

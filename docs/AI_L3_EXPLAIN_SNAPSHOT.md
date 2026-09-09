@@ -1,6 +1,6 @@
 # L3 P1 — Opt-in scan explainer
 
-**Status:** Shipped — kept as opt-in “Plain language” reader in UI  
+**Status:** Shipped — **deterministic-only** (2026-09-08): Workers AI dropped; opt-in “Plain language” reader restates the signed snapshot without a model.  
 **Parent:** [`AI_FEATURE_DEVELOPMENT.md`](AI_FEATURE_DEVELOPMENT.md) · [`LOCALIZED_OBJECT_INTELLIGENCE_BOUNDARY.md`](LOCALIZED_OBJECT_INTELLIGENCE_BOUNDARY.md)  
 **Language policy:** [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) § Rename, don’t erase
 
@@ -8,7 +8,7 @@
 
 ## Goal
 
-Strangers scanning a **status plate** or **live object** with `object_streams` may optionally request a **plain-language summary** of the signed public snapshot. The summary is **not** resolver truth and never replaces the signed snapshot block. UI copy says **Plain language**, while the stable endpoint and JSON fields keep their `ai` names for integrators.
+Strangers scanning a **status plate** or **live object** with `object_streams` may optionally request a **plain-language summary** of the signed public snapshot. The summary is **not** resolver truth and never replaces the signed snapshot block. It is assembled **deterministically from signed field values** — no model output enters the response. UI copy says **Plain language**, while the stable endpoint and JSON fields keep their `ai` names for integrators.
 
 ---
 
@@ -18,6 +18,7 @@ Strangers scanning a **status plate** or **live object** with `object_streams` m
 - Modify or store resolver state
 - Use scan analytics, geolocation, or verifier identity
 - Explain cards without `public_snapshot` (no streams)
+- **Invoke any model** — the reference operator has no AI binding (2026-09-08)
 
 ---
 
@@ -51,8 +52,8 @@ Validation matches L2 assembly limits (plain text, bounded field count and lengt
 
 ```json
 {
-  "summary": "The studio door is open until 9 PM. Special hours: Thursday closes at 6 PM.",
-  "source": "workers_ai",
+  "summary": "This object is Studio door. Current status: Open until 9 PM. Special hours: Thursday closes at 6 PM.",
+  "source": "deterministic",
   "disclaimer": "Plain-language summary — not signed network state. Only the signed snapshot above is steward-published resolver copy.",
   "limits": {
     "ai_explain_warning": "..."
@@ -60,7 +61,7 @@ Validation matches L2 assembly limits (plain text, bounded field count and lengt
 }
 ```
 
-`source` is `workers_ai` when Cloudflare Workers AI ran, or `deterministic` when the operator has no AI binding (local dev fallback).
+`source` is always `"deterministic"` on the reference operator — the Workers AI binding was removed (2026-09-08) and no model text can enter this response.
 
 ### Errors
 
@@ -68,20 +69,26 @@ Validation matches L2 assembly limits (plain text, bounded field count and lengt
 |------|------|---------|
 | `INVALID_SNAPSHOT` | 422 | Missing or malformed `public_snapshot` |
 | `RATE_LIMITED` | 429 | Per-IP hourly cap |
-| `AI_UNAVAILABLE` | 503 | Workers AI error (no deterministic retry beyond fallback) |
 
 ---
 
-## Model behavior
+## Restatement rules (deterministic)
 
-System prompt rules (enforced in `ai-explain-core.ts`):
+`deterministicExplainSnapshot()` in [`ai-explain-core.ts`](../worker/src/resolver/ai-explain-core.ts) joins the signed fields into short sentences:
 
-- Restate **only** provided fields — no invented facts
-- 2–3 short sentences maximum
-- Do not claim verification, ownership, scan history, or legal identity
+- `object` field → `This object is <value>.`
+- `status` field → `Current status: <value>.`
+- `statement` field → the value itself (sentence-terminated)
+- any other field → `<key>: <value>.`
+
+Rules:
+
+- Restate **only** provided fields — no invented facts, hours, locations, or verification
+- Same inputs → same summary (deterministic)
+- No claim of verification, ownership, scan history, or legal identity
 - Plain language for a stranger who just scanned a QR
 
-When `env.AI` is absent, `deterministicExplainSnapshot()` joins field values into readable sentences — same disclaimer, `source: deterministic`.
+The summary is bounded by the same L2 assembly limits used for `public_snapshot` (max 12 fields, key ≤ 40, value ≤ 120, plain text).
 
 ---
 
@@ -106,16 +113,14 @@ Styling: `site/scan-pass.css` (`.scan-ai-explain-*`) — visually distinct from 
 
 ---
 
-## Workers AI binding
+## Deterministic-only (no model dependency)
 
-`worker/wrangler.toml`:
+Decision: **resolve Priority 4 → deterministic-only** (2026-09-08) — see [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) § Implementation priority stack · [`EPHEMERAL_STATE_AND_MERCH.md`](EPHEMERAL_STATE_AND_MERCH.md).
 
-```toml
-[ai]
-binding = "AI"
-```
-
-Model: `@cf/meta/llama-3.1-8b-instruct` (Workers AI). Change only with security/copy review.
+- The `[ai]` Workers binding was **removed** from `worker/wrangler.toml` — no model is invoked anywhere on the reference operator.
+- `AI_EXPLAIN_SYSTEM_PROMPT`, `buildExplainUserPrompt`, and `extractAiText` were deleted from `ai-explain-core.ts`; only the deterministic restatement remains.
+- The deprecated L3 P2 draft endpoint ([`AI_L3_DRAFT_MANIFESTO.md`](AI_L3_DRAFT_MANIFESTO.md), API only) inherits deterministic output in production; its unit tests may still mock `AI`.
+- Latency and cost are now bounded: one D1 rate-limit read + one deterministic join — no model round-trip.
 
 ---
 
@@ -129,9 +134,10 @@ Model: `@cf/meta/llama-3.1-8b-instruct` (Workers AI). Change only with security/
 
 | Step | Pass? |
 |------|-------|
-| POST with valid snapshot returns summary + disclaimer | ✅ `ai-explain-snapshot.test.ts` |
+| POST with valid snapshot returns deterministic summary + disclaimer | ✅ `ai-explain-snapshot.test.ts` |
 | Invalid body returns 422 | ✅ |
 | Rate limit returns 429 | ✅ |
 | Scan HTML includes explain button when snapshot present | ✅ `object-streams.test.ts` |
 | Signed snapshot block unchanged; AI panel separate | ☐ manual |
 | `GET …/status` includes `scan.ai` when snapshot present | ✅ `ai-explain-snapshot.test.ts` |
+| No Workers AI binding; no model text in response | ✅ `wrangler.toml` · `ai-explain-core.ts` · `ai-explain-snapshot.test.ts` |

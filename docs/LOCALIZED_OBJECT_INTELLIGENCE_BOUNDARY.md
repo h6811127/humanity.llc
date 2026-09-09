@@ -1,6 +1,6 @@
 # Localized object intelligence boundary
 
-**Status:** Active — L0–L2 shipped; **L3 P1 shipped** (kept as opt-in Plain language reader); **L3 P2 UI retired** (draft API tests only)  
+**Status:** Active — L0–L2 shipped; **L3 P1 shipped** (kept as opt-in Plain language reader, **deterministic-only** since 2026-09-08 — no model); **L3 P2 UI retired** (draft API tests only)  
 **Parent:** `docs/ROOT_CARD_AND_CHILD_OBJECTS.md` · `docs/MANIFESTO_STATUS_UPDATE.md` · `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md`  
 **AI hub:** `docs/AI_FEATURE_DEVELOPMENT.md` · **L3:** `docs/AI_L3_EXPLAIN_SNAPSHOT.md` · `docs/AI_L3_DRAFT_MANIFESTO.md`  
 **Research (not shipping):** `docs/PHYSICAL_WORLD_MULTIPLAYER_RESEARCH_SPEC.md`
@@ -27,7 +27,7 @@ This doc defines the **read-only assembly boundary** before any orchestration or
 | **L0 Manifesto** | Headline + status line (`manifesto_line`) | Shipped |
 | **L1 Object streams** | Up to 4 signed detail rows (`object_streams`) | Shipped |
 | **L2 Public snapshot** | Deterministic read-only line + JSON from L0 + L1 | Shipped |
-| **L3 Agent / orchestration** | Summarize or mediate **only** from L0–L2; no hidden telemetry | **P1 shipped** (Plain language reader) · **P2 UI retired** · rest research |
+| **L3 Agent / orchestration** | Summarize or mediate **only** from L0–L2; no hidden telemetry | **P1 shipped** (Plain language reader, **deterministic-only**) · **P2 UI retired** · rest research |
 
 ---
 
@@ -53,7 +53,7 @@ Rules:
 
 Future read-only agents must treat `public_snapshot` + `object_streams` + `manifesto_line` as the **only** public inputs from the resolver unless a separate signed document type ships.
 
-**L3 P1 (shipped):** strangers may opt in to `POST /.well-known/hc/v1/ai/explain-snapshot` for plain-language summary — labeled **not signed network state**. See [`AI_L3_EXPLAIN_SNAPSHOT.md`](AI_L3_EXPLAIN_SNAPSHOT.md).
+**L3 P1 (shipped, deterministic-only):** strangers may opt in to `POST /.well-known/hc/v1/ai/explain-snapshot` for a plain-language summary — labeled **not signed network state**. The reference operator has **no model** (2026-09-08): `deterministicExplainSnapshot()` restates signed fields only. See [`AI_L3_EXPLAIN_SNAPSHOT.md`](AI_L3_EXPLAIN_SNAPSHOT.md).
 
 **L3 P2 (UI retired 2026-05-27):** `POST /.well-known/hc/v1/ai/draft-manifesto` remains for tests/integrators only—**no** `/created/` product UI. Stewards write copy themselves. See [`AI_L3_DRAFT_MANIFESTO.md`](AI_L3_DRAFT_MANIFESTO.md).
 

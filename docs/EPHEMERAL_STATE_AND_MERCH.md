@@ -52,8 +52,8 @@ WEAR → Owner updates signed state from /created/ (or hub → Update status)
 Enjoyment and usefulness for **all** stewards does not require LLMs:
 
 1. **Structured fields** — status plate templates (`object` / `status` rows) and `object_streams` detail rows assemble deterministic L2 `public_snapshot`.
-2. **Deterministic reader** — when Workers AI is absent, `deterministicExplainSnapshot()` still restates fields ([`ai-explain-core.ts`](../worker/src/resolver/ai-explain-core.ts)).
-3. **Product decision (open)** — Priority 4 in merch stack: keep P1, **deterministic-only**, or remove scan reader ([`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) § Implementation priority stack).
+2. **Deterministic reader** — the reference operator is deterministic-only: `deterministicExplainSnapshot()` restates signed fields without any model ([`ai-explain-core.ts`](../worker/src/resolver/ai-explain-core.ts)).
+3. **Product decision (closed 2026-09-08 — deterministic-only)** — Priority 4 in merch stack resolved: **keep** the opt-in scan reader as a **model-free restatement** of signed fields; Workers AI binding removed ([`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) § Implementation priority stack · [`AI_L3_EXPLAIN_SNAPSHOT.md`](AI_L3_EXPLAIN_SNAPSHOT.md)).
 
 Stewards **write and sign** copy themselves (L3 P2 ghostwriting UI retired 2026-05-27).
 
@@ -90,7 +90,7 @@ Code: [`site/js/merch-funnel-core.mjs`](../site/js/merch-funnel-core.mjs) · [`s
 |------|------|------|
 | 1 | Merch operator close-out — live payment, Printify submit, physical QA | Operator |
 | 2 | Backup/recovery nudge before or after first Tier 1 checkout | Product + UI | **✅ Shipped** — `/shop/customize/` pre-checkout + `/shop/thanks/` post-checkout (`merch-backup-nudge-core.mjs`) |
-| 3 | AI P1 decision — keep / deterministic-only / remove | Product |
+| 3 | AI P1 decision — keep / deterministic-only / remove | Product | **✅ Closed 2026-09-08 — deterministic-only** (Workers AI dropped; opt-in restatement kept) |
 | 4 | Guided live-object template at create (optional `object_streams` without AI) | Engineering |
 | 5 | Gift mode · adopt batch QR · Commons Pass ephemeral scopes | Phase C / D |
 | 6 | Owner-surface visual choreography (customize Settle, created live object card, publish pulse, thanks activation, stranger preview) | Product + design | **✅ V1–V4 shipped** — [`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) |

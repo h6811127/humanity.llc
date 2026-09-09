@@ -10,14 +10,32 @@ export const AI_EXPLAIN_MAX_FIELDS = 12;
 export const AI_EXPLAIN_FIELD_KEY_MAX = 40;
 export const AI_EXPLAIN_FIELD_VALUE_MAX = 120;
 
-export const AI_EXPLAIN_SYSTEM_PROMPT = `You summarize signed public object state for someone who just scanned a QR code.
-Rules:
-- Restate ONLY the fields provided. Do not invent facts, hours, locations, or verification.
-- Use 2-3 short, plain sentences maximum.
-- Do not claim the reader owns the object, that anyone scanned it, or that the state is legally verified.
-- Do not mention AI, models, or the resolver.`;
-
+/**
+ * Reference operator is deterministic-only (2026-09-08): the Workers AI binding was
+ * removed, so `source` is always `"deterministic"`. The union type is kept for
+ * integrators that parsed older responses. See docs/AI_L3_EXPLAIN_SNAPSHOT.md.
+ */
 export type AiExplainSource = "workers_ai" | "deterministic";
+
+/** Stable response source for the reference operator. */
+export const AI_EXPLAIN_DETERMINISTIC_SOURCE: AiExplainSource = "deterministic";
+
+/**
+ * Shared Workers AI text extractor — used ONLY by the deprecated L3 P2 draft API
+ * (`ai-draft-*.ts`, tests/integrators). The P1 explain path is deterministic-only
+ * and never calls this. Kept here for back-compat; do not reintroduce into P1.
+ */
+export function extractAiText(response: unknown): string | null {
+  if (!response || typeof response !== "object") return null;
+  const record = response as Record<string, unknown>;
+  if (typeof record.response === "string" && record.response.trim()) {
+    return record.response.trim();
+  }
+  if (typeof record.result === "string" && record.result.trim()) {
+    return record.result.trim();
+  }
+  return null;
+}
 
 export type AgentContextLimits = {
   bearer_warning: string;
@@ -86,7 +104,7 @@ export function validateExplainSnapshotInput(
   return { text: text.trim(), fields: normalized };
 }
 
-/** Deterministic fallback when Workers AI is unavailable. */
+/** Deterministic restatement of signed public fields — the only explain path on the reference operator. */
 export function deterministicExplainSnapshot(snapshot: PublicObjectSnapshot): string {
   const sentences: string[] = [];
   for (const field of snapshot.fields) {
@@ -101,23 +119,6 @@ export function deterministicExplainSnapshot(snapshot: PublicObjectSnapshot): st
     }
   }
   return sentences.join(" ").trim();
-}
-
-export function buildExplainUserPrompt(snapshot: PublicObjectSnapshot): string {
-  const lines = snapshot.fields.map((f) => `${f.key}: ${f.value}`);
-  return `Signed public fields:\n${lines.join("\n")}\n\nPlain-language summary:`;
-}
-
-export function extractAiText(response: unknown): string | null {
-  if (!response || typeof response !== "object") return null;
-  const record = response as Record<string, unknown>;
-  if (typeof record.response === "string" && record.response.trim()) {
-    return record.response.trim();
-  }
-  if (typeof record.result === "string" && record.result.trim()) {
-    return record.result.trim();
-  }
-  return null;
 }
 
 export function buildAgentContextPacket(

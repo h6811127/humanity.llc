@@ -1,36 +1,17 @@
 import { checkAiExplainRateLimit, hashIp } from "../db/rate-limit";
 import { clientIp, errorResponse, jsonResponse, withCors } from "../http/resolver";
 import {
-  AI_EXPLAIN_SYSTEM_PROMPT,
+  AI_EXPLAIN_DETERMINISTIC_SOURCE,
   aiExplainResponseBody,
-  buildExplainUserPrompt,
   deterministicExplainSnapshot,
-  extractAiText,
   validateExplainSnapshotInput,
 } from "./ai-explain-core";
 
-const WORKERS_AI_MODEL = "@cf/meta/llama-3.1-8b-instruct";
-
 export interface AiExplainEnv {
   DB: D1Database;
-  AI?: Ai;
 }
 
-async function runWorkersAiExplain(
-  ai: Ai,
-  snapshot: { text: string; fields: { key: string; value: string }[] }
-): Promise<string | null> {
-  const response = await ai.run(WORKERS_AI_MODEL, {
-    messages: [
-      { role: "system", content: AI_EXPLAIN_SYSTEM_PROMPT },
-      { role: "user", content: buildExplainUserPrompt(snapshot) },
-    ],
-    max_tokens: 180,
-  });
-  return extractAiText(response);
-}
-
-/** POST /.well-known/hc/v1/ai/explain-snapshot — L3 P1 opt-in plain-language summary. */
+/** POST /.well-known/hc/v1/ai/explain-snapshot — L3 P1 opt-in plain-language summary (deterministic-only). */
 export async function handlePostAiExplainSnapshot(
   request: Request,
   env: AiExplainEnv
@@ -71,24 +52,12 @@ export async function handlePostAiExplainSnapshot(
     );
   }
 
-  if (env.AI) {
-    try {
-      const aiText = await runWorkersAiExplain(env.AI, validated);
-      if (aiText) {
-        return withCors(
-          request,
-          jsonResponse(aiExplainResponseBody(aiText, "workers_ai"), 200)
-        );
-      }
-    } catch {
-      /* fall through to deterministic */
-    }
-  }
-
+  // Reference operator is deterministic-only — no Workers AI binding (2026-09-08).
+  // The snapshot is restated from signed fields; no model text ever reaches this response.
   const summary = deterministicExplainSnapshot(validated);
   return withCors(
     request,
-    jsonResponse(aiExplainResponseBody(summary, "deterministic"), 200)
+    jsonResponse(aiExplainResponseBody(summary, AI_EXPLAIN_DETERMINISTIC_SOURCE), 200)
   );
 }
 

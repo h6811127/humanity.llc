@@ -1,6 +1,6 @@
 # Object state, readers, and the AI era
 
-**Status:** Active — **L0–L2 shipped**; L3 P1 kept as opt-in plain-language reader; **L3 P2 UI retired** (2026-05-27)  
+**Status:** Active — **L0–L2 shipped**; L3 P1 shipped as **deterministic-only** reader (Workers AI dropped 2026-09-08); **L3 P2 UI retired** (2026-05-27)  
 **Parent:** [`LOCALIZED_OBJECT_INTELLIGENCE_BOUNDARY.md`](LOCALIZED_OBJECT_INTELLIGENCE_BOUNDARY.md) · [`PHASE_A_STRANGER_PATH_PRIORITIES.md`](PHASE_A_STRANGER_PATH_PRIORITIES.md)  
 **Language policy:** [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) § Rename, don’t erase (UI **Plain language**; stable `ai` API fields)  
 **Slices:** [`AI_L3_EXPLAIN_SNAPSHOT.md`](AI_L3_EXPLAIN_SNAPSHOT.md) · [`AI_L3_DRAFT_MANIFESTO.md`](AI_L3_DRAFT_MANIFESTO.md) (API only, UI retired)
@@ -32,7 +32,7 @@ See [`VOUCH_TRUST_POSITIONING.md`](VOUCH_TRUST_POSITIONING.md) · [`DEMOCRATIC_I
 |-------|--------|
 | **L0–L2** (manifesto, object streams, public snapshot) | **Shipped — product core** |
 | **Integrator `agent_context`** (status JSON) | **Shipped — protocol, no model required** |
-| **L3 P1** — opt-in scan reader | **Kept — renamed “Plain language” in UI** |
+| **L3 P1** — opt-in scan reader | **Kept — deterministic-only** (2026-09-08: Workers AI dropped; restates signed fields, no model) |
 | **L3 P2** — steward draft | **UI retired** · API kept deprecated for tests/integrators |
 | **Anti-synthetic abuse** (V-07, A-01…) | Threat model + shipped crypto/rate controls |
 | **Generative backlog** (copilots, compilers, narrators) | **Cancelled** for reference operator UI |
@@ -50,7 +50,7 @@ Canonical boundary: [`LOCALIZED_OBJECT_INTELLIGENCE_BOUNDARY.md`](LOCALIZED_OBJE
 | **L0 Manifesto** | `manifesto_line` headline + status | Shipped |
 | **L1 Object streams** | Up to 4 signed detail rows (`object_streams`) | Shipped |
 | **L2 Public snapshot** | Deterministic `{ text, fields[] }` from L0 + L1 | Shipped |
-| **L3 Readers / orchestration** | Optional read-only layer on L0–L2 only | P1 shipped (review); P2 UI retired |
+| **L3 Readers / orchestration** | Optional read-only layer on L0–L2 only | P1 shipped (deterministic-only); P2 UI retired |
 
 ### Design principles (locked)
 
@@ -82,7 +82,7 @@ Canonical boundary: [`LOCALIZED_OBJECT_INTELLIGENCE_BOUNDARY.md`](LOCALIZED_OBJE
 
 ### L3 P1: scan reader (explain snapshot)
 
-See [`AI_L3_EXPLAIN_SNAPSHOT.md`](AI_L3_EXPLAIN_SNAPSHOT.md). **Step 2 done:** keep opt-in, de-emphasize AI in UI copy.
+See [`AI_L3_EXPLAIN_SNAPSHOT.md`](AI_L3_EXPLAIN_SNAPSHOT.md). **Step 2 done** (keep opt-in, de-emphasize AI in UI copy). **Priority 4 closed (2026-09-08): deterministic-only** — Workers AI binding removed; endpoint restates signed fields with no model.
 
 | Piece | Path |
 |-------|------|
@@ -138,6 +138,7 @@ Ordered plan from brand review (2026-05-27). Update this table as steps complete
 | **4** | **Re-align sequencing** with Phase A pilots — no new L3 user features until strangers complete create → scan → update → revoke without hand-holding. | ✅ Noted | [`PHASE_A_STRANGER_PATH_PRIORITIES.md`](PHASE_A_STRANGER_PATH_PRIORITIES.md) |
 | **5** | **Marketing clarity** — public copy leads with accountable humans and signed state, not “we have AI.” Audit landing, create, scan limit strings. | ✅ Done — landing/create guard + scan limit copy avoids AI-as-product language | [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) · [`LAUNCH_LANGUAGE_KIT.md`](LAUNCH_LANGUAGE_KIT.md) |
 | **6** | **Ephemeral state UX for Tier 1 merch** — unlock `/created/` update without revoke-first gate; Tier 1 thanks path → `#update-status`. Product moat is L0–L2, not AI. | ✅ Shipped | [`EPHEMERAL_STATE_AND_MERCH.md`](EPHEMERAL_STATE_AND_MERCH.md) |
+| **7** | **Resolve Priority 4 — L3 P1 reader decision → deterministic-only** — drop the Workers AI dependency from the scan explainer; keep opt-in restatement + stable `ai` API fields; update docs + tests. | ✅ Done (2026-09-08) | [`AI_L3_EXPLAIN_SNAPSHOT.md`](AI_L3_EXPLAIN_SNAPSHOT.md) · `worker/src/resolver/ai-explain-*.ts` · `worker/wrangler.toml` · `MERCH_FUNNEL_MVP.md` § Implementation priority stack |
 
 ---
 
@@ -150,7 +151,7 @@ Physical merch value is **mutable signed state on immutable ink** — not genera
 | L0–L2 | Updates from `/created/` or hub | Reads signed snapshot on scan |
 | L3 P1 | N/A (stewards write copy) | Opt-in plain-language restatement only |
 
-See [`EPHEMERAL_STATE_AND_MERCH.md`](EPHEMERAL_STATE_AND_MERCH.md) for Tier 1 funnel step **WEAR**, accessibility without LLMs, and open Priority 4 (P1 keep / deterministic-only / remove).
+See [`EPHEMERAL_STATE_AND_MERCH.md`](EPHEMERAL_STATE_AND_MERCH.md) for Tier 1 funnel step **WEAR** and accessibility without LLMs. **Priority 4 closed (2026-09-08):** L3 P1 is **deterministic-only** — keep the opt-in reader as a model-free restatement of signed fields.
 
 ---
 
@@ -162,7 +163,7 @@ See [`EPHEMERAL_STATE_AND_MERCH.md`](EPHEMERAL_STATE_AND_MERCH.md) for Tier 1 fu
 |-------|------|-----------|
 | **Now** | Status plate + lost-item field pilots · **merch funnel** (scan → `/shop/customize/`) | Proves L0–L2 + commerce path — [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) |
 | **Hold** | New L3 user-facing features | Until Phase A stranger loop proven |
-| **Review** | P1 scan reader (step 2) | Accessibility vs brand |
+| **Review** | ~~P1 scan reader~~ | **Closed 2026-09-08 — deterministic-only** (accessibility kept, model dropped) |
 | **Keep** | `agent_context` JSON | Protocol for external integrators |
 | **Later** | Anti-synthetic nudges (V-07) | Adversary lane, not author assist |
 | **Much later** | Commons Pass, federation | Phase D–E |

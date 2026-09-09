@@ -89,9 +89,8 @@ PERSONALIZE_GLITCH_HOODIE_PRINTIFY_IMAGE_ANGLE = "0"
 [triggers]
 crons = ["0 4 * * *", "0,30 * * * *"]
 
-# L3 P1 — opt-in scan explainer (docs/AI_L3_EXPLAIN_SNAPSHOT.md)
-[ai]
-binding = "AI"
+# L3 P1 scan explainer is deterministic-only (2026-09-08) — no Workers AI dependency.
+# See docs/AI_L3_EXPLAIN_SNAPSHOT.md · docs/AI_FEATURE_DEVELOPMENT.md
 
 [[routes]]
 pattern = "humanity.llc/.well-known/hc/v1/*"
