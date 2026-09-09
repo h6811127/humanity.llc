@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Live QR on your door · humanity.llc</title>
+    <meta
+      name="description"
+      content="Paid install: a live QR on your door. Scanners see today’s hours. You update from your phone. Create stays free."
+    />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="color-scheme" content="light dark" />
+    <script>
+      (function () {
+        try {
+          if (localStorage.getItem("hc_theme") === "dark") {
+            document.documentElement.dataset.theme = "dark";
+            document.documentElement.style.colorScheme = "dark";
+          }
+        } catch (e) {
+          /* ignore */
+        }
+      })();
+    </script>
+    <link rel="stylesheet" href="/styles.css?v=163" />
+    <link rel="stylesheet" href="/css/install.css?v=2" />
+    <link rel="stylesheet" href="/css/theme-dark.css?v=34" />
+  </head>
+  <body class="install-page">
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/?intent=deploy">Do it yourself</a>
+      </header>
+      <main class="screen screen-landing">
+        <article class="studio-post-article" id="install-offer">
+          <p class="install-kicker">Operator install</p>
+          <h1>Live QR on your door</h1>
+          <p>
+            Scanners see today’s hours or status. You change the line from your phone.
+            The sticker stays — the status changes.
+          </p>
+          <ul class="install-price">
+            <li><strong>$250</strong> — print, place, and a walkthrough of Live on your phone</li>
+            <li><strong>$25 / month</strong> — optional. We keep the object hosted and honest. Invoice, not a paywall.</li>
+          </ul>
+          <ul>
+            <li>One status plate on a real door, window, or counter.</li>
+            <li>You hold the keys. Sign, update, and revoke stay free.</li>
+            <li>Cedar Rapids and nearby — elsewhere by arrangement.</li>
+          </ul>
+          <ol class="install-next">
+            <li>You send this request (mail app, not a checkout).</li>
+            <li>I reply with a date and how to pay $250 (invoice / Venmo / cash).</li>
+            <li>We print, place on the door, and walk through Live on your phone.</li>
+          </ol>
+          <form id="install-book-form" class="install-book" novalidate>
+            <h2>Book an install</h2>
+            <p class="form-hint">
+              Opens your mail app with the door details filled in. Payment is invoice after we set a
+              date — not a card form.
+            </p>
+            <label class="form-label" for="install-place">Place</label>
+            <input
+              class="form-input"
+              id="install-place"
+              name="place"
+              type="text"
+              required
+              autocomplete="organization"
+              maxlength="80"
+              placeholder="Studio door, café window, shop counter"
+            />
+            <label class="form-label" for="install-neighborhood">Neighborhood or address</label>
+            <input
+              class="form-input"
+              id="install-neighborhood"
+              name="neighborhood"
+              type="text"
+              required
+              autocomplete="street-address"
+              maxlength="120"
+              placeholder="NewBo, Czech Village, or a street"
+            />
+            <label class="form-label" for="install-scanner-line">What scanners should see</label>
+            <input
+              class="form-input"
+              id="install-scanner-line"
+              name="scannerLine"
+              type="text"
+              required
+              maxlength="80"
+              placeholder="Open · Thu–Sun until 9 PM"
+            />
+            <label class="form-label" for="install-contact">How to reach you</label>
+            <input
+              class="form-input"
+              id="install-contact"
+              name="contact"
+              type="text"
+              required
+              autocomplete="email"
+              maxlength="120"
+              placeholder="Name and email or phone"
+            />
+            <label class="install-hosted">
+              <input type="checkbox" id="install-hosted" name="hosted" />
+              Add $25 / month hosted after install (invoice)
+            </label>
+            <p id="install-book-error" class="install-book-error" hidden role="alert"></p>
+            <div class="install-actions">
+              <button type="submit" class="landing-hero-btn landing-hero-btn-primary">
+                Send install request
+              </button>
+              <a class="btn-secondary" href="/create/?intent=deploy">Print your own — free</a>
+            </div>
+          </form>
+          <p class="install-mail-fallback">
+            Or
+            <a href="mailto:info@humanity.llc?subject=Live%20object%20install">email info@humanity.llc</a>
+            with the same details.
+          </p>
+          <p class="install-honesty">
+            This is print and place, not a stronger identity claim. Buying an install does not
+            vouch you. Hoodies and stickers stay on
+            <a href="/shop/">/shop/</a>.
+          </p>
+        </article>
+      </main>
+    </div>
+    <script type="module" src="/js/install-book.mjs?v=2"></script>
+  </body>
+</html>

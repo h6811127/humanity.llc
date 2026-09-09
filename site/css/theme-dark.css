@@ -1578,3 +1578,18 @@ html[data-theme="dark"] .docket-top .docket-top-charter:hover,
 html[data-theme="dark"] .docket-top .docket-top-charter:focus-visible {
   color: var(--shell-label-strong);
 }
+
+html[data-theme="dark"] .install-price {
+  background: var(--shell-fill);
+  border-color: var(--shell-separator);
+}
+
+html[data-theme="dark"] .install-page .install-kicker,
+html[data-theme="dark"] .install-honesty,
+html[data-theme="dark"] .install-mail-fallback {
+  color: var(--shell-label);
+}
+
+html[data-theme="dark"] .install-book-error {
+  color: #ff8a80;
+}

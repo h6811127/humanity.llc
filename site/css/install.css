@@ -1,0 +1,102 @@
+/* Paid door-plate install offer — operator service, not homepage. */
+
+.install-page .install-kicker {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted, rgba(0, 0, 0, 0.55));
+}
+
+.install-price {
+  margin: 20px 0;
+  padding: 16px 18px;
+  list-style: none;
+  border: 1px solid var(--shell-separator, rgba(0, 0, 0, 0.12));
+  border-radius: 16px;
+  background: var(--shell-fill, #f5f5f7);
+}
+
+.install-price li {
+  margin: 0;
+  padding: 6px 0;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.install-price li + li {
+  border-top: 1px solid var(--shell-separator, rgba(0, 0, 0, 0.08));
+}
+
+.install-next {
+  margin: 20px 0 8px;
+  padding-left: 1.25em;
+}
+
+.install-next li {
+  margin: 6px 0;
+  line-height: 1.45;
+}
+
+.install-book {
+  display: flex;
+  flex-direction: column;
+  margin: 28px 0 8px;
+}
+
+.install-book h2 {
+  margin: 0 0 8px;
+  font-size: 22px;
+  letter-spacing: -0.03em;
+}
+
+.install-hosted {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 16px 0 4px;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.install-hosted input {
+  margin-top: 3px;
+}
+
+.install-book-error {
+  margin: 8px 0 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #b42318;
+}
+
+.install-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 20px 0 8px;
+}
+
+.install-page .install-actions .landing-hero-btn {
+  width: 100%;
+  text-align: center;
+  cursor: pointer;
+  appearance: none;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.install-mail-fallback {
+  margin: 8px 0 0;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.install-honesty {
+  margin: 24px 0 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text-muted, rgba(0, 0, 0, 0.55));
+}

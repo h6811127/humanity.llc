@@ -22,7 +22,7 @@ Not a bio link. Not legal ID. Object name + live network status.
 
 **Current path (deploy wizard — Account → Endpoint → Scan link):**
 
-1. Go to **https://humanity.llc/create/?intent=deploy** (launch door 1 **Live status on something**)
+1. Go to **https://humanity.llc/create/?intent=deploy** (launch door 1 **Live status on something**). Paid print-and-place: [`/install/`](../site/install/index.html) (booking form → mailto; invoice, not checkout).
 2. Answer what scanners should see:
    - **Handle**  -  your account id (e.g. `river_studio`)
    - **What is this plate on?**  -  headline on scan (e.g. `Studio door`)
