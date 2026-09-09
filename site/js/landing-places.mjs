@@ -7,15 +7,19 @@ import {
   DISCOVERY_NEAR_ME_PRIVACY_HREF,
   LANDING_DEFAULT_DISCOVERY_REGION,
   LANDING_PLACES_FAR_AWAY_METERS,
+  LANDING_PLACES_GEO_DENIED_STATUS,
   LANDING_PLACES_NEAR_ME_CTA,
   LANDING_PLACES_REGIONS_URL,
   LANDING_PLACES_SECTION_TITLE,
   buildLandingPlacesRows,
   formatLandingPlacesFarAwayNotice,
   formatLandingPlacesLead,
+  formatLandingPlacesNearMeStatus,
+  formatLandingPlacesRegionEmptyNotice,
   landingPlacesBrowseHref,
   normalizeLandingPlacesRegions,
   landingPlacesDefaultRegion,
+  renderLandingPlacesLoadErrorHtml,
   renderLandingPlacesResults,
   resolveLandingCategoryPinFacet,
   resolveLandingPlacesNearestMeters,
@@ -144,6 +148,7 @@ export function paintLandingPlacesSection(state) {
   const titleEl = document.getElementById("landing-places-title");
   const privacyEl = document.getElementById("landing-places-privacy");
   const densityEl = document.getElementById("landing-places-density");
+  const statusEl = document.getElementById("landing-places-near-me-status");
   if (!(resultsRoot instanceof HTMLElement)) return;
 
   const region = state.region || LANDING_DEFAULT_DISCOVERY_REGION;
@@ -156,6 +161,7 @@ export function paintLandingPlacesSection(state) {
     snapshotIndex: state.snapshotIndex ?? null,
     clientCoords: state.clientCoords ?? null,
   });
+  const nearestMeters = resolveLandingPlacesNearestMeters(model.distancesByPinId);
 
   if (state.regionOptions?.length) {
     paintLandingPlacesRegionPicker(state.regionOptions, region);
@@ -169,6 +175,7 @@ export function paintLandingPlacesSection(state) {
       cityLabel: state.cityLabel,
       pinCount: state.pins.length,
       nearMeActive,
+      nearMeSorted: nearMeActive && nearestMeters != null && state.pins.length > 0,
     });
   }
   if (privacyEl instanceof HTMLElement) {
@@ -181,15 +188,31 @@ export function paintLandingPlacesSection(state) {
   }
 
   if (densityEl instanceof HTMLElement) {
-    const notice = nearMeActive
-      ? formatLandingPlacesFarAwayNotice({
-          cityLabel: state.cityLabel,
-          nearestMeters: resolveLandingPlacesNearestMeters(model.distancesByPinId),
-          farAwayMeters: LANDING_PLACES_FAR_AWAY_METERS,
-        })
-      : null;
+    let notice = null;
+    if (state.pins.length === 0) {
+      notice = formatLandingPlacesRegionEmptyNotice({ cityLabel: state.cityLabel });
+    } else if (nearMeActive) {
+      notice = formatLandingPlacesFarAwayNotice({
+        cityLabel: state.cityLabel,
+        nearestMeters,
+        farAwayMeters: LANDING_PLACES_FAR_AWAY_METERS,
+      });
+    }
     densityEl.hidden = !notice;
     densityEl.textContent = notice ?? "";
+  }
+
+  if (statusEl instanceof HTMLElement) {
+    if (nearMeActive) {
+      statusEl.dataset.hcNearMe = "active";
+      statusEl.textContent = formatLandingPlacesNearMeStatus({
+        pinCount: state.pins.length,
+        nearestMeters,
+      });
+    } else if (statusEl.dataset.hcNearMe === "active") {
+      statusEl.textContent = "";
+      delete statusEl.dataset.hcNearMe;
+    }
   }
 
   resultsRoot.innerHTML = renderLandingPlacesResults(model, {
@@ -199,6 +222,16 @@ export function paintLandingPlacesSection(state) {
     query: state.query,
     cityLabel: state.cityLabel,
   });
+}
+
+/**
+ * Clear near-me status (region switch or cold reset).
+ */
+export function clearLandingPlacesNearMeStatus() {
+  const statusEl = document.getElementById("landing-places-near-me-status");
+  if (!(statusEl instanceof HTMLElement)) return;
+  statusEl.textContent = "";
+  delete statusEl.dataset.hcNearMe;
 }
 
 /**
@@ -217,19 +250,17 @@ export function bindLandingPlacesNearMe(handlers) {
     nearMeBtn.disabled = true;
     if (statusEl instanceof HTMLElement) {
       statusEl.textContent = "Requesting location on your device…";
+      delete statusEl.dataset.hcNearMe;
     }
     try {
       const coords = await requestDiscoveryClientCoords();
       handlers.setClientCoords(coords);
-      if (statusEl instanceof HTMLElement) {
-        statusEl.textContent = "Sorted nearest first on this device.";
-      }
       handlers.render();
     } catch {
       handlers.setClientCoords(null);
       if (statusEl instanceof HTMLElement) {
-        statusEl.textContent =
-          "Location unavailable — showing alphabetical order. Enable location in browser settings to sort near me.";
+        statusEl.dataset.hcNearMe = "denied";
+        statusEl.textContent = LANDING_PLACES_GEO_DENIED_STATUS;
       }
       handlers.render();
     } finally {
@@ -311,4 +342,5 @@ export {
   LANDING_DEFAULT_DISCOVERY_REGION,
   landingPlacesBrowseHref,
   readLandingPlacesRegionQueryParam,
+  renderLandingPlacesLoadErrorHtml,
 };

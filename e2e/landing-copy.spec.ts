@@ -34,6 +34,8 @@ test.describe("landing copy contract", () => {
     await expect(page.getByRole("heading", { name: "Live object carriers" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Customize Glitch hoodie" })).toBeVisible();
     await expect(page.getByRole("link", { name: "See all carriers" })).toBeVisible();
+    await expect(page.locator("#landing-try-live-object")).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole("link", { name: "Try a live object" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Start with one live object" })).toBeVisible();
     const hero = page.locator(".landing-discovery-hero");
     await expect(hero.getByText("No account", { exact: true })).toBeVisible();
@@ -86,7 +88,7 @@ test.describe("landing copy contract", () => {
       timeout: 10_000,
     });
     await expect(page.locator("#landing-places-results")).toContainText(
-      /No listed places in Example City|Browse other regions|See all places/
+      /No listed places in Example City|Pick another region|browse all regions|See all places/
     );
   });
 

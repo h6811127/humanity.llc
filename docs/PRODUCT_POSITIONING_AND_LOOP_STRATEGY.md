@@ -5,7 +5,7 @@
 **Parent:** `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` · `docs/STATUS_PLATE_PILOT.md`  
 **Language policy:** [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md)  
 **Object model (protocol):** [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md)  
-**Last updated:** 2026-07-29 — Front door **P5a–c shipped:** places-first `/` + landing near-me + multi-region picker
+**Last updated:** 2026-08-28 — Front door **north star** + world-index framing + DENSE + **DEMO try-live** (contract v17)
 
 ---
 
@@ -23,9 +23,26 @@
 
 ---
 
-## Front door strategy (June 2026)
+## Front door strategy (June 2026 · north star locked 2026-08-28)
 
-**Decision (shipped):** **Discovery-first landing** — `/` is a **places + boards utility dashboard** (no marketing landing). Primary strip: **Places near me** (DiscoveryPins); **Boards & seasons** secondary. Strangers browse public truth; stewards use create/shop from secondary rows. **Option B (shipped):** top-nav **Create** → steward chooser (deploy + wear), not a protocol form.
+### North star vs beachhead (do not conflate)
+
+| Choice | Meaning | Role |
+|--------|---------|------|
+| **A — Live world index** | `/` is the **front door of the physical internet**: browse the live public layer on real objects (places, boards, tags, wear) without an account | **Product identity** — build toward this |
+| **C — Beachhead city portal** | Cedar Rapids (and summer wedges: hoodie, city board) supply **honest density** while the graph is sparse | **Content / GTM stage** — not the brand of `/` |
+
+**Decision (2026-08-28):** Follow **A**. Treat **C as fill for A’s shelves**, not as homepage identity. Do not optimize `/` to read as “the Cedar Rapids civic/game app.” Optimize so that if density grew to many cities tomorrow, the IA would still be right.
+
+**Sparse-graph rule:** Fail-**closed** on nearness, fullness, and “live now” claims until they are true; fail-**open** on a real small catalog (or an honest empty). Never pad density. Never imply one city *is* the physical internet.
+
+**Delight rule:** Motion on `/` proves the medium (**status changed** / space reordered) — not game-company chrome. Ambient “board weather” waits on signed network-lens honesty (B13 / GT-8). Spec ownership: presentation streams under this north star; protocol unchanged.
+
+### Shipped composition (machinery — still discovery-first)
+
+**Decision (shipped):** **Discovery-first landing** — `/` is a **places + boards browse index** (no marketing landing, no shop grid). Primary strip: **Places near me** (DiscoveryPins); **Boards & seasons** secondary. Strangers browse public truth; stewards use create/shop from secondary rows. **Option B (shipped):** top-nav **Create** → steward chooser (deploy + wear), not a protocol form.
+
+**Framing target:** Same machinery, **world-index** voice — “live layer over reality, currently sparse” — not “municipal CR dashboard with optional other regions.” Region default may remain Cedar Rapids until multi-city density exists; that is a **default catalog**, not the product noun.
 
 **Decision (shipped):** **`#landing-live-object-carriers`** — one static **Live object carriers** row after public boards, hydrating from `shop-config.json` + store catalog when Worker is reachable. Links to `/shop/`; replaces retired **`#launch-doors`**. **Not** a carousel — revisit swipe UI only when ≥5 distinct carriers with photography.
 
@@ -33,7 +50,7 @@
 
 | Job | User question | Primary entry on `/` | Protocol (unchanged) |
 |-----|---------------|----------------------|----------------------|
-| **Activate a place** | “What's happening / what's true near me?” | Shelves + **`#landing-places`** (pin strip + Sort near me) + **Boards & seasons** · full browse at [`/discover/cedar-rapids-iowa/`](../site/discover/cedar-rapids-iowa/) ([`DISCOVERY_PROJECTION.md`](DISCOVERY_PROJECTION.md) § P5) | `game_node` + Layer 5 · boards link to `/play/` |
+| **Activate a place** | “What's happening / what's true near me?” | Shelves + **`#landing-places`** (pin strip + Sort near me + region) + **Boards & seasons** · full browse at [`/discover/…`](../site/discover/) ([`DISCOVERY_PROJECTION.md`](DISCOVERY_PROJECTION.md) § P5). Beachhead default region may be Cedar Rapids — **region ≠ product**. | `game_node` + Layer 5 · boards link to `/play/` |
 | **Deploy on something** | “Something in the world should stay *true*.” | **Start with one live object** → `/create/` | Deploy wizard · legacy flat compat per [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) |
 | **Wear live state** | “What I wear should mean something *today*.” | **`#landing-live-object-carriers`** → `/shop/` (shipped) · scan curiosity CTA (primary merch funnel) | `scope: print_artifact`; steward updates from `/created/` |
 
@@ -48,8 +65,9 @@ Lost-item relay, status plate, menus, crisis cards, etc. are **catalog instances
 | 3 | Search + **`#landing-places`** | Primary `/` job — listed pins + optional near-me sort ([`DISCOVERY_PROJECTION.md`](DISCOVERY_PROJECTION.md) § P5) |
 | 4 | **Boards & seasons** | Network lenses — season maps and public board cards |
 | 5 | **`#landing-live-object-carriers`** (shipped) | Secondary commerce — one featured carrier row → `/shop/` |
-| 6 | **`#landing-start-object-cta`** | Secondary steward entry — BYOP deploy |
-| 7 | Trust disclosures · device settings | Progressive depth — not first scroll |
+| 6 | **`#landing-try-live-object`** (shipped) | Secondary **read-only** company demo plate → production `/c/…?q=…` (soft-hide if offline) |
+| 7 | **`#landing-start-object-cta`** | Secondary steward entry — BYOP deploy |
+| 8 | Trust disclosures · device settings | Progressive depth — not first scroll |
 
 **Retired:** **`#launch-doors`** (Three ways in hero block). Job routes unchanged; presentation distributed across rows above.
 
@@ -57,7 +75,7 @@ Lost-item relay, status plate, menus, crisis cards, etc. are **catalog instances
 
 **Revenue rule:** `/` **teases** carriers and links to `/shop/`; **hosted tier** upsell stays on **`/created/`** and entitlements UI — not the discovery homepage.
 
-**Architecture alignment:** Presentation is routing and copy only. Resolver composition (`buildScanViewModel`), custody, and child-object APIs do not fork per row. `verify:landing` + [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) § Landing lock discovery hero + section order (+ carriers row when implemented).
+**Architecture alignment:** Presentation is routing and copy only. Resolver composition (`buildScanViewModel`), custody, and child-object APIs do not fork per row. `verify:landing` + [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) § Landing lock discovery hero + section order (+ carriers row) and the **live world index** north star (beachhead ≠ identity).
 
 ### Create vs buy hoodie (carrier split, not capability split)
 
@@ -65,11 +83,12 @@ Lost-item relay, status plate, menus, crisis cards, etc. are **catalog instances
 |------|-----------|---------|-----------|
 | **Buy (door 2)** | Curated carrier — print quality, Glitch brand, fulfillment | Product margin | Same live object on fabric |
 | **Create (door 1)** | BYOP — sign, print own sticker/sign | Free today; habit + upsell | Same signing + revoke stack |
+| **Install (operator)** | Printed plate placed on their door + Live walkthrough | Cash / invoice (`/install/` booking form → mailto) | Same status plate |
 
 **Rules:**
 
 1. **Never paywall** the core primitive — sign, one live object, publish, revoke ([`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md)).
-2. **Charge for carriers** — hoodie, sticker sheets, print packs ([`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md)).
+2. **Charge for carriers** — hoodie, sticker sheets, print packs ([`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md)). Charge for **operator install** (print + place) without paywalling create.
 3. **Create is step 4 of the merch funnel** — scan → want → **create card** → customize → checkout; not a competitor to commerce.
 4. Under door 2 (shipped step 15): honest BYOP link — “Or print your own wear” → `/create/?intent=wear`.
 
@@ -77,7 +96,7 @@ Lost-item relay, status plate, menus, crisis cards, etc. are **catalog instances
 
 ### Top-nav Create (Option B — shipped)
 
-Bare `/create/` is a **two-row steward chooser**: deploy on something + wear carrier (shop). **Not** a mirror of landing door 3 — **Play the city game** stays on `/` and `/play/`; **Organize a live season** is a footnote link (`?intent=game`). No **General / Status plate / Lost item** tabs as the first screen.
+Bare `/create/` is a **two-row steward chooser**: deploy on something + wear carrier (shop). **Not** a mirror of landing door 3 — **Play the city game** stays on `/` and `/play/`; **Organize a live season** is a footnote link (`?intent=game`). **Have us put it on your door** → [`/install/`](../site/install/index.html) is the same footnote row — operator print-and-place, not a chooser door. No **General / Status plate / Lost item** tabs as the first screen.
 
 **Architecture alignment:** Chooser is static HTML/JS routing — no new Worker routes. Deep links (`?template=`, `?intent=`) remain for pilots, merch handoff (`hc_ref`), and E2E ([`e2e/create-flow-convergence.spec.ts`](../e2e/create-flow-convergence.spec.ts)).
 
@@ -126,10 +145,13 @@ See [`QR_DESIGN_SPACE.md`](QR_DESIGN_SPACE.md) § Catalog roles.
 | Surface | Lead copy |
 |---------|-----------|
 | Landing hero H1 (shipped) | **Check what's true right now before you knock, pick up, or show up.** |
-| Landing hero subline | Current public truth on real doors, tags, and places |
-| Landing meta / OG (shipped) | Check what's true right now on real doors, tags, and places. Browse live public boards — no account. No scan trails. |
+| Landing hero eyebrow (shipped) | **Public programmable objects** — category noun; not a second H1 |
+| Landing hero subline (shipped) | Browse the live public layer on real doors, tags, and places — signed by whoever maintains them… |
+| Landing meta / OG (shipped) | Browse the live public layer… Check what's true before you knock… No account / No scan trails |
+| Landing places lead | Region is **one slice of the public index** (switch region / All regions); near-me sort is optional device-local |
 | Landing hook (secondary) | **The sticker stays — the status changes.** — `#landing-start-object-cta` footnote |
 | Landing carriers row (shipped) | **Live object carriers** — e.g. *Glitch hoodie · unique QR on fabric — preview before checkout* · **See all carriers →** `/shop/` |
+| Landing try-live (shipped) | **Try a live object** — company demo status plate (`showcase-status-plate.json`); read-only; soft-hide if pointer missing |
 | Browse shelves | Live now · Open or paused · Return, relay, hours |
 | Public boards | **Boards & seasons** — open a board for the shared season map |
 | Create row (shipped) | **Start with one live object** → `/create/` |

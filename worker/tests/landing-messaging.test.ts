@@ -28,7 +28,12 @@ describe("landing messaging (Step 3)", () => {
     expect(html).toContain(
       "Check what's true right now before you knock, pick up, or show up."
     );
-    expect(html).toContain("Current public truth on real doors, tags, and places");
+    expect(html).toContain("Public programmable objects");
+    expect(html).toContain("Browse the live public layer on real doors, tags, and places");
+    expect(html).toContain("A public index of listed places and boards");
+    expect(html).toContain("One region in the public index");
+    expect(html).not.toContain("Current public truth on real doors, tags, and places");
+    expect(html).not.toContain("what's happening around town this season");
     expect(html).toContain('id="landing-entry-shelves"');
     expect(html).toContain("Live now");
     expect(html).toContain("Open or paused");
@@ -45,6 +50,9 @@ describe("landing messaging (Step 3)", () => {
     expect(html).toContain("Live object carriers");
     expect(html).toContain('href="/shop/"');
     expect(html).toContain("See all carriers");
+    expect(html).toContain('id="landing-try-live-object"');
+    expect(html).toContain("Try a live object");
+    expect(html).toContain("landing-try-live-object.mjs?v=1");
     expect(html).toContain('id="landing-start-object-cta"');
     expect(html).toContain("Start with one live object");
     expect(html).toContain('href="/create/"');
@@ -55,14 +63,15 @@ describe("landing messaging (Step 3)", () => {
     expect(html).not.toContain("Listed networks");
     expect(html).not.toContain("An internet for physical places and objects.");
     expect(html).not.toContain('id="launch-doors"');
-    expect(html).not.toContain("Try a live object");
     expect(html).not.toContain("Live state<br />on real objects.");
+    expect(html).not.toContain("One use · status plate");
   });
 
   it("landing loads public networks portal script and styles", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
     expect(html).toContain("public-networks-portal.css?v=12");
-    expect(html).toContain("public-networks-portal.mjs?v=14");
+    expect(html).toContain("public-networks-portal.mjs?v=15");
+    expect(html).toContain("landing-try-live-object.mjs?v=1");
     expect(html).not.toContain("landing-showcase.mjs");
   });
 

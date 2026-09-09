@@ -51,6 +51,15 @@ export const LANDING_PLACES_SECTION_TITLE = "Places near me";
 export const LANDING_PLACES_REGIONS_URL = "/data/discovery-landing-regions.json";
 /** Nearest listed pin beyond this → far-away density notice (client-only). */
 export const LANDING_PLACES_FAR_AWAY_METERS = 80_000;
+
+/** Geo denied / unavailable — fail-closed on sort, catalog stays open. */
+export const LANDING_PLACES_GEO_DENIED_STATUS =
+  "Location unavailable — showing listed order. Enable location in browser settings to sort near me.";
+
+/** Index / fetch failure — fail-closed on claims, fail-open escape. */
+export const LANDING_PLACES_LOAD_ERROR_MESSAGE =
+  "Couldn't load places — try again, or browse all regions.";
+
 export { DISCOVERY_NEAR_ME_PRIVACY_COPY, DISCOVERY_NEAR_ME_PRIVACY_HREF, LANDING_PLACES_REGION_STORAGE_KEY };
 
 /** @typedef {"all" | "live_now" | "open_paused" | "return_hours"} LandingPinFacet */
@@ -162,7 +171,50 @@ export function formatLandingPlacesFarAwayNotice(ctx = {}) {
   const city = String(ctx.cityLabel ?? "this region").trim() || "this region";
   const dist = formatDiscoveryNearMeDistance(nearest);
   const distBit = dist ? ` (nearest listed place ~${dist})` : "";
-  return `Looks like you're far from ${city}${distBit}. Showing that region's places — or browse other regions.`;
+  return `Looks like you're far from ${city}${distBit}. Still showing that region's places in the public index — switch region or open All regions.`;
+}
+
+/**
+ * Cold / empty region density line (no nearness claim).
+ * @param {{ cityLabel?: string }} [ctx]
+ * @returns {string | null}
+ */
+export function formatLandingPlacesRegionEmptyNotice(ctx = {}) {
+  const city = String(ctx.cityLabel ?? "").trim();
+  if (!city) {
+    return "This region isn't listed in the public index yet — switch region or open All regions.";
+  }
+  return `${city} isn't dense yet — only steward-listed places appear. Switch region or open All regions.`;
+}
+
+/**
+ * Near-me status after successful geo (paint owns final copy).
+ * @param {{
+ *   pinCount?: number;
+ *   nearestMeters?: number | null;
+ * }} [ctx]
+ */
+export function formatLandingPlacesNearMeStatus(ctx = {}) {
+  const pinCount = typeof ctx.pinCount === "number" ? ctx.pinCount : 0;
+  if (pinCount <= 0) {
+    return "Location on — no listed places in this region to sort. Switch region or open All regions.";
+  }
+  if (ctx.nearestMeters == null) {
+    return "Location on — places here lack map points yet, so order stays as listed.";
+  }
+  return "Sorted nearest first on this device.";
+}
+
+/**
+ * @returns {string}
+ */
+export function renderLandingPlacesLoadErrorHtml() {
+  return `<p class="landing-places-empty discovery-region-empty">${escapeDiscoveryHtml(
+    LANDING_PLACES_LOAD_ERROR_MESSAGE
+  )}</p>
+<p class="landing-places-more idea-footnote"><a href="${escapeDiscoveryHtml(
+    LANDING_PLACES_ALL_REGIONS_HREF
+  )}">${escapeDiscoveryHtml(LANDING_PLACES_ALL_REGIONS_CTA)}</a></p>`;
 }
 
 /**
@@ -247,19 +299,26 @@ export function landingPlacesBrowseHref(region = LANDING_DEFAULT_DISCOVERY_REGIO
  *   cityLabel?: string;
  *   pinCount?: number | null;
  *   nearMeActive?: boolean;
+ *   nearMeSorted?: boolean;
  * }} [ctx]
  */
 export function formatLandingPlacesLead(ctx = {}) {
   const city = String(ctx.cityLabel ?? "Cedar Rapids").trim() || "Cedar Rapids";
   const count = ctx.pinCount;
+  if (typeof count === "number" && count === 0) {
+    return `${city} has no listed places in the public index yet. Switch region or open All regions.`;
+  }
   const countBit =
     typeof count === "number" && count > 0
       ? `${count} listed place${count === 1 ? "" : "s"} in ${city}`
       : `Listed places in ${city}`;
-  if (ctx.nearMeActive) {
+  if (ctx.nearMeActive && ctx.nearMeSorted) {
     return `${countBit}. Sorted nearest first on this device.`;
   }
-  return `${countBit}. Sort near me uses location on your device; scans are not tracked.`;
+  if (ctx.nearMeActive) {
+    return `${countBit}. Location on — order stays as listed until places have map points.`;
+  }
+  return `${countBit}. One region in the public index — switch region or open All regions for more. Sort near me uses location on your device; scans are not tracked.`;
 }
 
 /**
@@ -276,8 +335,8 @@ export function landingPlacesEmptyMessage(ctx) {
   if (!ctx.hasPins) {
     const city = String(ctx.cityLabel ?? "").trim();
     return city
-      ? `No listed places in ${city} yet. Browse other regions or check back soon.`
-      : "No listed places for this region yet. Browse other regions or check back soon.";
+      ? `No listed places in ${city} yet. Pick another region, or browse all regions.`
+      : "No listed places for this region yet. Pick another region, or browse all regions.";
   }
   const facet = String(ctx.facet ?? "all");
   const q = String(ctx.query ?? "").trim();

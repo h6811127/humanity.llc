@@ -3,19 +3,22 @@
  * Do not change without updating worker/tests/landing-copy-contract.test.ts and running
  * `npm run verify:landing`.
  *
- * @see docs/DEVICE_HUB_AND_LOCAL_SEARCH.md § Landing story
- * @see docs/MERCH_VISUAL_CHOREOGRAPHY.md § Landing carriers row
+ * @see docs/PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md § Front door strategy (live world index)
  * @see docs/DISCOVERY_PROJECTION.md § WS-DISCOVER-P5
+ * @see docs/MERCH_VISUAL_CHOREOGRAPHY.md § Landing carriers row
  */
 
-/** Bump when hero / discovery dashboard copy or structure changes intentionally. */
-export const LANDING_COPY_CONTRACT_VERSION = 14;
+/** Bump when hero / world-index framing or structure changes intentionally. */
+export const LANDING_COPY_CONTRACT_VERSION = 17;
 
-export const LANDING_STYLES_CACHE_BUST = "163";
+export const LANDING_STYLES_CACHE_BUST = "164";
 
 export const LANDING_REQUIRED_SNIPPETS = [
+  "Public programmable objects",
   "Check what's true right now before you knock, pick up, or show up.",
-  "Current public truth on real doors, tags, and places",
+  "Browse the live public layer on real doors, tags, and places",
+  "A public index of listed places and boards",
+  "One region in the public index",
   'id="landing-entry-shelves"',
   "Live now",
   "Open or paused",
@@ -51,6 +54,10 @@ export const LANDING_REQUIRED_SNIPPETS = [
   'href="/shop/"',
   "See all carriers",
   "Buying merch does not verify you",
+  'id="landing-try-live-object"',
+  "Try a live object",
+  "company demo plate",
+  "landing-try-live-object.mjs?v=1",
   'id="landing-start-object-cta"',
   "Start with one live object",
   'href="/create/"',
@@ -65,7 +72,7 @@ export const LANDING_REQUIRED_SNIPPETS = [
   "public-networks-portal.css?v=12",
   "discovery-region-browse.css?v=5",
   `styles.css?v=${LANDING_STYLES_CACHE_BUST}`,
-  "public-networks-portal.mjs?v=14",
+  "public-networks-portal.mjs?v=15",
   'id="landing-public-docket"',
   'href="/docket/"',
   "Public Docket · nonviolent accountability",
@@ -87,8 +94,6 @@ export const LANDING_FORBIDDEN_SNIPPETS = [
   "Create public networks in the physical world",
   "today\u2019s signed state",
   "An internet for physical places and objects.",
-  'id="landing-try-live-object"',
-  "Try a live object",
   'id="launch-doors"',
   "landing-launch-doors-list",
   "Start here",
@@ -105,12 +110,15 @@ export const LANDING_FORBIDDEN_SNIPPETS = [
   "Community-run networks",
   "Open public networks that expose live places",
   "Public live boards",
+  "Current public truth on real doors, tags, and places",
+  "what's happening around town this season",
   "custom products",
   'class="landing-carriers-carousel"',
   "swiper",
   "carousel",
   "Humanity\u2019s Most Wanted",
   "Most Wanted",
+  "landing-showcase.mjs",
 ];
 
 /** Narrative sections must appear in document order. */
@@ -121,5 +129,6 @@ export const LANDING_SECTION_ORDER_MARKERS = [
   'id="landing-places"',
   'id="public-networks-results"',
   'id="landing-live-object-carriers"',
+  'id="landing-try-live-object"',
   'id="landing-start-object-cta"',
 ];

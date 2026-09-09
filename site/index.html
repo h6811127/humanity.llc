@@ -9,7 +9,7 @@
     <title>humanity.llc · Check what's true right now</title>
     <meta
       name="description"
-      content="Check what's true right now on real doors, tags, and places. Browse live public boards — games, open or paused resources, return paths and hours. No account. No scan trails."
+      content="Browse the live public layer on real doors, tags, and places. Check what's true before you knock, pick up, or show up — no account. No scan trails."
     />
     <meta name="theme-color" content="#ffffff" />
     <meta name="color-scheme" content="light dark" />
@@ -76,7 +76,7 @@
       })();
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=5" />
-    <link rel="stylesheet" href="/styles.css?v=163" />
+    <link rel="stylesheet" href="/styles.css?v=164" />
     <link rel="stylesheet" href="/css/public-networks-portal.css?v=12" />
     <link rel="stylesheet" href="/css/discovery-region-browse.css?v=5" />
     <link rel="stylesheet" href="/css/device-shell.css?v=94" />
@@ -84,7 +84,7 @@
     <meta property="og:title" content="humanity.llc · Check what's true right now" />
     <meta
       property="og:description"
-      content="Current public truth on real doors, tags, and places. Browse live boards before you knock, pick up, or show up. No scan trails."
+      content="Browse the live public layer on real doors, tags, and places. Check what's true before you knock, pick up, or show up. No scan trails."
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://humanity.llc" />
@@ -509,13 +509,14 @@
         </div>
       </section>
 
-      <!-- landing-copy-contract: human-first discovery dashboard — see site/js/landing-copy-contract.mjs -->
+      <!-- landing-copy-contract: live world index (physical internet) — see site/js/landing-copy-contract.mjs -->
       <main class="screen screen-landing public-networks-screen">
         <section class="hero hero-tight hero-compact landing-discovery-hero" data-landing-tutorial>
+          <p class="hero-eyebrow">Public programmable objects</p>
           <h1>Check what's true right now before you knock, pick up, or show up.</h1>
           <p class="hero-line">
-            Current public truth on real doors, tags, and places — published by whoever maintains
-            them, not guessed from who walked by.
+            Browse the live public layer on real doors, tags, and places — signed by whoever
+            maintains them, not guessed from who walked by.
           </p>
           <ul class="landing-trust-chips" aria-label="Trust at a glance">
             <li class="landing-trust-chip">No account</li>
@@ -540,8 +541,7 @@
               >
                 <span class="landing-entry-shelf-title">Live now</span>
                 <span class="landing-entry-shelf-copy">
-                  Weekend games, festivals, and shared play — what's happening around town this
-                  season.
+                  Weekend games, festivals, and shared play — what's listed as live this season.
                 </span>
               </button>
             </li>
@@ -587,8 +587,9 @@
             placeholder="Place, city, board, or keyword"
           />
           <p class="form-hint public-networks-toolbar-hint">
-            Places are listed pins you can open before you go. Boards group places by community
-            season. Only intentionally listed rows appear — not a map, feed, or scan history.
+            A public index of listed places and boards you can open before you go. Only
+            intentionally listed rows appear — not a map, feed, or scan history. Density is
+            uneven; empty regions stay honest.
           </p>
           <div
             class="public-networks-categories"
@@ -619,7 +620,7 @@
             <select
               class="landing-places-region"
               id="landing-places-region"
-              aria-label="Discovery region"
+              aria-label="Listed region in the public index"
             >
               <option value="cedar-rapids-iowa">Cedar Rapids · Cedar Rapids, Iowa</option>
               <option value="example-city">Example City · Example City (template)</option>
@@ -629,8 +630,8 @@
             >
           </div>
           <p class="form-hint landing-places-lead" id="landing-places-lead">
-            Listed places in Cedar Rapids. Sort near me uses location on your device; scans are not
-            tracked.
+            Listed places in Cedar Rapids. One region in the public index — switch region or open
+            All regions for more. Sort near me uses location on your device; scans are not tracked.
           </p>
           <p class="landing-places-privacy discovery-region-privacy" id="landing-places-privacy">
             Location is used on your device to sort results; scans are not tracked.
@@ -711,6 +712,39 @@
               · Buying merch does not verify you.
             </p>
           </article>
+        </section>
+
+        <section
+          class="landing-try-live-object idea-section"
+          id="landing-try-live-object"
+          aria-labelledby="landing-try-live-object-title"
+          hidden
+        >
+          <h2 class="group-label" id="landing-try-live-object-title">Try a live object</h2>
+          <p class="form-hint" id="landing-try-live-object-lead">
+            Open a company demo plate — same scan shape as a sticker in the world. Read-only; no
+            account.
+          </p>
+          <div class="landing-try-live-object-actions">
+            <a
+              class="landing-hero-btn landing-hero-btn-secondary"
+              id="landing-try-live-object-link"
+              href="#"
+              >Try a live object</a
+            >
+          </div>
+          <p class="form-hint" id="landing-try-live-object-label" hidden></p>
+          <figure class="landing-try-live-object-qr" id="landing-try-live-object-qr" hidden>
+            <img
+              id="landing-try-live-object-qr-img"
+              alt="QR code for the demo live object"
+              width="160"
+              height="160"
+            />
+            <figcaption class="form-hint">
+              Same URL as a printed sticker — on desktop, scan with another phone.
+            </figcaption>
+          </figure>
         </section>
 
         <section
@@ -1251,6 +1285,7 @@
     <script src="/js/landing-focus.mjs?v=5" type="module"></script>
     <script src="/js/device-status-bootstrap.mjs?v=94" type="module"></script>
     <script src="/js/landing-device-hub.mjs?v=14" type="module"></script>
-    <script src="/js/public-networks-portal.mjs?v=14" type="module"></script>
+    <script src="/js/public-networks-portal.mjs?v=15" type="module"></script>
+    <script src="/js/landing-try-live-object.mjs?v=1" type="module"></script>
   </body>
 </html>

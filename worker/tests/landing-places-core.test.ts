@@ -2,12 +2,17 @@ import { describe, expect, it } from "vitest";
 
 import {
   LANDING_PLACES_FAR_AWAY_METERS,
+  LANDING_PLACES_GEO_DENIED_STATUS,
+  LANDING_PLACES_LOAD_ERROR_MESSAGE,
   LANDING_PLACES_PREVIEW_LIMIT,
   filterLandingPinsByFacet,
   formatLandingPlacesFarAwayNotice,
   formatLandingPlacesLead,
+  formatLandingPlacesNearMeStatus,
+  formatLandingPlacesRegionEmptyNotice,
   landingPlacesBrowseHref,
   landingPlacesEmptyMessage,
+  renderLandingPlacesLoadErrorHtml,
   resolveLandingCategoryPinFacet,
   resolveLandingPlacesNearestMeters,
   resolveLandingShelfPinFacet,
@@ -81,18 +86,27 @@ describe("landing-places-core", () => {
     expect(formatLandingPlacesLead({ pinCount: 41, cityLabel: "Cedar Rapids" })).toContain(
       "41 listed places"
     );
-    expect(formatLandingPlacesLead({ pinCount: 41, nearMeActive: true })).toContain(
+    expect(formatLandingPlacesLead({ pinCount: 41, cityLabel: "Cedar Rapids" })).toContain(
+      "One region in the public index"
+    );
+    expect(formatLandingPlacesLead({ pinCount: 0, cityLabel: "Example City" })).toContain(
+      "no listed places in the public index yet"
+    );
+    expect(formatLandingPlacesLead({ pinCount: 41, nearMeActive: true, nearMeSorted: true })).toContain(
       "Sorted nearest first"
+    );
+    expect(formatLandingPlacesLead({ pinCount: 41, nearMeActive: true, nearMeSorted: false })).toMatch(
+      /order stays as listed/
     );
     expect(landingPlacesEmptyMessage({ hasPins: true, facet: "open_paused" })).toMatch(
       /open\/paused/i
     );
     expect(
       landingPlacesEmptyMessage({ hasPins: false, cityLabel: "Example City" })
-    ).toMatch(/No listed places in Example City/);
+    ).toMatch(/Pick another region/);
   });
 
-  it("formats far-away density notice when nearest pin is distant (P5c)", () => {
+  it("formats density and near-me status honesty (DENSE)", () => {
     expect(
       formatLandingPlacesFarAwayNotice({
         cityLabel: "Cedar Rapids",
@@ -105,11 +119,40 @@ describe("landing-places-core", () => {
         nearestMeters: LANDING_PLACES_FAR_AWAY_METERS + 500,
       })
     ).toMatch(/far from Cedar Rapids/);
+    expect(
+      formatLandingPlacesFarAwayNotice({
+        cityLabel: "Cedar Rapids",
+        nearestMeters: LANDING_PLACES_FAR_AWAY_METERS + 500,
+      })
+    ).toMatch(/public index/);
     const distances = new Map([
       ["a", 120_000],
       ["b", 90_000],
     ]);
     expect(resolveLandingPlacesNearestMeters(distances)).toBe(90_000);
+
+    expect(formatLandingPlacesRegionEmptyNotice({ cityLabel: "Example City" })).toMatch(
+      /isn't dense yet/
+    );
+    expect(formatLandingPlacesNearMeStatus({ pinCount: 0 })).toMatch(/no listed places/);
+    expect(formatLandingPlacesNearMeStatus({ pinCount: 3, nearestMeters: null })).toMatch(
+      /lack map points/
+    );
+    expect(formatLandingPlacesNearMeStatus({ pinCount: 3, nearestMeters: 120 })).toMatch(
+      /Sorted nearest first/
+    );
+    expect(LANDING_PLACES_GEO_DENIED_STATUS).toMatch(/Location unavailable/);
+    expect(renderLandingPlacesLoadErrorHtml()).toContain(LANDING_PLACES_LOAD_ERROR_MESSAGE);
+    expect(renderLandingPlacesLoadErrorHtml()).toContain("/discover/");
+  });
+
+  it("formats far-away density notice when nearest pin is distant (P5c)", () => {
+    expect(
+      formatLandingPlacesFarAwayNotice({
+        cityLabel: "Cedar Rapids",
+        nearestMeters: LANDING_PLACES_FAR_AWAY_METERS + 500,
+      })
+    ).toMatch(/far from Cedar Rapids/);
   });
 
   it("sorts preview nearest-first when client coords are present (P5b)", () => {

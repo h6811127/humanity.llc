@@ -8304,6 +8304,31 @@ html[data-theme="dark"] .landing-launch-doors-lead {
   transform: scale(0.99);
 }
 
+.landing-try-live-object-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.landing-try-live-object-qr {
+  margin: 14px 0 0;
+  max-width: 12rem;
+}
+
+.landing-try-live-object-qr img {
+  display: block;
+  width: 160px;
+  height: 160px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  background: var(--white);
+}
+
+.landing-try-live-object-qr figcaption {
+  margin-top: 8px;
+}
+
 .landing-hero-sub-links {
   display: flex;
   flex-direction: column;

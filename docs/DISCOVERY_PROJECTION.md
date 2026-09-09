@@ -3,10 +3,10 @@
 **Status:** Strategic spec — discovery plane · **P0–P4 shipped** · **P5a–c shipped** (places-first `/` + near-me + multi-region picker) · belt: `npm run verify:discover` · `npm run verify:landing`  
 **Audience:** Product, frontend, operators, agents  
 **Scope:** Public browse, near-me planning, board map lenses — **no resolver, scan, or network-graph changes**  
-**Last updated:** 2026-07-29 — **WS-DISCOVER-P5c** landing region picker + persisted default
+**Last updated:** 2026-08-28 — Landing north star + **DENSE** sparse/empty/geo honesty ([`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) § Front door)
 
 **Parent stack:** [`LIVE_OBJECT_ARCHITECTURE.md`](LIVE_OBJECT_ARCHITECTURE.md) (resolver L1–L5) · [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) · [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md)  
-**Related:** [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) · [`V1_IMPLEMENTATION_CONTRACTS.md`](V1_IMPLEMENTATION_CONTRACTS.md) (public search deferred in v1 slice) · [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md)
+**Related:** [`CITY_GAME_MAP_DASHBOARD.md`](CITY_GAME_MAP_DASHBOARD.md) · [`V1_IMPLEMENTATION_CONTRACTS.md`](V1_IMPLEMENTATION_CONTRACTS.md) (public search deferred in v1 slice) · [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) · [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) § Front door
 
 ---
 
@@ -14,7 +14,9 @@
 
 At low object density, a listed **network board** can imply its place catalog. At city scale (many **Objects**, many overlapping **Networks**), strangers need a **human-facing browse index** that does not fork resolver truth.
 
-**Landing (`/`) today:** Shipped as a **discovery dashboard** — shelves, search, and **Public live boards** (`public-networks-portal.mjs`). This is the no-landing entry: utility for players/checkers, not a marketing homepage. **Shipped:** **`#landing-live-object-carriers`** row after boards (commerce teaser → `/shop/`) — does not change discovery plane semantics ([`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) § Landing carriers row). **Hosted tier** upsell stays on `/created/`, not `/`.
+**Landing (`/`) north star:** **Live world index** — front door of the **physical internet** (public programmable objects on real doors, tags, places, boards). Browse the live layer without an account; create/wear secondary. **Beachhead cities** (e.g. Cedar Rapids) and summer wedges (hoodie, city board) supply **honest density**, not product identity. Spec: [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) § Front door strategy.
+
+**Landing (`/`) today (machinery):** Shipped as a **discovery browse index** — shelves, search, **`#landing-places`**, and **Boards & seasons** (`public-networks-portal.mjs`). Not a marketing homepage or shop grid. **Shipped:** **`#landing-live-object-carriers`** row after boards (commerce teaser → `/shop/`) — does not change discovery plane semantics ([`MERCH_VISUAL_CHOREOGRAPHY.md`](MERCH_VISUAL_CHOREOGRAPHY.md) § Landing carriers row). **Hosted tier** upsell stays on `/created/`, not `/`.
 
 This doc defines the **discovery plane**: how public listings, geo browse, and board maps **project** resolver state into browse rows — without new signed documents, without changing `/c/…` scan URLs, and without scan surveillance.
 
@@ -400,7 +402,7 @@ Discovery plane targets the second without changing resolver cardinality.
 
 ### WS-DISCOVER-P5 — places-first landing composition
 
-**Status:** **P5a–c ☑ shipped**. Closes the gap between discovery-first copy (“what’s true near me?”) and a boards-primary homepage. **No** new signed documents, scan routes, or network-graph changes.
+**Status:** **P5a–c ☑ shipped**. Closes the gap between discovery-first copy (“what’s true near me?”) and a boards-primary homepage. **No** new signed documents, scan routes, or network-graph changes. **North-star note (2026-08-28):** P5 machinery stays; framing evolves toward **world index** (multi-region catalog) with beachhead default density — do not re-center `/` as a single-city portal product.
 
 **Gap (pre-P5a):** `/` listed **networks**; **places (pins)** and client-side **Sort near me** lived only on `/discover/{region}/`.
 
@@ -409,8 +411,20 @@ Discovery plane targets the second without changing resolver cardinality.
 | **P5a** | Places-first composition on `/` | **☑ shipped** — `#landing-places` pin strip; shelves filter pins by facet; **Boards & seasons** secondary · [`landing-places-core.mjs`](../site/js/landing-places-core.mjs) · [`landing-places.mjs`](../site/js/landing-places.mjs) · [`public-networks-portal.mjs`](../site/js/public-networks-portal.mjs) (places mount only when `#landing-places-results` exists) |
 | **P5b** | Honest near-me on `/` | **☑ shipped** — `geolocation=(self)` on `/` in [`site/_headers`](../site/_headers); `#landing-places-near-me` button; client sort via [`requestDiscoveryClientCoords()`](../site/js/discovery-near-me-core.mjs) + [`sortDiscoveryPinsByNearMe()`](../site/js/discovery-near-me-core.mjs); required privacy copy on `#landing-places-privacy` |
 | **P5c** | Multi-region places-first | **☑ shipped** — `#landing-places-region` picker from [`discovery-landing-regions.json`](../site/data/discovery-landing-regions.json) (Cedar Rapids + Example City template) · persisted default (`hc_landing_places_region`) · `?region=` deep link · **All regions** → [`/discover/`](../site/discover/) · empty / far-away density copy (`#landing-places-density`) · empty pin index [`discovery-example-city.json`](../site/data/discovery-example-city.json) · [`landing-places-region-core.mjs`](../site/js/landing-places-region-core.mjs) · [`landing-places-core.mjs`](../site/js/landing-places-core.mjs) |
+| **DENSE** | Sparse / empty / geo honesty | **☑ shipped (2026-08-28)** — fail-closed nearness · fail-open catalog escapes · empty-region lead + density notice · near-me status does not claim sort when zero pins / no map points · load-error + All regions · Scenes **deferred** · H2 remains **Places near me** (lead never implies sorted without geo) · world-index framing |
 
-**Regression:** `npm run verify:landing` (contract v13+) · [`landing-places-core.test.ts`](../worker/tests/landing-places-core.test.ts) · [`landing-places-region-core.test.ts`](../worker/tests/landing-places-region-core.test.ts) · [`e2e/landing-copy.spec.ts`](../e2e/landing-copy.spec.ts).
+**Density honesty (DENSE · world-index)**
+
+| State | Behavior |
+|-------|----------|
+| Cold · no geo | Default beachhead region catalog; lead names city + “one region in the public index”; **no** nearest claim |
+| Region empty | Honest empty + density notice + All regions / switch region — **no** demo/synthetic pins |
+| Geo denied | Catalog stays; status = location unavailable; near-me not active |
+| Geo ok · pins · nearest ≥ ~80 km | Sorted + far-away density notice; stay on selected region |
+| Geo ok · zero pins / no map points | Status tells truth; no fake “sorted nearest” |
+| Index fetch fail | Load-error copy + All regions escape |
+
+**Regression:** `npm run verify:landing` (contract v16+) · [`landing-places-core.test.ts`](../worker/tests/landing-places-core.test.ts) · [`landing-places-region-core.test.ts`](../worker/tests/landing-places-region-core.test.ts) · [`e2e/landing-copy.spec.ts`](../e2e/landing-copy.spec.ts).
 
 ---
 

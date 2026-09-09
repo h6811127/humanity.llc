@@ -15,11 +15,13 @@ import {
   bindLandingPlacesNearMe,
   bindLandingPlacesRegionPicker,
   cityLabelForLandingPlacesRegion,
+  clearLandingPlacesNearMeStatus,
   fetchLandingPinIndex,
   fetchLandingPlacesRegionOptions,
   fetchLandingPlacesSnapshotIndex,
   LANDING_DEFAULT_DISCOVERY_REGION,
   paintLandingPlacesSection,
+  renderLandingPlacesLoadErrorHtml,
   resolveLandingCategoryPinFacet,
   resolveLandingPlacesRegionSelection,
   resolveLandingShelfPinFacet,
@@ -287,6 +289,7 @@ function bindPublicNetworksPortal(allCards, placesApi = {}) {
         if (!placesApi.onRegionChange) return;
         const loadGen = ++regionLoadGeneration;
         clientCoords = null;
+        clearLandingPlacesNearMeStatus();
         const placesMount = document.getElementById("landing-places-results");
         if (placesMount instanceof HTMLElement) {
           placesMount.innerHTML = '<p class="landing-places-loading">Loading places…</p>';
@@ -303,8 +306,7 @@ function bindPublicNetworksPortal(allCards, placesApi = {}) {
           if (loadGen !== regionLoadGeneration) return;
           console.warn("[landing-places-region]", err);
           if (placesMount instanceof HTMLElement) {
-            placesMount.innerHTML =
-              '<p class="landing-places-empty discovery-region-empty">Could not load places.</p>';
+            placesMount.innerHTML = renderLandingPlacesLoadErrorHtml();
           }
         }
       },
@@ -388,8 +390,7 @@ async function bootPublicNetworksPortal() {
         });
       } catch (placesErr) {
         console.warn("[landing-places]", placesErr);
-        placesMount.innerHTML =
-          '<p class="landing-places-empty discovery-region-empty">Could not load places.</p>';
+        placesMount.innerHTML = renderLandingPlacesLoadErrorHtml();
       }
     }
 
