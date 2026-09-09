@@ -3,7 +3,23 @@
 **Purpose:** Single reference for parallel agents and humans — active work, regression gates, file ownership.  
 **Also read:** [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) (rules that must stay true) · [`DOC_MAINTENANCE.md`](DOC_MAINTENANCE.md) (doc policy)
 
-**Last updated:** 2026-07-31
+**Last updated:** 2026-09-09
+
+**Changelog (2026-09-09):** **Participant agency L3 slice #1 shipped** — device-local season follow (**“My networks”** shelf on `/play/season/` + `/play/cedar-rapids/`) · `localStorage` key `hc_participant_follows` (cap 20) · nothing uploaded, no watch polling yet · “check”, never “scanned” copy · [`LAYER3_PERSONAL_AGENCY.md`](LAYER3_PERSONAL_AGENCY.md) § Smallest safe product surfaces · `npm run worker:test -- worker/tests/participant-follow-core.test.ts`.
+
+**Changelog (2026-09-08):** **Object-scoped intelligence: Priority 4 resolved — L3 P1 scan reader is now deterministic-only** — Workers AI binding removed from `worker/wrangler.toml`; `explain-snapshot` always restates signed fields (`source: "deterministic"`), no model output, stable `ai` API fields kept. P2 draft API (deprecated, tests/integrators only) inherits deterministic production output. Docs + tests updated. [`AI_FEATURE_DEVELOPMENT.md`](AI_FEATURE_DEVELOPMENT.md) § Concrete next steps step 7 · [`AI_L3_EXPLAIN_SNAPSHOT.md`](AI_L3_EXPLAIN_SNAPSHOT.md) · `MERCH_FUNNEL_MVP.md` § Implementation priority stack.
+
+**Changelog (2026-08-28):** **Landing DEMO shipped** — `#landing-try-live-object` secondary company demo plate from `showcase-status-plate.json` · desktop QR pedagogy · soft-hide if offline · contract **v17** · [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) § Front door · `npm run verify:landing` · ops: `npm run site:verify-showcase`.
+
+**Changelog (2026-08-28):** **Landing DENSE honesty shipped** — empty-region lead/density · near-me status fail-closed (zero pins / no map points / geo denied) · load-error + All regions · contract **v16** · [`DISCOVERY_PROJECTION.md`](DISCOVERY_PROJECTION.md) § P5 · `npm run verify:landing`.
+
+**Changelog (2026-08-28):** **Landing world-index framing shipped** — hero eyebrow + live-public-layer subline/meta · places lead “one region in the public index” · contract **v15** · [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) § Front door · `npm run verify:landing`.
+
+**Changelog (2026-08-28):** **Landing north star locked (docs)** — `/` = **live world index** (physical internet front door); Cedar Rapids / summer wedges = **beachhead density**, not homepage identity · sparse honesty + delight-as-liveness rules · [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) § Front door · [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) § Landing · [`DISCOVERY_PROJECTION.md`](DISCOVERY_PROJECTION.md) Purpose. **No** contract bump; presentation follow-on separate.
+
+**Changelog (2026-08-28):** **Operator install booking** — `/install/` form composes mailto (place, neighborhood, scanner line, contact) · invoice / Venmo / cash, not Stripe · create stays free · off `/`.
+
+**Changelog (2026-08-28):** **Operator install offer** — `/install/` paid door-plate (print + place) · create stays free · off `/` · create chooser footnote · [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md).
 
 **Changelog (2026-07-31):** **WS-DOCKET production chapter mint replay verified** — replaced stale chapter receipt with a live non-starter `status_plate` QR · explicit `--production --confirm-production-mint --replay` guard · starter-four remain unminted and excluded from discovery · [`PUBLIC_DOCKET_AND_ACCOUNTABILITY_VERTICAL.md`](PUBLIC_DOCKET_AND_ACCOUNTABILITY_VERTICAL.md).
 
