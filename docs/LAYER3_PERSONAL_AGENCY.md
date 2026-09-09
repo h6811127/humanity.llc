@@ -1,6 +1,6 @@
 # Layer 3 — personal agency (on-device)
 
-**Status:** Strategic spec — **not implemented**  
+**Status:** Strategic spec — **slice #1 shipped (2026-09-09)**: device-local season follow (“My networks” on `/play/season/` + `/play/cedar-rapids/`) — `hc_participant_follows` localStorage only, no upload, no watch polling yet · slices #2–4 (Brief, Pin, Charter panel) still planned  
 **Audience:** Product, device shell, privacy, agents  
 **Parent:** [`AI_ECOSYSTEM_RESEARCH.md`](AI_ECOSYSTEM_RESEARCH.md) · [`DEVICE_OS.md`](DEVICE_OS.md) · [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md)
 
@@ -164,7 +164,7 @@ User-initiated diff of **published** policies:
 
 ### Participant (minimal)
 
-1. **Follow** — `season_id` local
+1. **Follow** — `season_id` local ✅ slice #1 (2026-09-09) — shelf + follow/unfollow on play pages; cap 20; no upload
 2. **Brief** — 3 lines from last snapshot on open
 3. **Pin** — board or scan URL (cap ~20)
 4. **Charter** — what device remembers
