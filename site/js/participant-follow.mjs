@@ -15,6 +15,7 @@ import {
   loadFollows,
   unfollowSeason,
 } from "./participant-follow-core.mjs";
+import { bootParticipantBriefs } from "./participant-follow-brief.mjs";
 
 /**
  * Mount id used by both /play/season/ and /play/cedar-rapids/.
@@ -52,6 +53,13 @@ export function renderFollowShelf(shelf, rows, follows, onSeasonPage = false) {
   </section>` : ""}
   ${shelfHtml}
 </div>`;
+
+  // Slice #2 — Brief: device-initiated WATCH — fetch public snapshots for followed
+  // networks and show up to 3 lines. This happens only here (on page render), never in
+  // the background, and never uploads. Copy stays in the "checked" register.
+  if (follows.length) {
+    bootParticipantBriefs(shelf, follows);
+  }
 }
 
 /**

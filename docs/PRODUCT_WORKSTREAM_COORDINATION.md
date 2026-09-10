@@ -5,6 +5,8 @@
 
 **Last updated:** 2026-09-09
 
+**Changelog (2026-09-09):** **Participant agency L3 slice #2 shipped — Brief** — “3 lines from last snapshot on open” on the follow shelf for followed networks · device-initiated GET of the public season snapshot (`headlines`), no background poll, no upload · copy “Checked on this device”, never “scanned” · `site/js/participant-follow-brief-core.mjs` (+`-brief.mjs`) · [`LAYER3_PERSONAL_AGENCY.md`](LAYER3_PERSONAL_AGENCY.md) § Smallest safe product surfaces · `npm run worker:test -- worker/tests/participant-follow-brief-core.test.ts`.
+
 **Changelog (2026-09-09):** **Participant agency L3 slice #1 shipped** — device-local season follow (**“My networks”** shelf on `/play/season/` + `/play/cedar-rapids/`) · `localStorage` key `hc_participant_follows` (cap 20) · nothing uploaded, no watch polling yet · “check”, never “scanned” copy · [`LAYER3_PERSONAL_AGENCY.md`](LAYER3_PERSONAL_AGENCY.md) § Smallest safe product surfaces · `npm run worker:test -- worker/tests/participant-follow-core.test.ts`.
 
 **Changelog (2026-09-08):** **Object-scoped intelligence: Priority 4 resolved — L3 P1 scan reader is now deterministic-only** — Workers AI binding removed from `worker/wrangler.toml`; `explain-snapshot` always restates signed fields (`source: "deterministic"`), no model output, stable `ai` API fields kept. P2 draft API (deprecated, tests/integrators only) inherits deterministic production output. Docs + tests updated. [`AI_FEATURE_DEVELOPMENT.md`](AI_FEATURE_DEVELOPMENT.md) § Concrete next steps step 7 · [`AI_L3_EXPLAIN_SNAPSHOT.md`](AI_L3_EXPLAIN_SNAPSHOT.md) · `MERCH_FUNNEL_MVP.md` § Implementation priority stack.

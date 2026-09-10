@@ -1593,3 +1593,31 @@ html[data-theme="dark"] .install-mail-fallback {
 html[data-theme="dark"] .install-book-error {
   color: #ff8a80;
 }
+
+/* Participant L3 — follow shelf + brief (slices #1–2) in dark theme. */
+html[data-theme="dark"] .participant-brief {
+  background: var(--shell-fill-secondary, #2c2c2e);
+  border-color: var(--shell-separator, rgba(255, 255, 255, 0.12));
+}
+
+html[data-theme="dark"] .participant-follow-btn {
+  border-color: var(--shell-separator, rgba(255, 255, 255, 0.18));
+  color: var(--shell-label, #e6e6ea);
+}
+
+html[data-theme="dark"] .participant-follow-btn--following {
+  border-color: var(--green, #2d8a4e);
+  color: var(--green, #2d8a4e);
+}
+
+html[data-theme="dark"] .participant-brief-line {
+  color: var(--shell-label, #e6e6ea);
+}
+
+html[data-theme="dark"] .participant-brief-checked {
+  color: var(--shell-label-weak, #98989d);
+}
+
+html[data-theme="dark"] .participant-brief-open {
+  color: #ff8a80;
+}

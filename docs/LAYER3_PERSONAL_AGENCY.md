@@ -1,6 +1,6 @@
 # Layer 3 — personal agency (on-device)
 
-**Status:** Strategic spec — **slice #1 shipped (2026-09-09)**: device-local season follow (“My networks” on `/play/season/` + `/play/cedar-rapids/`) — `hc_participant_follows` localStorage only, no upload, no watch polling yet · slices #2–4 (Brief, Pin, Charter panel) still planned  
+**Status:** Strategic spec — **slice #1 shipped (2026-09-09)**: device-local season follow (“My networks” on `/play/season/` + `/play/cedar-rapids/`) — `hc_participant_follows` localStorage only, no upload, no watch polling yet · **slice #2 shipped (2026-09-09)**: **Brief** — “3 lines from last snapshot on open” for followed networks from the public season snapshot (`headlines`), device-initiated, “checked on this device” copy · slices #3–4 (Pin, Charter panel) still planned  
 **Audience:** Product, device shell, privacy, agents  
 **Parent:** [`AI_ECOSYSTEM_RESEARCH.md`](AI_ECOSYSTEM_RESEARCH.md) · [`DEVICE_OS.md`](DEVICE_OS.md) · [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md)
 
@@ -165,7 +165,7 @@ User-initiated diff of **published** policies:
 ### Participant (minimal)
 
 1. **Follow** — `season_id` local ✅ slice #1 (2026-09-09) — shelf + follow/unfollow on play pages; cap 20; no upload
-2. **Brief** — 3 lines from last snapshot on open
+2. **Brief** — 3 lines from last snapshot on open ✅ slice #2 (2026-09-09) — followed-network `headlines` from public season snapshot; device-initiated check; “checked on this device”, never “scanned”
 3. **Pin** — board or scan URL (cap ~20)
 4. **Charter** — what device remembers
 
