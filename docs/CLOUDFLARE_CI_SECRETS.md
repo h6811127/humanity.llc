@@ -26,6 +26,7 @@ Create or edit the token at [Cloudflare dashboard → My Profile → API Tokens]
 |------------|-------|-----|
 | **Account → Cloudflare Pages → Edit** | Target account | Pages deploy |
 | **Account → Workers Scripts → Edit** | Target account | Worker deploy |
+| **Zone → Workers Routes → Edit** | `humanity.llc` zone | Worker route reconciliation (`[[routes]]` in `wrangler.toml`; without it deploy uploads then fails listing `/zones/:id/workers/routes` with auth 10000) |
 | **Account → D1 → Edit** | Target account | Remote migrations |
 | **User → User Details → Read** | User | Wrangler membership lookup (`/memberships`) |
 
