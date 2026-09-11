@@ -13974,3 +13974,109 @@ span.city-game-map-spotlight-hint:active {
   color: var(--red);
   text-decoration: none;
 }
+
+/* Participant L3 — pinned boards (slice #3). Device-local bookmarks, no upload. */
+.participant-pin-cta {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: var(--radius-lg);
+  background: #f9f9fb;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+}
+
+.participant-pin-cta h2.group-label {
+  margin: 0 0 8px 0;
+}
+
+.participant-pin-btn {
+  font-size: 13px;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--black);
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.participant-pin-btn--primary {
+  border-color: var(--red);
+  color: var(--red);
+  font-weight: 600;
+}
+
+.participant-pins-list {
+  list-style: none;
+  margin: 0 0 0 14px;
+  padding: 0;
+}
+
+.participant-pin-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 0;
+  font-size: 15px;
+}
+
+.participant-pin-link {
+  flex: 1 1 auto;
+  color: var(--black);
+  text-decoration: none;
+}
+
+/* Participant L3 — charter (slice #4). Honest inventory: what this device remembers. */
+.participant-charter-mount {
+  margin-top: 8px;
+}
+
+.participant-charter {
+  border: 0;
+  padding: 0;
+  margin: 0 0 12px 2px;
+  color: var(--grey);
+}
+
+.participant-charter-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  cursor: pointer;
+  list-style: none;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--grey);
+}
+
+.participant-charter-summary::-webkit-details-marker {
+  display: none;
+}
+
+.participant-charter-summary::after {
+  content: "›";
+  font-size: 16px;
+  line-height: 1;
+  color: var(--grey);
+  transform: rotate(90deg);
+}
+
+.participant-charter[open] .participant-charter-summary::after {
+  transform: rotate(-90deg);
+}
+
+.participant-charter-body {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--grey);
+}
+
+.participant-charter-list {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}

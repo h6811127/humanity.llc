@@ -3,7 +3,11 @@
 **Purpose:** Single reference for parallel agents and humans — active work, regression gates, file ownership.  
 **Also read:** [`SYSTEM_INVARIANTS.md`](SYSTEM_INVARIANTS.md) (rules that must stay true) · [`DOC_MAINTENANCE.md`](DOC_MAINTENANCE.md) (doc policy)
 
-**Last updated:** 2026-09-09
+**Last updated:** 2026-09-11
+
+**Changelog (2026-09-11):** **Participant agency L3 slice #4 shipped — Charter** — “What this device keeps” on the play-page follow shelf: honest inventory of the device-local stores (follows + pins counts), names the keys `hc_participant_follows` + `hc_participant_pins`, promises nothing is uploaded, and says how to clear · re-renders on every follow/pin change via the storage-change events · Participant (minimal) complete · `site/js/participant-charter-core.mjs` (+`-charter.mjs`) · [`LAYER3_PERSONAL_AGENCY.md`](LAYER3_PERSONAL_AGENCY.md) § Smallest safe product surfaces · `npm run worker:test -- worker/tests/participant-charter-core.test.ts`.
+
+**Changelog (2026-09-09):** **Participant agency L3 slice #3 shipped — Pin** — pin a public board on play pages (`hc_participant_pins`, cap 20) · “Pin this board” on the season rules page + “Pinned boards” shelf · bookmarks only, no keys, no upload · scan-URL pinning stays on `/wallet/` (`device-pins.mjs` untouched) · `site/js/participant-pin-core.mjs` (+`-pin.mjs`) · [`LAYER3_PERSONAL_AGENCY.md`](LAYER3_PERSONAL_AGENCY.md) § Smallest safe product surfaces · `npm run worker:test -- worker/tests/participant-pin-core.test.ts`.
 
 **Changelog (2026-09-09):** **Participant agency L3 slice #2 shipped — Brief** — “3 lines from last snapshot on open” on the follow shelf for followed networks · device-initiated GET of the public season snapshot (`headlines`), no background poll, no upload · copy “Checked on this device”, never “scanned” · `site/js/participant-follow-brief-core.mjs` (+`-brief.mjs`) · [`LAYER3_PERSONAL_AGENCY.md`](LAYER3_PERSONAL_AGENCY.md) § Smallest safe product surfaces · `npm run worker:test -- worker/tests/participant-follow-brief-core.test.ts`.
 

@@ -16,6 +16,8 @@ import {
   unfollowSeason,
 } from "./participant-follow-core.mjs";
 import { bootParticipantBriefs } from "./participant-follow-brief.mjs";
+import { bootParticipantPins } from "./participant-pin.mjs";
+import { bootParticipantCharter } from "./participant-charter.mjs";
 
 /**
  * Mount id used by both /play/season/ and /play/cedar-rapids/.
@@ -75,7 +77,7 @@ export function bindFollowButtons(shelf, root, rows) {
     const follows = loadFollows();
     const currentPageSeasonId =
       rows.length === 1 && rows[0].season_id ? rows[0].season_id : null;
-    renderFollowShelf(shelf, rows, follows, onSeasonPage);
+    renderFollowShelfWithPins(shelf, rows, follows, onSeasonPage);
     // Keep the current page's season discoverable even after re-render.
     if (currentPageSeasonId) {
       const row = rows.find((r) => r.season_id === currentPageSeasonId);
@@ -110,6 +112,21 @@ export function bindFollowButtons(shelf, root, rows) {
  * @param {HTMLElement} shelf
  * @param {{ resolveSeason?: boolean }} [opts]
  */
+let pinnedSeason = null;
+
+/**
+ * @param {HTMLElement} shelf
+ * @param {Array<{ season_id: string; title: string|null; rules_path: string|null; json_url: string|null }>} rows
+ * @param {boolean} onSeasonPage
+ */
+export function renderFollowShelfWithPins(shelf, rows, follows, onSeasonPage) {
+  renderFollowShelf(shelf, rows, follows, onSeasonPage);
+  if (pinnedSeason) bootParticipantPins(shelf, pinnedSeason);
+  // Slice #4 — Charter: honest "what this device remembers" disclosure. Rendered
+  // after the stores are read so the counts are current on every shelf re-render.
+  bootParticipantCharter(shelf);
+}
+
 export async function bootParticipantFollowShelf(shelf, opts = {}) {
   if (!(shelf instanceof HTMLElement)) return;
 
@@ -127,7 +144,8 @@ export async function bootParticipantFollowShelf(shelf, opts = {}) {
   }
 
   // On a single network page (e.g. /play/cedar-rapids/), make sure the current season is
-  // followable even if it isn't in the index (still follow by its resolved season_id).
+  // followable even if it isn't in the index (still follow by its resolved season_id),
+  // and enable the Pin-this-board surface.
   if (opts.resolveSeason) {
     try {
       const resolved = await resolvePlayPageSeason();
@@ -139,12 +157,17 @@ export async function bootParticipantFollowShelf(shelf, opts = {}) {
           json_url: resolved.jsonUrl,
         });
       }
+      pinnedSeason = {
+        season_id: resolved.seasonId,
+        title: resolved.title || resolved.seasonId,
+        rules_path: resolved.rulesPath,
+      };
     } catch {
       /* index already loaded what it could */
     }
   }
 
-  renderFollowShelf(shelf, rows, follows, opts.resolveSeason === true);
+  renderFollowShelfWithPins(shelf, rows, follows, opts.resolveSeason === true);
   bindFollowButtons(shelf, document, rows);
 }
 

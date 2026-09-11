@@ -1,6 +1,6 @@
 # Layer 3 — personal agency (on-device)
 
-**Status:** Strategic spec — **slice #1 shipped (2026-09-09)**: device-local season follow (“My networks” on `/play/season/` + `/play/cedar-rapids/`) — `hc_participant_follows` localStorage only, no upload, no watch polling yet · **slice #2 shipped (2026-09-09)**: **Brief** — “3 lines from last snapshot on open” for followed networks from the public season snapshot (`headlines`), device-initiated, “checked on this device” copy · slices #3–4 (Pin, Charter panel) still planned  
+**Status:** Strategic spec — **slice #1 shipped (2026-09-09)**: device-local season follow (“My networks” on `/play/season/` + `/play/cedar-rapids/`) — `hc_participant_follows` localStorage only, no upload · **slice #2 shipped (2026-09-09)**: **Brief** — “3 lines from last snapshot on open” for followed networks from the public season snapshot (`headlines`), device-initiated, “checked on this device” copy · **slice #3 shipped (2026-09-09)**: **Pin** — pin a public board URL on play pages, `hc_participant_pins`, cap 20, “Pinned boards” list, device-local only · **slice #4 shipped (2026-09-11)**: **Charter** — “What this device keeps” honest inventory on the play-page shelf (follows + pins counts, the key names, nothing is uploaded, how to clear) · Participant (minimal) complete 🎉  
 **Audience:** Product, device shell, privacy, agents  
 **Parent:** [`AI_ECOSYSTEM_RESEARCH.md`](AI_ECOSYSTEM_RESEARCH.md) · [`DEVICE_OS.md`](DEVICE_OS.md) · [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md)
 
@@ -166,8 +166,8 @@ User-initiated diff of **published** policies:
 
 1. **Follow** — `season_id` local ✅ slice #1 (2026-09-09) — shelf + follow/unfollow on play pages; cap 20; no upload
 2. **Brief** — 3 lines from last snapshot on open ✅ slice #2 (2026-09-09) — followed-network `headlines` from public season snapshot; device-initiated check; “checked on this device”, never “scanned”
-3. **Pin** — board or scan URL (cap ~20)
-4. **Charter** — what device remembers
+3. **Pin** — board or scan URL (cap ~20) ✅ slice #3 (2026-09-09) — public board URL pin on play pages (`hc_participant_pins`), “Pinned boards” list, bookmarks only (scan-URL pinning stays on `/wallet/` via `device-pins.mjs`)
+4. **Charter** — what device remembers ✅ slice #4 (2026-09-11) — “What this device keeps” disclosure on the follow shelf: follows + pins counts, the storage key names (`hc_participant_follows`, `hc_participant_pins`), that nothing is uploaded, and that clearing site data removes them; re-renders whenever either store changes
 
 Placement: network/play surfaces—not full steward hub chrome.
 

@@ -1621,3 +1621,44 @@ html[data-theme="dark"] .participant-brief-checked {
 html[data-theme="dark"] .participant-brief-open {
   color: #ff8a80;
 }
+
+/* Participant L3 — pin (slice #3) in dark theme. */
+html[data-theme="dark"] .participant-pin-cta {
+  background: var(--shell-fill-secondary, #2c2c2e);
+  border-color: var(--shell-separator, rgba(255, 255, 255, 0.12));
+}
+
+html[data-theme="dark"] .participant-pin-btn {
+  border-color: var(--shell-separator, rgba(255, 255, 255, 0.18));
+  color: var(--shell-label, #e6e6ea);
+}
+
+html[data-theme="dark"] .participant-pin-btn--primary {
+  border-color: #ff8a80;
+  color: #ff8a80;
+}
+
+html[data-theme="dark"] .participant-pin-link {
+  color: var(--shell-label, #e6e6ea);
+}
+
+/* Participant L3 — charter (slice #4) in dark theme. */
+html[data-theme="dark"] .participant-charter {
+  color: var(--shell-label-weak, #98989d);
+}
+
+html[data-theme="dark"] .participant-charter-summary {
+  color: var(--shell-label-weak, #98989d);
+}
+
+html[data-theme="dark"] .participant-charter-summary::after {
+  color: var(--shell-label-weak, #98989d);
+}
+
+html[data-theme="dark"] .participant-charter-body {
+  color: var(--shell-label-weak, #98989d);
+}
+
+html[data-theme="dark"] .participant-charter-list {
+  color: var(--shell-label-weak, #98989d);
+}
