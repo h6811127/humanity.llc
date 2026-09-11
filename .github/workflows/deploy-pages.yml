@@ -62,6 +62,6 @@ jobs:
           HC_CI_PAGES_ORIGIN: https://humanity-llc.pages.dev
           HC_CI_VERIFY_SECRET: ${{ secrets.HC_CI_VERIFY_SECRET }}
       - name: Post-deploy OG-2 dual-gate walk preflight
-        run: npm run ws-object-graph:prod-walk-preflight
+        run: npm run ws-object-graph:prod-walk-preflight -- --post-walk
         env:
           API_ORIGIN: https://humanity.llc

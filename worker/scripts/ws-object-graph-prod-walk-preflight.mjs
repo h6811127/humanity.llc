@@ -17,6 +17,12 @@ import {
 } from "./ws-object-graph-dual-gate-walk-core.mjs";
 import { evaluateProdDualGateWalkPreflight } from "./ws-object-graph-prod-walk-preflight-core.mjs";
 
+import {
+  buildCiDeployVerifyHeaders,
+  fetchCiProductionUrl,
+  resolveCiSiteOrigins,
+} from "./ci-production-fetch.mjs";
+
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const seasonPath = join(root, "site/data/city-game-cr-season-01.json");
 const apiOrigin = (process.env.API_ORIGIN || "https://humanity.llc").replace(/\/$/, "");
@@ -32,8 +38,32 @@ async function fetchJson(url) {
 }
 
 async function fetchHtml(url) {
-  const res = await fetch(url, { headers: { Accept: "text/html" } });
+  // Worker scan/status paths hit humanity.llc directly (Pages preview cannot
+  // serve them). Send the CI verify headers so WAF skips bot challenges.
+  const res = await fetch(url, {
+    headers: { Accept: "text/html", ...buildCiDeployVerifyHeaders() },
+  });
   return { ok: res.ok, status: res.status, html: await res.text() };
+}
+
+async function fetchPagesHtml(url) {
+  // Pages-hosted paths (/play/…) use the CI WAF fallback to pages.dev.
+  // fetchCiProductionUrl expects a PATH, not a full URL — resolve the path
+  // against the API origin so the correct file is fetched from each origin.
+  const origins = resolveCiSiteOrigins(apiOrigin, process.env.HC_CI_PAGES_ORIGIN).filter(
+    (origin) => origin !== apiOrigin
+  );
+  const path = url.startsWith(apiOrigin) ? url.slice(apiOrigin.length) || "/" : url;
+  try {
+    const { res, text } = await fetchCiProductionUrl(path, {
+      accept: "text/html",
+      origins: [apiOrigin, ...origins],
+    });
+    return { ok: res.ok, status: res.status, html: text };
+  } catch {
+    const res = await fetch(url, { headers: { Accept: "text/html" } });
+    return { ok: res.ok, status: res.status, html: await res.text() };
+  }
 }
 
 async function main() {
@@ -80,8 +110,8 @@ async function main() {
   const riverHtml = urls.riverScan
     ? await fetchHtml(urls.riverScan)
     : { ok: false, status: 0, html: "" };
-  const comprehension = await fetchHtml(urls.comprehensionUrl);
-  const walk = await fetchHtml(urls.walkUrl);
+  const comprehension = await fetchPagesHtml(urls.comprehensionUrl);
+  const walk = await fetchPagesHtml(urls.walkUrl);
 
   const result = evaluateProdDualGateWalkPreflight({
     season,
